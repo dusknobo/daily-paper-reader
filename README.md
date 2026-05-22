@@ -176,6 +176,12 @@ python src/local_debug_server.py --host 127.0.0.1 --port 8000
 DPR_INSTALL_MODE=full scripts/bootstrap_local.sh
 ```
 
+完整依赖模式默认先安装 **CPU 版 PyTorch**，避免普通本机部署时误下载 CUDA 大包。如果你确实需要自定义 PyTorch 源，可以设置：
+
+```bash
+DPR_INSTALL_MODE=full DPR_TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu scripts/bootstrap_local.sh
+```
+
 如果需要跳过依赖安装，可以使用：
 
 ```bash

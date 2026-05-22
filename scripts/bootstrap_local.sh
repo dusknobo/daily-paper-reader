@@ -10,6 +10,7 @@ VENV_DIR="${DPR_LOCAL_VENV:-.venv}"
 PYTHON_BIN="${PYTHON:-python3}"
 INSTALL_MODE="${DPR_INSTALL_MODE:-minimal}"
 SKIP_INSTALL="${DPR_SKIP_INSTALL:-0}"
+TORCH_INDEX_URL="${DPR_TORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}"
 
 log() {
   printf '[bootstrap-local] %s\n' "$*"
@@ -34,7 +35,9 @@ log "使用 Python：$(python -c 'import sys; print(sys.executable)')"
 
 if [ "$SKIP_INSTALL" != "1" ] && [ "$INSTALL_MODE" = "full" ]; then
   log "安装/更新完整依赖：requirements.txt"
+  log "默认使用 CPU PyTorch：$TORCH_INDEX_URL"
   python -m pip install --upgrade pip
+  python -m pip install --index-url "$TORCH_INDEX_URL" torch
   python -m pip install -r requirements.txt
 elif [ "$SKIP_INSTALL" != "1" ]; then
   log "快速部署模式：跳过完整依赖安装"

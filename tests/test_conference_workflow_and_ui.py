@@ -56,6 +56,7 @@ class ConferenceWorkflowAndUiTest(unittest.TestCase):
         self.assertTrue((root / "src" / "local_debug_server.py").exists())
         self.assertTrue((root / "scripts" / "local_debug.sh").exists())
         self.assertTrue((root / "scripts" / "bootstrap_local.sh").exists())
+        self.assertTrue((root / "requirements-cpu.txt").exists())
         self.assertIn("run_rerank: 'true'", runner)
         self.assertIn("run_llm_refine: 'true'", runner)
         self.assertIn("reranker_profile", runner)
