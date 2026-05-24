@@ -1054,35 +1054,38 @@ window.SubscriptionsManager = (function () {
               <button id="arxiv-admin-open-workflow-panel-btn" class="arxiv-tool-btn" type="button" style="padding:2px 8px;">工作流</button>
             </div>
             <div id="arxiv-admin-quick-run-hint" class="dpr-task-hint">先在上方勾选常规词条。</div>
-            <div class="dpr-task-action-grid">
-              <button id="arxiv-admin-quick-run-10d-btn" class="chat-quick-run-item" type="button">
-                <span class="dpr-task-action-title">10 天论文</span>
-                <span class="dpr-task-action-cost">约 ¥0.10</span>
-              </button>
-              <button id="arxiv-admin-quick-run-30d-btn" class="chat-quick-run-item" type="button">
-                <span class="dpr-task-action-title">30 天速览</span>
-                <span class="dpr-task-action-cost">约 ¥0.20</span>
-              </button>
-              <button id="arxiv-admin-quick-run-30d-standard-btn" class="chat-quick-run-item" type="button">
-                <span class="dpr-task-action-title">30 天精读</span>
-                <span class="dpr-task-action-cost">约 ¥0.50</span>
-              </button>
-            </div>
-            <div id="arxiv-admin-quick-run-msg" class="chat-quick-run-msg"></div>
+            <div class="dpr-task-content-row">
+              <div class="dpr-task-primary-column">
+                <div class="dpr-task-action-grid">
+                  <button id="arxiv-admin-quick-run-10d-btn" class="chat-quick-run-item" type="button">
+                    <span class="dpr-task-action-title">10 天论文</span>
+                    <span class="dpr-task-action-cost">约 ¥0.10</span>
+                  </button>
+                  <button id="arxiv-admin-quick-run-30d-btn" class="chat-quick-run-item" type="button">
+                    <span class="dpr-task-action-title">30 天速览</span>
+                    <span class="dpr-task-action-cost">约 ¥0.20</span>
+                  </button>
+                  <button id="arxiv-admin-quick-run-30d-standard-btn" class="chat-quick-run-item" type="button">
+                    <span class="dpr-task-action-title">30 天精读</span>
+                    <span class="dpr-task-action-cost">约 ¥0.50</span>
+                  </button>
+                </div>
+                <div id="arxiv-admin-quick-run-msg" class="chat-quick-run-msg"></div>
+              </div>
 
-            <div class="chat-quick-run-divider" aria-hidden="true"></div>
-            <div class="dpr-task-danger-row">
-              <div class="chat-quick-run-title">危险操作</div>
-              <button
-                id="arxiv-admin-reset-content-btn"
-                class="chat-quick-run-run-btn"
-                type="button"
-                style="background:#c62828; color:#fff; border-color:#b71c1c;"
-              >
-                删除所有
-              </button>
+              <div class="dpr-task-danger-module">
+                <div class="chat-quick-run-title">危险操作</div>
+                <button
+                  id="arxiv-admin-reset-content-btn"
+                  class="chat-quick-run-run-btn"
+                  type="button"
+                  style="background:#c62828; color:#fff; border-color:#b71c1c;"
+                >
+                  删除所有
+                </button>
+                <div id="arxiv-admin-reset-content-msg" class="chat-quick-run-msg"></div>
+              </div>
             </div>
-            <div id="arxiv-admin-reset-content-msg" class="chat-quick-run-msg"></div>
           </div>
 
           <div
