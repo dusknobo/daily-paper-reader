@@ -1,0 +1,1038 @@
+Title: G-Adaptivity: optimised graph-based mesh relocation for finite element methods
+
+URL Source: https://openreview.net/pdf?id=pyIXyl4qFx
+
+Number of Pages: 25
+
+Markdown Content:
+# G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+James Rowbottom * 1 Georg Maierhofer * 1 Teo Deveney 2 3 Eike Mueller 3 Alberto Paganini 4
+
+Katharina Schratz 5 Pietro Li` o 6 Carola-Bibiane Sch¨ onlieb 1 Chris Budd 3
+
+# Abstract 
+
+We present a novel, and effective, approach to achieve optimal mesh relocation in finite element methods (FEMs). The cost and accuracy of FEMs is critically dependent on the choice of mesh points. Mesh relocation (r-adaptivity) seeks to optimise the mesh geometry to obtain the best solution accuracy at given computational budget. Classical r-adaptivity relies on the solution of a separate nonlinear “meshing” PDE to determine mesh point locations. This incurs significant cost at remeshing, and relies on estimates that relate interpolation- and FEM-error. Recent machine learning approaches have focused on the construc-tion of fast surrogates for such classical methods. Instead, our new approach trains a graph neural network (GNN) to determine mesh point locations by directly minimising the FE solution error from the PDE system Firedrake to achieve higher so-lution accuracy. Our GNN architecture closely aligns the mesh solution space to that of classical meshing methodologies, thus replacing classical estimates for optimality with a learnable strategy. This allows for rapid and robust training and re-sults in an extremely efficient and effective GNN approach to online r-adaptivity. Our method out-performs both classical, and prior ML, approaches to r-adaptive meshing. In particular, it achieves lower FE solution error, whilst retaining the sig-nificant speed-up over classical methods observed in prior ML work.            
+
+> *Equal contribution 1Department of Applied Mathematics and Theoretical Physics, University of Cambridge, UK 2Department of Computer Science, University of Bath, UK 3Department of Mathematical Sciences, University of Bath, UK 4School of Computing and Mathematical Sciences, University of Leices-ter, UK 5Laboratoire Jacques-Louis Lions, Sorbonne Universit ´e, France 6Department of Computer Science and Technology, Uni-versity of Cambridge, UK. Correspondence to: James Rowbottom
+> <jr908@cam.ac.uk >, Georg Maierhofer <gam37@cam.ac.uk >.
+> Proceedings of the 42 nd International Conference on Machine Learning , Vancouver, Canada. PMLR 267, 2025. Copyright 2025 by the author(s).
+
+# 1. Introduction 
+
+Finite element methods (FEM) are currently the most widely-used tool for the large scale solution of partial differ-ential equations (PDEs) (Ainsworth & Oden, 1997; Cotter, 2023). Central advantages are robustness, reliable error estimates, and thoroughly developed code bases (such as deal.II (Africa et al., 2024), DUNE (Bastian et al., 2008), Fenics (Logg et al., 2012), and Firedrake (Ham et al., 2023)), which are highly parallelisable and efficient. However, even with such optimised software the simulation of large scale problems (e.g. weather forecasting, structural simulations in engineering systems) is computationally costly. An im-portant ingredient that determines the cost is the number of degrees of freedom (DOFs) required by a FEM to satisfy a chosen error tolerance. Since this cost depends on the number Nz of mesh points z(i) of the underlying compu-tational mesh, it is desirable to keep Nz moderate. Mesh adaptivity based on mesh refinement and/or relocation to capture important solution features at the right scale can bal-ance computational cost and accuracy. However, classical mesh-adaptive methods can be difficult to implement and require significant computational resources. In contrast, in the present work, we introduce a cheap, stable and highly efficient graph neural network (GNN) architecture to imple-ment learnable mesh relocation ( r-adaptivity). Our method keeps Nz fixed and adapts the mesh point locations to reduce the overall FE error. Many classical mesh relocation meth-ods have focused on finding and minimising mathematical substitutes of the FE error (usually simplified upper bounds) and solving additional (differential) equations to relocate the mesh points. For example, one can solve the Monge-Amp `ere (MA) equation (Budd et al., 2009) to find mesh point locations that minimise the interpolation error, which is an upper bound (up to some parameters and constants) of the FEM error arising from C ´ea’s lemma (Huang & Russell, 2011). Recent Machine Learning (ML) approaches rely on similar mathematical simplifications and learn a surro-gate for the mesh equations (Song et al., 2022; Zhang et al., 2024) leading to significant speed-up with comparable error reduction. In the present work we take an entirely different approach. We present G-adaptivity, an approach to mesh adaptivity that trains a GNN to generate meshes that directly minimise the error of the corresponding FEM solution . We 1G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+couple backpropagation through a novel diffusion-based GNN-deformer, with mesh point gradients obtained through an application of Firedrake adjoint (Mitusch et al., 2019; Ham et al., 2023), to minimise the FEM approximation error directly (as opposed to the upper bound considered in (Huang & Russell, 2011)). The result is a model capa-ble of outperforming the current state-of-the-art r-adaptive methods, whilst retaining the significant acceleration of ML based approaches (cf. Figure 1). Solution values MA: 28.74% ER in 5183ms G-Adapt: 39.99% ER in 120ms DirectOpt: 42.96% ER in 9911ms   
+
+> Figure 1. Optimised meshes from our new approach (G-Adapt) on the example of Poissons’ equation: the error reduction (ER) achieved by classical Monge-Amp `ere (MA) can be significantly improved with direct optimisation (DirectOpt) of the FEM loss with respect to the mesh points, but at prohibitive additional cost. Our new approach achieves near optimal meshes in a fraction of the inference time.
+
+Contributions Our work improves earlier ML based ap-proaches to mesh relocation in the following ways: • A novel training mechanism capitalising recent ad-vances in FEM systems, which leads to a fast meshing algorithm that reduces the FE error even over state-of-the-art classical meshing methods. This was not possible in any prior surrogate ML approach; • An improved GNN architecture based on a diffusion deformer, which allows for improved mesh relocation quality and provable non-tangling of generated meshes; • A novel equidistribution loss regularizer, which en-forces mesh regularity in unsupervised GNN training; • Thorough numerical comparison with classical and recent approaches in terms of accuracy, mesh quality and computational time. Our experiments include both stationary and time-dependent test cases. 
+
+# 2. Related work 
+
+The effective approximation of PDE solutions is one of the central problems in computational mathematics. Over the recent decade, extensive work has been devoted to using ML for the numerical approximation of PDEs. This includes physics informed neural networks (PINNS) (Raissi et al., 2019; Raissi, 2018), Fourier Neural Operators (FNOs) (Li et al., 2020b; 2023), graph neural operators (Li et al., 2020a), DeepONets (Lu et al., 2021), Message Passing Neural PDE Solvers (Brandstetter et al., 2022) and the deep Ritz method (E & Yu, 2018). The majority of such approaches try to directly approximate the PDE, or the associated solution operator, with a machine learning surrogate. Such methods offer certain advantages (for example in high dimensional settings (Han et al., 2018)), but are typically outperformed by traditional numerical methods in accuracy in most set-tings (Grossmann et al., 2023). Our approach is different. We use ML as a central ingredient of a finite element dis-cretisation to construct an improved computational mesh, which is then coupled to a classical PDE solver. The crucial advantage is that we retain convergence guarantees and ro-bustness of FEMs, something that is often lacking in direct ML-based PDE approximations. At the same time our ap-proach achieves a significant speed up in the calculation of the improved mesh compared to classical approaches. 
+
+Adaptive mesh methods are a widely used tool for improv-ing the performance of a classical FEM by varying the local density of the mesh points. This is necessary if the PDE solution has small length scales or singularities. Adaptivity allows achieving high accuracy without resorting to uniform mesh refinement. The most popular form is h-adaptivity (Ainsworth & Oden, 1997), in which mesh cells are subdi-vided when an a-posteriori estimate of the solution error is large. Such methods have complex data structures (see e.g. (Burstedde et al., 2011)) and, possibly, poor mesh regularity. Alternatively, the relocation based r-adaptive methods con-sidered in this paper move a fixed number of mesh points to achieve a high density of points where a monitor m(z) of the solution error is large. Done correctly this can lead to significant error reduction but at some extra cost (Huang & Russell, 2011). 
+
+GNNs are the dominant approach to applying machine learn-ing to irregularly structured data (Bronstein et al., 2017; Battaglia et al., 2018). There has been a proliferation of architectures inspired by spectral graph theory (Defferrard et al., 2016), convolutional (GCN) (Kipf & Welling, 2022), message passing (MPNN) (Gilmer et al., 2017) and atten-2G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+tional (GAT) (Veli ˇckovi ´c et al., 2018) approaches. More recently a range of differential equation inspired architec-tures (Chamberlain et al., 2021b;a; Giovanni et al., 2023) apply analytical tools to solve known problems with GNNs including stability, over smoothing and bottleneck phenom-ena. This algorithmic alignment along with the powerful message passing paradigm provide new solutions to some of the most pressing problems in science, including protein folding (Jumper et al., 2021), weather prediction (Lam et al., 2023), dynamics learning (Pfaff et al., 2023) and new nu-merical PDE solvers (Brandstetter et al., 2022; Lienen & G¨ unnemann, 2022; Alet et al., 2019). 
+
+Fast ML based methods reduce the significant computa-tional cost of classical methods for adaptive meshing. This includes work on h-adaptive mesh refinement (Foucart et al., 2023; Freymuth et al., 2023), and many contributions to r-adaptivity based on surrogate ML solvers of classical mesh movement PDEs (Yang et al., 2023; Hu et al., 2024) and supervised learning for mesh adaptivity using Graph Neu-ral Networks (GNNs) (Song et al., 2022). A notable re-cent development is the universal mesh movement network (UM2N) (Zhang et al., 2024), which achieves error reduc-tion on par with MA, but at significant speed up, and can also be applied to multiply connected domains. 
+
+# 3. Preliminaries and background 
+
+3.1. Problem specification 
+
+We consider finite element solutions to nonlinear second-order PDEs on general domains Ω of dimension d. In ab-stract form, we can write these PDEs as follows: 
+
+F(ut, u, ∇u, ∇2u) = f in Ω, αu +β∂ nu = g on ∂Ω,
+
+(1) where α, β ∈ R. For transient problems, Ω = eΩ × (0 , T ),where eΩ is a (d − 1) -dimensional spatial domain and (0 , T )
+
+is the time-interval of interest. In this case, we employ the method of lines and combine the FEM with suitable time-stepping schemes (Hairer & Wanner, 1996). To compute finite element solutions, we introduce a mesh T of the spa-tial domain with Nz nodes, which we collect in the node set Z. The mesh T is used to construct trial and test func-tions with local support to discretize (1) . For example, for a Poisson problem with homogeneous Dirichlet boundary conditions we consider the space of piecewise linear func-tions (vanishing on ∂Ω) SZ on T and solve: Find UZ ∈ SZ
+
+such that 
+
+(∇UZ , ∇v)L2(Ω) = ( f, v )L2(Ω) ∀v ∈ SZ ; (2) where (·, ·)L2(Ω) denotes the inner-product in L2(Ω) .To minimise the error E(Z, U Z ) between the exact solution 
+
+u of (1) and its finite element approximation UZ , r-adaptive meshing modifies the location of the node coordinates. Of-ten, and in this work, r-adaptivity is particularly concerned with the reduction of the squared L2-error 
+
+E(Z, U Z ) := ∥UZ − u∥2
+
+> L2(Ω)
+
+. (3) For transient problems, we tacitly assume that (3) is evalu-ated at the final time t = T .
+
+3.2. Adaptive Meshing 
+
+Relocation based r-adaptivity turns a mesh with a certain topology into another mesh with the same topology. For this, the mesh points z(i) are moved, but their connectivity 
+
+(and hence the associated data structures) is unaltered. Such methods typically map a fixed mesh in a computational do-main (i.e. a representation of the mesh graph) to a deformed mesh in the physical domain where the PDE is posed. Note that, for transient problems, Ω should be replaced by ˜Ω and 
+
+d should be replaced by d − 1 in the following explanation (cf. Section 3.1). We denote the mesh points in the physical domain by Z = {z(i)}Nz 
+
+> i=1
+
+which form a triangulation T of 
+
+Ω with NT mesh elements, i.e.          
+
+> T ⊂
+> n
+> ∆(j)⊂ Z ;|∆(j)|=d+ 1
+> o
+> ,|T | =NT.
+
+We define the following domains and coordinates: the “computational” domain ΩC is mapped to the “physical” domain ΩP ⊆ Rd, and the “computational” coordinates 
+
+ξ ∈ ΩC are mapped to the “physical” coordinates z ∈ ΩP .To construct an adaptive mesh we consider a differentiable, possibly time-dependent, deformation map F : Ω C → ΩP ,so that z = F(ξ, t ) and F(∂ΩC ) = ∂ΩP . If ξ(i) are the 
+
+fixed mesh points in the computational domain then z(i) =
+
+F(ξ(i), t ). Assuming the mesh in the computational domain is regular, then determining the (properties of the) mesh in the physical domain, reduces to finding, (and analysing), F.
+
+Location based methods find F by solving a PDE, or a linked variational principle. Monge-Amp ´ere (MA) methods assume that F is a Legendre transform with a ‘mesh po-tential’ ϕ(ξ, t ) for which F = ∇ξϕ. The linearisation of F
+
+is given by J = ∂F/∂ ξ ≡ H(ϕ) where H is the Hessian of ϕ. Relocation methods usually equidistribute a monitor function m(z) so that ϕ satisfies the MA equation 
+
+m(z)|H(ϕ)| = m(∇ϕ)|H(ϕ)| = θ, for constant θ. 
+
+(4) For example, in (Huang & Russell, 2011) m(z) is an a-priori monitor of the interpolation error. The PDE (4) has a unique, convex, solution (Budd et al., 2013) which avoids mesh tangling. However, (4) is expensive to solve and, in its pure form, only applicable to simply connected domains. Solution procedures include relaxation methods (Budd et al., 2009), quasi-Newton methods (McRae et al., 2018), surro-gates (Song et al., 2022; Zhang et al., 2024), and PINNs (Yang et al., 2023). 3G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Velocity based methods find an ODE describing the mesh point evolution in pseudo-time τ so that 
+
+∂z(i)/∂τ = v(z(i), t ). (5) The choice of velocity function v is critical to the success of such methods, and is often motivated by natural Lagrangian structures of the underlying PDE. These methods provide the basis of our diffusion-based deformer (diffformer) de-scribed in section 4.1 and while they often lead to mesh tangling where mesh lines cross (cf. Ch. 7 in (Huang & Russell, 2011)), our architecture is specifically designed to enforce non-tangling of the mesh (cf. Theorem 4.2). 
+
+# 4. The G-adaptivity framework 
+
+The G-adaptive mesh relocation method described below is essentially a velocity based method with learnable coef-ficients that are trained by calculating the rate of change of the FE solution error E with respect to the mesh point location. As we explain below, the G-adaptivity framework combines feature selection, structural regularization and direct optimisation to learn optimal mesh relocation in an unsupervised manner whilst avoiding mesh tangling. 
+
+4.1. Graph-based adaptive mesh refinement 
+
+For simplicity of exposition we focus our discussion on the 2D case, but note that this approach generalises in a straight-forward manner to 3D cases as shown in Section 5.5. A mesh T (i.e. a triangulation of the domain Ω) with mesh-points Z gives rise to a natural graph, with the nodeset 
+
+V = Z and the edgeset E = {(zi, zj ) ∈ V × V ; ∃∆ ∈T , s.t. zi, zj ∈ ∆}, i.e. two nodes share an edge if there is a triangle in the mesh T which has both nodes as ver-tices. The graph (V, E) can be enriched with node fea-tures xi ∈ Rd0 : i ∈ V represented in matrix notation as 
+
+X ∈ RNz ×d0 . For example we could associate to each mesh point z(i) the value of the solution field u(z(i)) as a feature. Likewise, we can introduce latent features that propagate through repeated application of a map on the graph, this is used in our architecture (cf. Figure 2). Mesh connectivity is stored in the adjacency matrix A (where 
+
+aij = 1 if (i, j ) ∈ E and zero otherwise). A graph neu-ral network (GNN) Mθ : RNz ×d0 × E → RNz ×dN is a map from features to features constructed with layers 
+
+Lθk : RNz ×dk → RNz ×dk+1 acting node wise as 
+
+xk+1  
+
+> i
+
+= Lθk (xki ) = ϕθk
+
+xki , X
+
+> j∈N i
+
+φθk (xkj )
+
+
+
+where φθk is the learnable edge-wise operation, ϕθk is a learnable node-wise aggregation and Ni = {j ∈ V ; ( i, j ) ∈E} is the set of nodes adjacent to the meshpoint i.Integral to the G-adaptivity framework is the construction of the feature matrix such that the GNN can act as a mesh de-former. Similar to (Zhang et al., 2024) we construct the fea-ture matrix by concatenating coordinates of a regular mesh 
+
+ξ ∈ RNz ×d with a learnable feature encoding hθ (Z0, H )
+
+which, motivated by (4) , is dependent on the Frobenius norm of the Hessian H(UZ0 ) = ∥∂i∂j u∥F : Ω → R of the FEM solution UZ0 on the undeformed mesh Z0. When higher order finite element functions are used in the approx-imation space of UZ the Hessian can be obtained by simple differentiation, but even in the case of linear elements this in-formation is recoverable using widely-used techniques such as the one described in Appendix A.2. The final input fea-ture matrix is then X =  Z0 ∥ X0
+
+> λ
+
+ ∈ RNx×(d+|λ|), X0 
+
+> λ
+
+=
+
+hθ (Z0, H ), where λ denotes the index set for the node fea-tures, which is passed into a GNN mesh deformer that then outputs the relocated mesh points. Previous works (Song et al., 2022; Zhang et al., 2024) used a graph attention net-work (GAT) (Veli ˇckovi ´c et al., 2018) as the GNN mesh deformer Zk+1 
+
+Xk+1 
+
+> λ
+
+
+
+=
+
+ Aθ (Xk)Zk
+
+σλ
+
+ Aθ (Xk)XkλWλ
+
+
+
+(6) where X = ( Z, Xλ) and Wλ is a learnable linear transfor-mation matrix. To prevent mesh crossing the non-linearity and channel mixing are excluded from the positional chan-nels in (6) . In the above Aθ (Xk) is row-stochastic meaning that the top row of (6) corresponds to a graph-based aver-aging over graph neighbours. Motivated by (Chamberlain et al., 2021b) and velocity-based methods for meshpoint re-location introduced in section 3.2, in our G-Adaptive frame-work this average is replaced by a diffusion based deformer (henceforth referred to as Diffformer )
+
+˙Z(τ ) = ( Aθ (Xk) − I)Z(τ ), Z(0) = Zk, (7) which is solved to a finite end time τ = τend and leads to the meshpoint update Zk+1 = Z(τend ), i.e. an overall deformer of the form 
+
+Zk+1 
+
+Xk+1 
+
+> λ
+
+
+
+=
+
+ Z(τend )
+
+σλ
+
+ Aθ (Xk)XkλWλ
+
+
+
+. (8) As before, the learnable attention Aθ is row-stochastic, meaning (7) is essentially a diffusion equation on the graph 
+
+V. Further details on our Diffformer are provided in Ap-pendix A.1. We can stack multiple layers of (8) , each time varying the number of hidden feature dimensions which are updated using the second row of (8) . We denote the overall GNN by the map Mθ and a schematic overview of the components of Mθ is provided in Figure 2. 
+
+4.2. Structural regularization 
+
+The architectural changes between (6) and (8) lead to several regularity properties that we refer to as structural regulariza-tion. The Diffformer based architecture has a key advantage 4G-Adaptivity: optimised graph-based mesh relocation for finite element methods Input mesh coordinates                      
+
+> Zin = ( z(i)in )Nz
+> i=1
+> Curvature information: H(UZin )
+> Feature extractor X0
+> λ=hθ(Zin ;H)
+> Diffformer: ˙Z= ( Aθ(Xk)−I)Z
+> Computation of attention 7→Aθ(Xk)
+> Feature deformer:
+> Xk+1
+> λ=σλ
+> (Aθ(Xk)XkλWλ
+> )
+> Deformed mesh coordinates
+> Zout = ( z(i)out )Nz
+> i=1
+
+## +
+
+## +     
+
+> Next layer: k7→k+ 1
+
+Figure 2. Schematic overview of our new graph diffusion-based architecture. 
+
+over other velocity based methods in the generation of reg-ular meshes. A requirement of FEM meshes is that they are not ‘tangled’, i.e. that they form a well-posed triangu-lation of the domain Ω (i.e. no triangles overlap). This follows if each mesh point is in the interior of the convex hull of its neighbours on the graph and can equivalently be characterised using the Jacobian of the deformation map 
+
+M.
+
+Definition 4.1. Let J(i) be the Jacobian of the deformation map M at simplex ∆(i). A mesh is said to be tangled if there exists a simplex where the determinant of the Jacobian 
+
+det( J(i)) ≤ 0 (Huang & Russell, 2011). Velocity based methods often lead to tangled meshes due to the local way in which the mesh point movement is defined. However, this does not arise in our method. 
+
+Theorem 4.2 (Discrete-Time Non-Tangling) . If the diffu-sion equation (7) is solved with the forward Euler method, then for sufficiently small pseudo-timestep dτ < 1/2, the discrete mesh evolution under the deformation map M pre-serves element orientations, ensuring that no mesh tangling occurs. 
+
+A full proof is given in Appendix F but in essence the dif-fusion process ensures that meshpoints are simultaneously moved along directions that point into the convex hull of neighbouring meshpoints, thus ensuring that tangling cannot occur (cf. Figure 3). The proof relies on the softmax of the attention mechanism normalising the adjacency to be row stochastic and for the time step of the residual connection to be controllable. This is a benefit over (6) and allows (8) to learn an anisotropic diffusion which is akin to a learnable monitor function from xi(t)     
+
+> (AX(t)) iDiffformer xi(t+δt )
+
+Figure 3. The action of the graph diffusion pulls nodes into the convex hull of their graph neighbours. 
+
+classical relocation methods. 
+
+4.3. Firedrake adjoint optimal gradient computation and direct FEM loss 
+
+Training the GNN Mθ requires computing the derivative of E(Z) = E(Z, U Z ) with respect to the node coordinates 
+
+Z. Since evaluating E(Z, U Z ) requires solving the PDE (1) first, a na ¨ıve application of automated differentiation would result in the solution of additional (Nz × d) PDEs (Nz × (d − 1) in the transient case). To avoid the additional computational cost, we employ the well-established method of adjoints. Specifically, we employ Firedrake’s automated adjoint capabilities implemented in pyadjoint (Mitusch et al., 2019). With pyadjoint, derivatives with respect to mesh coordinates can be computed in an automated fashion as shape derivatives of E(Z, U Z ) in directions discretized with vector-valued linear Lagrangian FEs (Ham et al., 2019a). 
+
+Remark 4.3 . Often, the exact solution u to (1) is not known and must itself be approximated with the FEM (e.g., by interpolating onto UZ a FE solution computed on a much finer mesh). In this case, it is essential to correct the direc-tional derivatives computed with Firedrake by adding the corrections terms stemming from evaluating the formula 
+
+Z
+
+> Ω
+
+(u − UZ )∇u · V dx 
+
+along each finite element direction V ∈ Sd 
+
+> Z
+
+(V ∈ S(d−1) 
+
+> Z
+
+in the transient case). This is necessary because the shape derivative of a FE function in a direction discretized with FEs is zero (Ham et al., 2019a). 
+
+4.4. Regularized gradients 
+
+In line with the concept of equidistribution discussed in Appendix E.2 we introduce a regularizing term in train-ing which further enforces mesh regularity in an unsuper-vised manner and leads to improved training of the mesh deformer using only information about a predefined mon-itor function m(UZ ) (we follow (Zhang et al., 2024) and use m(UZ ) = 1 + 5 |∇ UZ |   
+
+> max Ω|∇ UZ|
+
+). The motivation is to pro-vide a global signal that moves mesh points into regions of the domain where the solution varies and likely requires 5G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+more meshpoints to resolve. For this we add the following regularizing term to our loss: 
+
+Lequi (Z) = X
+
+> ∆(j)∈T
+
+Z
+
+> ∆(j)
+
+m(x)dx − m 2
+
+,
+
+where m = |T | −1 P
+
+> ∆(j)∈T
+
+R 
+
+> ∆(j)
+
+m(x)dx . Given the area of a simplex in the mesh α(∆ (i)) ∈ T the terms in the above loss are approximated by R 
+
+> ∆(j)
+
+m(x)dx ≈
+
+α(∆ (j))cd
+
+P 
+
+> z∈∆(j)
+
+m(z), where c2 = 1/3, c 3 = 1/4.This leads to the following full regularized loss which we use in the training of our Diffformer: 
+
+Lθ = E(Mθ ) + Lequi (Mθ ) (9) During training the weighted graph Laplacian ( Aθ −I in (7) )will adaptively adjust to minimize both terms, meaning the mesh evolution will not purely follow the degree weighted graph Laplacian dynamics but will now be biased towards error reduction and equidistribution. 
+
+# 5. Experimental results 
+
+We evaluate G-adaptivity on three classical meshing prob-lems in two-dimensions: an elliptic PDE (Poisson’s equa-tion) in a variety of convex domains, a nonlinear time-evolution PDE (Burger’s equation), and the time dependent Navier-Stokes equations in a multiply connected domain. In the following we present the performance improvements obtained in terms of the FEM L2-error reduction (cf. (3) )and compute time, using our novel approach for adaptive meshing on each of these problems. Additional experiments and sensitivity analysis is provide in the Appendix D. Full code to build the datasets and reproduce our results can be found at https://github.com/JRowbottomGit/g-adaptivity. 
+
+5.1. Experimental details Method Our experimental pipeline consists of three parts: (i) we build datasets containing information about the PDE, FEM solution on a regular (i.e. not relocated) grid and the corresponding approximation of the Hessian of the solu-tion; (ii) then we train either our model or the baseline to predict a relocated mesh on which we perform another FE solve to obtain the improved solution approximation; (iii) finally, we compare this FEM solution to a reference solu-tion (calculated on a fine reference mesh) and determine the change in L2-error over the original undeformed mesh, i.e. in the above notation we look at relative error reduction of E(UMθ ) over E(UZ0 ). These steps are repeated for the three PDE datasets as described below. Note that the Fire-drake adjoint solve is only required during training of our G-Adaptive network and not during inference. The times reported in the below numerical examples thus contain a true reflection of the fast online mesh adaption times. 
+
+Datasets For each experiment described below we build a randomised dataset with held-out test data. This means in each case we specify a set of solution values through varying source terms or boundary conditions (adjusted to the PDE at hand). We then generate training and test sets of coarse, undeformed, meshes T of varying resolution with associated FEM solution values and, for each mesh, we also compute a reference solution (on a finer reference mesh) which serves as comparison for the error computation. For most test cases the solution values are generated by randomly sampling Gaussians in the domain Ω. For the example of the Navier– Stokes flow around a cylinder we used snapshots of a time-series simulation of vortex shedding. Full details on the specific configurations for each experiment are provided in Appendix C. 
+
+Baselines We compare our algorithm against two adap-tive mesh algorithms: classical MA as described and im-plemented by (Wallwork et al., 2024) and the ML based surrogate GNN method UM2N (Zhang et al., 2024). These two state-of-the-art approaches serve as a baseline for the FEM error reduction and deformation time. As a third base-line we train UM2N on our regularized PDE loss (9) , which we denote by UM2N-G in the tables below, in order to high-light the performance improvements gained from both our new architecture (Figure 2) and our new training (9). 
+
+Experiment details Here we refer to our framework G-adaptivity and our model Diffformer synonymously, which we train using the regularized PDE-loss (9) (which is the regularized L2 FEM approximation error + equidistribution regularizer). Calculation of the L2-error is obtained by cal-culating an FE solution on the moved mesh and comparing this to the projection of the reference solution of a fine regu-lar reference mesh onto sufficiently higher order elements. We train our new model (G-Adapt) and UM2N-G for 300 epochs using an Adam optimiser and learning rate of 0.001. Our model has 4 diffformer blocks as described in Appendix C. Each blocked is rolled out using explicit Euler integration for 32 steps with a step size of 0.1. For the baseline UM2N we trained using 1000 epochs in order to achieve good per-formance but we believe further tuning of the training may be required in order to achieve a similar performance to the one reported in (Zhang et al., 2024). UM2N remains an important baseline and we expect that with appropriate training the method would be able to achieve a similar error reduction (ER) as the Monge-Amp `ere (MA) solver, but we would like to highlight that even in the best reported results of the original paper, UM2N never achieved a larger error reduction than MA. 
+
+Evaluation We report three metrics to evaluate the per-formance of the mesh relocation methods at hand: (i) the relative L2 error reduction (ER) of the FE solution on the 6G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+relocated mesh versus the FE solution on the initial coarse mesh (larger error reduction means improved performance); (ii) the time taken to relocate the mesh (shorter times means faster relocation); (iii) the aspect ratio of the deformed mesh as a measure of mesh quality as described in Appendix F.4 (a single digit aspect ratio is generally acceptable and a smaller aspect ratio indicates a more regular mesh). Each experiment is performed in full five times (training and eval-uation) with different random seeds to provide the error bars. 
+
+5.2. Benchmarking on Poisson’s equation 
+
+Our first benchmark is on the classical Poisson problem 
+
+−∇ 2u = f (z) with Dirichlet boundary conditions. Full details of the FEM formulation are given in Appendix C.1. We benchmark the results against two datasets on a square (cf. Figure 1) and polygonal domain respectively (cf. Figure 4). Further evaluations on five additional (non-convex) geometries are provided in Appendix D.4. For both aforementioned examples we sample source terms and boundary conditions corresponding to underlying Gaussian fields. On the square domain Ω = [0 , 1] 2 we initialise the mesh-deformation with a regular grid and to showcase G-adaptivty’s ability to work on irregular domains with un-structured meshes we apply a similar methodology to the convex polygonal dataset (a sample is shown in Figure 4). The results for both datasets are presented in Table 9. The central observation in these results is that our methodol-ogy provides the very first ML approach to mesh relocation which is able to outperform MA in terms of error reduction, while retaining the fast mesh relocation times given by the state-of-the-art GNN - UM2N (Zhang et al., 2024).                                                                         
+
+> Table 1. Benchmarking results on Poisson Square and Poisson Convex Polygon datasets.
+> POISSON SQUARE
+> MODEL ERROR RED . (%) TIME (MS )ASPECT
+> DIRECT OPT †27.40 ±0.00 126028 33.99 ±0.00 MA 12.69 ±0.00 3780 2.11 ±0.00 UM2N 6.83 ±1.10 70 1.99 ±0.03 UM2N-G16.40 ±2.65 30 2.61 ±0.17 G-A DAPT 21.01 ±0.33 88 2.92 ±0.03
+> POISSON CONVEX POLYGON
+> DIRECT OPT †20.51 ±0.00 56280 2.07 ±0.00 MA 10.97 ± 0.00 4446 1.95 ±0.00 UM2N 3.12 ±0.38 36 1.66 ±0.03 UM2N-G15.00 ±0.13 16 1.88 ±0.03 G-A DAPT 16.84 ±0.10 55 1.86 ±0.02
+
+† The direct optimization method is included here purely for exposition, showing that MA-meshes are not necessarily optimal. DirectOpt computes the optimal mesh for a given PDE with known solution but is extremely slow and relies on data which is not available during inference, thus it does not constitute a practical adaptive meshing strategy. In contrast, once trained, our G-Adaptive approach yields fast online mesh movement without needing reference solution values.  
+
+> Figure 4. The solution fields and corresponding G-Adaptive mesh with 23.10 % error reduction in 59ms on a polygonal domain.
+
+5.3. Time-dependent Burgers’ equation 
+
+In our second example we highlight that our approach can equally well be applied to time-dependent problems, in particular the viscous Burgers’ equation: 
+
+∂u
+
+∂t + ( u · ∇ )u − ν∇2u = 0 .
+
+Further details on the specific FEM implementation (and implicit time-stepper) used are given in Appendix C.2. We randomly sample Gaussians on the square domain Ω = [0 , 1] 2 as initial conditions for the evolution in Burgers’ equation and perform the following experiments. 
+
+Burgers’ square rollout: We train the models on a set of Gaussian initial conditions for a timestep δt = 0 .02 
+
+with 2 steps and evaluate by following 10 trajectories of randomly sampled Gaussians in the Burgers equation for 20 timesteps, remeshing after every 2 steps (cf. Figure 5 and Appendix D.3). The results in the top part of Table 2 show the average error reduction over achieved over every block of two timesteps. While the MA performs well on this task, we note that the UM2N and UM2N-G baselines appear to lead to a negative error reduction (i.e. an increase), which is likely due to the fact that the Burgers’ equation changes the solution shape and thus trajectories will lead to out-of-distribution cases for methods that are trained only on initial conditions. Due to the structural regularity of our new approach (cf. Section 4.2) our approach is able to deal with out-of-distribution data very well, and most importantly is able to outperform MA in terms of error reduction while retaining a fast mesh relocation time. 
+
+Burgers’ square 10 steps: The interpolation error in remeshing is significant and provides a central limitation to current mesh relocation techniques (cf. (Budd et al., 7G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Table 2. Benchmarking results on Burgers’ Square datasets. 
+
+BURGERS ’ S QUARE ROLLOUT 
+
+MODEL ERROR RED . (%) TIME (MS ) ASPECT 
+
+MA 25.78 ± 0.00 18884 1.99 ± 0.00 UM2N –11.24 ± 2.52 314 2.52 ± 0.39 UM2N-G –2.33 ± 3.73 316 2.83 ± 0.11 G-A DAPT 27.17 ± 0.34 717 2.85 ± 0.12 
+
+BURGERS ’ S QUARE 10 S TEPS 
+
+MA 12.28 ± 0.00 11566 1.99 ± 0.00 UM2N 3.52 ± 0.60 30 2.33 ± 0.01 UM2N-G 16.38 ± 2.85 41 1.83 ± 0.10 G-A DAPT 21.66 ± 3.13 93 2.82 ± 0.06 Velocity field at t=0.2 MA mesh at t=0.2 MA mesh at t=0.6 G-Adapt. mesh at t=0.2 G-Adapt. mesh at t=0.6 Velocity field at t=0.6 
+
+Figure 5. Snapshots of the velocity field (x-component) together with the corresponding deformed meshes provided by Monge– Amp `ere (MA) with 46.52% average error reduction over the full solution path compared to the deformed meshes provided by our approach (G-Adapt.) with 49.15% error reduction. 
+
+2009)). It is thus desirable to relocate meshes only after several timesteps. It turns out that our approach lends it-self to targeted training not just of a GNN that reduces the FEM error in a stationary sense, but a GNN that seeks to find an optimal mesh given a specified remeshing frequency. The classical method MA has no means of inferring this information or adjusting the meshes accordingly. On this example we trained the GNN on a collection of random Gaussian initial conditions with the loss attained by solving the corresponding FEM problem for 10 timesteps of size 
+
+δt = 0 .02 . The results in Table 2 highlight that in this way we can achieve even more significant ER over MA thus lead-ing to efficient meshes that require less frequent changes in time-evolving systems. 
+
+5.4. Navier–Stokes equation and flow past a cylinder 
+
+Our final example is the canonical flow past cylinder prob-lem we simulate data using an FE solution for 400 time steps of size δt = 0 .01 of the time series evolution ex-pressed in Gaussian basis function expansions (cf. Figure 6 and Appendix A.3). The training and test data are 25 and 50 respectively random snapshots from the range t ∈ [1 , 4] with remeshing after every 5 timesteps. Full details of the PDE and FEM formulation are provided in Appendix C.3. Again we observe good error reduction and fast mesh relocation times in our new methodology. Solution velocity field (x-component) Undeformed mesh G-Adaptivity deformed mesh (23.57% ER in 32ms) 
+
+Figure 6. The G-Adaptivity-deformed mesh on the Navier–Stokes equation (23.57% error reduction in 32ms). The adapted mesh correctly recognises areas of large solution curvature and resolves them more finely (on the upstream side of the cylinder resolving the stagnation point singularity and along the path of shed vorticity). 
+
+8G-Adaptivity: optimised graph-based mesh relocation for finite element methods                       
+
+> Table 3. Benchmarking results on Navier–Stokes datasets.
+> NAVIER –S TOKES
+> MODEL ERROR RED . (%) TIME (MS )ASPECT
+> MA ∗NA --UM2N †1.34 ±0.57 44 1.65 ±0.06 UM2N-G25.55 ± 0.81 30 2.32 ± 0.06 G-A DAPT 26.36±1.37 49 3.51 ± 0.81
+
+∗ Standard Monge–Amp `ere solvers do not converge on mul-tiply connected domains. † Since no MA data is available we use the best UM2N model from Section 5.2. 
+
+5.5. 3D adaptive meshing 
+
+The G-Adaptivity framework and diffusion deformer model are also easily adapted to the 3D setting. To demonstrate this we perform an experiment on a 10x10x10 unit cube for the 3D Poisson problem with Dirichlet boundary conditions and Gaussian solutions, analogous to Section 5.2. An example of the corresponding results can be seen in Figure 7. In the interest of brevity, the full numerical results are presented in Appendix 5.6 and show that the method outperforms MA significantly (out-of-the-box UM2N does not apply in 3D) and that it leads to effective mesh point concentration in regions of interest.  
+
+> Figure 7. Examples of 3D solution fields and adapted meshes.
+
+5.6. Scalability of the G-Adaptivity framework 
+
+The G-Adaptivity framework is able to scale to very large meshes. In particular the inductive learning property of GNNs ensures the ability of GNNs to transfer to unseen graphs in this case meaning we can perform super-resolution. In Table 9 we report experiments where the model is trained on 15x15 mesh and inference is performed on larger 60x60 (3,600 nodes) and 150x150 (22,500 nodes) meshes for the Poisson problem with 128 sampled Gaussians (see Figure 8). In order to scale the transformer encoder, which in naive form scales with O(N 2) edges we use a sliding win-dow SWIN (Liu et al., 2021) style transformer to capture the monitor function embedding at the mid-length scales. Our model consistently achieved significant mesh adapta-tion, accuracy improvement, and computational acceleration compared to Monge-Amp ´ere, matching the performance ob-served on smaller-scale experiments.  
+
+> Figure 8. G-Adaptivity on large-scale fine meshes
+
+# 6. Conclusions and future work 
+
+We have presented a novel, and effective, approach to the classical problem of r-adaptive meshing for FEM solutions of PDEs. In particular, we demonstrate, that GNNs together with a differentiable FEM solver (Firedrake), and a loss function given by the regularized solution error, can be ef-fectively used to optimise the location of mesh points to minimise the FEM error. Hence we can take an entirely different route from prior work (both classical and ML ap-proaches) which determine good choices of mesh points by analysis-inspired heuristics using a location based approach. We demonstrate the advantages of our method on challeng-ing test problems in two dimensions, including in a multiply connected domain, and find that, on those examples, we are able to outperform both classical and ML methods in terms of error reduction while retaining similar computational cost to prior ML work. We note that the direct FEM error optimisation approach extends naturally to more complex domains, and PDEs, where classical methods may struggle providing a basis for future extensions of this work. Finally, we note that any machine learning-based approach is inherently statistical in nature, meaning that GNN-based meshing tools are likely to perform worse on out-of-distribution data. We observed this in our experiments with both pre-trained UM2N models and our own G-Adaptive approach when applied to PDEs whose solutions exhibited markedly different scales and features from those seen dur-ing training. Enhancing the scale-generalisation capabilities of ML-based adaptive meshing therefore remains an impor-tant open problem for future investigation. 9G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+# Acknowledgements 
+
+The authors would like to thank Patrick Farrell and David Ham for helpful advice related to capabilities of Firedrake, as well as Joseph G. Wallwork and Mingrui Zhang for shar-ing code and advice on the use of the UM2N baseline model and the Python Movement package. JR, GM, TD, CBS & CB gratefully acknowledge support from the EPSRC programme grant in ‘The Mathematics of Deep Learning’, under the project EP/V026259/1. GM gratefully acknowl-edges funding from the Mathematical Institute, University of Oxford. KS gratefully acknowledges funding from the Euro-pean Research Council (ERC) under the European Union’s Horizon 2020 research and innovation programme (grant agreement No. 850941). 
+
+# Impact Statement 
+
+This paper presents work that aims to accelerate and improve the performance of mesh relocation methods for FEM using Machine Learning. FEMs are omnipresent in scientific computing and the generation and adaption of an effective mesh is paramount to any large-scale application of FEMs. The potential applications and benefits of advancements in this field are thus significant as complex nonlinear PDEs appear everywhere in nature: from weather and climate forecasting over oceanography up to general relativity. 
+
+# References 
+
+Africa, P. C., Arndt, D., Bangerth, W., Blais, B., Fehling, M., Gassm ¨oller, R., Heister, T., Heltai, L., Kinnewig, S., Kronbichler, M., Maier, M., Munch, P., Schreter-Fleischhacker, M., Thiele, J. P., Turcksin, B., Wells, D., and Yushutin, V. The deal.ii library, version 9.6. Journal of Numerical Mathematics , 32(4):369–380, 2024. doi: 10.1515/jnma-2024-0137. Ainsworth, M. and Oden, J. T. A posteriori error estimation in finite element analysis. Computer Methods in Applied Mechanics and Engineering , 142(1):1–88, March 1997. ISSN 0045-7825. doi: 10.1016/S0045-7825(96)01107-3. Alet, F., Jeewajee, A. K., Villalonga, M. B., Rodriguez, A., Lozano-Perez, T., and Kaelbling, L. Graph Element Networks: Adaptive, structured computation and memory. In Proceedings of the 36th International Conference on Machine Learning , pp. 212–222. PMLR, May 2019. Alnæs, M. S., Logg, A., Ølgaard, K. B., Rognes, M. E., and Wells, G. N. Unified form language: A domain-specific language for weak formulations of partial differential equations. ACM Transactions on Mathematical Software (TOMS) , 40(2):1–37, 2014. Balay, S., Abhyankar, S., Adams, M., Brown, J., Brune, P., Buschelman, K., Dalcin, L., Dener, A., Eijkhout, V., Gropp, W., et al. Petsc users manual. 2019. Bastian, P., Blatt, M., Dedner, A., Engwer, C., Kl ¨ofkorn, R., Kornhuber, R., Ohlberger, M., and Sander, O. Ageneric grid interface for parallel and adaptive scientific computing. part ii: implementation and tests in dune. 
+
+Computing , 82:121–138, 2008. Battaglia, P. W., Hamrick, J. B., Bapst, V., Sanchez-Gonzalez, A., Zambaldi, V. F., Malinowski, M., Tacchetti, A., Raposo, D., Santoro, A., Faulkner, R., G ¨ul c¸ ehre, C¸ ., Song, H. F., Ballard, A. J., Gilmer, J., Dahl, G. E., Vaswani, A., Allen, K. R., Nash, C., Langston, V., Dyer, C., Heess, N., Wierstra, D., Kohli, P., Botvinick, M. M., Vinyals, O., Li, Y., and Pascanu, R. Relational induc-tive biases, deep learning, and graph networks. CoRR ,abs/1806.01261, 2018. Bouziani, N. and Ham, D. A. Physics-driven machine learn-ing models coupling PyTorch and Firedrake. 2023. Bouziani, N., Ham, D. A., and Farsi, A. Differentiable pro-gramming across the PDE and Machine Learning barrier. 
+
+arXiv preprint arXiv:2409.06085 , 2024. Brandstetter, J., Worrall, D., and Welling, M. Message Pass-ing Neural PDE Solvers. arXiv:2202.03376 [cs, math] ,February 2022. Bronstein, M. M., Bruna, J., LeCun, Y., Szlam, A., and Van-dergheynst, P. Geometric deep learning: Going beyond euclidean data. IEEE Signal Processing Magazine , 34(4): 18–42, 2017. doi: 10.1109/MSP.2017.2693418. Budd, C., Cullen, M., and Walsh, E. Monge–Amp ´ere based moving mesh methods for numerical weather prediction, with applications to the Eady problem. Journal of Com-putational Physics , 236:247–270, March 2013. ISSN 00219991. doi: 10.1016/j.jcp.2012.11.014. Budd, C. J., Huang, W., and Russell, R. D. Adaptivity with moving grids. Acta Numerica , 18:111–241, May 2009. ISSN 1474-0508, 0962-4929. doi: 10.1017/ S0962492906400015. Burstedde, C., Wilcox, L. C., and Ghattas, O. p4est: Scal-able algorithms for parallel adaptive mesh refinement on forests of octrees. SIAM Journal on Scientific Computing ,33(3):1103–1133, 2011. Chamberlain, B., Rowbottom, J., Eynard, D., Di Giovanni, F., Dong, X., and Bronstein, M. Beltrami Flow and Neural Diffusion on Graphs. In Advances in Neural Information Processing Systems , volume 34, pp. 1594–1609. Curran Associates, Inc., 2021a. 10 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Chamberlain, B., Rowbottom, J., Gorinova, M. I., Bronstein, M., Webb, S., and Rossi, E. GRAND: Graph Neural Diffusion. In Proceedings of the 38th International Con-ference on Machine Learning , pp. 1407–1418. PMLR, July 2021b. Chorin, A. J. The numerical solution of the navier-stokes equations for an incompressible fluid. Bulletin of the American Mathematical Society , 73(6):928–931, 1967. Chorin, A. J. Numerical solution of the navier-stokes equa-tions. Mathematics of Computation , 22(104):745–762, 1968. Cotter, C. J. Compatible finite element methods for geophysical fluid dynamics. Acta Numerica , 32:291– 393, May 2023. ISSN 0962-4929, 1474-0508. doi: 10.1017/S0962492923000028. Defferrard, M., Bresson, X., and Vandergheynst, P. Convo-lutional Neural Networks on Graphs with Fast Localized Spectral Filtering. In Advances in Neural Information Processing Systems , volume 29. Curran Associates, Inc., 2016. E, W. and Yu, B. The Deep Ritz Method: A Deep Learning-Based Numerical Algorithm for Solving Vari-ational Problems. Communications in Mathematics and Statistics , 6(1):1–12, March 2018. ISSN 2194-671X. doi: 10.1007/s40304-018-0127-z. Farrell, P. E., Ham, D. A., Funke, S. W., and Rognes, M. E. Automated derivation of the adjoint of high-level transient finite element programs. SIAM Journal on Scientific Computing , 35(4):C369–C393, 2013. Foucart, C., Charous, A., and Lermusiaux, P. F. J. Deep rein-forcement learning for adaptive mesh refinement. Journal of Computational Physics , 491:112381, October 2023. ISSN 0021-9991. doi: 10.1016/j.jcp.2023.112381. Freymuth, N., Dahlinger, P., W ¨urth, T., Reisch, S., K ¨arger, L., and Neumann, G. Swarm reinforcement learning for adaptive mesh refinement. Advances in Neural Informa-tion Processing Systems , 2023. Gilmer, J., Schoenholz, S. S., Riley, P. F., Vinyals, O., and Dahl, G. E. Neural Message Passing for Quantum Chem-istry. In Proceedings of the 34th International Conference on Machine Learning , pp. 1263–1272. PMLR, July 2017. Giovanni, F. D., Rowbottom, J., Chamberlain, B. P., Markovich, T., and Bronstein, M. M. Understanding convolution on graphs via energies. Transactions on Ma-chine Learning Research , June 2023. ISSN 2835-8856. Grossmann, T. G., Komorowska, U. J., Latz, J., and Sch ¨onlieb, C.-B. Can Physics-Informed Neural Networks beat the Finite Element Method? arXiv:2302.04107 ,2023. Hairer, E. and Wanner, G. Solving Ordinary Differen-tial Equations II , volume 14 of Springer Series in Com-putational Mathematics . Springer, Berlin, Heidelberg, 1996. ISBN 978-3-642-05220-0 978-3-642-05221-7. doi: 10.1007/978-3-642-05221-7. Ham, D. A., Mitchell, L., Paganini, A., and Wechsung, F. Automated shape differentiation in the unified form language. Structural and Multidisciplinary Op-timization , 60(5):1813–1820, 2019a. doi: 10.1007/ s00158-019-02281-z. Ham, D. A., Mitchell, L., Paganini, A., and Wechsung, F. Automated shape differentiation in the Unified Form Language. Structural and multidisciplinary optimization ,60:1813–1820, 2019b. Ham, D. A., Kelly, P. H. J., Mitchell, L., Cotter, C. J., Kirby, R. C., Sagiyama, K., Bouziani, N., Vorderwuelbecke, S., Gregory, T. J., Betteridge, J., Shapero, D. R., Nixon-Hill, R. W., Ward, C. J., Farrell, P. E., Brubeck, P. D., Mars-den, I., Gibson, T. H., Homolya, M., Sun, T., McRae, A. T. T., Luporini, F., Gregory, A., Lange, M., Funke, S. W., Rathgeber, F., Bercea, G.-T., and Markall, G. R. 
+
+Firedrake User Manual . Imperial College London and University of Oxford and Baylor University and Univer-sity of Washington, first edition edition, 5 2023. Han, J., Jentzen, A., and E, W. Solving high-dimensional partial differential equations using deep learning. Pro-ceedings of the National Academy of Sciences , 115(34): 8505–8510, 2018. Hu, P., Wang, Y., and Ma, Z.-M. Better Neural PDE Ssolvers Through Data-Free Mesh Movers. The Twelfth Interna-tional Conference on Learning Representations , 2024. Huang, W. and Russell, R. Adaptive Moving Mesh Methods ,volume 174. January 2011. ISBN 978-1-4419-7915-5. doi: 10.1007/978-1-4419-7916-2. Jumper, J., Evans, R., Pritzel, A., Green, T., Figurnov, M., Ronneberger, O., Tunyasuvunakool, K., Bates, R., ˇZ´ıdek, A., Potapenko, A., Bridgland, A., Meyer, C., Kohl, S. A. A., Ballard, A. J., Cowie, A., Romera-Paredes, B., Nikolov, S., Jain, R., Adler, J., Back, T., Petersen, S., Reiman, D., Clancy, E., Zielinski, M., Steinegger, M., Pacholska, M., Berghammer, T., Bodenstein, S., Silver, D., Vinyals, O., Senior, A. W., Kavukcuoglu, K., Kohli, P., and Hassabis, D. Highly accurate pro-tein structure prediction with AlphaFold. Nature , 596 (7873):583–589, August 2021. ISSN 1476-4687. doi: 10.1038/s41586-021-03819-2. 11 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Kipf, T. N. and Welling, M. Semi-Supervised Classification with Graph Convolutional Networks. In International Conference on Learning Representations , July 2022. Lam, R., Sanchez-Gonzalez, A., Willson, M., Wirnsberger, P., Fortunato, M., Alet, F., Ravuri, S., Ewalds, T., Eaton-Rosen, Z., Hu, W., Merose, A., Hoyer, S., Holland, G., Vinyals, O., Stott, J., Pritzel, A., Mohamed, S., and Battaglia, P. Learning skillful medium-range global weather forecasting. Science , 382(6677):1416–1421, De-cember 2023. doi: 10.1126/science.adi2336. Li, Z., Kovachki, N., Azizzadenesheli, K., Liu, B., Stuart, A., Bhattacharya, K., and Anandkumar, A. Multipole Graph Neural Operator for Parametric Partial Differential Equations. In Advances in Neural Information Processing Systems , volume 33, pp. 6755–6766. Curran Associates, Inc., 2020a. Li, Z., Kovachki, N. B., Azizzadenesheli, K., Liu, B., Bhat-tacharya, K., Stuart, A., and Anandkumar, A. Fourier Neural Operator for Parametric Partial Differential Equa-tions. In International Conference on Learning Represen-tations , September 2020b. Li, Z., Kovachki, N. B., Choy, C., Li, B., Kossaifi, J., Otta, S. P., Nabian, M. A., Stadler, M., Hundt, C., Azizzade-nesheli, K., and Anandkumar, A. Geometry-Informed Neural Operator for Large-Scale 3D PDEs. In Thirty-Seventh Conference on Neural Information Processing Systems , November 2023. Lienen, M. and G ¨unnemann, S. Learning the Dynamics of Physical Systems from Sparse Observations with Fi-nite Element Networks. In International Conference on Learning Representations , March 2022. Liu, Z., Lin, Y., Cao, Y., Hu, H., Wei, Y., Zhang, Z., Lin, S., and Guo, B. Swin transformer: Hierarchical vision trans-former using shifted windows. In 2021 IEEE/CVF In-ternational Conference on Computer Vision, ICCV 2021, Montreal, QC, Canada, October 10-17, 2021 , pp. 9992– 10002. IEEE, 2021. Logg, A., Mardal, K.-A., and Wells, G. Automated solution of differential equations by the finite element method: The FEniCS book , volume 84. Springer Science & Business Media, 2012. Lu, L., Jin, P., Pang, G., Zhang, Z., and Karniadakis, G. E. Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators. Nature Machine Intelligence , 3(3):218–229, March 2021. ISSN 2522-5839. doi: 10.1038/s42256-021-00302-5. McRae, A. T. T., Cotter, C. J., and Budd, C. J. Optimal-Transport–Based Mesh Adaptivity on the Plane and Sphere Using Finite Elements. SIAM Journal on Sci-entific Computing , 40(2):A1121–A1148, 2018. Mitusch, S., Funke, S., and Dokken, J. dolfin-adjoint 2018.1: automated adjoints for fenics and firedrake. Journal of Open Source Software , 4(38):1292, 2019. Pfaff, T., Fortunato, M., Sanchez-Gonzalez, A., and Battaglia, P. Learning Mesh-Based Simulation with Graph Networks. In International Conference on Learn-ing Representations , February 2023. Picasso, M., Alauzet, F., Borouchaki, H., and George, P.-L. A numerical study of some hessian recovery techniques on isotropic and anisotropic meshes. SIAM Journal on Scientific Computing , 33(3):1058–1076, 2011. Piccolo, C. and Cullen, M. A new implementation of the adaptive mesh transform in the Met Office 3D-Var system. 
+
+Quarterly Journal of the Royal Meteorological Society ,138(667):1560–1570, 2012. Raissi, M. Forward-Backward Stochastic Neural Networks: Deep Learning of High-dimensional Partial Differential Equations, April 2018. Raissi, M., Perdikaris, P., and Karniadakis, G. E. Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. Journal of Computational Physics , 378:686–707, February 2019. ISSN 0021-9991. doi: 10.1016/j.jcp.2018.10.045. Rathgeber, F., Markall, G. R., Mitchell, L., Loriant, N., Ham, D. A., Bertolli, C., and Kelly, P. H. Pyop2: A high-level framework for performance-portable simula-tions on unstructured meshes. In 2012 SC Companion: High Performance Computing, Networking Storage and Analysis , pp. 1116–1123. IEEE, 2012. Song, W., Zhang, M., Wallwork, J. G., Gao, J., Tian, Z., Sun, F., Piggott, M. D., Chen, J., Shi, Z., Chen, X., and Wang, J. M2N: Mesh Movement Networks for PDE Solvers. In Advances in Neural Information Processing Systems ,May 2022. Uribe, D., Durand, C., Baudouin, C., and Bigot, R. Enhanc-ing data representation in forging processes: Investigating discretization and R-adaptivity strategies with Proper Or-thogonal Decomposition reduction. Finite Elements in Analysis and Design , 242:104276, 2024. Vallet, M.-G., Manole, C.-M., Dompierre, J., Dufour, S., and Guibault, F. Numerical comparison of some hessian recovery techniques. International Journal for Numerical Methods in Engineering , 72(8):987–1007, 2007. 12 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Veli ˇckovi ´c, P., Cucurull, G., Casanova, A., Romero, A., Li `o, P., and Bengio, Y. Graph Attention Networks. In 
+
+International Conference on Learning Representations ,February 2018. Wallwork, J. G., Kramer, S. C., Zhang, M., and Dundovic, D. Movement, May 2024. Yang, Y., Yang, Q., Deng, Y., and He, Q. MMPDE-Net and Moving Sampling Physics-informed Neural Networks Based On Moving Mesh Method, November 2023. Zhang, M., Wang, C., Kramer, S., Wallwork, J. G., Li, S., Liu, J., Chen, X., and Piggott, M. D. Towards universal mesh movement networks. 2024. 13 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+# A. Implementation details 
+
+A.1. Diffusion deformer (diffformer) details 
+
+We apply the diffformer in learned blocks 
+
+D(b) 
+
+> θ
+
+(X) = 
+
+> Tb
+
+Y
+
+> n=0
+
+(I + dt (A(b) 
+
+> θ
+
+(X(b)) − I)) 
+
+!
+
+X(b). (10) where n = 0 , . . . , T i/dt denotes the discrete time step index, Nb is the number of blocks in the deformer, such that A(b) 
+
+> θ
+
+(X)
+
+is the attentional adjacency matrix at block b, dynamically learned as: 
+
+a(b) 
+
+> ij
+
+= exp( ϕ(b) 
+
+> θ
+
+(Xi, Xj )) 
+
+P  
+
+> k∈N (i)
+
+exp( ϕ(b) 
+
+> θ
+
+(Xi, Xk)) .
+
+Then the full G-adaptivity diffusion based deformation Map is given by 
+
+Mθ (X0, A) = 
+
+> Nb
+
+Y
+
+> b=0
+
+D(b)
+
+> θ
+
+!
+
+X(n), (11) The process consists of: 1. Initializing the feature matrix X(0) as the feature positions. 2. Looping over Nb deformer blocks, updating positions iteratively. 3. Applying Ti/dt steps of discrete evolution to refine the mesh over time. The input feature matrix is X0 = ( ξ ∥ h) ∈ RNx×d+|λ| utilises the graph transformer encoder of (Zhang et al., 2024) with the exact same hyperparameters. Similarly each attentional matrix A(b) 
+
+> θ
+
+is adapted from the same. We use Nb = 4 blocks and rollout using explicit Euler time integration for 32 timesteps with a step size of 0.1. 
+
+A.2. Hessian recovery 
+
+To identify parts of the domain Ω where the solution varies rapidly in space, we use an estimator for the local Hessian H(x, y )
+
+which is inspired by the approach in (Picasso et al., 2011). For a piecewise linear function u ∈ V (Ω) an approximation of the components of H is obtained by solving the weak problem 
+
+−
+
+Z
+
+> Ω
+
+∂iu∂ j v dx =
+
+Z
+
+> Ω
+
+Hij v dx for all v ∈ V (Ω) , v|∂Ω (12) for Hij subject to the strong Dirichlet boundary condition Hij |∂Ω = 0 . While there might be other Hessian recovery techniques (see e.g. (Vallet et al., 2007)), we observe empirically that our approach leads to good results if the Frobenius norm || H|| F =
+
+qP 
+
+> i,j
+
+H2 
+
+> ij
+
+is fed as an input to the GNN. 
+
+A.3. Gaussian basis function expansion for time-dynamic training 
+
+For technical reasons, in the Navier Stokes dataset it was necessary to provide the initial conditions used for training in analytical form as an UFL (Alnæs et al., 2014) expression that can be fed to Firedrake. To achieve this, snapshots of the pressure and velocity fields are taken at specified times during the numerical solution of the time-dependent Navier Stokes equations. The fields w(x, y ) are approximated as a sum of Gaussian basis functions in the form 
+
+wGBF (x, y ) = X
+
+> ij
+
+aij ϕ(x − xi, y − yj ) with ϕ(x, y ) = exp 
+
+
+
+− 12
+
+ x2
+
+h2
+
+> x
+
++ y2
+
+h2
+
+> y
+
+ 
+
+(13) where the nx × ny = 8 × 8 nodal points (xi, y j ) are arranged in a regular Cartesian grid over the domain with grid spacings 
+
+hx and hy . The expansion coefficients are chosen such that wGBF (xi, y j ) = w(xi, y j ). The sum on the right hand side of (13) can be implemented as an UFL expression. 14 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+# B. Notes on the use of Firedrake in G-Adaptivity 
+
+Firedrake (Ham et al., 2023) is a Python framework for the automatic solution of finite element problems. The central design idea based on composable abstractions, which allow the expression of the partial differential equation in weak form at a high level in Unified Form Language (UFL) (Alnæs et al., 2014). This abstraction is gradually lowered to generate C-kernels for matrix-assembly that can be executed in grid traversal with PyOP2 (Rathgeber et al., 2012). PETSc (Balay et al., 2019) provides a wide range of linear- and non-linear solvers for the resulting linear algebra problem. Firedrake supports a broad collection of finite element discretisations and dolfin-adjoint (Mitusch et al., 2019) allows the automatic construction of the adjoint problem for a given forward equation. The recently added interface to PyTorch (Bouziani & Ham, 2023) is crucial for the work in this paper. 
+
+B.1. Additional details on implementation 
+
+Training the GNN requires computing the derivative of the loss function E(Z, U Z ) with respect to node coordinates Z. Since 
+
+E(Z, U Z ) is a PDE-constrained functional, it is necessary to use adjoint models to compute these derivatives efficiently. The derivative and adjoint formulas depend on the loss function and its PDE constraints and automating their derivation is crucial to develop a general r-adaptivity methodology that can be trained seamlessly on different test cases. Firedrake is the perfect tool for this because it can derive adjoint models (Farrell et al., 2013; Mitusch et al., 2019) and automatically compute derivatives of E(Z, U Z ) with respect to node coordinates (Ham et al., 2019b). Deriving these formulas by hand is nontrivial, tedious, and error prone. Firedrake is fully integrated with PyTorch (Bouziani et al., 2024), and this is key to formulate hybrid FEM-torch architectures required to train the GNN. Implementing our approach in Firedrake required minimal adaptations: the GNN model must conform to the Firedrake external operator API, and a term must be added to the derivatives with respect to node coordinates when E(Z, U Z ) comprises a finite element solution computed on a finer mesh. As an example consider the shape derivative dJ (Z, U Z )[ T ] of the functional J(Z, U Z ) = || UZ || 2
+
+> L2(Ω)
+
+, which is a simplified version of E(Z, U Z ) in (3) . The constraint on UZ is given by the simplest testcase: the weak Poisson equation in Appendix C.1 with f = 4 . With Firedrake and PyAdjoint, we can compute dJ (Z, U Z )[ T ] as follows: 
+
+mesh = UnitSquareMesh(3, 3) continue_annotation() Q = mesh.coordinates.function_space() T = Function(mesh.coordinates.function_space()) mesh.coordinates.assign(mesh.coordinates + T) V = FunctionSpace(mesh, \CG", 1) u = Function(V) v = TestFunction(V) solve((dot(grad(u),grad(v))-4*v)*dx==0, u, bcs=DirichletBC(V, 0, \on_boundary")) J = assemble(u**2*dx) Jred = ReducedFunctional(J, Control(T)) Jred.derivative() 
+
+Crucially, this only requires the implementation of the forward constraint equation in Appendix C.1. On the other hand, a tedious manual derivation of dJ (Z, U Z )[ T ] leads to dJ (Z, U Z )[ T ] = R
+
+> Ω
+
+(U 2 
+
+> Z
+
++ ∇UZ · ∇ p − 4p)∇ · T − ∇ UZ (DT +
+
+DT ⊤)∇p dx with p being the (weak) solution of the adjoint equation ∆p = 2 UZ . These formulae are problem dependent and will be significantly more complicated for other PDE constraints. For test cases such as the Navier Stokes equations in Appendix C.3 this approach quickly becomes intractable, as highlighted in (Ham et al., 2019b, p. 1818). In contrast, adapting the code above to the problems described in Appendix C.2 & C.3 requires only minor changes. 
+
+# C. Mathematical description of the numerical experiments 
+
+C.1. Poisson’s equation 
+
+Poisson’s equation −∇ 2u = f (z) is solved using the Finite Element method in the two-dimensional convex domain 
+
+z ∈ Ω ⊂ R2. We use the weak formulation (2) and seek piecewise linear functions u ∈ SZ with Dirichlet Boundary 15 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+conditions u|∂Ω = 0 such that 
+
+Z
+
+> Ω
+
+∇u · ∇ v dx =
+
+Z
+
+> Ω
+
+f v dx for all test functions v ∈ SZ , v |∂Ω = 0 . (14) 
+
+C.2. Burgers’ equation 
+
+The non-linear viscous Burgers’ equation describes the evolution of the vector- valued velocity field u as 
+
+∂u
+
+∂t + ( u · ∇ )u − ν∇2u = 0 in eΩ, (15) where ν > 0 is the kinematic viscosity and we solve consider a two-dimensional rectangular domain eΩ ⊂ R2. The term 
+
+(u · ∇ )u describes non-linear convection and ν∇2u is the viscous diffusion. We use a piecewise linear Finite Element discretisation with u ∈ Sd−1 
+
+> Z
+
+. A simple backward-Euler timestepping method with step-size ∆t is employed to compute the velocity un+1 ∈ Sd−1 
+
+> Z
+
+at the next timestep from the current velocity un ∈ Sd−1
+
+> Z
+
+The time-discretised weak form of (15) is given by: find un+1 ∈ Sd−1 
+
+> Z
+
+such that 
+
+Z
+
+> Ω
+
+ un+1 − un
+
+∆t · v + ( un+1 · ∇ un+1 ) · v + ν∇un+1 : ∇v
+
+
+
+dx = 0 (16) for all test functions v ∈ Sd−1 
+
+> Z
+
+. The final two terms in (16) are the weak form of the nonlinear advection and viscous diffusion term respectively. 
+
+C.3. The Navier–Stokes Equations 
+
+We consider the incompressible Navier-Stokes equations in primitive form for a time-dependent velocity field u and pressure 
+
+p in the two-dimensional spatial domain eΩ = [0 , 2.2] × [0 , 0.41] :
+
+∂u
+
+∂t + ( u · ∇ )u − ν∇2u + ∇p = f , in eΩ, (17) 
+
+∇ · u = 0 , in eΩ, (18) Here ν > 0 is again the kinematic viscosity and f is an external force term. The Finite Element discretisation uses Taylor-Hood elements with piecewise linear pressure and vector-valued piecewise quadratic velocity functions (u, p ) ∈ Qd−1 
+
+> Z
+
+× SZ . The time-stepping procedure, which computes the velocity un+1 ∈ Qd−1
+
+> Z
+
+and pressure pn+1 ∈ SZ at the next timestep from the current velocity un ∈ Qd−1 
+
+> Z
+
+, is a variant of Chorin’s projection method (Chorin, 1967; 1968). It consists of three steps, each of which requires the solution of a weak problem. 
+
+Step 1: Compute tentative velocity u∗ Find u∗ ∈ Qd−1 
+
+> Z
+
+such that: 
+
+Z
+
+> Ω
+
+ u∗ − un
+
+∆t · v + ( un · ∇ umid ) · v + ν∇umid : ∇v
+
+
+
+dx +
+
+Z
+
+> ∂Ω
+
+(pnn · v − ν(∇umid · n) · v) ds =
+
+Z
+
+> Ω
+
+f · v dx. (19) for all piecewise quadratic vector-valued test functions v ∈ Qd−1 
+
+> Z
+
+where umid = 12 (un + u∗). Homogeneous Dirichlet boundary conditions are applied at the top ( y = 0 .41 ) and bottom ( y = 0 ) of the domain. The velocity field is prescribed on the inflow boundary at the left side of the domain as u(x = 0 , y ) =  4.0 · 1.5 · y · 0.41 −y 
+
+> 0.41 2
+
+, 0. The weak problem in (19) is solved with a GMRES iteration that is preconditioned with successive overrelaxation (SOR). 
+
+Step 2: Solve for pressure correction To ensure that the velocity field at the next timestep is divergence-free, find 
+
+pn+1 ∈ SZ which satisfies the following elliptic problem: 
+
+Z
+
+> Ω
+
+∇pn+1 · ∇ q dx =
+
+Z
+
+> Ω
+
+∇pn · ∇ q dx − 1∆t
+
+Z
+
+> Ω
+
+(∇ · u∗)q dx (20) for all piecewise linear pressure test functions q ∈ SZ . To deal with the fact that the pressure is only determined up to an additive constant, homogeneous Dirichlet boundary conditions are applied to pn+1 , q at the outflow boundary. The weak problem in (20) is solved with a conjugate gradient iteration preconditioned with algebraic multigrid (AMG). 16 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Step 3: Update velocity Find un+1 ∈ Qd−1 
+
+> Z
+
+such that: 
+
+Z
+
+> Ω
+
+un+1 · v dx =
+
+Z
+
+> Ω
+
+u∗ · v dx − ∆t
+
+Z
+
+> Ω
+
+∇(pn+1 − pn) · v dx. (21) for all piecewise quadratic vector-valued test functions v ∈ Qd−1 
+
+> Z
+
+. The weak problem in (21) is solved with a conjugate gradient iteration preconditioned with SOR. 
+
+# D. Further details of numerical experiments 
+
+D.1. Model and data hyperparameters 
+
+Table 4 shows for each PDE and geometry the number of train and test set samples as will as the resolution or node count for the train, test dataset and evaluation mesh. 
+
+PDE Poisson Burgers Navier-Stokes Domain Square Polygonal Square Cylinder 
+
+Train/Test Samples 100/100 100/100 100/100 25/50 
+
+Train Resolution [15x15, 20x20] 114 nodes [15x15, 20x20] 201 nodes 
+
+Test Resolution [12x12,...,23x23] 114 nodes [12x12,...,23x23] 201 nodes 
+
+Eval Resolution 100x100 228 nodes 100x100 402 nodes  
+
+> Table 4. Summary of PDE problem setups, including domains, sample sizes, and training/testing/evaluation resolutions.
+
+17 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+D.2. Additional results in the Poisson square and polygon case 
+
+In Figures 9 and 10 we present additional plots from the Poisson experiments on the square and polygonal domain detailed in the main paper exhibiting the types of meshes generated with our novel G-Adaptive methodology.  
+
+> Figure 9. Comparison of MA and ML model-generated meshes for Poisson problems on square and polygonal domains
+
+18 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Figure 10. Comparison of MA and ML model-generated meshes for Poisson problems on square and polygonal domains 
+
+D.3. Additional examples of Burger’s evolution 
+
+In Figure 11 we include some additional mesh trajectories from the experiment performed in Section 5.3. 
+
+Figure 11. Snapshots of the velocity field (x-component) together with the corresponding deformed meshes provided by Monge–Amp `ere. 
+
+19 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+D.4. Further experiments on non-convex domains 
+
+While section 5.4 already contains an example of a non-convex domain we provide further evidence that our method extends to this case using domain data from UM2N (Zhang et al., 2024). In particular we conducted experiments similar to the setup of 5.2 on five non-convex domains, cf. Figure 12. On each domain we solve Poisson’s equation for randomly sampled Gaussian solutions with 100 training datapoints and 100 unseen test datapoints. The results (error reduction scores are listed in in Table 5 and the full results can be seen in Figure 12) confirm that our method performs robustly on non-convex geometries, achieving significantly greater error reduction than baselines and generating regular non-tangled meshes on all tested domains, succeeding even when some other approaches fail. Note that the UM2N results reported below were obtained using the pretrained model from the UM2N repository, since the MA meshes obtained using (Wallwork et al., 2024) were unsuitable for direct training in these cases. 
+
+Table 5. Error reduction scores (%) on Poisson’s equation in non-convex domain. 
+
+DOMAIN MA ∗ UM2N † UM2N-G G-A DAPT 
+
+GEOMETRY 1 0.23 ± 0.00 −76 .85 ± 0.00 1.92 ± 0.02 7.97 ± 0.04 
+
+GEOMETRY 2 −1.00 ± 0.00 −83 .88 ± 0.00 0.69 ± 0.08 8.88 ± 0.24 
+
+GEOMETRY 3 – −75 .82 ± 0.00 −0.96 ± 0.04 6.62 ± 0.09 
+
+H-G EOMETRY −108 .31 ± 0.00 −73 .59 ± 0.00 −0.92 ± 0.00 7.51 ± 0.00 
+
+L-G EOMETRY −89 .40 ± 0.00 −138 .43 ± 0.00 13.94 ± 1.18 16.25 ± 0.25 
+
+∗ Monge–Amp `ere solvers in general struggle with non-convex domains. † Since the MA data available is not suitable for accurate training we use the pretrained model from (Zhang et al., 2024) for our evaluation. 
+
+D.5. Model hyper-parameter sensitivity analysis 
+
+We have performed extensive sensitivity studies and found that our approach is robust to the particular choice of hyperpa-rameters for the diffformer blocks. We used Nb = 4 blocks and rollout using explicit Euler time integration for 32 timesteps with a step size of 0.1. It should be noted that the hyperparameters were identical in all experiments performed in the paper and did not require finetuning to the specific problem. Tables 6 and 7 show the sensitivity of the model to the diffusion parameters in terms of error reduction and inference time. 
+
+Table 6. The effect of pseudotime and diffusion timesteps on the Error reduction. 
+
+DIFFUSION TIME AND TIME -STEP PERFORMANCE SENSITIVITY 
+
+dτ \ NO.-TIMESTEPS 2 4 8 16 32 64 0.05 10.41 16.60 18.95 15.85 21.82 22.93 0.1 12.97 14.52 20.68 15.71 20.27 20.85 0.25 19.54 19.11 22.30 19.94 23.11 22.09 0.5 20.43 22.65 22.14 22.42 21.32 21.92 1 20.60 21.57 21.16 22.10 19.71 19.40 
+
+Table 7. The effect of pseudotime and diffusion timesteps on inference time (ms). 
+
+DIFFUSION TIME AND TIME -STEP INFERENCE TIME 
+
+dτ \ NO.-TIMESTEPS 2 4 8 16 32 64 0.05 60 44 46 116 65 247 0.1 54 42 79 61 86 208 0.25 41 40 48 56 119 108 0.5 50 58 49 92 125 158 1 52 59 45 69 100 108 
+
+We investigated the sensitivity of G-Adaptivity to the weighting of the equidistribution regularizer in Section 4.4. We found 20 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Figure 12. Benchmarking results for Poisson’s equation on non-convex geometries. 
+
+an optimal value in the Poisson square example was a loss weighting of 1, which was used throughout all experiments. 21 G-Adaptivity: optimised graph-based mesh relocation for finite element methods                 
+
+> Table 8. The effect of equidistribution loss regularisation on Error reduction.
+> EQUIDISTRIBUTION LOSS REGULARIZER PERFORMANCE SENSITIVTY
+> REG .WEIGHT 0 ( NO EQUI .-DIST .LOSS )0.5 1248ERROR RED . (%) 22.42 22.95 23.99 23.21 22.14 20.96
+
+D.6. Scalability of the G-Adaptivity framework 
+
+In Section 5.6 we claimed the G-Adaptivity framework is able to scale to very large meshes via super-resolution. In Table 9 we report experiments where the model is trained on 15x15 mesh and inference is performed on larger 60x60 (3,600 nodes) and 150x150 (22,500 nodes) meshes for the Poisson problem with 128 sampled Gaussians (see Figure 8). We also show the results for G-Adaptivity applied to a 10x10x10 (1,000 node) cube (see Figure 7).                       
+
+> Table 9. Benchmarking results of scaling G-Adaptivity on Poisson Square and Cube datasets.
+> SCALING G-A DAPTIVITY
+> SCALE MODEL ERROR RED . (%) TIME (MS )60 X60 MA 11.94 ± 1.50 23084 G-A DAPT 27.47 ± 0.89 452 150 X150 MA 17.96 ± 115395 G-A DAPT 25.70 ± 1.51 2555 10 X10 X10 MA 12.71 ± 0.00 41049 G-A DAPT 28.08 ± 0.36 494
+
+# E. Further details on mesh relocation 
+
+E.1. Advantages and limitations of r-adaptivity 
+
+r-adaptivity is a newer technology than h-adaptivity and as such is not yet widely adapted in industry. However, it has certain significant advantages over h-adaptivity. In particular it works with a constant data structure, is easy to use on parallel architectures, it gives a more regular mesh (often with guaranteed mesh regularity), it naturally inherits Lagrangian and scaling structures in a PDE (which is very useful for example in ocean modelling and studying PDEs with singularities), and can be easily linked to existing external software designed to solve a PDE on an unstructured mesh (for example a discontinuous Galerkin solver). As a result, r-adaptive methods have recently been very successfully used, for example, in the operational data assimilation codes of national weather forecasting offices, which when coupled to the computational dynamical core, have led to a very significant increases in computational accuracy, particularly for resolving local weather features such as fog and ice (Piccolo & Cullen, 2012). r-adaptivity has also found natural applications in the steel industry where the Lagrangian nature of the approach is very well suited to the evolving fine structures in the forging process (Uribe et al., 2024). Possible disadvantages of r-adaptivity, such as excessive mesh computation cost, and a tendency to mesh tangling, are exactly the issues we address in this paper, proposing a fast and accurate method which avoids tangling. 
+
+E.2. The Equidistribution Principle 
+
+The equidistribution principle applied to a mesh with cells Ci used for an FE calculation of a function u(z), aims to minimise 
+
+the total error over all the cells by equidistributing it over each cell. Typically the error over such a cell can be measured (or estimated) by the integral of an appropriate monitor function over that cell, or more simply by the expression 
+
+m(z)|Ci| (22) where z is a representative point in the cell, and (in the two dimensional case) |Ci| is the cell area. The equidistribution condition on the cells Ci then becomes 
+
+m(z)|Ci| = θ, (23) where θ (to be determined) is a constant. The function m is usually a function of u. An important example is given by the problem of linearly interpolating u(z) as it follows from C ´ea’s lemma that the resulting interpolation error is an (often tight) 22 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+upper bound for the FE solution error. In this case m will be a function of the curvature of u (with the exact form dependent on the norm used to measure the error) (Huang & Russell, 2011). In the context of r-adaptivity each such cell Ci in the physical domain, will be the image, under the action of the deformation map F of a reference cell (of fixed area) in the computational domain. The area |C|i of Ci will then be proportional to 
+
+det( J) where J is the Jacobian of F. The equidistribution condition (23) then becomes: 
+
+m(z) det( J) = θ. (24) Note that the application of the monitor function in this way is equivalent to defining a measure on the physical space. In one dimension the equidistribution condition (24) uniquely defines each cell length, and thus the cell shape, and hence the whole mesh. However in two dimensions it only gives the cell area but not the shape. To find the mesh uniquely additional conditions must be imposed. Noting the correspondence between the equidistribution condition and a measure on the physical space, the deformation map can be viewed as mapping a uniform measure in the computational space to a new measure in the physical space. It is natural to seek a map which minimises the cost of doing this, as this leads to meshes in the physical domain which are close to uniform and hence have minimal skewness and which avoid tangling. This gives an obvious link between mesh generation and optimal transport. In the continuous setting such a map can be calculated by solving (either directly or by using a surrogate solver) an associated Monge-Amp ´ere equation, leading to the MA methods described in the main body of the text. Note that with modifications this procedure can also be used to generate meshes on non-planar manifolds (McRae et al., 2018). 
+
+# F. Mesh Tangling Prevention 
+
+We provide a formal proof that a mesh evolution scheme based on the row-stochastic weighted graph Laplacian does not lead to tangling, provided a sufficiently small time step is chosen. The argument follows from the positivity of the determinant of the Jacobian of the deformation, which is preserved due to the eigen-structure of the graph Laplacian. 
+
+Remark F.1 (Iterative Application in GNN Blocks) . The below results extend to our GNN-based mesh deformer, which applies diffusion blocks iteratively. At each iteration, the network updates the node positions while resetting the adjacency weights and initial state X0. Since each block follows the same form the results can be applied recursively. This ensures that stability and mesh preservation hold across multiple diffusion steps, allowing controlled adaptation of the mesh throughout the G-adaptivity pipeline. 
+
+Definition F.2 (Weighted Random Walk Normalized Graph Laplacian) . Given a weighted graph G = ( V, E, Aθ ) with adjacency matrix A and a learnable weight matrix Aθ , where (Aθ )ij represents the weighted edge between nodes i and j,the weighted degree matrix is defined as Dii = P 
+
+> j
+
+(Aθ )ij . The weighted random walk normalized graph Laplacian is given by: 
+
+∆θ = I − D−1Aθ .
+
+The operator ∆θ is symmetric positive semi-definite, satisfying ∆θ ⪰ 0. Its eigenvalues satisfy 0 = λ∆θ 
+
+> 0
+
+≤ . . . ≤ λ∆θ 
+
+> n−2
+
+≤
+
+ρ∆θ , with ρ∆θ ≤ 2. The eigenvalues represent the graph frequencies , and the corresponding eigenvectors are denoted by 
+
+{ϕ∆θ 
+
+> ℓ
+
+}n−1 
+
+> ℓ=0
+
+.The weights (Aθ )ij satisfy ai,j > 0 if (i, j ) ∈ E and P  
+
+> j∈N (i)
+
+aij = 1 .• In the degree-normalised graph (random walk) Laplacian ( Aθ = A), row sums are preserved due to the degree normalization, ensuring P 
+
+> j
+
+˜Aij = 1 , where ˜A = D−1A.• In the softmax-weighted case , weights are computed as 
+
+(Aθ )ij = exp( f (Xi, X j )) 
+
+P 
+
+> k∈N i
+
+exp( f (Xi, X k)) ,
+
+enforcing row stochasticity P 
+
+> j
+
+(Aθ )ij = 1 .23 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+Definition F.3 (Jacobian of mesh Deformation Map) . Given the mesh deformation model Mθ : ( X, A) 7 → X , the Jacobian 
+
+J of the transformation is given by: 
+
+J = ∇M (X),
+
+where ∇M (X) is the local derivative of the deformation map. 
+
+Definition F.4. (Mesh Tangling). We say that a physical mesh is tangled if at least one simplex in the triangulation has a negative determinant in its Jacobian matrix, i.e., det( Ji) ≤ 0, for some i, where Ji is the Jacobian matrix of the affine transformation mapping the reference element to the physical element in the mesh. Equivalently, the mesh is untangled if all eigenvalues of the Hessian of the transformation function, or its discrete counterpart given by the graph Laplacian, remain positive. 
+
+Proof of Mesh Tangling Prevention 
+
+We prove that a Laplacian GNN-based mesh adaptation scheme prevents tangling, given a sufficiently small time step. The argument follows from the positivity of the determinant of the mesh deformation Jacobian, which is preserved due to the eigen-structure of the graph Laplacian. 
+
+F.1. Continuous-Time Evolution 
+
+The evolution of node positions follows the Laplacian-based update: 
+
+dX
+
+dt = ( A − I)X = −∆X.
+
+where ∆ is the weighted random-walk graph Laplacian. As A is frozen over every diffusion block, the solution of this ordinary differential equation is: 
+
+X(t) = e−t∆X(0) , (25) implying the determinant of the transformation Jacobian satisfies 
+
+J(t) = det( e−t∆)J(0) = Y
+
+> i
+
+e−tλ i
+
+!
+
+J(0) = e−t tr(∆) J(0) . (26) Since tr(∆) = Nx × d ≥ 0, we have J(t) > 0 for all t ≥ 0, ensuring that no elements invert. 
+
+F.2. Time Step Constraints for Mesh Preservation 
+
+The discrete update for the mesh is Xk+1 = ( I − dt ∆) Xk, propagating the determinant as Jk+1 = det( I − dt ∆) Jk. To prevent inversion, we require det( I − dt ∆) > 0.
+
+Theorem F.5 (Time Step Condition for Mesh Preservation) . Given the discrete update Xk+1 = ( I − dt ∆) Xk, the mesh remains untangled if dt < 12 .Proof. The determinant of the deformation Jacobian propagates as det Jk+1 = det( I −dt ∆) det Jk. To ensure det Jk+1 >
+
+0, we require det( I − dt ∆) > 0. The eigenvalues of I − dt ∆ are μi = 1 − dtλ i so the determinant condition reduces to 
+
+Y
+
+> i
+
+(1 − dtλ i) > 0.
+
+Noting that A has positive entries with row sum equal to 1, it follows by Gershgorin’s theorem that the eigenvalues of A − I
+
+are contained in the Gershgorin circle |λi − 1| < 1. Seeing as the coefficients of A − I are real-valued the eigenvalues of A − I are either real-valued or come in complex conjugate pairs. If λi is real-valued the contribution to the above determinant is 1 − dtλ i > 1 − 2dt > 0 if dt > 1/2. If Im λi̸ = 0 then λi is also an eigenvalue and the contribution to the determinant is (1 − dtλ i)(1 − dtλ i) = |1 − dt Re λi|2 + |Im λi|2 > 0. Hence we obtain det( I − dt ∆) > 0 if dt < 12 .24 G-Adaptivity: optimised graph-based mesh relocation for finite element methods 
+
+F.3. Monitor-Conditioned Time Step 
+
+To refine the time step bound, consider the propagation matrix M = I − dt ∆ with eigenvalues μi = 1 − dtλ i. The condition number of M is κ(M ) = 1−dtλ min  
+
+> 1−dtλ max
+
+. Similarly, by Gershgorin’s theorem, λmax ≤ 2.
+
+Theorem F.6 (Monitor-Conditioned Time Step) . Given the discrete update Xk+1 = ( I − dt ∆) Xk, where the monitor function redistributes the mesh to improve spectral conditioning, the time step satisfies 
+
+dt ≤ min 
+
+ 12 , κ(M )2
+
+
+
+.
+
+Proof. The local mesh determinant propagates as Jk+1 = det( I − dt ∆) Jk. Stability requires 1 − dtλ max > 0. Since 
+
+λmax ≤ 2, we obtain dt ≤ κ(M )2 , completing the proof. 
+
+F.4. Mesh Quality Measures 
+
+Mesh quality measures are often used as indicators of whether a mesh will be effective when used to solve a PDE. In particular, the mesh-quality metrics are directly related to the conditioning of FEM stiffness matrices, meaning poor mesh conditioning leads to numerical instabilities in the FEM solvers. Our method is designed to minimise the FE solution error 
+
+directly , but the inclusion of the equidistribution regularisation ensures that G-Adaptivity leads to meshes that maintain good conditioning while reducing the FEM error.In our numerical experiments we report aspect ratio as a strong indicator of this mesh conditioning, but in the relevant literature the following metrics are commonly used to often used to assess mesh scale, skewness, and regularity. Two paradigms exist for evaluating mesh quality: • Known deformation map : Mesh quality is assessed directly using the eigenvalues λ0, λ 1 of the Jacobian. • Local geometric properties : Skewness can be measured as the ratio of the circumcircle to incircle radius, while regularity is inferred from element area variance. Mesh quality can be quantified through: • Scale : Element size, measured as λ0λ1, compared to a natural length scale. • Skewness : The anisotropy of elements, given by λ1/λ 0.• Regularity : Consistency of adjacent elements, e.g., variance in element areas. • Consistency : Stability of element shapes across the domain. 
+
+Aspect Ratio for our evaluation we use the aspect ratio of a triangular element, which is defined as the ratio of the longest edge lmax to the shortest altitude hmin :AR = lmax 
+
+hmin 
+
+, (27) where hmin is the shortest perpendicular distance from the opposite vertex to the longest edge. A higher aspect ratio indicates more elongated elements. 25

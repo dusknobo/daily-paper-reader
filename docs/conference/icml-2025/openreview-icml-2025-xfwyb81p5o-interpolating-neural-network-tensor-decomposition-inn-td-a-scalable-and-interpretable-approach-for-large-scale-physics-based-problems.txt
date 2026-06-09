@@ -1,0 +1,1305 @@
+Title: Interpolating Neural Network-Tensor Decomposition (INN-TD): a scalable and interpretable approach for large-scale physics-based problems
+
+URL Source: https://openreview.net/pdf?id=xfWYB81p5O
+
+Number of Pages: 25
+
+Markdown Content:
+# Interpolating Neural Network-Tensor Decomposition (INN-TD): a scalable and interpretable approach for large-scale physics-based problems 
+
+Jiachen Guo 1 Xiaoyu Xie 2 Chanwook Park 2 Hantao Zhang 1 Matthew J. Politis 1 Gino Domel 2
+
+Wing Kam Liu 2 3 
+
+## Abstract 
+
+Deep learning has been extensively employed as a powerful function approximator for modeling physics-based problems described by partial dif-ferential equations (PDEs). Despite its popular-ity, standard deep learning models often demand prohibitively large computational resources and yield limited accuracy when scaling to large-scale, high-dimensional physical problems. Their black-box nature further hinders the application in in-dustrial problems where interpretability and high precision are critical. To overcome these chal-lenges, this paper introduces Interpolating Neu-ral Network-Tensor Decomposition (INN-TD), a scalable and interpretable framework that has the merits of both machine learning and finite element methods for modeling large-scale phys-ical systems. By integrating locally supported interpolation functions from the finite element into the network architecture, INN-TD achieves a sparse learning structure with enhanced accu-racy, faster training/solving speed, and reduced memory footprint. This makes it particularly ef-fective for tackling large-scale high-dimensional parametric PDEs in training, solving, and inverse optimization tasks in physical problems where high precision is required. 
+
+## 1. Introduction 
+
+Deep learning methods have become a popular approach to model physical problems in recent years. Once trained,      
+
+> 1Theoretical and applied mechanics program, Northwest-ern University, 2145 Sheridan Rd, Evanston, Illinois, USA
+> 2Department of mechanical engineering, Northwestern Univer-sity, 2145 Sheridan Rd, Evanston, Illinois, USA 3HIDENN-AI, Evanston, Illinois, USA. Correspondence to: Wing Kam Liu <w-liu@northwestern.edu >.
+> Proceedings of the 42 nd International Conference on Machine Learning , Vancouver, Canada. PMLR 267, 2025. Copyright 2025 by the author(s).
+
+these models can make predictions much faster than stan-dard numerical simulations. However, deep learning faces challenges in modeling physical problems such as lower accuracy, instability, and the need for a huge amount of high-fidelity training data. As a result, its applications re-main limited for many engineering fields that require high precision, such as aerospace, semiconductor manufacturing, and earthquake engineering. In this paper, we propose Inter-polating Neural Network-Tensor Decomposition (INN-TD), which leverages the merits of both machine learning and numerical analysis to tackle large-scale, high-dimensional physical problems governed by partial differential equations (PDEs). 
+
+## 2. Related work 
+
+Deep learning theory has been applied to solve physical problems that are challenging for standard numerical al-gorithms. Based on the objective of the task, the current works can be broadly classified into 3 major categories: data-driven trainers, data-free solvers, and inverse problems. 
+
+2.1. Data-driven trainers 
+
+In the data-driven regime, we aim to leverage the universal approximation capabilities of neural networks to approxi-mate PDE solutions. Multilayer perceptrons (MLP) have been used due to their universal approximation capability (Cybenko, 1989). Depending on the shape of the domain, convolutional neural networks and graph neural networks can be used as additional inductive biases for data on regu-lar grids and irregular geometries, respectively (Gao et al., 2021; Pfaff et al., 2020). In recent years, many operator learning methods have been proposed to learn functional mappings instead of functions (Li et al., 2020; Lu et al., 2021; Huang et al., 2023). However, due to the black-box nature, designing optimal model architectures and optimiza-tion hyperparameters is still largely heuristic and requires trial and error (Rathore et al., 2024; Colbrook et al., 2022). For problems where physics is fully known, it becomes cumbersome to first generate offline data using standard numerical solvers and then train surrogate models from the offline data. Data generation and storage for large-scale 1Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+physical problems can be extremely expensive. For these problems, a better approach is to directly solve PDEs using deep learning models. 
+
+2.2. Data-free solvers 
+
+For cases where no data is available, deep learning can be used as function approximators to approximate PDE solu-tions. For example, MLP has been vastly used in physics-informed neural networks (PINNs) and its variations to approximate solutions to PDEs (Raissi et al., 2019; Zhang et al., 2022). Despite their vast usage, however, unlike classical numerical solvers which have a solid theoretical foundation, most of the current deep learning models are based on heuristics and lack theoretical analysis (Wang et al., 2022). It has been shown that PINN results have often been compared to weak baselines, potentially over-estimating their capabilities (McGreivy & Hakim, 2024). Most data-free deep learning solvers also suffer from the curse of dimensionality (Krishnapriyan et al., 2021) and are relatively slow compared to standard numerical solvers such as finite difference/volume/element methods (Grossmann et al., 2024). 
+
+2.3. Finite element interpolation 
+
+Finite element method (FEM) is the computational workhorse to numerically solve differential equations aris-ing in physics-based simulation (Liu et al., 2022). FEM is based on finite element (FE) interpolation theory. FEM first decomposes the original computational domain into a finite number of elements and then leverages locally-supported FE interpolation functions to approximate the field variables within each local domain. FEM can solve a wide range of problems, including structural mechanics, heat transfer, fluid flow, weather forecasting, and, in general, every con-ceivable problem that can be described by PDEs. Recent advancements in finite element (FE) methods focus on utiliz-ing machine learning to enhance traditional FE interpolation theory. By employing Convolutional-Hierarchical Deep Neural Network (C-HiDeNN), a generalized FE interpola-tion framework has been proposed, offering improved flexi-bility and greater accuracy (Lu et al., 2023; Li et al., 2023; Park et al., 2023). Despite their robustness and widespread application, finite element (FE)-type methods have been primarily applied to address space/space-time problems, exhibiting limitations in handling parametric partial differ-ential equations (PDEs). Furthermore, FE methods are par-ticularly susceptible to the curse of dimensionality, which poses significant computational challenges and escalates costs when applied to large-scale, high-dimensional prob-lems (Bungartz & Griebel, 2004). 
+
+2.4. Tensor decomposition 
+
+Tensor decomposition (TD) has been widely used in data compression tasks (Sidiropoulos et al., 2017). Among differ-ent tensor decomposition schemes, the Canonical Polyadic (CP) decomposition has been very popular since it decom-poses higher-order tensors into a tensor product of 1D vec-tors (Kolda & Bader, 2009). CP decomposition has also been used vastly to solve PDEs (Beylkin & Mohlenkamp, 2005; Bachmayr, 2023; Dolgov et al., 2012; Cohen et al., 2010). From now on, we refer to CP decomposition as TD unless stated otherwise. TD has also been used in regres-sion and classification tasks as an efficient model due to a lesser number of parameters (Ahmed et al., 2020; Park et al., 2024). Recently, it has been proved that if MLP is used to approximate each mode in TD, then it’s also a universal approximation (Vemuri et al., 2025). 
+
+## 3. INN-TD formulation 
+
+Interpolating Neural Network-Tensor Decomposition (INN-TD) achieves its remarkable efficiency through two key components: the utilization of C-HiDeNN, which is a gen-eral locally supported interpolation theory based on finite element, and the integration of tensor decomposition tech-niques. These elements collectively enhance the frame-work’s capability to model complex physical systems with improved accuracy and computational efficiency. 
+
+3.1. C-HiDeNN interpolation 
+
+Assume we want to learn a univariate function f (x) given data (xi, y i). In INN-TD, the target function f (x) is first broken into small elements, and then data within each ele-ment is approximated locally. This concept has been widely used in numerical methods such as finite element (FE). Here, we use a generalized version of FEM shape functions called Convolutional-Hierarchical Deep Neural Network (C-HiDeNN) (Lu et al., 2023) as the basis for the local in-terpolation function. For example, to approximate a simple sinusoidal function over multiple periods as shown in Fig. 1, we start by dividing the original domain into several el-ements, which we refer to as a mesh. The boundaries of each element are referred to as nodes, which are highlighted as green dots in Fig. 1. For each segment of the mesh, we employ local interpolation functions to perform the ap-proximation locally. The final approximation of the entire function is achieved by linking these locally approximated segments together. Assuming approximating the original function using n ele-ments, the univariate function f (x) is approximated using C-HiDeNN interpolation functions in INN-TD, and can be written as: 2Interpolating Neural Network-Tensor Decomposition (INN-TD)  
+
+> Figure 1. C-HiDeNN approaximation based on locally supported basis functions
+
+f (x) ≈ fN (x; s, a, p )ux (1) where ux ∈ Rn+1 is defined as the nodal values (grid point values); fN (x; s, a, p ) is the C-HiDeNN interpolation basis functions for different n elements as shown in Eq. 2. The approximation is governed by three hyperparameters, which allow for the approximation of polynomial orders of any degree: patch size s, reproducing order p, and dilation pa-rameter a. Details regarding the role of each hyperparameter are provided in the Appendix. A. 
+
+fN (x; s, a, p ) = [ eN0(x; s, a, p ), ..., eNn(x; s, a, p )] (2) C-HiDeNN interpolation function maintains all the essential finite element approximation properties such as Kronecker delta (Hughes, 2003), partition of unity (Melenk & Babu ˇska, 1996), error estimations and convergence theorems (Lu et al., 2023). For example, fN (x) satisfies the following Kronecker delta property at nodal position xl:
+
+eNk(xl; s, a, p ) = δkl (3) where the Kronecker delta is defined as: 
+
+δkl =
+
+(
+
+0 if k̸ = l, 
+
+1 if k = l. (4) At the Dirichlet boundary node ( xl), we have: 
+
+X
+
+> k
+
+eNk(xl; a, s, p )uk = ul (5) Thus, unlike many data-free solvers where an additional penalty term has to be added to softly enforce the Dirich-let boundary condition, C-HiDeNN can easily enforce the Dirichlet boundary condition. In summary, C-HiDeNN basis function has the following advantages over MLP, especially when applied to physical problems: 1. The Dirichlet boundary condition is automat-ically satisfied. 2. C-HiDeNN is interpretable as it uses locally supported basis functions and the number of ele-ments in C-HiDeNN is closely related to the resolution. 3. C-HiDeNN facilitates numerical integration through the use of Gaussian quadrature (Hughes, 2003), making it straight-forward and efficient for many classical integral methods in solving PDEs. For simplicity of the notation, hyperparame-ters s, a, p are dropped from now on. 
+
+3.2. INN-TD approximation 
+
+A general multivariate function u(x1, x 2, . . . , x D ) can be approximated using functional tensor decomposition (TD) as 1
+
+u(x1, x 2, ..., x D ) ≈ J u(x) = 
+
+> M
+
+X
+
+> m=1
+
+ΠDd=1 f (m) 
+
+> d
+
+(xd) (6) where M is defined as the total number of modes in TD; D is the total number of input dimensions; x =(x1, x 2, . . . , x D ); f (m) 
+
+> d
+
+(xd) is the univariate function for 
+
+d-th dimension and m-th mode. It has been proved that when the mode number M is sufficiently large and each univariate function f (m) 
+
+> d
+
+(xd) serves as a universal approxi-mation, Eq. 6 becomes a universal approximation for any multivariate function (Vemuri et al., 2025). In INN-TD, we utilize the C-HiDeNN interpolation function for each univariate function f (m) 
+
+> d
+
+(xd). As a result, Eq. 6 can be written as: 
+
+J u(x) = 
+
+> M
+
+X
+
+> m=1
+
+fN1(x1)u(m) 
+
+> x1
+
+· fN2(x2)u(m) 
+
+> x2
+
+·... · fND (xD )u(m)
+
+> xD
+
+(7) The model parameters for each mode in the INN-TD frame-work are U (m) = [ u(m)1 , u(m)2 , ..., u(m) 
+
+> D
+
+]. Since we have 
+
+M modes in the INN-TD interpolation, the complete model parameters are represented as U = [ U (1) , U (2) , ..., U (M )].The overall structure of INN-TD is shown in Fig. 9 in the Appendix. 
+
+3.3. Interpretability of INN-TD 
+
+As stated in (Doshi-Velez & Kim, 2017), model interpretabil-ity refers to the ability to explain a model’s behavior in a way that is understandable to humans. INN-TD is an interpretable machine learning algorithm designed for sci-
+
+> 1For ease of discussion, we only cover cases where the outputs are scalars in the main text. Nonetheless, the current framework seamlessly extends to handle high-dimensional outputs, as shown in Appendix E.2.6.
+
+3Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+entific and engineering problems, offering transparency in its structure, clear convergence guarantees, and explain-able insight into how data or parameter changes affect out-comes. In addressing physics-based problems described using PDEs, we harness several inductive biases inherent in both physics and classical numerical methods. Many physical problems tend to be low-dimensional in nature. For instance, in structural engineering, it is often observed that only the initial few frequencies significantly influence a structure’s dynamic response. As such, this response can be effectively approximated using a limited number of modes. More broadly, proper orthogonal decomposition (POD) or Karhunen-Lo `eve expansions are widely employed to sim-plify the complexity inherent in original physical models and have been widely used in reduced-order modeling of structural analysis and fluid dynamics problems (Rathinam & Petzold, 2003). Consequently, we utilize INN-TD as an efficient tool to uncover the naturally low-dimensional characteristics of physical problems. Additionally, INN-TD incorporates the concept of locally supported interpolation functions from the finite element method as approximators. Specifically, we employ the C-HiDeNN interpolation function, which balances the robust capabilities of generalized finite element methods with the adaptability of machine learning approaches. As a result, INN-TD adeptly accounts for the Kronecker Delta and par-tition of unity properties, providing flexibility, locality, sta-bility, and control over the interpolation process. Detailed definitions of these desired properties are explained in Ap-pendix A. As a result, INN-TD is very efficient and accurate in terms of capturing complex physics for both data-driven training and data-free solving tasks. Finally, unlike many black-box deep learning methods, INN-TD offers a clear interpretation. Specifically, the number of elements nd in dimension d determines the resolution of the interpolation, with larger nd corresponding to a higher-resolution interpolation in dimension d. For cases where 
+
+D = 2 , the total number of modes M is closely linked to the number of singular values in singular value decomposition (SVD) (Kolda & Bader, 2009). The benefits of such inter-pretability when solving PDEs are demonstrated in detail through a numerical example in Fig. 2. In this example, INN-TD is leveraged to solve the 2D Poisson’s equation with the local source term. By controlling mesh density and hyperparameters s and p, INN-TD can accurately predict the solution field. Details of this example can be found in Appendix B. Moreover, due to its interpretable nature, INN-TD exhibits convergence properties as a data-free solver. Specifically, in-creasing the number of model parameters tends to improve accuracy. This is corroborated using multiple numerical ex-amples in Section 4.2. The error bound is also theoretically shown in (Guo et al., 2025).      
+
+> Figure 2. Interpretable design of INN-TD: (a) the 1D meshes used in INN-TD are only refined at the location where nonlinearity happens with larger sand pused to achieve higher-order smooth-ness (b) point-wise absolute error between INN-TD and the exact solution
+
+3.4. Data-driven training 
+
+For training tasks, our goal is to estimate the function y ≈J u(x) given the data pairs (xi, y i). In this section, we focus solely on regression tasks, as our primary interest lies in learning function mapping to approximate physical relationships 2. The model parameters U can be obtained via a standard data-driven framework. We utilize the mean squared error (MSE) as the loss function to measure the difference between predicted values and true labels: 
+
+L = 1
+
+K
+
+X
+
+> k
+
+(J u(x∗
+
+> k
+
+; U ) − y∗
+
+> k
+
+)2. (8) where k is the index of training data; K is the total number of training data; (x∗, y∗) is the training data pairs. We propose two training schemes for determining model  
+
+> 2Data-driven training code can be found in: https://github. com/hachanook/pyinn/tree/icml_rev
+
+4Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+parameters. The first scheme utilizes a boosting algorithm, treating each mode as a weak learner. We iteratively intro-duce new weak learner J (M )u(x∗
+
+> k
+
+; U ) until the loss meets the predefined criteria: 
+
+argmin   
+
+> U(M)
+
+L = argmin   
+
+> U(M)
+
+1
+
+K
+
+X
+
+> k
+
+(Σ M −1 
+
+> m=1
+
+J (m)u(x∗
+
+> k
+
+; U (m))+ 
+
+J (M )u(x∗
+
+> k
+
+; U (M )) − y∗
+
+> k
+
+)2.
+
+(9) In the second scheme, known as all-at-once optimization, model parameters for all modes are determined simultane-ously. 
+
+argmin 
+
+> U
+
+L = argmin 
+
+> U
+
+1
+
+K
+
+X
+
+> k
+
+(J u(x∗
+
+> k
+
+; U ) − y∗
+
+> k
+
+)2. (10) Details about the boosting and all-at-once training algo-rithms can be found in Appendix C. 
+
+3.5. Data-free solving 
+
+Contrary to data-driven training tasks, no data is available to train the model parameters for data-free solving. How-ever, we know the underlying physics is governed by the corresponding PDE. This knowledge can be leveraged to solve the model parameters in an a priori sense so that the PDE and its initial and boundary conditions are satisfied. As a result, data-free solving tasks are significantly more challenging than data-driven training tasks. 3
+
+In the solving task, we categorize the independent variables 
+
+x into three distinct types based on their physical signif-icance. These are: spatial variables xs, which describe geometric features; the temporal variable xt; and parametric variables xp, which may include PDE coefficients, forcing terms, as well as initial and boundary conditions. Thus, a general PDE for physical problems can be represented as a space-parameter-time (S-P-T) problem. 
+
+L(J u(xs, xp, x t)) = 0 , (11) where L(·) denotes a general (nonlinear) differential op-erator; J u(xs, xp, x t) is the approximated solution, com-monly referred to as the trial function in numerical analysis. Methods for solving partial differential equations (PDEs) generally fall into two categories. The first involves directly minimizing the residual of the PDE in its differential form. The second projects the PDE loss onto a subspace, evaluat-ing the loss via a weighted-sum residual in the integral form.  
+
+> 3Data-free solving code can be found in: https://hub.docker. com/r/chiachenkuo/spt_demo
+
+Similar to FEM, INN-TD employs the integral form, which benefits from the efficiency of Gaussian quadrature-based numerical integration: 
+
+Z
+
+δJ u(xs, xp, x t)L(J u(xs, xp, x t)) dxsdxpdx t = 0 
+
+(12) where δJ u(xs, xp, x t) is called as the test function (Hughes, 2003). Different test functions can be adopted depending on the formulation. In this paper, we use the Galerkin formulation where the same function space is used for trial and test functions (Hughes, 2003). Additionally, we leverage integration by parts in Eq. 12 to relax the re-quirement for function continuity in INN-TD approximation (Guo et al., 2024). In solving high-dimensional S-P-T partial differential equa-tions (PDEs), a major challenge is the exponential increase in computational cost as the number of dimensions rises. This phenomenon, known as the curse of dimensionality, has been one of the most critical bottlenecks for both standard numerical and deep learning-based solvers. To address this challenge, only one-dimensional integration is performed in Eq. 12 due to the tensor decomposition structure of the INN-TD approximation. This approach ensures that the number of unknowns in the resulting system of equations depends only on the grid points across each dimension. Consequently, INN-TD effectively circumvents the curse of dimensionality, allowing it to handle high-dimensional prob-lems using very fine grids and achieving high resolution. This capability is especially advantageous for modeling physical phenomena that demand an extremely fine mesh to accurately capture and resolve localized features. In this paper, Eq. 12 is solved using a boosting algorithm. Moreover, instead of relying on stochastic optimization schemes, we use subspace iteration to linearize Eq. 12, taking advantage of the sparsity in the resulting system of equations, and solve it using sparse direct solvers. Details about the data-free solver algorithm can be found in Ap-pendix D. 
+
+3.6. Inverse optimization 
+
+In many engineering applications, determining the optimal coefficients or design parameters from experimental data or underlying physics is essential. In such cases, INN-TD serves as an efficient parametric mapping tool from the input space to the output space, thanks to its sparse structure. There are, in general, two different ways to tackle this prob-lem. In the first case, the spatial, temporal, and parametric variables are all treated as inputs to the machine learning model. Once the model is trained/solved, one can easily leverage automatic differentiation to infer the parametric 5Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+inputs (Takamoto et al., 2022). This approach requires the model to accurately learn the parametric mapping. In the second case, the physical parameters become trainable neu-ral network parameters. While they don’t appear directly in the network, they influence the loss function through an additional residual (Zhang et al., 2022). The performance of this approach can be sensitive to the contribution of each loss term and may require adaptive scaling of the loss func-tion components (Berardi et al., 2025). In this paper, we adopt the first approach for INN-TD to solve inverse problems, as INN-TD can efficiently and ac-curately handle general parametric function mapping. The optimal parameters can be obtained by minimizing the fol-lowing loss function. 
+
+argmin 
+
+> xp
+
+L = argmin 
+
+> xp
+
+∥J u(xs, x t; xp) − u∗(xs, x t)∥ℓ2
+
+(13) where ∥ · ∥ ℓ2 is the L2 norm and is defined as ∥x∥ℓ2 =pP ni=1 |xi|2; u∗(xs, x t) is the target spatial-temporal field. 
+
+## 4. Results 
+
+In this section, we present the performance of INN-TD in three key areas: data-driven training, data-free solving, and inverse optimization. We compare its performance with other deep learning models including vanilla MLP, SIREN (Sitzmann et al., 2020), Kolmogorov-Arnold net-works (KAN) (Liu et al., 2024), and tensor-decomposition physics-informed neural networks (CP-PINN) (Vemuri et al., 2025). All of the cases were run on a single NVIDIA RTX A6000 GPU. 
+
+4.1. Data-driven training task 
+
+4.1.1. T RAINING ON PARAMETRIC PDE SOLUTIONS 
+
+In this example, we aim to learn the solution to a time-dependent parametric PDE that models heat transfer inside the domain. The input parameters are spatial location (x, y ),time t, heat conductivity k, and source power P . The output is the temperature u. As a result, the function mapping of the parametric PDE can be written as (x, y, k, P, t ) → u.The governing parametric PDE can be written as: 
+
+
+
+˙u(x, t ) + k∆u(x, t ) = b(x, P ) in Ωx ⊗ Ωt,u(x, t )|∂Ω = 0 ,u(x, 0) = 0 ,
+
+(14) defined in a spatial domain Ωx = [0 , 1] 2, a temporal domain 
+
+Ωt = (0 , 0.04] , and parametric domains Ωk = [1 , 4] and 
+
+ΩP = [100 , 200] .We use the Gaussian source function to model the right-hand side (RHS) source term b(x, P ):
+
+b(x, P ) = Σ ns
+
+> i=1
+
+P exp 
+
+
+
+− 2(( x − xi)2 + ( y − yi)2)
+
+r20
+
+
+
+(15) where r0 = 0 .05 is the standard deviation that characterizes the width of the source function and (xi, y i) is the i-th source center. We used ns = 16 in this example as shown in Fig. 3. 
+
+Figure 3. Problem statement 
+
+The simulation data are generated by running finite element analysis (FEA) with different parameters: k and P . We compare 4 different methods: MLP, SIREN, KAN, INN-TD. The results are summarized in Table. 1 where the root mean squared error (RMSE) is reported. Details on the model setup are provided in Appendix E. We can see that INN-TD outperforms in the training and test sets. Note that for KAN, the 30% and 100% training data cases use a batch size of 256 to prevent out-of-memory issues, while the 10% training data case employs full-batch optimization, resulting in a significantly lower error than the other two cases. Nevertheless, for all cases listed here, INN has higher accuracy compared to the other 3 different models. 
+
+Table 1. Root Mean Square Error (RMSE) Comparison for Train-ing and Test Sets                                                       
+
+> Dataset Model Training ( ×10 −3)Test ( ×10 −3)Mean Std Mean Std Training 10% MLP 4.180 0.873 3.660 0.498 SIREN 2.330 0.188 4.550 0.297 KAN 4.600 0.243 4.840 0.323 INN-TD 0.213 0.009 0.748 0.911 Training 30% MLP 0.699 0.143 0.912 0.155 SIREN 1.240 0.161 2.020 0.197 KAN 4.710 1.120 4.490 0.996 INN-TD 0.154 0.003 0.154 0.006 Training 100% MLP 0.385 0.037 0.534 0.041 SIREN 1.170 0.121 1.660 0.200 KAN 4.590 0.231 4.260 0.087 INN-TD 0.126 0.002 0.129 0.005
+
+6Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+(a) Domain size x ∈ [0 , 1] 2 (b) Domain size x ∈ [0 , 12] 2
+
+Figure 4. Analytical solution for 2D cases. 
+
+4.2. Data-free Solving task 
+
+4.2.1. S OLVING HIGH -DIMENSIONAL PDE In this example, we use INN-TD as a data-free solver to directly solve high-dimensional Poisson’s equation with different source terms and compare its performance in terms of accuracy and speed against CP-PINN and KAN. Detailed model setups can be found in Appendix E. The multi-dimensional Poisson’s equation is written as: 
+
+∆u(x1, x 2, ..., x D ) = f (x1, x 2, ..., x D ) (16) where ∆( ·) is the Laplace operator which is defined as: 
+
+∆( ·) := ∂2(·)
+
+> ∂x 21
+
++ ∂2(·)
+
+> ∂x 22
+
++, ..., ∂2(·)
+
+> ∂x 2
+> D
+
+; D denotes the total num-ber of dimensions. Point-wise relative L2 norm error is used to measure the accuracy since INN-TD is also compared with collocatio-based machine learning method: 
+
+ϵ =
+
+" KX
+
+> k=1
+
+[J u(xk) − uexact (xk)] 2
+
+# 12
+
+/
+
+" KX
+
+> k=1
+
+uexact (xk)2
+
+# 12
+
+(17) where K is the total number of test data; uexact (xk) is the analytical solution. We let f (x) = − π2
+
+> 4
+
+PDi=1 sin   π 
+
+> 2
+
+xi
+
+
+
+and the corresponding analytical solution is: 
+
+uexact (x) = 
+
+> n
+
+X
+
+> i=1
+
+
+
+sin 
+
+ π
+
+2 xi
+
+ 
+
+(18) Two cases are examined here. In Case 1, the domain size is 
+
+[0 , 1] D , while Case 2 explores a larger domain size [0 , 12] D .The analytical solution is shown in Fig. 4 for both cases when D = 2 . As evident from the figure, Case 2 is more challenging to solve due to the presence of higher-frequency signals in its analytical solution. It’s known that vanilla MLP has spectral bias and thus poses challenges to learn Case 2 accurately and efficiently (Rahaman et al., 2019). Table. 2 lists the detailed performance of each different method in Case 1. INN-TD stands out due to its better performance in terms of accuracy and computational effi-ciency. For instance, in the 2D setting, INN-TD achieves a low relative L2 norm error of 1.754 × 10 −8 in just 0.81 seconds, significantly outperforming other methods in both accuracy and speed. As the dimensionality increases to 5 and 10, INN-TD maintains its high accuracy with errors of 
+
+1.659 × 10 −8 and 1.238 × 10 −8, respectively, while still being computationally efficient. CP-PINN and KAN are able to tackle high-dimensional problems. However, since the total number of collocation points will increase expo-nentially with the increase of dimension, they still suffer from expensive computational costs for high-dimensional problems. This demonstrates the robustness and scalability of the INN-TD method, making it a promising approach for solving high-dimensional PDEs. 
+
+Table 2. Comparison of different data-free solvers with domain size [0 , 1] D : INN-TD outperforms other models in both accuracy and speed. The mean values for error and wall time are reported.                                                          
+
+> Model # dim # collo-cation points in each dim #model param-eters Relative L2 norm error GPU wall time (sec) INN-TD
+> 2-256 1.754 ×10 −80.81
+> 5-1,600 1.659 ×10 −86.88
+> 10 -6,400 1.238 ×10 −857 .43
+> CP-PINN
+> 232 96 4.63 ×10 −360 .68
+> 2128 96 2.64 ×10 −3169 .2
+> 532 1,200 5.90 ×10 −32,130
+> KAN
+> 232 348 9.44 ×10 −556 .16
+> 2128 348 4.84 ×10 −558 .88
+> 512 624 1.68 ×10 −4842 .1
+
+Table. 3 provides a performance comparison of different models in Case 2. It is evident that the accuracy of both CP-PINN and KAN significantly decrease compared to Case 1, due to the increase in domain size. Despite utilizing more collocation points, the relative L2 norm error for these two methods does not converge to a smaller value, indicat-ing possible limitations in applying them to industrial-level problems requiring high accuracy and solver convergence. In contrast, INN-TD demonstrates significantly better accu-racy, outperforming other methods by orders of magnitude while requiring much less computational time. Furthermore, we evaluate the convergence of the INN-TD data-free solver for Case 1. As illustrated in Fig.5 (a), INN-TD demonstrates favorable convergence properties, with reduced error achieved as the model complexity in-creases. This convergence property enhances confidence in the model’s accuracy, enabling the design of the network to align with the anticipated precision. In addition to this example, three more examples are in-cluded in Appendix E.2 to further demonstrate the efficiency and accuracy of INN-TD as a data-free solver for tackling 7Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+Table 3. Comparison of different data-free solvers with domain size [0 , 12] D : INN-TD outperforms other models in both accuracy and speed. The mean values for error and wall time are reported.                                                         
+
+> Model Dim # collo-cation points in each dim #model param-eters Relative L2 norm error GPU wall time (sec) INN-TD
+> 2-256 4.77 ×10 −40.22
+> 5-1,600 3.97 ×10 −47.04
+> 10 -6,400 3.71 ×10 −459 .75
+> CP-PINN
+> 232 216 2.5×10 −287 .6
+> 21,024 216 2.1×10 −2261 .6
+> 22,048 296 3.2×10 −2292
+> KAN
+> 232 348 7.8×10 −160 .68
+> 2128 348 8.0×10 −172 .6
+> 2128 3,188 2.8×10 −1119 .7
+
+large-scale high-dimensional PDEs. In particular, we show INN-TD doesn’t exhibit the failure modes of PINN when solving the Helmholtz equation (Wang et al., 2021). 4.2.2. S OLVING GENERAL SPACE -PARAMETER -TIME 
+
+(S-P-T) PDE A distinct advantage of machine learning-based data-free solvers is their ability to naturally handle parametric PDEs by treating parametric variables as inputs. In contrast, stan-dard numerical solvers like FEM must rerun simulations for each different set of parametric inputs. In this example, we demonstrate that INN-TD effectively handles parametric PDEs by utilizing a space-parameter-time (S-P-T) interpo-lation. We consider solving the time-dependent parametric PDE described in Eq. 14, treating it as a 3D spatial problem 
+
+xs = ( x, y, z ) with 2D parametric inputs xp = ( k, P ) and 1D temporal input xt = t.The new source function can be written as: 
+
+b(x, P ) = Σ ns
+
+> i=1
+
+P exp 
+
+
+
+− 2(( x − xi)2 + ( y − yi)2)
+
+r20
+
+
+
+1z≥d0
+
+(19) where d0 is the depth of the source and d0 = 0 .5 in the cur-rent example; 1z≥d0 is the indicator function where 1z≥d0
+
+equals 1 if z ≥ d0 or 0 if z < d 0. Therefore, this PDE can be interpreted as modeling heat transfer with multiple fixed heat sources, each characterized by a radius r0 and a penetration depth d0, as shown in Fig. 6. This problem is solved using INN-TD using the algorithm listed in Algorithm 3 by discretizing each input dimension with 101 grid points and utilizing 100 modes. The total solving time takes 155 s on a single NVIDIA RTX A6000 GPU. Fig. 7 compares the INN-TD solution with FEM when k = 1 .03 , P = 101 , t = 0 .95 .To quantitatively assess the accuracy of the solution ob-tained from INN-TD, we measured the accuracy of INN-TD against the high-fidelity simulation by running implicit FEM 
+
+Figure 5. Solving the 2D Poisson’s Eq. using INN-TD with dif-ferent number of model parameters and hyperparameters s and p.
+
+a=20 is used for all cases. The statistics are obtained by repeating each case for 10 times and the shaded area represents 1 standard deviation (a) convergence of INN-TD using different s and p (b) statistics of total computational time (c) statistics of GPU VRAM usage 
+
+with different realizations of parametric inputs (k, P ). The relative L2 norm error for INN-TD is 3.38 × 10 −3. De-tails about the error computation can be found in Appendix E.2.4. 8Interpolating Neural Network-Tensor Decomposition (INN-TD)       
+
+> Figure 6. S-P-T data-free solver problem
+> Figure 7. Comparison of INN-TD and FEM solution for k=1.03 , P = 101 , t = 0 .95
+
+More data-free solving problems can be found in Appendix E.2. 
+
+4.3. Inverse optimization task 
+
+In the previous section, we have shown INN-TD can effec-tively capture complex S-P-T function mapping for both data-driven training and data-free solving tasks. Conse-quently, for the inverse problem, we first train (solve) the function mapping from S-P-T continuum to output using the data-driven trainer (data-free solver). Then we recover the unknown parametric coefficients by minimizing the differ-ence between prediction and measurements using automatic differentiation. As an example, we use the same PDE as in section 4.2.2 to il-lustrate the performance of INN-TD for the inverse problem. In this task, we aim to find the optimal parametric inputs 
+
+(k, P ) to obtain the target spatial-temporal field u∗(xs, x t).We adopt the following 2 metrics to analyze the accuracy. The error of identified parametric input is defined as: 
+
+ϵxp = |xp − x∗
+
+> p
+
+||x∗
+
+> p
+
+| (20) The error of the prediction is defined as the relative L2 norm error between estimated output and target output. 
+
+ϵL2 = ∥J u(xs, x t; xp) − u∗(xs, x t)∥2
+
+∥u∗(xs, x t)∥2
+
+(21) The error metrics of this example are summarized in Table. 4. As shown in the table, INN-TD effectively recovers the optimal parametric inputs with high accuracy. Details on the model setups can be found in Appendix E.2.5.                      
+
+> Table 4. Error for inverse optimization task.
+> Error Type Mean Standard Deviation
+> ϵL22.18 ×10 −35.64 ×10 −5
+> ϵk2.76 ×10 −34.64 ×10 −4
+> ϵP2.62 ×10 −33.11 ×10 −4
+
+## 5. Conclusion 
+
+In this paper, we introduced INN-TD as an efficient and accurate function approximation for large-scale, high-dimensional problems governed by PDEs. By combining the strengths of machine learning techniques and classical numerical algorithms, INN-TD demonstrated high accuracy in data-driven training, data-free solving, and inverse opti-mization tasks for problems where the underlying physics are described by PDEs. Particularly in the solving task, INN-TD achieves orders of magnitude better accuracy compared to other machine learning models. Convergence properties have been observed where more model parameters result in higher accuracy. Furthermore, INN-TD efficiently scales to higher-dimensional problems with extremely fast solv-ing speeds. Lastly, due to its interpretable nature, we can tailor the structure of INN-TD according to the required resolution in physical problems. In conclusion, by unifying training, solving, and inverse optimization within a single framework, INN-TD offers a seamless approach to address-ing challenging, large-scale physical problems that demand high precision and rapid solution speeds. 
+
+## Acknowledgment 
+
+The authors would like to greatly thank Prof. Thomas J.R. Hughes from the University of Texas, Austin for his insight-ful feedback and suggestions on the current work. 
+
+## Impact Statement 
+
+INN-TD lies at the intersection of artificial intelligence (AI) and traditional simulation approaches. By embedding in-ductive biases inspired by numerical analysis directly into the network architecture, INN-TD effectively tackles the challenges of low accuracy and high computational cost as-sociated with current deep learning models when applied to high-dimensional, large-scale physical problems governed by PDEs. 9Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+## References 
+
+Ahmed, T., Raja, H., and Bajwa, W. U. Tensor regression using low-rank and sparse tucker decompositions. SIAM Journal on Mathematics of Data Science , 2(4):944–966, 2020. Bachmayr, M. Low-rank tensor methods for partial differ-ential equations. Acta Numerica , 32:1–121, 2023. Berardi, M., Difonzo, F. V., and Icardi, M. Inverse physics-informed neural networks for transport models in porous materials. Computer Methods in Applied Mechanics and Engineering , 435:117628, 2025. Beylkin, G. and Mohlenkamp, M. J. Algorithms for nu-merical analysis in high dimensions. SIAM Journal on Scientific Computing , 26(6):2133–2159, 2005. Bungartz, H.-J. and Griebel, M. Sparse grids. Acta numer-ica , 13:147–269, 2004. Cohen, A., DeVore, R., and Schwab, C. Convergence rates of best n-term galerkin approximations for a class of el-liptic spdes. Foundations of Computational Mathematics ,10(6):615–646, 2010. Colbrook, M. J., Antun, V., and Hansen, A. C. The difficulty of computing stable and accurate neural networks: On the barriers of deep learning and smale’s 18th problem. 
+
+Proceedings of the National Academy of Sciences , 119 (12):e2107151119, 2022. Cybenko, G. Approximation by superpositions of a sig-moidal function. Mathematics of control, signals and systems , 2(4):303–314, 1989. Dolgov, S. V., Khoromskij, B. N., and Oseledets, I. V. Fast solution of parabolic problems in the tensor train/quantized tensor train format with initial applica-tion to the fokker–planck equation. SIAM Journal on Scientific Computing , 34(6):A3016–A3038, 2012. Doshi-Velez, F. and Kim, B. Towards a rigorous sci-ence of interpretable machine learning. arXiv preprint arXiv:1702.08608 , 2017. Gao, H., Sun, L., and Wang, J.-X. Phygeonet: Physics-informed geometry-adaptive convolutional neural net-works for solving parameterized steady-state pdes on irregular domain. Journal of Computational Physics , 428: 110079, 2021. Grossmann, T. G., Komorowska, U. J., Latz, J., and Sch ¨onlieb, C.-B. Can physics-informed neural networks beat the finite element method? IMA Journal of Applied Mathematics , pp. hxae011, 2024. Guo, J., Park, C., Xie, X., Sang, Z., Wagner, G. J., and Liu, W. K. Convolutional hierarchical deep learning neural networks-tensor decomposition (c-hidenn-td): a scalable surrogate modeling approach for large-scale physical sys-tems. arXiv preprint arXiv:2409.00329 , 2024. Guo, J., Domel, G., Park, C., Zhang, H., Gumus, O. C., Lu, Y., Wagner, G. J., Qian, D., Cao, J., Hughes, T. J., et al. Tensor-decomposition-based a priori surrogate (taps) modeling for ultra large-scale simulations. arXiv preprint arXiv:2503.13933 , 2025. Huang, O., Saha, S., Guo, J., and Liu, W. K. An introduction to kernel and operator learning methods for homogeniza-tion by self-consistent clustering analysis. Computational Mechanics , 72(1):195–219, 2023. Hughes, T. J. The finite element method: linear static and dynamic finite element analysis . Courier Corporation, 2003. Kharazmi, E., Zhang, Z., and Karniadakis, G. E. hp-vpinns: Variational physics-informed neural networks with do-main decomposition. Computer Methods in Applied Me-chanics and Engineering , 374:113547, 2021. Kolda, T. G. and Bader, B. W. Tensor decompositions and applications. SIAM review , 51(3):455–500, 2009. Krishnapriyan, A., Gholami, A., Zhe, S., Kirby, R., and Mahoney, M. W. Characterizing possible failure modes in physics-informed neural networks. Advances in neural information processing systems , 34:26548–26560, 2021. Li, H., Knapik, S., Li, Y., Park, C., Guo, J., Mojumder, S., Lu, Y., Chen, W., Apley, D. W., and Liu, W. K. Convo-lution hierarchical deep-learning neural network tensor decomposition (c-hidenn-td) for high-resolution topology optimization. Computational Mechanics , 72(2):363–382, 2023. Li, Z., Kovachki, N., Azizzadenesheli, K., Liu, B., Bhat-tacharya, K., Stuart, A., and Anandkumar, A. Fourier neural operator for parametric partial differential equa-tions. arXiv preprint arXiv:2010.08895 , 2020. Liu, W. K., Li, S., and Park, H. S. Eighty years of the finite element method: Birth, evolution, and future. Archives of Computational Methods in Engineering , 29(6):4431– 4453, 2022. Liu, Z., Wang, Y., Vaidya, S., Ruehle, F., Halver-son, J., Solja ˇci ´c, M., Hou, T. Y., and Tegmark, M. Kan: Kolmogorov-arnold networks. arXiv preprint arXiv:2404.19756 , 2024. Lu, L., Jin, P., Pang, G., Zhang, Z., and Karniadakis, G. E. Learning nonlinear operators via deeponet based on the 10 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+universal approximation theorem of operators. Nature machine intelligence , 3(3):218–229, 2021. Lu, Y., Li, H., Zhang, L., Park, C., Mojumder, S., Knapik, S., Sang, Z., Tang, S., Apley, D. W., Wagner, G. J., et al. Convolution hierarchical deep-learning neural networks (c-hidenn): finite elements, isogeometric analysis, tensor decomposition, and beyond. Computational Mechanics ,72(2):333–362, 2023. McGreivy, N. and Hakim, A. Weak baselines and reporting biases lead to overoptimism in machine learning for fluid-related partial differential equations. Nature Machine Intelligence , pp. 1–14, 2024. Melenk, J. M. and Babu ˇska, I. The partition of unity finite element method: basic theory and applications. Computer methods in applied mechanics and engineering , 139(1-4): 289–314, 1996. Park, C., Lu, Y., Saha, S., Xue, T., Guo, J., Mojumder, S., Apley, D. W., Wagner, G. J., and Liu, W. K. Convolu-tion hierarchical deep-learning neural network (c-hidenn) with graphics processing unit (gpu) acceleration. Compu-tational Mechanics , 72(2):383–409, 2023. Park, C., Saha, S., Guo, J., Xie, X., Mojumder, S., Bessa, M. A., Qian, D., Chen, W., Wagner, G. J., Cao, J., et al. Engineering software 2.0 by interpolating neural net-works: unifying training, solving, and calibration. arXiv preprint arXiv:2404.10296 , 2024. Pfaff, T., Fortunato, M., Sanchez-Gonzalez, A., and Battaglia, P. W. Learning mesh-based simulation with graph networks. arXiv preprint arXiv:2010.03409 , 2020. Rahaman, N., Baratin, A., Arpit, D., Draxler, F., Lin, M., Hamprecht, F., Bengio, Y., and Courville, A. On the spec-tral bias of neural networks. In International conference on machine learning , pp. 5301–5310. PMLR, 2019. Raissi, M., Perdikaris, P., and Karniadakis, G. E. Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. Journal of Computational physics , 378:686–707, 2019. Rathinam, M. and Petzold, L. R. A new look at proper orthogonal decomposition. SIAM Journal on Numerical Analysis , 41(5):1893–1925, 2003. Rathore, P., Lei, W., Frangella, Z., Lu, L., and Udell, M. Challenges in training pinns: a loss landscape perspective. In Proceedings of the 41st International Conference on Machine Learning , ICML’24. JMLR.org, 2024. Sidiropoulos, N. D., De Lathauwer, L., Fu, X., Huang, K., Papalexakis, E. E., and Faloutsos, C. Tensor decomposi-tion for signal processing and machine learning. IEEE Transactions on signal processing , 65(13):3551–3582, 2017. Sitzmann, V., Martel, J., Bergman, A., Lindell, D., and Wetzstein, G. Implicit neural representations with peri-odic activation functions. Advances in neural information processing systems , 33:7462–7473, 2020. Takamoto, M., Praditia, T., Leiteritz, R., MacKinlay, D., Alesiani, F., Pfl ¨uger, D., and Niepert, M. Pdebench: An extensive benchmark for scientific machine learning. 
+
+Advances in Neural Information Processing Systems , 35: 1596–1611, 2022. Vemuri, S. K., B ¨uchner, T., Niebling, J., and Denzler, J. Functional tensor decompositions for physics-informed neural networks. In International Conference on Pattern Recognition , pp. 32–46. Springer, 2025. Wang, S., Teng, Y., and Perdikaris, P. Understanding and mitigating gradient flow pathologies in physics-informed neural networks. SIAM Journal on Scientific Computing ,43(5):A3055–A3081, 2021. Wang, S., Yu, X., and Perdikaris, P. When and why pinns fail to train: A neural tangent kernel perspective. Journal of Computational Physics , 449:110768, 2022. Zhang, E., Dao, M., Karniadakis, G. E., and Suresh, S. Anal-yses of internal structures and defects in materials using physics-informed neural networks. Science advances , 8 (7):eabk0644, 2022. 11 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+## A. C-HiDeNN interpolation theory 
+
+Convolutional-Hierarchical Deep Neural Network (C-HiDeNN) interpolation theory synergizes the advantages of finite element interpolation, mesh-free interpolation, and machine learning optimization. (Lu et al., 2023; Park et al., 2023). A 1D C-HiDeNN interpolation can be written in the algebraic form as 
+
+J u(x) = X
+
+> i∈Ae
+
+Ni(x) X
+
+> j∈Ais
+
+W(j) 
+
+> i
+
+(x; s, a, p )uj = X
+
+> k∈Aes
+
+eNk(x; s, a, p )uk = fN (x; s, a, p )u (22) where Ni(x) is the standard finite element basis function at node i; W (j) 
+
+> i
+
+(x; s, a, p ) is the convolution patch function at node j defined on the support domain Ais. The double summation can be combined to a single summation over elemental nodal patches defined as Aes = S 
+
+> i∈Ae
+
+Ais. We can also interpret Eq. 22 as a partially connected MLP, as shown in Fig. 8.  
+
+> Figure 8. (a) Convolution patch in 1D C-HiDeNN shape function (b) Construction of convolution patch function (c) C-HiDeNN shape function as MLP with 3 hidden layers. This plot is adopted from (Park et al., 2024).
+
+In Fig. 8, the convolution patch function W (j) 
+
+> i
+
+(x; s, a, p ) is controlled by three hyperparameters: patch size s that controls nodal connectivity, dilation parameter a that normalizes distances between patch nodes, and reproducing order p that defines types/orders of activation functions to be reproduced by the patch functions. C-HiDeNN can adapt to these hyperparameters node by node using optimization, rendering an adaptable functional space without altering the number of nodes or layers. Unlike the traditional black-box MLP, C-HiDeNN can be interpreted as a tailored MLP structure that preserves several desired properties (inductive biases) that are particularly important in numerical analysis: locality, Kronecker delta property (Hughes, 2003), partition of unity (Melenk & Babu ˇska, 1996), and easy for integration (Hughes, 2003). These attributes enable C-HiDeNN to efficiently model complex physical problems with high accuracy. 12 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+Table 5. Comparison of MLP and C-HiDeNN 
+
+Properties MLP C-HiDeNN 
+
+Boundary/initial condition Penalty term in the loss func-tion (Raissi et al., 2019) Automatic satisfaction due to Kronecker delta (Lu et al., 2023) Convergence and stability Stochastic and not guaranteed (Colbrook et al., 2022) Shown for different PDEs (Guo et al., 2024) Numerical integration Quasi-Monte Carlo integra-tion (Kharazmi et al., 2021) Gaussian quadrature (Hughes, 2003) Interpretability Black-box model Fully interpretable 
+
+## B. Interpretability of INN-TD 
+
+Unlike most black-box machine learning models, INN-TD has a fully interpretable architecture. As shown in Fig. 9, INN-TD can be interpreted as a specially pruned MLP where the first 2 hidden layers represent locally supported linear finite element basis functions. The 3rd hidden layer reconstructs the C-HiDeNN interpolation function with higher-order smoothness which is controlled by hyperparameter patch size s and reproducing polynomial order p. The 4th hidden layer leverages tensor decomposition to counter the curse of dimensionality. As a result, INN-TD’s learning parameters are interpretable nodal values of TD components, in contrast to the opaque weights and biases of neural networks. To demonstrate the benefits of INN’s interpretability, we solve the following 2D Poisson’s equation in Ω = [0 , 100] 2 with a local source function.  ∂2
+
+∂x 21
+
++ ∂2
+
+∂x 22
+
+
+
+u = f (x, y ) (23) The local Gaussian source function f (x, y ) is defined as: 
+
+f (x, y ) = 0 .064( x − 40) 2e−0.04( x−44) 2
+
+e−0.04( y−75) 2
+
++ 0 .064( x − 20) 2e−0.04( x−20) 2
+
+e−0.04( y−25) 2
+
++0 .064( y − 15) 2e−0.04( x−46) 2
+
+e−0.04( y−55) 2
+
++ 0 .064( y − 25) 2e−0.04( x−26) 2
+
+e−0.04( y−25) 2
+
+−1.6e−0.04( x−20) 2
+
+e−0.04( y−25) 2
+
+− 1.6e−0.04( x−40) 2
+
+e−0.04( y−55) 2
+
+(24) The exact solution to this problem is: 
+
+uex (x, y ) = 10 e− (x−20) 225 e− (y−25) 225 + 10 e− (x−60) 225 e− (y−75) 225 (25) The Dirichlet boundary condition is u|∂Ω = uex (x, y )|∂Ω.To efficiently solve this problem, we leverage the interpretable locally supported basis function in INN-TD. As can be seen from Fig. 10 (a), a nonuniform mesh is used to accommodate the local source function: a fine mesh is used for the source function region, whereas a coarse mesh is used for other regions. Moreover, since the nonlinearity of the solution is expected to be localized near the source function region, larger s and p can be used for these local regions to improve the accuracy. The absolute pointwise error with respect to the exact solution is plotted in Fig. 10 (d) where the order is around 10 −6.
+
+## C. INN-TD trainer 
+
+Two different training schemes can be used for INN-TD trainer. The first method is based on the boosting algorithm. The core idea behind boosting is to convert a set of weak learners into a strong learner. A weak learner is a model that performs slightly better than random guessing. The boosting process involves sequentially training multiple weak learners, each trying to correct the errors made by its predecessor. We define the weak learner for mode m as J (m)y(x; U (m)), where U (m) = [ u(m)1 , u (m)2 , ..., u (m) 
+
+> D
+
+] is the model parameter for mode m. The strong learner J y(x; U ) can be obtained by adding weak learners for each mode, and we define U = [ U (1) , U (2) , ..., U (M )].
+
+J y(x; U ) = Σ Mm=1 J (m)y(x; U (m)) (26) 13 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+Figure 9. Interpretable structure of INN-TD 
+
+The loss of model prediction and training data (x∗, y ∗) is defined using the mean squared error: 
+
+L = 1
+
+K
+
+X
+
+> k
+
+(J y(x∗
+
+> k
+
+; U ) − y∗
+
+> k
+
+)2. (27) Assuming the previous M −1 weak learners have been obtained, and we aim to learn the new weak learner J (M )y(x; U (M )),Eq. 27 can be written as: 
+
+L = 1
+
+K
+
+X
+
+> k
+
+(Σ M −1 
+
+> m=1
+
+J (m)y(x∗
+
+> k
+
+; U (m)) + J (M )y(x∗
+
+> k
+
+; U (M )) − y∗
+
+> k
+
+)2. (28) Consequently, the goal is to learn to model parameters U (M ) for new weak learner J (M )y(x; U (M )) using optimization schemes. 
+
+argmin   
+
+> U(M)
+
+L = 1
+
+K
+
+X
+
+> k
+
+(Σ M −1 
+
+> m=1
+
+J (m)y(x∗
+
+> k
+
+; U (m)) + J (M )y(x∗
+
+> k
+
+; U (M )) − y∗
+
+> k
+
+)2. (29) The complete boosting algorithm for INN-TD trainer is shown in algorithm 1. Instead of gradually enhancing the accuracy of the model by adding weak learners, one can also predefine the total number of modes M required in the model and optimize the unknown parameters in the model in an all-at-once fashion as shown in Eq. 26. Consequently, we treat the total number of modes as one additional hyperparameter. The all-at-once training 14 Interpolating Neural Network-Tensor Decomposition (INN-TD)      
+
+> Figure 10. Interpretable design of INN-TD: (a) 1D meshes used in INN-TD are only refined at the location where nonlinearity happens with larger sand pused to achieve higher-order smoothness (b) INN-TD solution (c) Exact solution (d) point-wise absolute error
+
+Algorithm 1 INN-TD trainer: boosting Define maximum number of weak learners (modes) M , maximum epoch number epoch max , grid for each dimension xd
+
+Initialize model J y(x) = 0 
+
+for (epoch loop) epoch = 1 to epoch max do for (boosting loop) m = 1 to Mmax do 
+
+Initialize solution vector U (m) for the m-th weak learner. Optimize Eq. 29 using optimization schemes such as Adam Update learner: J y(x) = J y(x) + J (m)y(x; U (m))
+
+Check loss 
+
+end for end for 
+
+strategy has been shown to generally lead to better accuracy compared to the boosting strategy when the total number of modes M is the same. The complete all-at-once algorithm for INN-TD trainer is shown in algorithm 2. We use this algorithm for all of the training experiments presented in the paper. 
+
+Algorithm 2 INN-TD trainer: all-at-once Define total number of modes M , maximum epoch number epoch max , grid for each dimension xd
+
+Initialize model parameters U = [ U (1) , U (2) , ..., U (M )].
+
+for (epoch loop) epoch = 1 to epoch max do 
+
+Optimize Eq. 26 using optimization schemes such as Adam. Check loss 
+
+end for 
+
+## D. INN-TD solver 
+
+Boosting algorithm is adopted for INN-TD solver. Such method is known as proper generalized decomposition (PGD) in the field of computational mechanics (Li et al., 2023). A similar all-at-once approach named a priori tensor decomposition is also available (Guo et al., 2024). Different from the training approach where the loss is computed in a point-wise manner, we compute the PDE loss in a weighted-sum residual format. Without loss of generality, we focus on the discussion of the scalar solution field. Vector and higher-order tensorial solution fields can be treated in a similar way. Assume PDE can be written as: 
+
+Lu(x) = 0 (30) 15 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+where L is a general (nonlinear) differential operator, u(x) is the D-dimensional PDE solution depending on independent variables x = ( x1, x 2, ..., x D ). The INN-TD approximation to the solution can be written as: 
+
+J u(x) = 
+
+> M
+
+X
+
+> m=1
+
+fN1(x1)u(m) 
+
+> x1
+
+· fN2(x2)u(m) 
+
+> x2
+
+· ... · fND (xD )u(m) 
+
+> xD
+
+(31) In the context of solutions to time-dependent parametric partial differential equations (PDEs), the independent variables 
+
+(x1, x 2, . . . , x D ) can be divided into three distinct categories: spatial variables xs, parametric variables xp, and temporal variables xt. Spatial variables xs define the spatial coordinates relevant to the problem. Parametric variables xp serve as additional coordinates and can represent PDE coefficients, initial conditions, boundary conditions, and geometry descriptors. Temporal variable xt represents time. The weighted-sum residual form is adopted to solve PDEs. 
+
+Z
+
+δ(J u(x)) L(J u(x)) dx = 0 (32) where δ(J u(x)) is the so-called weighting function. Depending on the form of the PDE, different choices of δ(J u(x)) 
+
+can be adopted. For instance, if the Dirac Delta function δ(x − xi) (δ here refers to the Dirac Delta function) is used for the weighting function where xi is the collocation point, Eq. 32 becomes the differential (strong) form: Lu(x) = 0 .In this paper, we adopt the Galerkin formulation, where the function space of the weighting function is the same as our approximation. Moreover, integration by parts can be used to alleviate the differentiability requirement on the approximated solution (Hughes, 2003). In the boosting solution scheme, the solution is obtained incrementally in a mode by mode fashion: 
+
+J u(x) =  
+
+> M−1
+
+X
+
+> m=1
+
+fN1(x1)u(m) 
+
+> x1
+
+· fN2(x2)u(m) 
+
+> x2
+
+· ... · fND (xD )u(m) 
+
+> xD
+
++ fN1(x1)ux1 · fN2(x2)ux2 · ... · fND (xD )uxD (33) where we neglect the superscript M for the last mode M that we are solving. As a result, the corresponding weighting function can be written as: 
+
+δJ u(x) = fN1(x1)δux1 · fN2(x2)ux2 · ... · fND (xD )uxD +
+
+fN1(x1)ux1 · fN2(x2)δux2 · ... · fND (xD )uxD +
+
+fN1(x1)ux1 · fN2(x2)ux2 · ... · fND (xD )uxD +
+
+fN1(x1)ux1 · fN2(x2)ux2 · ... · fND (xD )δuxD
+
+(34) Based on Eq. 34, we further use subspace iteration to linearize the problem. In subspace iteration, we sequentially alternate 1 unknown variable while treating others as known constant values. In this case, the variation for other unknowns will be 0. Taking subspace iteration in x1 as an example, Eq. 34 becomes: 
+
+δx1 J u(x) = fN1(x1)δux1 · fN2(x2)ux2 · ... · fND (xD )uxD (35) Plugging Eq. 33, 35 into Eq. 32 and integrating along each 1D dimension, the matrix equations for x1 dimension can be derived: 
+
+Ax1 ux1 = Qx1 (36) where ux1 is the solution vector for the current dimension at the current mode; Ax1 is a banded sparse matrix as in the standard finite element method thanks to locally supported basis functions; Qx1 is a 1D vector. Similarly, we can sequentially alternate other dimensions and obtain the corresponding linear system of equations: 
+
+Axd uxd = Qxd (37) 16 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+where d = 1 , ..., D ; uxd is the solution vector for the current dimension at the current mode; Axd is a banded sparse matrix; 
+
+Qxd is a 1D vector. As a result, Eq. 37 can be efficiently solved using sparse matrix solvers. We can keep iterating Eq. 37 until the variation of solution vector for each dimension is within tolerance. In practice, 3-5 iterations will yield good accuracy. After the current mode is solved, we can introduce additional modes to further enhance the accuracy of the INN-TD model. This iterative process will be continued until the results meet the predefined accuracy criteria. The complete boosting algorithm for INN-TD solver is shown in algorithm 3. 
+
+Algorithm 3 INN-TD solver: boosting Define total number of modes M ; maximum number of iteration iter max ; tolerance; grid for each dimension xd
+
+Initialize solution J u(x) = 0 
+
+Initialize solution vector u(m) 
+
+> xd
+
+.
+
+for (boosting loop) m = 1 to M do for (subspace iteration loop) iter = 1 to iter max do for (dimension loop) d = 1 to D do 
+
+Update Axd and Qxd
+
+Solve Axd u(m) 
+
+> xd
+
+= Qxd using sparse matrix solver 
+
+end for 
+
+Check convergence 
+
+end for 
+
+J u(x) = J u(x) + fN1(x1)u(m) 
+
+> x1
+
+· fN2(x2)u(m) 
+
+> x2
+
+· ... · fND (xD )u(m)
+
+> xD
+
+Check Error 
+
+if Error ≤ Tolerance then 
+
+Break 
+
+end if end for 
+
+## E. Detailed model setups 
+
+E.1. Data-driven training examples 
+
+E.1.1. M ODEL SETUPS OF TRAINING ON PARAMETRIC PDE SOLUTIONS 
+
+This section presents the hyperparameters for training models on the PDE dataset. For the MLP model, we set the initial learning rate to 0.001, the batch size to 128, and use the Adam optimizer. Training runs for a maximum of 500 epochs with early stopping based on the validation error. If the validation error increases for 10 consecutive epochs, the model training will be stopped. We also apply an adaptive learning rate scheduler, reducing the learning rate by 10% after each epoch. The MLP model has 5 hidden layers, each having 50 neurons. For the SIREN model, we use almost the same hyperparameters as the MLP model. But we reduce the initial learning rate to 0.0001 to avoid loss explosion. We also increase the model complexity of the SIREN model. The model consists of 4 hidden layers, each containing 100 neurons. For the KAN model, we set the layer widths to [5, 5, 5, 1] for the 10% training data case, given that the input and output dimensions are 5 ( x, y, t, k, p ) and 1 ( u), respectively. We use 10 grid intervals,third-order of piecewise polynomials, and the LBFGS optimizer with 2, 000 steps and full-batch training. For the 30% and 100% training data cases, full-batch training is infeasible due to the GPU memory limitation, so we set the batch size to 256. With a smaller batch size, we increase the layer widths to [5, 10, 10, 1] and extend the number of training steps to 3,000. Notably, training loss can easily explode to NaN and increasing batch size does not change the final error too much. The INN-TD model uses 60 modes with 40 elements while the hyperparameters are: patch size s = 4 , dilation parameter 
+
+a = 20 , and polynomial order p = 1 . Thus, there are a total of 5 × 60 × 41 = 12 , 300 trainable parameters. We use the batch size of 128 for 100 epochs with the same early stopping criteria adopted in MLP. The Adam optimizer is adopted with a learning rate of 0.0001. 17 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+E.2. Data-free solver examples 
+
+E.2.1. H IGH -DIMENSIONAL PDE This subsection has detailed information discussed in section 4.2.1. Four different models, namely, INN-TD, PINN, CP-PINN, and KAN, were used as data-free solvers. The following high-dimensional PDE is solved. 
+
+∆u(x1, x 2, ..., x D ) = f (x1, x 2, ..., x D ) (38) In case 1, we adopt the following analytical solution: 
+
+uexact (x) = 
+
+nX
+
+i=1 
+
+
+
+sin 
+
+ π
+
+2 xi
+
+ 
+
+(39) The corresponding right-hand side (RHS) is: 
+
+f (x) = − π2
+
+4
+
+DX
+
+i=1 
+
+sin 
+
+ π
+
+2 xi
+
+
+
+(40) Detailed performance comparison of different models is listed in the tables below. 
+
+Table 6. Case 1: domain size x ∈ [0 , 1] D (each case is repeated 10 times to obtain the statistics) 
+
+Model # Dim. # colloc. # grid pts # modes # model Mean rel. L2 norm Mean GPU wall Mean GPU (D) points in each dim params. error w/ std. time w/ std. VRAM usage (s) w/ std. (MB) 
+
+INN-TD (4 iterations) 2 - 32 4 256 1.754 × 10 −8 ± 1 × 10 −12 0.81 ± 0.10 760 ± 0
+
+5 - 32 10 1,600 1.659 × 10 −8 ± 1.2 × 10 −13 6.88 ± 0.03 760 ± 0
+
+10 - 32 10 6,400 1.238 × 10 −8 ± 1.6 × 10 −12 57 .43 ± 0.41 760 ± 0
+
+CP-PINN (80 K epochs) 2 32 2 - 4 96 4.63 × 10 −3 ± 7.14 × 10 −4 60 .68 ± 0.53 880 ± 0
+
+2 128 2 - 4 96 2.64 × 10 −3 ± 3.54 × 10 −4 169 .2 ± 4.83 882 ± 0
+
+5 32 5 - 10 1,200 5.90 × 10 −3 ± 6.91 × 10 −4 2, 130 ± 18 .6 3018 ± 0
+
+KAN (50 steps) 2 32 2 5 - 348 9.44 × 10 −5 ± 8.37 × 10 −6 56 .16 ± 0.58 866 ± 0
+
+2 128 2 5 - 348 4.84 × 10 −5 ± 8.95 × 10 −6 58 .88 ± 0.58 1, 160 ± 0
+
+5 12 5 5 - 624 1.68 × 10 −4 ± 2.45 × 10 −5 842 .1 ± 3.94 9, 988 ± 0
+
+Table 7. Case 1: domain size x ∈ [0 , 12] D (each case is repeated 10 times to obtain the statistics) 
+
+Model # Dim. # colloc. # grid pts # modes # model Mean rel. L2 norm Mean GPU wall Mean GPU (D) points in each dim params. error w/ std. time w/ std. VRAM usage (s) w/ std. (MB) 
+
+INN-TD (4 iterations) 2 - 32 4 256 4.77 × 10 −4 ± 3.27 × 10 −8 0.22 ± 0.006 760 ± 0
+
+5 - 32 10 1,600 3.97 × 10 −4 ± 4.62 × 10 −8 7.04 ± 0.04 760 ± 0
+
+10 - 32 10 6,400 3.71 × 10 −4 ± 2.69 × 10 −9 59 .75 ± 0.39 760 ± 0
+
+CP-PINN (80 K epochs) 2 32 2 - 4 216 0.025 ± 0.004 87 .6 ± 6.53 882 ± 0
+
+2 1,024 2 - 4 216 0.021 ± 0.012 261 .6 ± 7.79 1,014 ± 0
+
+2 2,048 2 - 4 296 0.032 ± 0.007 292 ± 10 .3 1,014 ± 0
+
+KAN (50 steps) 2 32 2 5 - 348 0.78 ± 0.40 60 .68 ± 0.53 866 ± 0
+
+2 1,024 2 5 - 348 0.80 ± 0.27 72 .6 ± 1.19 19 ,948 ± 0
+
+2 128 2 10 - 3,188 0.28 ± 0.08 119 .7 ± 2.05 2,486 ± 0
+
+We also investigated the performance of four different models for the following analytical solution as in Case 2. 
+
+u(x) = 
+
+DY
+
+d=1 
+
+(sin( πx d)) (41) For 2D cases, the analytical solutions are shown in Fig. 11. 18 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+(a) Domain size x ∈ [0 , 1] 2 (b) Domain size x ∈ [0 , 12] 2
+
+Figure 11. Analytical solution for 2D cases. 
+
+The corresponding RHS can be written as: 
+
+f (x) = −Dπ 2
+
+> D
+
+Y
+
+> d=1
+
+(sin( πx d)) (42) Similarly, we studied 2 subcases with different domain sizes. The detailed comparison is shown in the table below. 
+
+Table 8. Case 2: domain size x ∈ [0 , 1] D (each case is repeated 10 times to obtain the statistics)                                                                                                                                                                     
+
+> Model # Dim. # colloc. # grid pts # modes # model Mean rel. L2 norm Mean GPU wall Mean GPU (D)points in each dim params. error w/ std. time w/ std. VRAM usage (s) w/ std. (MB)
+> INN-TD (4 iterations) 2-32 164 5.03 ×10 −7±1.31 ×10 −14 0.81 ±0.10 760 ±0
+> 5-32 1160 1.23 ×10 −6±8.65 ×10 −14 1.01 ±0.02 760 ±0
+> 10 -32 1320 2.42 ×10 −6±8.1×10 −14 3.62 ±0.06 764 ±0
+> CP-PINN (80 K epochs) 232 2-496 4.13 ×10 −3±1.00 ×10 −3171 .68 ±15 .3880 ±0
+> 2128 2-496 5.17 ×10 −3±1.38 ×10 −4169 .2±14 .83 882 ±0
+> 532 5-10 1,200 8.40 ×10 −3±1.45 ×10 −32,102 ±73 .83,018 ±0
+> KAN (50 steps) 232 25-348 8.03 ×10 −4±6.90 ×10 −557 .5±0.48 866 ±0
+> 2128 25-348 9.13 ×10 −4±1.90 ×10 −461 .0±0.35 1,160 ±0
+> 512 55-624 0.59 ±0.0054 872 .8±3.71 9,988 ±0
+
+Here we investigate the convergence of INN-TD for the 2D case with domain size Ω ∈ [0 , 12] 2. The details are shown in Fig. 12. INN-TD shows a convergence property where a larger number of model parameters leads to better accuracy. Moreover, the convergence rate can be controlled by adopting different combinations of hyperparameters s and p.E.2.2. S OLVING THE HELMHOLTZ EQUATION 
+
+In this example, INN-TD is used to solve the Helmholtz equation as shown below. In (Wang et al., 2021), it is shown that the vanilla PINN exhibits failure modes when solving this equation. Here we use INN-TD to solve the exact same problem. 
+
+ ∂2
+
+∂x 21
+
++ ∂2
+
+∂x 22
+
+
+
+u + u(x, y ) = q(x, y ) (43) where the forcing function is defined as: 
+
+q(x, y ) = −(a1π)2sin( a1πx )sin( a2πy ) − (a2π)2sin( a1πx )sin( a2πy ) + k2sin( a1πx )sin( a2πy ) (44) 19 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+Table 9. Case 2: domain size x ∈ [0 , 12] D (each case is repeated 10 times to obtain the statistics)                                                                                                                                                                    
+
+> Model # Dim. # colloc. # grid pts # modes # model Mean rel. L2 norm Mean GPU wall Mean GPU (D)points in each dim params. error w/ std. time w/ std. VRAM usage (s) w/ std. (MB)
+> INN-TD (4 iterations) 2-32 164 1.56 ×10 −2±6.17 ×10 −14 0.77 ±0.30 760 ±0
+> 2-256 1512 2.45 ×10 −6±1.37 ×10 −14 0.82 ±0.04 760 ±0
+> 5-32 1160 6.33 ×10 −6±1.36 ×10 −13 1.56 ±0.01 760 ±0
+> 10 -32 1320 1.33 ×10 −7±3.65 ×10 −14 3.82 ±0.02 764 ±0
+> CP-PINN (80 K epochs) 232 2-4216 1.45 ±0.21 102 .1±12 .3882 ±0
+> 21,024 2-4216 0.63 ±0.13 315 .5±10 .71,014 ±0
+> 22,048 2-4296 0.60 ±0.26 1,378 ±30 .71,014 ±0
+> KAN (50 steps) 232 25-348 1.00 ±1.96 ×10 −538 .9±3.05 866 ±0
+> 2128 210 -5,498 0.89 ±0.10 191 ±4.81 3,368 ±0
+> 2128 220 -28 ,578 0.53 ±0.03 369 .6±2.06 11 ,668 ±0
+
+Figure 12. Solving the 2D Poisson Eq. using INN-TD with different number of model parameters and hyperparameters s and p. a=20 is used for all cases. The statistics are obtained by repeating each case for 10 times and the shaded area represents 1 standard deviation (a) convergence of INN-TD using different s and p (b) statistics of total computational time (c) statistics of GPU VRAM usage 
+
+The solution domain is defined as: Ω ∈ [−1, 1] × [−1, 1] . The analytical solution to this problem is: 
+
+u(x1, x 2) = sin( a1πx ) sin( a2πy ) (45) The comparison of INN-TD solution and the analytical solution is shown in Fig. 13. It can be seen that INN-TD achieves high accuracy without any failure modes. Furthermore, we study the convergence of INN-TD with different hyperparameters. The result is shown in Fig. 14. As expected, INN-TD shows the convergence property where a larger number of model parameters leads to higher accuracy. Higher s and p can also decrease the error. E.2.3. S PACE -TIME PDE EXAMPLE 
+
+In this example, we show the convergence property of INN-TD data-free solver for a space-time problem. The governing PDE is shown below: 
+
+˙u(x, t ) + k∆u(x, t ) = b(x, t ) in Ωx ⊗ Ωt (46) where k is heat conductivity. b(x, t ) is defined as: 
+
+b(x, t ) = exp 
+
+−
+
+2
+
+
+
+(x − x0(t)) 2 + ( y − y0(t)) 2
+
+
+
+r2
+
+ (47) where r is the standard deviation that characterizes the width of the heat source; [x0(t), y 0(t)] is the heat source center. This equation models the heat transfer with a moving heat source. The 4D space-time continuum is adopted as: Ωx = [ −10 , 10] 3
+
+; Ωt = (0 , 0.1] .20 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+Figure 13. Solving the 2D Helmholtz Eq. using INN-TD ( s = p = 1 , a = 20 ) with 2 modes and 250 elements along each direction. The total solution time is 0.48 sec (a) INN-TD solution (b) exact solution (c) point-wise absolute error 
+
+Figure 14. Solving the 2D Helmholtz Eq. using INN-TD with different number of model parameters and hyperparameters s and p. a = 20 
+
+is used for all cases. The statistics are obtained by repeating each case for 10 times and the shaded area represents 1 standard deviation (a) convergence of INN-TD using different s and p (b) statistics of total computational time (c) statistics of GPU VRAM usage 
+
+To investigate the convergence of INN-TD for space-time problems, we use the following forcing function: 
+
+b(x, t ) = 2(1 − 2y2)(1 − e−15 t)e−y2−(100 t−x−5) 2
+
++ 2(1 − 2(100 t − x − 5) 2)(1 − e−15 t)e−y2−(100 t−x−5) 2
+
++ (1 
+
+− e−15 t)(200 x + 1000 − 20000 t)e−y2−(100 t−x−5) 2
+
+− 15 e−15 te−y2−(100 t−x−5) 2
+
+(48) As a result, the exact solution can be written as: 
+
+uexact (x, t ) = (1 − e−15 t)e−y2−(x−100 t−5) 2
+
+(49) A sample snapshot of the solution is shown in Fig. 15 (a). Since it’s straightforward for numerical integration of C-HiDeNN interpolation function, here we define the relative L2 21 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+Figure 15. Space-time PDE: (a) snapshot of the space-time solution (b) convergence for the 4D space-time problem: relationship between number of model parameters and relative L2 norm error 
+
+norm error in the integral form: R (uexact (x, t ) − J u(x, t )) 2 dxdt 
+
+ 12
+
+R (uexact (x)) 2 dxdt 
+
+ 12
+
+(50) We investigated the convergence properties of INN-TD using different hyperparameters s and p in C-HiDeNN interpolation. As shown in Fig. 15 (b), the error of INN-TD decreases as more model parameters are utilized. This guaranteed convergence distinguishes INN-TD from other black-box deep learning models, where an increase in model parameters does not necessarily result in reduced error. Additionally, the convergence rate can be controlled by adjusting s and p, providing flexibility in designing the INN-TD according to the accuracy requirement. E.2.4. S PACE -PARAMETER -TIME (S-P-T) PDE EXAMPLE 
+
+To solve the 6D S-P-T problem, we used 101 grid points to discretize each input dimension of (x, y, z, k, P, t ). 100 modes were used for INN-TD approximation. Therefore, the INN-TD interpolation function can be written as: 
+
+J u(x) = 
+
+> 100
+
+X
+
+> m=1
+
+fNx(x)u(m) 
+
+> x
+
+· fNy (y)u(m) 
+
+> y
+
+· fNz (z)u(m) 
+
+> z
+
+· fNk(k)u(m) 
+
+> k
+
+· fNP (P )u(m) 
+
+> P
+
+· fNt(t)u(m) 
+
+> t
+
+(51) Algorithm 3 was used to solve the S-P-T problem, and it took in total 155 s to run the solver on a single NVIDIA RTX A6000 GPU. Since the analytical solution is not available for this problem, we used the finite element method (FEM) to generate the simulation data and treated it as the ground truth. For ease of validation, the same spatial mesh size ( 100 × 100 × 100 )and 100 time steps were adopted in FEM simulation. We repeated running FEM simulations with 10 randomly selected parametric input pairs (k, P ). The relative L2 norm error is computed as follows: 
+
+ϵ =
+
+ X
+
+> i,j,a,b,c,d
+
+[J u(xi, y j , z a, k b, P c, t d) − uF EM (xi, y j , z a, t d; kb, P c)2
+
+
+
+> 12
+
+/
+
+ X
+
+> i,j,a,b,c,d
+
+uF EM (xi, y j , z a, t d; kb, P c)2
+
+
+
+> 12
+
+(52) where i, j, a, b, c, d refer to the data index of each input dimension. 22 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+E.2.5. I NVERSE OPTIMIZATION PROBLEM 
+
+In this problem, we solved the S-P-T problem using INN-TD data-free solver. As a result, we obtained the S-P-T interpolation function as shown in Eq. 51. To test the effectiveness of INN-TD for the inverse optimization problem, we randomly sampled 100 different parametric input pairs (ki, P i), i = 1 , .., 100 , and generated the corresponding ground truth through high-fidelity FEM simulation. Then we used Adam optimizer to optimize the loss function as shown in Eq. 13. The learning rate was chosen as 0.1. To ensure the parameters (ki, P i) are within the predefined range, we added a box constraint on the parameter such that: 
+
+kmin ≤ ki < k max 
+
+Pmin ≤ Pi < P max 
+
+For each optimization case, we used uniform distributions for the initial guess. The mean and standard deviation for the relative L2 norm error and parameter error were then computed across all cases. E.2.6. V ECTOR SOLUTION FIELD : ELASTICITY PROBLEM 
+
+In this example, INN-TD is used to solve the 3D elasticity problem in solid mechanics where the solution field is a vector field. The solution u = [ u1(x, y, z ), u 2(x, y, z ), u 3(x, y, z )] represents the displacement along the x, y and z directions. The governing equation is shown below: 
+
+μu i,jj + ( μ + λ)uj,ji + bi = 0 (53) where Einstein summation is used in the index notation, i = 1 , 2, 3 and j = 1 , 2, 3; λ, μ are the Lam ´e constants. The solution domain is defined as Ω = [0 , 1] × [0 , 1] × [0 , 2] and homogeneous boundary condition is assumed. The forcing function bi is defined as: 
+
+
+
+b1 = 922765196 .706382 · n22x(x − 1) sin( n1πy ) sin   n1πz 
+
+> 2
+
+ − 58745053 .109746 · n2 cos( n2πx ) (2 y − 1) sin   n2πz 
+
+> 2
+
+
+
+−58745056 .109746 · n3 cos( n3πy ) sin( n3πy ) ( z − 1) − 523575701 .269786 · sin( n1πy ) sin   n1πz 
+
+> 2
+
+
+
+b2 = 922765186 .706382 · n22 sin( n2πx ) y(y − 1) sin   n2πz 
+
+> 2
+
+ − 587450563 .109746 · n1(2 x − 1) cos( n1πy ) sin   n1πz 
+
+> 2
+
+
+
+−587450563 .109746 · n3 sin( n3πx ) cos( n3πy ) ( z − 1) − 523575701 .269788 · sin( n2πx ) sin   n2πz 
+
+> 2
+
+
+
+b3 = 738212149 .36510 · n23 sin( n3πx ) sin( n3πy )z(z − 2) − 293725281 .554873 · n2 sin( n2πx ) (2 y − 1) cos   n2πz 
+
+> 2
+
+
+
+−2937252181554873 · n1(2 x − 1) sin( n1πy ) cos   n1πz 
+
+> 2
+
+ − 261787850 .634994 · sin( n3πx ) sin( n3πy )
+
+(54) The analytical solution to the problem is: 
+
+
+
+u1(x, y, z ) = 0 .000972354873786749 · (x2 − x) sin( n1πy ) sin   n1πz 
+
+> 2
+
+
+
+u2(x, y, z ) = 0 .000972354873786749 · (y2 − y) sin( n2πx ) sin   n2πz 
+
+> 2
+
+
+
+u3(x, y, z ) = 0 .000972354873786749 · sin( n3πx ) sin( n3πy )
+
+ z2 
+
+> 2
+
+− z
+
+ (55) The convergence of INN-TD is shown in Fig. 16. E.2.7. O PERATOR SOLVING 
+
+INN-TD can also be extended to approximate PDE operators. As an example, we show that INN-TD can be leveraged to approximate the PDE operator for the following equation: 
+
+∂u ∂t − ∂∂x k(x) ∂u ∂x = f (x) (56) with homogeneous initial and boundary conditions. Here we aim to approximate the PDE operator from the conductivity field k(x) to the space-time PDE solution u(x, t ).23 Interpolating Neural Network-Tensor Decomposition (INN-TD)  
+
+> Figure 16. Convergence for the elasticity problem: relationship between mesh size and energy norm error
+
+To account for the arbitrariness of k(x), we discretize x and assume the nodal values of k(x) are subjected to the following covariance function: 
+
+C(xi, x j ) = σ2 exp − (xi − xj )2
+
+2l2
+
+!
+
+(57) where hyperparameters σ and l refer to standard deviation and length scale, respectively. The covariance matrix can be further decomposed using eigen-decomposition and arbitrary k(x) is approximated using the following equation: 
+
+k(x, ζ) = kμ +
+
+> nx
+
+X
+
+> I=1
+
+eNI (x)
+
+> ne
+
+X
+
+> J=1
+
+pλJ ϕIJ ζJ (58) where kμ is the mean value; λJ is the J-th eigenvalue; ϕIJ refers to the I-th component of J-th eigenvector; ζJ is the J-th uncorrelated variable; eNI (x) is the I-th C-HiDeNN basis function. As a result, the INN-TD approximation of the PDE operator can be written as: 
+
+J u(x, ζ, t ) = 
+
+> M
+
+X
+
+> m=1
+
+u(m) 
+
+> x
+
+(x)ψ(m)1 (ζ1)ψ(m)2 (ζ2) · ... · ψ(m) 
+
+> ne
+
+(ζne )u(m) 
+
+> t
+
+(t) (59) where each univariate function is approximated using C-HiDeNN basis functions. The details of the model discretizations are shown in Table 10. INN-TD requires 96 .74 ± 4.65 sec for the offline computation. Fig. 17 shows that INN-TD gives accurate predictions as compared to the corresponding finite difference solutions for different realizations of the conductivity field.  
+
+> Table 10. Summary of the INN-TD model for approximating PDE operator
+
+Discretization variable Space (x) Parameter for k (ζ) Time (t) 
+
+Domain [0, 1] [-5, 5] [0, 0.01] Number of independent variables 1 71 1Number of elements 71 101 151 Number of eigenvalues – 71 –24 Interpolating Neural Network-Tensor Decomposition (INN-TD) 
+
+Figure 17. Results for operator solving task when conductivity field k(x) is a (a) sinusoidal function (b) random function. 
+
+25

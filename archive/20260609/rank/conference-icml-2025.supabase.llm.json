@@ -1,0 +1,1101 @@
+{
+  "top_k": 200,
+  "generated_at": "2026-06-09T05:08:56.635819+00:00",
+  "papers": [
+    {
+      "id": "openreview-icml-2025-1qzmwvrgsu",
+      "source": "ICML-2025-Accepted",
+      "title": "PEINR: A Physics-enhanced Implicit Neural Representation for High-Fidelity Flow Field Reconstruction",
+      "abstract": "Implicit neural representation (INR) has now been thrust into the limelight with its flexibility in high-fidelity flow field reconstruction tasks. However, the lack of standard benchmarking datasets and the grid independence assumption for INR-based methods hinder progress and adoption in real-world simulation scenarios. Moreover, naive adoptions of existing INR frameworks suffer from limited accuracy in capturing fine-scale structures and spatiotemporal dynamics. Tacking these issues, we first introduce HFR-Beach, a 5.4 TB public large-scale CFD dataset with 33,600 unsteady 2D and 3D vector fields for reconstructing high-fidelity flow fields. We further present PEINR, a physics-enhanced INR framework, to enrich the flow fields by concurrently enhancing numerical-precision and grid-resolution. Specifically, PEINR is mainly composed of physical encoding and transformer-based spatiotemporal fuser (TransSTF). Physical encoding decouples temporal and spatial components, employing Gaussian coordinate encoding and localized encoding techniques to capture the nonlinear characteristics of spatiotemporal dynamics and the stencil discretization of spatial dimensions, respectively. TransSTF fuses both spatial and temporal information via transformer for capturing long-range temporal dependencies. Qualitative and quantitative experiments and demonstrate that PEINR outperforms state-of-the-art INR-based methods in reconstruction quality.",
+      "authors": [
+        "Liming Shen",
+        "Liang Deng",
+        "Chongke Bi",
+        "Yu Wang",
+        "Xinhai Chen",
+        "Yueqing Wang",
+        "Jie Liu"
+      ],
+      "primary_category": "Implicit Neural Representation",
+      "categories": [
+        "Implicit Neural Representation",
+        "Time-varying data visualization",
+        "Standard benchmark datasets",
+        "High-fidelity flow field reconstruction",
+        "Physical encoding"
+      ],
+      "published": "2025-05-01T13:13:03.05+00:00",
+      "link": "https://openreview.net/forum?id=1QZMWVrgsU",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-ef1uhxznny",
+      "source": "ICML-2025-Accepted",
+      "title": "Active Learning with Selective Time-Step Acquisition for PDEs",
+      "abstract": "Accurately solving partial differential equations (PDEs) is critical to understanding complex scientific and engineering phenomena, yet traditional numerical solvers are computationally expensive. Surrogate models offer a more efficient alternative, but their development is hindered by the cost of generating sufficient training data from numerical solvers. In this paper, we present a novel framework for active learning (AL) in PDE surrogate modeling that reduces this cost. Unlike the existing AL methods for PDEs that always acquire entire PDE trajectories, our approach strategically generates only the most important time steps with the numerical solver, while employing the surrogate model to approximate the remaining steps. This dramatically reduces the cost incurred by each trajectory and thus allows the active learning algorithm to try out a more diverse set of trajectories given the same budget. To accommodate this novel framework, we develop an acquisition function that estimates the utility of a set of time steps by approximating its resulting variance reduction. We demonstrate the effectiveness of our method on several benchmark PDEs, including the Burgers' equation, Korteweg–De Vries equation, Kuramoto–Sivashinsky equation, the incompressible Navier-Stokes equation, and the compressible Navier-Stokes equation.\nExperiments show that our approach improves performance by large margins over the best existing method. Our method not only reduces average error but also the 99\\%, 95\\%, and 50\\% quantiles of error, which is rare for an AL algorithm. All in all, our approach offers a data-efficient solution to surrogate modeling for PDEs.",
+      "authors": [
+        "Yegon Kim",
+        "Hyunsu Kim",
+        "Gyeonghoon Ko",
+        "Juho Lee"
+      ],
+      "primary_category": "Active learning",
+      "categories": [
+        "Active learning",
+        "Partial Differential Equation (PDE)"
+      ],
+      "published": "2025-05-01T13:17:37.479+00:00",
+      "link": "https://openreview.net/forum?id=ef1UHxznNy",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-6f1hx1enef",
+      "source": "ICML-2025-Accepted",
+      "title": "Geometric and Physical Constraints Synergistically Enhance Neural PDE Surrogates",
+      "abstract": "Neural PDE surrogates can improve the cost-accuracy tradeoff of classical solvers, but often generalize poorly to new initial conditions and accumulate errors over time. Physical and symmetry constraints have shown promise in closing this performance gap, but existing techniques for imposing these inductive biases are incompatible with the staggered grids commonly used in computational fluid dynamics. Here we introduce novel input and output layers that respect physical laws and symmetries on the staggered grids, and for the first time systematically investigate how these constraints, individually and in combination, affect the accuracy of PDE surrogates. We focus on two challenging problems: shallow water equations with closed boundaries and decaying incompressible turbulence. Compared to strong baselines, symmetries and physical constraints consistently improve performance across tasks, architectures, autoregressive prediction steps, accuracy measures, and network sizes. Symmetries are more effective than physical constraints, but surrogates with both performed best, even compared to baselines with data augmentation or pushforward training, while themselves benefiting from the pushforward trick. Doubly-constrained surrogates also generalize better to initial conditions and durations beyond the range of the training data, and more accurately predict real-world ocean currents.",
+      "authors": [
+        "Yunfei Huang",
+        "David S. Greenberg"
+      ],
+      "primary_category": "Geometric and Physical Constraints",
+      "categories": [
+        "Geometric and Physical Constraints",
+        "Neural PDE Surrogates",
+        "Symmetry Equivariance",
+        "Conservation Laws",
+        "Fluid Dynamics"
+      ],
+      "published": "2025-05-01T13:19:54.217+00:00",
+      "link": "https://openreview.net/forum?id=6f1Hx1eneF",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-3bajmrapsx",
+      "source": "ICML-2025-Accepted",
+      "title": "PDE-Transformer: Efficient and Versatile Transformers for Physics Simulations",
+      "abstract": "We introduce PDE-Transformer, an improved transformer-based architecture for surrogate modeling of physics simulations on regular grids. We combine recent architectural improvements of diffusion transformers with adjustments specific for large-scale simulations to yield a more scalable and versatile general-purpose transformer architecture, which can be used as the backbone for building large-scale foundation models in physical sciences. We demonstrate that our proposed architecture outperforms state-of-the-art transformer architectures for computer vision on a large dataset of 16 different types of PDEs. We propose to embed different physical channels individually as spatio-temporal tokens, which interact via channel-wise self-attention. This helps to maintain a consistent information density of tokens when learning multiple types of PDEs simultaneously. We demonstrate that our pre-trained models achieve improved performance on several challenging downstream tasks compared to training from scratch and also beat other foundation model architectures for physics simulations.\nOur source code is available at https://github.com/tum-pbs/pde-transformer.",
+      "authors": [
+        "Benjamin Holzschuh",
+        "Qiang Liu",
+        "Georg Kohl",
+        "Nils Thuerey"
+      ],
+      "primary_category": "physics simulations",
+      "categories": [
+        "physics simulations",
+        "PDEs",
+        "transformer architectures",
+        "scalability"
+      ],
+      "published": "2025-05-01T13:15:50.084+00:00",
+      "link": "https://openreview.net/forum?id=3BaJMRaPSx",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-pwr2lznsqc",
+      "source": "ICML-2025-Accepted",
+      "title": "M2PDE: Compositional Generative Multiphysics and Multi-component PDE Simulation",
+      "abstract": "Multiphysics simulation, which models the interactions between multiple physical processes, and multi-component simulation of complex structures are critical in fields like nuclear and aerospace engineering. Previous studies use numerical solvers or ML-based surrogate models for these simulations. However, multiphysics simulations typically require integrating multiple specialized solvers-each for a specific physical process-into a coupled program, which introduces significant development challenges. Furthermore, existing numerical algorithms struggle with highly complex large-scale structures in multi-component simulations. Here we propose compositional Multiphysics and Multi-component PDE Simulation with Diffusion models (M2PDE) to overcome these challenges. During diffusion-based training, M2PDE learns energy functions modeling the conditional probability of one physical process/component conditioned on other processes/components. In inference, M2PDE generates coupled multiphysics and multi-component solutions by sampling from the joint probability distribution. We evaluate M2PDE on two multiphysics tasks-reaction-diffusion and nuclear thermal coupling--where it achieves more accurate predictions than surrogate models in challenging scenarios. We then apply it to a multi-component prismatic fuel element problem, demonstrating that M2PDE scales from single-component training to a 64-component structure and outperforms existing domain-decomposition and graph-based approaches. The code is available at github.com/AI4Science-WestlakeU/M2PDE.",
+      "authors": [
+        "Tao Zhang",
+        "Zhenhai Liu",
+        "Feipeng Qi",
+        "Yongjun Jiao",
+        "Tailin Wu"
+      ],
+      "primary_category": "multiphysics",
+      "categories": [
+        "multiphysics",
+        "multi-component",
+        "PDE simulation",
+        "physical simulation",
+        "generative"
+      ],
+      "published": "2025-05-01T13:15:51.171+00:00",
+      "link": "https://openreview.net/forum?id=Pwr2LznsQc",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-pyixyl4qfx",
+      "source": "ICML-2025-Accepted",
+      "title": "G-Adaptivity: optimised graph-based mesh relocation for finite element methods",
+      "abstract": "We present a novel, and effective, approach to achieve optimal mesh relocation in finite element methods (FEMs). The cost and accuracy of FEMs is critically dependent on the choice of mesh points. Mesh relocation (r-adaptivity) seeks to optimise the mesh geometry to obtain the best solution accuracy at given computational budget. Classical r-adaptivity relies on the solution of a separate nonlinear ``meshing'' PDE to determine mesh point locations. This incurs significant cost at remeshing, and relies on estimates that relate interpolation- and FEM-error. Recent machine learning approaches have focused on the construction of fast surrogates for such classical methods. Instead, our new approach trains a graph neural network (GNN) to determine mesh point locations by directly minimising the FE solution error from the PDE system Firedrake to achieve higher solution accuracy. Our GNN architecture closely aligns the mesh solution space to that of classical meshing methodologies, thus replacing classical estimates for optimality with a learnable strategy. This allows for rapid and robust training and results in an extremely efficient and effective GNN approach to online r-adaptivity. Our method outperforms both classical, and prior ML, approaches to r-adaptive meshing. In particular, it achieves lower FE solution error, whilst retaining the significant speed-up over classical methods observed in prior ML work.",
+      "authors": [
+        "James Rowbottom",
+        "Georg Maierhofer",
+        "Teo Deveney",
+        "Eike Hermann Müller",
+        "Alberto Paganini",
+        "Katharina Schratz",
+        "Pietro Lio",
+        "Carola-Bibiane Schönlieb",
+        "Chris Budd"
+      ],
+      "primary_category": "Mesh Adaptation",
+      "categories": [
+        "Mesh Adaptation",
+        "r-Adaptivity",
+        "Monge–Ampere",
+        "Deep Learning",
+        "Finite Element Methods",
+        "Partial Differential Equations",
+        "Neural Network",
+        "Graph Neural Networks"
+      ],
+      "published": "2025-05-01T13:20:03.46+00:00",
+      "link": "https://openreview.net/forum?id=pyIXyl4qFx",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-am7iah0krx",
+      "source": "ICML-2025-Accepted",
+      "title": "Transolver++: An Accurate Neural Solver for PDEs on Million-Scale Geometries",
+      "abstract": "Although deep models have been widely explored in solving partial differential equations (PDEs), previous works are primarily limited to data only with up to tens of thousands of mesh points, far from the million-point scale required by industrial simulations that involve complex geometries. In the spirit of advancing neural PDE solvers to real industrial applications, we present Transolver++, a highly parallel and efficient neural solver that can accurately solve PDEs on million-scale geometries. Building upon previous advancements in solving PDEs by learning physical states via Transolver, Transolver++ is further equipped with an extremely optimized parallelism framework and a local adaptive mechanism to efficiently capture eidetic physical states from massive mesh points, successfully tackling the thorny challenges in computation and physics learning when scaling up input mesh size. Transolver++ increases the single-GPU input capacity to million-scale points for the first time and is capable of continuously scaling input size in linear complexity by increasing GPUs. Experimentally, Transolver++ yields 13\\% relative promotion across six standard PDE benchmarks and achieves over 20\\% performance gain in million-scale high-fidelity industrial simulations, whose sizes are 100$\\times$ larger than previous benchmarks, covering car and 3D aircraft designs.",
+      "authors": [
+        "Huakun Luo",
+        "Haixu Wu",
+        "Hang Zhou",
+        "Lanxiang Xing",
+        "Yichen Di",
+        "Jianmin Wang",
+        "Mingsheng Long"
+      ],
+      "primary_category": "PDE;Neural Operator;Eidetic Physical States;Local Adaptive mechanism;Parallelism optimization;large-scale industrial dataset;",
+      "categories": [
+        "PDE;Neural Operator;Eidetic Physical States;Local Adaptive mechanism;Parallelism optimization;large-scale industrial dataset;"
+      ],
+      "published": "2025-05-01T13:13:00.966+00:00",
+      "link": "https://openreview.net/forum?id=AM7iAh0krx",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-xgj33p4qwt",
+      "source": "ICML-2025-Accepted",
+      "title": "From Uncertain to Safe: Conformal Adaptation of Diffusion Models for Safe PDE Control",
+      "abstract": "The application of deep learning for partial differential equation (PDE)-constrained control is gaining increasing attention. However, existing methods rarely consider safety requirements crucial in real-world applications. To address this limitation, we propose Safe Diffusion Models for PDE Control (SafeDiffCon), which introduce the uncertainty quantile as model uncertainty quantification to achieve optimal control under safety constraints through both post-training and inference phases. Firstly, our approach post-trains a pre-trained diffusion model to generate control sequences that better satisfy safety constraints while achieving improved control objectives via a reweighted diffusion loss, which incorporates the uncertainty quantile estimated using conformal prediction. Secondly, during inference, the diffusion model dynamically adjusts both its generation process and parameters through iterative guidance and fine-tuning, conditioned on control targets while simultaneously integrating the estimated uncertainty quantile. We evaluate SafeDiffCon on three control tasks: 1D Burgers' equation, 2D incompressible fluid, and controlled nuclear fusion problem. Results demonstrate that SafeDiffCon is the only method that satisfies all safety constraints, whereas other classical and deep learning baselines fail. Furthermore, while adhering to safety constraints, SafeDiffCon achieves the best control performance. The code can be found at https://github.com/AI4Science-WestlakeU/safediffcon.",
+      "authors": [
+        "Peiyan Hu",
+        "Xiaowei Qian",
+        "Wenhao Deng",
+        "Rui Wang",
+        "Haodong Feng",
+        "Ruiqi Feng",
+        "Tao Zhang",
+        "Long Wei",
+        "Yue Wang",
+        "Zhi-Ming Ma",
+        "Tailin Wu"
+      ],
+      "primary_category": "safe PDE control",
+      "categories": [
+        "safe PDE control",
+        "PDE simulation",
+        "generative models",
+        "conformal prediction"
+      ],
+      "published": "2025-05-01T13:16:26.078+00:00",
+      "link": "https://openreview.net/forum?id=XGJ33p4qwt",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-icml-2025-xfwyb81p5o",
+      "source": "ICML-2025-Accepted",
+      "title": "Interpolating Neural Network-Tensor Decomposition (INN-TD): a scalable and interpretable approach for large-scale physics-based problems",
+      "abstract": "Deep learning has been extensively employed as a powerful function approximator for modeling physics-based problems described by partial differential equations (PDEs). Despite their popularity, standard deep learning models often demand prohibitively large computational resources and yield limited accuracy when scaling to large-scale, high-dimensional physical problems. Their black-box nature further hinders their application in industrial problems where interpretability and high precision are critical. To overcome these challenges, this paper introduces Interpolating Neural Network-Tensor Decomposition (INN-TD), a scalable and interpretable framework that has the merits of both machine learning and finite element methods for modeling large-scale physical systems.  By integrating locally supported interpolation functions from finite element into the network architecture, INN-TD achieves a sparse learning structure with enhanced accuracy, faster training/solving speed, and reduced memory footprint. This makes it particularly effective for tackling large-scale high-dimensional parametric PDEs in training, solving, and inverse optimization tasks in physical problems where high precision is required.",
+      "authors": [
+        "Jiachen Guo",
+        "Xiaoyu Xie",
+        "Chanwook Park",
+        "Hantao Zhang",
+        "Matthew J. Politis",
+        "Gino Domel",
+        "Wing Kam Liu"
+      ],
+      "primary_category": "Scientific Machine Learning; Large-scale simulation; Partial Differential Equations (PDEs); Numerical Analysis; Tensor decomposition",
+      "categories": [
+        "Scientific Machine Learning; Large-scale simulation; Partial Differential Equations (PDEs); Numerical Analysis; Tensor decomposition"
+      ],
+      "published": "2025-05-01T13:21:02.358+00:00",
+      "link": "https://openreview.net/forum?id=xfWYB81p5O",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "CFD modeling of falling film heat transfer in vertical tubes",
+      "sim_scores": {
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.015151515151515152,
+          "rank": 6
+        },
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.014925373134328358,
+          "rank": 7
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.014285714285714285,
+          "rank": 10
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.013888888888888888,
+          "rank": 12
+        },
+        "openreview-icml-2025-xgj33p4qwt": {
+          "score": 0.0136986301369863,
+          "rank": 13
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.013333333333333334,
+          "rank": 15
+        },
+        "openreview-icml-2025-xfwyb81p5o": {
+          "score": 0.012345679012345678,
+          "rank": 21
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.012195121951219513,
+          "rank": 22
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-icml-2025-1qzmwvrgsu",
+          "score": 0.8798076923076922,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-6f1hx1enef",
+          "score": 0.8422090729783037,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-pwr2lznsqc",
+          "score": 0.7703788748564866,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-ef1uhxznny",
+          "score": 0.73604826546003,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-xfwyb81p5o",
+          "score": 0.702712746191007,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-pyixyl4qfx",
+          "score": 0.702712746191007,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-am7iah0krx",
+          "score": 0.6703296703296702,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-3bajmrapsx",
+          "score": 0.6388587937883712,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-xgj33p4qwt",
+          "score": 0.3433395872420263,
+          "star_rating": 3
+        }
+      ]
+    },
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "Falling film evaporation and heat transfer in vertical tubes CFD",
+      "sim_scores": {
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.015625,
+          "rank": 4
+        },
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.015384615384615385,
+          "rank": 5
+        },
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.015151515151515152,
+          "rank": 6
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.0136986301369863,
+          "rank": 13
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.012987012987012988,
+          "rank": 17
+        },
+        "openreview-icml-2025-xgj33p4qwt": {
+          "score": 0.01282051282051282,
+          "rank": 18
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.0125,
+          "rank": 20
+        },
+        "openreview-icml-2025-xfwyb81p5o": {
+          "score": 0.011627906976744186,
+          "rank": 26
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-icml-2025-1qzmwvrgsu",
+          "score": 1.0,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-icml-2025-am7iah0krx",
+          "score": 0.8798076923076922,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-pyixyl4qfx",
+          "score": 0.8057498057498057,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-6f1hx1enef",
+          "score": 0.7703788748564866,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-ef1uhxznny",
+          "score": 0.702712746191007,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-3bajmrapsx",
+          "score": 0.49392712550607265,
+          "star_rating": 3
+        },
+        {
+          "paper_id": "openreview-icml-2025-xfwyb81p5o",
+          "score": 0.4411571334648256,
+          "star_rating": 3
+        },
+        {
+          "paper_id": "openreview-icml-2025-pwr2lznsqc",
+          "score": 0.41577409931840303,
+          "star_rating": 3
+        },
+        {
+          "paper_id": "openreview-icml-2025-xgj33p4qwt",
+          "score": 0.29792429792429775,
+          "star_rating": 3
+        }
+      ]
+    },
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics",
+      "sim_scores": {
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.015384615384615385,
+          "rank": 5
+        },
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.014925373134328358,
+          "rank": 7
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.014492753623188406,
+          "rank": 9
+        },
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.014084507042253521,
+          "rank": 11
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.013888888888888888,
+          "rank": 12
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.0136986301369863,
+          "rank": 13
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.013513513513513514,
+          "rank": 14
+        },
+        "openreview-icml-2025-xfwyb81p5o": {
+          "score": 0.01282051282051282,
+          "rank": 18
+        },
+        "openreview-icml-2025-xgj33p4qwt": {
+          "score": 0.012195121951219513,
+          "rank": 22
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-icml-2025-1qzmwvrgsu",
+          "score": 1.0,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-icml-2025-6f1hx1enef",
+          "score": 0.9586435070306036,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-icml-2025-am7iah0krx",
+          "score": 0.8798076923076922,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-3bajmrapsx",
+          "score": 0.8422090729783037,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-pwr2lznsqc",
+          "score": 0.608262108262108,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-xfwyb81p5o",
+          "score": 0.5495495495495496,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-pyixyl4qfx",
+          "score": 0.5213675213675214,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-ef1uhxznny",
+          "score": 0.4411571334648256,
+          "star_rating": 3
+        },
+        {
+          "paper_id": "openreview-icml-2025-xgj33p4qwt",
+          "score": 0.2760180995475112,
+          "star_rating": 3
+        }
+      ]
+    },
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "Numerical simulation of heat transfer in vertical falling film heat exchangers",
+      "sim_scores": {
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.015873015873015872,
+          "rank": 3
+        },
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.015151515151515152,
+          "rank": 6
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.014925373134328358,
+          "rank": 7
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.014705882352941176,
+          "rank": 8
+        },
+        "openreview-icml-2025-xgj33p4qwt": {
+          "score": 0.014492753623188406,
+          "rank": 9
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.013333333333333334,
+          "rank": 15
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.01282051282051282,
+          "rank": 18
+        },
+        "openreview-icml-2025-xfwyb81p5o": {
+          "score": 0.011627906976744186,
+          "rank": 26
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-icml-2025-3bajmrapsx",
+          "score": 0.9586435070306036,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-icml-2025-pwr2lznsqc",
+          "score": 0.9586435070306036,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-icml-2025-am7iah0krx",
+          "score": 0.8798076923076922,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-ef1uhxznny",
+          "score": 0.8422090729783037,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-xfwyb81p5o",
+          "score": 0.8057498057498057,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-1qzmwvrgsu",
+          "score": 0.7703788748564866,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-pyixyl4qfx",
+          "score": 0.73604826546003,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-6f1hx1enef",
+          "score": 0.6388587937883712,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-icml-2025-xgj33p4qwt",
+          "score": 0.5213675213675214,
+          "star_rating": 4
+        }
+      ]
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "falling film on vertical tube",
+      "sim_scores": {
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.014084507042253521,
+          "rank": 11
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.013888888888888888,
+          "rank": 12
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.010869565217391304,
+          "rank": 32
+        },
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.010752688172043012,
+          "rank": 33
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "heat and mass transfer in falling film",
+      "sim_scores": {
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.015384615384615385,
+          "rank": 5
+        },
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.015151515151515152,
+          "rank": 6
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.014925373134328358,
+          "rank": 7
+        },
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.013333333333333334,
+          "rank": 15
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.012987012987012988,
+          "rank": 17
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.011627906976744186,
+          "rank": 26
+        },
+        "openreview-icml-2025-xgj33p4qwt": {
+          "score": 0.011235955056179775,
+          "rank": 29
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.010638297872340425,
+          "rank": 34
+        },
+        "openreview-icml-2025-xfwyb81p5o": {
+          "score": 0.009523809523809525,
+          "rank": 45
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "heat transfer in falling film",
+      "sim_scores": {
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.014925373134328358,
+          "rank": 7
+        },
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.014705882352941176,
+          "rank": 8
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.014492753623188406,
+          "rank": 9
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.013333333333333334,
+          "rank": 15
+        },
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.012658227848101266,
+          "rank": 19
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.011363636363636364,
+          "rank": 28
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.010309278350515464,
+          "rank": 37
+        },
+        "openreview-icml-2025-xgj33p4qwt": {
+          "score": 0.009615384615384616,
+          "rank": 44
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "liquid film thickness measurement",
+      "sim_scores": {}
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "multiphase flow CFD",
+      "sim_scores": {
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.015625,
+          "rank": 4
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.014285714285714285,
+          "rank": 10
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.013513513513513514,
+          "rank": 14
+        },
+        "openreview-icml-2025-pyixyl4qfx": {
+          "score": 0.013333333333333334,
+          "rank": 15
+        },
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.012987012987012988,
+          "rank": 17
+        },
+        "openreview-icml-2025-xfwyb81p5o": {
+          "score": 0.011764705882352941,
+          "rank": 25
+        },
+        "openreview-icml-2025-xgj33p4qwt": {
+          "score": 0.010638297872340425,
+          "rank": 34
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.010101010101010102,
+          "rank": 39
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "two-phase flow simulation",
+      "sim_scores": {
+        "openreview-icml-2025-1qzmwvrgsu": {
+          "score": 0.014925373134328358,
+          "rank": 7
+        },
+        "openreview-icml-2025-6f1hx1enef": {
+          "score": 0.014492753623188406,
+          "rank": 9
+        },
+        "openreview-icml-2025-ef1uhxznny": {
+          "score": 0.013157894736842105,
+          "rank": 16
+        },
+        "openreview-icml-2025-am7iah0krx": {
+          "score": 0.012345679012345678,
+          "rank": 21
+        },
+        "openreview-icml-2025-pwr2lznsqc": {
+          "score": 0.012048192771084338,
+          "rank": 23
+        },
+        "openreview-icml-2025-3bajmrapsx": {
+          "score": 0.01,
+          "rank": 40
+        }
+      }
+    }
+  ],
+  "global_candidate_ids": [
+    "openreview-icml-2025-sdk6bsmhgm",
+    "openreview-icml-2025-ef1uhxznny",
+    "openreview-icml-2025-f9jvsrgpdg",
+    "openreview-icml-2025-d1gs8qt74m",
+    "openreview-icml-2025-pwr2lznsqc",
+    "openreview-icml-2025-sux6wzy9t1",
+    "openreview-icml-2025-z2ulbbck2x",
+    "openreview-icml-2025-jfafmsajum",
+    "openreview-icml-2025-ooaub9jwpf",
+    "openreview-icml-2025-1qzmwvrgsu",
+    "openreview-icml-2025-qg9p1i5lmp",
+    "openreview-icml-2025-yj1my9tten",
+    "openreview-icml-2025-6f1hx1enef",
+    "openreview-icml-2025-ya2kskunmh",
+    "openreview-icml-2025-3bajmrapsx",
+    "openreview-icml-2025-v2nq1e78rc",
+    "openreview-icml-2025-pyixyl4qfx",
+    "openreview-icml-2025-am7iah0krx",
+    "openreview-icml-2025-rk18zikrfi",
+    "openreview-icml-2025-xpm298dhxn",
+    "openreview-icml-2025-b74kufhhsk",
+    "openreview-icml-2025-ob5a6yiamf",
+    "openreview-icml-2025-rqtrsrcbnu",
+    "openreview-icml-2025-xgj33p4qwt",
+    "openreview-icml-2025-a9vfggyjqa",
+    "openreview-icml-2025-7w1ygbpdmw",
+    "openreview-icml-2025-uqcfovxb67",
+    "openreview-icml-2025-codooe6xab",
+    "openreview-icml-2025-dllvjzq7vd",
+    "openreview-icml-2025-xfwyb81p5o",
+    "openreview-icml-2025-rmqnijtu6h",
+    "openreview-icml-2025-u5nrmos8ed",
+    "openreview-icml-2025-hzcx5etoh9",
+    "openreview-icml-2025-riysklg0vt",
+    "openreview-icml-2025-zzvtc92dyq",
+    "openreview-icml-2025-oeo53q93ip",
+    "openreview-icml-2025-rfcp1qzzhq",
+    "openreview-icml-2025-wmiueircam",
+    "openreview-icml-2025-ww1grftqhx",
+    "openreview-icml-2025-u74moxpejd",
+    "openreview-icml-2025-pqyjmq39gi",
+    "openreview-icml-2025-wfhq9owxoh",
+    "openreview-icml-2025-oqutbneejz",
+    "openreview-icml-2025-ouapobdc1e",
+    "openreview-icml-2025-o2fupyerws",
+    "openreview-icml-2025-cjcrotfmem",
+    "openreview-icml-2025-kv8ouyjdig",
+    "openreview-icml-2025-6hmqt7dtx3",
+    "openreview-icml-2025-rkbanvzycr",
+    "openreview-icml-2025-x7uvxefs9a",
+    "openreview-icml-2025-ekez0dzzpe",
+    "openreview-icml-2025-6mqv4fnsj0",
+    "openreview-icml-2025-wisfjyoa6m",
+    "openreview-icml-2025-rmcyr6vsom",
+    "openreview-icml-2025-ubmnbcbetz",
+    "openreview-icml-2025-usaksvawic",
+    "openreview-icml-2025-vkqkoc0j9w",
+    "openreview-icml-2025-xtuwxfh8nq",
+    "openreview-icml-2025-xtxcm4xz82",
+    "openreview-icml-2025-3vn8fxszda",
+    "openreview-icml-2025-bv8nd99mek",
+    "openreview-icml-2025-rjzkpnsvrm",
+    "openreview-icml-2025-cpmhmojlax",
+    "openreview-icml-2025-ro5ogozs6m",
+    "openreview-icml-2025-udrezphnky",
+    "openreview-icml-2025-xivuqzz59o",
+    "openreview-icml-2025-ves22inukm",
+    "openreview-icml-2025-gy3l3r2jp9",
+    "openreview-icml-2025-fezimuj6sg",
+    "openreview-icml-2025-bxybxzci2r",
+    "openreview-icml-2025-it8qiznsal",
+    "openreview-icml-2025-9dhilxylvc",
+    "openreview-icml-2025-fwqh7m5drm",
+    "openreview-icml-2025-ij0vj0bc72",
+    "openreview-icml-2025-pkangfzjby",
+    "openreview-icml-2025-uyuqcpczcw",
+    "openreview-icml-2025-7sg4s8d8aq",
+    "openreview-icml-2025-v3b79m7t8z",
+    "openreview-icml-2025-qizywidwzh",
+    "openreview-icml-2025-kjtvcskssy",
+    "openreview-icml-2025-v7vnjjxblg",
+    "openreview-icml-2025-yznx6tf3ef",
+    "openreview-icml-2025-adwra8faao",
+    "openreview-icml-2025-fue1umh99f",
+    "openreview-icml-2025-cmox0besds",
+    "openreview-icml-2025-ra2p4h7dep",
+    "openreview-icml-2025-22knokkoku",
+    "openreview-icml-2025-magosim8ut",
+    "openreview-icml-2025-73zruyi5kb",
+    "openreview-icml-2025-8jgwozceqs",
+    "openreview-icml-2025-gn2izaiyzz",
+    "openreview-icml-2025-f5czhqyk3h",
+    "openreview-icml-2025-nsldadggy5",
+    "openreview-icml-2025-czqxb524oo",
+    "openreview-icml-2025-uzvqmfa6rh",
+    "openreview-icml-2025-to7ovzkco1",
+    "openreview-icml-2025-3h80hystmh",
+    "openreview-icml-2025-nhaanf5com",
+    "openreview-icml-2025-9ccjjfiutb",
+    "openreview-icml-2025-iwkcnloa2a",
+    "openreview-icml-2025-zqs9yrynhs",
+    "openreview-icml-2025-038rewbchh",
+    "openreview-icml-2025-kvf2sfl1pi",
+    "openreview-icml-2025-5pizevq9fy",
+    "openreview-icml-2025-iakg2nvmvn",
+    "openreview-icml-2025-qdelyl0fst",
+    "openreview-icml-2025-tiynbkwl7t",
+    "openreview-icml-2025-f7boaymwl7",
+    "openreview-icml-2025-gkqoqgchtq",
+    "openreview-icml-2025-fime06sv71",
+    "openreview-icml-2025-yqbzzewpdq",
+    "openreview-icml-2025-g5cijb2ery",
+    "openreview-icml-2025-vwylq0vpjx",
+    "openreview-icml-2025-jvdfkvf4qy",
+    "openreview-icml-2025-c8pgyyfhof",
+    "openreview-icml-2025-qtuxdy2qeb",
+    "openreview-icml-2025-p0bqivwnez",
+    "openreview-icml-2025-pnyodfnphv",
+    "openreview-icml-2025-m2eftrbv4o",
+    "openreview-icml-2025-qqgw9stpbq"
+  ],
+  "global_pool_lane_top_k": 30,
+  "global_pool_limit": 120,
+  "global_pool_guaranteed_per_lane": 2,
+  "global_pool_effective_size": 120,
+  "reranked_at": "2026-06-09T05:10:07.164361+00:00",
+  "llm_ranked": [
+    {
+      "paper_id": "openreview-icml-2025-1qzmwvrgsu",
+      "score": 7.0,
+      "evidence_en": "physics-enhanced INR for high-fidelity flow field reconstruction from CFD data, applicable to falling film simulations",
+      "evidence_cn": "物理增强的隐式神经表示用于从CFD数据重建高保真流场，可应用于降膜模拟",
+      "canonical_evidence": "物理增强的隐式神经表示用于从CFD数据重建高保真流场，可应用于降膜模拟",
+      "tldr_en": "PEINR introduces a physics-enhanced implicit neural representation for high-fidelity flow field reconstruction and releases a large-scale CFD dataset HFR-Beach; this surrogate approach is highly relevant to two-phase flow CFD and can be adapted for falling film heat transfer modeling.",
+      "tldr_cn": "针对隐式神经表示在流场重建中缺乏标准数据集和忽略物理规律的问题，论文发布5.4TB的HFR-Beach CFD数据集，并提出物理增强的INR框架PEINR。实验表明该方法能精细捕捉流场细节和时空动态，为降膜蒸发等两相流CFD模拟提供了高保真代理模型基础。",
+      "title_zh": "PEINR: 面向高保真流场重建的物理增强隐式神经表示",
+      "motivation_cn": "解决INR在流场重建中标准数据集缺失和物理约束不足的问题。",
+      "method_cn": "构建大规模CFD数据集，并提出融入物理先验的隐式神经表示。",
+      "result_cn": "在重建精度和细节捕捉上超越现有INR方法。",
+      "conclusion_cn": "为基于数据的流场重建提供基准和强基线，有望促进降膜流动CFD的代理模型研究。",
+      "matched_requirement_id": "req-composite-falling-film",
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD."
+    },
+    {
+      "paper_id": "openreview-icml-2025-am7iah0krx",
+      "score": 6.0,
+      "evidence_en": "scalable neural PDE solver capable of handling complex industrial geometries, useful for CFD of falling film",
+      "evidence_cn": "可处理复杂工业几何的大规模神经PDE求解器，可用于降膜CFD",
+      "canonical_evidence": "可处理复杂工业几何的大规模神经PDE求解器，可用于降膜CFD",
+      "tldr_en": "Transolver++ is a highly parallelized neural solver that scales to million-mesh-point geometries, enabling accurate simulation of industrial PDEs, which can potentially accelerate falling film CFD studies.",
+      "tldr_cn": "针对现有神经PDE求解器仅适用于数万网格点规模的局限，Transolver++通过优化并行机制和局部自适应策略，实现了百万级复杂几何上的精确求解。其在工业仿真基准上表现优异，为降膜换热器的计算流体力学模拟提供了高效替代方案。",
+      "title_zh": "Transolver++：面向百万规模几何的精确神经PDE求解器",
+      "motivation_cn": "工业仿真通常涉及百万网格的复杂几何，现有神经求解器难以胜任。",
+      "method_cn": "在Transolver基础上，引入高度优化的并行框架和局部自适应机制，高效捕捉物理状态。",
+      "result_cn": "在百万网格的工业级PDE测试中达到高精度，速度远超传统数值方法。",
+      "conclusion_cn": "Transolver++可用于加速复杂几何下的CFD仿真，对降膜换热器模拟具有潜在价值。",
+      "matched_requirement_id": "req-composite-falling-film",
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD."
+    },
+    {
+      "paper_id": "openreview-icml-2025-3bajmrapsx",
+      "score": 6.0,
+      "evidence_en": "general-purpose transformer for surrogate modeling of PDEs, applicable to fluid dynamics and perhaps falling film CFD",
+      "evidence_cn": "用于物理模拟的通用变换器代理模型，可潜在用于降膜CFD",
+      "canonical_evidence": "用于物理模拟的通用变换器代理模型，可潜在用于降膜CFD",
+      "tldr_en": "PDE-Transformer is a transformer-based architecture for surrogate modeling of physics simulations, outperforming prior models on diverse PDEs and serving as a backbone for large-scale scientific ML, relevant to accelerating falling film CFD.",
+      "tldr_cn": "PDE-Transformer采用通道独立嵌入和时空自注意力，设计了一种面向大规模物理模拟的通用变换器架构。该模型在16种不同类型PDE数据集上超越现有视觉变换器，可作为科学机器学习的基础骨干，为降膜CFD等模拟提供高效代理模型。",
+      "title_zh": "PDE-Transformer：用于物理模拟的高效通用变换器",
+      "motivation_cn": "现有物理模拟变换器难以兼顾可扩展性和通用性。",
+      "method_cn": "结合扩散变换器架构改进与大规模模拟适配，提出通道独立嵌入和时空自注意力的PDE-Transformer。",
+      "result_cn": "在多类PDE基准上优于最先进变换器，展现了通用性和效率。",
+      "conclusion_cn": "PDE-Transformer有望成为物理科学中的基础模型，加速包括降膜传热在内的CFD模拟。",
+      "matched_requirement_id": "req-composite-falling-film",
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD."
+    },
+    {
+      "paper_id": "openreview-icml-2025-6f1hx1enef",
+      "score": 6.0,
+      "evidence_en": "neural PDE surrogates with physical/symmetry constraints on staggered grids for CFD, applicable to falling film heat transfer simulation",
+      "evidence_cn": "基于交错网格的物理对称约束神经代理模型用于CFD，可迁移至降膜换热模拟",
+      "canonical_evidence": "基于交错网格的物理对称约束神经代理模型用于CFD，可迁移至降膜换热模拟",
+      "tldr_en": "This paper proposes neural PDE surrogates that incorporate geometric/physical constraints on staggered grids, improving accuracy for CFD problems like shallow water equations; the method is directly transferable to falling film heat transfer simulations.",
+      "tldr_cn": "该论文提出在交错网格上引入几何与物理约束的神经偏微分方程代理模型，系统研究了这些先验对于计算流体力学问题精度的影响。以浅水波方程为对象，验证了约束协同提升泛化性与长期预测能力。该方法可直接迁移至垂直降膜换热的CFD建模，为传热与多相流模拟提供物理一致的加速手段。",
+      "title_zh": "几何与物理约束协同增强神经偏微分方程代理模型",
+      "motivation_cn": "神经PDE代理模型在CFD中泛化差且误差累积，现有物理约束不兼容交错网格。",
+      "method_cn": "设计尊重物理定律和对称性的输入输出层，系统组合约束嵌入交错网格代理模型。",
+      "result_cn": "在浅水波方程中，几何与物理约束协同提升精度和泛化能力。",
+      "conclusion_cn": "物理感知的神经代理模型为复杂流体仿真提供了可靠且高效的计算方案。",
+      "matched_requirement_id": "req-7",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "CFD modeling of falling film heat transfer in vertical tubes"
+    },
+    {
+      "paper_id": "openreview-icml-2025-ef1uhxznny",
+      "score": 6.0,
+      "evidence_en": "active learning for PDE surrogate modeling can reduce simulation cost for CFD of falling film heat transfer",
+      "evidence_cn": "针对PDE代理模型的主动学习可降低降膜换热CFD模拟的成本",
+      "canonical_evidence": "针对PDE代理模型的主动学习可降低降膜换热CFD模拟的成本",
+      "tldr_en": "This paper proposes active learning for PDE surrogates that selectively acquires only critical time steps from numerical solvers, drastically reducing training data cost; this methodology can be directly applied to accelerate CFD modeling of falling film heat transfer in vertical tubes.",
+      "tldr_cn": "针对PDE代理模型训练数据生成成本高昂的问题，论文提出一种选择性时间步主动学习框架，仅用数值求解器生成最关键时间步，其余由代理模型近似。实验表明该方法大大降低了数据获取成本，为垂直管降膜换热CFD模拟的加速提供了可行路径。",
+      "title_zh": "面向偏微分方程的选择性时间步主动学习",
+      "motivation_cn": "解决训练PDE代理模型时全轨迹数据获取成本高的问题。",
+      "method_cn": "提出仅获取关键时间步的主动学习策略，其余用代理模型补全。",
+      "result_cn": "在多个PDE基准上大幅减少所需数值模拟次数。",
+      "conclusion_cn": "该主动学习框架可显著降低PDE代理建模成本，适用于降膜CFD等工程模拟。",
+      "matched_requirement_id": "req-7",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "CFD modeling of falling film heat transfer in vertical tubes"
+    },
+    {
+      "paper_id": "openreview-icml-2025-xfwyb81p5o",
+      "score": 4.0,
+      "evidence_en": "scalable and interpretable deep learning framework combining neural networks and tensor decomposition for physics-based problems described by PDEs",
+      "evidence_cn": "结合神经网络与张量分解的可扩展可解释框架，用于PDE描述的物理问题",
+      "canonical_evidence": "结合神经网络与张量分解的可扩展可解释框架，用于PDE描述的物理问题",
+      "tldr_en": "INN-TD combines neural network interpolation and tensor decomposition to scale and interpret deep learning for large-scale PDE-based physics problems, potentially benefiting CFD.",
+      "tldr_cn": "该论文提出插值神经网络与张量分解相结合的框架，解决标准深度学习在求解大规模物理PDE时计算资源高、精度低和可解释性差的问题。通过利用两种方法的优势，该框架在高维物理问题中表现出更好的可扩展性和可解释性，可作为降膜换热等工业CFD问题的潜在高效求解器。",
+      "title_zh": "插值神经网络-张量分解：一种面向大规模物理问题可扩展且可解释的方法",
+      "motivation_cn": "标准深度学习求解PDE面临资源消耗大、精度有限和黑箱不可解释问题。",
+      "method_cn": "融合插值神经网络与张量分解，构建可扩展且可解释的物理求解框架。",
+      "result_cn": "在大规模高维物理问题上实现高精度与可解释性，优于纯深度学习方法。",
+      "conclusion_cn": "为工业级CFD等物理问题提供了一种兼顾效率与可解释性的方案。",
+      "matched_requirement_id": "req-composite-falling-film",
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD."
+    },
+    {
+      "paper_id": "openreview-icml-2025-pwr2lznsqc",
+      "score": 4.0,
+      "evidence_en": "compositional generative model for multiphysics and multi-component PDE simulation, directly applicable to multiphase flow CFD",
+      "evidence_cn": "面向多物理场及多组件PDE模拟的组合式生成模型，可直接用于多相流CFD",
+      "canonical_evidence": "面向多物理场及多组件PDE模拟的组合式生成模型，可直接用于多相流CFD",
+      "tldr_en": "M2PDE uses diffusion models for compositional multiphysics and multi-component PDE simulation, overcoming the need for multiple solvers and enabling flexible coupling of physical processes.",
+      "tldr_cn": "多物理场仿真通常需要集成多个专用求解器，开发复杂且难以处理大规模多组件结构。本文提出M2PDE，利用扩散模型进行组合式生成，统一模拟多物理和多组件PDE。实验表明该方法能有效耦合不同物理过程，生成高保真仿真结果，降低了多物理仿真的门槛。",
+      "title_zh": "M2PDE：组合式生成多物理场和多组件PDE模拟",
+      "motivation_cn": "多物理场仿真需集成多个专用求解器，复杂结构仿真困难。",
+      "method_cn": "提出基于扩散模型的组合式多物理场多组件PDE模拟框架M2PDE。",
+      "result_cn": "该框架能灵活耦合不同物理过程，生成高质量仿真数据。",
+      "conclusion_cn": "M2PDE为多物理多组件系统提供了通用高效的生成式仿真途径。",
+      "matched_requirement_id": "req-5",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD"
+    },
+    {
+      "paper_id": "openreview-icml-2025-pyixyl4qfx",
+      "score": 4.0,
+      "evidence_en": "graph-based mesh relocation for FEM can improve CFD simulation efficiency",
+      "evidence_cn": "基于图的有限元网格重定位可提高CFD模拟效率",
+      "canonical_evidence": "基于图的有限元网格重定位可提高CFD模拟效率",
+      "tldr_en": "G-Adaptivity trains a graph neural network to directly optimize mesh points for FEM accuracy, avoiding costly meshing PDE solves, which could accelerate CFD simulations of falling film flows.",
+      "tldr_cn": "针对传统r-自适应网格重定位需要求解非线性网格偏微分方程、计算成本高的问题，该论文提出用图神经网络直接优化网格点位置，绕过传统方法。实验表明其在有限元分析中能提升精度和效率，有望加速降膜流动的CFD模拟网格生成。",
+      "title_zh": "G-Adaptivity: 优化的基于图的有限元网格重定位",
+      "motivation_cn": "降低有限元方法中网格重定位的计算开销。",
+      "method_cn": "训练图神经网络直接优化网格点位置，替代传统网格偏微分方程求解。",
+      "result_cn": "在基准测试上获得更优的精度-成本权衡。",
+      "conclusion_cn": "为有限元模拟提供了一种高效网格优化工具，可间接辅助CFD计算。",
+      "matched_requirement_id": "req-5",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD"
+    },
+    {
+      "paper_id": "openreview-icml-2025-xgj33p4qwt",
+      "score": 4.0,
+      "evidence_en": "diffusion models for safe PDE control could be applied to falling film systems",
+      "evidence_cn": "用于安全PDE控制的扩散模型可潜在地应用于降膜系统",
+      "canonical_evidence": "用于安全PDE控制的扩散模型可潜在地应用于降膜系统",
+      "tldr_en": "SafeDiffCon introduces uncertainty quantile into diffusion models for safe PDE-constrained control; this methodology could eventually be transferred to control of falling film heat exchangers.",
+      "tldr_cn": "针对现有PDE控制方法忽略安全约束的问题，论文提出SafeDiffCon，在扩散模型中引入不确定性分位数以生成满足安全约束的控制序列。实验验证了其在多种PDE控制任务中的安全性和性能，为降膜换热过程的鲁棒控制提供了理论参考。",
+      "title_zh": "从不确定到安全: 面向安全PDE控制的扩散模型共形适应",
+      "motivation_cn": "解决PDE控制中深度学习方法缺乏安全保障的问题。",
+      "method_cn": "通过重新加权扩散损失和不确定性分位数后训练，实现安全控制序列生成。",
+      "result_cn": "在一系列PDE基准上取得满足安全约束的优化控制。",
+      "conclusion_cn": "为安全关键型PDE控制提供了新范式，可能拓展至降膜蒸发器等工业应用。",
+      "matched_requirement_id": "req-composite-falling-film",
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD."
+    }
+  ],
+  "llm_ranked_at": "2026-06-09T05:13:11.492480+00:00",
+  "display_min_score": 4.0,
+  "pruned_at": "2026-06-09T05:13:11.529884+00:00"
+}
