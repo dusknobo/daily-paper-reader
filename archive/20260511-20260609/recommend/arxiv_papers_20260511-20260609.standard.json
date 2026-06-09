@@ -1,0 +1,324 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-09T04:54:04.588226+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2605.17519v1",
+      "source": "arxiv",
+      "title": "Solutocapillary instability in slipping falling films",
+      "abstract": "We present a comprehensive framework for gravity-driven, surfactant-laden thin films flowing over slippery substrates, elucidating how wall slip modifies the coupled hydrodynamics and interfacial transport. A long-wave model is formulated with a conservative bulk-surface mass balance and a Navier slip condition. The Orr-Sommerfeld eigenvalue problem governs the linear regime, while a weighted-residual model captures the nonlinear evolution over a range of equilibrium surfactant coverages, Marangoni strengths, and adsorption kinetics. The analysis predicts a non-monotonic variation of the critical Reynolds number with equilibrium coverage, exhibiting a maximum at intermediate $Γ_e$, and a slip-induced transition from single- to double-hump solitary structures with increasing Marangoni number, accompanied by attenuated capillary ripples. Under fast adsorption kinetics, the surface field homogenizes, preserving the mean film shape and flux while flattening both the surface concentration $Γ$ and the bulk inventory $χ+ hφ$. A spurious interfacial mass growth reported by Pascal et al.(PRF, 2019) and D'Alessio et al.(JFM, 2020) is resolved through a revised surface balance ensuring strict conservation. Wall slip thus emerges as a key control parameter, reducing viscous resistance and mitigating Marangoni back-stress. The slip parameter $β$ is a useful control knob for surfactant-laden films. Slip prevents fragile multi-hump bound states, promoting a single broad crest or an almost flat, uniform sheet by carefully bonding $β$ to wave selection, ripple damping, and the bulk-surface surfactant balance.",
+      "authors": [
+        "Sanghasri Mukhopadhyay",
+        "Séverine Millet",
+        "Bastien Di Pierro",
+        "Asim Mukhopadhyay"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "math.AP"
+      ],
+      "published": "2026-05-17T16:03:36+00:00",
+      "link": "https://arxiv.org/pdf/2605.17519v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "studies falling film with solutocapillary (mass transfer) effects on slippery substrates, directly relevant to heat and mass transfer in falling film",
+      "llm_evidence_cn": "研究滑移基底上具有溶质毛细（传质）效应的降落膜，与降膜传热传质直接相关",
+      "llm_evidence": "研究滑移基底上具有溶质毛细（传质）效应的降落膜，与降膜传热传质直接相关",
+      "canonical_evidence": "研究滑移基底上具有溶质毛细（传质）效应的降落膜，与降膜传热传质直接相关",
+      "llm_tldr_en": "Presents a comprehensive model for gravity-driven surfactant-laden falling films with wall slip, revealing non-monotonic stability and slip-induced wave transitions; directly informs falling film heat/mass transfer design.",
+      "llm_tldr_cn": "针对含表面活性剂且存在壁面滑移的重力驱动降膜，建立了长波模型，通过线性Orr-Sommerfeld分析和非线性加权残差方法，揭示了临界雷诺数随表面活性剂覆盖度的非单调变化以及滑移诱导的波结构转变，为降膜传热传质过程中的流动不稳定性提供了机理认识。",
+      "llm_tldr": "针对含表面活性剂且存在壁面滑移的重力驱动降膜，建立了长波模型，通过线性Orr-Sommerfeld分析和非线性加权残差方法，揭示了临界雷诺数随表面活性剂覆盖度的非单调变化以及滑移诱导的波结构转变，为降膜传热传质过程中的流动不稳定性提供了机理认识。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "heat and mass transfer in falling film",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2605.19427v1",
+      "source": "arxiv",
+      "title": "A conservation-consistent boundary condition for nonlinear models of soluble-surfactant-laden falling films",
+      "abstract": "A conservation-consistent boundary condition is proposed for nonlinear models of soluble-surfactant-laden falling films, ensuring exact conservation of total surfactant mass. The formulation resolves an inconsistency in widely used reduced models, Pascal et al. (PRF, 2019), D'Alessio et al. (JFM, 2020), which exhibit a gradual drift of mass during nonlinear evolution in a closed periodic domain. We show that this originates from an inconsistency in the surface transport reduction and derive a corrected boundary condition that removes this defect. As the discrepancy appears only at the nonlinear order, linear stability results remain unaffected, explaining why the issue has remained unnoticed.",
+      "authors": [
+        "Sanghasri Mukhopadhyay",
+        "Séverine Millet",
+        "Bastien Di Pierro",
+        "Asim Mukhopadhyay"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP",
+        "physics.flu-dyn"
+      ],
+      "published": "2026-05-19T06:29:59+00:00",
+      "link": "https://arxiv.org/pdf/2605.19427v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Direct falling film model with surfactant mass transport; corrects conservation in nonlinear simulations.",
+      "llm_evidence_cn": "含表面活性剂的降膜模型，校正了非线性模拟中的质量守恒。",
+      "llm_evidence": "含表面活性剂的降膜模型，校正了非线性模拟中的质量守恒。",
+      "canonical_evidence": "含表面活性剂的降膜模型，校正了非线性模拟中的质量守恒。",
+      "llm_tldr_en": "Identifies a mass conservation error in existing nonlinear models of surfactant-laden falling films and derives a corrected boundary condition that ensures exact surfactant mass conservation. The fix is crucial for accurate long-time simulations of falling films with heat/mass transfer.",
+      "llm_tldr_cn": "现有含可溶性表面活性剂的降膜非线性模型在封闭周期域内存在质量漂移缺陷。本文通过分析表面输运降阶的矛盾，推导出保护总表面活性剂质量的修正边界条件。修正仅影响非线性阶，不影响线性稳定性结果。该守恒边界条件对长时间降膜传热传质精确模拟至关重要，可直接用于垂直管降膜蒸发等过程的模型开发。",
+      "llm_tldr": "现有含可溶性表面活性剂的降膜非线性模型在封闭周期域内存在质量漂移缺陷。本文通过分析表面输运降阶的矛盾，推导出保护总表面活性剂质量的修正边界条件。修正仅影响非线性阶，不影响线性稳定性结果。该守恒边界条件对长时间降膜传热传质精确模拟至关重要，可直接用于垂直管降膜蒸发等过程的模型开发。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "heat and mass transfer in falling film",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2605.11896v1",
+      "source": "arxiv",
+      "title": "A Volume of Fluid Immersed Boundary Method for Industrial Polymer Mixing",
+      "abstract": "This work develops advanced numerical methods for free-surface simulations of polymer mixing processes, integrating a Volume of Fluid (VOF) interface-capturing approach with a non-conforming Immersed Boundary (IB) method to model two-phase flows of highly viscous polymer melts and air within partially filled rotating mixing devices, implemented within the Finite Volume OpenFOAM library. To overcome severe numerical instabilities arising from the strong viscosity contrast between polymer melts and air, a block-coupled scheme providing fully implicit viscous diffusion treatment is integrated into the VOF-IB framework, relaxing time-step stability constraints and substantially reducing computational cost with respect to standard segregated solvers. The resulting BC-VOF-IB solver is applied to industrially relevant geometries of single- and twin-screw extruders, yielding physically consistent predictions of velocity and pressure fields under partial filling conditions. While further developments, most notably the inclusion of thermal effects, remain necessary, the proposed framework represents a meaningful step toward bridging academic CFD research and the practical demands of industrial polymer processing.",
+      "authors": [
+        "Emilia Capuano",
+        "Daniele Cerroni",
+        "Holger Marschall",
+        "Giorgio Negrini",
+        "Nicola Parolini",
+        "Marco Verani"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "math.NA"
+      ],
+      "published": "2026-05-12T10:11:19+00:00",
+      "link": "https://arxiv.org/pdf/2605.11896v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Develops a Volume of Fluid Immersed Boundary method for two-phase flow simulation in OpenFOAM",
+      "llm_evidence_cn": "开发了一种用于两相流模拟的流体体积浸入边界方法并在OpenFOAM中实现",
+      "llm_evidence": "开发了一种用于两相流模拟的流体体积浸入边界方法并在OpenFOAM中实现",
+      "canonical_evidence": "开发了一种用于两相流模拟的流体体积浸入边界方法并在OpenFOAM中实现",
+      "llm_tldr_en": "Presents a VOF-IB method for two-phase polymer-air flow in rotating mixers, with a block-coupled implicit treatment to handle high viscosity contrasts, reducing computational cost and enabling efficient free-surface simulations.",
+      "llm_tldr_cn": "针对高粘度比聚合物-空气两相流，提出结合VOF界面捕捉与浸入边界法的数值方法，通过块耦合隐式粘性处理克服了强粘度对比引起的数值不稳定，松弛了时间步长约束并显著降低了计算成本，为工业混合中复杂自由表面两相流模拟提供了高效工具。",
+      "llm_tldr": "针对高粘度比聚合物-空气两相流，提出结合VOF界面捕捉与浸入边界法的数值方法，通过块耦合隐式粘性处理克服了强粘度对比引起的数值不稳定，松弛了时间步长约束并显著降低了计算成本，为工业混合中复杂自由表面两相流模拟提供了高效工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.10305v1",
+      "source": "arxiv",
+      "title": "Analysis of a three-dimensional fluid flow in rotating cylinders",
+      "abstract": "Subject of consideration is the modelling and analysis of a capillary-driven three-dimensional rimming-flow problem. We present the derivation of a fourth-order quasilinear degenerate-parabolic partial differential equation for the height $h > 0$ of a fluid film coating the inner wall of a cylinder that rotates around a horizontal axis. The equation arises from a rescaled Navier-Stokes system for thin fluid films by means of a lubrication approximation and accounts for the physical effects of rotation, surface tension and gravity. The effect of the latter is measured by a non-dimensional parameter $0 \\leq δ\\ll 1$.   We characterise the structure of the steady states depending on the ratio $\\ell$ of the cylinder length to its radius. In the absence of gravity ($δ=0$), in the case $\\frac{\\ell}π \\notin \\mathbb{Z}$, steady states are unique. For $0 < δ\\ll 1$, steady states are shown to be locally unique for any $\\ell$. These steady states are stable for $\\ell < π$, while they are unstable for $\\ell > π$.   Furthermore, in the absence of gravity, for all $\\ell > 0$, we show that there exists a manifold of time-periodic solutions. In the critical case $\\ell = π$, we study the dynamics of the solutions close to the manifold of periodic orbits in the critical case $\\ell = π$ on the large time scale $τ= δ^2 t$. It turns out that in the time scale $τ$ this dynamics can be approximated by a system of ordinary differential equations.",
+      "authors": [
+        "Juri Joussen",
+        "Janne Laudien",
+        "Christina Lienstromberg",
+        "Juan J. L. Velázquez"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP"
+      ],
+      "published": "2026-05-11T10:02:43+00:00",
+      "link": "https://arxiv.org/pdf/2605.10305v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "derives a PDE for thin film height on a rotating cylinder using lubrication theory, relevant to falling film hydrodynamics",
+      "llm_evidence_cn": "利用润滑理论导出旋转圆筒内薄膜高度的偏微分方程，与降膜流体动力学相关",
+      "llm_evidence": "利用润滑理论导出旋转圆筒内薄膜高度的偏微分方程，与降膜流体动力学相关",
+      "canonical_evidence": "利用润滑理论导出旋转圆筒内薄膜高度的偏微分方程，与降膜流体动力学相关",
+      "llm_tldr_en": "Derives a 4th-order PDE for the film height in a rotating cylinder via lubrication approximation, capturing rotation, surface tension, and gravity; useful for falling film modeling but without heat transfer.",
+      "llm_tldr_cn": "该论文针对绕水平轴旋转的圆筒内壁上的薄流体膜，利用润滑近似从 Navier-Stokes 方程推导了膜高演化的四阶拟线性退化抛物型偏微分方程。方程考虑了旋转、表面张力和重力效应，并分析了稳态解结构。虽然未涉及传热，但该方法可外推至垂直管降膜的流体力学建模。",
+      "llm_tldr": "该论文针对绕水平轴旋转的圆筒内壁上的薄流体膜，利用润滑近似从 Navier-Stokes 方程推导了膜高演化的四阶拟线性退化抛物型偏微分方程。方程考虑了旋转、表面张力和重力效应，并分析了稳态解结构。虽然未涉及传热，但该方法可外推至垂直管降膜的流体力学建模。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "heat transfer in falling film",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.20565v1",
+      "source": "arxiv",
+      "title": "Simulations of Particle-Laden Flows with Large Dispersed-Phase Size Disparities Using Highly Scalable Parallel Adaptive Methods",
+      "abstract": "The numerical simulation of multiphase flows involving dispersed components with large scale disparities, such as the collisions between millimeter-sized bubbles and micron-sized mineral particles in flotation, poses a significant computational challenge. Accurately resolving the thin boundary layers of finite-size objects while tracking massive numbers of small particles within a large turbulent domain is often prohibitively expensive on uniform grids. To address this, we present a parallel scalable computational framework that couples the lattice Boltzmann method with the immersed boundary method on a dynamically adaptive octree grid. A key algorithm is developed for the efficient parallel host-cell searching, which significantly accelerates the tracking of Lagrangian points on distributed unstructured grids. The accuracy and robustness of the code are rigorously validated against canonical benchmarks, including the flow induced by an oscillating cylinder and the sedimentation of a sphere. The framework is applied to the multiscale problem of bubble-particle collisions. In quiescent flow, the simulations accurately capture the hydrodynamic interception mechanism, reproducing the theoretical collision efficiency scaling law proportional to the square of the particle-to-bubble size ratio. Furthermore, the framework is applied to the simulation of fully resolved bubbles interacting with inertial point particles in homogeneous isotropic turbulence.",
+      "authors": [
+        "Linfeng Jiang",
+        "Enrico Calzavarini",
+        "Dominik Krug"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-05-19T23:51:12+00:00",
+      "link": "https://arxiv.org/pdf/2605.20565v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "presents a parallel adaptive lattice Boltzmann-immersed boundary framework for multiphase flows with large scale disparities",
+      "llm_evidence_cn": "提出并行自适应格子玻尔兹曼-浸入边界框架，用于大尺度悬殊的多相流",
+      "llm_evidence": "提出并行自适应格子玻尔兹曼-浸入边界框架，用于大尺度悬殊的多相流",
+      "canonical_evidence": "提出并行自适应格子玻尔兹曼-浸入边界框架，用于大尺度悬殊的多相流",
+      "llm_tldr_en": "Develops a highly scalable CFD framework for multiphase flows with large particle/bubble size ratios, applicable to complex falling film simulations with dispersed phases.",
+      "llm_tldr_cn": "针对多相流中分散相尺度悬殊（如气泡与矿物颗粒）的挑战，该论文开发了基于格子玻尔兹曼和浸入边界法的并行自适应八叉树网格框架。该框架能够高效解析薄边界层并跟踪大量小尺寸颗粒，在此类多物理场模拟中显著提升计算能力。该技术可为包含离散相的降膜换热过程提供高保真仿真工具。",
+      "llm_tldr": "针对多相流中分散相尺度悬殊（如气泡与矿物颗粒）的挑战，该论文开发了基于格子玻尔兹曼和浸入边界法的并行自适应八叉树网格框架。该框架能够高效解析薄边界层并跟踪大量小尺寸颗粒，在此类多物理场模拟中显著提升计算能力。该技术可为包含离散相的降膜换热过程提供高保真仿真工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.11991v1",
+      "source": "arxiv",
+      "title": "Intermittent two-phase flow in porous media: insights from pore-scale direct numerical simulation",
+      "abstract": "Recent X-ray imaging experiments have revealed that multiphase flow through porous media involves transient fluctuations in local occupancy, even under fixed macroscopic steady-state conditions where capillary forces dominate at the pore scale. To examine how intermittency manifests at the pore scale we perform direct numerical finite volume simulations (DNS) of immiscible two-phase flow through a micro-CT-derived Bentheimer sandstone geometry at capillary numbers in the Darcy and intermittent flow regimes. We show that intermittent disconnection and reconnection are accompanied by strongly coupled local pressure redistribution and non-wetting phase flow. This behaviour contrasts with the Darcy flow regime, in which the phases remain predominantly in fixed pathways. Macroscopically the computed pressure-gradient-capillary-number relationship ($\\nabla P$-Ca) recovers both the linear Darcy and the sub-linear intermittent scaling regimes consistent with previous experimental measurements. We show how an increase in intermittency leads to the transition from the linear to the sub-linear regime. Using topology-aware snap-off detection, we show that the spatial extent of intermittency increases with capillary number. Spectral, local-geometry, and network-connectivity analyses provide further evidence that the intermittent elements organise into connected conduits embedded within a stable backbone of fixed flow pathways: intermittency is a network-coupled rather than purely local process. This work characterises the pore-scale manifestation of intermittency as a periodic sequence of drainage and imbibition displacements triggered by local pressure fluctuations whose macroscopic consequence is to improve the overall mobility of the fluid phases.",
+      "authors": [
+        "Alexandra Karabasova",
+        "Sajjad Foroughi",
+        "Martin J. Blunt",
+        "Branko Bijeljic"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-05-12T11:43:01+00:00",
+      "link": "https://arxiv.org/pdf/2605.11991v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "DNS of immiscible two-phase flow, interface capturing methods transferable to falling film simulations",
+      "llm_evidence_cn": "非混相两相流的DNS，界面捕捉方法可迁移至降膜模拟",
+      "llm_evidence": "非混相两相流的DNS，界面捕捉方法可迁移至降膜模拟",
+      "canonical_evidence": "非混相两相流的DNS，界面捕捉方法可迁移至降膜模拟",
+      "llm_tldr_en": "Performs direct numerical simulation of two-phase flow in porous media, revealing intermittent flow behavior; the numerical techniques (VOF/level-set) are applicable to falling film studies.",
+      "llm_tldr_cn": "对多孔介质中的非混相两相流进行直接数值模拟，揭示了间歇性流动行为；所用界面捕捉数值技术可应用于降膜研究。",
+      "llm_tldr": "对多孔介质中的非混相两相流进行直接数值模拟，揭示了间歇性流动行为；所用界面捕捉数值技术可应用于降膜研究。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2605.27725v1",
+      "source": "arxiv",
+      "title": "CFDTwin: An open-source GUI and Python toolkit for POD-NN surrogate modeling of ANSYS Fluent simulations",
+      "abstract": "High-fidelity computational fluid dynamics (CFD) is widely used for thermal-fluid design, but repeated CFD solves remain expensive for design optimization, uncertainty analysis, and digital-twin workflows. Recently, our team has demonstrated that a proper orthogonal decomposition and neural-network (POD-NN) surrogate can predict two-dimensional thermal fields in an electronics-cooling cold plate with large inference speedups while preserving physically interpretable modal structure. Reproducing and extending such workflows, however, typically requires custom scripts for parameter sampling, Fluent automation, data extraction, reduced-order model construction, neural-network training, validation, and prediction. This paper introduces CFDTwin, an open-source Python package and optional desktop graphical user interface (GUI) that packages these steps into a reusable workflow for ANSYS Fluent simulations. CFDTwin allows users to define simulation inputs and output quantities, generate design-of-experiments samples, run and resume Fluent batch simulations, train POD-NN surrogate models for scalar, surface-field, and cell-zone outputs, inspect validation metrics, and evaluate trained models at new design points without re-running Fluent. The same workflow is exposed through a scriptable Python API and a GUI, supporting reproducible studies, user-facing model validation, and automated design exploration. CFDTwin extends the prior POD-NN modeling study from a case-specific research implementation to a reusable research-software platform for CFD surrogate modeling and digital-twin development.",
+      "authors": [
+        "Daniel Curl",
+        "Han Hu"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "cs.LG"
+      ],
+      "published": "2026-05-26T22:00:49+00:00",
+      "link": "https://arxiv.org/pdf/2605.27725v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "open-source toolkit for POD-NN surrogate modeling of CFD simulations, enabling fast thermal-fluid design",
+      "llm_evidence_cn": "用于CFD模拟的POD-NN代理建模开源工具包，可实现快速热流体设计",
+      "llm_evidence": "用于CFD模拟的POD-NN代理建模开源工具包，可实现快速热流体设计",
+      "canonical_evidence": "用于CFD模拟的POD-NN代理建模开源工具包，可实现快速热流体设计",
+      "llm_tldr_en": "An open-source toolkit for building POD-NN surrogate models from ANSYS Fluent simulations, speeding up thermal-fluid CFD workflows including falling film heat transfer simulations.",
+      "llm_tldr_cn": "该论文提供了一个开源工具包，用于从ANSYS Fluent仿真数据构建POD-NN代理模型，以显著加快热流体设计优化和数字孪生工作流。该方法可用于加速垂直管降膜换热的CFD模拟，从而减少计算成本。",
+      "llm_tldr": "该论文提供了一个开源工具包，用于从ANSYS Fluent仿真数据构建POD-NN代理模型，以显著加快热流体设计优化和数字孪生工作流。该方法可用于加速垂直管降膜换热的CFD模拟，从而减少计算成本。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "CFD modeling of falling film heat transfer in vertical tubes",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2605.22214v1",
+      "source": "arxiv",
+      "title": "N-Component Free Energy Lattice Boltzmann Method with Reduction Consistency and Global Momentum Conservation",
+      "abstract": "We present a free energy lattice Boltzmann model capable of simulating fluid systems with an arbitrary number of immiscible components in principle. Our method is strictly reduction consistent, ensuring that absent fluid components do not spontaneously nucleate. We introduce a novel discretization of the surface tension force that globally conserves momentum to machine precision, and we enforce reduction consistency through a flux correction that is independent of the mobility. The method is benchmarked with a range of static and dynamic problems, including: liquid lenses, Janus droplets, quaternary phase separation, and six-component layered Poiseuille flow, and we obtain excellent agreement with theoretical predictions throughout. Finally, we demonstrate the applicability of the proposed method through patterned liquid surfaces and microfluidic emulsion droplet generation.",
+      "authors": [
+        "Michael Rennick",
+        "Xitong Zhang",
+        "Tim Niklas Bingert",
+        "Mathias J. Krause",
+        "Halim Kusumaatmaja"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-05-21T09:19:16+00:00",
+      "link": "https://arxiv.org/pdf/2605.22214v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multiphase LBM method for immiscible components; directly applicable to CFD of multicomponent falling films.",
+      "llm_evidence_cn": "不混溶组分的多相LBM方法；可直接应用于多组分降膜CFD。",
+      "llm_evidence": "不混溶组分的多相LBM方法；可直接应用于多组分降膜CFD。",
+      "canonical_evidence": "不混溶组分的多相LBM方法；可直接应用于多组分降膜CFD。",
+      "llm_tldr_en": "Proposes an N-component free energy LBM with reduction consistency and global momentum conservation, benchmarked on multiphase problems like Janus droplets and layered flows. Provides a robust multiphase CFD tool that can be adapted for falling film heat/mass transfer simulations.",
+      "llm_tldr_cn": "针对多相格子玻尔兹曼方法中还原一致性与动量守恒不足的问题，本文提出一种可模拟任意数目不混溶组分的自由能LBM。通过引入新型表面张力离散和通量修正，严格保证全局动量守恒和组分非自发形核。在液滴透镜、四相分离及六组分层流等静态和动态算例中，与理论解高度一致。该方法为多组分降膜换热与传质模拟提供了通用且精确的CFD基础。",
+      "llm_tldr": "针对多相格子玻尔兹曼方法中还原一致性与动量守恒不足的问题，本文提出一种可模拟任意数目不混溶组分的自由能LBM。通过引入新型表面张力离散和通量修正，严格保证全局动量守恒和组分非自发形核。在液滴透镜、四相分离及六组分层流等静态和动态算例中，与理论解高度一致。该方法为多组分降膜换热与传质模拟提供了通用且精确的CFD基础。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

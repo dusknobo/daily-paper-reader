@@ -1,0 +1,2171 @@
+Title: Solutocapillary instability in slipping falling films
+
+URL Source: https://arxiv.org/pdf/2605.17519v1
+
+Published Time: Tue, 19 May 2026 02:04:52 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+# Solutocapillary instability in slipping falling films 
+
+Sanghasri Mukhopadhyay, 1, ∗ S´ everine Millet, 2 Bastien Di Pierro, 2 and Asim Mukhopadhyay 3
+
+> 1
+
+Centre for Applied Sciences (CAS), International Institute of Information Technology, Bengaluru 560100, India 
+
+> 2
+
+Universit´ e Claude Bernard Lyon 1, LMFA, UMR 5509, CNRS, Ecole Centrale de Lyon, INSA Lyon, 69622 Villeurbanne, France 
+
+> 3
+
+Department of Mathematics, Vivekananda Mahavidyalaya, Burdwan 713103, West Bengal, India 
+
+(Dated: May 19, 2026) 
+
+We present a comprehensive framework for gravity-driven, surfactant-laden thin films flowing over slippery sub-strates, elucidating how wall slip modifies the coupled hydrodynamics and interfacial transport. A long-wave model is formulated with a conservative bulk–surface mass balance and a Navier slip condition. The Orr–Sommerfeld eigen-value problem governs the linear regime, while a weighted-residual model captures the nonlinear evolution over a range of equilibrium surfactant coverages, Marangoni strengths, and adsorption kinetics. The analysis predicts a non-monotonic variation of the critical Reynolds number with equilibrium coverage, exhibiting a maximum at intermediate Γe, and a slip-induced transition from single- to double-hump solitary structures with increasing Marangoni number, accompanied by attenuated capillary ripples. Under fast adsorption kinetics, the surface field homogenizes, preserving the mean film shape and flux while flattening both the surface concentration Γ and the bulk inventory χ + hϕ . Aspurious interfacial mass growth reported by Pascal et al. [43] and D’Alessio et al. [9] is resolved through a revised surface balance ensuring strict conservation. Wall slip thus emerges as a key control parameter, reducing viscous resistance and mitigating Marangoni back-stress. The slip parameter β is a useful control knob for surfactant-laden films. Slip prevents fragile multi-hump bound states, promoting a single broad crest or an almost flat, uniform sheet by carefully bonding β to wave selection, ripple damping, and the bulk-surface surfactant balance. 
+
+I. INTRODUCTION 
+
+Gravity-driven liquid films flowing down inclined surfaces occur in many natural and industrial settings, including coating flows, heat and mass transfer devices, and absorption systems. Such films are known to become unstable beyond a critical flow rate, leading to the formation of interfacial waves whose onset and nonlinear evolution have been studied extensively. Surfactants, or surface-active agents, preferentially adsorb at fluid interfaces and modify surface tension, thereby influencing interfacial dynamics. Their role in fluid systems is well documented in both industrial and biological con-texts, ranging from absorption refrigeration systems to pulmonary mechanics. Early theoretical studies by Whitaker [60] and Benjamin [3] demonstrated that insoluble surfactants can have a pronounced stabilizing effect on the primary instability of falling films through Marangoni stresses, effectively imparting an elastic character to the interface. Subsequent work investigated the nonlinear evolution and rupture of thin surfactant-laden films. For example, Jensen & Grotberg [23] showed that surfactant-induced capillary forces can drive film thinning and rupture, while nonlinear analyses by De Wit et al. [13] and de Souza & Gallez [12] identified conditions for pattern formation. Over the past two decades, numerous studies have examined the influence of insoluble surfactants on falling-film instabilities under the effects of gravity, heating, and inertia [1, 4, 6, 21, 22, 32, 55]. Using the weighted residual integral boundary layer method, Pereira & Kalliadasis [44] analyzed the dynamics of surfactant-laden films on inclined substrates. In practice, however, most surfactants are at least partially soluble, allowing exchange between the interface and the bulk liquid. This exchange alters interfacial concentration gradients and can weaken or suppress Marangoni stresses when transfer rates are high. Experimental studies by Georgantaki et al. [17] and Katsiavria & Bontozoglou [31] demonstrated that increasing surfactant solubility leads to marked changes in film dynamics and stability. Theoretical studies have likewise shown that soluble surfactants introduce new instability mechanisms. Ji & Set-terwall [24] identified Marangoni-driven instabilities in falling films contaminated with soluble surfactants, while Shkadov et al. [54] reported multiple diffusion-driven modes. Further analysis by Yiantsios & Higgins [62] highlighted the competing roles of solubility, diffusion, and surface viscosity in evaporating films. More recently, Karapetsas & Bontozoglou [29] and Karapetsas & Bontozoglou [30] performed a systematic study of soluble-surfactant effects on inclined flows, showing that increased solubility can destabilize the film. These findings were supported experimen-tally by Georgantaki et al. [18], who observed a significant increase in the critical Reynolds number due to surfactant presence.  
+
+> ∗sanghasri.m@iiitb.ac.in
+> arXiv:2605.17519v1 [physics.flu-dyn] 17 May 2026
+
+2
+
+FIG. 1: Sketch of the problem The combined influence of surfactant transport and additional physical effects has also received attention. Pascal 
+
+et al. [43] examined films with variable mass density, revealing a non-monotonic dependence of stability on surfactant concentration. The interplay between solutal and thermocapillary effects was investigated by D’Alessio et al. [9], who showed that surfactants can enhance inertial instabilities in non-isothermal flows. In an isothermal setting, Samanta [51] revisited a similar configuration and reported that surfactants may stabilize long-wave disturbances while destabilizing compliant-substrate flows. Related Orr-Sommerfeld analyses for non-isothermal films were presented by Samanta [50], who showed that unstable surfactant modes may disappear in the absence of external shear. In the classical description of falling films over solid substrates, the no-slip boundary condition is commonly assumed. However, the strict enforcement of no slip has been shown to lead to stress singularities at moving contact lines [36, 58], and experiments have reported finite slip on hydrophobic surfaces [8]. A widely used alternative is the Navier slip boundary condition [37], which relates the wall shear stress to the tangential velocity. Its physical basis has been supported by molecular dynamics simulations [11] and reviewed by Neto et al. [38]. Despite this, the role of wall slip in falling films laden with soluble surfactants has not been fully clarified. In addition to examining the hydrodynamic–surfactant coupling in the presence of wall slip, the present work addresses an inconsistency reported in previous long-wave models, where a non-physical accumulation of surfactant mass at the interface was observed during nonlinear evolution [9, 43]. Here, we investigate the stability and nonlinear dynamics of gravity-driven, surfactant-laden falling films over an inclined substrate with wall slip. We perform a linear stability analysis based on the Orr-Sommerfeld formulation to determine how the critical Reynolds number depends on the slip parameter and the base-state surfactant concentration. We then develop a depth-averaged weighted residual model that enforces a strictly conservative bulk-surface surfactant balance, allowing us to isolate the coupled effects of wall slip and surfactant solubility on the onset of instability and nonlinear wave dynamics. While introducing slip modifies only one boundary condition, it changes the near-wall shear and therefore the base advection that drives surfactant redistribution and Marangoni back-stress. This coupling alters both the linear onset threshold and the nonlinear wave selection, which cannot be inferred from the no-slip theory by a simple parameter shift. The paper is organized as follows. Section II presents the governing equations and nondimensionalization. Section III describes the linear stability analysis in both the arbitrary-wavelength and long-wave limits. Section IV examines nonlinear wave evolution, and Section V summarizes the main conclusions.  
+
+> II. PROBLEM STATEMENT AND FORMULATION
+
+We consider a thin Newtonian liquid film (viscosity η, density ρ) flowing down an inclined slippery substrate at angle θ to the horizontal. The free surface is located at z = h(x, t ). The flow is two-dimensional, gravity-driven, and the liquid contains a soluble surfactant. We suppose that a constant mass of surfactant is applied to the liquid layer. Because we are working with a soluble surfactant, we must consider two different concentrations: one for the surfactant adsorbed at the surface and one for the surfactant dissolved in the bulk of the layer. Furthermore, we 3will assume that the concentrations of surfactants are below the critical level for micelle formation, such that the surfactant added to the liquid exists as monomers. The coordinate system is chosen such that the x − axis along the flow direction and the z − axis normal to the inclined plane (see Figure 1). The basic governing equations for the problem ([9]) are the equation of continuity: 
+
+∇ · ⃗ V = 0 , (1) the equation of momentum balance (Navier-Stokes equation for incompressible fluid): 
+
+ρD t⃗ V = −∇ p + ρg + η∇2⃗ V , (2) and the advection-diffusion equation for the surfactant: 
+
+DtC = Db∇2C, (3) 
+
+Dt = ∂t +⃗ V · ∇ is the convective derivative, ∇ denotes the two-dimensional gradient operator and ∇2 the Laplacian, ⃗V ≡ (u, w ), where u(t, x, z ) and w(t, x, z ) denote the velocity components in the x and z directions, respectively, t
+
+denotes the time, p(t, x, z ) denotes the pressure, g = ( g sin θ, −g cos θ) is the gravitational acceleration, C(t, x, z ) is the bulk concentration of the surfactant and Db is the diffusivity of the surfactant in the bulk fluid. The pertinent boundary conditions on the plane substrate z = 0 ([36]) are ⃗V · tw = ls(nw · τ · tw),⃗ V · nw = 0 , nw · ∇ C = 0 , (4) where, tw and nw are unit tangential and unit normal vectors on the solid-liquid interface, respectively [64], and ls is the (dimensional) Navier slip length. The dimensionless slip parameter used later is β = ls/ˆhN [36]). Voronov et al. 
+
+[59] experimentally determined that an estimate of the slip length for a polydimethylsiloxane (PDMS) slippery plane is 250 μm [59]. The first equation of (4) is called the Navier slip boundary condition, which states that the velocity at the boundary is proportional to the tangential component of the wall stress. The second equation of (4) is the non-penetration condition, which implies that the fluid is not allowed to cross the boundary. The third equation of (4) is the non-mass-flux condition of the solute. The boundary conditions on the free surface z = h(x, t ), separating the liquid layer from a quiescent ambient gas, are given by ([35]) 
+
+pa + n · τ · n = −σ∇ · n (5) 
+
+n · τ · t = ∇σ · t (6) 
+
+Dtf = 0 (7) are the usual normal and tangential stress balances along with the kinematic boundary condition, where pa is the pressure of the ambient gas, σ is the surface tension coefficient of the fluid and n, and t are the unit normal and tangential vectors on the free surface, respectively, and f (x, t ) = z − h(x, t ), τ = −pI + η(∇⃗ V + ( ∇⃗ V )T ) is the total stress tensor, I is the identity tensor. Equations (5) and (6) are called dynamic conditions that arise from a balance between ambient pressure and surface tension. Equation (7) is a kinematic condition, which states that a particle on the free surface always remains there. Since we assumed that a fixed mass of soluble surfactant is added to the liquid layer, we must consider a separate concentration to describe the transport of surfactant absorbed at the interface. To formulate the surfactant transport equation at the free surface, we must consider advective and diffusive transport along the interface, as well as surfactant adsorption and desorption between the interface and the bulk solution. We perform the following equation [15, 34, 56] to incorporate the above fact in z = h(x, t )
+
+∂Γ
+
+∂t |{z} 
+
+> unsteady
+
++ ∇s · (Γ ⃗ Vs)
+
+| {z }
+
+> advection
+
+= Ds∇2
+
+> s
+
+Γ
+
+| {z }
+
+> diffusion
+
++ Jbs 
+
+|{z} 
+
+> source term
+
+, (8) 4where, Γ( x, t ) is the concentration of surface surfactant, ∇s = ( I − nn ) · ∇ is the surface gradient operator, ⃗ Vs =(I − nn ) ·⃗ V is the tangential velocity on the free surface. Ds is the molecular diffusivity of the surface and Jbs denotes the net flux of surfactant absorbed on the free surface. We want to emphasize there that ∇s · (Γ ⃗ Vs) is the surface advection term while Ds∇2
+
+> s
+
+Γ is the surface diffusion term. We would like to highlight that in this model the surfactant is permitted to diffuse along the interface with constant diffusivity or to be advected along the thin film’s surface [15, 46, 56]. We also assumed that the adsorption rate is proportional to the concentration in the bulk and that the desorption rate is proportional to the surface concentration [9, 30]. Then according to Langmuir isotherm [14], at z = h(x, t )
+
+Jbs = k1
+
+
+
+1 − ΓΓ∞
+
+
+
+C − k2Γ, (9) where, k1 and k2 are the adsorption and desorption reaction rates, respectively, and Γ ∞ denotes the maximum packing surface concentration. For insoluble surfactant, the source term Jbs = 0, as there is no adsorption/desorption, so that 
+
+k1 and k2 are essentially zero [41]. According to Fick’s law of diffusion, the molar flux resulting from diffusion is proportional to the bulk concentration gradient of the surfactant; we have the following 
+
+Jbs = −Db∇C · n. (10) In the foregoing analysis we have assumed that the surface tension coefficient will vary linearly with the surface surfactant concentration, which is of the form 
+
+σ(Γ) = σ0 − σΓ(Γ − ΓE ), (11) where, Γ E is the equilibrium surface surfactant concentration and σ0 = σ(Γ E ) and σΓ = − ∂σ ∂Γ Γ=Γ E
+
+. Equation (11) is only dependent on σΓ and Γ E , a generic specimen (prototype) equation of state, which is commonly used in thin film investigations to describe the solutal Marangoni effect [26, 39]. However, experiments have shown that surface tension can be approximated by a linear function throughout a wide concentration range [16].  
+
+> A. Lubrication approximation and scaling
+
+We chose a pair of separate characteristic length scales, ˆλ in the longitudinal direction, whose order is equal to the disturbance wavelength and ˆhN , the mean thickness of the film in the transverse direction. The velocity scale appears as ˆV . We will write more about the velocity scale later in the right place. In fact, we utilize the same scale as [36] to nondimensionalize the governing equations and boundary conditions. The extra set of nondimensional variables used in this work is Γ ∗ = (1 /Γ∞)Γ and C∗ = ( ˆh/ Γ∞)C.The non-dimensional basic equations, after dropping the asterisk, for the problem are 
+
+∂u ∂x + ∂w ∂z = 0 , (12) 
+
+εRe 
+
+ ∂u ∂t + u ∂u ∂x + w ∂u ∂z 
+
+
+
+= −εRe ∂p ∂x + Re F r 2 +
+
+
+
+ε2 ∂2u∂x 2 + ∂2u∂z 2
+
+
+
+, (13) 
+
+ε2Re 
+
+ ∂w ∂t + u ∂w ∂x + w ∂w ∂z 
+
+
+
+= −Re ∂p ∂z − Re F r 2 cot θ +
+
+
+
+ε3 ∂2w∂x 2 + ε ∂2w∂z 2
+
+
+
+, (14) 
+
+εP e b
+
+ ∂C ∂t + u ∂C ∂x + w ∂C ∂z 
+
+
+
+= ε2 ∂2C∂x 2 + ∂2C∂z 2 (15) where, Re = ˆV ˆhN /ν , is the Reynolds number ( ν = η/ρ is the kinematic viscosity), F r = ˆV / 
+
+q
+
+g sin θˆhN is the Froude number, P e b = ˆV ˆhN /D b, is the P´ eclet number, and ε = 2 πˆhN /ˆλ << 1 is the aspect ratio. The boundary conditions at z = 0 are as follows: 
+
+u = β ∂u ∂z , w = 0 , ∂C ∂z = 0 , (16) 5where β = √μ/ (υˆhN ) is the slip coefficient (dimensionless slip length) which measures the influence of the substrate permeability. Fluid with a base layer thickness of 3 × 10 −3m, an acceptable range of the dimensionless slip length range ( β) is (0 − 0.08) makes sense [49]. The boundary conditions at z = h are given by: 
+
+pa − p + 2 Re −1ε
+
+(
+
+ε2 ∂u ∂x 
+
+ ∂h ∂x 
+
+2
+
+−
+
+ ∂u ∂z + ε2 ∂w ∂x 
+
+ ∂h ∂x + ∂w ∂z 
+
+)
+
+1 + ε2
+
+ ∂h ∂x 
+
+2!−1
+
+= ε2 ∂2h∂x 2
+
+W e − M n (Γ − Γe)
+
+(
+
+1 + ε2
+
+ ∂h ∂x 
+
+2)3/2 , (17) where W e = σ0/(ρ ˆV 2ˆhN ) is the Weber number, M n = σΓΓ∞/(ρ ˆV 2ˆhN ) is the Marangoni number, and Γ e = Γ E /Γ∞
+
+is the dimensionless equilibrium surface surfactant concentration. Unless stated otherwise, parameter studies are performed by varying a single control parameter while holding all others fixed. In particular, when the equilibrium surface concentration Γ e is varied, the equation-of-state parameters σ0 and σΓ are kept fixed, so that the Weber number W e and Marangoni number M n remain independent control parameters. When W e or M n are instead recomputed from a Γ e-dependent base state, this choice is stated explicitly. The rest of the boundary conditions at z = h are: 
+
+ ∂u ∂z + ε2 ∂w ∂x 
+
+ (
+
+1 − ε2
+
+ ∂h ∂x 
+
+2)
+
+− 4ε2 ∂u ∂x ∂h ∂x + εReM n ∂Γ
+
+∂x 
+
+(
+
+1 + ε2
+
+ ∂h ∂x 
+
+2)1/2
+
+= 0 , (18) 
+
+w = ∂h ∂t + u ∂h ∂x , (19) 
+
+ε
+
+"
+
+∂Γ
+
+∂t + 1
+
+p1 + ε2h2
+
+> x
+
+∂(Γ us)
+
+∂x 
+
+#
+
+= ε2
+
+P e s
+
+p1 + ε2h2
+
+> x
+
+∂∂x 
+
+"
+
+1
+
+p1 + ε2h2
+
+> x
+
+∂Γ
+
+∂x 
+
+#
+
++ ks[κ(1 − Γ) C − Γ] (20) where, P e s = ˆV ˆhN /Ds surface Peclet number, ks = k2ˆhN / ˆV is the desorption rate, κ = k1/(k2ˆhN ) is the adsorption equilibrium constant, and us(x, t ) = 1√1+ ε2h2
+
+> x
+
+u(x, z = h, t ) is the surface velocity. To derive equation (20) from equation (8) we have normalized ∇s and us by p1 + h2
+
+> x
+
+, the component of the fundamental tensor gij on the free surface z = h(x) in the streamwise direction 1.Wong et al. [61] developed a surfactant mass balance equation at a deforming fluid interface that considers both Eulerian and Lagrangian frames. We emphasize that the equation (20) is not the same as the corresponding equation in Pascal et al. [43] and D’Alessio et al. [9]. In effect, they have an additional term, namely εΓ ∂u ∂z hx. Within their reduced long-wave closure, this term is not accompanied by a corresponding contribution in the bulk transport equation, which, within that reduced closure, leads to a mismatch in the bulk-surface exchange terms and can compromise strict global surfactant mass conservation at the reduced-model level. As shown in Appendix C, this manifests as a spurious long-time growth of the interfacial surfactant inventory. By contrast, Eq. (20) reduces to the conservative surface-transport form of Pereira & Kalliadasis [44] in the insoluble-surfactant limit. The remaining boundary condition in dimensionless form is as follows: 1
+
+P e b
+
+(
+
+1 + ε2
+
+ ∂h ∂x 
+
+2)1/2
+
+
+
+ε2 ∂h ∂x ∂C ∂x − ∂C ∂z 
+
+
+
+= ks[κ(1 − Γ) C − Γ] (21)  
+
+> 1For alternative derivation we refer to Appendix A
+
+6The P´ eclet number P e b,s is a dimensionless ratio that compares the advection rate to the diffusion rate. The equilibrium constant of adsorption κ is the ratio of the kinetic constants of the forward and backward reaction for the interaction between the interface and the bulk, providing a direct measure of the solubility of the surfactant in the bulk liquid [23]. Surfactants with κ ≪ 1 are highly soluble, while those with κ ≫ 1 are sparingly soluble; that is, surfactants are trapped at the interface and nearly insoluble [27, 29]. Furthermore, since κ is the ratio between adsorption and desorption rate, κ → ∞ corresponds to an insoluble surfactant (as for the insoluble limit k1,2 → 0).  
+
+> B. Base profiles
+
+The steady flow of the equilibrium solution corresponding to the uniform stream direction (base state) can be found by setting ∂∂t ≡ 0, ∂∂x ≡ 0 and w = 0. 
+
+UB (z) = Re F r 2
+
+
+
+− 12 z2 + z + β
+
+
+
+, WB = 0 , (22) 
+
+PB (z) = − Re F r 2
+
+ cot θRe 
+
+
+
+(z − 1) , hB = he = 1 (23) 
+
+CB ≡ Ce = Γe
+
+κ(1 − Γe) , ΓB = Γ e, (24) where, Ce and Γ e are the bulk and surface surfactant concentration respectively at the equilibrium state, which is also called the uniform base level concentration. Since the surface concentration has been scaled by its maximal value, the range of the control parameter Γ e will be 0 ≤ Γe ≤ 1. To achieve a finite bulk concentration, κ → ∞ as Γ e → 1−,ensuring that the product κ(1 − Γe) does not approach zero. Furthermore, at this moment, the surface surfactant concentration Γ e and the bulk surfactant concentration Ce are in equilibrium with Jbs = 0, and the equation (9) produces the following relationship: Ce = Γ e/κ (1 − Γe). It should be noted that when Ce > 1, the bulk surfactant forms micelles. This study focuses exclusively on the properties of soluble surfactants, including solubility, sorption kinetics, and bulk diffusivity, when Ce < 1 [33]. For insoluble surfactant κ → ∞ , we anticipate that the concentration of surfactant in the bulk will vanish at the insoluble limit. This implies that maximum surface concentration can only be achieved if the surfactant is insoluble. The base flow solution shows that the flow velocity UB (z) is a quadratic function of z with a semiparabolic form, peaks at the film surface. It should be emphasized that the base velocity is independent of the surfactant concentration. Figure 2(a) shows that the base velocity in the stream direction increases in the presence of the slip length [36]. In contrast, the slip length parameter reduces the wall shear stress, as seen in Figure 2(b). This result confirms that the slippery plane has a significant impact on the base flow velocity.  
+
+> III. ORR-SOMMERFELD (OS) BOUNDARY VALUE PROBLEM
+
+We linearize the complete system around the base state and introduce perturbations in normal mode. Since we know a normal mode analysis requires splitting each unknown X into X = XB + ˜X exp[ ik (x − αt )]. Where XB represents the base flow, while ˜X(z) represents the infinitesimal amplitude of a sine wave with wave number k and celerity 
+
+α. Therefore, we linearize the governing equations (12-21) and applying normal modes yields the Orr-Sommerfeld eigenvalue problem [63]. (D2 − k2)2ψ − i kRe (UB − α) ( D2 − k2)ψ − UB ′′ ψ = 0 , (25) (D2 − k2)c − ikP e b(UB − α)c = 0 , (26) where ψ(z) and c(z) are the amplitude of the stream function and the surfactant concentration, respectively, and 
+
+D ≡ d/dz . The associated boundary conditions are as follows: 
+
+ψ(0) = 0 , (27) 70.0 0.2 0.4 0.6 0.8 1.0 
+
+# UB(z)
+
+0.0 
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> z
+
+= 0 
+
+= 0.04 
+
+= 0.08 
+
+> (a) The variation of the base flow
+
+0.00 0.20 0.40 0.60 0.80 1.00 
+
+> dU B
+> dz
+
+0.00 
+
+0.20 
+
+0.40 
+
+0.60 
+
+0.80 
+
+1.00 
+
+> z
+
+= 0 
+
+= 0.04 
+
+= 0.08 (b) The variation of the wall shear stress 
+
+FIG. 2: Base flow and wall shear stress for different values of the slip parameter β, the velocity scale is twice the free surface velocity. 
+
+βψ ′′ (0) − ψ′(0) = 0 , (28) 
+
+c′(0) = 0 , (29) 
+
+ψ′′ (1) + k2ψ(1) + i kReM nγ − UB ′′ (1) ψ(1) [UB (1) − α] = 0 , (30) 
+
+ψ′′′ (1) − 3k2ψ′(1) − i Re k [ψ′(1)( UB (1) − α)] +i k 
+
+  Re F r 2
+
+ cot θ + k2ReW e UB (1) − α
+
+!
+
+ψ(1) = 0 , (31) 
+
+γk 2 + ikP e s[Γ B ψ′(1) − γ(α − UB (1))] +ksP e s[γ(1 + κC B (1)) − κc(1)(1 − ΓB )] = 0 , (32) 
+
+c′(1) = P e bks [γ(1 + κC B (1)) − κc(1)(1 − ΓB )] , (33) where, γ denotes the amplitude of the perturbed part of the surface surfactant concentration, and the primes indicate differentiation with respect to z. Since the Orr-Sommerfeld framework applies to disturbances of arbitrary wavelength, the long-wave parameter ε is removed by introducing the scaled variables ˆ x = x/ε and ˆ t = t/ε , and subsequently omitting the hat (ˆ .) notation. This rescaling ensures identical characteristic length scales in the streamwise and normal directions, thereby extending the analysis beyond the long-wave approximation. Note that the Orr-Sommerfeld problem is written in the rescaled variables used for arbitrary wavelengths, so the long-wave aspect ratio ε is absorbed into the streamwise and time scalings. Parameters defined later within the reduced long-wave model (e.g., Ka =
+
+ε2Re W e ) therefore do not appear explicitly in Eqs. (25)-(26), but enter in the long-wave/DA model. 8
+
+A. Asymptotic solution of the OS problem 
+
+To predict the onset of instability, we apply an asymptotic analysis as k → 0. This is because perturbations of small wavenumbers are more unstable. Long-wavelength asymptotic analysis can solve the eigenvalue problem by expanding the eigenfunction/flow variables Ψ, c, γ and the eigenvalues α in powers of k [63]. 
+
+ψ(z) = ψ0(z) + kψ 1(z) + O(k2), c(z) = c0(z) + kc1(z) + O(k2), γ(z) = γ0(z) + kγ 1(z) + O(k2) and α =
+
+α0 + kα 1 + O(k2). Solving the hierarchy of problems at various orders of k, we can find the complex phase speed α = αr + iα i =
+
+α0 + kα 12, where, 
+
+α0 = (1 + 2 β) Re F r 2 (34) 
+
+α1 = iRe 
+
+"
+
+(1 + β){2 + 5 β(2 + 3 β)}
+
+15 
+
+ Re F r 2
+
+2
+
+− (1 + 3 β)3
+
+ Re F r 2
+
+ cot θRe 
+
+− 3(1 + 2 β)M n Γeκ(1 − Γe)2
+
+4 + 3 κ(1 − Γe)2
+
+
+
+(35) The neutral stability is given by α1 = 0, which gives cot θRe = 2 + 5 β(2 + 3 β)5
+
+ Re F r 2
+
+" 1 + β
+
+1 + 3 β
+
+
+
+− 45(1 + 2 β)(1 + 3 β){2 + 5 β(2 + 3 β)}
+
+ Re F r 2
+
+−2 M n Γeκ(1 − Γe)2
+
+4 + 3 κ(1 − Γe)2
+
+#
+
+(36) The onset of instability is obtained by considering the zero critical wave number [53]. This yields the critical condition 
+
+Re c = 5
+
+{2 + 5 β(2 + 3 β)}
+
+ 1 + 3 β
+
+1 + β
+
+  Re F r 2
+
+−1
+
+cot θ
+
+| {z }
+
+> Gravity effect
+
++ 45(1 + 2 β)(1 + β){2 + 5 β(2 + 3 β)}
+
+ Re F r 2
+
+−2  M n Γeκ(1 − Γe)2
+
+4 + 3 κ(1 − Γe)2
+
+| {z }
+
+> Surfactant effect
+
+(37) In the insoluble limit, letting κ → ∞ , we have 
+
+Re c = 5
+
+{2 + 5 β(2 + 3 β)}
+
+ 1 + 3 β
+
+1 + β
+
+  Re F r 2
+
+−1
+
+cot θ
+
++ 15(1 + 2 β)(1 + β){2 + 5 β(2 + 3 β)}
+
+ Re F r 2
+
+−2
+
+M n Γe (38) To make a comparison to the previously established work, we must use proper scaling, for example: 1. The choice is of the velocity scale ˆV = ⟨u⟩ = g sin θˆh2 
+
+> N
+
+/3ν the average Nusselt velocity for flat rigid plate, we get Re/F r 2 = ( g sin θˆh2 
+
+> N
+
+/ν )(1 / ˆV ) = 3 [42].   
+
+> 2This eigen value corresponds to the hydrodynamic Kapitza mode α(1) ; for more information, see Appendix B.
+
+92. For, ˆV = 2 ˆUN = ( g sin θˆh2 
+
+> N
+
+/ν )(1 + 2 β) as twice the dimensional Nusselt free surface velocity and redefine the Reynolds number as Re = ˆUN ˆhN /ν , then Re/F r 2 = 2 /(1 + 2 β)[52]. 3. If we choose the viscous gravity length scale lν = ν2/3(g sin θ)−1/3 and tν = ν1/3(g sin θ)−2/3 and the velocity scale ˆV = UN = ( g sin θˆh2 
+
+> N
+
+/ν )(1 + 2 β), we get Re/F r 2 = 1 /(1 + 2 β) [25]. For detailed information, see Mukhopadhyay & Mukhopadhyay [36]. Therefore, if we choose the velocity scale as the twice the dimensional Nusselt free surface velocity and redefine Reynolds number as Re = ˆUN ˆhN /ν then 
+
+Re/F r 2 = 2 /(1 + 2 β), Equations (37) and (38) reduce to: 
+
+Re c = 5(1 + 2 β)2{2 + 5 β(2 + 3 β)}
+
+ 1 + 3 β
+
+1 + β
+
+
+
+cot θ + 45(1 + 2 β)3
+
+4(1 + β){2 + 5 β(2 + 3 β)}
+
+ M n Γeκ(1 − Γe)2
+
+4 + 3 κ(1 − Γe)2
+
+
+
+(39) and 
+
+Re c = 5(1 + 2 β)2{2 + 5 β(2 + 3 β)}
+
+ 1 + 3 β
+
+1 + β
+
+
+
+cot θ + 15(1 + 2 β)3
+
+4(1 + β){2 + 5 β(2 + 3 β)} M n Γe (40) There are numerous limits and comparisons that can be made. To obtain the no-slip limit, set β = 0. Equations (39) and (40) reduces to 
+
+Re c = 54 cot θ + 45 8
+
+ M n Γeκ(1 − Γe)2
+
+4 + 3 κ(1 − Γe)2
+
+
+
+(41) and 
+
+Re c = 54 cot θ + 15 8 M n Γe, (42) respectively. The expression in Equation (41) is identical to that reported by Karapetsas & Bontozoglou [30] in the context of the isothermal limit of their study. Equations (41) and (42) are identical to Equations (97) and (95) (in the context of isothermal flow), respectively, as reported by [50]. For the non-surfactant limit with the average Nusselt velocity for flat rigid plate as the velocity scale, we have 
+
+Re c = 53{2 + 5 β(2 + 3 β)}
+
+ 1 + 3 β
+
+1 + β
+
+
+
+cot θ. (43) This is exactly the same as Sadiq & Usha [48]. To isolate the effect of wall slip on the onset of instability, we first examine how the critical Reynolds number Re c
+
+varies with the slip parameter β for different equilibrium surface coverages. This representation cleanly separates changes in the linear stability threshold from changes in nonlinear wave morphology that arise solely from differing distances to onset. Figure 3 shows that the onset threshold depends sensitively on both the slip parameter β and the base-state surfactant concentration. For a fixed Γ e, increasing β modifies the wall shear and the base velocity profile, which changes the balance between gravitational forcing and surfactant-induced Marangoni stresses. The compar-ison between solid and dashed curves indicates that surfactant solubility alters this balance by allowing additional redistribution of surfactant through bulk–interface exchange. As a result, the effect of slip on Re c is not identical for soluble and insoluble surfactants, even when the interfacial concentration is the same. The separation between solid and dashed curves at fixed Γ e directly shows that wall slip and surfactant solubility do not act independently on the onset threshold. In the nonlinear analysis below, the critical values Re c obtained here are used to define the distance from onset, allowing parameter effects to be compared at fixed supercriticality. Figure (4) shows the variation of the critical Reynolds number Re c with the equilibrium surface surfactant parameter Γe. The results show that for insoluble surfactants ( κ → ∞ dashed line in Figure (4) (b)), Re c increases steadily with Γe, indicating a stabilizing influence of Γ e under all circumstances. However, the picture differs for soluble surfactants. In the case of soluble surfactants, Re c grows with Γ e, reaches its maximum, and then declines, resulting in two zones, reflecting its double role. It provides stability in the first zone before the maximum and instability in the second zone thereafter. The dual role of Γ e can be articulated in accordance with the elucidation provided by Georgantaki et al. 
+
+[18]. Increasing Γ e leads to an increase in the gradient of surface surfactant concentration, or surface elasticity. As a result, the generated Marangoni stress reduces the surface deformation and stabilizes the instability of the mode. 10 0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 
+
+# 16.5 
+
+# 17.0 
+
+# 17.5 
+
+# 18.0 
+
+# 18.5 
+
+# 19.0 
+
+# 19.5  
+
+> Re c
+> e
+
+## = 0.1  
+
+> e
+
+## = 0.5  
+
+> e
+
+## = 0.9 
+
+FIG. 3: Critical Reynolds number Re c as a function of the slip parameter β for different base-state surfactant concentrations Γ e. Solid lines correspond to a soluble surfactant, while dashed lines show the corresponding insoluble-surfactant cases. Colors indicate the value of Γ e.The local equilibrium near the free surface of the film causes the concentration of the bulk surfactant to increase, resulting in a higher mass exchange between the surface and the concentration of the bulk surfactant and an intensified concentration gradient across the surface. As a result, the influence of surface elasticity is eliminated, and the film surface behaves similarly to a smooth viscous surface. It is important to note that for different values of κ (panel (b)), we find that the maximum Re c shifts to Γ e ≈ 1 in a non-linear fashion as the parameter κ increases showing its stabilizing impact, but for M n , the line of maximum Re c is almost vertical (panel (d)) and its stabilizing impact is not as strong as κ. The scenario of an insoluble surfactant-impure film flow is more stable than that of the soluble surfactant-laden film flow because, physically, increasing κ indicates a stronger adsorption of surfactant at the film surface than desorption of surfactant. Lastly, we observe that the present findings are in agreement with those of Karapetsas & Bontozoglou [30] and Samanta [50]. The slip parameter β gives a destabilizing effect (panel (c)). Panel (a) shows the effects of scaling, which depend only on the observer.  
+
+> B. Numerical solution of OS problem
+
+In order to determine the linear stability of perturbations of an arbitrary wavelength, we obtain numerical solutions to the Orr-Sommerfeld eigenvalue problem. Gottlieb & Orszag [19] proposed the Chebyshev method along with the QZ algorithm. In this method, each flow variable is expanded as a series of Chebyshev polynomials. 
+
+ψ(ξ) = 
+
+> N
+
+X
+
+> j=0
+
+aj Tj (ξ), c(ξ) = 
+
+> N
+
+X
+
+> j=0
+
+bj Tj (ξ) (44) 11 0.0 0.2 0.4 0.6 0.8 1.0 
+
+e
+
+10 
+
+15 
+
+20 
+
+25 
+
+30 
+
+35 
+
+40 
+
+> Re c
+
+Re Fr 2 = 3 
+
+Re Fr 2 = 21 + 2 
+
+Re Fr 2 = 11 + 2 
+
+(a) β = 0 .04 , M n = 1 , κ = 10 , θ = 4 ◦0.0 0.2 0.4 0.6 0.8 1.0 
+
+> e
+
+17.25 
+
+17.50 
+
+17.75 
+
+18.00 
+
+18.25 
+
+18.50 
+
+18.75 
+
+19.00  
+
+> Re c
+> (0.34, 17.17)
+> (0.39, 17.31)
+> (0.56, 17.78)
+> (0.75, 18.31)
+> (0.87, 18.67)
+> (0.97, 18.95)
+> Zone I Zone II
+
+= 10 1
+
+= 10 0
+
+= 10 1
+
+= 10 2
+
+= 10 3
+
+= 10 5
+
+=
+
+(b) β = 0 .04 , M n = 1 , Re F r 2 = 21 + 2 β , θ = 4 ◦0.0 0.2 0.4 0.6 0.8 1.0 
+
+> e
+
+16.5 
+
+17.0 
+
+17.5 
+
+18.0 
+
+18.5 
+
+19.0 
+
+19.5  
+
+> Re c
+> (0.56, 18.50)
+> (0.56, 17.78)
+> (0.56, 17.06)
+> Zone I Zone II
+
+= 0 
+
+= 0.04 
+
+= 0.08 
+
+(c) κ = 10 , M n = 1 , Re F r 2 = 21 + 2 β , θ = 4 ◦0.0 0.2 0.4 0.6 0.8 1.0 
+
+> e
+
+17.25 
+
+17.50 
+
+17.75 
+
+18.00 
+
+18.25 
+
+18.50 
+
+18.75 
+
+19.00  
+
+> Re c
+> (0.56, 17.22)
+> (0.56, 17.47)
+> (0.56, 17.78)
+> Zone I Zone II
+
+Mn = 0.1 
+
+Mn = 0.5 
+
+Mn = 1.0 (d) β = 0 .04 , κ = 10 , Re F r 2 = 21 + 2 β , θ = 4 ◦
+
+FIG. 4: Effect of different parameters in critical Reynolds as a function of Γ e. The solid lines represent the results for soluble surfactant, whereas the dashed line represents respective cases for insoluble surfactant. The insoluble cases are plotted using the equation (38). where, aj ’s, and bj ’s are the discrete Chebyshev expansion coefficients [57] to be determined from the numerical simulation and the transformation ξ = 2 z − 1 is used to shift the liquid layer domain [0, 1] to the computational domain [-1, 1] in which the Chebyshev polynomials Tj (ξ) are defined, and 12 
+
+Tj (ξ) = cos( j cos −1(ξ)) Substituting (44) in the governing equations, one can recast them into a generalized matrix eigenvalue problem 
+
+A℘ = αB℘, (45) where ℘ = [ ψ0 ψ1 ... ψN c0 c1 ... cN γ] is the eigenvector ( ψi = ψ(ξi), ci = c(ξi)), A and B are (2 N + 3) × (2 N + 3) matrices, and eigenvalues α provide all possible temporal modes. The most unstable temporal mode predicts the instability of the given flow configuration. In the present work, we have used the Chebyshev spectral collocation method proposed by Henningson & Schmid [20]. In this method, the Chebyshev polynomials are evaluated at the Gauss-Lobatto collocation points ξi = − cos( iπ/N ) (i = 0 , .., N ), which are actually the extrema of the Chebyshev polynomials. Figures 5–8 show the neutral stability and temporal growth rate curves in the Re − k plane obtained from numerical solutions to the Orr-Sommerfeld eigenvalue problem in different parametric spaces, for all wavenumbers (or for an arbitrary Reynolds number). Neutral stability curves separate the stable and unstable regions, and the interpretation of these curves at k = 0 yields the critical Reynolds number for the amplification of infinitely long perturbations. Figures 5 illustrate that the wall slip parameter β has a dual effect on the primary instability. It is clear from the figures that near the onset of instability (small Re ), increasing β leads to increased growth rates and a higher peak in the dispersion curve at small k (long waves); this implies that the slip promotes long-wave instability near the instability threshold. Physically, slip at the substrate reduces shear resistance, allowing surface disturbances to grow more easily. This behavior of the wall-slip parameter aligns closely with the analytical findings based on the long-wave assumption near the instability threshold. In contrast, far from the critical Reynolds number we observe that beyond a certain critical value of the wavenumber k+ (say), increasing β causes a reduction in growth rate and then slip dampens the disturbances after that critical wavenumber ( k > k +). The wavenumber k+ represents the intersection of two curves and is determined by the system parameters. We observed that far from the threshold, k+ shifts to the left as Re increases. This phenomenon can be interpreted as the smoothing effect of slip on relatively high-frequency perturbations; possibly, for a fixed Reynolds number, the thickness of the base film decreases to compensate for the effect of the slip length, thus strengthening the impact of the capillary term on the primary instability. Therefore, increasing the wall-slip parameter causes a destabilizing effect near the onset of instability and plays a dual role further from the threshold; it initially destabilizes and then stabilizes after a critical wavenumber is reached. Numerous authors, including Bhat & Samanta [5] and D´ avalos-Orozco [10], have reported on the dual role of the slip parameter. Figures 6 show the fluctuation of the marginal stability and growth rate curves with the equilibrium concentration of surface surfactant Γ e. It is also evident from the figures that the growth rate curves intersect at a specific value of k,which plays a dual function in the primary instability as anticipated in the asymptotic analysis of the Orr-Sommerfeld study, which has been extensively studied previously. Figures 7 show that equilibrium constant adsorption κ exerts a stabilizing effect as the growth rate declines with the persistent increase in κ. This observation also supports our earlier findings regarding the long-wave approximation. Figures 8 show that the Marangoni surfactant number has a stabilizing effect in the whole range of Re unconditionally. This result is also in excellent agreement with the analytical findings for the long-wave assumption.  
+
+> IV. DEPTH-AVERAGED (DA) MODEL
+
+This section investigates how nonlinearity affects flow stability. One way to make things easier is to project the dynamics of the film onto a limited set of variables, or degrees of freedom, that are functions of the location x on the plane and of time t only. We use the Ruyer-Quil & Manneville [47] weighted residual technique to create a four-equation model that is valid up to a moderate Reynolds number, consistent in first order, and includes second-order streamwise viscous terms. Since the normal velocity component of the plane w = −
+
+# R z
+
+> 0
+
+∂u ∂x dz is relatively smaller than the stream component u, we can neglect the inertia terms and the viscous terms of the stream in the z component of the momentum equation (14). The inertia and the viscous term in the streamwise z component of the momentum equation are of higher order and can therefore be omitted [52]. The pressure distribution is obtained by integrating the remaining equation up to the order ε. Substituting the value of p into equation (13) produces an approximate momentum equation. 13 20 30 40 50 60 70 80 90 100 
+
+Re 
+
+0.00 0.01 0.02 0.03 0.04 0.05 0.06 
+
+> k
+
+β=0 
+
+β=0.04 
+
+β=0.08 
+
+(a) 0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 
+
+k
+
+−0.00100 
+
+−0.00075 
+
+−0.00050 
+
+−0.00025 0.00000 0.00025 0.00050 0.00075 0.00100 
+
+> kα i
+
+β=0 
+
+β=0.04 
+
+β=0.08 (b) Re = 40 0.000 0.005 0.010 0.015 0.020 0.025 0.030 0.035 0.040 
+
+k
+
+−0.0010 
+
+−0.0005 0.0000 0.0005 0.0010 0.0015 
+
+> kα i
+
+β=0 
+
+β=0.04 
+
+β=0.08 
+
+(c) Re = 100 0.0000 0 .0025 0 .0050 0 .0075 0 .0100 0 .0125 0 .0150 0 .0175 0 .0200 
+
+k
+
+−0.00100 
+
+−0.00075 
+
+−0.00050 
+
+−0.00025 0.00000 0.00025 0.00050 0.00075 0.00100 
+
+> kα i
+
+β=0 
+
+β=0.04 
+
+β=0.08 (d) Re = 200 
+
+FIG. 5: Effect of slip parameter ( β) in linear stability. 
+
+M n = 0 .5, Γe = 0 .5, κ = 10 , P e b = P e s = 700 , k s = 0 .5, θ = 4 ◦, Ka = 1000. Left panel: marginal stability curve, right upper panel: growth rate curve for Re = 40, right lower panel: growth rate curve for Re = 100. The marker in panel (a) represents the critical Reynolds number obtained through asymptotic analysis, but the other legends remain consistent. 14 20 30 40 50 60 70 80 90 100 
+
+Re 
+
+> 0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40
+> k
+> Γe=0.1
+> Γe=0.5
+> Γe=0.9
+
+(a) 0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 
+
+k   
+
+> −0.001 0.000 0.001 0.002 0.003 0.004 0.005 0.006 0.007
+> kα i
+> Γe=0.1
+> Γe=0.5
+> Γe=0.9
+> 0.04 0.05 0.06
+> −0.0001 0.0000 0.0001 0.0002
+
+(b) Re = 40 
+
+FIG. 6: Effect of Γ e in linear stability. M n = 0 .5, β = 0 .04 , κ = 10 , P e b = P e s = 700 , k s = 0 .5, θ = 4 ◦, Ka = 1000. Left panel: marginal stability curve, right panel: growth rate curve for Re = 40. The marker in panel (a) represents the critical Reynolds number obtained through asymptotic analysis, but the other legends remain consistent. 20 30 40 50 60 70 80 90 100 
+
+Re 
+
+> 0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07
+> k
+> κ=1
+> κ=10
+> κ=100
+
+(a) 0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 
+
+k 
+
+> −0.0010
+> −0.0005 0.0000 0.0005 0.0010 0.0015 0.0020
+> kα i
+> κ=1
+> κ=10
+> κ=100
+
+(b) Re = 40 
+
+FIG. 7: Effect of κ in linear stability. M n = 0 .5, β = 0 .04 , Γe = 0 .5, P e b = P e s = 700 , k s = 0 .5, θ = 4 ◦, Ka = 1000. Left panel: marginal stability curve, right panel: growth rate curve for Re = 40. The marker in panel (a) represents the critical Reynolds number obtained through asymptotic analysis, but the other legends remain consistent. 15 20 30 40 50 60 70 80 90 100 
+
+Re 
+
+> 0.00.10.20.30.40.50.60.70.8
+> k
+> M n =0
+> M n =0.1
+> M n =0.5
+
+(a) 0.0 0.1 0.2 0.3 0.4 0.5
+
+k 
+
+> 0.000 0.002 0.004 0.006 0.008 0.010 0.012
+> kα i
+> M n =0.0
+> M n =0.1
+> M n =0.5
+
+(b) Re = 40 
+
+FIG. 8: Effect of Marangoni number ( M n ) in linear stability. 
+
+β = 0 .04 , Γe = 0 .5, κ = 10 , P e b = P e s = 700 , k s = 0 .5, θ = 4 ◦, Ka = 1000. Left panel: marginal stability curve, right panel: growth rate curve for Re = 40. The marker in panel (a) represents the critical Reynolds number obtained through asymptotic analysis, but the other legends remain consistent. 
+
+εRe 
+
+ ∂u ∂t + u ∂u ∂x + w ∂u ∂z 
+
+
+
+= Re F r 2 + ∂2u∂z 2 − ε Re F r 2 cot θh x
+
++2 ε2 ∂2u∂x 2 + ε2 ∂∂x 
+
+ ∂u ∂x z=h
+
+
+
++ εKah xxx , (46) where Ka = ε2ReW e . Let us decompose the velocity components as: u = u0 + εu 1 + ε2u2 + ..., w = εw 1 + ε2w2 + ... .Then equation (46) reduces to 
+
+∂2(u0 + εu 1)
+
+∂z 2 + Re F r 2 = εRe 
+
+ ∂u 0
+
+∂t + u0
+
+∂u 0
+
+∂x + εw 1
+
+∂u 0
+
+∂z 
+
+
+
++ K
+
++ε Re F r 2 cot θ ∂h ∂x − εKa ∂2h∂x 2 − 2ε2 ∂2u0
+
+∂x 2 − ε2
+
+ ∂u 0
+
+∂x h
+
+
+
++ O(ε3) (47) where K represents the second order inertia corrections contributed by the deviations u1 from the parabolic velocity profile and εw 1 = −
+
+# R z
+
+> 0
+
+∂u 0
+
+∂x dz . Moreover, to single out u1 we use the gauge condition 
+
+# R h
+
+> 0
+
+u1dz = 0, which ensures that q still corresponds to the local flow rate. The main objective of the weighted residual method is to eliminate the dependence on z by making certain assumptions about the velocity and solute concentration. We suggest the following specific profile for u and C:
+
+u0(x, z, t ) = a0(x, t )f0(¯ z) + b0(x, t )f1(¯ z) (48) where 
+
+f0(¯ z) = ¯ z − ¯z2
+
+2 + ¯β (49) 
+
+f1(¯ z) = 2¯ z − 3¯ z2 (50) 16 with ¯β = β/h and ¯ z = z/h , and, 
+
+a0(x, t ) = 
+
+q(x, t ) −
+
+# R h
+
+> 0
+
+u1dz h
+
+# R 10
+
+f0(¯ z)d¯z
+
+(51) 
+
+b0(x, t ) = M a ∂Γ
+
+∂x 
+
+ h
+
+4
+
+
+
+(52) 
+
+C = ϕ(x, t ) + P e bks
+
+ h
+
+2
+
+
+
+[κ(1 − Γ) ϕ − Γ](1 − ¯z2) (53) where q(x, t ) = R h 
+
+> 0
+
+udz , M a = εReM n and ϕ(x, t ) = 
+
+(
+
+C(x, z = h, t ) if t > 0
+
+ϕe = Ce if t = 0 The excess / deficit amount of surfactant in the bulk is given by 
+
+χ =
+
+R h 
+
+> 0
+
+(C − ϕ)dz = P e bks
+
+3 h2[κ(1 − Γ) ϕ − Γ] if t > 0(Ce − ϕe)he = 0 if t = 0 ,
+
+which is related to the net surfactant adsorption rate. Equation (47) explains the balance of gravity acceleration and drag forces, which is influenced by inertia, viscous stream-wise diffusion, surface tension and the hydrostatic pressure gradient. The weighted residual approach renders the residual orthogonal to each element of a complete set; we may choose weight functions to emphasize speeded up by judicious choice of the weight functions. According to the Galerkin approach, we have appropriately chosen f0 as the weight function and multiplied the equation (47) by f0
+
+and integrated with respect to z from 0 to h(x, t ) to obtain a second-order weighted residual model for the momentum equations. We chose unity as the weight function for the concentration equation (15) and integrated it from z = 0 to 
+
+z = h(x, t ). To accurately preserve the critical condition, the momentum equation must be consistent up to order ε
+
+in the averaging process, as the onset of the instability is captured by the gradient expansion up to first order [47]. The weighted residual technique provides a convenient shortcut to obtain the evaluation equation for q by carefully choosing the weight function w. Writing equation (47) as BL (u1) = 0, we introduce the inner product ⟨a, b ⟩ = R h 
+
+> 0
+
+ab dz
+
+derived from the plane norm L2 and the residual R = ⟨BL (u1), w⟩ = 0 with the mass balance equation forms a system of evolution equation. Similarly, let us introduce the linear drag operator L = ∂zz the only term involving u1 in the residual R comes from the calculation of the drag ⟨w, Lu1⟩ = ⟨L ∗w, u 1⟩, where L∗ denotes the adjoint operator of L. Two integrations by parts suffice to show that L = L∗, that is, the operator L is self-adjoint. The order of ε
+
+contribution of the drag can be canceled using the gauge condition ⟨u1, 1⟩ = 0. After some simple algebraic calculation [9, 52], the model for variables h, q, χ and Γ is as follows: 
+
+∂h ∂t + ∂q ∂x = 0 (54) 
+
+∂q ∂t + F ( ¯β) qh∂q ∂x − G( ¯β) q2
+
+h2
+
+∂h ∂x = 1
+
+εRe H( ¯β)
+
+ Re F r 2
+
+ 1 + 3 ¯β
+
+3
+
+
+
+h − qh2
+
+
+
+−M a 
+
+ 2 + 5 ¯β
+
+4
+
+ ∂Γ
+
+∂x 
+
+
+
++ 1
+
+Re I( ¯β)
+
+
+
+Ka h ∂3h∂x 3 − Re F r 2 cot θh ∂h ∂x 
+
+
+
++ εRe 
+
+"
+
+J( ¯β) qh2
+
+ ∂h ∂x 
+
+2
+
+− K( ¯β) 1
+
+h∂q ∂x ∂h ∂x − L( ¯β) qh∂2h∂x 2 + M ( ¯β) ∂2q∂x 2
+
+#
+
++M a 
+
+
+
+P ( ¯β)h2 ∂2Γ
+
+∂t∂x + R( ¯β)qh ∂2Γ
+
+∂x 2 + S( ¯β)h ∂q ∂x ∂Γ
+
+∂x + T ( ¯β)q ∂h ∂x ∂Γ
+
+∂x 
+
+
+
+(55) 17 
+
+∂∂t (χ + ϕh ) + ∂∂x 
+
+ 33 40 + 3 ¯β
+
+  
+
+(1 + 3 ¯β)
+
+ q χ h + ϕq 
+
+
+
+= ε
+
+Pe b
+
+"
+
+∂2χ∂x 2 − 3χh2
+
+ ∂h ∂x 
+
+2
+
++ h ∂2ϕ∂x 2
+
+#
+
+− 3
+
+εP e b
+
+χh2 − 3Ma 80 
+
+ ∂2Γ
+
+∂x 2 hχ + ∂χ ∂x ∂Γ
+
+∂x h + χ ∂Γ
+
+∂x ∂h ∂x 
+
+
+
+(56) 
+
+∂Γ
+
+∂t + ∂∂x 
+
+ 3(1 + 2 ¯β)2(1 + 3 ¯β)
+
+ qΓ
+
+h
+
+ 
+
+= εP e s
+
+∂2Γ
+
+∂x 2 + 3
+
+εP e b
+
+χh2
+
++ 14 M a 
+
+"
+
+∂2Γ
+
+∂x 2 Γh +
+
+ ∂Γ
+
+∂x 
+
+2
+
+h + Γ ∂Γ
+
+∂x ∂h ∂x 
+
+#
+
+(57) where, 
+
+F ( ¯β) = 34 + 14 ¯β{17 + 45 ¯β(1 + ¯β)}
+
+7{2 + 5 ¯β(2 + 3 ¯β)}(1 + 3 ¯β) (58) 
+
+G( ¯β) = 18 + 9 ¯β[18 + 35 ¯β{2 + ¯β(4 + 3 ¯β)}]7{2 + 5 ¯β(2 + 3 ¯β)}(1 + 3 ¯β)2 (59) 
+
+H( ¯β) = 5(1 + 3 ¯β)
+
+{2 + 5 ¯β(2 + 3 ¯β)} (60) 
+
+I( ¯β) = 5(1 + 3 ¯β)2
+
+3{2 + 5 ¯β(2 + 3 ¯β)} (61) 
+
+J( ¯β) = 8 + 3 ¯β[24 + ¯β{107 + 45 ¯β(5 + 4 ¯β)}]
+
+{2 + 5 ¯β(2 + 3 ¯β)}(1 + 3 ¯β)2 (62) 
+
+K( ¯β) = 9(1 + 2 ¯β){1 + 5 ¯β(1 + 2 ¯β)}{2 + 5 ¯β(2 + 3 ¯β)}(1 + 3 ¯β) (63) 
+
+L( ¯β) = 6(1 + 2 ¯β)(1 + 3 ¯β) (64) 
+
+M ( ¯β) = 3{3 + 5 ¯β(3 + 4 ¯β)}{2 + 5 ¯β(2 + 3 ¯β)} (65) 
+
+P ( ¯β) = (1 + 3 ¯β)24 {2 + 5 ¯β(2 + 3 ¯β)} (66) 
+
+R( ¯β) = 3(5 + 14 ¯β)112 {2 + 5 ¯β(2 + 3 ¯β)} (67) 
+
+S( ¯β) = 19 + 42 ¯β
+
+168 {2 + 5 ¯β(2 + 3 ¯β)} (68) 
+
+T ( ¯β) = 5 + 12 ¯β(4 + 7 ¯β)56 {2 + 5 ¯β(2 + 3 ¯β)}(1 + 3 ¯β) (69) The model equations (54 - 56) are identical to those derived by D’Alessio et al. [9] for isothermal films with soluble surfactants in the no-slip limit β = 0, but equation (57) is slightly different in the multiplier (1/4) instead of (5/4) in the last term. This discrepancy arises due to the additional term in equation (20), as pointed out earlier. This disparity causes a mass increase in the free surface as time progresses in the nonlinear simulation, impeding the system’s ability to reach a stable solution over time. 3 Note that the source term in the surface equation (57) + 3
+
+> εP e b
+> χh2
+
+appears in the bulk equation (56) as − 3 
+
+> εP e b
+> χh2
+
+with the same coefficient 3 
+
+> εP e b
+
+with the opposite sign, as we have defined χ appropriately. Equations (54 - 57) are identical with [44] (equations (45a-45c) of their paper; equation  
+
+> 3For more details, please refer to Appendix C.
+
+18 (56) will be redundant) in the insoluble limit, with the velocity scaling ˆV = 2 ˆUN , twice the dimensional Nusselt free surface velocity, and with β = 0, for no-slip substrate. It is worth noting that Pereira & Kalliadasis [44] calculated the equations up to the order of ε, but this is correct up to the order of ε2. Equations (54 - 55) reduce to the simplified second-order momentum equation derived by Samanta et al. [52] in the case of zero surfactant, and finally to that derived by Ruyer-Quil & Manneville [47] in the no-slip limit β = 0. The two remaining equations (56) and (57) of the model will be superfluous for the no-surfactant limit.  
+
+> A. Numerical Solution of DA model
+
+Equations (54)-(57) are numerically solved with a pseudospectral discretization coupled with a high-order time integration. Due to periodic boundary conditions, each unknown f is decomposed as a truncated Fourier series: 
+
+f (x, t ) = 
+
+> N/ 2
+
+X
+
+> k=−N/ 2
+
+ˆfk(t) eikx (70) with N the number of collocation points [45]. Spatial derivatives are then computed using the following: 
+
+∂m
+
+∂x m f (x, t ) = 
+
+> N/ 2
+
+X
+
+> k=−N/ 2
+
+(ik )m ˆfk(t) eikx (71) The aliasing behavior is mitigated through the de-aliasing process, i.e. by filtering the modes above kf = 2 kmax /(p+1), with p the order of nonlinearity [40] and kmax = ( π/L )N . Temporal derivatives are integrated with a fourth-order Runge-Kutta scheme [7, 45]. Finally, the mixed term ∂2Γ
+
+∂t∂x of equation (55) is evaluated by calculating the spatial derivative of equation (57) : 
+
+∂2Γ
+
+∂t∂x = ∂∂x ∂Γ
+
+∂t = ∂∂x 
+
+ εP e s
+
+∂2Γ
+
+∂x 2 + 3
+
+εP e b
+
+χh2 − ∂∂x 
+
+ 3(1 + 2 ¯β)2(1 + 3 ¯β)
+
+ qΓ
+
+h
+
+ 
+
++ ∂∂x 
+
+"
+
+14 M a 
+
+(
+
+∂2Γ
+
+∂x 2 Γ + 
+
+ ∂Γ
+
+∂x 
+
+2
+
+h + Γ ∂Γ
+
+∂x ∂h ∂x 
+
+)# 
+
+. (72) Finally, we monitor the total surfactant mass 
+
+Mtot (t) = 
+
+Z L
+
+> 0
+
+Γ( x, t ) + 
+
+Z h(x,t )0
+
+C(x, z, t ) dz 
+
+!
+
+dx, (73) and verify that its relative variation remains at the level of numerical round-off for all simulations reported below. This diagnostic is essential here, since earlier long-wave models [9, 43] exhibit spurious interfacial mass growth in long-time simulations (see Appendix C). In falling-film flows, the wave shape and amplitude depend strongly on how far the system is from the instability threshold. To distinguish genuine parameter effects from a trivial change in supercriticality, we therefore quantify the distance from the onset using 
+
+δ = Re − Re c
+
+Re c
+
+, (74) where Re c is evaluated for the corresponding parameter set. When parameters such as β or Γ e are varied at fixed Re ,the corresponding change in Re c implies that the system moves across different supercriticality levels. Reporting δ
+
+is therefore essential to distinguish genuine parameter-induced changes in wave structure from trivial changes caused by varying distance from onset. We verified numerical convergence by increasing the number of Fourier modes and reducing the time step until changes in wave amplitude and phase speed were below a prescribed tolerance. We also monitor the total surfactant mass Mtot and confirm that its relative variation remains within numerical round-off throughout the simulations. To benchmark and validate our program, we reproduced Figure 12(a) of [52] as a limiting case without surfactant and obtained identical results (Figure 9), thus confirming the precision of our implementation. 19 0 20 40 60 80 
+
+# x
+
+0.00.51.01.52.02.5
+
+> h
+
+FIG. 9: Validation of our program by reproducing Figure 12 of [52] for the surfactant-free case. The figures in this section are plotted for Re = 50 , Ka = 1000 , θ = 4 ◦, k s = 0 .5, P e s = P e b = 700 , if not mentioned otherwise. Figure 10 tracks the time evolution of the film height h(x, t ), the interfacial surfactant Γ( x, t ), and the bulk inventory 
+
+χ(x, t ) + h(x, t )ϕ(x, t ) in a periodic domain of length L = 240, starting from a small disturbance aligned with the leading eigenvector of the linearized system (54)–(57). The disturbance rapidly organizes into nonlinear permanent waves. The envelopes of hmin (t) and hmax (t) level off to a quasi-steady plateau by t ≈ 1200 (for the parameter set in the caption), while Γ and χ+hϕ settle into smoothly translating profiles. This behavior contrasts with Pascal et al. [43] and D’Alessio et al. [9], who reported an unstable evolution of q and Γ and a time-independent χ. In our formulation, a fully conservative bulk–surface balance eliminates the spurious gain/loss of interfacial mass, so χ evolves consistently with advection–diffusion in the bulk and adsorption at the interface, and the coupled system selects stable traveling waves rather than drifting or ill-posed states. This rectified mass budget is essential for observing saturation of wave amplitudes and for capturing the long-time permanence of the nonlinear structures shown. Figures 11, 12, 13 and 14 show how film thickness h, flow rate q, surface surfactant concentration Γ, and total surfactant content in the bulk χ + hϕ change along the streamwise direction on fully developed permanent waves (at t = 2000) as parameters β, Γ e, M n and κ vary. All of the profiles in Figure 11 have been phase-aligned, with the main crest near the center of the computational domain. Under no-slip conditions ( β = 0), the interface forms a two-hump permanent wave. Wall slip ( β̸ = 0) reduces wall friction, permitting liquid to spread easier. The pattern settles to a single hump, with enhanced capillary ripples ahead of the main wave hump. Slip minimizes near-wall shear and Marangoni back-stress (which favors single-crest selection while suppressing the bound pair), but the greater local flux q associated with slip feeds the short-wave capillary branch, sharpening the ripple field. The surface concentration Γ and the bulk content χ + hϕ exhibit matching corrugations, tracking the interfacial shape and advective transport. To achieve thickness control and defect suppression in coating, lubrication, and microfluidic applications, increasing β reduces multi-crest formations to a single crest but results in stronger capillary ripples. Figure 12 shows the variations for three distinct equilibrium surface surfactant concentrations ( Γ e = 0 .1, 0.5 and 0.9 ) for β = 0 .04, M n = 0 .1, κ = 10 and Re = 50. The interface shows a non-monotonic tendency, with h (similar to q) nearly the same for Γ e = 0 .1 and 0 .9, but becoming slightly smaller when Γ e = 0 .5. When the surface is almost clean (Γ e = 0 .1), interfacial tension dominates and the film remains relatively stable; when it is heavily contaminated (Γ e = 0 .9), surface elasticity weakens because the interface is close to saturation. At the intermediate value, i.e., around Γ e ≈ 0.5, even small perturbations in Γ maximize surface tension gradient, creating strong Marangoni stresses that oppose interfacial deformation and slightly reduce the film height. The effect 20 0 50 100 150 200 
+
+# x
+
+0.81.01.21.41.6
+
+> h
+
+0 500 1000 1500 2000 
+
+# t
+
+0.81.01.21.41.6
+
+hmin 
+
+hmax 
+
+0 50 100 150 200 
+
+# x
+
+0.10 0.15 0.20 0.25 0.30 
+
+> Γ
+
+0 50 100 150 200 
+
+# x
+
+0.010 0.015 0.020 0.025 0.030 
+
+> χ + hφ
+
+t=0.0 t=500.0 t=1000.0 t=1500.0 t=2000.0 
+
+FIG. 10: Formation of solitary waves over the time for β = 0 .04, Γ e = 0 .1, M n = 0 .1 and κ = 10 
+
+δ = ( Re − Re c)/Re c ≃ 1.9, indicating a strongly supercritical regime. is most apparent in Γ, which exhibits its largest spatial fluctuations at Γ e ≈ 0.5. This intermediate state corresponds to the maximum in Re c observed earlier in linear analysis (Figure 4). From Figure 13 it is evident that at low M n = 0 .1, the film exhibits a single broad hump preceded by a pronounced train of capillary ripples. As M n increases to 0 .5 and 1, Marangoni stresses strengthen and the pattern reorganizes: the main elevation splits into two solitary-like crests, while the capillary ripples are strongly suppressed. Physically, the enhanced interfacial elasticity at larger M n generates surface-compression/extension zones that redistribute mo-mentum beneath the interface (supporting two peaks) and, at the same time, damp the short-wave capillary branch, erasing the high-frequency oscillations prominent at low M n .To demonstrate the variation of the adsorption equilibrium constant κ in Figure 14, we have chosen two values 21 0 50 100 150 200 
+
+# x
+
+0.81.01.21.41.6
+
+> h
+
+0 50 100 150 200 
+
+# x
+
+0.00.51.01.52.02.5
+
+> q
+
+0 50 100 150 200 
+
+# x
+
+0.05 0.10 0.15 0.20 0.25 0.30 0.35 
+
+> Γ
+
+0 50 100 150 200 
+
+# x
+
+0.010 0.015 0.020 0.025 0.030 0.035 
+
+> χ + hφ
+
+β = 0 
+
+β = 0 .02 
+
+β = 0 .04 
+
+β = 0 .08 
+
+FIG. 11: Permanent solitary waves at time t = 2000 for different slip variable β, when Γ e = 0 .1, M n = 0 .1 and 
+
+κ = 10, 
+
+κ = 10 and 100 while keeping the rest the same as in Figure 12 with M n = 0 .1. The parameter κ characterizes the strength of exchange between the bulk and the interface: higher values correspond to faster adsorption–desorption kinetics and a more equilibrated surface. As seen in the figure, increasing κ produces only minor changes in the film height and flow rate, indicating that the overall hydrodynamic field remains largely unaffected by the kinetic exchange in this parameter regime. However, the surfactant-related fields respond more sensitively. With Γ e fixed, increasing κ
+
+mainly affects the bulk field: χ + hϕ loses most of its modulation and approaches an almost smooth, nearly flat profile. By contrast, Γ keeps essentially the same baseline shape, with only minor amplitude/phase adjustments. This reflects faster adsorption–desorption, rapidly re-equilibrating the bulk with the interface. It plays a key role in homogenizing the interfacial surfactant distribution and stabilizing the film against concentration-driven disturbances. 22 0 50 100 150 200 
+
+# x
+
+0.81.01.21.41.6
+
+> h
+
+0 50 100 150 200 
+
+# x
+
+0.51.01.52.02.5
+
+> q
+
+0 50 100 150 200 
+
+# x
+
+0.20.40.60.81.0
+
+> Γ
+
+0 50 100 150 200 
+
+# x
+
+0.00.51.01.52.02.53.0
+
+> χ + hφ
+
+Γe = 0 .1Γe = 0 .5Γe = 0 .9
+
+FIG. 12: Permanent solitary waves at time t = 2000 for different Γ e, when β = 0 .04, M n = 0 .1 and κ = 10  
+
+> V. CONCLUSION
+
+In this work we have examined the stability and nonlinear dynamics of a gravity-driven thin liquid film laden with a soluble surfactant flowing down an inclined substrate with wall slip. Slip at the solid boundary was mod-eled using a Navier condition, while surfactant transport was described through a coupled bulk-surface formulation with adsorption-desorption kinetics. The linear stability problem was analyzed by solving the full Orr-Sommerfeld eigenvalue system, both asymptotically in the long-wave limit and numerically for arbitrary wavenumbers. The linear analysis highlights a fundamental difference between soluble and insoluble surfactants. While insoluble surfactants are known to have a purely stabilizing influence, soluble surfactants exhibit a dual role: the critical Reynolds number initially increases with the equilibrium surface coverage Γ e, indicating stabilization, but decreases 23 0 50 100 150 200 
+
+# x
+
+0.81.01.21.41.6
+
+> h
+
+0 50 100 150 200 
+
+# x
+
+0.51.01.52.02.5
+
+> q
+
+0 50 100 150 200 
+
+# x
+
+0.10 0.15 0.20 0.25 0.30 
+
+> Γ
+
+0 50 100 150 200 
+
+# x
+
+0.010 0.015 0.020 0.025 0.030 
+
+> χ + hφ
+
+Mn = 0 .1
+
+Mn = 0 .5
+
+Mn = 1 
+
+FIG. 13: Permanent solitary waves at time t = 2000 for different M n , when β = 0 .04, Γ e = 0 .1 and κ = 10 beyond a threshold value, leading to destabilization. This non-monotonic behavior reflects the competing effects of Marangoni stresses and bulk-surface exchange. Both the Marangoni number and the solubility parameter tend to damp interfacial disturbances and delay the onset of instability. The numerical solution of the full eigenvalue problem confirms these asymptotic predictions and clarifies the role of wall slip. Close to the instability threshold, slip enhances the growth of unstable modes, whereas at higher Reynolds numbers it has a dual effect: long waves are destabilized, while shorter waves are stabilized. As the Reynolds number increases, the boundary between these regimes shifts toward smaller wavenumbers, resulting in a widening of the stable band. To investigate the post-critical dynamics, a reduced long-wave model was derived using a weighted-residual ap-proach. The model consistently incorporates slip, Marangoni stresses, and soluble surfactant transport, and correctly 24 0 50 100 150 200 
+
+# x
+
+0.81.01.21.41.6
+
+> h
+
+0 50 100 150 200 
+
+# x
+
+0.51.01.52.02.5
+
+> q
+
+0 50 100 150 200 
+
+# x
+
+0.05 0.10 0.15 0.20 0.25 0.30 
+
+> Γ
+
+0 50 100 150 200 
+
+# x
+
+0.000 0.005 0.010 0.015 0.020 0.025 0.030 
+
+> χ + hφ
+
+κ = 10 
+
+κ = 100 
+
+FIG. 14: Permanent solitary waves at time t = 2000 for different κ, when β = 0 .04, Γ e = 0 .1 and M n = 0 .1recovers the limiting cases of clean films, insoluble surfactants, and no-slip substrates. Nonlinear simulations reveal that increasing the Marangoni number drives a transition from single-hump to double-hump solitary-wave structures, accompanied by a reduction in capillary ripples and a non-monotonic dependence on the equilibrium surface coverage. An important outcome of the present formulation is the resolution of the nonphysical accumulation of surfactant mass reported in earlier long-wave studies [9, 43]. By enforcing strict global conservation of total surfactant mass, the model yields physically meaningful steady interfacial states and long-time dynamics. Overall, the results show that wall slip, quantified by the parameter β, provides a practical control mechanism for surfactant-laden falling films. By systematically linking β to instability onset, wave selection, ripple attenuation, and the bulk-surface surfactant balance, we demonstrate how slip suppresses fragile multi-hump bound states and promotes either a single, broad crest or an almost flat, uniform film. The underlying mechanism is straightforward: 25 slip reduces near-wall shear and Marangoni back-stress, weakens tail-tail interactions between waves, and promotes homogenization of the interfacial surfactant field. From an applied perspective, this suggests that surface chemistry or microstructural design of substrates can be used to improve film uniformity and robustness. Finally, we emphasize that the slip condition is employed here as an effective boundary condition; in genuinely porous or textured substrates, the slip length may depend on microstructural details and flow conditions, which are not resolved in the present model. The present framework provides a consistent basis for future studies incorporating thermal effects, non-Newtonian rheology, or dynamically structured substrates, where the interplay between interfacial transport and wall slip is expected to be even richer. 
+
+> Acknowledgment
+
+The authors would like to thank the French Institute in India (IFI) - the Embassy of France in India for providing Scientific High-Level Visiting Fellowships (SSHN) 2024 to initiate this project, and heartfelt gratitude to Professor Christian Ruyer-Quil for insightful discussions and advice. 
+
+> Declaration of Interests
+
+The authors report no conflict of interest. 
+
+> Appendix A
+> Surfactant transport equation at the free surface
+
+Equation (8) is written in vector form in terms of the surface gradient operator ∇s to maintain consistency with previous works in the literature, but it is appropriate to write the equation in tensor form in curvilinear coordinates since the free surface z = h(x, t ) is a curve in the xz plane, and equation (8) is valid on the free surface. Then, equation (8) in tensorial form is given below: 
+
+∂Γ
+
+∂t + div(Γ Vi) = Dsdiv(gradΓ) + Jbs , (75) where Vi = u(x, z = h(x, t ), t ) are the components of the velocity on the free surface. The components of velocity in curvilinear coordinates are indeed a covariant tensor, though velocity itself is a contravariant vector. Therefore, we have to consider the divergence of a co-/contravariant vector in terms of the covariant derivative (since partial deriva-tives are not a tensor). To find the explicit form of equation (75), we have to find the divergence of a covariant vector and the Laplacian of a scalar function in a curvilinear coordinate system. For, let μi be an arbitrary contravariant vector, and let μi be the corresponding covariant form. Then their covariant derivatives are μi,j and μi,j , respectively. Then their divergence is given by div μi = μi,i = 1
+
+√g∂∂x l (√gμ l) = div μi = μi,i = 1
+
+√g∂∂x l (√gg lj μj ),
+
+where, gij is the reciprocal tensor of the fundamental tensor gij and μi = gij μj and g = det gij ̸ = 0. Note that in this case the Laplacian of a scalar function ϕ in a curvilinear coordinate system is the divergence of this gradient vector field is ∆ϕ = ∇2ϕ = div(grad ϕ) = 1
+
+√g∂∂x i
+
+√gg ij ∂ϕ ∂x j
+
+
+
+.
+
+where, gij is the reciprocal tensor of the fundamental tensor gij and μi = gij μj .Thus, the explicit form of equation(75) is 
+
+∂Γ
+
+∂t + 1
+
+√g∂∂x l (√gg lj (Γ Vj )) = Ds
+
+1
+
+√g∂∂x i
+
+√gg ij ∂Γ
+
+∂x j
+
+
+
++ Jbs , (76) where, g11 = (1 + h2
+
+> x
+
+), g11 = 1 /(1 + h2
+
+> x
+
+) along the stream direction, since ds 2 = dx 2 + dz 2 = (1 + h2
+
+> x
+
+)dx 2 = g11 dx 2. It is not surprising that normalization is not needed when writing equation (76), since the tensor equation is independent of coordinate transformation. 26 0.0000 0.0002 0.0004 0.0006 0.0008 0.0010 
+
+# k
+
+10 −8
+
+10 −7
+
+10 −6
+
+10 −5
+
+> kα i
+
+β=0 
+
+β=0.04 
+
+β=0.08 
+
+> (a)
+
+10 −4 10 −3 10 −2
+
+# k
+
+0123456
+
+> kα i
+
+×10 −5
+
+β=0.04 (b) 
+
+FIG. 15: Comparison of growth rate with that from analytic (solid lines) and numerical (dashed lines) results of Orr Sommerfeld analysis for Re = 30: (a) kα i - axis is in log-scale; (b) k-axis log scale plotted only for β = 0 .04. 
+
+> Appendix B
+> The interface mode and the surfactant mode
+
+The interface and surfactant modes can be derived analytically from the small wavenumber expansion of the Orr-Sommerfeld eigenvalue problem, by suitably normalizing ψ0 and deleting replicated solutions of ψ0 that occur at each of the higher orders, which are as follows: 
+
+α(1) = (1 + 2 β) Re F r 2 + ikRe 
+
+"
+
+(1 + β){2 + 5 β(2 + 3 β)}
+
+15 
+
+ Re F r 2
+
+2
+
+− (1 + 3 β)3
+
+ Re F r 2
+
+ cot θRe − 3(1 + 2 β)M n Γeκ(1 − Γe)2
+
+4 + 3 κ(1 − Γe)2
+
+
+
++ O(k2) (77) 
+
+α(2) = (1 + 2 β) 12
+
+Re F r 2 − ik P e s
+
++ O(k2) (78) The above two modes are quite similar to their insoluble surfactant counterparts κ → ∞ , as revealed by [44] in the non-slip limit ( β = 0). The interface mode is activated by interface deflection, whereas the surfactant mode occurs when the amplitude of the surface surfactant changes, regardless of interfacial deflection. For the interface mode [33], we set η0 = 1, η1 = η2 = 0, and other variables change according to it. Wave celerity 
+
+α0 is independent of surfactant solubility, which confirms the insoluble case. However, bulk surfactant advection and surfactant solubility affect γ0 values. [30], as well as [27], reported similar findings. Similarly, for the surfactant mode [33], we set γ0 = 1, γ1 = γ2 = 0 and η0 = 0 therefore c0 = 1 /κ (1 − Γe)2.In the non-slip limit, the third mode ([44]), namely the shear mode, can be found as: 
+
+α(3) = − π2
+
+4kRe n2 + O(1) , n is odd . (79) That is, countably infinite numbers of eigenvalues ([44]). The classical shear mode loses its mathematical foun-dation under Navier slip conditions in the long-wave limit, as slip undermines the wall vorticity anchoring essential 27 to its validity. The eigenvalues α(i)’s, representing the different modes of instabilities, are the unique solutions of the Orr-Sommerfeld problem in the limit of a small wavenumber [44]. [44] clarified that the surfactant mode is a diffusion mode modified by advection and associated with the surface transport equation. The surface mode is a classical long-wave interface instability mode, also known as the Kapitza mode [28], modified by Marangoni effects, while shear modes are Yih modes [63] characterized by hydrodynamics (without Marangoni effects) associated with semiparabolic Nusselt velocity profiles. We would like to note that in the asymptotic solution of the OS problem section, we computed the onset of instability (critical Reynolds number) from the hydrodynamic Kapitza mode α(1) .The first mode defines the threshold for hydrodynamic instabilities and has been extensively discussed by var-ious writers, beginning with Benjamin [2] and Yih [63] for a clean fluid. The phase velocity of this mode is 
+
+cR = (1 + 2 β) Re F r 2 + O(k3) (the real part of α(1) , see equation (34)), which depends on the slip parameter and is twice the interfacial velocity of the flat film to the leading order in k. In figure (15), we compare the growth of the disturbance to the numerical solution of the Orr-Sommerfeld eigenvalue problem. We observed that it is in good agreement for small wavenumbers and low to moderate Reynolds numbers. The imaginary part of α(1) denotes the onset of instability when the coefficient of O(k3) vanishes and the critical Reynolds number is given in (37) and is also discussed in detail in that section. The second mode, which we call the surfactant mode, is essentially a diffusional mode modified by advection and is related to the specific structure of the surface transport equation and is independent of the solubility of the surfactant, which is first detected by [6] by solving the Orr-Sommerfeld problem. [44] identified the mode as a concentration mode and noted that it is connected with the diffusion and advection of species by flow, as evidenced by the presence of P e s. The phase velocity for this mode is cR = (1+2 β) 12
+
+Re F r 2 +O(k3), which also depends on the slip parameter and is the same with the interfacial velocity of the flat film to the leading order in k, allowing the species to be transported by the flow. This mode is strictly stable as long as the surfactant is able to diffuse; i.e., P e s is finite. However, it becomes neutrally stable when P e s → ∞ ([6], [44]). In which case convection is much faster than diffusion, and any perturbation in the concentration of surfactant does not decay but is advected by flow without change. 
+
+> Appendix C
+> Surfactant mass conservation
+
+The total mass of the surfactant at any instant t is given by 
+
+M (t) = 
+
+Z L
+
+> 0
+
+Z h
+
+> 0
+
+C(x, z, t )dzdx +
+
+Z L
+
+> 0
+
+Γ( x, t )dx =
+
+Z L
+
+> 0
+
+[ϕ(x, t )h(x, t ) + χ(x, t ) + Γ( x, t )] dx 
+
+is a constant quantity. Since 
+
+∂M (t)
+
+∂t = 0 = ⇒ ∂∂t 
+
+Z L
+
+> 0
+
+h
+
+ϕ(x, t ) h(x, t ) + χ(x, t ) + Γ( x, t )
+
+i
+
+dx = 0 ,
+
+it follows that 
+
+Z L
+
+> 0
+
+h ∂∂t (χ + ϕ h ) + ∂Γ
+
+∂t 
+
+i
+
+dx = 0 .
+
+Since L is arbitrary, the integrand must vanish: 
+
+∂∂t (χ + ϕ h ) + ∂Γ
+
+∂t = 0 .
+
+This conservation law provides a useful diagnostic for evaluating the consistency and fidelity of numerical models that involve soluble surfactants. Figure (16) presents the temporal evolution of the surface and bulk surfactant masses, the total surfactant mass, and their respective fluxes. The surface mass increases slightly due to the interfacial transfer from the bulk, governed by the term 3 
+
+> εP e b
+> χh2
+
+. The corresponding decrease in the bulk mass preserves overall conservation, ensuring that the 28 0 200 400 600 800 1000 
+
+t
+
+0.10 0.15 0.20 0.25 0.30 
+
+∫ Γdx 
+
+∫ φh + χdx 
+
+∫ Γ + φh + χdx 
+
+0 200 400 600 800 1000 
+
+t
+
+−4
+
+−3
+
+−2
+
+−10123
+
+×10 −5
+
+∫ ε 
+
+> P e s
+> ∂2Γ
+> ∂x 2
+
+dx 
+
+∫ 1 
+
+> 4
+
+M a 
+
+[
+
+h∂2Γ 
+
+> ∂x 2
+
+Γ + h (∂Γ
+
+> ∂x
+
+)2 + Γ ∂Γ
+
+> ∂x ∂h
+> ∂x
+
+]
+
+dx 
+
+∫ 3 
+
+> P e bεχ
+> h2
+
+dx 
+
+0 200 400 600 800 1000 
+
+t
+
+−3
+
+−2
+
+−101234 ×10 −5
+
+∫ 3Ma 
+
+> 80
+
+[∂2Γ 
+
+> ∂x 2
+
+hχ + ∂χ  
+
+> ∂x ∂Γ
+> ∂x
+
+h + χ∂Γ
+
+> ∂x ∂h
+> ∂x
+
+]
+
+dx 
+
+∫ − 3 
+
+> P e bεχ
+> h2
+
+dx 
+
+∫ ε
+
+> Pe b
+
+[∂2χ 
+
+> ∂x 2
+
+− 3χ
+
+> h2
+
+(∂h 
+
+> ∂x
+
+)2 + h∂2φ
+
+> ∂x 2
+
+]
+
+dx 
+
+0 200 400 600 800 1000 
+
+t
+
+−4
+
+−3
+
+−2
+
+−101234 ×10 −5
+
+∫ ∂Γ 
+
+> ∂t
+
+dx 
+
+∫ ∂(φh +χ) 
+
+> ∂t
+
+dx 
+
+∫ ∂(Γ+ φh +χ) 
+
+> ∂t
+
+dx 
+
+FIG. 16: Surface, bulk and total mass and mass flux for model equations (54 - 57) with β = 0. Upper left: Surfactant mass, bulk mass and total mass. Upper right: mass fluxes for equation (57). Lower left: mass fluxes for equation (56). Lower right: time derivative of surface, bulk and total mass. 29 0 200 400 600 800 1000 
+
+t
+
+0.20.40.60.81.01.21.41.6
+
+∫ Γdx 
+
+∫ φh + χdx 
+
+∫ Γ + φh + χdx 
+
+0 200 400 600 800 1000 
+
+t
+
+−0.002 
+
+−0.001 0.000 0.001 0.002 0.003 ∫ ε 
+
+> P e s
+> ∂2Γ
+> ∂x 2
+
+dx 
+
+∫ 1 
+
+> 4
+
+M a 
+
+[
+
+h∂2Γ 
+
+> ∂x 2
+
+Γ + h (∂Γ
+
+> ∂x
+
+)2]
+
++ 5 
+
+> 4
+
+M a Γ∂Γ 
+
+> ∂x ∂h
+> ∂x
+
+dx 
+
+∫ 3 
+
+> P e bεχ
+> h2
+
+dx 
+
+0 200 400 600 800 1000 
+
+t
+
+0.0000 0.0005 0.0010 0.0015 0.0020 0.0025 ∫ 3Ma 
+
+> 80
+
+[∂2Γ 
+
+> ∂x 2
+
+hχ + ∂χ  
+
+> ∂x ∂Γ
+> ∂x
+
+h + χ∂Γ
+
+> ∂x ∂h
+> ∂x
+
+]
+
+dx 
+
+∫ − 3 
+
+> P e bεχ
+> h2
+
+dx 
+
+∫ ε
+
+> Pe b
+
+[∂2χ 
+
+> ∂x 2
+
+− 3χ
+
+> h2
+
+(∂h 
+
+> ∂x
+
+)2 + h∂2φ
+
+> ∂x 2
+
+]
+
+dx 
+
+0 200 400 600 800 1000 
+
+t
+
+0.0000 0.0005 0.0010 0.0015 0.0020 0.0025 0.0030 ∫ ∂Γ 
+
+> ∂t
+
+dx 
+
+∫ ∂(φh +χ) 
+
+> ∂t
+
+dx 
+
+∫ ∂(Γ+ φh +χ) 
+
+> ∂t
+
+dx 
+
+FIG. 17: Total mass and mass flux for model equations of [43] without density fluctuations. Upper left: Surfactant mass, bulk mass and total mass. Upper right: mass fluxes for surface concentration. Lower left: mass fluxes for bulk concentration. Lower right: time derivative of surface, bulk and total mass. 30 total surfactant mass remains constant. For comparison, figure (17) shows the same quantities computed using the formulation of [43] for a no-slip wall ( β = 0) and in the absence of density variations. The only distinction between the two models is the numerical coefficient in the nonlinear term, which changes from 1 /4 → 5/4 for the term Γ ∂Γ 
+
+> ∂x ∂h ∂x
+
+.This apparently minor modification produces an unnatural exponential growth of all surfactant mass components over time, revealing a fundamental inconsistency in the earlier closure. 
+
+[1] Anjalaiah, Usha, R. & Millet, S. 2013 Thin film flow down a porous substrate in the presence of an insoluble surfactant: Stability analysis. Physics of Fluids 25 (2), 022101. [2] Benjamin, T. Brooke 1957 Wave formation in laminar flow down an inclined plane. Journal of Fluid Mechanics 2 (6), 554–573. [3] Benjamin, T Brooke 1964 Effects of surface contamination on wave formation in falling liquid films(Stabilizing effect of surface active agents on wave formation in contaminated falling liquid film. Archiwum Mechaniki Stosowanej 16 (3), 615–626. [4] Bhamla, M. Saad, Chai, Chew, `Alvarez-Valenzuela, Marco A., Tajuelo, Javier & Fuller, Gerald G. 2017 Interfacial mechanisms for stability of surfactant-laden films. PLOS ONE 12 (5), e0175753. [5] Bhat, Farooq Ahmad & Samanta, Arghya 2018 Linear stability of a contaminated fluid flow down a slippery inclined plane. Phys. Rev. E 98 (3), 033108. [6] Blyth, M. G. & Pozrikidis, C. 2004 Effect of surfactant on the stability of film flow down an inclined plane. Journal of Fluid Mechanics 521 , 241–250. [7] Carpenter, Mark H. & Kennedy, Christopher A. 1994 Fourth-order 2n-storage runge–kutta schemes. Tech. Rep. 
+
+NASA TM-109112. NASA Langley Research Center. [8] Churaev, N. V, Sobolev, V. D & Somov, A. N 1984 Slippage of liquids over lyophobic solid surfaces. Journal of Colloid and Interface Science 97 (2), 574–581. [9] D’Alessio, S. J. D., Pascal, J. P., Ellaban, E. & Ruyer-Quil, C. 2020 Marangoni instabilities associated with heated surfactant-laden falling films. Journal of Fluid Mechanics 887 , A20. [10] D´ avalos-Orozco, L. ˜A. 2024 Thermocapillary stability of a viscoelastic liquid film falling down above or below an inclined thick wall with slip. Journal of the Taiwan Institute of Chemical Engineers 165 , 105788. [11] de la Torre, J. A. 2019 Microscopic Slip Boundary Conditions in Unsteady Fluid Flows. Phys. Rev. Lett. 123 (26). [12] de Souza, E. Ramos & Gallez, D. 1998 Pattern formation in thin liquid films with insoluble surfactants. Physics of Fluids 10 (8), 1804–1814. [13] De Wit, A., Gallez, D. & Christov, C. I. 1994 Nonlinear evolution equations for thin liquid films with insoluble surfactants. Physics of Fluids 6 (10), 3256–3266. [14] Edwards, David & Brenner, Howard 2013 Interfacial Transport Processes and Rheology . Butterworth-Heinemann. [15] Gaver, Donald P. & Grotberg, James B. 1990 The dynamics of a localized surfactant on a thin film. Journal of Fluid Mechanics 213 , 127–148. [16] Gaver, Donald P. & Grotberg, James B. 1992 Droplet spreading on a thin viscous film. Journal of Fluid Mechanics 
+
+235 , 399–414. [17] Georgantaki, A., Vlachogiannis, M. & Bontozoglou, V. 2012 The effect of soluble surfactants on liquid film flow. 
+
+J. Phys.: Conf. Ser. 395 , 012165. [18] Georgantaki, A., Vlachogiannis, M. & Bontozoglou, V. 2016 Measurements of the stabilisation of liquid film flow by the soluble surfactant sodium dodecyl sulfate (SDS). International Journal of Multiphase Flow 86 , 28–34. [19] Gottlieb, David & Orszag, Steven A. 1977 Numerical Analysis of Spectral Methods: Theory and Applications . SIAM. [20] Henningson, Dan S. & Schmid, Peter J. 2012 Stability and Transition in Shear Flows: 142 , softcover reprint of the original 1st ed. 2001 edition edn. New York: Springer-Verlag New York Inc. [21] Hermans, Eline, Bhamla, M. Saad, Kao, Peter, G. Fuller, Gerald & Vermant, Jan 2015 Lung surfactants and different contributions to thin film stability. Soft Matter 11 (41), 8048–8057. [22] Hu, Tao, Fu, Qingfei & Yang, Lijun 2020 Falling film with insoluble surfactants: Effects of surface elasticity and surface viscosities. Journal of Fluid Mechanics 889 , A16. [23] Jensen, O. E. & Grotberg, J. B. 1992 Insoluble surfactant spreading on a thin viscous film: Shock evolution and film rupture. Journal of Fluid Mechanics 240 , 259–288. [24] Ji, Wei & Setterwall, Fredrik 1995 Effect of heat transfer additives on the instabilities of an absorbing falling film. 
+
+Chemical Engineering Science 50 (19), 3077–3097. [25] Kalliadasis, S., Ruyer-Quil, C., Scheid, B. & Velarde, M. G. 2012 Falling Liquid Films , Applied Mathematical Sciences , vol. 176. London: Springer London. [26] Kalliadasis, S. & Thiele, Uwe , ed. 2007 Thin Films of Soft Matter . Wien ; New York: Springer. [27] Kalogirou, A. & Blyth, M. G. 2019 The role of soluble surfactants in the linear stability of two-layer flow in a channel. 
+
+Journal of Fluid Mechanics 873 , 18–48. [28] Kapitza, P.L. & Kapitza, S.P. 1949 Wave flow of thin layers of a viscous fluid: III. Experimental study of undulatory flow conditions. Zhurnal Eksperimental’noi i Teoreticheskoi Fiziki 19 (2), 105–120. [29] Karapetsas, George & Bontozoglou, Vasilis 2013 The primary instability of falling films in the presence of soluble 31 
+
+surfactants. Journal of Fluid Mechanics 729 , 123–150. [30] Karapetsas, George & Bontozoglou, Vasilis 2014 The role of surfactants on the mechanism of the long-wave instability in liquid film flows. Journal of Fluid Mechanics 741 , 139–155. [31] Katsiavria, A. & Bontozoglou, V. 2020 Stability of liquid film flow laden with the soluble surfactant sodium dodecyl sulphate: Predictions versus experimental data. J. Fluid Mech. 894 , A18. [32] Levy, Rachel, Shearer, Michael & Witelski, Thomas P. 2007 Gravity-driven thin liquid films with insoluble surfactant: Smooth traveling waves. European Journal of Applied Mathematics 18 (6), 679–708. [33] Li, Sheng, Chen, Ya-Zhou, Cheng, Ze & Peng, Jie 2023 The role of soluble surfactant in the linear instability of a film coating inside a tube. Journal of Fluid Mechanics 973 , A46. [34] Manikantan, Harishankar & Squires, Todd M. 2020 Surfactant dynamics: Hidden variables controlling fluid flows. 
+
+Journal of Fluid Mechanics 892 , P1. [35] Mukhopadhyay, Sanghasri & Mukhopadhyay, Asim 2020 Waves and instabilities of viscoelastic fluid film flowing down an inclined wavy bottom. Phys. Rev. E 102 (2), 023117. [36] Mukhopadhyay, Sanghasri & Mukhopadhyay, Asim 2021 Hydrodynamic instability and wave formation of a viscous film flowing down a slippery inclined substrate: Effect of odd-viscosity. European Journal of Mechanics - B/Fluids 89 ,161–170. [37] Navier, C. L. M. H. 1823 M´ emoire, Sur les lois du mouvement des fluids. M´ emoires de l’Acad´ emie Royale des Sciences de l’Institut de France 6, 389–440. [38] Neto, Chiara, Evans, Drew R, Bonaccurso, Elmar, Butt, Hans-J¨ urgen & Craig, Vincent S J 2005 Boundary slip in Newtonian liquids: A review of experimental studies. Rep. Prog. Phys. 68 (12), 2859. [39] Oron, Alexander, Davis, Stephen H. & Bankoff, S. George 1997 Long-scale evolution of thin liquid films. Rev. Mod. Phys. 69 (3), 931–980. [40] Orszag, Steven A. 1971 Elimination of aliasing in finite-difference schemes by filtering high-wavenumber components. 
+
+Journal of the Atmospheric Sciences 28 (6), 1074–1074. [41] Palmer, Harvey J. & Berg, John C. 1972 Hydrodynamic stability of surfactant solutions heated from below. Journal of Fluid Mechanics 51 (2), 385–402. [42] Pascal, J. P. 1999 Linear stability of fluid flow down a porous inclined plane. J. Phys. D: Appl. Phys. 32 (4), 417–422. [43] Pascal, J. P., D’Alessio, S. J. D. & Ellaban, E. 2019 Stability of inclined flow of a liquid film with soluble surfactants and variable mass density. Phys. Rev. Fluids 4 (5), 054004. [44] Pereira, Antonio & Kalliadasis, Serafim 2008 Dynamics of a falling film with solutal Marangoni effect. Phys. Rev. E 78 (3), 036312. [45] Peyret, Roger 2002 Spectral Methods for Incompressible Viscous Flow , 2nd edn. New York: Springer. [46] Rahman, Muhammad Rizwanur, Ewen, James P., Shen, Li, Heyes, David M., Dini, Daniele & Smith, Edward 
+
+2025 Nanoscale surfactant transport: Bridging molecular and continuum models. Journal of Fluid Mechanics 1009 , A18. [47] Ruyer-Quil, C. & Manneville, P. 2000 Improved modeling of flows down inclined planes. Eur. Phys. J. B 15 (2), 357–369. [48] Sadiq, I. Mohammed Rizwan & Usha, R. 2008 Thin Newtonian film flow down a porous inclined plane: Stability analysis. Physics of Fluids 20 (2), 022105. [49] Samanta, Arghya 2017 Role of slip on the linear stability of a liquid flow through a porous channel. Physics of Fluids 
+
+29 (9), 094103. [50] Samanta, Arghya 2025 Effect of soluble surfactant on thermocapillary instability in falling film. Phys. Rev. Fluids 10 (6), 064001. [51] Samanta, Arghya 2025 Role of soluble surfactant in linear stability of a liquid film flowing down a compliant substrate. 
+
+Journal of Fluid Mechanics 1011 , A6. [52] Samanta, A., Ruyer-Quil, C. & Goyeau, B. 2011 A falling film down a slippery inclined plane. Journal of Fluid Mechanics 684 , 353–383. [53] Scheid, B., Ruyer-Quil, C., Kalliadasis, S., Velarde, M. G. & Zeytounian, R. Kh 2005 Thermocapillary long waves in a liquid film flow. Part 2. Linear stability and nonlinear waves. Journal of Fluid Mechanics 538 , 223–244. [54] Shkadov, V. Ya., Velarde, M. G. & Shkadova, V. P. 2004 Falling films and the Marangoni effect. Phys. Rev. E 
+
+69 (5), 056310. [55] Srivastava, Ashna & Tiwari, Naveen 2018 Effect of an insoluble surfactant on the dynamics of a thin liquid film flowing over a non-uniformly heated substrate. Eur. Phys. J. E 41 (5), 56. [56] Stone, H. A. 1990 A simple derivation of the time-dependent convective-diffusion equation for surfactant transport along a deforming interface. Physics of Fluids A: Fluid Dynamics 2 (1), 111–112. [57] Trefethen, Lloyd N. 2000 Spectral Methods in MATLAB . SIAM. [58] V, Elizabeth B. Dussan & Davis, Stephen H. 1974 On the motion of a fluid-fluid interface along a solid surface. 
+
+Journal of Fluid Mechanics 65 (1), 71–95. [59] Voronov, Roman S., Papavassiliou, Dimitrios V. & Lee, Lloyd L. 2008 Review of Fluid Slip over Superhydrophobic Surfaces and Its Dependence on the Contact Angle. Ind. Eng. Chem. Res. 47 (8), 2455–2477. [60] Whitaker, Stephen 1964 Effect of Surface Active Agents on the Stability of Falling Liquid Films. Ind. Eng. Chem. Fund. 
+
+3 (2), 132–142. [61] Wong, H., Rumschitzki, D. & Maldarelli, C. 1996 On the surfactant mass balance at a deforming fluid interface. 
+
+Physics of Fluids 8 (11), 3203–3204. [62] Yiantsios, Stergios G. & Higgins, Brian G. 2010 A mechanism of Marangoni instability in evaporating thin liquid 32 
+
+films due to soluble surfactant. Physics of Fluids 22 (2), 022102. [63] Yih, Chia-Shun 1963 Stability of Liquid Flow down an Inclined Plane. Physics of Fluids 6 (3), 321. [64] Zhao, Quan, Ren, Weiqing & Zhang, Zhen 2021 A thermodynamically consistent model and its conservative numerical approximation for moving contact lines with soluble surfactants. Computer Methods in Applied Mechanics and Engineering 
+
+385 , 114033.

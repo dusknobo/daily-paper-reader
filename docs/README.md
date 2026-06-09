@@ -6,22 +6,44 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-03-06
-- 运行时间：2026-03-06 19:11:19 UTC
+- 最新运行日期：2026-05-11 ~ 2026-06-09
+- 运行时间：2026-06-09 05:03:27 UTC
 - 运行状态：成功
-- 本次总论文数：0
-- 精读区：0
-- 速读区：0
+- 本次总论文数：8
+- 精读区：2
+- 速读区：6
 
 ### 今日简报（AI）
-> 今日无新推荐，系统未产出可展示论文。
-- 详情：[/202603/06/README](/202603/06/README)
+今日精读聚焦于液膜失稳，发现滑移会显著改变毛细孤波结构；速读则涵盖了工业混合与颗粒流的高效模拟。最值得关注的是滑移液膜的非线性边界条件，它解决了表面活性剂输运的守恒难题。建议后续读者追踪这两项液膜模型在精密涂布工艺中的落地潜力。
+- 详情：[/20260511-20260609/README](/20260511-20260609/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Solutocapillary instability in slipping falling films](/20260511-20260609/2605.17519v1-solutocapillary-instability-in-slipping-falling-films)  
+   标签：评分：8.0/10、query:falling-film
+   evidence：研究滑移基底上具有溶质毛细（传质）效应的降落膜，与降膜传热传质直接相关
+2. [A conservation-consistent boundary condition for nonlinear models of soluble-surfactant-laden falling films](/20260511-20260609/2605.19427v1-a-conservation-consistent-boundary-condition-for-nonlinear-models-of-soluble-surfactant-laden-falling-films)  
+   标签：评分：8.0/10、query:falling-film
+   evidence：含表面活性剂的降膜模型，校正了非线性模拟中的质量守恒。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [A Volume of Fluid Immersed Boundary Method for Industrial Polymer Mixing](/20260511-20260609/2605.11896v1-a-volume-of-fluid-immersed-boundary-method-for-industrial-polymer-mixing)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：开发了一种用于两相流模拟的流体体积浸入边界方法并在OpenFOAM中实现
+2. [Simulations of Particle-Laden Flows with Large Dispersed-Phase Size Disparities Using Highly Scalable Parallel Adaptive Methods](/20260511-20260609/2605.20565v1-simulations-of-particle-laden-flows-with-large-dispersed-phase-size-disparities-using-highly-scalable-parallel-adaptive-methods)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：提出并行自适应格子玻尔兹曼-浸入边界框架，用于大尺度悬殊的多相流
+3. [CFDTwin: An open-source GUI and Python toolkit for POD-NN surrogate modeling of ANSYS Fluent simulations](/20260511-20260609/2605.27725v1-cfdtwin-an-open-source-gui-and-python-toolkit-for-pod-nn-surrogate-modeling-of-ansys-fluent-simulations)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：用于CFD模拟的POD-NN代理建模开源工具包，可实现快速热流体设计
+4. [Analysis of a three-dimensional fluid flow in rotating cylinders](/20260511-20260609/2605.10305v1-analysis-of-a-three-dimensional-fluid-flow-in-rotating-cylinders)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：利用润滑理论导出旋转圆筒内薄膜高度的偏微分方程，与降膜流体动力学相关
+5. [Intermittent two-phase flow in porous media: insights from pore-scale direct numerical simulation](/20260511-20260609/2605.11991v1-intermittent-two-phase-flow-in-porous-media-insights-from-pore-scale-direct-numerical-simulation)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：非混相两相流的DNS，界面捕捉方法可迁移至降膜模拟
+6. [N-Component Free Energy Lattice Boltzmann Method with Reduction Consistency and Global Momentum Conservation](/20260511-20260609/2605.22214v1-n-component-free-energy-lattice-boltzmann-method-with-reduction-consistency-and-global-momentum-conservation)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：不混溶组分的多相LBM方法；可直接应用于多组分降膜CFD。
 
 
 <div class="dpr-home-promo-card">

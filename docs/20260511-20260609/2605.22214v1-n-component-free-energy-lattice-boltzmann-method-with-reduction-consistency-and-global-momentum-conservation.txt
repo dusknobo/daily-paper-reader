@@ -1,0 +1,1603 @@
+Title: N-Component Free Energy Lattice Boltzmann Method with Reduction Consistency and Global Momentum Conservation
+
+URL Source: https://arxiv.org/pdf/2605.22214v1
+
+Published Time: Fri, 22 May 2026 00:52:18 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# N-Component Free Energy Lattice Boltzmann Method with Reduction Consistency and Global Momentum Conservation 
+
+Michael Rennick, 1 Xitong Zhang, 1 Tim Niklas Bingert, 2, 3 Mathias J. Krause, 2, 3 and Halim Kusumaatmaja 1
+
+> 1)
+
+Institute f or Multiscale T hermo f luids , School o f Engineering , University o f Edinburgh , Edinburgh EH 9 3 FD , United Kingdom 
+
+> 2)
+
+Institute f or Mechanical Process Engineering and Mechanics , Karlsruhe Institute o f Technology , Karlsruhe , Baden −
+
+W ¨urttemberg , Germany 
+
+> 3)
+
+Lattice Boltzmann Research Group , Karlsruhe Institute o f Technology , Karlsruhe , Baden −W ¨urttemberg , Germany 
+
+(*Electronic mail: halim.kusumaatmaja@ed.ac.uk) (Dated: 22 May 2026) 
+
+We present a free energy lattice Boltzmann model capable of simulating fluid systems with an arbitrary number of immiscible components in principle. Our method is strictly reduction consistent, ensuring that absent fluid components do not spontaneously nucleate. We introduce a novel discretization of the surface tension force that globally conserves momentum to machine precision, and we enforce reduction consistency through a flux correction that is independent of the mobility. The method is benchmarked with a range of static and dynamic problems, including: liquid lenses, Janus droplets, quaternary phase separation, and six-component layered Poiseuille flow, and we obtain excellent agreement with theoretical predictions throughout. Finally, we demonstrate the applicability of the proposed method through patterned liquid surfaces and microfluidic emulsion droplet generation. 
+
+I. INTRODUCTION 
+
+Multicomponent fluid flows underpin a broad range of nat-ural and industrial applications, and there is a recent drive to study systems composed of three or more immiscible compo-nents. For example, emulsion droplets consisting of multiple nested phases offer promising platforms for drug delivery and for controlled chemical reactions between their constituent fluids 1–7 . Patterned liquid infused surfaces employ multiple lubricating fluids to direct droplet motion, while maintaining an ultra smooth lubricant surface and preventing pinning on surface heterogeneities 8–10 . In biological contexts, phase sep-aration of proteins and nucleic acids within cells can lead to a large number of distinct condensates 11–14 , and engineered DNA nanostar systems 15,16 have been used to generate up to nine immiscible phases 17 .A wide range of numerical techniques have been developed to capture systems comprising two, and in some cases three, immiscible fluids, including sharp 18–20 and diffuse 21–23 inter-face approaches. However, methods capable of handling an arbitrary number ( N) of distinct phases in principle are still limited. The principal challenge lies in constructing a system of macroscopic equations that is reduction consistent, where an N component system exactly reproduces the corresponding 
+
+N − 1 component system when one fluid is absent 24,25 . With-out this property, absent fluid components can spontaneously nucleate, severely compromising simulation accuracy and sta-bility. In this work, we formulate a continuum model for N-component fluids that is full reduction consistent, and develop a suitable free energy lattice Boltzmann method (LBM) 26,27 
+
+to solve it. The LBM is widely used to study multicomponent fluid problems 28–30 , and is becoming increasingly popular due to its exceptional computational efficiency in large, complex geometries 31–33 . Moreover, as a diffuse interface method, in-terface motion, including break-up and coalescence events, can be tracked implicitly from the evolution of a continuous phase field. A number of these approaches have been devel-oped to study multicomponent flow problems with up to three fluids 23,30,34,35 , but lattice Boltzmann methods capable of re-solving fluid flows with four or more distinct fluid phases are limited. In addition, some approaches have been developed to resolve large numbers of immiscible droplets of the same fluid 36,37 , preventing coalescence using near contact forces. While these techniques have the advantage of remaining com-putationally feasible for hundreds or thousands droplets, they do not allow for independent selection of the interfacial ten-sions between fluid phases, and rely on interfaces that are phase separated a priori. Our method is capable of simulat-ing fluid flows of multiple immiscible fluid components with independent selection of all interfacial tensions between the fluids. In contrast to previous LBM approaches, our method has two key advantages. First, in order to capture both the in-terfacial dynamics and the diffusive phase separation physics, we evolve the fluid concentrations using a system of Cahn-Hilliard equations. Previous attempts to incorporate reduc-tion consistency in Cahn-Hilliard systems have typically re-lied upon a specific degenerate form of the diffusive mobil-ity 25,38,39 , which leads to zero flux for an absent fluid. How-ever, as a consequence, the diffusive physics is restricted by the approach for reduction consistency. This is a serious limi-tation, as we will exemplify here in the context of liquid-liquid phase separation studies. Instead, our strategy is to apply a source term in the Cahn-Hilliard equations to cancel any erro-neous flux, while the mobility is a free parameter to tune the diffusivity 24 . We demonstrate that the model reproduces es-tablished hydrodynamic and diffusive scaling laws for phase separation 40–43 . Second, previous methods utilise a discreti-sation of the potential form of the surface tension force 26,38,39 ,which is not strictly momentum conserving and can induce a significant whole domain drift. Here, we resolve this issue by deriving a momentum conserving discretisation of the surface tension force that eliminates this drift to machine precision. This paper is structured as follows. In Sec. II, we present the continuum model solved in this work, including the ap-
+
+> arXiv:2605.22214v1 [physics.flu-dyn] 21 May 2026
+
+2proach to ensure reduction consistency. Then, in Sec. III, we provide the LBM scheme and conservative discretisation of the surface tension force. We then provide a series of system-atic static and dynamic benchmark tests in Sec. IV to vali-date our model, including (i) liquid lenses and Janus droplets, (ii) hydrodynamic and diffusive phase separation, and (iii) Poiseuille flow with six fluid layers. To illustrate the capa-bilities of the method, in Sec. V we showcase applications to study patterned liquid surfaces and a microfluidic design for generating emulsion droplets. Finally, we conclude our work in Sec. VI.  
+
+> II. CONTINUUM MODEL
+
+We derive our method from three distinct continuum equa-tions. First and second, we solve the incompressible continu-ity and Navier-Stokes equations to capture the incompressibil-ity constraint and momentum conservation respectively 
+
+∇ · v = 0, (1) 
+
+∂t (ρv) + ∇ · (ρvv ) = −∇P + η∆v + F. (2) In these equations, v, ρ, η and P are the fluid velocity, density, dynamic viscosity and hydrodynamic pressure. F = Fs + Fb
+
+includes the surface tension force Fs and any external body force Fb.Thirdly, to track the evolution of the interface locations for 
+
+N immiscible components, we evolve N − 1 Cahn-Hilliard equations for the fluid volume fractions Ci
+
+∂tCi + ∇ · (vCi) = −∇ · Ji, ∀i ∈ { 1, 2, . . . , N − 1}, (3) with the evolution of CN implicit from the constraint that 
+
+∑Ni=1 Ci = 1. The fluid density ρ can then be calculated from the volume fractions and component densities ρi as 
+
+ρ =
+
+> N
+
+# ∑
+
+> i=1
+
+ρiCi, (4) although we fix ρi = 1 in this study for simplicity, and con-sider cases where inertial effects are negligible. The surface tension force Fs and diffusive flux Ji can be de-rived in terms of the fluid free energy F . The following form allows independent selection of the surface tensions between each of N components 24,25 
+
+F =
+
+> Z
+
+[EB + EI ] dV , (5) 
+
+EB =
+
+> N
+
+# ∑ 
+
+> i̸=j
+
+βi j 
+
+2
+
+h
+
+f (Ci) + f (Cj) − f (Ci +Cj)
+
+i
+
+,
+
+f (Ci) = C2 
+
+> i
+
+(1 −Ci)2, EI = −
+
+> N
+
+# ∑ 
+
+> i̸=j
+
+κi j 
+
+2 ∇Ci · ∇Cj.
+
+The bulk term EB ensures that, far from the interface, the en-ergy is minimised when Ci is either 1 or 0 for each component. The gradient term EI leads to diffuse interfaces with charac-teristic width D = p8κi j /βi j and ensures that the excess free 0.0 0.5 1.0       
+
+> C 10.0 0.5 1.0
+> C 20.0 0.5 1.0
+> C30.0 0.5 1.0
+> C 10.0 0.5 1.0
+> C 20.0 0.5 1.0
+> C3
+
+J ≠ 0 for {1,2,3} triple point 4 Nuclea �on of C 4a b4J , Equa �on 10 4J , Equa �on 12                
+
+> FIG. 1. (a) Bulk flux from Eq. 10 in the Cahn-Hilliard equation for
+> C4=0 as a function of C1,C2and C3.The non-zero flux in this case leads to the nucleation of C4. (b) Bulk flux from Eq. 12 in the Cahn-Hilliard equation for C4=0 as a function of C1,C2and C3,demonstrating that it provides reduction consistency.
+
+energy per unit area of the diffuse interface corresponds to the surface tensions σi j = p2κi j βi j /9. In this study, we set 
+
+D = 4. A common form of the diffusive flux is 24,25,38,39 
+
+Ji = M∇
+
+> N
+
+# ∑
+
+> j=1
+
+αi j μ j
+
+!
+
+, (6) where M controls the diffusive mobility and μ j = δ F /δCj is the chemical potential of fluid j
+
+μ j =
+
+> N
+
+# ∑  
+
+> k,k̸=j
+
+"
+
+β jk 
+
+
+
+f ′(Cj) − f ′(Cj +Ck)
+
+
+
+(7) 
+
++ κ jk ∇2Ck
+
+#
+
+,
+
+f ′(Cj) = 2Cj(1 − 3Cj + 2C2 
+
+> j
+
+).
+
+The coefficients αi j are given by solving the linear system 24 
+
+ασ = I + γ ⊗ 1T , (8) 
+
+α1 = 0, (9) where γ is a vector of size N and σ is the symmetric matrix of surface tensions. Additionally, ⊗ represents the Kronecker product and 1 and 0 are vectors of size N with each entry as 1 and 0 respectively. To ensure reduction consistency, the diffusion flux Ji of an absent fluid component i must be zero. In general, this is not met for arbitrary choices of M and αi j ,except for N = 2. To identify the root cause of reduction inconsistency, we can calculate the resulting bulk flux in the Cahn-Hilliard equation for the N > 3 component system as Ji,bulk =
+
+−M∇ ∑ Nj=1 αi j μ j,b, where μ j,b = ∂ EB/∂Cj and αi j satisfies Eq. 8 and Eq. 9. We ignore the gradient terms in μ j as these 3are naturally reduction consistent. Using this approach, we obtain 24 
+
+Ji,bulk = 12 MD ∇
+
+"
+
+−Ci(1 − 3Ci + 2C2 
+
+> i
+
+)+ 6 ∑ 
+
+> 1≤j<k<l≤N
+
+
+
+αi j (σ jk + σ jl ) + αik (σ jk + σkl )+ αil (σ jl + σkl ) − γi
+
+
+
+CjCkCl
+
+#
+
+. (10) Fig. 1 (a) illustrates the case where N = 4 and C4 = 0 initially. However, employing Eq. 10, we find that J4,bulk ̸ = 0 if at least three other components are present, as CjCkCl̸ = 0. This leads to unphysical nucleation of C4 at any triple point formed of other fluids. To resolve this issue, we note that, for three component sys-tems, the flux corresponds to 
+
+Ji,bulk = 12 MD ∇
+
+"
+
+−Ci(1 − 3Ci + 2C2 
+
+> i
+
+)+ 6
+
+
+
+αii (σi j + σik ) + αi j (σi j + σ jk )+ αik (σik + σ jk ) − γi
+
+
+
+CiCjCk
+
+#
+
+, 1 ≤ i < j < k ≤ 3.
+
+(11) For N = 3, reduction consistency is guaranteed by the con-straint that αi j satisfies Eq. 8 and Eq. 9, and the flux in Eq. 11 is zero when Ci = 0. However, for N > 3, this is not possible using the expression in Eq. 10, as we do not have sufficient in-dependent choices for the αi j terms to also cancel the CjCkCl
+
+terms, which are in general non-zero when Ci = 0. Correspondingly, our strategy is to recast the flux such that the N component flux must reduce to Eq. 11 when only three fluids are present. This is given by 
+
+Ji = M∇
+
+> N
+
+# ∑
+
+> j=1
+
+αi j (μ j + φ j + ξ j)
+
+!
+
+. (12) The φ j term can be expressed as 24 
+
+φ j = 12 
+
+D ∑     
+
+> 1≤k<l<m≤Nk̸=j,l̸=j,m̸=j
+
+Λ j; j,k,l,mCkClCm. (13) We select coefficients Λ j; j,k,l,m to satisfy the following relation (14) 
+
+# ∑  
+
+> 1≤j≤Nj̸=k,l,m
+
+αi j Λ j; j,k,l,m = Γi,k,l,m, ∀i /∈ k, l, m,
+
+Γi,k,l,m = −6 (αik (σkl + σkm )+ αil (σkl + σlm ) + αim (σkm + σlm ) − γi) ,
+
+where Γi,k,l,m is chosen to cancel the CkClCm terms in Eq. 10 that do not contain Ci. The linear system then can be solved to calculate Λ j; j,k,l,m following 
+
+(αi, j)( Λ j) = ( Γi), ∀i, j /∈ k, l, m. (15) 
+
+(Λ j) and (Γi) are vectors of size N − 3 with each entry as 
+
+Λ j; j,k,l,m and Γi respectively for all i, j /∈ k, l, m, and (αi. j) is the submatrix of α constructed of all entries i, j not equal to 
+
+k, l, m. We can use this to find Λ j; j,k,l,m for all combinations of 
+
+k, l, m. After following the procedure for Λ j; j,k,l,m, the effect of φ j is illustrated in Fig. 1 (b), showing the flux J4 = 0 when using the modified chemical potential. In addition, the free energy in Eq. 5 is not in general bounded from below outside of the physical range Ci ∈ [0, 1]
+
+when one or more spreading parameters 
+
+Si j ;k = σi j − σik − σ jk (16) are positive 22,24 . We therefore also include an optional stabil-ising contribution 
+
+ξ j = 12 
+
+D Ω ∑    
+
+> 1≤k<l≤Nk̸=j,l̸=j
+
+C2 
+
+> k
+
+C2
+
+> l
+
+2Cj − ∑ 
+
+> 1≤m≤Nm̸=j,k,l
+
+Θkl ; j;mCm
+
+ , (17) where we set Ω = 0 when all spreading parameters are nega-tive. The parameters Θkl ; j;m are evaluated from 
+
+# ∑  
+
+> 1≤j≤Nj̸=k,l,m
+
+αi j Θkl ; j;m = 2αim , ∀i /∈ k, l, m. (18) This can be equivalently expressed as the linear system 
+
+(αi, j)( Θk,l ) = 2(αi,m), ∀i /∈ k, l, m, (19) which we use to obtain all Θkl ; j;m for a given set of k, l, m.This procedure only has to be performed once for a given set of surface tensions and the coefficients can be calculated ana-lytically, so it does not impact the computational performance of the model. We provide a Python script to calculate αi j ,
+
+Λ j; j,k,l,m and Θkl ; j;m in the Supplementary Material. Our strategy to achieve reduction consistency has similar-ities to that proposed by Boyer and Minjeaud 24 . In their ap-proach, this was done by including an additional contribution to the free energy, and they presented two models. Here, we recast the approach for reduction consistency in terms of con-tributions to the flux, instead of a global contribution to the free energy. The flux employed in our work, as shown in Eq. 12, maps to the flux that derives from one of their models. In our formulation, it is also unnecessary to include contribu-tions from the φ j and ξ j terms in the chemical force, which is already reduction consistent by default. Boyer and Min-jeaud 24 further presented an alternative free energy model for arbitrary N. However, it is challenging to implement numeri-cally because it is not continuously differentiable with respect to the fluid concentrations. 
+
+III. LATTICE BOLTZMANN METHOD 
+
+We use the LBM to numerically discretise the continuum model described in Sec. II. In the LBM, the fluid motion is de-scribed through the propagation and collision of particle dis-tributions on a regular grid of lattice nodes. The distributions 4are free to move between lattice sites in a discrete stencil of velocity directions ek. In this work, we use the D2Q9 stencil, with directions 
+
+e =
+
+ 0 1 −1 0 0 1 −1 1 −10 0 0 1 −1 1 −1 −1 1
+
+
+
+, (20) and weights 
+
+w =  49 19 19 19 19 136 136 136 136 
+
+ . (21) As is standard in the LBM 26 , we set the lattice sound speed as c2 
+
+> s
+
+= 1/3 and the time step δt = 1. All quoted quantities are given in lattice units. Extension to three dimensions, such as using a D3Q19 stencil, is straightforward and follows the standard route in the LBM. The computational complexity of our approach with increasing N is discussed in Appendix B.  
+
+> A. Hydrodynamics
+
+The lattice Boltzmann equation (LBE) for hydrodynamics can be written as 
+
+fk(x + ekδt ,t + δt ) − fk(x,t) = 
+
+ΩT RT ( fk) + FT RT (Fk). (22) Here, we use the TRT collision operator 26 
+
+ΩT RT ( fk) = − ω+δt( f + 
+
+> k
+
+(x,t) − f eq + 
+
+> k
+
+(x,t)) 
+
+− ω−δt( f − 
+
+> k
+
+(x,t) − f eq − 
+
+> k
+
+(x,t)) , (23) 
+
+f + 
+
+> k
+
+= fk + f¯k
+
+2 , f − 
+
+> k
+
+= fk − f¯k
+
+2 , (24) where ¯ k refers to the opposite velocity direction to k. ω+ can be related to the dynamic viscosity in Eq. 2 as 
+
+η = c2 
+
+> s
+
+ρ
+
+ 1
+
+ω+δt − 12
+
+
+
+. (25) 
+
+ω− is then a free parameter, and can be used to control the magic parameter ΛTRT 
+
+ΛTRT =
+
+ 1
+
+ω+δt − 12
+
+  1
+
+ω−δt − 12
+
+
+
+, (26) which affects the truncation error and stability of the LBM scheme. We use the TRT collision operator to improve accu-racy in the case that there are large viscosity contrasts between components 26 . When viscosity ratios are close to 1, we set 
+
+ω+ = ω−, in which case the TRT collision operator reduces to the simpler BGK approach 26 .The equilibrium distribution function is defined as 44,45 
+
+f eq k =
+
+( Pc2
+
+> s
+
+(1 − w0) + ρ (sk(v)) , if k = 0,
+
+> Pc2
+> s
+
+wi + ρ (sk(v)) , otherwise, (27) 
+
+sk(v) = wk
+
+"
+
+v · ek
+
+c2
+
+> s
+
++ (v · ek)2
+
+2c4
+
+> s
+
+− v · v
+
+2c2
+
+> s
+
+#
+
+. (28) To incorporate the effects of hydrodynamic and thermody-namic forces, and to enforce incompressibility, we define the forcing term as 46 
+
+FT RT (Fk) = 12
+
+
+
+1 − 12 ω+
+
+
+
+δt(Fk + F¯k)+ 12
+
+
+
+1 − 12 ω−
+
+
+
+δt(Fk − F¯k), (29) with 44,45 
+
+(30) 
+
+Fk = wk
+
+ v · ∇ρc2 
+
+> s
+
++ ek · F
+
+c2
+
+> s
+
++ (v · ∇ρc2 
+
+> s
+
++ vF ) : (ekek − c2 
+
+> s
+
+I)
+
+c4
+
+> s
+
+
+
+.
+
+The surface tension force can be expressed as 
+
+Fs = ∑
+
+> i
+
+μi∇Ci = ∑
+
+> i
+
+ ∂ EB
+
+∂Ci
+
++ ∂ EI
+
+∂Ci
+
+
+
+∇Ci, (31) which can be equivalently written as the divergence of a stress tensor (proof given in Appendix A) 
+
+Fs ≡ ∇ · σ = ∇ ·
+
+
+
+[EB + EI ] I + ∑ 
+
+> i̸=j
+
+κi j ∇Ci ⊗ ∇Cj
+
+
+
+. (32) This equivalence is essential for momentum conservation, as the divergence theorem guarantees that the integral of Fs over the simulation domain is equal to zero, with solid or periodic boundary conditions. Numerically, however, the equivalence fails because the chain rule, 
+
+# ∑
+
+> i
+
+∂ EB
+
+∂Ci
+
+∇Ci = ∇EB, (33) is not satisfied exactly when ∇Ci and ∇EB are calculated through finite difference stencils and ∂ EB/∂Ci is evaluated an-alytically. As a result, the standard numerical implementation of ∑i μi∇Ci can no longer be expressed as a divergence, and the divergence theorem no longer applies to guarantee mo-mentum conservation. In Sec. IV A, we demonstrate that the lack of momentum conservation can lead to a large unphysi-cal whole domain drift. To resolve this issue, we modify the chemical force in Eq. 31 with ∑i(∂ EB/∂Ci)∇Ci = ∇EB to en-sure a numerical divergence consistent form 
+
+Fs = ∇EB + ∑
+
+> i
+
+∂ EI
+
+∂Ci
+
+∇Ci = ∇EB +
+
+> N
+
+# ∑  
+
+> i,j=1; i̸=j
+
+κi j ∇2Cj∇Ci, (34) thereby resolving the domain drift while avoiding the need to evaluate the full stress tensor divergence. We evaluate all directional gradients using second-order ac-curate isotropic finite difference stencils 
+
+∇ψ = 1
+
+c2 
+
+> s
+
+δt
+
+> Q−1
+
+# ∑
+
+> k=1
+
+wkek[ψx+ekδt − ψx], (35) 5where ψ is an arbitrary scalar field on the lattice. ∇2Ci needed to calculate μi and Fs is given by 
+
+∇2Ci = 2
+
+c2 
+
+> s
+
+δt2
+
+> Q−1
+
+# ∑
+
+> k=1
+
+wk[Ci,x+ekδt −Ci,x]. (36) The first and zeroth moments of fk are used to calculate the momentum and hydrodynamic pressure respectively 44,45 
+
+(37) ρv =
+
+> Q−1
+
+# ∑
+
+> k=0
+
+ek fk + δt
+
+2 F,
+
+(38) P = c2
+
+> s
+
+1 − ω0
+
+"Q−1
+
+# ∑ 
+
+> k̸=0
+
+fk + δt
+
+2 v · ∇ρ + ρs0(v)
+
+#
+
+. 
+
+> B. Interface Capturing
+
+To evolve the fluid volume fractions Ci, we utilise the fol-lowing LBE 47 
+
+gi,k(x + ekδt ,t + δt ) − gi,k(x,t) = 
+
+− 1
+
+τg,i
+
+h
+
+gi,k(x,t) − geq i,k(x,t)
+
+i
+
+. (39) with 
+
+geq i,k =
+
+
+
+wkCi(1 + sk(v))+ (1 − w0)m ∑Nj=1 αi j (μ j + φ j + ξ j), if k = 0,
+
+wkCi(1 + sk(v)) −
+
+wkm ∑Nj=1 αi j (μ j + φ j + ξ j), if k̸ = 0.
+
+(40) 
+
+Ci can then be evaluated from the zeroth moment 
+
+Ci =
+
+> Q−1
+
+# ∑
+
+> k=0
+
+gi,k. (41) For diffuse interface models, there are different ways to for-mulate the fluid viscosity in the interface region. Here, for simplicity, we calculate the fluid viscosity by taking the vis-cosity of the fluid on each lattice node with the maximum value of Ci
+
+η = ηi with i corresponding to Ci = max 
+
+> j∈{ 1,..., N}
+
+Cj. (42) The mobility in the Cahn-Hilliard equations can be computed as 
+
+M = c2 
+
+> s
+
+m(τg,i − 0.5)δt . (43) In this work, we set τg,i = 1 and m = 1/50 to fix the mobility as M = 1/300.  
+
+> C. Boundary Conditions
+
+At solid walls, we apply the halfway bounce-back boundary condition 26 for all distributions, which enforces the no-slip condition half a lattice spacing 12 ekδt beyond the edge of the simulated fluid domain, also implying that the solid wall is at the same position 
+
+f unknown  
+
+> k
+
+(xb,t + δt) = f ∗ 
+
+> ¯k
+
+(xb,t + δt), (44) where xb is the position of a node adjacent to the boundary and f ∗ 
+
+> ¯k
+
+is the updated fluid distribution before propagation 
+
+f ∗ 
+
+> ¯k
+
+(xb,t + δt) = f¯k(xb,t) + ΩT RT ( f¯k) + FT RT (F¯k). (45) Directional gradients intersecting with solid boundaries are calculated to match the bounce back treatment for the distributions 48 , where any scalar quantity ψx+ekδt in Eq. 35 that would lie within a solid wall is replaced with ψx.In Section V B, we apply a number of additional boundary conditions to allow fluid to enter and exit the simulation do-main. The first of these is a Dirichlet condition that enforces a constant velocity on the boundary 26,49 
+
+f unknown  
+
+> k
+
+(xb,t + δt) = f ∗ 
+
+> ¯k
+
+(xb,t + δt) − 2wkρb
+
+ek · vb
+
+c2
+
+> s
+
+, (46) where ρb and vb are the density and velocity at the boundary location respectively. We also utilise the convective boundary condition 50 to al-low fluid to exit the domain according to a convective flow velocity U normal to the boundary following 
+
+∂ (ρv)
+
+∂t +U ∂ (ρv)
+
+∂ x = 0, ∂Ci
+
+∂t +U ∂Ci
+
+∂ x = 0, (47) which is applied on the boundary location at the edge of the simulated domain. Different choices are available for the value of U50 , but here we take the average normal velocity through the boundary. This boundary condition can be ap-plied to all the distributions on the boundary following 
+
+fk(N,t + δt) = fk(N,t) + U δt  
+
+> δx
+
+fk(N − 1,t + δt)
+
+1 +U δt 
+
+> δx
+
+, (48) where N refers to fluid nodes adjacent to the boundary and 
+
+N − 1 refers to nodes adjacent to these further into the fluid domain. Note that here U is evaluated on the N − 1 nodes af-ter streaming, so we must obtain the velocity on these nodes first, before applying the boundary condition on the nodes at 
+
+N. Directional gradients are evaluated by assuming unknown quantities beyond the boundary ψ(N + 1,t) have been con-vected with velocity U50 
+
+ψ(N + 1,t + δt) = ψ(N + 1,t) + U δt  
+
+> δx
+
+ψ(N,t + δt)
+
+1 +U δt 
+
+> δx
+
+. (49) Finally, to enforce a constant Ci on the open boundaries, we apply a Dirichlet boundary condition using the anti-bounce-back method 26 , which sets a constant value on the boundary location 12 ekδt beyond the edge of the simulated nodes 
+
+gunknown  
+
+> k
+
+(xb,t + δt) = −g∗ 
+
+> ¯k
+
+(xb,t + δt) + 2geq  
+
+> ¯k
+
+(Ci,b, vb), (50) 6                                                                                              
+
+> TABLE I. Configurations of surface tensions and resulting theoretical and measured Neumann angles in the liquid lens benchmark. The results are plotted in Fig. 2 (b).
+> σ12 σ13 σ14 σ23 σ24 σ34 θtheory interior θtheory exterior θmeasured interior θmeasured exterior
+> 0.005 0.0028 0.0028 0.0028 0.0028 0.0028 53 .5153 .254 .2152 .90.005 0.003 0.003 0.003 0.003 0.003 67 .1146 .467 .4†146 .3†
+> 0.005 0.0035 0.0035 0.0035 0.0035 0.0035 88 .8135 .689 .3135 .40.005 0.004 0.004 0.004 0.004 0.004 102 .6128 .7103 .3128 .30.005 0.005 0.005 0.005 0.005 0.005 120 .0120 .0120 .8119 .60.005 0.006 0.006 0.006 0.006 0.006 130 .8114 .6131 .4114 .30.005 0.007 0.007 0.007 0.007 0.007 138 .2110 .9138 .8110 .60.005 0.008 0.008 0.008 0.008 0.008 143 .6108 .2144 .1‡107 .9‡
+> 0.005 0.009 0.009 0.009 0.009 0.009 147 .7106 .1148 .3105 .9
+
+where Ci,b is the volume fraction on the boundary. Directional gradients are evaluated by assuming unknown quantities be-yond the boundary match the prescribed Dirichlet value. On all other boundaries, we apply periodic boundary conditions.   
+
+> IV. BENCHMARKS A. Liquid Lens and Janus Droplet
+
+To validate that our method obtains the correct interfacial tensions, we investigate a four fluid liquid-lens setup, with an 
+
+N = 6 phase field free energy model to investigate the reduc-tion consistency properties. This involves two droplets at the interface of two other fluids, shown in Fig. 2 (a). We set up the simulation by initialising smoothed rectangles of fluid 1 (pur-ple) and 2 (pink) at the bottom and top halves of a 300 × 150 simulation domain with periodic boundaries. Two smooth semicircles of fluid 3 (yellow) and 4 (blue) with a radius of 35 are initialised in the centre and allowed to evolve towards their equilibrium configuration over 5 × 10 5 timesteps. We set 
+
+ηi = 1/6 for all fluids. Theoretical relations for the Neumann angles at three com-ponent contact points can be calculated in terms of the surface tensions at each interface triple point 51 
+
+cos (π − θi j ) = − σ 2 
+
+> i j
+
+− σ 2 
+
+> ik
+
+− σ 2
+
+> jk
+
+2σik σ jk 
+
+, i, j,k∈{ 1,2,3,4}   
+
+> i̸=j̸=k
+
+, (51) where θi j refers to the angle formed between the tangents to the interfaces of fluids i and j. We group the resulting angles depending on whether they are interior or exterior to the lens fluids, and average the identical angles shown in Fig. 2 (a). Angles are obtained fitting the top and bottom of the Ci = 0.5contour to two circles and calculating the tangent of these cir-cles at the triple points. We set σ34 = 0.005 and vary the re-maining independent surface tensions for fluids 1, 2, 3 and 4 identically to obtain different configurations, shown in Ta-ble I. The surface tensions for absent fluids 5 and 6 are all identically σ5 j = σ6 j = 0.005. Fig. 2 (b) and Table I demonstrate a consistent agreement within 1 ◦ between theory and measurement. Reduction con-sistency is essential for this benchmark to guarantee that the correct interfacial tensions are correctly captured in the four component system and that fluids 5 and 6 do not nucleate. Fig. 2 (c) displays that, if we do not include φ j, absent flu-ids nucleate, which quickly drive the system to instability. In contrast, we observe that C5 and C6 remain absent to machine precision when we include φ j, further confirming that reduc-tion consistency is satisfied. It should be noted that reduction consistency is necessary even in simulations with no globally absent components. To demonstrate this, we study an identical liquid lens setup with configuration † in Fig. 2(a) and Table I but now set N = 4, with all fluid components present. Because triple points are effectively local N = 3 subsystems, we observe that the locally absent C3 nucleates at the triple point formed of fluids 1, 2, and 4 in Fig. 2 (d) if we do not resolve reduction consistency by including φ j in the flux. In this case, negative values of C3
+
+quickly lead to simulation instability. Including φ j completely resolves this issue. To demonstrate the importance of our conservative surface tension force, we investigate a Janus droplet, consisting of three different fluids. We set N = 4 and initialise a circu-lar droplet of fluid 2 with a radius of 20 in the centre of a 100 ×100 domain with periodic boundaries. We then initialise equivalent droplets of fluids 3 and 4 with centres 25 lattice units to the right and left respectively, minus any overlapping regions. We configure σ14 = σ24 = 0.0095 and set the other surface tensions to σi j = 0.005. The resulting Janus droplet is asymmetric, as shown in Fig. 2 (e), and the non-conservative form of the surface tension force Fs = ∑i μi∇Ci leads to the droplet drifting over time. This is quantified in Fig. 2 (f) by a significant average velocity of > 10 −4 over the whole domain after a short time. Because the largest characteristic veloci-ties in LBM simulations are typically ≤ 10 −2 26 , this presents a major source of inaccuracy. In contrast, our conservative form effectively eliminates this unphysical drift to machine precision, as shown in Fig. 2 (e,f).  
+
+> B. Phase Separation
+
+To apply this model to phase separation problems, we must reproduce established theoretical and experimental domain size scaling predictions. A common measure of the domain 710 2 10 4                                    
+
+> t
+> 10 24
+> 10 20
+> 10 16
+> 10 12
+> 10 8
+> 10 4
+> 10 010 410 8max(| C i |)
+> C5, with j
+> C6, with j
+> C5, no j
+> C6, no j
+> 0
+> t
+> 10 17
+> 10 15
+> 10 13
+> 10 11
+> 10 9
+> 10 7
+> 10 5
+> 10 3
+> |u x, avg  |Non-Conservative Fs
+> Conservative Fs
+> No j
+> With j
+> Lines *Overlap Simulation Nucleation Diverges
+
+a b c‡†d e ft=2.5×10 4 5t=470 uxt=2.85×10 t=4.4×10 5 2×10 5 4×10 5        
+
+> 60 90 120 150 Analytical Angle ( )
+> 60 90 120 150 Measured Angle (  )
+> Non-Conservative Fs
+> Conservative Fs
+
+FIG. 2. (a) Visualisation of liquid lens setup for configurations ‡ and † labelled in Table I. Symbols associated with the measured interior (square) and exterior (circle) angles between components are shown. Due to symmetry some angles are identical, so we take the average and plot them together. We set N = 6, and initially set C5 = C6 = 0 to capture an N = 4 subsystem. (b) Measured Neumann angles plotted against analytical predictions. (c) Maximum value of |Ci| over time for absent components with the configuration †, plotted with and without the reduction consistency term φ j in the flux. The lines for C5 and C6 overlap. (d) Fluid C3 plotted in a liquid lens setup with N = 4. We observe nucleation at triple points unless we apply φ j. (e) Time evolution of an initially stationary triple Janus droplet with the non-conservative surface tension force Fs = ∑i μi∇Ci and the conservative surface tension force given in Eq. 34. (f) Magnitude of the average velocity of the Janus droplet in the x direction over time. 
+
+size is given by 52,53 
+
+Li = 2π
+
+R Si(k)d2k
+
+R kS i(k)d2k , (52) which defines a characteristic length scale associated with fluid component i. Here, Si(k) = 
+
+D bλ i(k) bλ i(−k)
+
+E
+
+is the circularly averaged structure factor, which is obtained from Fourier transforms of the field λi(r) = H(Ci(r) − 0.5), where 
+
+H is the Heaviside step function. This formulation of λi(r) is used to avoid contributions from the interface width in Si(k).We then average Li across all components to compute the overall domain size L. In symmetric two-dimensional binary mixtures, we expect coarsening to occur due to inertial hydro-dynamics with L ∝ t2/3 at late times 40–43,54 . Alternatively, if the primary driver of phase separation is diffusion, the average length scale increases with L ∝ t1/3 at late times 40,41,55 .We initialise the fluid concentrations by assigning random values of Ci on each lattice site, which are drawn from a uni-form distribution in the range [0, 2/N] for each fluid compo-nent. These values are then normalized to enforce the con-straint ∑i Ci = 1. We set all surface tensions as σi j = 0.005 and the viscosity of each fluid as ηi = 1/6. In each case, we plot L against t alongside illustrative L ∝ t 23 and L ∝ t 13 curves. For an 1600 × 1600 N = 2 system, we observe bicontinuous fluid regions in Fig. 3 (a) and obtain the expected inertial hy-drodynamic scaling of L ∝ t 23 in Fig. 3 (b), with some fluctu-ations due to finite size effects. If we do not evolve the LBE for Eq. 1 and Eq. 2 and remove the effects of hydrodynam-ics, we can investigate the diffusive coarsening regime. For 
+
+N = 4 and equal compositions in an 400 × 400 system, shown in Fig. 3 (c), we obtain the correct scaling in Fig. 3 (d) with 
+
+αi j evaluated from Eqs. 8 and 9. Previous approaches 25,38,39 have resolved reduction consis-tency by allowing αi j to vary with the fluid concentrations, such as αi j = CiCj or αi j = C2 
+
+> i
+
+C2 
+
+> j
+
+, with αii = − ∑Nj=1 αi j .With these selections, the mobility of an absent component is zero, ensuring it cannot nucleate. However, the first expres-sion for αi j can lead to negative mobilities, causing simula-tion instability. Moreover, we demonstrate in Fig. 3 (d) that using αi j = C2 
+
+> i
+
+C2 
+
+> j
+
+and αii = − ∑Nj=1 αi j cannot reproduce the 
+
+L ∝ t 13 scaling, as diffusion is now concentrated around the 810 5 5 × 10 5                  
+
+> t
+> 10 20 30
+> Lij =C2
+> iC2
+> j
+> Lt13
+> Lt23
+> ij =Const
+> 10 410 5
+> t
+> 30 40 60 100
+> LLt13
+> Lt23
+
+acbd
+
+FIG. 3. (a) Snapshot during phase separation with N = 6 and vol-ume fractions V1 = V2 = 1/2 and V3 = V4 = V5 = V6 = 0. This case reduces to a binary phase separation problem. (b) The av-erage length scale L from Eq. 52 follows the expected hydrody-namic L ∝ t 23 scaling. (c) Snapshot during phase separation with 
+
+V1 = V2 = V3 = V4 = 1/4 and V5 = V6 = 0 where we do not evolve the fluid velocity. (d) Corresponding data for L over time. Our ap-proach, where αi j are constants obtained from Eqs. 8 and 9, provides the expected L ∝ t 13 scaling when compared to the illustrative curve, while enforcing αi j = C2 
+
+> i
+
+C2 
+
+> j
+
+fails to capture this regime. 
+
+fluid interface. Therefore, previous approaches to capture re-duction consistency in the LBM are unsuitable for complete study of phase separation dynamics. The procedure to incor-porate αi j = C2 
+
+> i
+
+C2 
+
+> j
+
+in the LBM is described in Appendix C. 
+
+C. Layered Poiseuille Flow 
+
+In order to quantitatively validate the dynamic flow perfor-mance of the method, we investigate layered Poiseuille flow. The setup is shown in Fig. 3(a), where six fluid layers are introduced into an N = 6 system parallel to two solid bound-aries, with a domain size of 360 ×1. We apply periodic bound-aries on the top and bottom of the domain, and apply a con-stant body force parallel to the solid walls Fb,y = 4×10 −8. We set ω+ = 1/0.82, 1 /0.58, 1 /0.52, 1 /0.54, 1 /0.66 and 1 /1.14 and ρ = 1 to obtain η = 0.107, 0 .027, 0 .007, 0 .013, 0 .053 and 0.213 respectively, and set ΛTRT = 3/16. The surface tensions are all σi j = 0.005. To derive an analytical solution for the equilibrium velocity profile, we note that the viscous force and the applied body force exactly cancel in equilibrium 
+
+ηi
+
+d2vi
+
+dx 2 = Fb,y, (53) 100 200 300 x0.000 0.002 0.004 0.006 0.008 0.010 0.012 0.014 0.016 v(x) 
+
+> Theory Data
+> No-Slip
+
+Fb,y 0.107 0.027 0.007 0.013 0.053 0.213 η =ab
+
+FIG. 4. (a) Layered Poiseuille setup, with a body force applied ver-tically to six fluid layers with different viscosities. We apply the no-slip boundary condition on the left and right walls and periodic boundary conditions on the top and bottom. (b) Equilibrium velocity profile along the channel width plotted against theoretical predictions given by Eq. 56. 
+
+for each layer i. Here, y is the flow direction and x is normal to the left solid wall. We can integrate once to obtain 
+
+dv i
+
+dx = Fb,y
+
+ηi
+
+x + Ai, (54) where Ai is an integration constant. Applying the constraint of continuous shear stress across the interface 
+
+ηi
+
+dv i
+
+dx (xi) = ηi+1
+
+dv i+1
+
+dx (xi), (55) where xi is the location of the interface between layers i and 
+
+i + 1, we conclude that ηiAi = A is an identical constant for all layers. Integrating again, we arrive at the velocity profile 
+
+vi(x) = Fb,y
+
+2ηi
+
+x2 + A
+
+ηi
+
+x + Bi, (56) where Bi is an integration constant for each layer. Now, we use the fact that the velocity is continuous across each interface, and apply the no-slip boundary condition at the solid walls 
+
+vi(xi) = vi+1(xi), v1(0) = 0, v6(W ) = 0. (57) The result is a linear system that can be solved to obtain the constants A and Bi
+
+Ax = b, x = ( A, B1, B2, B3, B4, B5, B6)T . (58) From this system of equations, we obtain A = −6.57 × 10 −6,
+
+B1 = 0, B2 = 0.00906, B3 = 0.0654, B4 = 0.0253, B5 =
+
+0.00135 and B6 = −0.00106. 90 t                  
+
+> 0.000 0.002 0.004 0.006
+> v cm , x
+> Fb= 26 × 10 7
+> Fb= 14 × 10 7
+> Fb= 8 × 10 7
+> Fb= 3 × 10 7
+> Fb= 2 × 10 7
+> 3×10 56×10 5
+
+a bF =2x10 -7 Pinned bbF =3x10 -7 t=2.5×10 4 t=3.25×10 5 t=6.25×10 5
+
+FIG. 5. (a) Visualisation of PaLS setup, with a droplet of fluid 2 (pink) on alternating patches of fluid 3 (yellow) and fluid 4 (blue) surrounded by fluid 1 (purple). Droplets on PaLS can become pinned on lubricant-lubricant-air contact lines 8. Applying a large enough body force Fb
+
+allows the droplet to overcome the pinning force and subsequently travel over the surface. (b) Centre of mass velocity of droplets moving on PaLS, with varying Fb.
+
+In Fig. 4(b), we show the measured velocity profile com-pared with the theoretical curves given by Eq. 56. We obtain an excellent agreement between the simulated data and the theoretical solution for the wide range of viscosities tested. 
+
+V. APPLICATIONS A. Patterned Liquid Surfaces 
+
+Patterned liquid surfaces (PaLS) are solid surfaces coated with thin domains of two immiscible lubricant phases ar-ranged in prescribed patterns 9,10 . In contrast to traditional liquid-infused surfaces, which exploit a smooth lubricant coating to repel droplets at tilt angles of ≈ 1 − 3◦56,57 , PaLS offer the possibility to direct droplet motion by exploiting pin-ning on the interfaces between lubricant patches. Recent ex-perimental and theoretical studies have revealed a rich phase space of distinct wetting states of droplets on these surfaces 8,but computational approaches so far have been limited to static energy-minimisation simulations. In this section, we highlight the applicability of our approach to study these sys-tems dynamically for the first time. We initialise eight stripes of alternating lubricant compo-nents of fluids 3 and 4 with a height of 15 in a 400 × 140 sim-ulation domain, with solid walls on the top and bottom and periodic boundaries on the sides. We then initialise a hemi-spherical droplet of fluid 2 with radius of 60 surrounded by fluid 1. To prevent the lubricant phases from travelling over the surface, we place solid posts with dimensions 2 × 5 on the surface between each lubricant-lubricant interface. In experi-ments, the lubricant is prevented from moving by chemically patterning the underlying substrate 8. To investigate droplet motion on these surfaces, we apply a horizontal body force to the droplet of fluid 2 and vary the magnitude. The surface tensions are configured as σ13 = σ14 = σ23 = σ24 = 0.01 and 
+
+σ12 = σ34 = 0.005, with Ω = 1/90 in Eq. 17. The viscosi-ties are η1 = 2/300, η2 = 0.1 and η3 = η4 = 2/3 and we set 
+
+ΛTRT = 3/16. With a body force of Fb = 2 × 10 −7, the front of the droplet becomes pinned at the first lubricant-lubricant-air contact line it approaches, shown in Fig. 5 (a). Increasing the body force to Fb = 3 × 10 −7 allows the droplet to overcome the pinning force and it begins to move over the surface. The full time evolution in each case is shown in Supplementary Movie 1 and 2 respectively. We plot the droplet centre-of-mass ve-locity as vcm ,x = R C2vxdV /R C2dV for varying Fb in Fig. 5 (b). At smaller Fb, the droplet exhibits stick-slip motion, as it easily slides over the smooth lubricant interfaces, before it is slowed at the lubricant-lubricant-air contact lines. As a result, the centre of mass velocity oscillates over time. Because the viscous friction force scales with the droplet velocity 58–60 , at higher body forces, the magnitude of the oscillations reduces as viscous drag becomes the dominant source of friction. 
+
+B. Emulsion Droplet Generation 
+
+Emulsion droplets are hierarchical fluid structures com-prising a host droplet with internal droplets of other immis-cible phases. The generation of emulsion droplets is com-monly achieved using microfluidic devices 1–7 , and the result-ing structures can be employed to facilitate drug encapsula-tion and delivery 6, enable controlled chemical reactions 61,62 ,and act as templates for Janus particle fabrication 3,5 . The in-clusion of ξ j in Eq. 17 enables our method to study the rich phase space of possible distinct droplet morphologies which can form with different combinations of positive spreading pa-rameters Si j ;k > 0. To study the generation of emulsion droplets, we employ a microfluidic geometry, shown in Fig. 6 (a), designed to sequentially introduce and encapsulate multiple immiscible fluid phases. The geometry consists of two inlets with length 
+
+L1 = 30 and width wI1 = 10 on the left of the domain, one of which injects pure fluid 3 and the other injects pure fluid 4, both with velocity v1 = 0.003. The total domain height is H1 = 140 and each channel begins a distance of H2 = 55 from the edge of the domain. These are followed by two perpendicular inlets of fluid 2 with width wI2 = 8 at veloc-ity v2 = 0.0045. The fluids then enter into a wider channel with height H3 = 80 and length L2 = 30 followed by two further inlets for fluid 1 at velocity v3 = 0.0098 and width 
+
+wI3 = 51. Finally, the geometry opens into a channel with height H4 = 110. We configure σ14 = σ13 = 0.012 and the 10 wI1 wI2 Lab1v1v2 v3v2 v3v1wI3 H3H1H2H4wI1 L 2    
+
+> t=1.55×10 5t=0 t=1.60×10 5t=1.65×10 5t=1.70×10 5t=1.75×10 5
+> FIG. 6. (a) Microfluidic design for generating triple-emulsion droplets, showing the initial state at t=0. Physical dimensions of the design are annotated and the arrows denote flow directions from the inlets. The visualisation is cut off before the edge of the simulation domain on the right hand side. (b) Time evolution showing the for-mation of an emulsion droplet from the injected fluids. The surface tensions are configured to encourage cloaking of fluids 3 (yellow) and 4 (blue) by fluid 2 (pink).
+
+remaining surface tensions as σi j = 0.005 to encourage fluid 2 to completely cloak fluids 3 and 4, and we set Ω = 1/18 in Eq. 17. The viscosities are identically ηi = 1/12. At the in-lets, we apply Dirichlet conditions for the velocity and volume fractions Ci using Eq. 46 and Eq. 50 respectively. The full do-main size is 600 × 140, and we apply the convective boundary condition in Eq. 48 on the right boundary. Fig. 6 (b) shows snapshots of the droplet formation pro-cess over time. As fluids 3 and 4 are injected into fluid 2, a composite structure comprising all three fluids is formed and flows into the wider downstream channel, where it is elon-gated into a compound thread by the flow of fluid 1. As the thread extends, interfacial tension acts to minimize the surface area, ultimately leading to capillary instability and pinch-off, resulting in the formation of an emulsion droplet of fluid 2 that encapsulates one droplet each of fluids 3 and 4. The de-sign continues to produce regular emulsion droplets over time, as evidenced by the previously generated droplet visible in the first two snapshots. The full time evolution is shown in Sup-plementary Movie 3.  
+
+> VI. CONCLUSION
+
+In this paper, we have presented a free energy lattice Boltz-mann method (LBM) for simulating flows with an arbitrary number of immiscible fluid components in principle. The method allows for independent selection of the interfacial ten-sions and viscosities for each fluid component in the system. Our underlying model is strictly reduction consistent, ensur-ing that an N component system exactly recovers the corre-sponding N − 1 system when one component is absent. Akey advantage of our approach is that reduction consistency is enforced independently of the diffusive mobility, enabling accurate control of diffusive dynamics and the recovery of es-tablished phase-separation scaling laws. In addition, we intro-duced a momentum conserving discretisation of the surface tension force, resolving a significant velocity drift present in previous LBM schemes. We demonstrate the capabilities of our method using a series of static and dynamic benchmark problems, includ-ing liquid lenses, Janus droplets, layered Poiseuille flow and liquid-liquid phase separation, and obtain excellent agreement throughout between theoretical and simulated results. We fur-ther highlight the promising capabilities of the method for fu-ture study of applications involving three or more immisci-ble fluids, including droplet dynamics on patterned liquid in-fused surfaces and microfluidic devices for multiple emulsion droplet generation. Our method is well positioned to support existing experi-mental work in a broad range of applications involving mul-tiple immiscible fluids. Potential areas include biomedical systems, such as the study of phase-separated biomolecu-lar condensates 11–14 and droplet-based cell assays 63,64 ; new soft materials, including DNA nanostars 17 and block copoly-mers 65–67 ; patterned liquid surfaces 8–10 to direct droplet mo-tion; complex emulsions and layered textures in food 68 and cosmetic 69 formulations; and microreactors for controlled chemical reactions 61,62 . Future extensions to the method should include wetting interactions with solid boundaries 70 
+
+and support for large density contrasts among the fluid com-ponents 48,71 .
+
+> SUPPLEMENTARY MATERIAL
+
+See the Supplementary Material for supplementary movies associated with Fig. 5 (a) and Fig. 6 (b), and a Python script 11 to evaluate αi j , Λ j; j,k,l,m, and Θkl ; j;m in Sec. II. 
+
+ACKNOWLEDGMENTS 
+
+We thank Dr Rodrigo Ledesma and Dr Luiz Eduardo Czelusniak for useful discussions. This work was supported by Leverhulme Trust (research project grant RPG-2022-140), UKRI Engineering and Physical Sciences Research Council (EP/V034154/2), and EPSRC IAA project “Liquid Evapora-tion of Structured Surface”. This work used the Cirrus UK National Tier-2 HPC Service at EPCC. We also acknowledge compute resources on ARCHER2 via the UK Consortium on Mesoscale Engineering Sciences (EP/L00030X/1). In addi-tion, we want to thank the DFG project OPUS-26 (LAP). For the purpose of open access, the author has applied a Creative Commons Attribution (CC BY) licence to any Author Ac-cepted Manuscript version arising from this submission. 
+
+CONFLICT OF INTEREST STATEMENT 
+
+The authors have no conflicts to disclose. 
+
+AUTHOR CONTRIBUTIONS 
+
+Michael Rennick: Conceptualization (equal); Investiga-tion (lead); Methodology (lead); Software (lead); Writing -original draft (equal); Writing - review & editing (equal). Xi-tong Zhang: Conceptualization (equal); Methodology (sup-porting); Writing - review & editing (equal). Tim Niklas Bingert: Methodology (supporting); Software (supporting); Writing - review & editing (equal). Mathias J. Krause: 
+
+Funding acquisition (equal); Supervision (supporting); Writ-ing - review & editing (equal). Halim Kusumaatmaja: Con-ceptualization (equal); Funding acquisition (equal); Supervi-sion (lead); Writing - original draft (equal); Writing - review & editing (equal). 
+
+DATA AVAILABILITY STATEMENT 
+
+The data that support the findings of this study are available from the corresponding author upon reasonable request. 
+
+Appendix A: Equivalence of Chemical Force and Stress Tensor Divergence 
+
+The divergence of the stress tensor ∇ · σ is analytically con-sistent with the application of a chemical force ∑i μi∇Ci. The stress tensor σ ≡ σαβ can be written in tensor notation as 
+
+σαβ =δαβ 
+
+"
+
+EB − ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+2 (∂γCi)( ∂γCj)
+
+#
+
++
+
+> N
+
+# ∑  
+
+> i,j=1; i̸=j
+
+κi j (∂αCi)( ∂β Cj). (A1) The divergence is then given by ∇·σ ≡ ∂β σαβ . For the second term in square brackets, we apply the chain rule 
+
+∂β (δαβ EB) = ∑
+
+> i
+
+∂ EB
+
+∂Ci
+
+∂αCi. (A2) For the third and fourth terms, we use the product rule 
+
+∂β
+
+
+
+δαβ ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+2 (∂γCi)( ∂γCj)
+
+
+
+=
+
+# ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+2
+
+(∂α ∂γCi)( ∂γCj) + ( ∂γCi)( ∂α ∂γCj) , (A3) 
+
+∂β
+
+
+
+δαβ ∑  
+
+> i,j=1; i̸=j
+
+κi j (∂αCi)( ∂β Cj)
+
+
+
+=
+
+# ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+(∂β ∂αCi)( ∂β Ci)) + ( ∂αCi)( ∂β ∂β Ci))  .
+
+(A4) Subsequently, we can express the total divergence as 
+
+∂β σαβ = ∑
+
+> i
+
+∂ EB
+
+∂Ci
+
+∂αCi
+
+− ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+2
+
+(∂α ∂γCi)( ∂γCj) + ( ∂γCi)( ∂α ∂γCj)
+
++ ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+(∂β ∂αCi)( ∂β Cj)) + ( ∂αCi)( ∂β ∂β Cj))  .
+
+(A5) The chemical potential can be expressed in terms of bulk and gradient terms as 
+
+μi = ∂ EB
+
+∂Ci
+
++ ∑ 
+
+> j=1,i̸=j
+
+κi j ∂γ ∂γCj. (A6) We can multiply this by ∂αCi to obtain 
+
+μi∂αCi = ∂ EB
+
+∂Ci
+
+∂αCi + ∑ 
+
+> j=1,i̸=j
+
+κi j (∂γ ∂γCj)( ∂αCi), (A7) 
+
+# ∑
+
+> i
+
+∂ EB
+
+∂Ci
+
+∂αCi = ∑
+
+> i
+
+μi∂αCi − ∑  
+
+> i,j=1,i̸=j
+
+κi j (∂γ ∂γCj)( ∂αCi).
+
+(A8) 12 After substituting Eq A8 into Eq. A5, we arrive at 
+
+∂β σαβ = ∑
+
+> i
+
+μi∂αCi − ∑  
+
+> i,j=1,i̸=j
+
+κi j (∂γ ∂γCj)( ∂αCi)
+
+− ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+2
+
+(∂α ∂γCi)( ∂γCj) + ( ∂γCi)( ∂α ∂γCj)
+
++ ∑  
+
+> i,j=1; i̸=j
+
+κi j 
+
+(∂β ∂αCi)( ∂β Cj)) + ( ∂αCi)( ∂β ∂β Cj))  .
+
+(A9) After exploiting the symmetry κi j = κ ji and relabelling in-dices, the mixed gradient terms in Ci cancel and we are finally left with 
+
+∂β σαβ = ∑
+
+> i
+
+μi∂αCi. (A10) 
+
+Appendix B: Computational Complexity 
+
+We expect the lattice Boltzmann equations for the evolution of fk and gk to occupy the majority of the computational time at small N. For each added phase, we must solve an additional lattice Boltzmann equation and the complexity increases with 
+
+O(N). Furthermore, the complexity of the chemical poten-tial and stress tensor gradient calculation scales with O(N2)
+
+and the calculation of φ j and ξ j scales with O(N3), and these calculations will start to dominate at very large N. The de-veloped method in this work is best suited to fluid problems with N ≲ O(10 ), where independent selection of some or all interfacial tensions is necessary. For example, this is relevant to model recent experimental systems using DNA nanostars with up to 9 immiscible phases 17 . In the future, it is also pos-sible to consider incorporating a near contact force 36,37 in our method. This would allow for independent selection of some interfacial tensions while improving computational complex-ity for large numbers of droplets. 
+
+Appendix C: Implementation of Concentration Dependent Mobility 
+
+In Fig. 3 (d), implementation of the concentration depen-dent mobility 
+
+αi j = C2 
+
+> i
+
+C2 
+
+> j
+
+, αii = −
+
+> N
+
+# ∑
+
+> j=1
+
+αi j , (C1) is performed following the approach of Zheng et al. (2021) 38 .The difference in approach is necessary to avoid spatial gradi-ents in αi j in the diffusive flux. Here, we set m = 0 in Eq. 40 and instead implement the right hand side of Eq. 3 by applying a source term to the LBE for distributions gi,k
+
+gi,k(x + ekδt ,t + δt ) − gi,k(x,t) = 
+
+− 1
+
+τg,i
+
+h
+
+gi,k(x,t) − geq i,k(x,t)
+
+i
+
++ δt
+
+
+
+1 − 12τg,i
+
+
+
+wkm∗ek · Gi,
+
+(C2) 
+
+Gi =
+
+> N
+
+# ∑
+
+> j=1
+
+αi j ∇(μ j + φ j + ξ j). (C3) The mobility is given by 
+
+M = δt c2 
+
+> s
+
+m∗(τg,i − 0.5), (C4) and we set m∗ = 10. 
+
+> 1
+
+Z. Zhu, F. Huang, C. Yang, T. Si, and R. X. Xu, ACS Applied Materials & Interfaces 11 , 40932 (2019). 
+
+> 2
+
+W. Wang, R. Xie, X.-J. Ju, T. Luo, L. Liu, D. A. Weitz, and L.-Y. Chu, Lab Chip 11 , 1587 (2011). 
+
+> 3
+
+T. Kamperman, V. D. Trikalitis, M. Karperien, C. W. Visser, and J. Leijten, ACS Applied Materials & Interfaces 10 , 23433 (2018). 
+
+> 4
+
+T. Jiang, Y. Jia, H. Sun, X. Deng, D. Tang, and Y. Ren, Micromachines (Basel) 11 (2020). 
+
+> 5
+
+W. Wang, B.-Y. Li, M.-J. Zhang, Y.-Y. Su, D.-W. Pan, Z. Liu, X.-J. Ju, R. Xie, Y. Faraj, and L.-Y. Chu, Chemical Engineering Journal 452 , 139277 (2023). 
+
+> 6
+
+J. Zhang, R. J. Coulston, S. T. Jones, J. Geng, O. A. Scherman, and C. Abell, Science 335 , 690 (2012). 
+
+> 7
+
+N. Wang, C. Semprebon, H. Liu, C. Zhang, and H. Kusumaatmaja, Journal of Fluid Mechanics 895 , A22 (2020). 
+
+> 8
+
+X. Zhang, H. Zhao, J. R. Panter, G. McHale, G. G. Wells, R. Ledesma-Aguilar, and H. Kusumaatmaja, Science Advances 11 , eadw6615 (2025). 
+
+> 9
+
+M. Pelizzari, G. McHale, S. Armstrong, H. Zhao, R. Ledesma-Aguilar, G. G. Wells, and H. Kusumaatmaja, Langmuir 39 , 15676 (2023). 
+
+> 10
+
+D. Paulssen, S. Hardt, and P. A. Levkin, ACS Applied Materials & Inter-faces 11 , 16130 (2019). 
+
+> 11
+
+D. Zwicker and L. Laan, Proceedings of the National Academy of Sciences 
+
+119 , e2201250119 (2022). 
+
+> 12
+
+W. M. Jacobs and D. Frenkel, The Journal of Chemical Physics 139 , 024108 (2013). 
+
+> 13
+
+W. M. Jacobs and D. Frenkel, Biophysical Journal 112 , 683 (2017). 
+
+> 14
+
+Y. Shin and C. P. Brangwynne, Science 357 , eaaf4382 (2017). 
+
+> 15
+
+G. R. Abraham, A. S. Chaderjian, A. B. N Nguyen, S. Wilken, and O. A. Saleh, Rep Prog Phys 87 (2024). 
+
+> 16
+
+G. Fabrini, N. Farag, S. P. Nuccio, S. Li, J. M. Stewart, A. A. Tang, R. Mc-Coy, R. M. Owens, P. W. K. Rothemund, E. Franco, M. Di Antonio, and L. Di Michele, Nature Nanotechnology 19 , 1665 (2024). 
+
+> 17
+
+A. S. Chaderjian, S. Wilken, and O. A. Saleh, Proceedings of the National Academy of Sciences 123 , e2523462123 (2026). 
+
+> 18
+
+J. Brackbill, D. Kothe, and C. Zemach, Journal of Computational Physics 
+
+100 , 335 (1992). 
+
+> 19
+
+M. Sussman, K. Smith, M. Hussaini, M. Ohta, and R. Zhi-Wei, Journal of Computational Physics 221 , 469 (2007). 
+
+> 20
+
+M. O. Abu-Al-Saud, S. Popinet, and H. A. Tchelepi, Journal of Computa-tional Physics 371 , 896 (2018). 
+
+> 21
+
+D. M. Anderson, G. B. McFadden, and A. A. Wheeler, Annual Review of Fluid Mechanics 30 , 139 (1998). 
+
+> 22
+
+F. Boyer and C. Lapuerta, Mathematical Modelling and Numerical Analysis 
+
+40 , 653 (2006). 
+
+> 23
+
+C. Semprebon, T. Krüger, and H. Kusumaatmaja, Phys. Rev. E 93 , 033305 (2016). 
+
+> 24
+
+F. Boyer and S. Minjeaud, Mathematical Models and Methods in Applied Sciences 24 , 2885 (2014). 
+
+> 25
+
+S. Dong, Journal of Computational Physics 361 , 1 (2018). 
+
+> 26
+
+T. Krueger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, and E. Viggen, The Lattice Boltzmann Method: Principles and Practice , Grad-uate Texts in Physics (Springer, 2016). 
+
+> 27
+
+S. Succi, The Lattice Boltzmann Equation for Fluid Dynamics and Beyond 
+
+(Oxford University Press, 2001). 
+
+> 28
+
+L. Biferale, P. Perlekar, M. Sbragaglia, and F. Toschi, Physical Review Let-ters 108 , 104502 (2012). 
+
+> 29
+
+G. Falcucci, G. Amati, P. Fanelli, V. K. Krastev, G. Polverino, M. Porfiri, and S. Succi, Nature 595 , 537 (2021). 
+
+> 30
+
+M. Wöhrwag, C. Semprebon, A. Mazloomi Moqaddam, I. Karlin, and H. Kusumaatmaja, Physical Review Letters 120 , 234501 (2018). 13 
+
+> 31
+
+A. Raeli, E. S. Borello, C. Serazio, L. E. Czelusniak, T. N. Bingert, M. J. Krause, and D. Viberti, Offshore Mediterranean Conference and Exhibi-tion, OMC Med Energy Conference and Exhibition , OMC (2025). 
+
+> 32
+
+A. Kummerländer, T. Bingert, S. Bock, F. Bukreev, D. Castroviejo, L. E. Czelusniak, D. Dapelo, C. Gaul, M. Dorn, L. Dorneles, J. Grafen, M. Grin-schewski, S. Ito, J. Jeßberger, F. Kaiser, D. Khazaeipoul, T. Krüger, A. Kumbhat, H. Kusumaatmaja, A. Nettekoven, A. Raeli, T. Riazantsev, M. Rennick, G. Prakash, F. Prinz, L. Sauterleute, M. Schecher, A. Schnei-der, Y. Shimojima, S. Simonis, P. Spelten, A. Tacques, and M. J. Krause, “Openlb release 1.9: Open source lattice boltzmann code,” (2025). 
+
+> 33
+
+M. Krause, A. Kummerländer, S. Avis, H. Kusumaatmaja, D. Dapelo, F. Klemens, M. Gaedtke, N. Hafen, A. Mink, R. Trunk, J. Marquardt, M. Maier, M. Haussmann, and S. Simonis, Computers & Mathematics with Applications 81 , 258 (2021). 
+
+> 34
+
+A. Lamura, G. Gonnella, and J. M. Yeomans, Europhysics Letters 45 , 314 (1999). 
+
+> 35
+
+R. Haghani Hassan Abadi, A. Fakhari, and M. H. Rahimian, Physical Re-view E 97 , 033312 (2018). 
+
+> 36
+
+A. Tiribocchi, M. Durve, M. Lauricella, A. Montessori, J.-M. Tucny, and S. Succi, Physics Reports 1105 , 1 (2025), lattice Boltzmann simulations for soft flowing matter. 
+
+> 37
+
+A. Montessori, M. Lauricella, N. Tirelli, and S. Succi, Journal of Fluid Mechanics 872 , 327–347 (2019). 
+
+> 38
+
+L. Zheng, S. Zheng, and Q. Zhai, Physica A: Statistical Mechanics and its Applications 574 , 126015 (2021). 
+
+> 39
+
+X. Yuan, B. Shi, C. Zhan, and Z. Chai, Physics of Fluids 34 , 023311 (2022). 
+
+> 40
+
+H.-J. Chung and R. J. Composto, Physical Review Letters 92 , 185704 (2004). 
+
+> 41
+
+H. Furukawa, Advances in Physics 34 , 703 (1985). 
+
+> 42
+
+A. J. Wagner and M. E. Cates, Europhysics Letters 56 , 556 (2001). 
+
+> 43
+
+A. J. Wagner and J. M. Yeomans, Physical Review Letters 80 , 1429 (1998). 
+
+> 44
+
+L. Ju, Z. Guo, B. Yan, and S. Sun, Physical Review E 109 , 045307 (2024). 
+
+> 45
+
+C. Zhang, Z. Guo, and L.-P. Wang, Physics of Fluids 34 , 012110 (2022). 
+
+> 46
+
+B. Postma and G. Silva, Physical Review E 102 , 063307 (2020). 
+
+> 47
+
+L. Zheng, S. Zheng, and Q. Zhai, Physical Review E 91 , 013309 (2015). 
+
+> 48
+
+T. Lee and L. Liu, Journal of Computational Physics 229 , 8045 (2010). 
+
+> 49
+
+A. J. C. Ladd, Journal of Fluid Mechanics 271 , 285–309 (1994). 
+
+> 50
+
+Q. Lou, Z. Guo, and B. Shi, Physical Review E 87 , 063301 (2013). 
+
+> 51
+
+J. S. Rowlinson and B. Widom, Molecular Theory of Capillarity (Clarendon Press, Oxford, UK, 1982). 
+
+> 52
+
+S. Mao, D. Kuldinow, M. P. Haataja, and A. Košmrlj, Soft Matter 15 , 1297 (2019). 
+
+> 53
+
+V. M. Kendon, M. E. Cates, I. Pagonabarraga, J.-C. Desplat, and P. Bladon, Journal of Fluid Mechanics 440 , 147–203 (2001). 
+
+> 54
+
+H. Furukawa, Physical Review E 61 , 1423 (2000). 
+
+> 55
+
+A. C. M. Shek and H. Kusumaatmaja, Soft Matter 18 , 5807 (2022). 
+
+> 56
+
+F. Schellenberger, J. Xie, N. Encinas, A. Hardy, M. Klapper, P. Papadopou-los, H.-J. Butt, and D. Vollmer, Soft Matter 11 , 7617 (2015). 
+
+> 57
+
+D. Bottone and S. Seeger, Langmuir 39 , 6160 (2023). 
+
+> 58
+
+A. Naga, M. Rennick, L. Hauer, W. S. Y. Wong, A. Sharifi-Aghili, D. Vollmer, and H. Kusumaatmaja, Communications Physics 7, 306 (2024). 
+
+> 59
+
+A. Keiser, L. Keiser, C. Clanet, and D. Quéré, Soft Matter 13 , 6981 (2017). 
+
+> 60
+
+D. Daniel, J. V. I. Timonen, R. Li, S. J. Velling, and J. Aizenberg, Nature Physics 13 , 1020 (2017). 
+
+> 61
+
+H. C. Shum, A. Bandyopadhyay, S. Bose, and D. A. Weitz, Chemistry of Materials 21 , 5548 (2009). 
+
+> 62
+
+Y. Jia, Y. Ren, L. Hou, W. Liu, X. Deng, and H. Jiang, Small 13 , 1702188 (2017). 
+
+> 63
+
+C. A. Lareau, F. M. Duarte, J. G. Chew, V. K. Kartha, Z. D. Burkett, A. S. Kohlway, D. Pokholok, M. J. Aryee, F. J. Steemers, R. Lebofsky, and J. D. Buenrostro, Nature Biotechnology 37 , 916 (2019). 
+
+> 64
+
+G. X. Y. Zheng, J. M. Terry, P. Belgrader, P. Ryvkin, Z. W. Bent, R. Wil-son, S. B. Ziraldo, T. D. Wheeler, G. P. McDermott, J. Zhu, M. T. Gre-gory, J. Shuga, L. Montesclaros, J. G. Underwood, D. A. Masquelier, S. Y. Nishimura, M. Schnall-Levin, P. W. Wyatt, C. M. Hindson, R. Bharadwaj, A. Wong, K. D. Ness, L. W. Beppu, H. J. Deeg, C. McFarland, K. R. Loeb, W. J. Valente, N. G. Ericson, E. A. Stevens, J. P. Radich, T. S. Mikkelsen, B. J. Hindson, and J. H. Bielas, Nature Communications 8, 14049 (2017). 
+
+> 65
+
+Y. Mai and A. Eisenberg, Chemical Society Reviews 41 , 5969 (2012). 
+
+> 66
+
+C. Lang, E. C. Lloyd, K. E. Matuszewski, Y. Xu, V. Ganesan, R. Huang, M. Kumar, and R. J. Hickey, Nature Nanotechnology 17 , 752 (2022). 
+
+> 67
+
+K.-V. Peinemann, V. Abetz, and P. F. W. Simon, Nature Materials 6, 992 (2007). 
+
+> 68
+
+I. Klojdová and C. Stathopoulos, Food Chemistry: X 16 , 100451 (2022). 
+
+> 69
+
+C. V. Kulkarni, Cosmetics 3 (2016). 
+
+> 70
+
+S. Dong, Journal of Computational Physics 338 , 21 (2017). 
+
+> 71
+
+R. Haghani Hassan Abadi, A. Fakhari, and M. H. Rahimian, Physical Re-view E 97 , 033312 (2018).
