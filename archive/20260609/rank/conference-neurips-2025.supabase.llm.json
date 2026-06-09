@@ -1,0 +1,555 @@
+{
+  "top_k": 200,
+  "generated_at": "2026-06-09T04:50:48.208896+00:00",
+  "papers": [
+    {
+      "id": "openreview-neurips-2025-cf4etwjy7n",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "Physics-Constrained Flow Matching: Sampling Generative Models with Hard Constraints",
+      "abstract": "Deep generative models have recently been applied to physical systems governed by partial differential equations (PDEs), offering scalable simulation and uncertainty-aware inference. However, enforcing physical constraints, such as conservation laws (linear and nonlinear) and physical consistencies, remains challenging. Existing methods often rely on soft penalties or architectural biases that fail to guarantee hard constraints. In this work, we propose Physics-Constrained Flow Matching (PCFM), a zero-shot inference framework that enforces arbitrary nonlinear constraints in pretrained flow-based generative models. PCFM continuously guides the sampling process through physics-based corrections applied to intermediate solution states, while remaining aligned with the learned flow and satisfying physical constraints. Empirically, PCFM outperforms both unconstrained and constrained baselines on a range of PDEs, including those with shocks, discontinuities, and sharp features, while ensuring exact constraint satisfaction at the final solution. Our method provides a flexible framework for enforcing hard constraints in both scientific and general-purpose generative models, especially in applications where constraint satisfaction is essential.",
+      "authors": [
+        "Utkarsh Utkarsh",
+        "Pengfei Cai",
+        "Alan Edelman",
+        "Rafael Gomez-Bombarelli",
+        "Christopher Vincent Rackauckas"
+      ],
+      "primary_category": "generative models",
+      "categories": [
+        "generative models",
+        "flow matching",
+        "scientific machine learning",
+        "hard constraints",
+        "conservation laws"
+      ],
+      "published": "2025-09-18T17:45:37.266+00:00",
+      "link": "https://openreview.net/forum?id=cf4etwjY7n",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-kqovgpom1s",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "Hybrid Boundary Physics-Informed Neural Networks for Solving Navier-Stokes Equations with Complex Boundary",
+      "abstract": "Physics-informed neural networks (PINN) have achieved notable success in solving partial differential equations (PDE), yet solving the Navier-Stokes equations (NSE) with complex boundary conditions remains a challenging task. In this paper, we introduce a novel Hybrid Boundary PINN (HB-PINN) method that combines a pretrained network for efficient initialization with a boundary-constrained mechanism. The HB-PINN method features a primary network focused on inner domain points and a distance metric network that enhances predictions at the boundaries, ensuring accurate solutions for both boundary and interior regions. Comprehensive experiments have been conducted on the NSE under complex boundary conditions, including the 2D cylinder wake flow and the 2D blocked cavity flow with a segmented inlet. The proposed method achieves state-of-the-art (SOTA) performance on these benchmark scenarios, demonstrating significantly improved accuracy over existing PINN-based approaches.",
+      "authors": [
+        "Chuyu Zhou",
+        "Tianyu Li",
+        "Chenxi Lan",
+        "Rongyu Du",
+        "Guoguo Xin",
+        "Wei Li",
+        "Guoqing Wang",
+        "Xun Liu",
+        "Hangzhou Yang"
+      ],
+      "primary_category": "Physics-informed neural networks",
+      "categories": [
+        "Physics-informed neural networks",
+        "Navier-Stokes equations",
+        "complex boundary conditions"
+      ],
+      "published": "2025-09-18T17:38:20.452+00:00",
+      "link": "https://openreview.net/forum?id=KQoVgPOM1S",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-hxfvnknt0n",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "Geometry Aware Operator Transformer as an efficient and accurate neural surrogate for PDEs on arbitrary domains",
+      "abstract": "The very challenging task of learning solution operators of PDEs on arbitrary domains accurately and efficiently is of vital importance to engineering and industrial simulations. Despite the existence of many operator learning algorithms to approximate such PDEs, we find that accurate models are not necessarily computationally efficient and vice versa. We address this issue by proposing a geometry aware operator transformer (GAOT) for learning PDEs on arbitrary domains. GAOT combines novel multiscale attentional graph neural operator encoders and decoders, together with geometry embeddings and (vision) transformer processors to accurately map information about the domain and the inputs into a robust approximation of the PDE solution. Multiple innovations in the implementation of GAOT also ensure computational efficiency and scalability. We demonstrate this significant gain in both accuracy and efficiency of GAOT over several baselines on a large number of learning tasks from a diverse set of PDEs, including achieving state of the art performance on three large scale three-dimensional industrial CFD datasets. Our project page for accessing the source code is available at https://camlab-ethz.github.io/GAOT.",
+      "authors": [
+        "Shizheng Wen",
+        "Arsh Kumbhat",
+        "Levi Lingsch",
+        "Sepehr Mousavi",
+        "Yizhou Zhao",
+        "Praveen Chandrashekar",
+        "Siddhartha Mishra"
+      ],
+      "primary_category": "Partial Differential Equations",
+      "categories": [
+        "Partial Differential Equations",
+        "Surrogates",
+        "AI for PDEs",
+        "Neural Operators",
+        "Transformers",
+        "Computational Efficiency",
+        "Scalability",
+        "Arbitrary Domains"
+      ],
+      "published": "2025-09-18T17:28:50.689+00:00",
+      "link": "https://openreview.net/forum?id=HXFvNkNt0n",
+      "pdf_url": null,
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-s3uk3lrfjy",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "INC: An Indirect Neural Corrector for Auto-Regressive Hybrid PDE Solvers",
+      "abstract": "When simulating partial differential equations, hybrid solvers combine coarse numerical solvers with learned correctors. They promise accelerated simulations while adhering to physical constraints. However, as shown in our theoretical framework, directly applying learned corrections to solver outputs leads to significant autoregressive errors, which originate from amplified perturbations that accumulate during long-term rollouts, especially in chaotic regimes. To overcome this, we propose the Indirect Neural Corrector ($\\mathrm{INC}$), which integrates learned corrections into the governing equations rather than applying direct state updates. Our key insight is that $\\mathrm{INC}$ reduces the error amplification on the order of $\\Delta t^{-1} + L$, where $\\Delta t$ is the timestep and $L$ the Lipschitz constant. At the same time, our framework poses no architectural requirements and integrates seamlessly with arbitrary neural networks and solvers. We test $\\mathrm{INC}$ in extensive benchmarks, covering numerous differentiable solvers, neural backbones, and test cases ranging from a 1D chaotic system to 3D turbulence. INC improves the long-term trajectory performance ($R^2$) by up to 158.7\\%, stabilizes blowups under aggressive  coarsening, and for complex 3D turbulence cases yields speed-ups of several orders of magnitude. INC thus enables stable, efficient PDE emulation with formal error reduction, paving the way for faster scientific and engineering simulations with reliable physics guarantees.",
+      "authors": [
+        "Hao Wei",
+        "Aleksandra Franz",
+        "Björn Malte List",
+        "Nils Thuerey"
+      ],
+      "primary_category": "machine learning for science",
+      "categories": [
+        "machine learning for science",
+        "hybrid PDE solvers",
+        "autoregressive error analysis",
+        "differentiable physics"
+      ],
+      "published": "2025-09-18T17:39:20.047+00:00",
+      "link": "https://openreview.net/forum?id=s3Uk3lrfjy",
+      "pdf_url": null,
+      "tags": [
+        "query:falling-film"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "CFD modeling of falling film heat transfer in vertical tubes",
+      "sim_scores": {
+        "openreview-neurips-2025-kqovgpom1s": {
+          "score": 0.0136986301369863,
+          "rank": 13
+        },
+        "openreview-neurips-2025-hxfvnknt0n": {
+          "score": 0.012195121951219513,
+          "rank": 22
+        },
+        "openreview-neurips-2025-cf4etwjy7n": {
+          "score": 0.009708737864077669,
+          "rank": 43
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-neurips-2025-cf4etwjy7n",
+          "score": 0.9586435070306036,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-kqovgpom1s",
+          "score": 0.578503688092729,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-hxfvnknt0n",
+          "score": 0.5495495495495496,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-s3uk3lrfjy",
+          "score": 0.32035835650293487,
+          "star_rating": 3
+        }
+      ]
+    },
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "Falling film evaporation and heat transfer in vertical tubes CFD",
+      "sim_scores": {
+        "openreview-neurips-2025-kqovgpom1s": {
+          "score": 0.013333333333333334,
+          "rank": 15
+        },
+        "openreview-neurips-2025-hxfvnknt0n": {
+          "score": 0.011627906976744186,
+          "rank": 26
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-neurips-2025-cf4etwjy7n",
+          "score": 0.9185999185999183,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-hxfvnknt0n",
+          "score": 0.578503688092729,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-kqovgpom1s",
+          "score": 0.5495495495495496,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-s3uk3lrfjy",
+          "score": 0.3668882557771445,
+          "star_rating": 3
+        }
+      ]
+    },
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics",
+      "sim_scores": {
+        "openreview-neurips-2025-kqovgpom1s": {
+          "score": 0.014705882352941176,
+          "rank": 8
+        },
+        "openreview-neurips-2025-hxfvnknt0n": {
+          "score": 0.012987012987012988,
+          "rank": 17
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-neurips-2025-kqovgpom1s",
+          "score": 0.9586435070306036,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-cf4etwjy7n",
+          "score": 0.9185999185999183,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-hxfvnknt0n",
+          "score": 0.578503688092729,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-s3uk3lrfjy",
+          "score": 0.4411571334648256,
+          "star_rating": 3
+        }
+      ]
+    },
+    {
+      "type": "intent_query",
+      "tag": "falling-film",
+      "paper_tag": "query:falling-film",
+      "query_text": "Numerical simulation of heat transfer in vertical falling film heat exchangers",
+      "sim_scores": {
+        "openreview-neurips-2025-kqovgpom1s": {
+          "score": 0.015384615384615385,
+          "rank": 5
+        },
+        "openreview-neurips-2025-hxfvnknt0n": {
+          "score": 0.013513513513513514,
+          "rank": 14
+        },
+        "openreview-neurips-2025-s3uk3lrfjy": {
+          "score": 0.01282051282051282,
+          "rank": 18
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-neurips-2025-cf4etwjy7n",
+          "score": 0.8422090729783037,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-hxfvnknt0n",
+          "score": 0.8057498057498057,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-s3uk3lrfjy",
+          "score": 0.702712746191007,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-kqovgpom1s",
+          "score": 0.46719946719946726,
+          "star_rating": 3
+        }
+      ]
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "falling film on vertical tube",
+      "sim_scores": {}
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "heat and mass transfer in falling film",
+      "sim_scores": {}
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "heat transfer in falling film",
+      "sim_scores": {}
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "liquid film thickness measurement",
+      "sim_scores": {}
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "multiphase flow CFD",
+      "sim_scores": {
+        "openreview-neurips-2025-kqovgpom1s": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "openreview-neurips-2025-cf4etwjy7n": {
+          "score": 0.0136986301369863,
+          "rank": 13
+        },
+        "openreview-neurips-2025-hxfvnknt0n": {
+          "score": 0.013333333333333334,
+          "rank": 15
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "two-phase flow",
+      "sim_scores": {}
+    },
+    {
+      "type": "keyword",
+      "tag": "falling-film",
+      "paper_tag": "keyword:falling-film",
+      "query_text": "two-phase flow simulation",
+      "sim_scores": {
+        "openreview-neurips-2025-cf4etwjy7n": {
+          "score": 0.015625,
+          "rank": 4
+        },
+        "openreview-neurips-2025-kqovgpom1s": {
+          "score": 0.01282051282051282,
+          "rank": 18
+        }
+      }
+    }
+  ],
+  "global_candidate_ids": [
+    "openreview-neurips-2025-uspciekk0y",
+    "openreview-neurips-2025-8t89byv781",
+    "openreview-neurips-2025-eziqkdf8m2",
+    "openreview-neurips-2025-4naw9mbtqq",
+    "openreview-neurips-2025-ug8krtngei",
+    "openreview-neurips-2025-ahekhff4oa",
+    "openreview-neurips-2025-f9aabpptfb",
+    "openreview-neurips-2025-qcftezc4x9",
+    "openreview-neurips-2025-kqovgpom1s",
+    "openreview-neurips-2025-bla5qx2sye",
+    "openreview-neurips-2025-isvaahgfsw",
+    "openreview-neurips-2025-yeq201u9am",
+    "openreview-neurips-2025-1esfejmubs",
+    "openreview-neurips-2025-ib0av2hphn",
+    "openreview-neurips-2025-rourpoa6pm",
+    "openreview-neurips-2025-6vodizmioy",
+    "openreview-neurips-2025-tfcxlp0jgo",
+    "openreview-neurips-2025-ztvk8xnffy",
+    "openreview-neurips-2025-awxrvm07zl",
+    "openreview-neurips-2025-wjhs0epjh7",
+    "openreview-neurips-2025-iqu63cyi3z",
+    "openreview-neurips-2025-u8aoixg1a4",
+    "openreview-neurips-2025-5bfo9i4kj1",
+    "openreview-neurips-2025-n30sfyprdd",
+    "openreview-neurips-2025-jhlblb6jpz",
+    "openreview-neurips-2025-x2u8esisdb",
+    "openreview-neurips-2025-skay3khkn2",
+    "openreview-neurips-2025-hwtvsl51ho",
+    "openreview-neurips-2025-cdebgwj6et",
+    "openreview-neurips-2025-mfbw0dlbfi",
+    "openreview-neurips-2025-4tp1suine5",
+    "openreview-neurips-2025-nmupdatzbh",
+    "openreview-neurips-2025-fbtgcefztk",
+    "openreview-neurips-2025-c0c943r6zj",
+    "openreview-neurips-2025-yxitkqjmpj",
+    "openreview-neurips-2025-hxfvnknt0n",
+    "openreview-neurips-2025-nlwhccs9dp",
+    "openreview-neurips-2025-mgjmpnzgqo",
+    "openreview-neurips-2025-ogc1qhaubj",
+    "openreview-neurips-2025-z5pd8ihp2q",
+    "openreview-neurips-2025-xgms1i0pdq",
+    "openreview-neurips-2025-byf7gvv0s0",
+    "openreview-neurips-2025-tdt6hf7jk5",
+    "openreview-neurips-2025-5xwyxupsll",
+    "openreview-neurips-2025-4jwus5hye1",
+    "openreview-neurips-2025-yt8v2qfv5w",
+    "openreview-neurips-2025-mykdd1wzdv",
+    "openreview-neurips-2025-btcloyrfyj",
+    "openreview-neurips-2025-rnbyxq9tow",
+    "openreview-neurips-2025-90qt3kvyae",
+    "openreview-neurips-2025-yeddfz9sgj",
+    "openreview-neurips-2025-noiiyik3hh",
+    "openreview-neurips-2025-feugq6aikr",
+    "openreview-neurips-2025-0r4yzkvt9j",
+    "openreview-neurips-2025-62tisv7pm3",
+    "openreview-neurips-2025-uyjcf4cwmc",
+    "openreview-neurips-2025-cf4etwjy7n",
+    "openreview-neurips-2025-sldyungwvu",
+    "openreview-neurips-2025-kz3w2a2y0e",
+    "openreview-neurips-2025-t9qndtvajx",
+    "openreview-neurips-2025-wztnoainz7",
+    "openreview-neurips-2025-znsr3waluo",
+    "openreview-neurips-2025-0suihptncp",
+    "openreview-neurips-2025-oawpraz4jj",
+    "openreview-neurips-2025-4mkiahbmgo",
+    "openreview-neurips-2025-zzlfhw4erp",
+    "openreview-neurips-2025-hvykiwfif8",
+    "openreview-neurips-2025-5ymzfufpfy",
+    "openreview-neurips-2025-3cinhxwcbr",
+    "openreview-neurips-2025-kqhzgtv9au",
+    "openreview-neurips-2025-gxgpjfjgmd",
+    "openreview-neurips-2025-zvqbnfwqkh",
+    "openreview-neurips-2025-o1mhvstfbq",
+    "openreview-neurips-2025-rvraxhcjc6",
+    "openreview-neurips-2025-crxzkxskow",
+    "openreview-neurips-2025-nosdt1fhpv",
+    "openreview-neurips-2025-krztgsqnk9",
+    "openreview-neurips-2025-0ijskicgkp",
+    "openreview-neurips-2025-irni27kaep",
+    "openreview-neurips-2025-bcpdjwshvv",
+    "openreview-neurips-2025-kmi7mbctul",
+    "openreview-neurips-2025-gv82iad70j",
+    "openreview-neurips-2025-idnw3bizcv",
+    "openreview-neurips-2025-rzjwktcidm",
+    "openreview-neurips-2025-zl4ifl17bu",
+    "openreview-neurips-2025-i64zlbup6u",
+    "openreview-neurips-2025-vmycnhs8av",
+    "openreview-neurips-2025-kwsptxxt2o",
+    "openreview-neurips-2025-rwwysbff2f",
+    "openreview-neurips-2025-gouaak6f2p",
+    "openreview-neurips-2025-qejosm3qks",
+    "openreview-neurips-2025-1nwqhiulqd",
+    "openreview-neurips-2025-pbvlbi6c30",
+    "openreview-neurips-2025-xvvebdprgi",
+    "openreview-neurips-2025-yslrxs9gcj",
+    "openreview-neurips-2025-j1qkrvjnvf",
+    "openreview-neurips-2025-sfsgkzu61h",
+    "openreview-neurips-2025-ybkddumtyn",
+    "openreview-neurips-2025-nhw8muiacl",
+    "openreview-neurips-2025-bascadmoqc",
+    "openreview-neurips-2025-hsf4gi5ien",
+    "openreview-neurips-2025-3jjeqnecsl",
+    "openreview-neurips-2025-ozul49u6p6",
+    "openreview-neurips-2025-r8n2h7hzqs",
+    "openreview-neurips-2025-2mdquk2qmi",
+    "openreview-neurips-2025-wfujqj5ubv",
+    "openreview-neurips-2025-enyvdnyhll",
+    "openreview-neurips-2025-sv1pbyc8zt",
+    "openreview-neurips-2025-gzsmywfhci",
+    "openreview-neurips-2025-pzhuescvco",
+    "openreview-neurips-2025-ii0t40q785",
+    "openreview-neurips-2025-r9mufuxg2o",
+    "openreview-neurips-2025-rbr2mmsbua",
+    "openreview-neurips-2025-s3uk3lrfjy",
+    "openreview-neurips-2025-cjrggdnfg2",
+    "openreview-neurips-2025-uwj4s7rmnr",
+    "openreview-neurips-2025-sbjagsdlhy",
+    "openreview-neurips-2025-6mmoy2ji8v",
+    "openreview-neurips-2025-g2uilebclf",
+    "openreview-neurips-2025-uvxqeigxfl"
+  ],
+  "global_pool_lane_top_k": 30,
+  "global_pool_limit": 120,
+  "global_pool_guaranteed_per_lane": 2,
+  "global_pool_effective_size": 120,
+  "reranked_at": "2026-06-09T04:51:57.199275+00:00",
+  "llm_ranked": [
+    {
+      "paper_id": "openreview-neurips-2025-kqovgpom1s",
+      "score": 5.0,
+      "evidence_en": "solves Navier-Stokes equations with complex boundaries, applicable to multiphase CFD",
+      "evidence_cn": "求解复杂边界纳维-斯托克斯方程，可用于多相流CFD",
+      "canonical_evidence": "求解复杂边界纳维-斯托克斯方程，可用于多相流CFD",
+      "tldr_en": "This paper proposes a hybrid boundary physics-informed neural network (HB-PINN) to solve Navier-Stokes equations with complex boundaries, enhancing both boundary and interior accuracy through a pretrained network and distance metric network, demonstrating potential for multiphase flow CFD.",
+      "tldr_cn": "针对复杂边界条件下纳维-斯托克斯方程求解这一难题，本文提出混合边界物理信息神经网络(HB-PINN)，结合预训练网络进行高效初始化和边界约束机制，通过主网络处理内部点、距离度量网络增强边界预测，从而准确求解边界和内部区域。实验表明，该方法在复杂边界条件下的NS方程求解上表现优越，为多相流CFD模拟提供了新的数值方法。",
+      "title_zh": "混合边界物理信息神经网络用于求解复杂边界条件下的纳维-斯托克斯方程",
+      "motivation_cn": "求解复杂边界条件下的纳维-斯托克斯方程是计算流体力学中的关键难题。",
+      "method_cn": "提出混合边界物理信息神经网络(HB-PINN)，结合预训练网络和距离度量网络以强化边界条件满足。",
+      "result_cn": "在若干复杂边界条件的NS方程上验证了方法，边界和内部预测精度均得到提升。",
+      "conclusion_cn": "HB-PINN为复杂边界流场计算提供了有效工具，可进一步推广至多相流模拟。",
+      "matched_requirement_id": "req-5",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-hxfvnknt0n",
+      "score": 4.0,
+      "evidence_en": "Neural operator for solving PDEs on arbitrary domains, applicable to multiphase flow CFD simulations",
+      "evidence_cn": "适用于任意域PDE求解的神经算子，可应用于多相流CFD模拟",
+      "canonical_evidence": "适用于任意域PDE求解的神经算子，可应用于多相流CFD模拟",
+      "tldr_en": "Proposes GAOT, a geometry-aware operator transformer that achieves efficient and accurate surrogate modeling of PDEs, which can accelerate multiphysics simulations such as falling film CFD.",
+      "tldr_cn": "该文提出几何感知算子Transformer (GAOT)，用于在任意域上高效准确地学习偏微分方程的解算子。GAOT结合多尺度图神经算子和Transformer，解决了现有模型精度与效率难以兼顾的问题，在工程模拟中具有广泛应用前景，尤其可用于加速降膜蒸发等多物理场CFD仿真。",
+      "title_zh": "几何感知算子Transformer：任意域上PDE的高效准确神经代理模型",
+      "motivation_cn": "当前PDE算子学习模型在工程仿真中难以同时实现高精度与低计算成本。",
+      "method_cn": "提出几何感知算子Transformer (GAOT)，融合多尺度注意力图神经算子编码器-解码器与Transformer处理器。",
+      "result_cn": "在多个基准PDE问题上，GAOT实现了兼具高精度与高效率的代理建模。",
+      "conclusion_cn": "GAOT为任意域上的偏微分方程快速求解提供了新范式，有望显著加速工业仿真设计。",
+      "matched_requirement_id": "req-5",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-cf4etwjy7n",
+      "score": 4.0,
+      "evidence_en": "Physics-constrained flow matching enforces conservation laws in generative PDE models, beneficial for CFD",
+      "evidence_cn": "物理约束流匹配在生成式PDE模型中强制执行守恒律，有助于CFD",
+      "canonical_evidence": "物理约束流匹配在生成式PDE模型中强制执行守恒律，有助于CFD",
+      "tldr_en": "Introduces PCFM, a zero-shot framework that enforces hard physical constraints in pretrained flow-based generative models, ensuring physics-consistent simulations for PDE-governed systems including potential falling film models.",
+      "tldr_cn": "该文提出物理约束流匹配(PCFM)，一种零样本推理框架，可在预训练的基于流的生成模型采样过程中持续施加任意非线性物理约束。与传统软惩罚不同，PCFM保证硬约束满足，为机械、热传导等由偏微分方程支配的系统提供了物理一致的生成模拟，对降膜换热等两相流CFD具有潜在价值。",
+      "title_zh": "物理约束流匹配：带硬约束的生成模型采样",
+      "motivation_cn": "现有生成式物理模型依赖软惩罚或架构偏差，无法保证质量及能量守恒等硬约束。",
+      "method_cn": "提出物理约束流匹配(PCFM)，在采样过程中通过基于物理的校正逐步引导，确保中间状态满足守恒律。",
+      "result_cn": "在多个PDE问题上实现了零样本且物理一致的模拟，优于仅靠软约束的方法。",
+      "conclusion_cn": "PCFM为需要严格物理一致性的科学模拟提供了新工具，有助于构建可靠的降膜蒸发仿真模型。",
+      "matched_requirement_id": "req-5",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-s3uk3lrfjy",
+      "score": 4.0,
+      "evidence_en": "Indirect neural corrector improves accuracy of hybrid PDE solvers, suitable for enhancing CFD simulations",
+      "evidence_cn": "间接神经校正器提高混合PDE求解器精度，适用于增强CFD模拟",
+      "canonical_evidence": "间接神经校正器提高混合PDE求解器精度，适用于增强CFD模拟",
+      "tldr_en": "Proposes INC, which integrates learned corrections into governing equations of hybrid solvers, reducing autoregressive error amplification and enabling more stable long-term PDE simulations for multiphase flow problems.",
+      "tldr_cn": "该文针对混合偏微分方程求解器中直接施加学习校正导致自回归误差激增的问题，提出间接神经校正器(INC)。INC将校正项融入控制方程而非直接修改状态量，理论上将误差放大倍数降低了Δt⁻¹ + L的量级，在长期演化模拟中表现出更高稳定性，对降膜蒸发等需要长时间积分的多物理场CFD仿真具有重要加速意义。",
+      "title_zh": "INC：自回归混合PDE求解器的间接神经校正器",
+      "motivation_cn": "混合求解器中直接的状态校正会放大扰动，导致长时间仿真误差指数增长。",
+      "method_cn": "提出间接神经校正器(INC)，将学习到的校正项注入控制方程的源项，避免直接状态更新。",
+      "result_cn": "在混沌和湍流示例中，INC显著降低了自回归误差，实现了稳定长期预测。",
+      "conclusion_cn": "INC为混合求解器提供了一种物理上更一致的校正方式，可推广至各类偏微分方程仿真加速。",
+      "matched_requirement_id": "req-5",
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD"
+    }
+  ],
+  "llm_ranked_at": "2026-06-09T04:57:17.149760+00:00",
+  "display_min_score": 4.0,
+  "pruned_at": "2026-06-09T04:57:17.188119+00:00"
+}
