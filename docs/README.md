@@ -6,44 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-05-11 ~ 2026-06-09
-- 运行时间：2026-06-09 05:03:27 UTC
+- 最新运行日期：2026-06-09
+- 运行时间：2026-06-09 21:49:50 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：2
-- 速读区：6
+- 本次总论文数：4
+- 精读区：0
+- 速读区：4
 
 ### 今日简报（AI）
-今日精读聚焦于液膜失稳，发现滑移会显著改变毛细孤波结构；速读则涵盖了工业混合与颗粒流的高效模拟。最值得关注的是滑移液膜的非线性边界条件，它解决了表面活性剂输运的守恒难题。建议后续读者追踪这两项液膜模型在精密涂布工艺中的落地潜力。
-- 详情：[/20260511-20260609/README](/20260511-20260609/README)
+今天速读了4篇多相流与流体动力学论文，重点关注界面模拟与参数敏感性。
+高密度和粘度比下的多相流激波模拟及气泡动力学值得一看，尤其在微通道沸腾传热中气泡列行为有直接应用。
+若对降阶模型感兴趣，可深挖主动子空间识别敏感参数的方法，帮助简化工程仿真。
+- 详情：[/202606/09/README](/202606/09/README)
 
 ### 精读区论文标签
-1. [Solutocapillary instability in slipping falling films](/20260511-20260609/2605.17519v1-solutocapillary-instability-in-slipping-falling-films)  
-   标签：评分：8.0/10、query:falling-film
-   evidence：研究滑移基底上具有溶质毛细（传质）效应的降落膜，与降膜传热传质直接相关
-2. [A conservation-consistent boundary condition for nonlinear models of soluble-surfactant-laden falling films](/20260511-20260609/2605.19427v1-a-conservation-consistent-boundary-condition-for-nonlinear-models-of-soluble-surfactant-laden-falling-films)  
-   标签：评分：8.0/10、query:falling-film
-   evidence：含表面活性剂的降膜模型，校正了非线性模拟中的质量守恒。
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [A Volume of Fluid Immersed Boundary Method for Industrial Polymer Mixing](/20260511-20260609/2605.11896v1-a-volume-of-fluid-immersed-boundary-method-for-industrial-polymer-mixing)  
+1. [Sharp-interface Simulations of Energetic Multiphase Flows with Large Density and Viscosity Ratios](/202606/09/2606.02467v1-sharp-interface-simulations-of-energetic-multiphase-flows-with-large-density-and-viscosity-ratios)  
    标签：评分：7.0/10、query:falling-film
-   evidence：开发了一种用于两相流模拟的流体体积浸入边界方法并在OpenFOAM中实现
-2. [Simulations of Particle-Laden Flows with Large Dispersed-Phase Size Disparities Using Highly Scalable Parallel Adaptive Methods](/20260511-20260609/2605.20565v1-simulations-of-particle-laden-flows-with-large-dispersed-phase-size-disparities-using-highly-scalable-parallel-adaptive-methods)  
-   标签：评分：7.0/10、query:falling-film
-   evidence：提出并行自适应格子玻尔兹曼-浸入边界框架，用于大尺度悬殊的多相流
-3. [CFDTwin: An open-source GUI and Python toolkit for POD-NN surrogate modeling of ANSYS Fluent simulations](/20260511-20260609/2605.27725v1-cfdtwin-an-open-source-gui-and-python-toolkit-for-pod-nn-surrogate-modeling-of-ansys-fluent-simulations)  
-   标签：评分：7.0/10、query:falling-film
-   evidence：用于CFD模拟的POD-NN代理建模开源工具包，可实现快速热流体设计
-4. [Analysis of a three-dimensional fluid flow in rotating cylinders](/20260511-20260609/2605.10305v1-analysis-of-a-three-dimensional-fluid-flow-in-rotating-cylinders)  
+   evidence：高密度比多相流的锐界面方法可应用于降膜模拟
+2. [Identifying sensitivity-dominant parameters via active subspaces in reduced-order modeling of fluid dynamics](/202606/09/2606.02315v1-identifying-sensitivity-dominant-parameters-via-active-subspaces-in-reduced-order-modeling-of-fluid-dynamics)  
    标签：评分：6.0/10、query:falling-film
-   evidence：利用润滑理论导出旋转圆筒内薄膜高度的偏微分方程，与降膜流体动力学相关
-5. [Intermittent two-phase flow in porous media: insights from pore-scale direct numerical simulation](/20260511-20260609/2605.11991v1-intermittent-two-phase-flow-in-porous-media-insights-from-pore-scale-direct-numerical-simulation)  
+   evidence：可迁移的CFD降阶建模框架，适用于降膜换热模拟
+3. [Dynamics of vapor bubble train in flow boiling heat transfer in microchannels](/202606/09/2606.03059v1-dynamics-of-vapor-bubble-train-in-flow-boiling-heat-transfer-in-microchannels)  
    标签：评分：6.0/10、query:falling-film
-   evidence：非混相两相流的DNS，界面捕捉方法可迁移至降膜模拟
-6. [N-Component Free Energy Lattice Boltzmann Method with Reduction Consistency and Global Momentum Conservation](/20260511-20260609/2605.22214v1-n-component-free-energy-lattice-boltzmann-method-with-reduction-consistency-and-global-momentum-conservation)  
+   evidence：微通道沸腾中蒸气气泡链的数值两相流模拟
+4. [An Energy-Stable Implicit Convex-Splitting BDF2 Scheme for the Cahn-Hilliard-Navier-Stokes Equations](/202606/09/2606.04204v1-an-energy-stable-implicit-convex-splitting-bdf2-scheme-for-the-cahn-hilliard-navier-stokes-equations)  
    标签：评分：6.0/10、query:falling-film
-   evidence：不混溶组分的多相LBM方法；可直接应用于多组分降膜CFD。
+   evidence：开发了用于Cahn-Hilliard-Navier-Stokes方程两相流模型的能量稳定BDF2格式
 
 
 <div class="dpr-home-promo-card">

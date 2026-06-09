@@ -1,0 +1,1752 @@
+Title: Identifying sensitivity-dominant parameters via active subspaces in reduced-order modeling of fluid dynamics
+
+URL Source: https://arxiv.org/pdf/2606.02315v1
+
+Published Time: Tue, 02 Jun 2026 03:13:32 GMT
+
+Number of Pages: 64
+
+Markdown Content:
+# Identifying sensitivity-dominant parameters via active subspaces in reduced-order modeling of fluid dynamics 
+
+## Dewu Yang 1, Rui Wang 1, Pengyu Lai 1, Junjie Wang 1,Feng Wang 1, Hui Xu 1* 
+
+1* School of Aeronautics and Astronautics, Shanghai Jiao Tong University, Shanghai, 200240, China. *Corresponding author(s). E-mail(s): dr.hxu@sjtu.edu.cn; 
+
+Abstract 
+
+Reduced-order models (ROMs) are widely employed to describe complex system dynamics when simulations with full-order models (FOMs) are computation-ally prohibitive. This study presents POD–AS–PRS, a novel model-reduction framework based on the active subspaces (AS) technique, which performs dimen-sionality reduction in both the state and parameter spaces, enabling efficient and high-fidelity approximations of quantities of interest (QoI). The approach employs proper orthogonal decomposition (POD) to extract low-dimensional coefficients from computational fluid dynamics (CFD) snapshots, which are inputs to a residual neural network (ResNet) with linear layers to learn their non-linear mapping to QoI. Reverse-mode automatic differentiation (AD) is utilized to compute gradients with respect to the coefficients, enabling AS analysis to identify influential modes by shifting the analysis to the POD coefficient space, thereby achieving a dual-stage dimensionality reduction driven by QoI sensitiv-ity rather than modal energy. A surrogate model is subsequently constructed using a polynomial response surface (PRS) based on AS-derived active variables, retaining only the highly influential POD coefficients to ensure accurate and effi-cient QoI reconstruction. The framework is validated on periodic and chaotic bluff-body flows, demonstrating high accuracy with few influential parameters, while AD-based gradients achieve a two-order-of-magnitude speed-up over finite-difference approximations. Sensitivity analysis further reveals that the influential coefficients are not necessarily proportional to modal energy, highlighting the critical flow structures. Consequently, POD–AS–PRS identifies a low-dimensional manifold of sensitivity-dominant parameters that govern the QoI, elucidating 
+
+1 
+
+> arXiv:2606.02315v1 [physics.flu-dyn] 1 Jun 2026 the essential flow structures and their coupling with control parameters, thereby enabling efficient and accurate QoI reconstruction.
+> Keywords: Active subspaces, Sensitivity analysis, Reduced order modeling
+
+# 1 Introduction 
+
+High-fidelity computational fluid dynamics (CFD) plays an indispensable role in engi-neering applications for the analysis and design of complex aerodynamic and turbulent flow systems [1–3]. However, the curse of dimensionality in parametric studies imposes a prohibitive computational burden [4, 5], rendering direct high-fidelity simulations impractical for real-time analysis, design optimization, and uncertainty quantification (UQ) [6–8]. To reduce these costs, reduced-order models (ROMs) have emerged as a prevalent strategy. In this context, there is a growing preference for non-intrusive 
+
+approaches which rely solely on simulation data [9, 10] and avoid the detailed knowl-edge of governing equations required by traditional intrusive methods [11–13]. Among these non-intrusive techniques, proper orthogonal decomposition (POD) is a power-ful tool for state-space reduction [14], capable of compressing complex flow fields into an optimal set of orthogonal modes based on energy content [15, 16]. Nevertheless, a critical limitation remains: POD is kinematic in nature and does not inherently reveal the underlying dynamics [17]. Consequently, interpreting individual modes and their influence on specific quantities of interest (QoI) can be challenging [18]. In particular, the contribution of each mode to integral quantities such as aerodynamic forces is not directly evident [17]. To overcome these limitations, it is advantageous to exploit low-dimensional structures in the parameter space—where the QoI varies predominantly along a few dominant directions. To identify and exploit these crucial low-dimensional structures in the input space, we turn to the active subspace (AS) method [19–21]. AS provides a rigorous, gradient-based framework for global sensitivity analysis by determining the directions of maximal output variation, thus linking input changes directly to the most influen-tial changes in the QoI. Specifically, AS analysis computes the second-moment matrix of the model’s gradient with respect to input parameters, and its eigen-decomposition identifies the dominant eigenvectors, or active directions, along which the output exhibits the largest variance [20, 22, 23]. Projecting the input space onto these low-dimensional active directions captures the principal sensitivity structure of the system, which has been successfully leveraged in engineering analysis [24–26] and Bayesian inverse problems [27]. However, in complex fluid dynamics systems, evaluating high-dimensional gradients remains computationally expensive, which limits the direct applicability of traditional AS analysis for large-scale or highly nonlinear models. Once the active subspace is identified, the input space can be projected onto a reduced set of active variables , each representing a linear combination of input param-eters. This projection mitigates the curse of dimensionality in surrogate modeling. Response surfaces (RS) are then constructed to approximate the QoI as a function of these active variables, using limited evaluations of the underlying model. Such 2surrogate models have proven successful in forward [28, 29] and inverse UQ prob-lems [30–32], as well as in optimization [33, 34]. However, most RS techniques still suffer from exponential scaling with the number of inputs. A common remedy is to perform global sensitivity analysis [20] to identify and retain only the most influen-tial parameters. Local sensitivity methods are inexpensive but unreliable across wide parameter domains, whereas global approaches, such as AS, provide robust measures of variability across the entire input space, capturing nonlinear interactions [35]. Despite its potential, there is a notable paucity of research on integrating POD with AS for reduced-order modeling. Furthermore, the few existing methodologies [22, 36] are subject to intrinsic limitations. Typically, such approaches employ AS strictly as a preprocessing tool to reduce the dimensionality of the physical or geometric parameter space. In this conventional context, AS serves as an ancillary tool for input-parameter reduction to support subsequent field reconstruction (e.g., via POD interpolation (PODI) or POD-Galerkin projection), without directly informing the selection of the reduced-order basis. Departing from this convention, the present work establishes a novel POD–AS integration paradigm. The core innovation lies in shift-ing the application of AS from the physical input space to the POD coefficient space, thereby enabling QoI-driven sensitivity analysis for modal screening. The objective is to identify the specific linear combinations of POD coefficients that dominate the variations of a targeted QoI. Empowered by efficient gradient computation via neural-network surrogates and reverse-mode AD, this approach allows for a QoI-oriented truncation strategy: POD modes are retained based on their sensitivity impact on the QoI, rather than their energy content. Consequently, the proposed POD–AS–PRS framework offers a gradient-informed, dual-stage dimensionality reduction methodol-ogy, uniquely integrating state-space compression with AS-driven analysis in the latent coefficient space. It should be noted that a direct performance comparison with conventional ROM frameworks is not appropriate in the present context, since the objectives and evalua-tion criteria are fundamentally different. Traditional ROM methods aim at minimizing full-field reconstruction or surrogate prediction errors in the state space, whereas the proposed framework is designed for identifying and interpreting the most influential modal directions governing QoI variations and enabling accurate QoI reconstruction from limited training samples, rather than for improving flow-field state reconstruc-tion performance. Therefore, standard ROM benchmarking metrics based on field-level reconstruction errors do not provide a meaningful basis for comparison. Instead, the effectiveness of the present methodology is demonstrated through sensitivity consis-tency, stability of AS eigenspectra, and surrogate reconstruction accuracy for the targeted QoI, which constitute the appropriate validation measures for the objectives of this study. By performing simultaneous reductions in both the state and parameter spaces, the framework enables the identification of sensitivity-dominant POD coefficients that drive the variation of the QoI. This facilitates the construction of a scalable and interpretable surrogate model based on the identified active variables. The integrated POD–AS paradigm provides not only enhanced computational efficiency but also 3improved physical insight into the flow structures that dominate QoI sensitivity, and is suitable for parametric studies, design optimization, and UQ in complex fluid systems. The remainder of this paper is organized as follows. Section 2 presents the methodology, including POD decomposition, ResNet training, AS analysis, and response surface construction. Section 3 details the algorithmic implementation of the POD–AS–PRS framework. Section 4 demonstrates its application to incompress-ible Navier–Stokes flows, including periodic cylinder and chaotic airfoil configurations. Finally, Section 5 summarizes the findings and outlines future research directions. 
+
+# 2 Mathematical preliminaries 
+
+This section provides the foundational mathematical tools underpinning the proposed framework. We begin this section by introducing the POD method that extracts low-dimensional representations of high-dimensional flow fields and provides the basis for state-space reduction, followed by a description of the ResNet architecture for nonlin-ear mapping from POD coefficients while enabling efficient gradient computation via backpropagation. The AS method for gradient-based parameter-space dimensionality reduction is formulated in Section 2.3, before presenting the construction of response surfaces for efficient surrogate modeling in Section 2.4. 
+
+## 2.1 Proper orthogonal decomposition 
+
+The purpose of the POD method is to extract an energy-optimal orthogonal basis from high-dimensional snapshot data in the least-squares sense. Consider a set of solution snapshots representing data at different times tk and spatial points xi, sampled uni-formly with temporal discretization {tk = ( k − 1)∆ t}nt
+
+> k=1
+
+, where ∆ t is the time step. Spatially, the data is defined on a regular Cartesian grid with nx × ny . For matrix representation, these spatial points are mapped to a single linear index i ∈ [1 , . . . , n s], where ns = nx × ny is the total number of spatial degrees of freedom. These snapshots are organized into a matrix S ∈ Rnt×ns . First, the snapshot matrix is mean-centered by subtracting its mean vector, ˜S = S − ¯S, (1) where ¯S ∈ R1×ns is the mean vector. Then, performing singular value decomposition (SVD) [37], ˜S = ΨΣΦ T , (2) where Ψ = [ ψ1, . . . , ψr( ˜S)] ∈ Cnt×r( ˜S) and Φ = [ ϕ1, . . . , ϕr( ˜S)] ∈ Cns×r( ˜S) collect the orthonormal temporal and spatial modes, respectively, and Σ = diag( σ1, . . . , σ r( ˜S))contains the corresponding singular values, with r( ˜S) = min( nt, n s) being the rank of ˜S.The temporal basis matrix Ψ and the corresponding matrix of POD coefficients (modal amplitudes) A are obtained through the relationship: 
+
+ΨΣ = ˜S(ΦT )−1 = A, which implies Ψ = AΣ−1, (3) 4where σr = ∥Ar∥2 and Ar denotes r-th column of the matrix A.The spatial modes Φ constitute the POD basis, providing the best rank-ˆ r approx-imation of ˜S in the least-squares sense. As established by [38], for a low-rank approximation, the corresponding approximation error, quantified by the Frobenius norm | · | F , is directly related to the singular values σi:
+
+∥ ˜S − ˆΨ ˆΨT ˜S∥2 
+
+> F
+
+=
+
+> r( ˜S)
+
+X
+
+> i=ˆ r+1
+
+σ2 
+
+> i
+
+, (4) where ˆΨ ∈ Cnt×ˆr contains of the first ˆ r columns of Ψ. This relationship explicitly demonstrates that the singular values σi quantify both mode energy and truncation error. The error decays to zero as ˆ r → r( ˜S), ensuring the strongest possible conver-gence. If the snapshot matrix ˜S captures the dynamics of the parametrized problem adequately, the decay of singular values serves as a surrogate for the Kolmogorov 
+
+m-width. Many problems exhibit exponential singular value decay, enabling accurate approximations in a low-dimensional linear reduced space. 
+
+## 2.2 Residual neural network with linear layers 
+
+In order to address the challenge of rapidly and accurately approximating the complex, nonlinear mapping between the input POD coefficients and the QoI in fluid dynam-ics, a deep ResNet architecture is employed. This framework is specifically chosen for its ability to mitigate the vanishing gradient problem inherent in deep neural net-works. Furthermore, the inherent differentiability of the network, facilitated by skip connections that ensure highly stable backpropagation, allows for the precise and com-putationally efficient calculation of the QoI gradient with respect to the input POD coefficients via AD. By utilizing the ResNet as a differentiable bridge, we eliminate the need for an explicit analytical formulation of the flow physics, thereby enabling the AD engine to rapidly provide the gradient information required for the subsequent active subspace identification. This architectural advantage leads to faster conver-gence, enhancing the model’s capacity to learn and approximate intricate functional relationships with high fidelity, ensuring a robust and efficient approximation of the QoI. It is important to emphasize that in this work, the deep ResNet architecture is employed not as a standalone predictive model, but strictly as a differentiable sur-rogate to facilitate the efficient computation of gradients via AD within the training distribution. 
+
+2.2.1 Network architecture 
+
+The canonical ResNet architecture, originally designed for image processing tasks, employs residual blocks constructed around convolutional operations [39]. In its stan-dard configuration, each residual block contains two sequential 3 × 3 convolutional layers, each followed by batch normalization (BN) and a Rectified Linear Unit (ReLU) activation function. A fundamental characteristic of this architecture is the identity skip connection, which performs an element-wise addition of the block’s input to the 5(a)     
+
+> 3×3 Conv
+> Batch norm
+> ReLU
+> 3×3 Conv
+> Batch norm
+
+# ⊕  
+
+> F(a) + a
+> ReLU
+> a
+> F(a)a
+> (identity)
+> (b)
+> FC
+> Batch norm
+> ReLU
+> FC
+> Batch norm
+
+# ⊕  
+
+> F(a) + a
+> ReLU
+> a
+> F(a)a
+> (identity)
+
+Fig. 1 : In a convolutional residual block (a), the portion within the dotted-line box needs to learn the residual mapping, making the identity mapping easier to learn. In the fully connected residual block (b), which is a variant used in our framework, the convolutional layers are replaced with fully connected layers to adapt to the input. output of the second convolutional layer, after which a final ReLU activation is applied. This structural formulation transforms the learning objective from approximating a complete transformation H(a) to learning a residual function F(a) = H(a) − a,thereby simplifying the optimization landscape and promoting more effective training of deep networks. In the present context, the input data consists of one-dimensional vectors of POD coefficients, rather than the multi-channel image data for which convolutional net-works are naturally suited. Consequently, we adapt the architecture by replacing the convolutional layers with fully connected (FC) linear layers. This modification pre-serves the essential residual learning paradigm while accommodating the structural characteristics of the input data. As schematically illustrated in Fig. 1, the conven-tional convolutional residual block is reconfigured into its fully-connected counterpart. Within this formulation, F(a) represents the residual mapping learned by the two lin-ear layers within the block, and a = [ a1, . . . , a m]T ∈ Rm denotes the input vector of POD coefficients extracted from a vorticity field, where m corresponds to the input dimension. The identity shortcut connection enables the direct summation of the input 
+
+a with the output of the residual mapping, producing the block output F(a) + a. This mechanism allows the network to focus on learning deviations from the identity map-ping, which has been demonstrated to enhance training stability and performance in deep architectures. The implemented ResNet variant is designed with a flexible architecture, compris-ing a configurable number of fully connected residual blocks whose depth and width are determined according to the complexity of the target task and the characteristics of the dataset. The number of hidden units per layer is a tunable hyperparameter; a default configuration of 128 hidden units is adopted in this study. The network accepts 6an input dimension equal to the number of retained POD modes and outputs a single scalar prediction corresponding to the QoI. Training is performed by minimizing the mean squared error (MSE) loss using the 
+
+Adam optimizer with an initial learning rate of 1 × 10 −3. To accelerate convergence and mitigate overfitting, a ReduceLRonPlateau learning rate scheduler is employed. This strategy halves the learning rate if the validation loss does not improve by at least 1 × 10 −4 over 10 consecutive epochs, and was found to converge faster while achiev-ing comparable or superior validation-loss performance compared to OneCycleLR [40]. Additionally, an early stopping mechanism is applied to prevent unnecessary compu-tation, halting training and restoring the model weights associated with the minimum validation loss if no significant improvement is observed within a predefined number of epochs. By exploiting the residual learning paradigm, the network effectively addresses the vanishing-gradient problem that often impedes the training of deep architectures, thereby enabling robust and efficient learning of complex nonlinear mappings between the POD coefficient inputs and the target QoI without reliance on explicit theoretical formulations or analytical expressions. This capability makes the framework particu-larly well-suited for reduced-order modeling of fluid dynamics systems. By enabling the accurate prediction of key QoI, such as drag or lift, directly from the POD coefficients without reconstructing the full-order flow field, the proposed approach facilitates real-time inference and comprehensive exploration of high-dimensional parameter spaces while significantly reducing overall computational cost. 
+
+2.2.2 Gradient approximation via reverse-mode automatic differentiation 
+
+We propose a systematic framework for computing gradients of the QoI with respect to POD coefficients in fluid dynamics simulations, leveraging reverse-mode AD as implemented in PyTorch [41]. This framework addresses the limitations of conventional numerical differentiation techniques in high-dimensional settings. We abstractly represent the map from inputs to the QoI by a function f : X → R,where X ⊆ Rm denotes the bounded input domain of interest and f corresponds to the ResNet output. A probability density ρ(x) that is strictly positive for x ∈ X and zero otherwise. We further assume that ρ and X are defined such that the components of x are independent, have zero mean, and are similarly scaled (e.g., by range or variance). This normalization, achieved through rotation, shifting, or scaling, removes units and ensures each input contributes equally to parameter studies. For simplicity, we treat f as incorporating any necessary transformations to map the normalized x
+
+to the simulation’s input range. The primary objective is to compute the gradient ∇xf , which characterizes the sensitivities of the QoI with respect to the POD coefficients. The function f is for-mulated as a composition comprising an initial projection layer, l residual blocks, followed by a final linear layer that produces the scalar output. Mathematically, this gradient corresponds to the Jacobian matrix that encodes sensitivities propagated through the network. Reverse-mode AD is employed for its efficiency and scalability. It enables the precise and efficient evaluation of this Jacobian for the scalar-valued 7QoI by performing only a single forward and backward pass through the network. In contrast, forward-mode AD requires m forward passes for an m-dimensional input, which is computationally prohibitive for large m [42]. Consequently, reverse-mode AD exhibits scalability that is effectively independent of the input dimension, with a computational complexity at most four times that of evaluating f . This makes it par-ticularly efficient for scalar-valued outputs from high-dimensional inputs. Subsequent numerical experiments confirm that gradients computed via reverse-mode AD agree with FD approximations to machine precision, while avoiding the latter’s inherent drawbacks, such as sensitivity to step-size selection and the linearly scaling computa-tional cost with respect to m. Although computation time in practice increases with the number of input samples, batch size, or network depth due to memory usage and matrix operations, reverse-mode AD provides both high accuracy and computa-tional efficiency, making it particularly suitable for high-dimensional POD inputs in gradient-based analyses. These results substantiate the suitability of reverse-mode AD for high-dimensional sensitivity analysis within the proposed ResNet-based reduced-order modeling framework. A detailed derivation, including the Jacobian formulation and adjoint propagation, is provided in Appendix A. The calculated gradient, ∇xf , is the fundamental quantity for subsequent analy-sis of parameter sensitivities. For the subsequent rigorous mathematical treatment of this sensitivity analysis, it is necessary to explicitly define the properties of the func-tion f (x). Assuming the function f (x) is differentiable and Lipschitz continuous with constant L, the gradient is oriented as a column m-vector, and Lipschitz continu-ity implies that the gradient’s norm is bounded. Consequently, the gradient obtained through reverse-mode AD can be written as: 
+
+∇xf (x) = 
+
+ ∂f (x)
+
+∂x 1
+
+, · · · , ∂f (x)
+
+∂x m
+
+T
+
+, ∥∇ xf (x)∥ ≤ L, ∀x ∈ X , (5) where ∥ · ∥ is the standard Euclidean norm. 
+
+## 2.3 Active subspace 
+
+To overcome the challenges of efficiently and effectively analyzing parameter sensitivi-ties in the high-dimensional input space of POD coefficients, the methodology of AS is employed. AS constitutes an efficient and systematic approach for functional analysis and dimension reduction, designed to identify a low-dimensional subspace of the input parameter space in which the function of interest exhibits the most significant varia-tion. This methodology provides a principled framework for reducing dimensionality while retaining the essential features of the underlying mapping. Unlike conventional approaches that select a subset of input variables based solely on their individual importance, AS identifies a set of important directions within the entire input space. Each direction is defined by a set of weights that form a linear combination of the inputs. These directions are obtained as the leading eigenvectors of the uncentered covariance matrix of the function gradients with respect to the inputs. If the function’s output remains invariant as the inputs vary along a specific direction, that direction can be neglected in the reduced analysis without significant loss of accuracy [21]. By 8projecting the high-dimensional input space onto this active subspace, one obtains a reduced representation that preserves the dominant sensitivities of the function, thereby enabling efficient parameter studies and reduced-order modeling. 
+
+2.3.1 Computing the active subspace 
+
+Consider a matrix, C, defined as the average of the outer product of the gradient with itself, and the matrix can be approximated using sample-based estimation: 
+
+C = E
+
+h
+
+(∇xf (x)) ( ∇xf (x)) T i
+
+=
+
+Z
+
+(∇xf (x)) ( ∇xf (x)) T ρd x, (6) where f (x) is a sufficiently smooth function such that the matrix C exists (i.e., the gradient’s partial derivatives are integrable), and E[·] is the expected value. 
+
+C can be interpreted as the uncentered covariance matrix of the gradient vector. The eigendecomposition of the resulting symmetric positive definite matrix is then performed 
+
+C = W ΛW T , Λ = diag( λ1, · · · , λ m), λ1 ≥ · · · ≥ λm ≥ 0, (7) where W includes all orthogonal eigenvectors and Λ are the eigenvalues. All the eigen-values are nonnegative because C is positive semidefinite. The relationship between the gradient of f (x) and the eigendecomposition of C is rigorously quantified as fol-lows: the mean-squared directional derivative of f (x) with respect to the eigenvector 
+
+wi, where wi represents an individual orthogonal eigenvector from the set W , equals the corresponding eigenvalue [21] 
+
+E[(( ∇xf (x)) T wi)2] = 
+
+Z 
+
+(∇xf (x)) T wi
+
+2
+
+ρd x = λi, i = 1 , · · · , m. (8) as proven by the definition of C. If the smallest eigenvalue λm is exactly zero, then the mean-squared change in f (x) along the eigenvectors wm is zero. Since f (x) is continuous, the directional derivative ( ∇xf (x)) T wm is zero everywhere in the domain 
+
+X . In other words, f (x) is always constant along the direction defined by wm. Given a point x1 ∈ X , choose a scalar z such that x1 + zwm = x2 ∈ X . Then f (x1) = f (x2), which implies that the value of f (x) is invariant with respect to z. This is information that we can exploit for dimension reduction. One can split the matrix Λ and W into two parts, 
+
+Λ =
+
+Λ1
+
+Λ2
+
+
+
+, W = [ W 1 W 2] , (9) where Λ1 = diag( λ1, · · · , λ n) with n < m , and W 1 ∈ Rm×n contains the first n
+
+eigenvectors.The rotated coordinates y and z are defined by 
+
+y = W T 
+
+> 1
+
+x ∈ Rn, z = W T 
+
+> 2
+
+x ∈ Rm−n, (10) 9which are the active variables and inactive variables , respectively. Any x ∈ Rm can be expressed in terms of y and z,
+
+x = W W T
+
+| {z }
+
+> I
+
+x = W 1W T 
+
+> 1
+
+x + W 2W T 
+
+> 2
+
+x = W 1y + W 2z. (11) Then we can compute the gradient of f (x) with respect to the decomposed variables 
+
+y and z, where f (x) = f (W 1y + W 2z). Applying the chain rule, we obtain: 
+
+∇yf (x) = ∇yf (W 1y + W 2z) = W T 
+
+> 1
+
+∇xf (W 1y + W 2z) = W T 
+
+> 1
+
+∇xf (x),
+
+∇zf (x) = ∇zf (W 1y + W 2z) = W T 
+
+> 2
+
+∇xf (W 1y + W 2z) = W T 
+
+> 2
+
+∇xf (x). (12) This decomposition reveals that f (x) varies more on average along the direc-tions defined by the columns of W 1 than directions defined by the columns of W 2.Following [21], this variation is quantified as: 
+
+E
+
+h
+
+(∇yf (x)) T (∇yf (x)) 
+
+i
+
+=
+
+Z
+
+(∇yf (x)) T (∇yf (x)) ρdx = λ1 + · · · + λn,
+
+E
+
+h
+
+(∇zf (x)) T (∇zf (x)) 
+
+i
+
+=
+
+Z
+
+(∇zf (x)) T (∇zf (x)) ρdx = λn+1 + · · · + λm,
+
+(13) where the average inner product of the gradient with itself to the eigenvalues of C.The active subspace is defined as the subspace spanned by the eigenvectors in W 1,while the inactive subspace is spanned by the remaining eigenvectors in W 2. Eq. (13) indicates that minuscule perturbations in the active variables y produce larger changes in f than equivalent perturbations in the inactive variables z. In other words, when 
+
+λn+1 = · · · = λm = 0, ∇zf (x) is zero everywhere, i.e., f (x) is z-invariant. The z-invariant functions have both linear contours and linear isoclines [20]. The gradient 
+
+∇zf (x) being zero everywhere in X implies that f (x1) = f (x2). To show that the gradients are equal, assume that x1 and x2 are in the interior of X . Then for arbitrary 
+
+c ∈ Rm, define 
+
+x′ 
+
+> 1
+
+= x1 + εc, x′ 
+
+> 2
+
+= x2 + εc, (14) where ε > 0 is chosen so that x′ 
+
+> 1
+
+and x′ 
+
+> 2
+
+are in X . Note that W T 
+
+> 1
+
+x′ 
+
+> 1
+
+= W T 
+
+> 2
+
+x′ 
+
+> 2
+
+so 
+
+f (x′
+
+> 1
+
+) = f (x′
+
+> 2
+
+). Then 
+
+cT (∇xf (x1) − ∇ xf (x2)) = lim 
+
+> ε→0
+
+1
+
+ε [( f (x′
+
+> 1
+
+) − f (x1)) − (f (x′
+
+> 2
+
+) − f (x2))] = 0 . (15) Simple limiting arguments can be used to extend these results to x1 or x2 on the boundary of X .
+
+2.3.2 Determination of the active subspace dimension 
+
+The identification of an active subspace requires estimation of the eigenpairs Λ and W ,followed by an analysis of the corresponding eigenvalues to assess their significance. 10 For problems with relatively low input dimensionality m, high-order numerical inte-gration schemes, such as tensor-product Gauss–Legendre quadrature, can be employed to accurately approximate the covariance matrix C. However, as m increases, the computational cost of direct numerical integration grows prohibitively, rendering it impractical for high-dimensional settings. In such cases, the covariance matrix is approximated via a sample average over M gradient evaluations: 
+
+C ≈ 1
+
+M
+
+> M
+
+X
+
+> i=1
+
+(∇xf (xi)) ( ∇xf (xi)) T = ˆW ˆΛ ˆW T
+
+, (16) where {xi}Mi=1 denotes the set of input samples. Here, ˆW and ˆΛ represent the estimated eigenvectors and eigenvalues of C, respectively. The magnitude of the eigen-values and the gaps between them in ˆΛ indicate the dimensionality of the active subspace, thereby guiding the subsequent reduction of the input parameter space. The dimension of the active subspace can be determined a priori for a given param-eter study, such as an n-dimensional regression, or selected to satisfy a prescribed approximation accuracy defined by a tolerance ϵ. This criterion can be formalized in terms of minimizing the residual energy associated with ridge approximation [21]: 
+
+Eρ
+
+h
+
+∥f (x) − Eρ
+
+h
+
+f | W T 
+
+> 1
+
+x
+
+i
+
+∥22
+
+i
+
+≤
+
+> m
+
+X
+
+> i=n+1
+
+λi ≤ ϵ2, (17) where Eρ[·] denotes the expectation with respect to the input density ρ, and λi
+
+are the eigenvalues of the uncentered covariance matrix C. The first inequality is a direct consequence of the properties of conditional expectations, reflecting the error incurred when restricting the function to the identified subspace. The second inequality bounds the tail sum of the eigenvalues via Poincar´ e-type inequalities [43] or alter-native estimates, thereby providing a rigorous measure of the fidelity of the reduced representation. To quantify the approximation error, consider the distance between the sub-space defined by the range of W 1 and the subspace defined by the range of ˆW 1.Following [44], the distance between subspaces is defined as 
+
+ϵ = W 1W T 
+
+> 1
+
+− ˆW 1 ˆW T 
+
+> 1
+
+= W T 
+
+> 1
+
+ˆW 2 ≤ 4λ1ωλn − λn+1 
+
+, (18) where ω ∈ (0 , (λn − λn+1 )/(5 λ1)) bounds the relative discretization error in approx-imating C via the sample average, assuming sufficient samples M . This bound highlights that a large eigenvalue gap λn − λn+1 ensures robust subspace estimation. The identification of eigenvalue gaps represents a distinct strategy compared to other dimension-reduction techniques that rely on eigenvalue spectra to construct low-dimensional representations. For example, POD in model reduction of dynamical systems and principal component analysis (PCA) for high-dimensional data typically determine the reduced dimension by energy criteria, such as retaining a prescribed fraction of the total variance (i.e., the cumulative sum of eigenvalues) [14, 45, 46]. 11 In contrast, the active subspace method emphasizes the accuracy of the subspace approximation itself, which is governed more directly by the presence and magnitude of eigenvalue gaps rather than by cumulative energy measures. This focus enables the identification of directions in parameter space that contribute most significantly to the variation of the QoI, thereby facilitating more efficient and targeted dimension reduction. In practical applications, the eigenvalue spectrum provides a physical heuristic for identifying the sensitivity-dominant directions of the active subspace [21]. While the largest spectral gap, defined as 
+
+Ngap = arg max  
+
+> n
+
+{λn − λn+1 } , (19) offers a principled criterion for isolating the most significant directions, it may not always account for the numerical saturation required for high-fidelity surrogate model-ing. Therefore, in this study, the spectral gap is used as a qualitative guide to confirm the low-dimensional nature of the flow physics, while the final operational dimension 
+
+NAS is determined via a grid search to ensure the reconstruction fidelity meets the tar-get threshold, as detailed in Sec. 3.4. This strategy ensures that the selected subspace is both physically representative and numerically sufficient, balancing computational efficiency with representational accuracy. 
+
+## 2.4 Response surface 
+
+In this study, the high-dimensional input vector x ∈ Rm can be projected onto a low-dimensional representation y = ˆW T 
+
+> 1
+
+x ∈ Rn, thereby enabling the construction of a reduced response surface g(y) to approximate the original mapping f (x). Even in cases where ˆλn+1 is small but nonzero, such a reduced representation can still provide an accurate approximation of f (x) with a rigorously bounded error. For a fixed y, the optimal reduced model is given by the conditional expectation of f conditioned on y [21], namely 
+
+g(y) = Ez [f (x) | y] = 
+
+Z
+
+f
+
+ ˆW 1y + ˆW 2z
+
+
+
+ρ(z | y) d z, (20) where ρ(z | y) denotes the conditional probability density function of the comple-mentary variables z conditioned on y. Accordingly, the original function f (x) can be approximated as 
+
+f (x) ≈ g
+
+ ˆW T 
+
+> 1
+
+x
+
+
+
+, (21) thereby reducing the effective dimensionality of the problem while preserving essential features of the response. Based on the Poincar´ e inequality [43] and following [21, Theorem 4.3], the approx-imation error incurred by this dimension reduction is bounded by the sum of the tail eigenvalues of the associated covariance matrix: 
+
+Z 
+
+f (x) − g(W T 
+
+> 1
+
+x)
+
+2
+
+ρdx ≤ O (λn+1 + . . . + λm) . (22) 12 This bound provides a quantitative measure of the fidelity of the reduced model relative to the full-dimensional representation. 
+
+# 3 The hybrid reduced order model (POD–AS–PRS) 
+
+The proposed POD–AS–PRS framework constitutes a novel non-intrusive reduced-order modeling methodology based on POD, AS, and RS techniques for efficient and accurate QoI reconstruction in parametrized fluid dynamics simulations. Specifically, POD is employed for state-space dimensionality reduction by projecting the high-dimensional flow-field data onto a low-dimensional basis, thereby extracting a compact set of modal coefficients that encapsulate the dominant spatial and temporal structures of the system. This step isolates the essential dynamics while significantly reducing the computational complexity of subsequent analyses. The AS then performs parameter-space dimensionality reduction by identifying directions in the POD coefficient space that exert the greatest influence on the QoI. A key innovation of this work lies in the computation of the necessary gradients for AS via reverse-mode AD of a trained ResNet, ensuring high accuracy and computational efficiency even in high-dimensional settings. Finally, a response surface is constructed to map the AS-reduced coordinates directly to the QoI. This surrogate model enables rapid and reliable online evalua-tions without requiring the reconstruction of the full-order field, thereby dramatically accelerating reconstruction while maintaining fidelity. This integrated POD–AS–PRS strategy is particularly advantageous for systems characterized by low Kolmogorov width, where substantial reductions in computational cost can be achieved without compromising reconstruction accuracy. The overall structure and computational work-flow of the proposed non-intrusive POD–AS–PRS framework are illustrated in Fig. 2, which serves as a schematic roadmap for the detailed exposition presented in the following sections. 
+
+## 3.1 Data preparation and state-space dimensionality reduction 
+
+The POD–AS–PRS framework commences with the preparation of CFD data and the application of POD to reduce the state-space dimensionality of high-dimensional flow field snapshots. This subsection elucidates the computational pipeline for acquiring, preprocessing, decomposing, and processing CFD data to yield a low-dimensional rep-resentation in the form of POD coefficients, which serve as inputs to the subsequent ResNet surrogate model. 
+
+3.1.1 Data acquisition and preprocessing 
+
+The CFD snapshots of relevant flow quantities are obtained from time-resolved unsteady simulations conducted under fixed operating conditions, and are repre-sented on a unified Cartesian grid, ensuring consistent spatial discretization and matrix dimensions for subsequent processing. The resulting multidimensional data are reshaped into a snapshot matrix S ∈ Rnt×ns , where nt denotes the number of snapshots and ns the flattened spatial degrees of freedom. The mean snapshot ¯S ∈ Rns is then computed and subtracted from S to obtain the mean-subtracted 13 Uncentered covariance 
+
+> matrix
+> Eigenvalue
+> decomposition
+> active
+> variable
+> inactive
+> variable
+> Determination of
+> Nga p
+> Parameter sensitivity
+> analysis
+
+Outcome 
+
+Centering 
+
+!!"["]
+
+!#["] tk
+
+Snapshots #
+
+## = # − #
+
+Reconstruction 
+
+QoI 
+
+Parameter -space 
+
+dimensionality 
+
+reduction 
+
+Low -
+
+dimensional 
+
+surrogate 
+
+model 
+
+> ResNet
+
+AS RS 
+
+> Linear layer 1
+> Linear layer 2
+> activation
+
+⊕
+
+> activation
+> (skip)
+> Gradient
+> computation
+> Forward pass:
+> MSE:
+> Backward pass:
+> Target
+> prediction
+> Training
+
+* + ,#
+
+!#
+
+* +
+
+&
+
+SVD 
+
+POD 
+
+coefficients 
+
+POD 
+
+> ROM
+
+State -space 
+
+dimensionality 
+
+reduction 
+
+Active subspace 
+
+analysis    
+
+> PRS Polynomial order select
+> Grid search
+> Approximate
+
+-∗
+
+Importance p arameter 
+
+&
+
+Gradient 
+
+calculation Fig. 2 : POD–AS–PRS framework workflow. matrix ˜S = S − ¯S, thereby isolating the dynamic fluctuations about the mean flow field. Prior to decomposition, the matrix ˜S is numerically conditioned by addressing undefined values and clipping small magnitude entries to ensure a well-posed input for subsequent reduced-order modeling procedures. 
+
+3.1.2 POD reduction 
+
+The POD reduction employs SVD to decompose the mean-subtracted snapshot matrix ˜S, as formulated in Sec. 2.1, producing a low-dimensional representation of the flow field. The energy contribution of the k-th mode is quantified as 
+
+σ2
+
+kPnt
+
+k=1 σ2
+
+k
+
+, (23) where σk is the k-th singular value. The number of retained modes r is determined by a cumulative energy threshold, satisfying 
+
+Prj=1 σ2
+
+j
+
+Pnt
+
+k=1 σ2
+
+k
+
+≥ θ, (24) with θ chosen to be close to one, ensuring a balance between accuracy and dimensionality reduction. 14 The POD coefficients are computed as in Eq. (3), and collecting all coefficient vectors as rows yields the POD coefficient matrix 
+
+A =
+
+
+
+a1
+
+a2
+
+...
+
+ant
+
+ ∈ Rnt×r (25) yielding ai ∈ Rr for each snapshot i. Hence, the i-th row of A corresponds to the POD coefficients of the i-th snapshot 
+
+ai =
+
+h
+
+a(j)
+
+> i
+
+i
+
+, i = 1 , . . . , n t, j = 1 , . . . , r (26) This enables the flow field to be approximated as 
+
+s[k, i] ≈ ¯s[i] + 
+
+> r
+
+X
+
+> j=1
+
+aj (tk)ϕj (xi). (27) The resulting POD coefficients serve as the low-dimensional input vector x for the subsequent ResNet-based surrogate model (Sec. 3.2). 
+
+## 3.2 ResNet model construction and training 
+
+The POD coefficients A are mapped to the QoI using the ResNet described in Sec. 2.2, which additionally facilitates the computation of gradients required for subsequent AS analysis. This subsection delineates the computational workflow for constructing, training, and computing gradients from the ResNet model, ensuring both efficient QoI prediction and seamless integration with the subsequent AS analysis detailed in Sec. 3.3. 
+
+3.2.1 ResNet architecture implementation 
+
+The ResNet architecture is initiated with an input projection layer that maps the r-dimensional POD coefficient vector into a higher-dimensional hidden feature space. This projection is followed by a series of residual blocks and optional dropout layers to enhance representational capacity while mitigating overfitting. This design achieves a balance between representational capacity and computational efficiency. The network culminates in an output head that reduces the high-dimensional hidden features to a scalar QoI through two FC layers, augmented with BN, ReLU activations, and dropout for additional regularization. This architectural design ensures both robust predictive performance and precise gradient computation required for AS analysis. 
+
+3.2.2 Training 
+
+Training is performed on a time-ordered dataset of paired POD coefficients and QoI, partitioned sequentially into training (80%), validation (10%), and test (10%) sets to 15 preserve temporal ordering and ensure realistic evaluation. The model is optimized by minimizing the MSE loss function [47], defined as 
+
+L = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+(ˆ yi − yi)2, (28) where ˆ yi denotes the predicted QoI and yi is the corresponding ground-truth value. Optimization employs the Adam optimizer [48] with an initial learning rate of 1 × 10 −3.To adapt the learning rate dynamically, a ReduceLROnPlateau scheduler is utilized, with a patience of 10 epochs and a reduction factor of 0.5, i.e., PLR = 10, fLR = 0 .5, triggered when the validation loss plateaus. To mitigate overfitting and enhance generalization, early stopping is imple-mented [49]. This regularization technique monitors the validation loss and terminates training when no significant improvement is observed. Specifically, for each training epoch Nep , the current validation loss L(Nep )val is compared to the historical minimum 
+
+Lbest val using the criterion: 
+
+(
+
+Reset counter, if L(Nep )val < Lbest val − δ
+
+Counter + = 1 , otherwise , (29) where δ = 1 × 10 −4 accounts for numerical fluctuations. Training halts if the counter reaches the patience value, and the model parameters corresponding to the lowest validation loss are restored. Mini-batch gradient descent is applied, with batch sizes ranging from 32 to 128 selected, facilitate efficient gradient updates. Hyperparameters, including the number of residual blocks, hidden layer dimensions, and dropout rates, are tuned systemat-ically by minimizing the validation loss, optimizing performance for complex CFD applications. To facilitate AS analysis (Sec. 3.3), gradients of the QoI with respect to the POD coefficients, ∇af , are computed via reverse-mode AD. These gradients are processed in batches to accommodate large datasets and mitigate memory demands, subsequently aggregated into a matrix G ∈ Rnt×r for covariance computation. This procedure yields derivatives accurate to machine precision while managing memory consumption effectively. 
+
+## 3.3 Parameter-space dimensionality reduction through AS 
+
+AS is performed in the POD coefficient space using gradients computed by the ResNet model. The pipeline ensures both scalability and numerical robustness in complex fluid dynamics applications. The uncentered covariance matrix is estimated as: 
+
+C =
+
+Z
+
+∇af (∇af )T ρ(a) d a ≈ 1
+
+ntntX
+
+> i=1
+
+∇afi (∇afi)T = ˆC, (30) 16 where ρ(a) denotes the probability density of the POD coefficients. As a symmetric, positive semi-definite matrix, ˆC admits an eigenvalue decomposition ˆC = ˆW ˆΛ ˆW T
+
+,with eigenvalues ˆλi arranged in descending order and corresponding eigenvectors ˆW
+
+normalized to ensure consistent orientation. The active subspace dimension NAS is determined via a grid search (Eq. (40)). The active subspace basis ˆW 1 ∈ Rr×NAS , comprising the first NAS eigenvectors, projects the normalized coefficients onto active variables y = ˆW T 
+
+> 1
+
+a ∈ Rnt×NAS ,thereby reducing the dimensionality from r to NAS . Specifically, for unsteady flows, the time-dependent active variables y(t) are obtained by projecting the POD coeffi-cients a(t)—extracted from the high-fidelity FOM snapshots at each corresponding time instant—onto the active subspace. This projection is applied to both the train-ing and test snapshots, such that the trained PRS can subsequently be evaluated on active variables derived from time instants not used during model construction. A non-parametric bootstrap analysis [50], involving 1000 iterations of gradient resampling, is performed to estimate confidence intervals for the eigenvalues and to assess subspace stability via the subspace distance metric. The relative contribution of each POD mode to the active subspace is quantified using activity scores [35]: 
+
+Ii =
+
+> r
+
+X
+
+> j=1
+
+ˆλj ( ˆ wij )2, i = 1 , · · · , n t, (31) where ˆ wij denotes the ( i, j )-th element of ˆW , representing the projection of the i-th POD mode onto the j-th active direction, and ˆλj weights the importance of that direction. Normalized activity scores are computed as ˆIi = Ii
+
+Pnt 
+
+> i=1
+
+Ii
+
+, (32) providing a relative measure of each POD mode’s influence on the QoI’s variability within the active subspace. To identify which POD modes should be retained, a cumu-lative contribution measure is introduced to determine the subset of modes whose combined influence exceeds a prescribed threshold, and is defined as 
+
+Prp
+
+> ˆi=1
+
+ˆIˆi
+
+Pnt 
+
+> i=1
+
+ˆIi
+
+=
+
+> rp
+
+X
+
+> ˆi=1
+
+ˆIˆi ≥ ϵ, (33) where rp denotes the number of POD modes retained based on their cumulative con-tribution and used to construct the active variables, and ϵ is a threshold close to unity that determines the retention criterion. These scores quantify the relative influence of individual POD modes on the vari-ability of the QoI. The structure of the AS provides a principled basis for interpreting these scores: the eigenvector ˆ w1 identifies the dominant direction in the POD coeffi-cient space, along which perturbations of a induce the significant variations in f (see 17 Eq. (8)). The magnitude and sign of the components of ˆ w1 indicate the relative sen-sitivity of each POD coefficient along this most influential direction. The second most important direction is captured by ˆ w2, whose significance relative to ˆ w1 is measured by the spectral gap ˆλ1 − ˆλ2. Accordingly, scaling each eigenvector by its correspond-ing eigenvalue, as in Eq. (31), yields a robust global sensitivity metric. While squaring the eigenvector components eliminates sign information, this procedure results in a practical and interpretable measure that can be directly compared to established sensi-tivity metrics [35]. This formulation thus facilitates a quantitative ranking of the POD modes according to their influence on the QoI within the reduced active subspace. 
+
+## 3.4 Construction of low-dimensional surrogate model through RS 
+
+We proceed to construct a reduced-order surrogate model based on a polynomial response surface (PRS) to approximate the mapping from the low-dimensional active variables y to the QoI, in accordance with the mathematical formulation presented in Sec. 2.4. The PRS is expressed as a linear combination of monomial basis functions: 
+
+g(y) = 
+
+> p
+
+X
+
+> |α|=0
+
+cαφα(y), |α| = α1 + · · · + αn, (34) where cα denote the polynomial coefficients obtained via least-squares regression, p
+
+is the polynomial order, and φα(y) = yα1 
+
+> 1
+
+yα2 
+
+> 2
+
+· · · yαn 
+
+> n
+
+represent the monomial basis functions. Here, n corresponds to the input dimension, i.e., the number of active variables NAS . The training dataset consists of the active variables y = ˆW T 
+
+> 1
+
+a and the corresponding QoI values f (a). For a training set containing Ntrain samples, the polynomial approximation is cast in matrix form: 
+
+f ≈ Bc , (35) where f ∈ RNtrain contains the QoI values, B ∈ RNtrain ×Np is the polynomial basis matrix with Np =  n+pp
+
+ terms, and c ∈ RNp is the vector of polynomial coefficients. Each row of B evaluates all monomial basis functions at a given sample of active variables: 
+
+Bi,j = φαj (yi) = 
+
+> NAS
+
+Y
+
+> k=1
+
+yαj,k  
+
+> i,k
+
+, i = 1 , · · · , N train , j = 1 , · · · , N p, (36) where yi ∈ RNAS is the i-th sample, and αj = ( αj, 1, α j, 2, . . . , α j,N AS ) denotes the multi-index of the j-th monomial basis. The least-squares regression problem is then formulated as: 
+
+c = arg min  
+
+> c
+
+∥Bc − f ∥22, (37) Formally, the analytical solution is given by: 
+
+c = ( BT B)−1BT f , (38) 18 with SVD employed in practice to ensure numerical stability. To identify the optimal combination of active subspace dimension NAS and poly-nomial order p, a grid search is conducted over candidate NAS values. For each NAS ,the corresponding optimal polynomial order p∗ is determined by cross-validation, minimizing the root mean square error (RMSE) over the validation set: 
+
+p∗ = arg min  
+
+> p
+
+RMSE val (p),
+
+RMSE val (p) = 
+
+vuut 1
+
+Nval 
+
+> Nval
+
+X
+
+> i=1
+
+(f (ai) − g(yi)) 2,
+
+(39) where Nval denotes the size of the validation set, f (ai) is the true QoI, and g(yi)the corresponding PRS reconstruction. After obtaining p∗ for each NAS , the optimal configuration is selected by maximizing the validation set coefficient of determination: (N ∗
+
+> AS
+
+, p ∗) = arg max  
+
+> NAS ,p
+
+R2val (NAS , p ), (40) where R2val (NAS , p ) is defined as 
+
+R2val = 1 −
+
+PNval  
+
+> i=1
+
+(f (ai) − g(yi)) 2
+
+PNval  
+
+> i=1
+
+(f (ai) − ¯fval )2 ,
+
+¯fval = 1
+
+Nval 
+
+> Nval
+
+X
+
+> i=1
+
+f (ai),
+
+(41) This procedure ensures that the final surrogate model balances model complex-ity and reconstruction accuracy, leveraging the most informative active subspace dimension while avoiding overfitting in the polynomial response surface. With the optimal polynomial order p∗ determined, the final PRS is trained on the combined training and validation datasets to maximize data utilization. Model perfor-mance is subsequently evaluated on an independent test set to assess generalization capabilities. Beyond its reconstructive accuracy, the PRS offers a degree of physical interpretability that is intrinsic to its polynomial structure. Each active variable yk
+
+represents a physically meaningful linear combination of POD coefficients that most strongly governs QoI variability, as identified through the AS analysis. The polynomial coefficients cα directly quantify how the QoI depends on these sensitivity-dominant directions and their interactions up to degree p∗, providing a transparent and analyt-ically accessible mapping from the active variables to the QoI. This PRS construction finalizes the POD–AS–PRS framework, yielding an efficient and accurate surrogate model for QoI reconstruction, well-suited for real-time applications in fluid dynam-ics. It should be emphasized that, for unsteady flows, this process does not involve a self-contained time-marching procedure. Specifically, the trained PRS maps the active variables y(t) to the QoI at each time step. To assess the generalization capability 19 of the surrogate, the dataset is partitioned chronologically: the first 80% of snap-shots are used for training, while the remaining 20% constitute an independent test set. For the training interval, the PRS performs a temporal reconstruction of the QoI within the known data range. For the independent test interval, the PRS maps pre-viously unseen active variables — obtained by projecting the POD coefficients of the test snapshots onto the identified active subspace — to the corresponding QoI val-ues, thereby demonstrating the surrogate’s ability to generalize to new inputs within the active subspace. It is acknowledged that this evaluation still relies on high-fidelity snapshots to provide the active variables y(t), and does not constitute autonomous temporal forecasting; the primary contribution lies in demonstrating that the identi-fied low-dimensional active subspace faithfully captures the governing physics of the QoI across both the training and test intervals. 
+
+## 3.5 The POD–AS–PRS algorithm 
+
+This section synthesizes the computational pipeline of the POD–AS–PRS framework, elucidating the synergistic integration of the preceding methodologies. This integration successfully demonstrates the framework’s efficacy in identifying the low-dimensional, active flow structures that critically influence the QoI and establishing a non-intrusive, compact surrogate model for rapid and accurate reconstruction within parametrized fluid dynamics simulations. The complete procedure is summarized in Algorithm 1. High-dimensional CFD snapshots are first projected onto the POD basis, yielding a set of modal coefficients A (Eq. (3)). A ResNet is then trained on A to provide highly accurate gradient information via reverse-mode AD. These gradients are subsequently exploited within the AS framework to identify a low-dimensional set of active variables 
+
+y that dominantly governs the variability of the QoI. Finally, a PRS surrogate is constructed in the reduced y-space, enabling rapid, high-fidelity, and interpretable online evaluations. Driven by this integrated methodology and its non-intrusive, modular design, the POD–AS–PRS framework is systematically validated using rigorous performance met-rics, including test set accuracy, eigenvalue spectra, and bootstrap confidence intervals to assess subspace stability. This modular design facilitates scalable QoI reconstruc-tion in large-scale, high-fidelity CFD problems, achieving substantial computational efficiency by exploiting the low Kolmogorov width of the system. As illustrated in Fig. 2, this workflow provides a robust and interpretable methodology for rapid and reliable QoI evaluation, positioning the framework as a powerful tool for advancing computational fluid dynamics. 
+
+# 4 Numerical investigations 
+
+This section presents numerical validation of the POD–AS–PRS framework through two canonical fluid dynamics problems exhibiting fundamentally different dynamical characteristics. The investigations commence with the well-established benchmark of flow past a circular cylinder, which exhibits strongly periodic dynamics. Subsequently, we examine the more complex case of flow over a NACA 4412 airfoil, characterized by intermittent and chaotic dynamics that pose significant challenges for reduced-order 20 Algorithm 1 The POD–AS–PRS Framework. 
+
+Require: CFD snapshots S(tk, xi), QoI f .
+
+Ensure: Surrogate model g(y) for QoI reconstruction.  
+
+> 1:
+
+Preprocess Data and Apply POD  
+
+> 2:
+
+Construct snapshot matrix S, compute mean-subtracted ˜S. 
+
+> 3:
+
+Perform SVD: ˜S = ΨΣΦ T , select r modes (Eq. (24)).  
+
+> 4:
+
+Compute POD coefficients A ∈ Rnt×r. 
+
+> 5:
+
+Train ResNet  
+
+> 6:
+
+Train ResNet to map A to QoI using MSE loss (Eq. (28)).  
+
+> 7:
+
+Compute gradient matrix G ∈ Rnt×r, where Gi, : = ∇af (ai) via reverse-mode AD.  
+
+> 8:
+
+Perform Active Subspace Analysis  
+
+> 9:
+
+Compute covariance ˆC from gradients, decompose ˆC = ˆW ˆΛ ˆW T
+
+(Eq. (16)).  
+
+> 10:
+
+Select active subspace basis ˆW 1 ∈ Rr×NAS via eigenvalue gap.  
+
+> 11:
+
+Project coefficients: y = ˆW T 
+
+> 1
+
+a ∈ Rnt×NAS . 
+
+> 12:
+
+Construct Response Surface  
+
+> 13:
+
+Fit polynomial g(y) = P 
+
+> |α|≤ p∗
+
+cαφα(y) using least-squares (Eq. (39)).  
+
+> 14:
+
+Output : Surrogate model g(y) for QoI reconstruction.  
+
+> 15:
+
+Evaluate g(y) on test set for generalization. modeling. High-fidelity simulations provide the full-order model data essential for con-structing and validating the reduced-order framework. The subsequent analysis strictly adheres to the computational pipeline established in the aforementioned methodol-ogy. Quantitative assessments of reconstruction accuracy, computational efficiency, and physical interpretability demonstrate the robustness in identifying sensitivity-dominant parameters and elucidating the underlying physics across different flow regimes. 
+
+## 4.1 The incompressible Navier–Stokes equations 
+
+We consider incompressible Navier–Stokes equations with constant fluid properties, coupled with the continuity equation: 
+
+∂u
+
+∂t = −u · ∇ u − ∇ p + 1
+
+Re ∇2u + fb, (42) 
+
+∇ · u = 0 . (43) where u = {u, v }T is the velocity vector with components in the x and y directions, p
+
+represents the pressure, and fb is the body-force term. Eq. (42) enforces momentum continuity, while Eq. (43) ensures mass continuity. These equations are integrated in time using the Nek5000 code developed by Fischer, Lottes, and Kerkemeier [51]. The system of equations is expressed in weak form, with the solution expanded using basis and test functions on each of these elements [52]. In the spectral element method (SEM) [53], the physical domain is decomposed into spectral elements. Within each element, the local flow field is approximated as a 21 sum of Lagrange interpolants constructed on an orthogonal basis of Legendre polyno-mials up to degree N . The same polynomial order N is used for all spatial directions. Following the PN − PN −2 spatial discretisation [54], N + 1 Gauss–Lobatto–Legendre (GLL) nodes are used to build the velocity Lagrange polynomial interpolants and 
+
+N − 1 Gauss–Legendre (GL) nodes for the pressure Lagrange polynomial interpolants (two orders less than the velocity field) in every spectral element. The discrete Pois-son equation for the pressure is solved using a variational multigrid GMRES solver, incorporating local overlapping Schwarz methods for element-based smoothing at res-olution N and approximately N/ 2, coupled with a global coarse-grid problem based on linear elements [55]. Here we adopt N = 11 for case 1 and N = 7 for case 2. For tempo-ral discretization, the equations are advanced in time using a third-order (case 1) and second-order (case 2) conditionally stable backward differentiation and extrapolation scheme (BDF k/EXT k) [56], employing an implicit treatment of the diffusion term and an explicit treatment of the advection term. Nek5000 has been extensively validated for a variety of incompressible flows, including cases with flow past a cylinder and an airfoil [57–60]. 
+
+## 4.2 Case 1: Cylinder flow at Re=100 
+
+This part presents the application and validation of the POD–AS–PRS framework to the canonical problem of flow past a circular cylinder. This benchmark con-figuration exhibits periodic vortex shedding and serves as an ideal test case for identifying sensitivity-dominant parameters with well-defined coherent structures. Comprehensive quantitative assessments demonstrate the framework’s accuracy in reconstructing aerodynamic quantities while providing physical insights into the dominant mechanisms governing drag variability. 
+
+4.2.1 Dataset description 
+
+The present investigation considers the flow over a circular cylinder, which exhibits periodic vortex shedding, specifically employing a cylinder geometry with a diameter of D. The diameter-based Reynolds number is Re = U∞D/ν = 100 with U∞ as the incoming free-stream velocity and ν as the kinematic viscosity. Length and velocity are non-dimensionalised by cylinder diameter D and U∞, respectively. Time refers to non-dimensional convective time normalised by DU −1 
+
+> ∞
+
+.The computational extent is ( x, y ) ∈ [−15 , 35] × [−15 , 15] with the origin located at the cylinder’s center. Within each element, flow quantities are resolved using high-order polynomial approximations implemented in the spectral code described in Sec. 4.1. For the cylinder case, a combination of 1472 elements and a polynomial order of 11 was selected. The operator-integrating-factor splitting method proposed in [61] was employed to ensure stable time integration with a maximum timestep of ∆t = 0 .001. The inflow boundary condition was prescribed as a constant velocity u = (1 , 0) throughout the simulation. No-slip (Dirichlet) boundary conditions were imposed on the wall of the cylinder, while symmetry conditions were enforced along the upper and lower domain boundaries. An open boundary condition with zero pressure (Neumann) 22 Fig. 3 : (a) Computational domain for the flow past a circular cylinder showing outlines of spectral elements without internal interpolation points. (b) Snapshot of vorticity. is applied at the exit section, allowing vortical structures to exit the computational domain smoothly. Fig. 3 shows the spectral element grid (without GLL interpolation points) along with a representative vorticity snapshot. In this case, snapshots from t = 250 to t = 300 are collected every 50 steps, yielding a total of 1000 snapshots used as inputs. 
+
+4.2.2 The quantity of interest 
+
+The drag and lift coefficients ( Cd and Cl, respectively) are defined as 
+
+Cd = Fd 
+
+> 12
+
+ρU 2
+
+> ∞
+
+D , Cl = Fl 
+
+> 12
+
+ρU 2
+
+> ∞
+
+D . (44) where ρ is the fluid density, while Fd and Fl are the drag and lift forces per unit span length, respectively. In this case, both Cd and Cl are designated as the QoIs. The temporal evolution of the QoI is illustrated in Fig. 4, where the grey-shaded region highlights the snapshot sampling interval employed in this case study. 
+
+4.2.3 Results and discussion 
+
+Dimensionality reduction of POD state-space 
+
+The POD analysis is performed on fluctuating components to extract the dominant oscillatory dynamics from fully converged full-order models (FOMs) snapshots. As shown in Fig. B1a in Appendix B, the spatial modes emerge in pairs, reflecting the periodic nature of vortex shedding. These results reveal that modes emerge in pairs due to the periodic nature of the flow, capturing real and imaginary components that can be combined into complex modes as u′ 
+
+> i
+
+= ui + iui+1 . The first six spatial POD modes (left column) and their corresponding temporal coefficients (right column) show that paired modes (e.g., Mode 2 as a phase-shifted version of Mode 1) exhibit sinu-soidal behavior in their coefficients, reflecting the dominant vortex-shedding frequency and its harmonics in higher-order modes. This structure aligns with typical bluff-body 23 0 50 100 150 200 250 300    
+
+> t / (DU −1
+> ∞)
+> 0.00.51.01.5
+> Cd, C l Cd
+> Cl
+> Data used for analysis
+
+(a) 1.35 1.36          
+
+> Cd
+> 250 260 270 280 290 300
+> t / (DU −1
+> ∞)
+> −0.20.00.2
+> Cl
+
+(b) 
+
+Fig. 4 : (a)Temporal evolution of the drag coefficient Cd and lift coefficient Cl, with the grey-shaded region denoting the snapshot sampling interval adopted for constructing the ROM; (b) zoomed view of Cd (top) and Cl (bottom) over the sampling interval. 
+
+(a) (b) 
+
+Fig. 5 : (a) The kinetic energy explained by each of the first 20 POD modes and the corresponding cumulative energy, and (b) the eigenvalue distribution of the first 20 modes for the test case 1. flows dominated by vortex shedding. The phase diagram in Fig. B1b demonstrates that the ( a1, a 2) evolution traces a nearly perfect circle, confirming the periodic nature of saturated vortex shedding. Additionally, the phase plots highlight that the third and fourth POD modes correspond to the second harmonics of the vortex shedding, while the fifth and sixth modes capture its third harmonics. Complementing this, the prob-ability density functions (PDFs) of the first six POD mode time coefficients exhibit bimodal distributions, as shown in Fig. B1b. The kernel density estimate (KDE) overlays highlight this continuous oscillation between positive and negative extrema, which is characteristic of coherent structures in vortex-dominated wakes. These anal-yses confirm that POD effectively extracts the key oscillatory dynamics, providing low-dimensional coefficients suitable as inputs for the subsequent ResNet-based QoI prediction and gradient computation in AS analysis. 24 The kinetic energy σ2 
+
+> k
+
+of each POD mode and the corresponding cumulative energy, represented in Fig. 5a, indicate strong dominance by the first two modes, which encap-sulate the primary shedding frequency and account for the majority of the flow’s kinetic energy. The first six modes collectively capture over 99% of the total energy (Table 1), thereby justifying the truncation of the basis at a very low order. This is corroborated by the eigenvalue spectrum of the first 20 modes in Fig. 5b, which decays rapidly and quantifies the separation between dominant and subordinate modes. Such a distribution not only validates the energy capture but also guides mode selection for the POD–AS–PRS framework, ensuring computational efficiency in constructing response surface-based surrogate models from AS-derived active variables.         
+
+> Minimum retained energy [%] NPOD
+> 90 394 496 599 699.5 799.9 999.99 13
+
+Table 1 : Cumulative retained energy for different numbers of POD modes for the test case 1. 
+
+Training of linear-layer ResNet and gradient computation 
+
+Following the POD decomposition, the extracted POD coefficients serve as low-dimensional inputs to learn the nonlinear mapping to the QoI, enabling efficient approximation and gradient computation through reverse-mode AD. The training process exhibited robust convergence under the MSE loss function, with early stopping (Eq. (29)) to prevent overfitting. Fig. 6 illustrates the training process and model performance for both QoIs. Figs. 6a and 6c show that the loss for both training and validation datasets rapidly decreases initially and then stabilizes for Cd and Cl, respectively, indicating effective convergence without significant over-fitting in either case. Figs. 6b and 6d evaluate the predictive accuracy of the model in the independent test dataset for Cd and Cl, respectively. The time-series compar-isons demonstrate close agreement with the ground truth across the temporal domain, capturing transient flow behaviors accurately. The parity plot further confirms high fidelity of the ResNet predictions, with predicted values closely clustering around the diagonal in both cases. To quantify the model’s performance more rigorously, Table 2 reports key metrics evaluated across the training, validation, and test datasets for both Cd and Cl, includ-ing the RMSE, mean absolute error (MAE), and coefficient of determination ( R2). For both quantities, the low RMSE and MAE values, combined with an R2 approaching unity, affirm the strong predictive performance of the linear-layer ResNet in mapping 25 (a) (b) 0 50 100 150 200 250 300 
+
+> Epochs
+> 10 −2
+> 10 −1
+> 10 0
+> Loss
+> Train Validation Best model point Early stopping point
+
+(c) 295 296 297 298 299        
+
+> t
+> −0.20.00.2
+> Cd
+> Ground truth Predicted
+> −0.3−0.2−0.10.00.10.20.3
+> Ground truth
+> −0.20.00.2
+> Predicted
+
+(d) 
+
+Fig. 6 : Loss function evolution for (a) Cd and (c) Cl; the yellow star ( ★) indicates the best model, while the red dot ( •) marks the early stopping point (Eq. (29)). Model performance on the test dataset for (b) Cd and (d) Cl: the upper panels compare predicted and ground truth values over time, while the lower panels show the corre-sponding parity plots. the POD coefficients to the respective QoI. These results validate the model’s suit-ability for subsequent gradient computation through AD, which forms the basis for the AS analysis in the POD–AS–PRS framework. Gradients of the predicted QoI with respect to the POD coefficients were computed using reverse-mode AD through the trained network. In the gradient-based sensitiv-ity analysis, the first 150 POD modes were retained as the input dimensions for each sample. This choice was made to capture sufficient system information and to provide a rich enough candidate space for the AS analysis to identify all potentially sensitive physical directions. To evaluate accuracy and efficiency, AD-based gradients were com-pared with FD approximations using central differences with step size h = 1 × 10 −2.The gradient differences are presented in Figs. 7a and 7c as violin plots overlaid with boxplots and strip plots for Cd and Cl, respectively, exhibiting symmetric distributions 26 QoI Metric Training set Validation set Test set 
+
+Cd
+
+RMSE 1.78 × 10 −4 3.32 × 10 −4 3.16 × 10 −4
+
+MAE 1.44 × 10 −4 2.75 × 10 −4 2.48 × 10 −4
+
+R2 0.999 0.998 0.998 
+
+Cl
+
+RMSE 6.17 × 10 −3 1.39 × 10 −2 1.24 × 10 −2
+
+MAE 5.00 × 10 −3 1.14 × 10 −2 9.52 × 10 −3
+
+R2 0.999 0.997 0.996 
+
+Table 2 : Performance metrics of the linear layer ResNet for test case 1. 
+
+(a) (b) 1 2 3 4 5 6 7 8 9 10   
+
+> Modes
+> −10 −2
+> −10 −3
+> 010 −3
+> 10 −2
+> ∇fAD  − ∇ fFD
+> Perfect Agreement ( ∇fAD =∇fFD )
+
+(c) AD FD 10 1 
+
+> 10 2
+> Total computation time (s) 4.55s 349.6s
+
+(d) 
+
+Fig. 7 : Gradient differences of the first 10 POD modes across all samples for (a) Cd
+
+and (c) Cl, shown as violin plots with boxplot and strip overlays; (b, d) total gradient computation times for AD and FD for (b) Cd and (d) Cl in test case 1. around the zero reference line, with medians close to zero and narrow interquartile ranges, indicating excellent agreement without systematic bias. Complementarily, the computational timings in Figs. 7b and 7d show that AD requires only 3.93s and 4.55s for Cd and Cl in total, respectively, whereas FD takes 347.5s and 349.6s, correspond-ing to a speedup of roughly two orders of magnitude in both cases. All computations were performed on a workstation equipped with an NVIDIA GeForce RTX 3090 GPU (compute capability 8.6, 24 GB memory). Beyond computational efficiency, AD inherently applies the chain rule across the computational graph, yielding derivatives with machine-precision accuracy and circumventing the truncation–round-off trade-off inherent to FD. For scalar outputs with high-dimensional inputs, reverse-mode AD computes the entire gradient at a cost comparable to a single function evalua-tion, in stark contrast to the d + 1 evaluations required by FD (where d is the input 27 dimension) [62]. This property renders AD particularly advantageous for large-scale gradient-based sensitivity analysis and model reduction. 
+
+Dimensionality reduction of active subspaces parameter-space 
+
+Using gradients of both Cd and Cl with respect to the POD coefficients obtained by reverse-mode AD, active subspace analyses were conducted independently for each QoI to identify low-dimensional structures capturing their respective variability. Following the AS analysis described in Sec. 2.3, the eigenvalue spectrum of the covariance matrices ˆC for Cd and Cl are shown in Figs. 8a and 8b, respectively. For both quantities, pronounced order-of-magnitude gaps among the leading eigen-values indicate the existence of a low-dimensional active subspace, with dominant contributions concentrated in the first few directions.      
+
+> (a) 123456
+
+Index       
+
+> 10 −2
+> 10 −1
+> 10 0
+> 10 1
+> Eigenvalues (b)
+> (c) 123456
+
+Modes  
+
+> −1.0
+> −0.50.00.51.0
+> Eigenvector components  w1
+> w2(d)
+
+Fig. 8 : The first six eigenvalues of the covariance matrix with bootstrap confidence intervals (grey regions) for (a) Cd and (b) Cl and components of the first two eigen-vectors for (c) Cd and (d) Cl in test case 1. 28 (a) −1.0 −0.5 0.0 0.5 1.0     
+
+> ˆWT
+> 1a
+> −0.20.00.2
+> Cl(b)
+> (c) −101
+
+Active variable 1  
+
+> −1.0
+> −0.50.00.51.0
+> Active variable 2
+> −0.20.00.2(d)
+
+Fig. 9 : Sufficient summary plots for (a, c) Cd and (b, d) Cl, using (a, b) one active variable and (c, d) two active variables for test case 1 Figs. 8c and 8d present the components of the first two eigenvectors of ˆC for Cd
+
+and Cl, respectively, which are utilized to generate one- and two-dimensional summary plots in Figs. 9a–9d to identify the appropriate dimension of the active subspace for each QoI. These summary plots, commonly referred to as sufficient summary plots[63], employ scatter representations that incorporate all available regression information. As described in Eq. (10), Figs. 9a–9d depict f (a) against active variable y = ˆW T 
+
+> 1
+
+a,where ˆW T 
+
+> 1
+
+contains the leading one and two eigenvectors, for both Cd and Cl. For both QoIs, the one-dimensional summary plots exhibit a gross monotonic trend in the output as a function of the first active variable. Notably, this monotonic relationship is more distinct for Cl than for Cd, suggesting that a one-dimensional active subspace may already be sufficient for representing the lift coefficient. Nonetheless, we prefer to retain more information about the QoI function by employing a two-dimensional active subspace for both QoIs. The two-dimensional summary plot captures more of the input/output relationship, where some curvature is apparent in the two-dimensional 29 level sets. Consequently, an approximation of the form Eq. (21) constructed with two eigenvectors may be more informative than one relying solely on the first eigenvector. This sort of qualitative reasoning is typical when the engineer is determining how to exploit the active subspace for a particular application. 
+
+(a) Mode1 Mode2 Mode3 Mode4 Mode5 Mode6 Mode1 Mode2 Mode3 Mode4 Mode5 Mode6  
+
+> 0.00.20.40.60.81.01.2
+> ∑ni=1  λ∗
+> i (wiwTi )
+
+(b) 0.0 0.5 1.0
+
+> Relative importance
+> Mode 5 Mode 1 Mode 6 Mode 3 Mode 4 Mode 2
+> 0.0009 0.0010 0.0038 0.0098 0.0241 0.9604
+
+(c) Mode1 Mode2 Mode3 Mode4 Mode5 Mode6 Mode1 Mode2 Mode3 Mode4 Mode5 Mode6  
+
+> 0.00.51.01.52.02.53.0
+> ×10 1
+> ∑ni=1  λ∗
+> i (wiwTi )
+
+(d) 
+
+Fig. 10 : Global sensitivity analysis of POD coefficients with respect to (a, b) Cd and (c, d) Cl for test case 1. (a, c) Normalized activity scores for the top six coefficients; (b, d) pairwise interaction matrices of the leading active subspace directions, where diagonal entries show individual sensitivities and off-diagonal entries indicate correlations (red for synergistic amplification, blue for antagonistic reduction). To elucidate the global sensitivity of the POD coefficients to both Cd and Cl,normalized activity scores were evaluated using a two-dimensional active subspace (NAS = 2) for each QoI. It is worth noting that the activity scores adopted here 30 Cd Cl                     
+
+> Minimum retained influence [%] NPOD Minimum retained influence [%] NPOD
+> 85 196 196 298 298 399 399 499.9 599.9 699.99 699.99 999.999 9
+
+Table 3 : Cumulative retained influence of POD modes on Cd and Cl for test case 1. as the sensitivity metric, rather than simpler alternatives such as Pearson correla-tion coefficients or standardized regression coefficients. Constantine & Diaz [35] have shown that activity score rankings are broadly consistent with those from standard sensitivity metrics for well-behaved engineering models, while different sensitivity met-rics measure different characteristics of the function, discrepancies between metrics can arise when the mapping between the QoI and the input variables exhibits non-linear or non-monotonic behaviour. This distinction is further substantiated by the quantitative ranking comparison presented in Appendix C. Beyond ranking, the AS framework additionally identifies directions of linear combinations of input parameters (i.e., active variables) that most strongly drive the model response. By exploiting these important directions, the dimension of the model’s parameter space can be signifi-cantly reduced, facilitating the construction of high-fidelity surrogates and extensive parameter studies that are otherwise numerically prohibitive [35]. This enables the AS framework to capture nonlinear and coupled contributions between POD coefficients and the QoI that are structurally inaccessible to univariate correlation or regression-based metrics, where each parameter is assessed independently without accounting for inter-parameter synergy. Figs. 10a and 10c depict these scores for the primary POD coefficients for Cd and Cl, respectively. The total influence of the retained num-ber of POD modes on Cd and Cl is summarised in Table 3. For Cd, Mode 3 emerges as the sensitivity-dominant parameter, contributing approximately 85%, followed by Mode 2 with about 11%, while higher-order modes have a negligible influence. For Cl,Mode 2 emerges as the most dominant parameter, accounting for approximately 96% of the total sensitivity, with Mode 4 as the secondary contributor at approximately 2%, while the remaining modes have negligible influence. For both QoIs, the sensitiv-ity ranking aligns well with the structure of the active subspace presented in Figs. 8c and 8d, where the largest components of the leading eigenvectors correspond to the most influential modes identified by the activity scores. The dominance of Mode 3 further reflects its preferential alignment with the steepest descent direction of Cd in parameter space, such that small perturbations in a3 induce disproportionately large variations in drag. This underscores the physical significance of sensitivity-dominant modes over energetic ones, which encapsulates flow features such as localized vortical structures or shear instabilities that significantly modulate the pressure distribution and viscous stresses, thereby exerting a substantial influence on Cd. In contrast, more 31 energetic modes such as Mode 1 contribute less, as their dominant structures corre-spond to quasi-steady or bulk oscillatory motions with a weaker impact on Cd. Mode 2, emphasized in w2, contributes as the secondary direction of sensitivity, consistent with its association to large-scale coherent motions that interact with the shear layer and modulate drag in a less dominant but still significant manner. The pronounced dominance of Mode 2 for Cl is consistent with its well-established role as the pri-mary carrier of the large-scale vortex-shedding dynamics, whose oscillatory motion is directly coupled to the periodic lift generation mechanism. This analysis highlights that the importance of POD modes does not scale monotonically with their energy content for either QoI. Instead, their sensitivity is governed by the specific coupling between modal structures and the respective force-producing mechanisms. It is worth noting that, under the same flow condition, Cd and Cl are simultaneously generated, yet the AS analysis reveals that their sensitivity-dominant modes are distinctly differ-ent: mode 3 governs Cd while mode 2 governs Cl. This raises a practically important question regarding modal selection when both QoIs are of interest. In the present case, however, this question admits a remarkably compact answer: retaining only modes 2, 3, and 4 is sufficient to accurately reconstruct both QoIs simultaneously, since the active subspace for Cd is spanned by modes 3 and 2, while that for Cl is spanned by modes 2 and 4. The union of these two sets yields a combined basis of just three modes, demonstrating that the AS framework enables a highly efficient dual-QoI sur-rogate with minimal modal redundancy. This further underscores the advantage of sensitivity-driven modal selection over energy-based truncation, where a much larger number of modes would be retained without necessarily improving QoI reconstruction accuracy. Figs. 10b and 10d delineate the pairwise interactions among POD coefficients encoded in the matrix M = Pni=1 ˆλi( ˆ wi ˆwTi ), where the diagonal elements recover the individual activity scores, consistent with Figs. 10a and 10c, while the off-diagonal entries quantify second-order modal couplings. Positive off-diagonal values (red) indi-cate synergistic interactions, whereby concurrent perturbations in two modes reinforce variations in the QoI, whereas negative values (blue) signify antagonistic interactions in which modal contributions counteract each other, thereby reducing the fluctuations of QoI. For Cd, Modes 3 and 4 exhibit a comparatively strong positive correlation, suggesting that in-phase variations of their associated flow structures synergistically enhance drag. Conversely, Modes 3 and 6 display a pronounced negative correlation, indicating that the effect of Mode 6 tends to counterbalance the dominant drag con-tribution of Mode 3. These interaction patterns reinforce the single-mode sensitivity analysis, highlighting that Mode 3 is the dominant driver of Cd variability, with its effects either amplified by Mode 4 or moderated by Mode 6. For Cl, the interaction matrix is markedly sparser, with Mode 2 overwhelmingly dominating the diagonal, and a pronounced antagonistic coupling observed between Modes 2 and 4, indicating that Mode 4 tends to attenuate the lift variations driven by Mode 2. Notably, in both cases, the QoI variations are governed by a sparse subset of sensitivity-dominant param-eters and their nonlinear couplings, providing a high-fidelity basis for constructing reduced-order models that transcend simple modal energy considerations. 32 Construction of response surface surrogate models 
+
+Based on the preceding AS analysis, the response surfaces for both Cd and Cl were constructed using active variables, derived from the respective sensitivity-dominant POD coefficients (Modes 3 and 2 for Cd and Modes 2 and 4 for Cl). This strategy effectively reduces the input dimension while preserving the governing variability of the QoI. Following the procedure described in Eq. (40), we perform a grid search over different active subspace dimensions and polynomial orders. The R2 values reported in the heatmaps are evaluated on the independent chronological test set, reflecting the surrogate’s generalization capability to active variables not seen during model construction. Figs. 11a and 11d present the heatmaps of R2 values obtained from the grid search. For both QoIs, even a single-dimensional active subspace ( NAS =1) achieves high reconstruction fidelity, confirming that the dominant physics of the cylinder flow can be represented by a very low-dimensional manifold. For Cl, the accuracy shows a slight improvement as the polynomial order increases from 1 to 2, while Cd remains relatively stable. To further capture the remaining variance and achieve near-unity fidelity, the active subspace is extended to two dimensions ( NAS =2). This expansion, combined with a third-order polynomial, enhances the model’s approximation accuracy, effectively capturing the complex variations of the QoI. Thus, the ( NAS , p ) = (2 , 3) is identified, providing a superior balance between computational efficiency and reconstruction accuracy for the sensitivity-driven ROM. To further illustrate this result, Figs. 11b–11f depict the constructed response surface in the two-dimensional active subspace. Figs. 11b and 11e show the three-dimensional surface of the reconstructed Cd and Cl, respectively, with respect to the first and second active variables, while Figs. 11c and 11f present the corresponding two-dimensional contour plot, showcasing projected iso-contours. These results collectively demonstrate that the surrogate model yields a smooth and high-fidelity representation of the aerodynamic coefficient variations, capturing the underlying manifold governed by the sensitivity-dominant parameters, thereby highlighting the efficacy of the active subspace in representing the input-output relationship. 
+
+Accuracy assessment of the POD–AS–PRS framework 
+
+The pre-constructed low-dimensional surrogate model is employed to evaluate the aerodynamic coefficient, Cd and Cl, leveraging the two-dimensional active subspace to compress the input space from the full POD coefficient to the identified sensitivity-dominant directions. Fig. 12 provides a comprehensive comparison between the ROM results and the FOM ground truth, covering both the training interval and the inde-pendent chronological test interval. The temporal evolution of Cd and Cl, shown in Figs. 12a and 12c, respectively, demonstrates that the ROM closely tracks the FOM across both the training and independent test intervals, capturing the dynamic behav-ior with high accuracy throughout the entire time domain. Furthermore, the parity plot in Figs. 12b and 12d show near-perfect alignment along the diagonal for both training and test data points, confirming the strong correlation between the sensitivity-driven surrogate and the full-order simulations. Quantitative performance metrics for both training and test datasets are summa-rized in Table 4. The R2 values for both coefficients are remarkably high across both 33 1 2 3    
+
+> Degree of the response surface
+> 12
+> Active subspace dimension
+> 0.966281 0.966222 0.966290 0.967218 0.995891 0.999557
+> 0.96 0.97 0.98 0.99
+
+(a) (b) (c) 1 2 3    
+
+> Degree of the response surface
+> 12
+> Active subspace dimension
+> 0.996965 0.999055 0.999054 0.999841 0.999923 0.999976
+> 0.996 0.997 0.998 0.999
+
+(d) −1.0  
+
+> −0.50.00.51.0
+> Active variable 1 −0.5 0.00.5
+> Active variable 2
+> −0.20.00.2
+> −0.20.00.2
+
+(e) −1 0 
+
+> Active vriable 1
+> −0.50.00.5
+> Active variable 2
+> −0.3
+> −0.2
+> −0.10.00.10.20.3
+> Cl
+
+(f) 
+
+Fig. 11 : Response surface construction and evaluation for reconstructing (a–c) Cd and (d–f) Cl. (a, d) Heatmaps of R2 values for different combinations of active subspace dimensions and polynomial orders; (b, e) three-dimensional response surfaces with respect to the two active variables; (c, f) corresponding two-dimensional contour plots (iso-contours). datasets, confirming that the surrogate model explains nearly all the variance in the FOM data and generalizes well to time instants not seen during model construction, while the low MAE and RMSE values across both intervals underscore the precision and robustness of the framework. It is worth noting that while Cl exhibits higher MAE and RMSE values compared to Cd, its R2 is notably closer to unity. This is attributed to the larger fluctuation amplitude of the lift coefficient relative to the drag coefficient. The higher absolute errors in Cl are a direct consequence of its greater operational range, yet the near-perfect R2 across both training and test datasets demonstrates the exceptional ability of the POD–AS–PRS framework to capture the full scaled dynam-ics of the lift oscillations. These results demonstrate that for periodic bluff-body flows, identifying the sensitivity-dominant parameters enables the construction of highly robust ROMs that bypass the redundancies of purely energy-based modal selection. 
+
+## 4.3 Case 2: Airfoil flow with intermittent and chaotic nature 
+
+This part examines the application of the POD–AS–PRS framework to a more chal-lenging flow configuration characterized by intermittent and chaotic dynamics: flow over a NACA 4412 airfoil. In contrast to the periodic vortex shedding observed in the cylinder flow, this case exhibits quasi-periodic behavior with intermittent fluctuations 34 250 260 270 280 290   
+
+> t/ (DU −1
+> ∞)
+> 1.350 1.355 1.360 1.365
+> Cd
+> FOM ROM
+
+(a) 1.35 1.36 1.37  
+
+> FOM
+> 1.350 1.355 1.360 1.365 1.370
+> ROM
+> Training Unseen Test
+
+(b) 250 260 270 280 290   
+
+> t/ (DU −1
+> ∞)
+> −0.20.00.2
+> Cl
+> FOM ROM
+
+(c) −0.2 0.0 0.2 
+
+> FOM
+> −0.20.00.2
+> ROM
+> Training Unseen Test
+
+(d) 
+
+Fig. 12 : Comparison of ROM results and FOM for (a, b) Cd and (c, d) Cl. (a, c) Temporal evolution over normalized time, where the gray-shaded and steelblue-shaded regions represent the training and test sets, respectively; FOM is represented by discrete black points and ROM reconstructions by red dashed lines. (b, d) Scatter plots of ROM results against FOM for both training (circles) and test (triangles) datasets, illustrating the high fidelity and generalization capability of the POD–AS– PRS framework. in aerodynamic coefficients, presenting significant challenges for reduced-order mod-eling due to its higher-dimensional dynamics and complex coherent structures. The investigation focuses on the framework’s efficacy in identifying sensitivity-dominant parameters despite the significantly slower energy decay of the POD spectrum. Par-ticular emphasis is placed on the method’s performance in capturing extreme events and heavy-tailed statistics in the lift coefficient, demonstrating its robustness in reconstructing both typical and rare flow regimes. 
+
+4.3.1 Dataset description 
+
+In contrast to the previously discussed periodic case involving vortex shedding behind a circular cylinder, the current study examines the flow over a wing profile charac-terized by intermittent and chaotic behavior. Specifically, we consider a NACA 4412 airfoil geometry with a chord length of C = 1m and an angle of attack α = 5 ◦. The chord-based Reynolds number is Re = U∞C/ν = 1 .75 × 10 4. Similar to the cylinder 35 Model QoI Dataset R2 MAE RMSE POD–AS–PRS                             
+
+> Cd
+> Train 0.999597 9.40 ×10 −51.35 ×10 −4
+> Test 0.999557 1.01 ×10 −41.43 ×10 −4
+> Cl
+> Train 0.999980 7.23 ×10 −41.04 ×10 −3
+> Test 0.999976 7.67 ×10 −41.09 ×10 −3
+
+Table 4 : Performance metrics of the POD–AS–PRS framework on training and test datasets for the cylinder flow at Re = 100. 
+
+Fig. 13 : (a) Computational domain for the flow past a NACA 4412 airfoil displaying outlines of elements without internal interpolation points. (b) Snapshot of vorticity. case, length and velocity are non-dimensionalised using the chord length C and U∞,respectively, while time is expressed in non-dimensional convective units normalized by CU −1 
+
+> ∞
+
+.The computational domain spans ( x, y ) ∈ [−2, 6.75] × [−2.5, 2.5], with the origin positioned at the centroid of the airfoil. The mesh comprises 4644 elements with a polynomial order of 7. Consistent with the cylinder configuration, time integration adopts the same scheme [61], maintaining a constant timestep of ∆ t = 0 .001. In addition, the filtering technique of [64] was applied to stabilize the simulation further. Boundary conditions mirror those of the previous case with the exception of the outlet, where a convective outflow boundary condition [65] is utilized to facilitate the smooth departure of intense vortical structures. Fig. 13 illustrates the element mesh (excluding GLL interpolation points) alongside a typical vorticity field snapshot. In this case, snapshots from t = 600 to t = 800 are collected every 40 steps, yielding a total of 5000 snapshots used as inputs. 
+
+4.3.2 The quantity of interest 
+
+In this study, the POD–AS–PRS framework is applied to enable efficient QoI recon-struction and to pinpoint influential parameters. For the airfoil configuration, the QoI is designated as the lift coefficient Cl and the drag coefficient Cd, which are 36 0.51.0                     
+
+> Cl
+> 100 200 300 400 500 600 700 800
+> t/ ( CU −1
+> ∞)0.05 0.10 0.15
+> Cd(a) 0.51.0
+> Cl
+> 600 625 650 675 700 725 750 775 800
+> t/ ( CU −1
+> ∞)0.075 0.100 0.125
+> Cd
+> (b)
+
+Fig. 14 : (a)Temporal evolution of the lift coefficient Cl and drag coefficient Cd, with the grey-shaded region denoting the snapshot sampling interval adopted for construct-ing the ROM; (b) zoomed view of Cl (top) and Cd (bottom) over the sampling interval. Red dashed lines indicate ±2σ away from the mean. defined analogously to the cylinder case (see Eq. (44) with the characterised length being the chord length). The two-dimensional simulation yields a quasi-stable behav-ior in which intermittent fluctuations are observed in both aerodynamic coefficients, as depicted in Fig. 14. This intermittent regime persists throughout the simulation duration considered herein, and the analysis focuses solely on this behavior. 
+
+4.3.3 Results and discussion 
+
+Dimensionality reduction of POD state-space 
+
+In this case, the snapshot matrices were constructed from the fully converged FOM results for POD analysis. As illustrated in Fig. B2a, similar to the cylinder flow case, the spatial modes manifest in pairs, reflecting the underlying periodic structures of the flow. Differing from the cylinder flow case, however, the corresponding tempo-ral coefficients exhibit quasi-periodic behavior with intermittently clustered patterns, indicative of increased flow complexity. Phase diagrams Fig. B2b reveal that each paired mode traces multiple intertwined trajectories, rather than single closed loops, indicating high-dimensional chaotic dynamics. The PDFs of the temporal coefficients show that the first four modes retain a bimodal distribution, while higher-order modes progressively transition to unimodal distributions, highlighting the increasing com-plexity of the flow structures captured by the higher modes. These observations confirm 37 (a) (b) 
+
+Fig. 15 : (a) The kinetic energy explained by each mode and the corresponding cumu-lative energy, and (b) the eigenvalue distribution for the test case 2. that POD effectively extracts the dominant coherent structures and temporal dynam-ics, providing suitable low-dimensional coefficients for subsequent ResNet-based QoI prediction and AS gradient computation, despite the enhanced complexity of the flow.        
+
+> Minimum retained energy [%] NPOD
+> 90 235 95 405 99 961 99.5 1255 99.9 2002 99.99 3097
+
+Table 5 : Cumulative retained energy for different numbers of POD modes for the test case 2. The kinetic energy σ2 
+
+> k
+
+of the POD modes and the corresponding cumulative energy are presented in Fig.15a. To capture 99% of the total kinetic energy, as many as 961 modes are required, as detailed in Table 5, indicating a notably slower energy concentration among the leading modes. The eigenvalue spectrum, shown in Fig.15b, further illustrates that although the flow retains low-rank characteristics, the decay rate of the eigenvalues is significantly slower than that observed in the periodic bluff-body wake. This slower decay reflects the increased complexity and higher-dimensional nature of the flow, necessitating the retention of a large number of modes for accurate representation. Such insights provide critical guidance for selecting modes in the POD– AS–PRS framework, ensuring that the subsequent construction of surrogate models from AS-derived active variables adequately captures the dominant dynamics of the quasi-periodic, intermittently clustered flow. 38 (a) (b) 0 25 50 75 100 125 150 175 
+
+> Epochs
+> 10 −1
+> 10 0
+> Loss
+> Train Validation Best model point Early stopping point
+
+(c) 780 .0 782 .5 785 .0 787 .5 790 .0 792 .5 795 .0 797 .5       
+
+> t
+> 0.08 0.10 0.12
+> Cd
+> Ground truth Predicted
+> 0.07 0.08 0.09 0.10 0.11 0.12 0.13
+> Ground truth
+> 0.08 0.10 0.12
+> Predicted
+
+(d) 
+
+Fig. 16 : (a, c) Loss function evolution for both training and validation regarding Cl
+
+and Cd respectively, the yellow star ( ★) indicates the best model point where the validation loss ceases to decrease, while the red dot ( •) marks the early stopping point determined by the stopping criterion(Eq. (29)). (b, d) Model performance on the test dataset for Cl and Cd: the upper panel compares the predicted and ground truth values over time, and the lower panel shows the parity plot between the predicted and ground truth values. 
+
+Training of linear-layer ResNet and gradient computation 
+
+The linear-layer ResNet model was employed to map the POD coefficients to both aero-dynamic coefficients, Cl and Cd, following the same training procedure as described for the previous case. The training process for both QoIs exhibited robust convergence, and the model maintained stable performance across the validation dataset. The training dynamics for Cl and Cd are illustrated in Fig. 16a and Fig. 16c, respec-tively. In both cases, the loss function decreases steadily and eventually stabilizes, indicating effective learning without signs of overfitting. The predictive performance is further assessed on an independent test dataset, as shown in Fig. 16b for Cl and Fig. 16d for Cd. The time-series comparison demonstrates close agreement between 39 predicted and reference values, successfully capturing the key transient features. The corresponding parity plot further confirms that the predictions for both coefficients closely follow the ground truth with minor deviations, thereby underscoring the high accuracy of the model. Quantitative performance metrics are summarized in Table 6, including RMSE, MAE, and R2 values evaluated over the training, validation, and test datasets. While the R2 scores for the training and validation sets exceed 0.95, a relative decrease is observed on the test dataset. This discrepancy is not an indication of overfitting, as training and validation losses converge consistently; rather, it stems from the chrono-logical data splitting applied to this inherently intermittent and quasi-periodic flow. The non-stationary nature of the intermittent regime makes late-time forecasting sig-nificantly more challenging than interpolation within the training window. Crucially, within the POD–AS–PRS framework, the ResNet is primarily utilized as a differen-tiable “gradient engine” to extract sensitivity information rather than as a standalone forecasting tool. The high training accuracy confirms that the models have effectively captured the underlying nonlinear mapping and its derivatives within the training manifold, providing a reliable foundation for the subsequent AS analysis. Gradients of the predicted aerodynamic coefficients, Cl and Cd, with respect to the POD coefficients were computed via reverse-mode AD through the trained network. Similar to the cylinder case, the first 500 POD modes were retained for each sample to provide a sufficiently rich candidate space for identifying all potentially sensitive physical directions. To evaluate computational efficiency, the AD-based gradients were compared against FD approximations, as shown in Fig. 17. The AD-based gradient computation required a total of 20.0s for Cl and 20.4s for Cd, whereas FD took 5654.6s and 5682.3s, achieving significant speedups of 282.73-fold and 278.5-fold, respectively. Relative to the previous cylinder wake case, these results demonstrate that, even for the more complex quasi-periodic and intermittently clustered flow, AD preserves both high computational efficiency and machine-precision accuracy in gradient evaluation. 
+
+Dimensionality reduction of active subspaces parameter-space 
+
+Figs. 18a and 18b present the distribution of the first 20 eigenvalues of the covari-ance matrix ˆC derived from the gradients of the aerodynamic coefficients, Cl and Cd,with respect to the POD coefficients. Although the leading eigenvalues exhibit signif-icant gaps, multiple AS dimensions are retained to adequately capture the variability                                               
+
+> QoI Metric Training set Validation set Test set
+> Cl
+> RMSE 8.26 ×10 −32.52 ×10 −23.67 ×10 −2
+> MAE 6.79 ×10 −32.04 ×10 −22.79 ×10 −2
+> R20.996 0.965 0.917
+> Cd
+> RMSE 9.98 ×10 −43.12 ×10 −34.38 ×10 −3
+> MAE 8.10 ×10 −42.44 ×10 −33.30 ×10 −3
+> R20.995 0.953 0.898
+
+Table 6 : Performance metrics of the linear layer ResNet for test case 2. 40 (a) (b) 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20   
+
+> Modes
+> −10 −2
+> −10 −3
+> 010 −3
+> 10 −2
+> ∇fAD  − ∇ fFD
+> Perfect Agreement ( ∇fAD =∇fFD )
+
+(c) AD FD 10 2 
+
+> 10 3
+> Total computation time (s) 20.4s 5682.3s
+
+(d) 
+
+Fig. 17 : Gradient differences of the first 20 POD modes across all samples for (a) Cl
+
+and (c) Cd, shown as violin plots with boxplot and strip overlays; (b, d) total gradient computation times for AD and FD for (b) Cl and (d) Cd in test case 2. of QoIs, Specifically, NAS = 22 and NAS = 24 are identified as optimal for Cl and 
+
+Cd, respectively, via a grid search on the AS dimension and the polynomial order for the response surface. Figs. 18d and 18c depict the components of the corresponding eigenvectors, where color indicates the sign of contribution to the active variables. Remarkably, the sensitivity rankings for both Cl and Cd exhibit a high degree of consistency across the leading eigenvectors, which stands in contrast to the previous circular cylinder case. In the cylinder flow, the inherent two-to-one frequency relation-ship between Cd and Cl, whereby the drag coefficient oscillates at twice the vortex shedding frequency (2 fs) while the lift coefficient oscillates at the fundamental shed-ding frequency ( fs) [66, 67], necessarily causes the two force coefficients to be governed by distinct POD modes, those capturing the fundamental frequency and those cap-turing its first harmonic, independently of the degree of flow nonlinearity. However, for the NACA4412 airfoil, the presence of non-zero mean lift, arising from the cam-ber and the effective angle of attack, fundamentally breaks this reflective symmetry. As a result, the drag and lift responses share the same dominant frequency, and the same POD modes govern both Cl and Cd simultaneously. Examination of the leading three eigenvectors elucidates the comparative sensitivities: for both QoIs, the primary eigenvector is dominated by the largest absolute component in Mode 2 (negative sign indicating an inverse coupling), followed by Mode 1 (positive); the secondary eigenvec-tor exhibits primacy in Mode 4 (negative); and the tertiary eigenvector displays the peak magnitude in Mode 3 (negative), with subsequent positive influences from Mode 5. This suggests that in non-symmetric lifting configurations with non-zero mean Cl,the broken wake symmetry eliminates the two-to-one frequency relationship between 41 (a) 2 4 6 8 10 12 14 16 18 20 Index 10 1 
+
+> 10 2
+> 10 3
+> 10 4
+> Eigenvalues
+
+(b) 
+
+(c) 2 4 6 8 10 12 14 16 18 20 Modes  
+
+> w1
+> w2
+> w3
+> w4
+> w5
+> w6
+> w7
+> w8
+> w9
+> w10
+> w11
+> w12
+> w13
+> w14
+> w15
+> w16
+> w17
+> w18
+> w19
+> w20
+> Eigenvectors
+> −1.00
+> −0.75
+> −0.50
+> −0.25 0.00 0.25 0.50 0.75 1.00
+> Component Value
+
+(d) 
+
+Fig. 18 : The first 20 eigenvalues of the covariance matrix with bootstrap confidence intervals (grey regions) for (a) Cl and (b) Cd and components of the first 20 eigenvec-tors for (c) Cl and (d) Cd in test case 2. 
+
+Cd and Cl, such that both force coefficients oscillate at the same dominant frequency and are consequently governed by the same set of dominant POD modes, as identified by the active subspace. To further elucidate the influence of the POD coefficients on the aerodynamic per-formance, global sensitivity was assessed using normalized activity scores for both 
+
+Cl and Cd. Figs. 19a and 19c present the scores for the leading POD modes. To facilitate a direct comparison between the two QoIs, both figures display the top 22 modes—the number required for Cl to reach a 99% cumulative influence—even though 
+
+Cd necessitates 32 modes to achieve the same threshold. For both coefficients, Mode 2 is identified as the sensitivity-dominant parameter, followed by Modes 1, 4, 3, and 5. This ranking is highly consistent with the relative magnitudes of the components in the leading active subspace eigenvectors (Figs. 18c and 18d), further corroborat-ing that higher-magnitude eigenvector components indicate relative sensitivity to the corresponding parameters. Table 7 details the cumulative influence of these modes on 42 (a) Mode1 Mode2 Mode3 Mode4 Mode5 Mode6 Mode7 Mode8 Mode9 Mode10 Mode13 Mode14 Mode15 Mode18 Mode19 Mode21 Mode24 Mode25 Mode29 Mode30 Mode31 Mode39 Mode1 Mode2 Mode3 Mode4 Mode5 Mode6 Mode7 Mode8 Mode9 Mode10 Mode13 Mode14 Mode15 Mode18 Mode19 Mode21 Mode24 Mode25 Mode29 Mode30 Mode31 Mode39  
+
+> −20246
+> ×10 4
+> ∑ni=1  λi (wiwTi )
+
+(b) 0.0 0.2 0.4 0.6 
+
+> Relative Importance Mode 42 Mode 10 Mode 38 Mode 7 Mode 18 Mode 8 Mode 35 Mode 31 Mode 20 Mode 22 Mode 24 Mode 30 Mode 12 Mode 26 Mode 15 Mode 5 Mode 21 Mode 6 Mode 3 Mode 4 Mode 1 Mode 2
+> 0.0006 0.0007 0.0007 0.0008 0.0009 0.0009 0.0010 0.0011 0.0011 0.0011 0.0020 0.0021 0.0029 0.0033 0.0040 0.0100 0.0100 0.0136 0.0212 0.0868 0.1991 0.6222
+
+(c) Mode1 Mode2 Mode3 Mode4 Mode5 Mode6 Mode7 Mode8 Mode10 Mode12 Mode15 Mode18 Mode20 Mode21 Mode22 Mode24 Mode26 Mode30 Mode31 Mode35 Mode38 Mode42 Mode1 Mode2 Mode3 Mode4 Mode5 Mode6 Mode7 Mode8 Mode10 Mode12 Mode15 Mode18 Mode20 Mode21 Mode22 Mode24 Mode26 Mode30 Mode31 Mode35 Mode38 Mode42  
+
+> −10123
+> ×10 4
+> ∑ni=1  λi (wiwTi )
+
+(d) 
+
+Fig. 19 : Global sensitivity analysis of POD coefficients with respect to (a, b) Cl and (c, d) Cd for test case 2. (a, c) Normalized activity scores for the POD coefficients whose cumulative contributions reach 99%; (b, d) pairwise interaction matrices of the leading active subspace directions, where diagonal entries show individual sensitivities and off-diagonal entries indicate correlations (red for synergistic amplification, blue for antagonistic reduction). QoI, illustrating the number of modes required to capture specified percentages of the total influence. Figs. 19b and 19d depict the pairwise interactions of the active vari-ables through the outer product of the eigenvectors. Notably, for both coefficients, the interaction between Modes 1 and 2 exhibits a relatively pronounced negative value, indicating antagonistic effects that attenuate their combined impact on aerodynamic coefficients. Overall, these results demonstrate that the variability of both aerodynamic forces is governed by a shared set of sensitivity-dominant parameters and their inter-modal couplings, despite the slightly higher modal requirements for Cd to account for the same level of global influence. This finding underscores the efficiency of the active 43 NPOD 
+
+Minimum retained influence [%] 
+
+Cl Cd
+
+95 6 696 7 797 9 998 13 15 99 22 32 99.99 95 115 
+
+Table 7 : Cumulative retained influence of POD modes on Cl and Cd for test case 2. 1 2 3
+
+Degree of the response surface 
+
+> 12345678910 11 12 13 14 15 16 17 18 19 20 21 22
+> Active subspace dimension
+
+0.8243 0.8423 0.8437 0.8234 0.8949 0.9009 0.8409 0.8989 0.9077 0.8701 0.9166 0.9188 0.8656 0.9122 0.9176 0.8888 0.9116 0.9217 0.8874 0.9149 0.9244 0.8916 0.9197 0.9283 0.8965 0.9218 0.9278 0.8977 0.9202 0.9300 0.8937 0.9247 0.9337 0.8920 0.9234 0.9320 0.8929 0.9250 0.9333 0.8936 0.9267 0.9341 0.8942 0.9276 0.9356 0.8948 0.9306 0.9355 0.8955 0.9305 0.9321 0.8948 0.9317 0.9319 0.8958 0.9344 0.9207 0.8956 0.9355 0.8967 0.8976 0.9373 0.8643 0.8983 0.9385 0.8044 
+
+> 0.82 0.84 0.86 0.88 0.90 0.92
+
+(a) 1 2 3
+
+Degree of the response surface 
+
+> 12345678910 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+> Active subspace dimension
+
+0.7831 0.7841 0.7919 0.7903 0.8021 0.8262 0.8043 0.8196 0.8350 0.8097 0.8246 0.8441 0.8598 0.8653 0.8848 0.8561 0.8702 0.8942 0.8548 0.8722 0.8960 0.8486 0.8711 0.8951 0.8498 0.8690 0.8913 0.8497 0.8777 0.8944 0.8487 0.8809 0.8953 0.8476 0.8820 0.8964 0.8479 0.8873 0.9017 0.8518 0.8900 0.9019 0.8525 0.8923 0.8989 0.8520 0.8948 0.8943 0.8541 0.8997 0.8990 0.8547 0.9007 0.8969 0.8548 0.9014 0.8886 0.8549 0.9033 0.8806 0.8553 0.9034 0.8687 0.8554 0.9053 0.8507 0.8554 0.9091 0.8082 0.8599 0.9113 0.7155 0.725 0.750 0.775 0.800 0.825 0.850 0.875 0.900 (b) 
+
+Fig. 20 : Construction and assessment of the response surface for evaluating the gen-eralization capability of the surrogate for (a) lift coefficient Cl and (b)drag coefficient 
+
+Cd. The heatmap presents the R2 scores on the test dataset corresponding to various active subspace dimensions and polynomial orders. subspace in isolating the low-dimensional mechanisms that drive complex aerodynamic response. 
+
+Construction of response surface surrogate models 
+
+Based on the identified sensitivity-dominant parameters, the response surface was constructed using the active variables derived from the leading POD modes that collec-tively account for over 99% of the total influence. By employing the AS-based response surface construction strategy described previously, a grid search over different active subspace dimensions and polynomial orders was conducted to evaluate the general-ization capability of the surrogate models on the independent test set. Fig. 20 depicts the R2 values corresponding to the tested combinations of active subspace dimension and polynomial order. For Cd, the grid search is presented up to NAS = 24, beyond 44 which the generalization performance begins to decline due to overfitting; the remain-ing dimensions are omitted for clarity of visualization. The analysis reveals that for both coefficients, the generalization performance improves consistently with increas-ing active subspace dimension, with the optimal balance between accuracy and model complexity achieved at ( NAS , p ) = (22 , 2) for Cl and ( NAS , p ) = (24 , 2) for Cd. This configuration ensures sufficient representation of the QoI variability while maintaining computational tractability for subsequent analyses. 
+
+Accuracy assessment of the POD–AS–PRS framework 
+
+To evaluate the performance of the POD–AS–PRS framework in a more complex quasi-periodic and chaotic flow, the pre-constructed low-dimensional surrogate mod-els were employed to perform reconstruction analysis within the training interval and generalization assessment within the independent test interval, covering both the lift coefficient Cl and the drag coefficient Cd. Fig. 21 provides a comprehensive comparison between ROM results and FOM ground truth for both aerodynamic coefficients. The time-series comparisons (left panel of Fig. 21a) demonstrate that the ROM accurately reproduces the temporal evolution of both Cl and Cd in the training set and exhibits robust generalization to the intermittent fluctuations characteristic of this flow regime in the test set. The right panel illustrates the density functions of the absolute devi-ations of the ROM results from the FOM mean for both training and test phases. For the training interval, the ROM successfully captures the heavy-tail characteristics associated with intermittent extreme events [68], confirming the high reconstruction fidelity of the identified active subspace. For the independent test interval, although a moderate deviation in the tail region is observed, the surrogate still demonstrates stable generalization performance. Fig. 21b further confirms that the ROM results are in strong alignment with the FOM, with minimal errors and no evident bias. As summarized in Table 8, the surrogate model achieves R2 values of 0.9726 and 0.9577 on the training set for Cl and Cd, respectively, confirming that the identified low-dimensional active subspace enables efficient and high-fidelity reconstruction of the QoI within the reduced manifold. The independent test set yields R2 values of 0.9385 and 0.9113, respectively. The moderate reduction in R2 from training to test intervals, as well as the tail deviation observed in the density functions, are consistent with the increased complexity of the chaotic flow regime, where intermittent extreme events in the test interval may exhibit statistical properties not fully represented in the training data. Nevertheless, despite the inherent complexity of the chaotic flow regime, the high 
+
+R2 values across both QoIs on the independent test set confirm that the identified active subspace generalizes well to unseen flow states, demonstrating the robustness of the framework under challenging conditions. Overall, these results demonstrate the applicability and reliability of the POD–AS–PRS framework in identifying and modeling sensitivity-dominant mechanisms that govern both typical and extreme flow conditions. 45 Training set Test set FOM ROM                           
+
+> 745 750 755 760 765 770
+> t/( CU °1
+> 1)
+> 0.075
+> 0.100
+> 0.125
+> Cd 10 °2
+> 10 °1
+> 10 0
+> Ω
+> 0123
+> |Cd°μ|/æ
+> 10 °2
+> 10 °1
+> 10 0
+> Ω
+> 745 750 755 760 765 770
+> t/( CU °1
+> 1)
+> 0.50
+> 0.75
+> 1.00
+> Cl 10 °2
+> 10 °1
+> 10 0
+> Ω
+> 0123
+> |Cl°μ|/æ
+> 10 °2
+> 10 °1
+> 10 0
+> Ω
+
+(a) 0.6 0.8 1.0
+
+FOM       
+
+> 0.60.81.0
+> ROM
+> Training Unseen Test
+> 0.50.60.70.80.91.01.1
+
+Cl
+
+> −0.10
+> −0.05 0.00 0.05 0.10
+> Residuals (ROM - FOM)
+> Training Unseen Test
+
+(b) 0.06 0.08 0.10 0.12 0.14 
+
+FOM     
+
+> 0.06 0.08 0.10 0.12 0.14
+> ROM
+> Training Unseen Test
+> 0.06 0.08 0.10 0.12 0.14
+
+Cd
+
+> −0.02
+> −0.01 0.00 0.01
+> Residuals (ROM - FOM)  Training Unseen Test
+
+Fig. 21 : Comparison of ROM results and FOM for aerodynamic coefficients ( Cl and 
+
+Cd), where the upper and lower panels in each subfigure correspond to Cl and Cd,respectively. (a) Time-series comparison of ROM and FOM: the left panels show the temporal evolution, where the gray-shaded and steelblue-shaded regions represent the training (reconstruction) and independent test (generalization) intervals, respectively. FOM values are represented as black solid lines and ROM results as red dashed lines. The right panels present the density functions corresponding to the histograms of the absolute deviations, |QoI − μ|/σ , where μ and σ denote the mean and standard devia-tion of QoI, for both training and test phases, highlighting the statistical consistency. (b) Scatter plots of ROM results against FOM (left) and residual analysis (right) for both training (circles) and test (triangles) datasets, illustrating the model fidelity and the error distributions across both aerodynamic coefficients. 
+
+# 5 Conclusions and perspectives 
+
+In this work, we propose a novel reduced-order modeling framework, termed POD–AS– PRS, which synergistically integrates AS-based parameter-space sensitivity analysis 46 Model QoI Dataset R2 MAE RMSE POD–AS–PRS                             
+
+> Cl
+> Train 0.9726 1.60 ×10 −22.17 ×10 −2
+> Test 0.9385 2.59 ×10 −23.27 ×10 −2
+> Cd
+> Train 0.9577 2.07 ×10 −32.87 ×10 −3
+> Test 0.9113 3.16 ×10 −34.18 ×10 −3
+
+Table 8 : Performance metrics of the POD–AS–PRS framework on training and test datasets for the NACA 4412 airfoil flow at Re = 1 .75 × 10 4.with the non-intrusive reduced-order modeling capability of POD and PRS surrogate modeling. The framework extracts low-dimensional POD coefficients from high-fidelity CFD snapshots and maps them to the QoI using a linear-layer ResNet. Gradients of the QoI with respect to the POD coefficients are computed via reverse-mode AD and are subsequently employed in AS analysis to identify the sensitivity-dominant parameters that exert the most significant functional influence on the QoI. Based on these identified active directions, a compact PRS is constructed in the reduced active subspace, yielding a surrogate model built in the physically meaningful active subspace. Compared to conventional approaches, the innovations of the POD–AS–PRS framework include: (1) The introduction of gradient-based AS analysis into non-intrusive ROM: By integrating AS analysis, the framework can efficiently identify and rank the influential POD modes that govern the variations of QoI, thereby bridging the gap between black-box data-driven modeling and physical interpretability. The PRS surrogate, constructed over the identified active subspace, further rein-forces this interpretability: its explicit polynomial structure directly reveals how the QoI depends on the sensitivity-dominant directions and their interactions. (2) Efficient gradient evaluation via neural network backpropagation: The frame-work utilizes a linear-layer ResNet to map POD coefficients to the QoI, enabling the computation of exact gradients via reverse-mode AD. This differentiable architecture achieves machine-precision accuracy and significant speedup com-pared to finite difference methods, all without the need for complex adjoint solvers or explicit analytical formulas. (3) Simultaneous reduction in both state and parameter spaces: Unlike traditional methods that only reduce the state dimension, this framework achieves dual-dimensionality reduction. By identifying a low-dimensional active subspace within the POD coefficient space, it further compresses the input dimension of the surrogate model, thereby significantly reducing the computational costs of both model training and online prediction. (4) Influence-based truncation for high-fidelity QoI reconstruction: The framework establishes a novel truncation criterion that prioritizes modes based on their sensitivity scores rather than modal energy. This ensures that even with only a few key POD modes, the surrogate model can capture the essential dynamics required for precise QoI reconstruction, ensuring reliable and precise surrogate modeling. 47 Overall, the proposed POD–AS–PRS framework advances reduced-order modeling by identifying sensitivity-dominant parameters through the synergistic unification of modal decomposition and active subspace analysis, establishing a robust methodology that optimizes computational efficiency while ensuring high reconstruction fidelity, generalizability to unseen flow states, and structural insight. Two numerical examples are employed to demonstrate the robustness and versa-tility of the framework across diverse flow regimes. To assess both the reconstruction capability and generalization capability of the surrogate models, the dataset in each case is partitioned chronologically, with the first 80% of snapshots used for training and the remaining 20% reserved as an independent test set. For both flow configu-rations, AD achieves approximately two orders of magnitude acceleration in gradient evaluation over FD while maintaining machine-precision accuracy, and the framework demonstrates high reconstruction fidelity on the training datasets and satisfactory generalizability on the independent test sets across both cases. For the cylinder flow, accurate drag and lift coefficients reconstructions were achieved using only a two-dimensional active subspace and two POD coefficients. In the airfoil flow, although 961 modes were required to capture 99% of the system energy, the framework identi-fies only 22 and 32 sensitivity-dominant POD modes for Cl and Cd, respectively, to reliably capture 99% of their functional influence. Within a 22-dimensional ( Cl) and 24-dimensional ( Cd) active subspace. Notably, the analysis reveals that for this non-symmetric lifting configuration, the primary sensitivity-dominant POD modes and the resulting structural composition of the leading active subspace eigenvectors for both Cl and Cd exhibit a high degree of consistency. This contrasts with the sym-metric cylinder case, where the two-to-one frequency relationship between Cd and Cl
+
+enforces a spectral separation that causes the two force coefficients to be governed by distinct modes. The elimination of this frequency constraint in the NACA 4412 lifting configuration thus allows the active subspace to identify a shared set of primary flow structures concurrently governing multiple aerodynamic performance metrics, even though Cd exhibits a more distributed sensitivity profile in the higher-order modes. Furthermore, AD enables end-to-end differentiable gradient computation through the nonlinear mapping, enhancing the robustness of active subspace identification and sensitivity analysis. The results confirm that the sensitivity ranking of POD modes does not strictly follow their kinetic energy ordering, underscoring the necessity of identifying specific flow structures most relevant to the target QoI. In conclusion, the POD–AS–PRS framework demonstrates that shifting the reduc-tion criterion from modal energy to QoI sensitivity ensures that the resulting ROMs capture the essential dynamics governing system performance. The present study focuses on aerodynamic force coefficients as representative performance metrics that are widely used across a broad range of engineering applications. By identifying sensitivity-dominant parameters, the framework provides an efficient, high-fidelity, and physically interpretable approach to reduced-order modeling in fluid dynamics. While the present framework is demonstrated for these critical engineering objectives, it is inherently adaptable to other QoI. In particular, higher-order metrics constitute more demanding and informative targets for sensitivity analysis, as they cannot be trivially correlated with individual POD modes. Future extensions will address higher-order 48 flow-field metrics, compressible three-dimensional flows, and multiple parameter vari-ations, further broadening the framework’s applicability to complex industrial design scenarios. 
+
+Acknowledgements. The authors warmly thank the reviewers for their careful reading of the manuscript and for their constructive comments and suggestions, which have significantly contributed to improving the quality and clarity of the present work. 
+
+Author contribution. Writing – original draft, D.Y.; Writing – review & editing, D.Y., R.W., F.W., H.X.; Visualization, D.Y., H.X.; Validation, D.Y., H.X.; Software, D.Y., J.W.; Methodology, D.Y., R.W., P.L., H.X.; Data curation, D.Y.; Conceptu-alization, D.Y., R.W., F.W., H.X.; Supervision, R.W., H.X.; Project administration, H.X.; and funding acquisition, H.X. 
+
+Data & Code availability. Data and code are publicly available at https://github. com/Dewu-Yang/POD-AS-PRS. 
+
+# Declarations 
+
+Competing interests. The authors declare that they have no financial or personal conflicts of interest that could have appeared to influence the research reported in this paper. 
+
+# Appendix A Derivation of gradient computation via reverse-mode AD 
+
+The goal is to compute the gradient ∇xf , which represents the sensitivities of the QoI with respect to the POD coefficients. Since f is a one-dimensional objective function, its Jacobian J reduces to a 1 × m row vector, equivalent to the gradient: 
+
+Jp = ∂f ∂x p
+
+, p = 1 , . . . , m. (A1) The function f is implemented as a composition of l residual blocks in the ResNet architecture: 
+
+f = f l+2 ◦ f l+1 ◦ . . . ◦ f 1, (A2) where f 1 denotes the initial projection layer mapping the input to the hidden dimen-sion, f ℓ for ℓ = 2 , . . . , l + 1 represents the mapping implemented by the ( ℓ − 1)-th residual block operating on the hidden dimension, and f l+2 is the final linear layer producing the scalar output. Each residual block incorporates two FC layers, BN, ReLU activation, and a skip connection that adds the block input to its output. The corresponding Jacobian matrix satisfies the chain rule: 
+
+J = Jl+2 · J l+1 · . . . · J 1, (A3) 49 where Jℓ = ∂f ℓ  
+
+> ∂f ℓ−1
+
+is the Jacobian of the ℓ-th operation, evaluated with respect to its input. For a composite function f (x) = h ◦ g(x) = h(g(x)), the Jacobian is given by: 
+
+J = Jh◦g = Jh(g(x)) · J g (x), (A4) where elements: 
+
+Jp = ∂f ∂x p
+
+=
+
+> q
+
+X
+
+> r=1
+
+∂h ∂g r
+
+∂g r
+
+∂x p
+
+, (A5) where q is the dimension of the intermediate output g(x), and the summation reflects the chain rule applied across the composite mapping. In reverse-mode AD, the computational graph G represents the ResNet architecture as a directed acyclic graph (DAG), where nodes correspond to intermediate variables and edges denote functional dependencies. The graph begins with the input POD coefficients x ∈ Rm, progresses through the initial projection layer, l residual blocks, and the final linear layer, culminating in the scalar QoI output f (x). To compute the gradient ∇xf , reverse-mode AD initializes an adjoint at the scalar output with ¯f = 1 (where the overbar denotes adjoints) and propagates it backward. The process recursively computes adjoints for each intermediate variable by applying the transpose of the local Jacobians, accumulating sensitivities via the chain rule in reverse. Let vℓ denotes the output of the ℓ-th operation, with v0 = x and vl+2 = f (x). The initial projection computes v1 = f 1(v0), each residual block computes vℓ =
+
+f ℓ(vℓ−1) = Fℓ−1(vℓ−1) + vℓ−1, where Fℓ−1 represents the residual mapping, and the final layer computes vl+2 = f l+2 (vl+1 ). The local Jacobian for the initial and final layers is the corresponding derivative matrices, while for each residual block: 
+
+Jℓ = ∂vℓ
+
+∂vℓ−1
+
+= ∂Fℓ−1
+
+∂vℓ−1
+
++ I. (A6) Starting from the output adjoint ¯ vl+2 = ¯f = 1 (treated as a one-dimensional vector for consistency), the adjoints are propagated backward as: 
+
+vℓ−1 = J Tℓ · vℓ, ℓ = l + 2 , l + 1 , . . . , 1. (A7) This recursion yields ¯ v0 = ∇xf , the gradient of the QoI with respect to the POD coefficients. Within each residual block, the residual mapping is 
+
+F(h) = σ (BN 2 (W2 · σ (BN 1 (W1 · h)))) , (A8) where h = vℓ−1, W1 and W2 are weight matrices of the FC layers, BN i denotes batch normalization layers, and σ is the ReLU linear activation function, the adjoint propagation bifurcates across the skip connection and the residual path. Specifically, 50 the adjoint for the block input is given by: 
+
+h = vℓ +
+
+ ∂F
+
+∂h
+
+T
+
+· vℓ, (A9) where the first term arises from the identity skip (direct passthrough of sensitivities), and the second term originates from the residual mapping layers. The adjoints sub-sequently propagate backward through the individual operations in F. Specifically, within a linear layer inside F, let u denote the input to the linear layer, which is the output of the previous sub-layer within F (e.g., a ReLU or BN layer). And r = W · u
+
+denotes the output of this linear layer. The corresponding adjoint is then computed as: ¯u = WT · ¯r. (A10) This procedure continues recursively through all layers of F, involving the computation of derivatives for the ReLU activation (a diagonal matrix with entries of 1 where the input is positive and 0 otherwise), batch normalization (incorporating adjustments for mean and variance normalization along with learnable parameters). This propagation persists until the adjoints reach the input x, thereby yielding the gradient ∇xf .The computational complexity of reverse-mode AD satisfies OPS( f, ∇xf ) ≤
+
+4 × OPS( f ), rendering reverse-mode AD particularly efficient for scalar-valued outputs [42], where OPS is fused multiply-add (FMA), serving as a metric for compu-tational complexity. In contrast, forward-mode AD requires m forward passes for an 
+
+m-dimensional input, rendering it inefficient for large m.
+
+# Appendix B POD Modal Structures and Temporal Evolution 
+
+51 (a)  (b) 
+
+> Fig. B1 : (a) The first 6 POD spatial modes (left) and their corresponding temporal coefficients (right). (b) Phase-space trajectories between pairs of the first 6 POD coefficients (upper triangle) and their PDFs (diagonal), with red curves representing KDE-smoothed distributions and bars indicating histograms, highlight the dominant spatiotemporal features of the flow for test case 1.
+
+52 (a)  (b) 
+
+> Fig. B2 : (a) The first 10 POD spatial modes (left) and their corresponding temporal coefficients (right). (b) Phase-space tra-jectories between pairs of the first 10 POD coefficients (upper triangle) and their PDFs (diagonal), with red curves representing KDE-smoothed distributions and bars indicating histograms, highlight the dominant spatiotemporal features of the flow for test case 2.
+
+53 Appendix C Comparison of AS-based Sensitivity with Simple Correlation Metrics 
+
+This appendix provides a systematic comparison of the mode sensitivity rankings produced by three methods, including the AS activity score Ii, the Pearson correlation coefficient |ri|, and the standardized regression coefficient |βi|. The comparison is performed for all four QoIs considered in this work, namely the lift and drag coefficients (Cl and Cd) for both the circular cylinder and the NACA 4412 airfoil, with the aim of demonstrating that, as flow nonlinearity increases, the AS activity scores progressively reveal inter-mode coupling contributions that are structurally inaccessible to any linear projection-based metric. 
+
+Pearson correlation coefficient. 
+
+The Pearson correlation coefficient [69] between each POD coefficient ai and the scalar QoI f is defined as 
+
+ri = cov( ai, f )
+
+σai σf
+
+=
+
+> N
+
+X
+
+> k=1
+
+ a(k) 
+
+> i
+
+− ¯ai
+
+  f (k) − ¯f vuut NX
+
+> k=1
+
+ a(k) 
+
+> i
+
+− ¯ai
+
+2
+
+vuut NX
+
+> k=1
+
+ f (k) − ¯f 2
+
+, (C11) where cov() in the numerator indicates the covariance between both variables, while the sigmas in the denominator indicate the standard deviation of the variable. Here, 
+
+N is the number of snapshots, and ¯ ai, ¯f denote the sample means of the i-th POD coefficient and the QoI, respectively. 
+
+Standardized regression coefficient. 
+
+The standardized regression coefficient βi is computed as [35, 70] 
+
+βi = bi
+
+√3 ˆ σf
+
+, (C12) where bi is the i-th coefficient of the least-squares linear fit f ≈ b0 +bT a, and the factor √3 arises from scaling by the standard deviation of a uniformly distributed variable on [ −1, 1]. As noted by Constantine and Diaz [35], since this coefficient is reliable only when f is smooth and monotonic along each input direction, its sensitivity to nonlinear contributions is structurally limited. Among the first six POD modes, the sensitivity rankings for the circular cylinder 
+
+Cl and Cd are presented in Tables C1 and C2, respectively, and illustrated in Fig. C3. For the circular cylinder Cl, the AS rankings are broadly consistent with both linear methods. Mode 2 dominates all three metrics ( I2 = 0 .960, |r2| = 0 .9999, |β2| = 0 .820). The only notable discrepancy concerns Mode 4, which is ranked 2nd by the AS activ-ity score ( I4 = 0 .024) but only 5th by both |r4| = 0 .001 and |β4| = 0 .001. This is 54 consistent with the observation of Constantine & Diaz [35] that different sensitivity metrics measure different characteristics of the function, and with the noted limita-tion that the standardized regression coefficient βi is only valid when f is smooth and monotonic along each component. In the present aerodynamic problem, Mode 2 alone accounts for over 96% of the QoI variance, effectively suppressing the detectable lin-ear signal of the remaining modes below the reliability threshold of both the Pearson correlation coefficient and the standardized regression coefficients. The AS activity scores, being derived from the gradient covariance matrix rather than linear projec-tions, remain sensitive to the nonlinear and coupled contributions of Mode 4 that are invisible to both linear methods in this regime. For the circular cylinder Cd, however, the divergence between AS and the linear methods increases substantially. Mode 3 dominates all three metrics ( I3 = 0 .854, |r3| = 0 .984, |β3| = 0 .816). Mode 2 is ranked 2nd by AS ( I2 = 0 .108) but only 4th by both |r2| = 0 .038 and |β2| = 0 .031, Mode 4 is ranked 3rd by AS ( I4 = 0 .022) yet 2nd by both |r4| = 0 .154 and |β4| = 0 .129. This increased divergence relative to the Cl case is physically consistent with the fact that the drag coefficient of a symmetric bluff body oscillates at twice the vortex shedding frequency [66, 67]: the two-to-one frequency of Cd relative to Cl introduces nonlinear inter-mode interactions that the gradient-based AS detects, but that linear projection metrics are structurally unable to resolve. 0.00.51.0 Cd
+
+1 2 3 4 5 6Mode 0.00.51.0 Cl AS activity score Ii  
+
+> Pearson |ri|
+> Standardised regression |βi|
+> Sensitivity metric value
+
+Fig. C3 : Comparison of sensitivity rankings for the first six POD modes of the cylin-der, produced by three methods: AS activity score Ii, Pearson correlation coefficient 
+
+|ri|, and standardized regression coefficient |βi|.This divergence is further amplified for the NACA 4412 airfoil, where the inherent aerodynamic nonlinearities are more significant than in the canonical cylinder flow. The rankings for the airfoil Cl and Cd are presented in Tables C3 and C4 and illus-trated in Fig. C4. For the airfoil Cl, Mode 2 and Mode 1 retain a consistent top-two ranking across all three metrics ( I2 = 0 .736, |r2| = 0 .849, |β2| = 0 .822; I1 = 0 .138, 
+
+|r1| = 0 .299, |β1| = 0 .292). Mode 4 is ranked 3rd by AS ( I4 = 0 .047) yet only 10th by |r4| = 0 .077 and 15th by |β4| = 0 .085; Mode 5 and Mode 6, ranked 5th 55 Table C1 : Sensitivity rankings for the first six POD modes with respect to the circular cylinder lift coefficient Cl.                                               
+
+> Mode AS activity score IiPearson |ri|Std. regression |βi|
+> Value Rank Value Rank Value Rank Mode 1 0.001 023 50.010 496 20.008 534 2Mode 2 0.960 367 10.999 931 10.819 924 1Mode 3 0.009 782 30.003 904 30.003 237 3Mode 4 0.024 136 20.001 152 50.000 964 5Mode 5 0.000 857 60.000 974 60.000 853 6Mode 6 0.003 753 40.003 182 40.002 819 4
+
+Table C2 : Sensitivity rankings for the first six POD modes with respect to the circular cylinder drag coefficient Cd.                                               
+
+> Mode AS activity score IiPearson |ri|Std. regression |βi|
+> Value Rank Value Rank Value Rank Mode 1 0.005 220 50.019 005 60.015 452 6Mode 2 0.107 782 20.037 990 40.031 151 4Mode 3 0.854 081 10.984 342 10.816 161 1Mode 4 0.021 915 30.154 046 20.128 930 2Mode 5 0.001 341 60.019 961 50.017 482 5Mode 6 0.008 544 40.071 556 30.063 374 3
+
+(I5 = 0 .009) and 8th ( I6 = 0 .007) by AS, fall to 13th/18th and 12th/17th by the two linear methods, respectively. The Mode 18 presents the converse failure: it receives rank 5th under |r18 | = 0 .144 and rank 3rd under |β18 | = 0 .284, yet is placed only 6th by AS ( I18 = 0 .007). The linear metrics amplify the strong marginal projection of Mode 18 onto Cl without accounting for the moderating effect of inter-mode coupling. In contrast, the AS, evaluated through the full gradient covariance matrix, correctly weights this contribution within the global nonlinear response. For the airfoil Cd, an analogous pattern is observed, with the divergence between AS and the linear met-rics more pronounced still. Mode 2 is identified as the most dominant mode across all three metrics ( I2 = 0 .622, |r2| = 0 .807, |β2| = 0 .781). Mode 1, ranked 2nd by both AS ( I1 = 0 .199) and Pearson ( |r1| = 0 .313), already falls to 3rd under the stan-dardized regression coefficient ( |β1| = 0 .305), indicating that the discrepancy between AS and the linear metrics emerges at the very head of the sensitivity spectrum and diverges further for the sub-dominant modes. Mode 4 is ranked 3rd by AS ( I4 = 0 .087) but only 4th by |r4| = 0 .169 and 6th by |β4| = 0 .187; Mode 6, ranked 5th by AS (I6 = 0 .014), falls to 7th under |r6| = 0 .095 and 14th under |β6| = 0 .110. The bidirec-tional nature of the failure is most starkly illustrated by Modes 12 and 18. Mode 12, ranked 10th by AS ( I12 = 0 .003) is assigned rank 138th by |r12 | = 0 .002 and rank 142nd by |β12 | = 0 .004, rendering it effectively negligible to both linear methods. Mode 18 exhibits the opposite behaviour: ranked 10th by |r18 | = 0 .077 and 8th by 56 0.00.51.0 Cl AS activity score Ii  
+
+> Pearson |ri|
+> Standardised regression |βi|
+
+1 3 5 7 9 11 13 15 17 19 Mode 0.00.51.0 Cd
+
+> Sensitivity metric value
+
+Fig. C4 : Comparison of sensitivity rankings for the first 20 POD modes of the NACA 4412 airfoil. 
+
+|β18 | = 0 .152, it is placed only 18th by AS ( I18 = 0 .001). This confirms that its high linear sensitivity is primarily an apparent correlation, one that fades once inter-mode coupling is properly resolved. These results reveal that linear metrics prioritize modes with strong marginal projections but systematically miss those whose influence stems from nonlinear coupling. This discrepancy underscores the fundamental insufficiency of univariate correlation- and regression-based metrics for nonlinear aerodynamic sen-sitivity analysis and provides direct empirical support for adopting the AS framework in the present work. 
+
+Table C3 : Sensitivity rankings for the first 20 POD modes with respect to the NACA 4412 airfoil lift coefficient Cl.
+
+Mode AS activity score Ii Pearson |ri| Std. regression |βi|
+
+Value Rank Value Rank Value Rank Mode 1 0.138 442 2 0.299 396 2 0.291 676 2Mode 2 0.736 419 1 0.849 197 1 0.821 857 1Mode 3 0.014 488 4 0.150 959 3 0.172 917 8Mode 4 0.046 527 3 0.077 257 10 0.085 499 15 Mode 5 0.008 838 5 0.061 079 13 0.071 060 18 Mode 6 0.007 139 8 0.066 518 12 0.077 143 17 Mode 7 0.007 164 7 0.083 446 8 0.158 921 9Mode 8 0.001 564 14 0.010 612 80 0.020 397 87 Mode 9 0.002 891 10 0.021 894 37 0.041 348 42 Mode 10 0.002 586 12 0.005 540 107 0.011 911 112 Mode 11 0.000 156 38 0.037 284 19 0.051 498 33 Mode 12 0.000 439 23 0.032 504 21 0.049 708 34 Mode 13 0.001 290 17 0.019 941 41 0.031 201 57 Mode 14 0.001 442 15 0.031 389 24 0.054 672 31 
+
+Continued on next page 
+
+57 Mode 15 0.002 226 13 0.081 998 9 0.157 721 10 Mode 16 0.000 370 26 0.005 142 112 0.010 125 117 Mode 17 0.000 349 27 0.026 457 29 0.054 821 30 Mode 18 0.007 166 6 0.143 640 5 0.283 847 3Mode 19 0.000 607 22 0.021 540 38 0.043 933 40 Mode 20 0.000 150 40 0.012 167 72 0.027 411 68 
+
+Table C4 : Sensitivity rankings for the first 20 POD modes with respect to the NACA 4412 airfoil drag coefficient Cd.
+
+Mode AS activity score Ii Pearson |ri| Std. regression |βi|
+
+Value Rank Value Rank Value Rank Mode 1 0.199 137 2 0.313 147 2 0.305 072 3Mode 2 0.622 167 1 0.806 902 1 0.780 924 1Mode 3 0.021 194 4 0.186 637 3 0.213 785 5Mode 4 0.086 762 3 0.168 659 4 0.186 651 6Mode 5 0.009 953 7 0.087 295 8 0.101 560 16 Mode 6 0.013 627 5 0.094 603 7 0.109 714 14 Mode 7 0.000 807 19 0.049 360 15 0.094 005 19 Mode 8 0.000 907 17 0.007 711 104 0.014 821 111 Mode 9 0.000 247 35 0.016 241 65 0.030 672 77 Mode 10 0.000 693 21 0.005 124 119 0.011 015 119 Mode 11 0.000 101 68 0.030 363 33 0.041 938 59 Mode 12 0.002 894 10 0.002 289 138 0.003 500 142 Mode 13 0.000 099 70 0.009 596 94 0.015 015 108 Mode 14 0.000 348 30 0.021 884 48 0.038 116 63 Mode 15 0.004 025 8 0.070 435 11 0.135 481 11 Mode 16 0.000 090 73 0.005 186 118 0.010 211 121 Mode 17 0.000 090 74 0.002 579 135 0.005 344 136 Mode 18 0.000 877 18 0.077 144 10 0.152 445 8Mode 19 0.000 350 28 0.001 820 142 0.003 712 141 Mode 20 0.001 100 14 0.007 634 105 0.017 199 104 
+
+# References 
+
+[1] Zhang, C., Duan, L., Choudhari, M.M.: Direct numerical simulation database for supersonic and hypersonic turbulent boundary layers. AIAA journal 56 (11), 4297–4311 (2018) [2] Gimenez, J.M., Sivori, F.M., Larreteguy, A.E., Monta˜ no, S.I., Aguerre, H.J., Nigro, N.M., Idelsohn, S.R.: A multiscale pseudo-dns approach for solving tur-bulent boundary-layer problems. Computer Methods in Applied Mechanics and Engineering 437 , 117804 (2025) 58 [3] Li, D., Komperda, J., Peyvan, A., Ghiasi, Z., Mashayek, F.: Assessment of turbu-lence models using dns data of compressible plane free shear layer flow. Journal of Fluid Mechanics 931 , 10 (2022) [4] Bellman, R., Corporation, R., Collection, K.M.R.: Dynamic Program-ming. Rand Corporation research study. Princeton University Press (1957). 
+
+https://books.google.com/books?id=wdtoPwAACAAJ 
+
+[5] Bellman, R., Kalaba, R.: A mathematical theory of adaptive control processes. Proceedings of the National Academy of Sciences 45 (8), 1288–1290 (1959) [6] Duan, J., Hesthaven, J.S.: Non-intrusive data-driven reduced-order modeling for time-dependent parametrized problems. Journal of Computational Physics 497 ,112621 (2024) [7] Amsallem, D., Zahr, M., Choi, Y., Farhat, C.: Design optimization using hyper-reduced-order models. Structural and Multidisciplinary Optimization 51 (4), 919– 940 (2015) [8] Xu, T., Sun, X., Choi, J.-I.: Reduced-order modeling for uncertainty quan-tification of parameterized fluid-structure interaction problems. Journal of Computational Physics, 114197 (2025) [9] Ghattas, O., Willcox, K.: Learning physics-based models from data: perspectives from inverse problems and model reduction. Acta Numerica 30 , 445–554 (2021) [10] Dave, H., Cotteleer, L., Parente, A.: Physics-informed non-intrusive reduced-order modeling of parameterized dynamical systems. Computer Methods in Applied Mechanics and Engineering 443 , 118045 (2025) [11] Bai, Z.: Krylov subspace techniques for reduced-order modeling of large-scale dynamical systems. Applied numerical mathematics 43 (1-2), 9–44 (2002) [12] Haasdonk, B.: Reduced basis methods for parametrized pdes–a tutorial introduc-tion for stationary and instationary problems. Model reduction and approxima-tion: theory and algorithms 15 , 65 (2017) [13] Chaturantabut, S., Sorensen, D.C.: Nonlinear model reduction via discrete empir-ical interpolation. SIAM Journal on Scientific Computing 32 (5), 2737–2764 (2010) [14] Lo` eve, M.: Elementary probability theory. In: Probability Theory I, pp. 1–52. Springer (1977) [15] Berkooz, G., Holmes, P., Lumley, J.L.: The proper orthogonal decomposition in the analysis of turbulent flows. Annual review of fluid mechanics 25 (1), 539–575 (1993) 59 [16] Chatterjee, A.: An introduction to the proper orthogonal decomposition. Current science, 808–817 (2000) [17] Prakhar, S., Seo, J.-H., Mittal, R.: Modal force partitioning–a method for deter-mining the aerodynamic loads for decomposed flow modes with application to aeroacoustic noise. Journal of Fluid Mechanics 1013 , 7 (2025) [18] Mendez, M.A., Balabane, M., Buchlin, J.-M.: Multi-scale proper orthogonal decomposition of complex fluid flows. Journal of Fluid Mechanics 870 , 988–1036 (2019) [19] Russi, T.M.: Uncertainty Quantification with Experimental Data and Complex System Models. University of California, Berkeley (2010) [20] Constantine, P.G., Dow, E., Wang, Q.: Active subspace methods in theory and practice: applications to kriging surfaces. SIAM Journal on Scientific Computing 
+
+36 (4), 1500–1524 (2014) [21] Constantine, P.G.: Active Subspaces: Emerging Ideas for Dimension Reduction in Parameter Studies. SIAM (2015) [22] Tezzele, M., Ballarin, F., Rozza, G.: Combined parameter and model reduction of cardiovascular problems by means of active subspaces and pod-galerkin methods. In: Mathematical and Numerical Modeling of the Cardiovascular System and Applications, pp. 185–207. Springer (2018) [23] Lukaczyk, T.W., Constantine, P., Palacios, F., Alonso, J.J.: Active subspaces for shape optimization. In: 10th AIAA Multidisciplinary Design Optimization Conference, p. 1171 (2014) [24] Constantine, P.G., Doostan, A.: Time-dependent global sensitivity analysis with active subspaces for a lithium ion battery model. Statistical Analysis and Data Mining: The ASA Data Science Journal 10 (5), 243–262 (2017) [25] Yu, G., Li, N., Chen, C., Zhang, X.: A novel global prediction framework for multi-response models in reliability engineering using adaptive sampling and active subspace methods. Computer Methods in Applied Mechanics and Engineering 
+
+433 , 117506 (2025) [26] Jefferson, J.L., Maxwell, R.M., Constantine, P.G.: Exploring the sensitivity of photosynthesis and stomatal resistance parameters in a land surface model. Journal of Hydrometeorology 18 (3), 897–915 (2017) [27] Constantine, P.G., Kent, C., Bui-Thanh, T.: Accelerating markov chain monte carlo with active subspaces. SIAM Journal on Scientific Computing 38 (5), 2779– 2805 (2016) 60 [28] Giunta, A., McFarland, J., Swiler, L., Eldred, M.: The promise and peril of uncertainty quantification using response surface approximations. Structures and Infrastructure Engineering 2(3-4), 175–189 (2006) [29] Li, J., Xiu, D.: Evaluation of failure probability via surrogate models. Journal of Computational Physics 229 (23), 8966–8980 (2010) [30] Marzouk, Y.M., Najm, H.N., Rahn, L.A.: Stochastic spectral methods for efficient bayesian solution of inverse problems. Journal of Computational Physics 224 (2), 560–586 (2007) [31] Bliznyuk, N., Ruppert, D., Shoemaker, C., Regis, R., Wild, S., Mugunthan, P.: Bayesian calibration and uncertainty analysis for computationally expensive models using optimization and radial basis function approximation. Journal of Computational and Graphical Statistics 17 (2), 270–294 (2008) [32] Constantine, P., Wang, Q., Doostan, A., Iaccarino, G.: A surrogate accelerated bayesian inverse analysis of the hyshot ii flight data. In: 52nd AIAA/AS-ME/ASCE/AHS/ASC Structures, Structural Dynamics and Materials Confer-ence 19th AIAA/ASME/AHS Adaptive Structures Conference 13t, p. 2037 (2011) [33] Jones, D.R.: A taxonomy of global optimization methods based on response surfaces. Journal of global optimization 21 (4), 345–383 (2001) [34] Wild, S.M., Regis, R.G., Shoemaker, C.A.: Orbit: Optimization by radial basis function interpolation in trust-regions. SIAM Journal on Scientific Computing 
+
+30 (6), 3197–3219 (2008) [35] Constantine, P.G., Diaz, P.: Global sensitivity metrics from active subspaces. Reliability Engineering & System Safety 162 , 1–13 (2017) [36] Demo, N., Tezzele, M., Rozza, G.: A non-intrusive approach for the reconstruction of pod modal coefficients through active subspaces. Comptes Rendus. M´ ecanique 
+
+347 (11), 873–881 (2019) [37] Kunisch, K., Volkwein, S.: Control of the burgers equation by a reduced-order approach using proper orthogonal decomposition. Journal of optimization theory and applications 102 (2), 345–371 (1999) [38] Kunisch, K., Volkwein, S.: Galerkin proper orthogonal decomposition methods for a general equation in fluid dynamics. SIAM Journal on Numerical Analysis 
+
+40 , 492–515 (2006) https://doi.org/10.1137/S0036142900382612 [39] He, K., Zhang, X., Ren, S., Sun, J.: Deep residual learning for image recogni-tion. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp. 770–778 (2016) 61 [40] Al-Kababji, A., Bensaali, F., Dakua, S.P.: Scheduling techniques for liver seg-mentation: Reducelronplateau vs onecyclelr. In: International Conference on Intelligent Systems and Pattern Recognition, pp. 204–212 (2022). Springer [41] Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., Killeen, T., Lin, Z., Gimelshein, N., Antiga, L., et al.: Pytorch: An imperative style, high-performance deep learning library. Advances in neural information processing systems 32 (2019) [42] Griewank, A., Walther, A.: Evaluating Derivatives: Principles and Techniques of Algorithmic Differentiation. SIAM (2008) [43] Poincar´ e, H.: Sur les equations aux d´ eriv´ ees partielles de la physique math´ ematique. American Journal of Mathematics 12 (3), 211–294 (1890). Accessed 2025-08-15 [44] Stewart, G.W.: Error and perturbation bounds for subspaces associated with certain eigenvalue problems. SIAM review 15 (4), 727–764 (1973) [45] Lumley, J.L.: The structure of inhomogeneous turbulent flows. Atmospheric turbulence and radio wave propagation, 166–178 (1967) [46] Perry, M., Wynn, H., Bates, R.: Principal components analysis in sensitivity studies of dynamic systems. Probabilistic engineering mechanics 21 (4), 454–460 (2006) [47] Hastie, T., Tibshirani, R., Friedman, J., et al.: The elements of statistical learning. Springer (2009) [48] Kingma, D.P.: Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 (2014) [49] Prechelt, L.: Early stopping-but when? In: Neural Networks: Tricks of the Trade, pp. 55–69. Springer (2002) [50] Tibshirani, R.J., Efron, B.: An introduction to the bootstrap. Monographs on statistics and applied probability 57 (1), 1–436 (1993) [51] Paul F. Fischer, J.W.L., Kerkemeier, S.G.: Nek5000 Web page. http://nek5000. mcs.anl.gov (2008) [52] Offermans, N., Peplinski, A., Marin, O., Schlatter, P.: Adaptive mesh refinement for steady flows in nek5000. Computers & Fluids 197 , 104352 (2020) [53] Patera, A.T.: A spectral element method for fluid dynamics: laminar flow in a channel expansion. Journal of Computational Physics 54 (3), 468–488 (1984) 62 [54] Maday, Y., Patera, A.T.: Spectral element methods for the incompressible navier-stokes equations. IN: State-of-the-art surveys on computational mechanics (A90-47176 21-64). New York, 71–143 (1989) [55] Fischer, P.F.: An overlapping schwarz method for spectral element solution of the incompressible navier–stokes equations. Journal of Computational Physics 
+
+133 (1), 84–101 (1997) [56] Fischer, P.: Implementation considerations for the oifs/characteristics approach to convection problems. Argonne National Laboratory 37 (2003) [57] Amor, C., Schlatter, P., Vinuesa, R., Le Clainche, S.: Higher-order dynamic mode decomposition on-the-fly: A low-order algorithm for complex fluid flows. Journal of Computational Physics 475 , 111849 (2023) [58] Citro, V., Luchini, P., Giannetti, F., Auteri, F.: Efficient stabilization and accel-eration of numerical simulation of fluid flows by residual recombination. Journal of Computational Physics 344 , 234–246 (2017) [59] Shahriari, N., Kollert, M.R., Hanifi, A.: Control of a swept-wing boundary layer using ring-type plasma actuators. Journal of Fluid Mechanics 844 , 36–60 (2018) [60] Rudy, S.H., Sapsis, T.P.: Prediction of intermittent fluctuations from surface pressure measurements on a turbulent airfoil. AIAA Journal 60 (7), 4174–4190 (2022) [61] Maday, Y., Patera, A.T., Rønquist, E.M.: An operator-integration-factor splitting method for time-dependent problems: application to incompressible fluid flow. Journal of Scientific Computing 5(4), 263–292 (1990) [62] Baydin, A.G., Pearlmutter, B.A., Radul, A.A., Siskind, J.M.: Automatic differ-entiation in machine learning: a survey. Journal of machine learning research 
+
+18 (153), 1–43 (2018) [63] Cook, R.D.: Regression Graphics: Ideas for Studying Regressions Through Graphics. John Wiley & Sons (2009) [64] Fischer, P., Mullen, J.: Filter-based stabilization of spectral element methods. Comptes Rendus de l’Acad´ emie des Sciences-Series I-Mathematics 332 (3), 265– 270 (2001) [65] Dong, S.: A convective-like energy-stable open boundary condition for simulations of incompressible flows. Journal of Computational Physics 302 , 300–328 (2015) https://doi.org/10.1016/j.jcp.2015.09.017 [66] Marzouk, O.A.: Extended five-term nonlinear drag model for a wide range of cylinder wakes: Osama a. marzouk. Journal of Engineering Mathematics 157 (1), 63 1 (2026) [67] Zheng, Z., Zhang, N.: Frequency effects on lift and drag for flow past an oscillating cylinder. Journal of Fluids and Structures 24 (3), 382–399 (2008) [68] Sapsis, T.P.: Statistics of extreme events in fluid flows and waves. Annual Review of Fluid Mechanics 53 (1), 85–111 (2021) [69] Pearson, K.: Vii. note on regression and inheritance in the case of two parents. proceedings of the royal society of London 58 (347-352), 240–242 (1895) [70] Saltelli, A., Ratto, M., Andres, T., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., Tarantola, S.: Global Sensitivity Analysis: the Primer. John Wiley & Sons (2008) 64

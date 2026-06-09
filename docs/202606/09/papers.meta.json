@@ -1,0 +1,69 @@
+{
+  "label": "2026-06-09",
+  "date": "2026-06-09",
+  "generated_at": "2026-06-09T21:50:01",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202606/09/2606.02467v1-sharp-interface-simulations-of-energetic-multiphase-flows-with-large-density-and-viscosity-ratios",
+      "section": "quick",
+      "title_en": "Sharp-interface Simulations of Energetic Multiphase Flows with Large Density and Viscosity Ratios",
+      "authors": "Tzu-Yao Huang, Nicolas Valle, Artur K. Lidtke, Kelli Hendrickson, Gabriel D. Weymouth",
+      "date": "2026-06-01",
+      "pdf": "https://arxiv.org/pdf/2606.02467v1",
+      "score": "7.0",
+      "evidence": "高密度比多相流的锐界面方法可应用于降膜模拟",
+      "tldr": "大密度比和大粘度比的含能多相流（如波浪破碎与空气卷吸）模拟中，传统速度格式难保鲁棒性，CMOM框架虽严守物理守恒但动量场的不连续性导致严重冲击问题。为解决此矛盾，本文提出同步施主区动量通量（SynDRoM）技术，强制输运速度场的单调性以消除伪振荡。同时，针对界面区粘度估计不当引入的时间步长限制和不稳定性，开发了基于有界运动粘度的限制器。通过标量输运、界面剪切不稳定性及重力驱动平面剪切流的测试，表明SynDRoM能保持物理保真度而无速度尖峰，粘度限制器提升稳定性，最终在波浪破碎全耦合模拟中验证了综合性能，为高保真模拟该类流动提供了有效方案。",
+      "tags": "query:falling-film",
+      "abstract_en": "Flows with high density ratios, such as wave breaking and air entrainment in maritime applications, remain challenging to simulate due to their energetic and strongly nonlinear nature. In such regimes, maintaining numerical robustness is difficult when using the commonly adopted velocity-based formulation. The Consistent Mass-Momentum (CMOM) transport framework improves numerical robustness by enforcing fundamental physical properties, most notably momentum conservation and semi-discrete energy-conserving. However, CMOM replaces the advection of a continuous velocity field with that of a discontinuous momentum field. When combined with sharp interface methods, this leads to severe momentum shocks, for which conventional shock-capturing schemes are ineffective. To reconcile physical fidelity with numerical robustness, this work proposes a Synchronized Donor-Region of Momentum fluxes (SynDRoM) that enforces monotonicity of the transported velocity field. The resulting algorithm effectively eliminates spurious velocity oscillations without sacrificing physical fidelity, as demonstrated through scalar transport and interfacial shear instability test cases. Beyond difficulties from large density ratio, improper estimation of viscosity in the vicinity of the interface can introduce numerical instabilities at finite time steps, thereby undermining overall robustness. To address this issue, a viscosity limiter based on the bounded kinetic viscosity concept is introduced and validated using a gravity-driven plane shear flow. Finally, a breaking wave simulation is performed to assess the combined performance of the proposed physics-preserving numerical schemes for multiphase flows.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/09/2606.02315v1-identifying-sensitivity-dominant-parameters-via-active-subspaces-in-reduced-order-modeling-of-fluid-dynamics",
+      "section": "quick",
+      "title_en": "Identifying sensitivity-dominant parameters via active subspaces in reduced-order modeling of fluid dynamics",
+      "authors": "Dewu Yang, Rui Wang, Pengyu Lai, Junjie Wang, Feng Wang, Hui Xu",
+      "date": "2026-06-01",
+      "pdf": "https://arxiv.org/pdf/2606.02315v1",
+      "score": "6.0",
+      "evidence": "可迁移的CFD降阶建模框架，适用于降膜换热模拟",
+      "tldr": "降阶模型在流体动力模拟中至关重要，但传统参数降维依赖模态能量无法保证对目标量的敏感性。本文提出POD-AS-PRS框架，利用活性子空间分析自动识别对感兴趣量敏感的主导POD系数，实现状态与参数双重降维。在周期性及混沌钝体绕流算例中，该框架仅用少量敏感参数即实现高保真度重构，且自动微分梯度计算速度较有限差分提升两个数量级。揭示了敏感性主导的低维流形，为高效准确预测流体动力学特性提供了新途径。",
+      "tags": "query:falling-film",
+      "abstract_en": "Reduced-order models (ROMs) are widely employed to describe complex system dynamics when simulations with full-order models (FOMs) are computationally prohibitive. This study presents POD-AS-PRS, a novel model-reduction framework based on the active subspaces (AS) technique, which performs dimensionality reduction in both the state and parameter spaces, enabling efficient and high-fidelity approximations of quantities of interest (QoI). The approach employs proper orthogonal decomposition (POD) to extract low-dimensional coefficients from CFD snapshots, which are inputs to a residual neural network (ResNet) with linear layers to learn their nonlinear mapping to QoI. Reverse-mode automatic differentiation (AD) is utilized to compute gradients with respect to the coefficients, enabling AS analysis to identify influential modes by shifting the analysis to the POD coefficient space, thereby achieving a dual-stage dimensionality reduction driven by QoI sensitivity rather than modal energy. A surrogate model is subsequently constructed using a polynomial response surface (PRS) based on AS-derived active variables, retaining only the highly influential POD coefficients to ensure accurate and efficient QoI reconstruction. The framework is validated on periodic and chaotic bluff-body flows, demonstrating high accuracy with few influential parameters, while AD-based gradients achieve a two-order-of-magnitude speed-up over finite-difference approximations. Sensitivity analysis further reveals that the influential coefficients are not necessarily proportional to modal energy, highlighting the critical flow structures. Consequently, POD-AS-PRS identifies a low-dimensional manifold of sensitivity-dominant parameters that govern the QoI, elucidating the essential flow structures and their coupling with control parameters, thereby enabling efficient and accurate QoI reconstruction.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/09/2606.03059v1-dynamics-of-vapor-bubble-train-in-flow-boiling-heat-transfer-in-microchannels",
+      "section": "quick",
+      "title_en": "Dynamics of vapor bubble train in flow boiling heat transfer in microchannels",
+      "authors": "Odumuyiwa A. Odumosu, Tianyou Wang, Zhizhao Che",
+      "date": "2026-06-02",
+      "pdf": "https://arxiv.org/pdf/2606.03059v1",
+      "score": "6.0",
+      "evidence": "微通道沸腾中蒸气气泡链的数值两相流模拟",
+      "tldr": "微通道流动沸腾凭借高效散热潜力备受关注，然实际应用中气泡常以列状形式出现，彼此间复杂的相互作用显著影响传热性能，而以往研究多局限于单一气泡。为此，本研究利用流动聚焦技术在微通道上游生成单分散蒸汽气泡列，并通过数值模拟系统考察了初始气液体积比、壁面热流及工质潜热的影响。结果表明，提高初始体积比虽增加气泡频率，但减小了气泡尺寸从而抑制生长率；壁面热流增大或工质潜热降低则通过增强气化速率促进气泡生长。此外，上游气化导致气泡膨胀并加速下游气泡运动，引发壁面温度和努塞尔数的周期性波动。这一工作为微通道沸腾热管理的精确预测与优化设计提供了重要理论支撑。",
+      "tags": "query:falling-film",
+      "abstract_en": "Microchannel flow boiling is a promising technique for micro-device thermal management, and understanding the bubble dynamics in microchannel flow boiling is important for the applications. Previous studies only focused on single, isolated bubbles, but the bubbles in microchannel flow boiling applications often exist as bubble trains, in which the bubbles interact with each other. Here, we investigate numerically vapor bubble trains in microchannel flow boiling by adopting the flow-focusing technique to form monodispersed bubbles in the upstream of the microchannel. With increasing the initial vapor-liquid volume ratio, the bubble frequency increases while the growth rate of the bubbles decreases because of the reduced bubble size. With increasing the heat flux on the wall or reducing the latent heat of the working fluid, the bubble train growth rate increases because of the increased vaporization rate. The vaporization of the fluid in the upstream causes the bubble expansion and accelerates the bubble movement in the downstream. The wall temperature and the Nusselt number fluctuate because of the periodic pass-through of bubbles.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/09/2606.04204v1-an-energy-stable-implicit-convex-splitting-bdf2-scheme-for-the-cahn-hilliard-navier-stokes-equations",
+      "section": "quick",
+      "title_en": "An Energy-Stable Implicit Convex-Splitting BDF2 Scheme for the Cahn-Hilliard-Navier-Stokes Equations",
+      "authors": "Xuelong Gu, Qi Wang",
+      "date": "2026-06-02",
+      "pdf": "https://arxiv.org/pdf/2606.04204v1",
+      "score": "6.0",
+      "evidence": "开发了用于Cahn-Hilliard-Navier-Stokes方程两相流模型的能量稳定BDF2格式",
+      "tldr": "Cahn-Hilliard-Navier-Stokes方程模拟两相流时，传统BDF2离散因耦合能量估计不兼容而难以保证能量稳定。本研究提出一种新的BDF2兼容凸分裂格式，利用移位BDF2恒等式处理非线性体力，直接构建离散体能量等式。该方案无条件能量稳定、质量守恒且唯一可解，能证明相变量、化学势、速度和压力的二阶收敛，为CHNS系统提供了首个高效、稳定的隐式BDF2数值方法。",
+      "tags": "query:falling-film",
+      "abstract_en": "We develop an energy-stable implicit convex-splitting BDF2 discretization (CS-BDF2) of the Cahn--Hilliard--Navier--Stokes equations. For the Cahn--Hilliard equation, BDF2 analyses can establish energy stability by testing the phase equation in the (H^{-1}) metric. For CHNS, this test is not compatible with the coupled energy estimate: the momentum equation is tested by (\\bfu^{n+1}), while the transported phase equation is tested by (μ^{n+1}) so that transport cancels capillary work. The chemical-potential relation must then be paired with the BDF2 phase increment ((3φ^{n+1}-4φ^n+φ^{n-1})/2); its nonlinear part must produce a BDF2 bulk-energy difference, up to nonnegative higher-order history terms. To overcome this difficulty, we introduce a new BDF2-compatible convex-splitting approximation of the nonlinear bulk force that directly yields a discrete bulk-energy identity and enables a discrete energy analysis for the CHNS system. Specifically, we discretize the bulk force (f(φ)=φ^3-φ) by (χ(φ^{\\dagger,n+1},φ^{\\dagger,n})-φ^{*,n+1}), where (χ(a,b)=\\tfrac14(a^2+b^2)(a+b)), (φ^{\\dagger,n+1}=\\tfrac{3φ^{n+1}-φ^n}{2}), (φ^{\\dagger,n}=\\tfrac{3φ^n-φ^{n-1}}{2}), and (φ^{*,n+1}=2φ^n-φ^{n-1}). This discretization is based on the shifted BDF2 identity ((3φ^{n+1}-4φ^n+φ^{n-1})/2=φ^{\\dagger,n+1}-φ^{\\dagger,n}). With a matching discretization of the reversible coupling terms in CHNS, the scheme is mass conservative, uniquely solvable, and unconditionally energy stable. We prove second-order convergence for the phase variable, chemical potential, velocity, and pressure.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

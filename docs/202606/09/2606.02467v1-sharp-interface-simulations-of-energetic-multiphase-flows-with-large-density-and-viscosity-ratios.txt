@@ -1,0 +1,525 @@
+Title: Sharp-interface Simulations of Energetic Multiphase Flows with Large Density and Viscosity Ratios
+
+URL Source: https://arxiv.org/pdf/2606.02467v1
+
+Published Time: Tue, 02 Jun 2026 03:21:05 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+36 th Symposium on Naval Hydrodynamics Busan, Korea, June 14 – 19, 2026 
+
+# Sharp-interface Simulations of Energetic Multiphase Flows with Large Density and Viscosity Ratios 
+
+# T.-Y. Huang 1, N. Valle 1, A. K. Lidtke 2, K. Hendrickson 3, G. D. Weymouth 1
+
+# (1Delft University of Technology, the Netherlands, 2Maritime Research Institute Netherlands (MARIN), the Netherlands, 3University of North Carolina at Chapel Hill, United States) 
+
+ABSTRACT 
+
+Flows with high density ratios, such as wave breaking and air entrainment in maritime applications, re-main challenging to simulate due to their energetic and strongly nonlinear nature. In such regimes, maintaining numerical robustness is difficult when using the com-monly adopted velocity-based formulation. The Con-sistent Mass-Momentum (CMOM) transport framework improves numerical robustness by enforcing fundamen-tal physical properties, most notably momentum conser-vation and semi-discrete energy-conserving. However, CMOM replaces the advection of a continuous velocity field with that of a discontinuous momentum field. When combined with sharp interface methods, this leads to se-vere momentum shocks, for which conventional shock-capturing schemes are ineffective. To reconcile physical fidelity with numerical robustness, this work proposes a Synchronized Donor-Region of Momentum fluxes (Syn-DRoM) that enforces monotonicity of the transported ve-locity field. The resulting algorithm effectively eliminates spurious velocity oscillations without sacrificing physical fidelity, as demonstrated through scalar transport and in-terfacial shear instability test cases. Beyond difficulties from large density ratio, improper estimation of viscosity in the vicinity of the interface can introduce numerical instabilities at finite time steps, thereby undermining over-all robustness. To address this issue, a viscosity limiter based on the bounded kinetic viscosity concept is intro-duced and validated using a gravity-driven plane shear flow. Finally, a breaking wave simulation is performed to assess the combined performance of the proposed physics-preserving numerical schemes for multiphase flows. 
+
+INTRODUCTION Advection schemes for extreme density ratios 
+
+Violent, turbulent multiphase flows are ubiqui-tous in naval hydrodynamics, arising in phenomena such as bow-wave breaking, wake air entrainment, propeller cavitation, and flows around appendages operating near the free surface. Since the earliest numerical simulations of multiphase flows (Harlow and Welch, 1965), the de-velopment of robust, efficient, and physically consistent numerical methods has remained a central challenge. In maritime applications, this challenge is exacerbated by extreme density ratios (Desjardins and Moureau, 2010): approximately 10 3 for air-water systems and up to 10 4 for cavitating flows. As a natural extension of single-phase solvers, non-conservative velocity formulations combined with interface-capturing techniques are widely used in multi-phase simulations (Dommermuth et al. , 2009, Stern et al. ,2013). However, the inconsistent advection of velocity and density leads to misalignment between pressure gra-dients and density discontinuities across interfaces. This inconsistency can trigger numerical divergence, particu-larly when large pressure gradients are divided by small densities (Arrufat et al. , 2021, Jin et al. , 2021). More-over, velocity-based formulations do not enforce momen-tum conservation or kinetic energy boundedness, allowing spurious transfers of momentum and energy directly with the advection terms (Desjardins and Moureau, 2010, Gh-ods and Herrmann, 2013). Various stabilization strategies have been pro-posed to alleviate these issues, including the Ghost Fluid Method (Fedkiw et al. , 1999, Peltonen et al. , 2020), Favre-averaged formulations (Fu et al. , 2010, Jin et al. , 2021), and artificially smoothed density profiles (Fuster et al. ,2009). While these approaches may improve numerical stability, they often compromise key physical properties such as momentum conservation, energy boundedness, or interface sharpness, and remain vulnerable to instabilities at high density ratios. Consistent Mass-Momentum (CMOM) transport schemes, originally proposed by Rudman (1998), were specifically designed to address these challenges. By em-ploying a conservative momentum formulation and syn-chronizing part of the momentum flux with the mass flux, CMOM schemes ensure consistent transport of discon-tinuities across flow variables. As a result, momentum conservation is satisfied by construction, which Mirjalili and Mani (2021), Valle and Verstappen (2023) find to be 
+
+> arXiv:2606.02467v1 [physics.flu-dyn] 1 Jun 2026
+
+a prerequisite for semi-discrete energy conservation. Fur-thermore, through the synchronizing the fluxes, CMOM also avoids unbounded pressure-density division problem (Valle and Verstappen, 2023). On the other hand, the computational overhead introduced by CMOM is small: momentum transport reuses the mass fluxes already com-puted during interface advection, while the additional con-version between velocity and momentum implies simple point-wise multiplication and division, which incurs only a negligible cost. Additionally, even when the pressure Pois-son solve remains the dominant computational expense, its cost also decreases in practice because the improved con-sistency between mass and momentum transport produces a more regular flow field than traditional formulations. These properties have made CMOM increasingly attrac-tive for high-density-ratio multiphase flows (van der Eijk and Wellens, 2023, Kuhn et al. , 2023, Li et al. , 2024, Mirjalili and Mani, 2021, Valle and Verstappen, 2023). Despite these advantages, CMOM combined with sharp-interface methods often produces oscillatory velocity fields due to momentum shocks. For incompress-ible flows, a satisfactory CMOM scheme should addition-ally ensure total variation diminishing (TVD) behavior of the velocity field (Kuhn et al. , 2023, Le Chenadec and Pitsch, 2013). Several studies have attempted to mitigate this issue using dissipative or interface-aware flux limiters (Desmons and Coquerelle, 2021, Kuhn et al. , 2023, Rem-merswaal, 2023, Zuzio et al. , 2020), but with limited suc-cess, largely due to inadequate treatment of interface ge-ometry during velocity reconstruction. Only a few works explicitly recognize the need for bounded momentum re-construction to guarantee velocity boundedness with sharp interfaces (Le Chenadec and Pitsch, 2013, Owkes and Desjardins, 2017, Remmerswaal, 2023). Building on the framework of Le Chenadec and Pitsch (2013), the present work proposes a generalized Synchronized Donor Region of Momentum flux (SynDRoM) method, designed to avoid full interface reconstruction on staggered grids and to in-tegrate naturally within a directionally split framework (Weymouth and Yue, 2010). 
+
+Treatment of viscosity jumps 
+
+In addition to large density contrasts, high vis-cosity ratios pose further challenges for the robustness of multiphase flow solvers (Desmons and Coquerelle, 2021, Li et al. , 2022, Nangia et al. , 2019). Sharp viscosity jumps induce discontinuities in velocity gradients and compli-cate the modeling of interfacial viscous stresses, such as those encountered in air lubrication layers (Elbing et al. ,2008). Simple arithmetic averaging of viscosity becomes inadequate in such cases (Tryggvason et al. , 2011). Al-ternative approaches, including Ghost Fluid formulations for viscous terms (Lalanne et al. , 2015), harmonic aver-aging (Nangia et al. , 2019, Prosperetti, 2002, Tryggvason 
+
+et al. , 2011), and anisotropic constitutive laws (Magnaudet 
+
+et al. , 2025), have shown limited success, particularly at finite time steps and high Reynolds numbers. Other sta-bilization techniques rely on smoothing material proper-ties, which undermines physical fidelity and conflicts with sharp-interface momentum transport. To address this is-sue, the present study introduces a simple viscosity limiter that constrains the effective kinematic viscosity within a stability-preserving range (Campbell, 2015). 
+
+Structure of the paper 
+
+The paper is organized to progressively identify, analyze, and resolve the key numerical challenges asso-ciated with energetic multiphase flows. The model is presented as follows: First, the limitations of velocity-based formulations and the original CMOM scheme are illustrated using a dam-break configuration, supported by energy behaviors. Second, a simplified one-dimensional test case is then introduced to explain why CMOM in combination with existing interface-aware slope limiters fails to maintain velocity boundedness when sharp inter-faces cross the grid boundaries. Third, building on these observations, we propose a modification of the advection scheme to CMOM, i.e. Synchronized Donor Region of Momentum flux (SynDRoM), together with a direction-ally split momentum update consistent with a conserva-tive Volume-of-Fluid (cVOF) framework and a modified temporal integration strategy. Finally, the treatment of viscosity jumps is subsequently discussed, leading to the introduction of a viscosity limiter designed to preserve numerical stability without sacrificing physical fidelity. The validation cases are selected to isolate and examine the physical mechanisms that are relevant to the final demonstration case of standing wave breakers. The dam-break problem, which also involves strong ex-changes between potential and kinetic energy, is first present to compare the characteristic behavior of differ-ent numerical schemes. Highly energetic events also fea-tures plentiful fast-traveling droplet; a conceptually re-lated one-dimensional droplet example is employed to clarify the root causes of success or failure for each method. Since velocity shear is ubiquitous at fluid in-terfaces and naturally triggers Kelvin-Helmholtz instabil-ity, this canonical problem–supported by well-established analytical solutions–is chosen as the validation case for SynDRoM. Vertical interfaces, which arise during jet for-mation in wave breaking, motivate the use of a falling-film configuration to assess the robustness of viscosity inter-polation schemes. Finally, the overall capability of the proposed solver is demonstrated through simulations of standing wave breakers, both with and without viscous effects. 
+
+SPECIAL TREATMENT OF ADVECTION TERMS Limitations of velocity formulations and motivation for a modified CMOM 
+
+We use a two-dimensional dam-break problem to illustrate the shortcomings of velocity-based formulations and the original CMOM scheme, and to provide an ini-tial comparison with the proposed SynDRoM. A column of water of height 𝐻 collapses under gravity 𝑔 in the ab-sence of stabilizing mechanisms such as surface tension or viscosity. Figure 1 compares the interface shape and vortic-ity field obtained using those three methods, while Figure 2 presents the temporal evolution of mechanical energy and its components. In the velocity-based formulation, the air velocity penetrates into the water field, producing an nonphysical devil-horn-shaped interface distortion (high-lighted by the purple oval in Figure 1a). This erroneous momentum transfer is accompanied by energy blow-up at later times, as evidenced by the spiky growth of total energy in Figure 2. The original CMOM formulation suppresses ve-locity penetration and prevents energy divergence; how-ever, it introduces localized velocity blobs in the light phase (marked by purple ovals in Figure 1b). In contrast, the SynDRoM formulation successfully resolves both the interface deformation and the spurious velocity structures without sacrificing the desired physical principles. The following sections examine the origin of the velocity blob-bing observed in the original CMOM scheme and intro-duce a remedy. 
+
+Numerical methods and original CMOM 
+
+This section summarizes the discretization of ad-vection terms in the original CMOM formulation, pro-viding the necessary background for subsequent analysis. Further implementation details are available in the open-source repository InterfaceAdvection.jl 1, a GPU-accelerated multiphase solver based on WaterLily.jl 
+
+(Weymouth and Font, 2025). We consider the incompressible one-fluid Navier-Stokes equations, treating the two fluids as a single con-tinuum with spatially varying properties determined by an indicator function. The continuity equation is solved using a directionally split conservative Volume-of-Fluid (cVOF) method (Weymouth and Yue, 2010). A stag-gered grid arrangement is adopted (Figure 3) to improve pressure-velocity coupling and preserve favorable spectral properties. The conservative governing equations required 
+
+> 1https://github.com/TzuYaoHuang/InterfaceAdvection.jl .The code is released under the MIT license and provides simple setup procedures and examples for reproducible simulations and benchmark-ing. Future developments include the incorporation of Boundary-Data Immersion Methods (Weymouth and Yue, 2011) to enable fluid-structure interaction problems such as ship-wave interaction, as well as multi-GPU extensions to support industrial-scale simulations.
+
+for CMOM are 
+
+𝜕 𝑡 𝜌 + 𝜕 𝑗 Φ 𝑗 = 0, (1) 
+
+𝜕 𝑡 𝑞 𝑖 + 𝜕 𝑗 Ψ𝑗 𝑢 𝑖 = −𝜕 𝑖 𝑝 + 𝜕 𝑗 (𝜇 (𝜕 𝑗 𝑢 𝑖 + 𝜕 𝑖 𝑢 𝑗 )) + 𝑔 𝑖 , (2) where 𝑞 𝑖 = 𝜌𝑢 𝑖 denotes momentum. The mass fluxes 
+
+Φ 𝑗 and Ψ𝑗 are defined on the faces of the collocated and staggered grids, respectively. 𝜇 is the dynamic viscosity and 𝑔 𝑖 the body force vectors. The advected velocity 𝑢 𝑖 
+
+is reconstructed using slope limiters within the implicit large-eddy simulation (iLES) framework. Viscous and body-force terms are omitted here and revisited in the viscosity section. CMOM enforces consistency between the mass fluxes in the continuity and momentum equations by syn-chronizing Φ 𝑗 and Ψ𝑗 , thereby embedding mass conserva-tion into the momentum update. However, the staggered grid arrangement (Figure 3) prevents direct reuse of collo-cated mass fluxes in the momentum advection step. Sev-eral remedies have been proposed, including additional staggered-grid mass advection (Zuzio et al. , 2020), multi-resolution cell complexes (Rudman, 1998), and isometric averaging of collocated-grid fluxes (Mirjalili and Mani, 2021, Valle and Verstappen, 2023, Verstappen and Veld-man, 2003). In this work, we adopt the latter approach due to its simplicity and strict mass and momentum conserva-tion. Isometric averaging– i.e. : volumetric averaging of density and area-weighted averaging of mass flux–maps collocated quantities onto staggered control volumes while preserving mass conservation by construction. For the horizontal staggered cell in Figure 3, the corresponding quantities are 
+
+𝜌 𝑢 𝑥 ;e = (𝜌 PVP + 𝜌 EVE)/(V P + V E),
+
+Ψ𝑥 ;E = (Φ𝑥 ;e Ae + Φ𝑥 ;ee Aee )/(A P + A ee ),
+
+Ψ𝑦 ;ne = (Φ𝑦 ;n An + Φ𝑦 ;nE AnE )/(A n + A E),
+
+where A and V denote face areas and cell volumes. For simplicity, a uniform unit cell complex is assumed here-inafter; extensions to stretched grids and three dimensions are straightforward. 
+
+Failure of original CMOM: non-monotonic transport 
+
+The quasi-one-dimensional test case shown in Figure 4, adapted from Arrufat et al. (2021), Kuhn et al. 
+
+(2023), illustrates the failure of original CMOM schemes– both with traditional and existing interface-aware slope limiters–to preserve velocity monotonicity. The setup is as follows: a dense, 1D, droplet embedded in air is advected uniformly to the right with velocity 𝑈 , while a sharp verti-cal velocity gradient exists at the rear interface. This con-figuration represents an extreme but revealing edge case, characterized by a localized spike in momentum. The flow behavior is conceptually similar to the top interface (a) Velocity formulation. (b) Original CMOM. (c) The proposed SynDRoM. 
+
+Figure 1: Interface shape and vorticity field of the 2D dam break example at 𝑡 √︁ 𝑔 /𝐻 = 0.6. Teal blue hatches show the water region. Flow field irregularities of velocity and original CMOM formulations indicated and zoomed in with purple oval insets. Flow field of SynDRoM is also enlarged with green oval for comparison purpose. (𝑁 𝑥 , 𝑁 𝑦 ) = (96 , 96 ).
+
+Figure 2: Temporal evolution of energy and its compo-nents of the dam break case. of dam break after a few time steps, with velocity pointing downwards. The simplified governing equations reduce to 
+
+𝜕 𝑡 𝜌 +𝜕 𝑗 Ψ = 0,𝜕 𝑡 𝑞 +𝜕 𝑗 Ψ𝑣 = 0,
+
+where Ψ = 𝜌𝑈 is the horizontal mass flux and 𝑞 = 𝜌𝑣 is the vertical momentum. Simulation results are summarized in Figure 5. In the inviscid limit, the vertical velocity should be transported exactly, maintaining a bounded top-hat profile without overshoot. Velocity-based schemes, although effective for scalar transport, allow spurious momentum leakage from the light to the dense phase, leading to incorrect momen-tum and energy transfer and ultimately distorting the in-terface ( cf. Figure 1a). The original CMOM formulation and its Favre-averaged variants (Kuhn et al. , 2023) elim-inate velocity penetration but instead generate nonphys-ical velocity overshoots in the light phase, violating the TVD condition. Favre averaging additionally introduces excessive diffusion at later stages. In contrast, the pro-posed method maintains monotonicity through controlled upwind diffusion localized at the interface. To elucidate the failure mechanism, we examine the three cells adjacent to the rear of the momentum spike (Figure 4). After one time step, the dense phase in cell P is fully advected out, corresponding to 𝛼 = 𝑈 Δ𝑡 /Δ𝑥 . With 
+
+𝑣 (𝑛 ) 
+
+> W
+
+= 1, 𝑣 (𝑛 ) 
+
+> E
+
+= 0, 𝑣 (𝑛 ) 
+
+> E
+
+≤ 𝑣 (𝑛 ) 
+
+> P
+
+≤ 𝑣 (𝑛 ) 
+
+> W
+
+, and density ratio 
+
+𝜆 𝜌 ≪ 1, the physical-relevant solution requires 
+
+𝑣 (𝑛 ) 
+
+> E
+
+≤ 𝑣 (𝑛 +1) 
+
+> P
+
+≤ 𝑣 (𝑛 ) 
+
+> W
+
+.
+
+However, in CMOM the updated velocity is obtained by dividing the advected momentum by the updated density, which leads to 
+
+𝑣 (𝑛 +1) 
+
+> P
+
+= 𝛼 (1 − 𝑣 (𝑛 ) 
+
+> P
+
+) + 𝑣 (𝑛 )
+
+> P
+
+| {z }
+
+> bounded
+
++ ( 1 − 𝛾 )𝑣 (𝑛 ) 
+
+> P
+
+𝛼 /𝜆 𝜌 
+
+| {z }
+
+> unbounded
+
+.𝛾 is introduced to represent different choice of interpola-tion at east face such as upwind ( 𝛾 = 1), central ( 𝛾 = 1/2) and downwind ( 𝛾 = 0). Note that we omit the interpolation at face w for simplicity. For small density ratio, 𝜆 𝜌 , even modest deviations from upwind interpolation (1 −𝛾 ≫ 𝜆 𝜌 )result in large velocity overshoots. Favre-averaged slope limiting (Kuhn et al. , 2023) reduces but does not elimi-nate this effect, as the effective interpolation coefficient 𝛾 
+
+remains too large to satisfy the TVD condition. The underlying issue is the lack of synchronic-ity between the advected momentum and the mass flux responsible for its transport, leaving excessive momen-tum in cells containing vanishingly small mass, leading Figure 3: Variable arrangement on a 2D staggered cell complex. The background black cell represents the col-located grid, while the green and purple cells correspond to the horizontal and vertical staggered cells, respectively. We follow Patankar’s compass notation for cell and face naming. Pressure 𝑝 and density 𝜌 are stored in collocated cells, while the velocities 𝑢 𝑖 and isometric-averaged den-sities 𝜌 𝑢 𝑖 resides on the staggered grids. Mass fluxes on collocated grid’s (black, Φ 𝑗 ) and staggered grid’s (green, 
+
+Ψ𝑗 ) faces are shown. Only the horizontal momentum con-trol volume (green) is highlighted for clarity, but mass fluxes also reside on faces of the vertical staggered volume (purple). to a spike in velocity. While this error diminishes for extremely small time steps ( 𝑈 Δ𝑡 /Δ𝑥 = O( 𝜆 𝜌 )), such re-strictions are impractical. To retain reasonable time-step sizes while enforcing velocity monotonicity, we introduce the synchronized momentum donor method in the follow-ing section. 
+
+Synchronized Donor Region of Momentum Flux (Syn-DRoM) 
+
+To achieve fully synchronized momentum trans-port, density, velocity, and momentum must be recon-structed consistently within each cell (Le Chenadec and Pitsch, 2013, Owkes and Desjardins, 2017). The pro-posed Synchronized Donor Region of Momentum flux (SynDRoM) follows the spirit of LeVeque’s Reconstruct-Evolve-Average (REA) framework (LeVeque, 2002). Mo-mentum is first reconstructed within a cell, evolved using a mass-flux-based donor concept, and finally averaged to obtain an updated velocity that satisfies the TVD condi-tion. In contrast to many existing interface-aware slope limiters, which focus solely on velocity reconstruction, SynDRoM explicitly accounts for the momentum distri-bution and the corresponding donor region, determined by mass transport. We illustrate the method using a momentum control volume 𝑞 (𝑛 ) 
+
+> P
+
+undergoing horizontal advection, as shown in Figure 6. Tensor notation is omitted for clarity. SynDRoM consists of two steps: 
+
+• Momentum reconstruction. A density-velocity distri-bution pair (𝜌 (𝑥 ), 𝑢 (𝑥 )) is reconstructed such that it reproduces the cell-averaged density and momentum, 
+
+𝜌 (𝑛 ) 
+
+> 𝑢 ;P
+
+=
+
+∫ 𝑥 e
+
+> 𝑥 w
+
+𝜌 (𝑥 ) d𝑥 , 𝑞 (𝑛 ) 
+
+> P
+
+=
+
+∫ 𝑥 e
+
+> 𝑥 w
+
+𝜌 (𝑥 )𝑢 (𝑥 ) d𝑥 , 
+
+while remaining bounded by neighboring cell val-ues in the advection direction to satisfy the TVD constraint. Since these conditions admit infinitely many solutions, a practical strategy is adopted: adensity distribution (being uniform, sloped, or Heav-iside, etc. ) is first assumed, from which the center of mass 𝑥 CoM is determined (vertical mustard line in Figure 6). A linear velocity distribution is then constructed by pivoting about (𝑥 CoM , 𝑢 (𝑛 ) 
+
+> P
+
+) (mustard point in panel Figure 6b), constrained by neighboring bounds. Any such reconstruction within the admis-sible envelope (gray area in Figure 6b) yields a TVD update. 
+
+• Momentum evolution with a synchronized donor re-gion. The mass flux Ψ(𝑛 ) is already known from the preceding mass-advection step and has been isomet-rically averaged onto the staggered grid. To ensure synchronicity, the donor region for momentum must correspond exactly to the mass-flux donor region. For the east face Ψ(𝑛 ) 
+
+> e
+
+, the right boundary 𝑥 r of the donor region is determined such that 
+
+Ψ(𝑛 ) 
+
+> e
+
+Δ𝑡 =
+
+∫ 𝑥 e
+
+> 𝑥 r
+
+𝜌 (𝑥 ) d𝑥 . 
+
+The momentum flux is then evaluated over the very same region, 
+
+Ψ(𝑛 ) 
+
+> e
+
+𝑢 (𝑛 ) 
+
+> e
+
+Δ𝑡 =
+
+∫ 𝑥 e
+
+> 𝑥 r
+
+𝜌 (𝑥 )𝑢 (𝑥 ) d𝑥 , (3) yielding the effective advected velocity being in the form of weighted average 
+
+𝑢 (𝑛 ) 
+
+> e
+
+=
+
+∫ 𝑥 e
+
+> 𝑥 r
+
+𝜌 (𝑥 )𝑢 (𝑥 ) d𝑥 
+
+ ∫ 𝑥 e
+
+> 𝑥 r
+
+𝜌 (𝑥 ) d𝑥 . (4) After update, the remaining velocity, also the weighted-average of the bounded velocity distribu-tion ( 𝑢 (𝑥 )), is obviously bounded due to the proper-ties of convex combination. Figure 4: Quasi-one-dimensional high density droplet (teal blue shade) transport. The high vertical shear present at the rear interface of the droplet (grid cell P) and is transported by 𝑈 . After one time step Δ𝑡 , the horizontal velocity transfer all but no more than the remaining high density fluid in P to E – the volume fraction inside the central satisfies 
+
+𝛼 = 𝑈 Δ𝑡 /Δ𝑥 . The new vertical velocity of the central cell P is to be determined. The velocity omits tensor notation and use 𝑣 to indicate the vertical one.    
+
+> (a) Velocity profile after one convection cycle. (b) Total variation of vertical velocity.
+
+Figure 5: One-dimensional periodic droplet advection of density ratio 𝜆 𝜌 = 10 −3. Initial vertical velocity (gray line) has a (inverse) top-hat profile with a little overlap with the droplet (teal blue shade); the field is convected using forward Euler and superbee interpolation. Result and comparison are present after one convection period ( 𝑡𝑈 /𝐿 = 1). 𝑁 𝑥 = 32, CFL = 𝑈 Δ𝑡 /Δ𝑥 = 0.05. The shades of CMOM variants show the overshoots while those of velocity formulation show the velocity leaks. Figure 6: Mass-flux-based donor region concept in SynDRoM with linear density distribution assumption, example using horizontal mass flux with focus on cell P. Panel (a) shows the density distribution and mass flux and (b) those for velocity and momentum. Center of mass are labeled with vertical mustard line, and the level of original velocity is signified with horizontal mustard line in (b). Lines pivoting around the mustard point are allowed in TVD conditions, the black line on the boundary is an example of using superbee philosophy. The green region in (a) represent the outing mass fluxes ( Ψ(𝑛 )
+
+> w/e
+
+Δ𝑡 ), while the blue represents the updated mass, 𝜌 (𝑛 +1) 
+
+> 𝑢 ;P
+
+. The mass flux donor region is synchronous to the momentum distribution to identify the correct momentum flux region: shown with two green dashed lines, 𝑥 l
+
+and 𝑥 r spanning across (a) and (b). The updated velocity 𝑢 (𝑛 +1) 
+
+> P
+
+, are weighted averaged of the rest velocity. 
+
+Figure 7: All is similar to Figure 6 but the uniform density assumption. The mass flux donor region is extended to the momentum distribution to identify the correct momentum donor region (two green trapezoids). The effective advected velocities, 𝑢 (𝑛 )
+
+> w/e
+
+, are midpoint of the contained velocity thanks to uniform density assumption. The orange hatch shows the advection sweep of the original CMOM with the given slope limiter, where it over-advect on west face and under-advect on the east face. The same procedure also applies to diverging mass fluxes, as illustrated in Figure 6, while still preserving veloc-ity boundedness through synchronized reconstruction and transport. Interestingly, the advected velocity in Equation 4 will approach upwind solution if the outing mass approach the original mass content, i.e. 𝑥 𝑟 → 𝑥 𝑤 . This explains why existing interface-aware flux limiters tend to apply dissipative flux limiters near the interfaces. The proposed approach, unlike Le Chenadec and Pitsch (2013), Owkes and Desjardins (2017), allows the density distribution used for momentum transport to dif-fer from the geometric interface representation, enabling compatibility with isometric interpolation and staggered grids. The donor region is mass-flux-based rather than volume-based, and thus does not need to coincide with the conventional advection sweep near the interface. For simplicity, we further assume a uniform den-sity distribution within staggered momentum cells (Fig-ure 7). This assumption is reasonable, as mapping density from collocated to staggered grids inevitably loses some geometric detail of sharp reconstructions. With the center of mass located at the cell center, standard single-phase slope limiters can be applied to reconstruct the velocity. The additional cost due to SynDRoM’s modification on slope limiter is thus small compared to other major com-putational cost such as the reconstruction step in geomet-ric Volume-of-Fluid methods and the pressure projection step. The assumption also enables us to compare with the original CMOM. The orange hatched regions in Fig-ure 7 illustrate how the original CMOM scheme over- and under-advects momentum when the donor-region concept is not enforced, leading to oscillatory velocity fields. 
+
+Directionally split momentum update: consistency with mass transport 
+
+As noted by Arrufat et al. (2021), a direction-ally split momentum update is required to remain consis-tent with the directionally split mass advection in cVOF. Attempts to avoid this through transverse-gradient correc-tions (Kuhn et al. , 2023) have shown limited effectiveness. Consider the example in Figure 8, where a dense fluid mass passes tangentially through an initially empty cell over one time step. Because the mass advection pro-ceeds sequentially in 𝑥 and 𝑦 , large intermediate mass fluxes appear on certain staggered faces (highlighted by red arrows). If momentum were updated in an unsplit fashion while using those mass fluxes, these fictitious fluxes could exceed the original available mass in the staggered con-trol volume, violating velocity boundedness. In essence, momentum would be transported where no mass yet exists. To avoid this inconsistency, momentum trans-port is further synchronized with each directional mass-advection substep, including the dilation correction inher-ent to cVOF. A directional update in the 𝑗 -th direction reads 
+
+𝜌 (𝑛 +1, 𝑗 ) = 𝜌 (𝑛 +1, 𝑗 ′ ) + Δ𝑡𝜕 ℎ𝑗 Φ(𝑛 +1, 𝑗 )
+
+> 𝑗
+
++ Δ𝑡 𝜌 (𝑛 ) 
+
+> 𝑐
+
+(𝜕 ℎ𝑗 𝑢 (𝑛 ) 
+
+> 𝑗
+
+), (5) 
+
+𝑞 (𝑛 +1, 𝑗 ) 
+
+> 𝑖
+
+= 𝑞 (𝑛 +1, 𝑗 ′ ) 
+
+> 𝑖
+
++ Δ𝑡𝜕 ℎ𝑗 Ψ(𝑛 +1, 𝑗 ) 
+
+> 𝑗
+
+𝑢 (𝑛 +1, 𝑗 ′ )
+
+> 𝑖
+
++ Δ𝑡𝑢 (𝑛 ) 
+
+> 𝑖
+
+𝜌 (𝑛 ) 
+
+> 𝑐
+
+(𝜕 ℎ𝑗 𝑢 (𝑛 ) 
+
+> 𝑗
+
+), (6) 
+
+𝑢 (𝑛 +1, 𝑗 ) 
+
+> 𝑖
+
+= 𝑞 (𝑛 +1, 𝑗 ) 
+
+> 𝑖
+
+/𝜌 (𝑛 +1, 𝑗 ) 
+
+> 𝑢 𝑖
+
+, (7) where no Einstein summation is implied over 𝑗 . Here, 
+
+𝜕 ℎ𝑗 denotes the discrete derivative in direction 𝑗 , and the overline indicates isometric averaging over the collocated cells overlapping the staggered momentum control vol-ume. As in directionally split cVOF, the advected velocity is taken from the previous substep (𝑛 + 1, 𝑗 ′). The for-mulation extends naturally to higher-order operator split-ting schemes, such as Strang splitting (Strang, 1968) and Auzinger-Ketcheson splitting (Auzinger et al. , 2017), with appropriate ordering and time-step control. In this work, a permuted Strang splitting is employed. 
+
+Temporal integration: density-weighted RK2 
+
+To preserve interface sharpness, a second-order Runge-Kutta method is adopted instead of Heun’s predictor-corrector scheme. In multiphase flows with CMOM, however, the midpoint velocity cannot be ob-tained by simple arithmetic averaging. Since density and momentum evolve linearly in time but velocity does not, a density-weighted average is required: 
+
+𝑢 (𝑛 +1/2) 
+
+> 𝑖
+
+= 𝑞 (𝑛 ) 
+
+> 𝑖
+
++ 𝑞 (𝑛 +1◦ )
+
+> 𝑖
+
+𝜌 (𝑛 ) 
+
+> 𝑢 𝑖
+
++ 𝜌 (𝑛 +1◦ )
+
+> 𝑢 𝑖
+
+≠ 𝑢 (𝑛 ) 
+
+> 𝑖
+
++ 𝑢 (𝑛 +1◦ )
+
+> 𝑖
+
+2 . (8) 
+
+Two-dimensional Kelvin-Helmholtz instability: preservation of flow physics 
+
+The Kelvin-Helmholtz instability provides aphysically meaningful test for assessing whether the pro-posed numerical method can correctly capture the growth of physical perturbations without introducing artificial damping or numerical instability. In particular, this case examines the ability of the scheme to preserve linear in-stability mechanisms while remaining robust during the subsequent nonlinear evolution. The configuration follows that of Arrufat et al. 
+
+(2021). A density ratio of 𝜆 𝜌 = 10 −3 is selected to repre-sent an air-water system. The computational domain has dimensions (𝐿, 2𝐿 ), with the dense fluid initially occupy-ing the upper half of the domain and the lighter fluid below, separated by a flat interface located at mid-height, as illus-trated in Figure 9a. Gravity is omitted in order to isolate Kelvin-Helmholtz dynamics and exclude Rayleigh-Taylor effects. Viscosity is also neglected to directly assess the robustness of the inviscid solver. (a) 𝑡 (𝑛 ) (b) 𝑡 (𝑛 +1,𝑥 )     
+
+> (c) 𝑡 (𝑛 +1)=𝑡 (𝑛 +1,𝑦 )
+
+Figure 8: Directionally-split mass update of a droplet’s side tangentially passing through a collocated cell. The figures are presented in visual order. The solid line represents the true motion path while the dash lines signify the auxiliary path from directional split algorithm. The 𝑥 sweep (b) is performed first and then the 𝑦 one (c). Bold red outlines around the arrows show the influenced mass fluxes.                    
+
+> (a) 𝑡𝑈 /𝐿 =0.0. (b) 𝑡𝑈 /𝐿 =2.0. (c) 𝑡𝑈 /𝐿 =3.0. (d) 𝑡𝑈 /𝐿 =3.8. (e) 𝑡𝑈 /𝐿 =5.0.
+
+Figure 9: Evolution of thick shear layer Kelvin-Helmholtz instability on the interface, contoured by non-dimensional vorticity. The black line is the interface. Teal blue hatches signify the water parts. Green arrows show the initial horizontal velocity profile. (𝑁 𝑥 , 𝑁 𝑦 ) = (96 , 192 ). 𝑡𝑈 /𝐿 = 3.8 in panel (d) is approximately when the maximum kinetic energy drain happens. Figure 10: Temporal evolution of perturbations of inter-face amplitude and maximum vertical velocity in Kelvin-Helmholtz instability, where the dashed line denotes the theoretical prediction. The interface amplitude is filtered by Fourier transform such that it only contains the largest wavelength, i.e. horizontal domain size. 
+
+Figure 11: Time derivatives of total kinetic energy of Kelvin-Helmholtz test case with zero line indicated. 
+
+Figure 12: Change of the horizontal momentum of the Kelvin-Helmholtz case. The vertical momentum is not shown as the slip boundary condition is imposed on the top and bottom boundaries. A finite-thickness shear layer is imposed in the dense phase. The horizontal velocity transitions smoothly from (1, 0)𝑈 to (− 1, 0)𝑈 , as indicated by the green arrows in Figure 9a, creating a velocity deflection near the inter-face that drives the instability. Monochromatic perturba-tions with wavelength 𝐿 are applied simultaneously to the interface position and the vertical velocity field. The verti-cal velocity perturbations decay exponentially away from the interface. The grid resolution is (𝑁 𝑥 , 𝑁 𝑦 ) = (96 , 192 ),with periodic boundary conditions in the horizontal ( 𝑥 ) di-rection and slip-wall boundary conditions in the vertical (𝑦 ) direction. During the early stages of the simulation, both the interface elevation and the maximum vertical velocity exhibit clear exponential growth in agreement with theo-retical predictions for Kelvin-Helmholtz instability (Fig-ure 10). The smooth and monotonic evolution of the inter-face amplitude confirms the correct excitation and preser-vation of the prescribed monochromatic mode, which is also visually evident in Figure 9a-c. Minor oscillations ob-served in the early-time evolution of the vertical velocity are attributed to transient adjustment of the flow from the prescribed initial condition and do not affect the overall growth rate. At later times, the flow enters a strongly nonlin-ear regime characterized by energetic interface roll-ups, vortex pairing, and eventual collapse of multiphase struc-tures (Figure 9d,e). This stage used to pose a significant challenge to numerical stability due to the presence of intense localized velocities and sharp interfacial deforma-tion. Despite these demanding conditions, the proposed method successfully maintains bounded total kinetic en-ergy throughout the simulation. Energy dissipation occurs only after the flow becomes irregular and multiscale, con-sistent with the iLES philosophy (Figure 11). Moreover, even in the presence of these fierce nonlinear phenomena, the method effectively confines the high-velocity regions to the light-fluid (air) phase, without spurious penetration of extreme velocities into the dense phase. Throughout the simulation, horizontal momentum is conserved to solver tolerance, as shown in Figure 12, further confirming the consistency and robustness of the proposed formulation. 
+
+SPECIAL TREATMENT OF THE VISCOUS TERM Discretization scheme 
+
+The viscous term is discretized following the standard bi-rotational formulation (Campbell, 2015, Tryg-gvason et al. , 2011). Shear-stress momentum fluxes are evaluated at the faces of staggered momentum cells (Fig-ure 13). The viscous contribution is naturally decomposed into cross-difference ( 𝜕 𝑗 𝑢 𝑖 , 𝑖 ≠ 𝑗 ) and inline-difference (𝜕 𝑗 𝑢 𝑖 , 𝑖 = 𝑗 ) components. Accordingly, dynamic viscos-ity must be evaluated at two distinct locations: collocated-cell vertices (hollow stars) for cross-difference terms and Figure 13: Locations at which viscosity is evaluated in a staggered-grid configuration. The hollow star de-notes the collocated-cell vertex (edge in 3D), used for cross-difference terms, while the solid star denotes the collocated-cell center, used for inline-difference terms. collocated-cell centers (solid stars) for inline-difference terms. While the viscosity at cell centers is directly avail-able, the vertex value must be interpolated from the four surrounding collocated cells. Common choices include arithmetic and harmonic averages; for example, at vertex ne, 
+
+𝜇 ne;arithmetic = 𝜇 P + 𝜇 E + 𝜇 N + 𝜇 NE 
+
+4 ,𝜇 ne;harmonic = 4
+
+𝜇 −1P + 𝜇 −1E + 𝜇 −1N + 𝜇 −1NE 
+
+.
+
+To update velocity, the viscous flux, thus 𝜇 , is divided by the density at the staggered-cell center. Near material interfaces, however, this division can become unbounded due to mismatched density and viscosity interpolations. This issue is intrinsic to both velocity and momentum formulations. 
+
+Failure of pure interpolation schemes 
+
+To illustrate the limitation of standard interpola-tion schemes, we consider a quasi-one-dimensional strati-fied Poiseuille flow driven downward by gravity, as shown in Figure 14a. The water occupies the region near the no-slip wall, while the air contacts a slip-wall bound-ary. The vertical direction is considered homogeneous as a quasi-one-dimensional case. The material proper-ties are 𝜌 air /𝜌 water = 10 −3, 𝜇 air /𝜇 water = 10 −2, and thus 
+
+νair /νwater = 10. 2
+
+The resulting velocity profiles are shown in Fig-ure 14b. The arithmetic average leads to numerical di-vergence within a few time steps. Although the harmonic mean avoids divergence, it significantly over-predicts the velocity gradient, reflecting its excessive bias toward the low-viscosity phase and its neglect of inertial effects. The root cause lies in the lack of boundedness of the kinematic viscosity, which directly controls viscous CFL stability (Campbell, 2015). Consider the control vol-ume P immediately next to the interface in Figure 14a. The semi-discrete viscous contribution reads 
+
+𝜕 𝑡 𝑣 P = 𝜇 e (𝑣 E − 𝑣 P) − 𝜇 w (𝑣 P − 𝑣 W)
+
+𝜌 P
+
+− 𝑔. 
+
+Two effective kinematic viscosities appear: 𝜇 e/𝜌 P and 
+
+𝜇 w/𝜌 P. While the eastern contribution remains bounded, the western contribution involves dividing a partially water-weighted dynamic viscosity by the air density, which can be excessively large. For instance, with a 30% water volume fraction in the southern cell, Arithmetic: 𝜇 w
+
+𝜌 P
+
+= 0.15 𝜇 water + 0.85 𝜇 air 
+
+𝜌 air 
+
+= 15 .85 νair ,
+
+Harmonic: 𝜇 w
+
+𝜌 P
+
+=  
+
+> 2
+> 10.3𝜇 water +0.7𝜇 air +1
+> 𝜇 air
+
+𝜌 air 
+
+= 1.9 νair .
+
+Both exceed the largest physical kinematic viscosity, νair 
+
+here, violating the viscous CFL constraint and leading to instability or loss of accuracy. 
+
+Bounded kinematic viscosity 
+
+To guarantee numerical stability, the effective kinematic viscosity must remain bounded. We enforce this requirement by limiting the dynamic viscosity used in cross-difference terms. At vertex ne in Figure 13, which is shared by four staggered momentum cells, we define 
+
+𝜇 ne = min  𝜇 ne;orig , 𝜌 ne;min νne 
+
+ , (9) where 𝜇 ne;orig is the original interpolated viscosity (arith-metic, harmonic, etc.), and 𝜌 ne;min is the minimum density among the four associated momentum cells, 
+
+𝜌 ne;min = min  
+
+> C ∈ { n,e,nE ,Ne }
+
+𝜌 𝑢 ;C .
+
+The upper bound νne is chosen based on phase occupancy, 
+
+νne =
+
+
+
+νwater , if ∑︁ 
+
+> C ∈ { P,E,N,NE }
+
+𝑓 C ≥ 2,
+
+νair , otherwise .      
+
+> 2The kinematic viscosity νis typeset in boldface to distinguish it from the vertical velocity 𝑣 ; this notation does not imply a vector quantity. (a) Stratified Poiseuille flow driven by a horizontal body force. (b) Velocity profiles of stratified Poiseuille flow.
+
+Figure 14: Gravity-driven stratified Poiseuille flow–case setup and simulation results. UnboundAri : arithmetic averaging without bounded treatment; Harmonic : harmonic mean following Tryggvason et al. (2011); BoundAri :arithmetic averaging with bounded treatment. The horizontal line marks the interface. The dark red box indicates the onset of divergence for UnboundAri . (𝑁 𝑥 , 𝑁 𝑦 ) = (16 , 1).Only the cross-difference term is modified, so as not to interfere with dilation-related effects in the inline contri-bution. As shown in Figure 14b, the proposed limiter yields both stable and physically accurate solutions. In the quasi-one-dimensional Poiseuille configuration, the viscosity at the western face naturally degenerates to the light-phase value, consistent with the physical configura-tion. This bounded treatment therefore restores robustness without sacrificing accuracy. 
+
+3D WAVE BREAKERS 
+
+The final test case considers a diagonal standing wave breaker, a canonical problem in naval hydrodynam-ics for which traditional velocity-based formulations are known to fail (Fu et al. , 2010). The imposed wave steep-ness is well beyond the linear regime, resulting in intense nonlinear interactions and strong concentration of kinetic energy near the air-water interface during wave overturn-ing. The initial free-surface elevation is prescribed as 
+
+𝑧 = 0.2𝐿 sin 
+
+ 2𝜋 (𝑥 + 𝑦 )
+
+𝐿 
+
+
+
+,
+
+where 𝐿 denotes the domain length in all three spatial directions, and the mean water level is located at mid-height of the domain. The diagonal orientation of the wave relative to the Cartesian grid is deliberately chosen to avoid grid-aligned bias and to challenge the numerical scheme under nontrivial interface advection. Periodic boundary conditions are applied in the horizontal directions ( 𝑥 and 
+
+𝑦 ), while slip-wall boundary conditions are imposed at the top and bottom boundaries. The characteristic velocity scale is taken as the Airy phase velocity, 𝑈 =√︁ 𝑔 tanh (𝑘 ℎ )/ 𝑘 , with the wavenumber defined as 𝑘 = 2√2𝜋 /𝐿 . Simulations are performed both with and without the viscous term. For the viscous case, the Reynolds number based on the water kinematic viscosity is 𝑅𝑒 = 𝑈 𝐿 /νwater = 2500, which is approximately the maximum Reynolds num-ber that can be reliably resolved on the finest grid with 
+
+𝑁 𝑥 = 𝑁 𝑦 = 𝑁 𝑧 = 256. The evolution of the free surface on the finest grid is demonstrated in Figure 15, with the corresponding mechanical energy evolution presented in Figure 16. At early times, potential energy is rapidly converted into ki-netic energy. Due to the large wave steepness, the crests do not evolve smoothly but instead form vertically oriented jets (Figure 15b). These jets subsequently undergo bifur-cation, transitioning first into plunging breakers and then into spilling breakers (Figure 15c). The spilling breakers interact strongly with the underlying free surface and are responsible for the most significant energy-drain events owing to their highly energetic impacts (Figure 15d). This stage is followed by intense air-water interaction, marked by vigorous entrainment and fragmentation (Figure 15d-f). Despite the extreme nonlinearity and energetic nature of these events, the proposed method maintains bounded mechanical energy throughout the simulation, even in the absence of explicit viscous effects. One counterintuitive observation is that the viscous simula-tions appear less dissipative than their inviscid counter-(a) Initial condition, 𝑡𝑈 /𝐿 = 0.0. (b) First kinetic-energy peak, 𝑡𝑈 /𝐿 = 0.22.                   
+
+> (c) Second potential-energy peak, 𝑡𝑈 /𝐿 =0.46. (d) Second kinetic-energy peak and maximum energy dissipa-tion, 𝑡𝑈 /𝐿 =0.66.
+> (e) Third potential-energy peak, 𝑡𝑈 /𝐿 =0.95. (f) Third kinetic-energy peak, 𝑡𝑈 /𝐿 =1.17.
+
+Figure 15: Evolution of a diagonal sine standing wave with inviscid condition. The free surface is shown and colored by velocity magnitude. Instants corresponding to peaks or troughs of kinetic and potential energy are presented. 
+
+𝑁 𝑥 = 𝑁 𝑦 = 𝑁 𝑧 = 256. parts. The presence of viscosity continuously moderates the flow field, degrading the strength of the most violent events and inhibiting the transition toward turbulence. As a result, the viscous flow does not experience dissipa-tion with turbulence-like mechanisms typically associated with iLES, where finer-scale structures are permitted to de-velop and contribute to enhanced dissipation. In contrast, the inviscid simulations allow richer small-scale dynam-ics through nonlinear energy transfer, which in turn lead to larger numerical dissipation. Grid convergence of the mechanical energy evo-lution is shown in Figure 18. Both the total energy and the dissipation rate exhibit consistent trends as the grid reso-lution is increased. Notably, the dissipation rate does not vanish in the limit of infinite resolution. This behavior can be attributed to the continuous decrease of the numerical Hinze and Kolmogorov scales, which enables increasingly fine, fractal-like fragmentation of the interface. Com-bined with interface-localized upwinding, this mechanism yields a physically consistent, energy-dissipative limit. In essence, the flow behaves as though it never reaches a scale below the Kolmogorov scale, instead sustaining a persis-tent cascading inertial range across all resolved scales even with increasing resolution. 
+
+CONCLUSIONS 
+
+This effort proposes modifications to existing ad-vection and viscous schemes to enhance the fidelity and robustness of multiphase flow simulations. We provide both analytical and numerical demonstrations that most (a) Total mechanical energy evolution. (b) Temporal change of mechanical energy components. 
+
+Figure 16: Mechanical energy evolution and its temporal derivatives. The zero level of the energy derivative is indicated by a gray dashed line. The color family of black (resp. blue) represents inviscid (resp. viscous) solution. 
+
+Figure 17: Relative change of horizontal momentum for the wave-breaker case. Vertical momentum is omitted due to slip boundary conditions at the top and bottom. The color family of black (resp. blue) represents inviscid (resp. viscous) solution. variants of Consistent Mass-Momentum (CMOM) meth-ods violate the Total Variation Diminishing (TVD) condi-tion near emptying interface cells, a deficiency that inher-ently threatens simulation credibility. Our analysis iden-tifies momentum reconstruction and a mass-flux-based donor concept as necessary requirements to preserve ex-act TVD properties in multiphase flows. To address these needs, we developed a TVD Synchronized Donor Region of Momentum flux (SynDRoM) for the CMOM framework, which significantly improves accuracy in predicting com-plex flow fields. The resulting algorithm, when combined with a directionally-split momentum update and a density-weighted RK2 scheme, robustly maintains TVD in multi-dimensional transport and handles extreme density ratios while retaining momentum conservation and empirical en-ergy boundedness. These physical properties are validated through the Kelvin-Helmholtz instability. We further in-troduce a bounded kinetic viscosity approach to handle the non-synchronicity of viscosity and density jump estima-tions, as demonstrated in falling film simulations. Both methods were further tested in energetic standing-wave breaker simulations and demonstrated the intended physi-cal behaviors. While this effort utilizes the simplest possible framework to demonstrate these core concepts, extensions to more advanced numerical setups are readily achievable. For the modified CMOM, the assumption of uniform den-sity in the staggered grid can be relaxed, provided the total momentum in a cell is retained during reconstruction. Ex-tension to unsplit schemes would require determining the momentum distribution where advection sweeps overlap and applying, for example, second-order Gaussian quadra-ture for integrating momentum fluxes. On the other hand, extension to collocated grids is relatively straightforward because the volume advection sweep is then identical to (a) Total mechanical energy evolution. (b) Temporal change of mechanical energy. 
+
+Figure 18: Grid-convergence of mechanical energy and its temporal derivative in inviscid simulation. The temporal derivative is window-averaged for clarity. the mass donor region, eliminating the need for interpola-tion from collocated to staggered mass (Le Chenadec and Pitsch, 2013), but at the expense of more sophisticated velocity-pressure decoupling, such as Santos et al. (2025). The current methods also demonstrate controlled dissipa-tion during high kinetic energy concentration events–such as the interaction of spilling breakers with flat interfaces and interface roll-ups during nonlinear instability phases. As noted in recent research, this proposed strategy can be readily applied to passive scalar transport (Kuhn et al. ,2023, Remmerswaal, 2023) in scenarios such as chemical reactions, thixotropic fluids, and heat transport. Finally, the bounded kinetic viscosity approach is not restricted to CMOM and can be applied to standard velocity for-mulations. The base dynamic viscosity can also be fur-ther generalized using setups such as Prosperetti (2002), and the methodology remains compatible with both sharp-interface and diffused-interface methods. The proposed numerical scheme is orthogonal to the interface capturing method, improving physical stabil-ity, and thus reliability, to the simulation. While topologi-cal changes are handled by the interface capturing scheme of choice (in our case, a conservative geometric Volume-of-Fluid), the enhanced physical reliability provided by SynDRoM and the viscosity limiter helps in removing numerical artifacts that could subsequently trigger false break-up events, always subject to an adequate mesh res-olution. These characteristics make the approach partic-ularly attractive for energetic free-surface and multiphase flows encountered in naval hydrodynamics. 
+
+ACKNOWLEDGMENTS 
+
+This work was fully supported by Delft Univer-sity of Technology. 
+
+REFERENCES 
+
+Arrufat, T., Crialesi-Esposito, M., Fuster, D., Ling, Y., Malan, L., Pal, S., Scardovelli, R., Tryggvason, G., and Zaleski, S., “A mass-momentum consistent, Volume-of-Fluid method for incompressible flow on staggered grids,” Computers & Fluids, vol. 215, p. 104785, 2021. Auzinger, W., Hofst¨ atter, H., Ketcheson, D., and Koch, O., “Practical splitting methods for the adaptive inte-gration of nonlinear evolution equations. Part I: Con-struction of optimized schemes and pairs of schemes,” BIT Numerical Mathematics, vol. 57, no. 1, pp. 55–74, 2017. Campbell, B. K., “A mechanistic investigation of non-linear interfacial instabilities leading to slug formation in multiphase flows,” Ph.D. dissertation, Massachusetts Institute of Technology, 2015. Desjardins, O. and Moureau, V., “Methods for multiphase flows with high density ratio,” in Center for Turbulence Research Proceedings of the Summer Program, 2010. Desmons, F. and Coquerelle, M., “A generalized high-order momentum preserving (HOMP) method in the one-fluid model for incompressible two phase flows with high density ratio,” Journal of Computational Physics, vol. 437, p. 110322, Jul. 2021. Dommermuth, D. G., O’Shea, T. T., Brucker, K. A., Chevalier, K. L., Yue, D. K. P., Hendrickson, K., and Weymouth, G. D., “Computational Naval Ship Hydro-dynamics,” in 2009 DoD High Performance Computing Modernization Program Users Group Conference. San Diego, CA, USA: IEEE, 2009, pp. 32–36. Eijk, M. van der and Wellens, P., “Two-phase free-surface flow interaction with moving bodies using a consistent, momentum preserving method,” Journal of Computational Physics, vol. 474, p. 111796, 2023. Elbing, B. R., Winkel, E. S., Lay, K. A., Ceccio, S. L., Dowling, D. R., and Perlin, M., “Bubble-induced skin-friction drag reduction and the abrupt transition to air-layer drag reduction,” Journal of Fluid Mechanics, vol. 612, pp. 201–236, 2008. Fedkiw, R. P., Aslam, T., Merriman, B., and Osher, S., “A Non-oscillatory Eulerian Approach to Interfaces in Multimaterial Flows (the Ghost Fluid Method),” Journal of Computational Physics, vol. 152, no. 2, pp. 457–492, 1999. Fu, T., Ratcliffe, T., O’Shea, T., Brucker, K., Graham, R., and Wyatt, D., “A Comparison of Experimental Mea-surements and Computational Predictions of a Deep-V Planing Hull,” in Proceedings of 28th Symposium on Naval Hydrodynamics, Pasadena, California, 2010, p. 17. Fuster, D., Agbaglah, G., Josserand, C., Popinet, S., and Zaleski, S., “Numerical simulation of droplets, bubbles and waves: State of the art,” Fluid Dynamics Research, vol. 41, no. 6, p. 065001, 2009. Ghods, S. and Herrmann, M., “A consistent rescaled mo-mentum transport method for simulating large density ratio incompressible multiphase flows using level set methods,” Physica Scripta, vol. T155, p. 014050, Jul. 2013. Harlow, F. H. and Welch, J. E., “Numerical Calculation of Time-Dependent Viscous Incompressible Flow of Fluid with Free Surface,” The Physics of Fluids, vol. 8, no. 12, pp. 2182–2189, Dec. 1965. Jin, Q., Hudson, D., and Price, W. G., “A combined volume of fluid and immersed boundary method for modeling of two-phase flows with high density ratio,” Journal of Fluids Engineering, vol. 144, no. 3, p. 031402, 2021. Kuhn, M. B., Deskos, G., and Sprague, M. A., “A mass-momentum consistent coupling for mesh-adaptive two-phase flow simulations,” Computers & Fluids, vol. 252, p. 105770, 2023. Lalanne, B., Villegas, L. R., Tanguy, S., and Risso, F., “On the computation of viscous terms for incompressible two-phase flows with Level Set/Ghost Fluid Method,” Journal of Computational Physics, vol. 301, pp. 289– 307, 2015. Le Chenadec, V. and Pitsch, H., “A monotonicity preserv-ing conservative sharp interface flow solver for high den-sity ratio two-phase flows,” Journal of Computational Physics, vol. 249, pp. 185–203, 2013. LeVeque, R. J., Finite Volume Methods for Hyperbolic Problems, ser. Cambridge Texts in Applied Mathemat-ics. Cambridge University Press, 2002. Li, R., Yang, Z., and Zhang, W., “Numerical investigation of mixed-phase turbulence induced by a plunging jet,” Journal of Fluid Mechanics, vol. 979, p. A27, 2024. Li, Z., Liu, C., Gao, R., and Hu, C., “A consistent mass-momentum advection method for the simulation of large-density-ratio two-phase flows,” International Journal of Multiphase Flow, vol. 156, p. 104192, 2022. Magnaudet, J., Bruhier, H., Mer, S., and Bonometti, T., “Rational constitutive law for the viscous stress tensor in incompressible two-phase flows: Derivation and tests against a three-dimensional benchmark experiment,” Physical Review Fluids, vol. 10, no. 7, p. 074001, Jul. 2025. Mirjalili, S. and Mani, A., “Consistent, energy-conserving momentum transport for simulations of two-phase flows using the phase field equations,” Journal of Computational Physics, vol. 426, p. 109918, 2021. Nangia, N., Griffith, B. E., Patankar, N. A., and Bhalla, A. P. S., “A robust incompressible Navier-Stokes solver for high density ratio multiphase flows,” Journal of Computational Physics, vol. 390, pp. 548–594, Aug. 2019. Owkes, M. and Desjardins, O., “A mass and momen-tum conserving unsplit semi-Lagrangian framework for simulating multiphase flows,” Journal of Computational Physics, vol. 332, pp. 21–46, 2017. Peltonen, P., Kanninen, P., Laurila, E., and Vuorinen, V., “The ghost fluid method for OpenFOAM: A compara-tive study in marine context,” Ocean Engineering, vol. 216, p. 108007, 2020. Prosperetti, A., “Navier-stokes numerical algorithms for free-surface flow computations: An overview,” in Drop-Surface Interactions, Rein, M., Ed. Vienna: Springer, 2002, pp. 237–257. Remmerswaal, R., “Numerical Modelling of Variability in Liquid Impacts,” Ph.D. dissertation, University of Groningen, 2023. Rudman, M., “A volume-tracking method for incompress-ible multifluid flows with large density variations,” International Journal for Numerical Methods in Fluids, vol. 28, no. 2, pp. 357–378, 1998. Santos, D., Hopman, J., P´ erez-Segarra, C., and Trias, F., “On a symmetry-preserving unconditionally stable projection method on collocated unstructured grids for incompressible flows,” Journal of Computational Physics, vol. 523, p. 113631, 2025. Stern, F., Yang, J., Wang, Z., Sadat-Hosseini, H., Mousaviraad, M., Bhushan, S., and Xing, T., “Computational ship hydrodynamics: Nowadays and way forward,” International Shipbuilding Progress, vol. 60, no. 1-4, pp. 3–105, 2013. Strang, G., “On the Construction and Comparison of Difference Schemes,” SIAM Journal on Numerical Analysis, vol. 5, no. 3, pp. 506–517, 1968. Tryggvason, G., Scardovelli, R., and Zaleski, S., Direct Numerical Simulations of Gas–Liquid Multiphase Flows. Cambridge: Cambridge University Press, 2011. Valle, N. and Verstappen, R., “Conservation of energy in the direct numerical simulation of interface-resolved multiphase flows,” Experimental and Computational Multiphase Flow, vol. 5, no. 4, pp. 333–343, 2023. Verstappen, R. and Veldman, A., “Symmetry-preserving discretization of turbulent flow,” Journal of Computational Physics, vol. 187, no. 1, pp. 343–368, 2003. Weymouth, G. D. and Yue, D. K.-P., “Conservative Volume-of-Fluid method for free-surface simulations on Cartesian-grids,” Journal of Computational Physics, vol. 229, no. 8, pp. 2853–2865, 2010. Weymouth, G. D. and Font, B., “Waterlily.jl: Adifferentiable and backend-agnostic julia solver for incompressible viscous flow around dynamic bodies,” Computer Physics Communications, vol. 315, p. 109748, 2025. Weymouth, G. D. and Yue, D. K.-P., “Boundary data immersion method for Cartesian-grid simulations of fluid-body interaction problems,” Journal of Computational Physics, vol. 230, no. 16, pp. 6233–6247, 2011. Zuzio, D., Orazzo, A., Estival` ezes, J.-L., and Lagrange, I., “A new efficient momentum preserving Level-Set/VOF method for high density and momentum ratio incompressible two-phase flows,” Journal of Computational Physics, vol. 410, p. 109342, 2020.
