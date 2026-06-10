@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-10T22:41:47.635415+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.09799v1",
+      "source": "arxiv",
+      "title": "A fast and consistent sharp-interface immersed boundary method for moving bodies of arbitrary thicknes",
+      "abstract": "Immersed boundary methods (IBMs) are widely used to simulate flows around complex geometries and moving bodies, but they often involve a trade-off between precision and computational efficiency. Eulerian formulations require special treatments for moving walls and may generate spurious force oscillations, whereas Lagrangian formulations can suffer from slip errors at the immersed surfaces. We propose a novel sharp-interface IBM for incompressible flows involving moving, deformable, and arbitrary-thickness bodies. The method combines a fast tagging algorithm, a two-sided Eulerian forcing strategy, and a consistent mass correction that reduces the splitting error of fractional-step schemes, while preserving the structure of the discrete Laplacian operator. This formulation retains the efficiency of direct Poisson solvers, thus avoiding the overhead of cut-cell, multigrid, and projection-based approaches. The method naturally handles moving boundaries, and yields small transpiration errors with second-order accuracy in the enforcement of the no-slip condition. Numerical tests using rigid, deformable, turbulent, and biologically inspired flows demonstrate the accuracy, robustness, and efficiency of the method, without compromising computational cost.",
+      "authors": [
+        "Giovanni Vagnoli",
+        "Martino Andrea Scarpolini",
+        "Roberto Verzicco",
+        "Francesco Viola"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-06-08T17:52:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.09799v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "sharp-interface IBM for moving bodies, applicable to multiphase CFD",
+      "llm_evidence_cn": "适用于多相CFD的运动体锐界面浸入边界法",
+      "llm_evidence": "适用于多相CFD的运动体锐界面浸入边界法",
+      "canonical_evidence": "适用于多相CFD的运动体锐界面浸入边界法",
+      "llm_tldr_en": "Proposes a fast and consistent sharp-interface immersed boundary method for incompressible flows with moving, deformable bodies of arbitrary thickness. The method combines fast tagging, two-sided Eulerian forcing, and consistent mass correction, enabling precise and efficient multiphase flow simulations.",
+      "llm_tldr_cn": "针对移动、可变形及任意厚度体的不可压缩流动，提出一种快速一致的锐界面浸入边界法。该方法融合快速标记、双面欧拉力策略和一致质量修正，减少了分步格式误差，在保持结构精度的同时提高了计算效率，可为降膜等含移动界面的多相流模拟提供有力工具。",
+      "llm_tldr": "针对移动、可变形及任意厚度体的不可压缩流动，提出一种快速一致的锐界面浸入边界法。该方法融合快速标记、双面欧拉力策略和一致质量修正，减少了分步格式误差，在保持结构精度的同时提高了计算效率，可为降膜等含移动界面的多相流模拟提供有力工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

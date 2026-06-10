@@ -1,0 +1,2121 @@
+Title: A fast and consistent sharp-interface immersed boundary method for moving bodies of arbitrary thicknes
+
+URL Source: https://arxiv.org/pdf/2606.09799v1
+
+Published Time: Tue, 09 Jun 2026 02:46:25 GMT
+
+Number of Pages: 42
+
+Markdown Content:
+# A fast and consistent sharp-interface immersed boundary method for moving bodies of arbitrary thickness 
+
+Giovanni Vagnoli a, Martino A. Scarpolini a, Roberto Verzicco a,b , Francesco Viola a, ∗ 
+
+> aGran Sasso Science Institute (GSSI), Viale Luigi Rendina, 26, L’Aquila, 67100, Italy
+> bDepartment of Physics, Mesa +Institute, and J. M. Burgers Centre for Fluid Dynamics, University of Twente, AE Enschede, Twente, 7500, The Netherlands
+
+Abstract 
+
+Immersed boundary methods (IBMs) are widely used to simulate flows around complex geometries and moving bodies, but they often involve a trade-o ff be-tween precision and computational e ffi ciency. Eulerian formulations require spe-cial treatments for moving walls and may generate spurious force oscillations, whereas Lagrangian formulations can su ff er from slip errors at the immersed sur-faces. We propose a novel sharp-interface IBM for incompressible flows involv-ing moving, deformable, and arbitrary-thickness bodies. The method combines a fast tagging algorithm, a two-sided Eulerian forcing strategy, and a consistent mass correction that reduces the splitting error of fractional-step schemes, while preserving the structure of the discrete Laplacian operator. This formulation re-tains the e ffi ciency of direct Poisson solvers, thus avoiding the overhead of cut-cell, multigrid, and projection-based approaches. The method naturally handles moving boundaries, and yields small transpiration errors with second-order ac-curacy in the enforcement of the no-slip condition. Numerical tests using rigid, deformable, turbulent, and biologically inspired flows demonstrate the accuracy, robustness, and e ffi ciency of the method, without compromising computational cost. 
+
+Keywords: Immersed boundary method, Sharp-interfaces, Fluid-structure interaction   
+
+> ∗Corresponding author
+> Email address: francesco.viola@gssi.it (Francesco Viola)
+> arXiv:2606.09799v1 [physics.flu-dyn] 8 Jun 2026
+
+1. Introduction 
+
+The immersed boundary method (IBM) has become a widely adopted ap-proach for the analysis of complex flow configurations [1, 2, 3], and it is exten-sively applied to biological [4] and fluid-structure interaction (FSI) problems [5], due to its capability to handle moving boundaries. The core idea of IBMs is the discretization of the Navier-Stokes equation on a grid that is not conformal to the solid body, and the no-slip condition is enforced on the immersed solid surface us-ing ad-hoc volume forces that mimic the e ff ects of the wall on the flow. Typically, IMBs are coupled with the fractional step method and low-order finite di ff erence operators, allowing the use of highly-e ffi cient numerical solvers, such as the ap-proximate factorisation of the implicit viscous term and fast Poisson solver, based on the fast Fourier transform (FFT), to enforce the incompressibility constraint [6, 7]. Multiple forcing strategies have been proposed to impose the no-slip condi-tion on solid walls, but among many, two main families have emerged. The first one encompasses Eulerian methods, in which the momentum forcing is evaluated on the fluid grid using the velocity boundary condition and the surrounding bulk values [8, 9, 10]. In this approach, the shape of the wall is represented sharply and the boundary condition on the wet side(s) is enforced with the same order of accuracy as the interpolator used to reconstruct the velocity field near the wall. It should be noted that in presence of moving boundaries, these methods require ad-ditional treatment to handle cells that change side of the interface (so-called fresh cells [10]), in order to evaluate properly the non-linear terms. Furthermore, the occurrence of spurious pressure and viscous oscillations on solid walls produces non-smooth hydrodynamic loads acting on solid bodies [11], hence limiting their application to FSI problems. Moreover, Eulerian methods are typically tailored for bodies enclosing a finite solid volume, as the treatment of the fluid-solid in-terface often requires the modification of the flow field inside the solid region; this makes di ffi cult to tackle zero-thickness bodies like membranes, shells or thin plates. The other family of forcings is represented by Lagrangian methods [12], where the former are evaluated on a set of points located on the solid walls (called La-grangian markers). The Lagrangian forcing is then distributed to the surrounding fluid points using interpolator and spreading operators, built upon proper trans-fer functions [13, 14], resulting in a di ff usion of the solid interface among a thin 2layer of Eulerian points. Such smearing of the fluid-solid interface allows to deal with moving walls without any special treatments of the boundary points, but it may produce large slip errors [15] because: (i) the spreading and interpolation operators are not reciprocal, and (ii) the support regions associated with di ff erent Lagrangian markers overlap, thus perturbing each other [16, 17]. To address these issues, implicit formulations have been proposed [18], enabling in principle the imposition of the no-slip condition on immersed surfaces up to machine preci-sion. However, such approaches significantly increase the computational cost and lead to poorly conditioned linear systems, making three-dimensional simulations computationally prohibitive [16]. In addition, when applied in the framework of the fractional step method [6], IBMs su ff er from the splitting error [17]. This stems from the fact that the elliptic equation arising from the enforcement of mass conservation is typically solved as if the solid body were absent. Hence, mass conservation is enforced also in the cells intersected by the immersed surface (so-called boundary cells ), thus, the velocity at the nodes forced by the IBM is altered by the solenoidal projection. Consequently, the enforcement of the no-slip condition on solid walls may be inaccurate, particularly in presence of strong pressure gradients [19]. To mitigate this issue, ad hoc mass sources can be introduced near the wall within the flow field to improve mass conservation on the boundary cells [20]. Similarly, cut-cells 
+
+methods [10] modify the shape of the boundary cells accordingly to the wall shape to evaluate the mass flux using a body conformal cell. However, such methods entails a noteworthy overhead to determine the shape of the cell near the wall. Moreover, the structure of the discrete Laplacian operator in the elliptic equation is modified, hence preventing the use of e ffi cient FFT-based direct solvers in favor of less e ffi cient iterative multigrid methods, which may lead to slow convergence in complex flow configurations. As an alternative, a homogeneous Neumann boundary condition for the pseudo-pressure on the immersed surface can be embedded in the elliptic problem to reduce the modification of the provisional velocity near the wall [21]. Neverthe-less, also this condition alters the system matrix of the elliptic equation, requiring multigrid or other iterative methods. Furthermore, imposing a vanishing normal derivative of the pseudo-pressure, only preserves the normal component of the velocity, while perturbing the tangential ones. Finally, in projection-based ap-proaches [22], the immersed boundary forcing is interpreted as a Lagrange multi-plier, enforcing the no-slip constraint on the immersed surfaces, hence also avoid-ing the splitting error. However, the resulting system of equations to be solved at each time step is significantly larger than the elliptic equation in the standard 3fractional-step method, thus making such approaches computationally prohibitive for three-dimensional cases. In this work, we propose a fast and consistent IB formulation that circumvents all the above limitations of traditional IBMs. The method is built using a two-sided sharp Eulerian treatment of the interface along with a parallel tagging algorithm to identify boundary cells. Furthermore, in order to satisfy numerical consistency in the boundary cells, a modified elliptic equation is obtained, which reduces split-ting error and preserves the structure of the Laplacian operator. The proposed IB forcing naturally accommodates moving boundaries and zero-thickness struc-tures, without additional complexity. Moving-least squares (MLS) kernels [23] are then employed for the smooth evaluation of the hydrodynamic loads acting on the solid wall, reducing spurious oscillations and enabling the investigation of FSI problems. The rest of the paper is organized as follows: in Section 2 the details of the underlying numerical solver are introduced, and the novel IB formulation is de-tailed in Section 3. In Section 4, the method is tested against several benchmarks including fixed domain geometries, rigid body dynamics and FSI. The numerical tests are designed to demonstrate and quantify the precision of the method, es-pecially in the enforcement of the no-sip condition on pressurized moving walls with zero-thickness. Conclusions are drawn in Section 5. 
+
+2. Numerical method: fractional step with a provisional IB step 
+
+The proposed IB method is incorporated within a standard fractional-step framework, with the key distinction, relatively to existing methods in the litera-ture, that the IB forcing step is performed before the evaluation of the provisional velocity. As detailed later on, this modification turns out to be useful to treat fresh cells occurring in moving boundary problems. Let us consider the incompressible Navier-Stokes equations in non-dimensional form: 
+
+∂u
+
+∂t + ∇ · (uu ) = −∇p + 1
+
+Re ∇2u + f, (1a) 
+
+∇ · u = 0, (1b) where u = [u1, u2, u3]T and p are velocity and pressure fields, f contains the exter-nal volume forces (including the IB forcing), Re = ρUL /μ is the Reynolds number based on density ρ, dynamic viscosity μ of the fluid, a reference length L and a reference velocity U. The system of equation is completed by an initial condition 4>>
+
+> >>
+
+> >pu3
+
+u2
+
+u1
+
+∆xk
+
+> 3
+
+∆x2
+
+∆x1
+
+> u1 grid > u2 grid 
+
+> u3 grid p grid 
+
+L3
+
+L2
+
+L1
+
+x3
+
+x2
+
+x1
+
+North 
+
+South 
+
+Periodic 
+
+> Periodic
+
+(a) (b) 
+
+L
+
+S
+
+U
+
+Ω  
+
+> Figure 1: a) Sketch of the three-dimensional computational domain Ωand of its spatial discretiza-tion. b) Magnification of a computational cell with the staggered location of the flow quantities.
+
+u = u0 at initial time t = 0, suitable far-field conditions and the no-slip condition 
+
+u = U(X(t)) on each solid wall S, being U the wall velocity depending on the instantaneous boundary position X(t). The computational domain is a box Ω of size L1 × L2 × L3, partitioned into 
+
+N1 × N2 × N3 cells (Figure 1a). In the periodic x1 and x2 directions the cells have uniform spacing ∆x1 and ∆x2, while a variable cell size ∆xk
+
+> 3
+
+, k ∈ [1 , N3], is used in the x3 direction. The discrete flow variables are arranged on a staggered grid: the pressure p (as well as all scalars) is located on the centers of the cells, while the velocity components u1, u2 and u3 are located on the cell faces (see Figure 1b). Second-order accurate centered finite-di ff erence schemes are employed to dis-cretize the spatial di ff erential operators. At the south wall, a Dirichlet boundary condition is applied on u, while on the north wall a radiative or Dirichlet boundary condition is prescribed. The time marching is performed using a fractional-step method, possibly with multiple sub-stages within each time step [6]. The temporal index is denoted by n,while s ∈ [1 , ns] represents the sub-stage index, with ns denoting the total number of sub-stages per time step. In the following, the Adams-Bashfort (AB) multi-step method ( ns = 1) and a two-stage Runge-Kutta (RK2) scheme ( ns = 2) are used to advance the non-linear terms, while the viscous terms are advanced using the Crank-Nicholson (CN) scheme. 5Each sub-stage starts with the identification of the forcing nodes , i.e., the set of Eulerian points on which the IB forcing is applied. Only on the forcing nodes, the provisional velocity ˆ u is determined by the IB forcing as follows: ˆu = us + f[us, Un]∆tn on the forcing nodes, (2) where ∆tn is the current time-step size, while f[us, Un] = uf [us, Un] − us/∆tn de-notes the IB forcing, being uf [us, Un] the velocity imposed on the forcing nodes evaluated from the fluid velocity at the previous sub-stage, us, and the wall ve-locity at the previous time step, Un, as detailed is Section 3.1. Anticipating the IB step before the evaluation of the momentum equation, enables a convenient treatment of fresh cells and improves the precision of the velocity gradients near the wall, as it will be detailed in Section 3.1 (see also Figures 3 and 4). On the remaining nodes, denoted fluid nodes , the provisional velocity is ob-tained from the momentum equation: ˆu − us
+
+∆tn = γsHs + ρsHs−1 − αsGp s + αs
+
+2Re L( ˆ u + us) on the fluid nodes, (3) where ρs, γs and αs = ρs + γs are the coe ffi cients of the time advancement scheme. 
+
+H indicates the non-linear terms written in conservative form, while G and L are the finite di ff erences gradient and Laplacian operators. For the AB +CN scheme, 
+
+s = 1 and s = 0 correspond to n and n − 1, respectively, with γ1 = 3/2 and 
+
+ρ1 = −1/2. On the other hand, γ1 = 1/2, γ2 = 1, ρ1 = 0 and ρ2 = −1/2 are used for the RK2 +CN scheme. The provisional equation is solved using an approximate factorization of L, yielding three tridiagonal systems per-direction that are solved using the Thomas algorithm [6, 7]. To satisfy mass conservation, ˆ u is projected onto a solenoidal space by means of the pseudo-pressure φ as follows: 
+
+us+1 = ˆu − αs∆tnGφ, (4) being us+1 the divergence-free velocity field. Applying the finite di ff erence di-vergence operator D to Equation (4) and imposing the discrete divergence-free condition Dus+1 = 0, the following elliptic equation for the pseudo-pressure is obtained: 
+
+Lcφ = 1
+
+αs∆tn D ˆu, (5) where Lc = DG is the discrete Laplacian operator on the pressure grid with the homogeneous Neumann condition on all the sides of the computational box. The 6Algorithm 1 The tagging algorithm 
+
+Require: Body surface discretized into Nt triangular elements; 
+
+Require: One of the three staggered grids of the velocity;  
+
+> 1:
+
+for all triangles with vertices nv1, v2, v3o do  
+
+> 2:
+
+Build the Cartesian bounding box: 
+
+B =
+
+
+
+x min nv1 
+
+> i
+
+, v2 
+
+> i
+
+, v3
+
+> i
+
+o − ∆xi < xi < max nv1 
+
+> i
+
+, v2 
+
+> i
+
+, v3
+
+> i
+
+o + ∆ xi, i = 1, 2, 3
+
+
+
+; 
+
+> 3:
+
+Identify the Ne Eulerian points within the bounding box;  
+
+> 4:
+
+for all Eulerian point xk, k ∈ [1 , Ne] do  
+
+> 5:
+
+Identify the closest point on the triangle to xk, denoted Xk, using a fast point-triangle distance algorithm [24];  
+
+> 6:
+
+Define the normal-to-the-surface vector Nk = xk − Xk; 
+
+> 7:
+
+if Nk ≤ diagonal length of the local Eulerian cell then  
+
+> 8:
+
+Identify the six neighboring nodes xk,n of xk on the lattice;  
+
+> 9:
+
+Identify the vectors vk,n = xk,n − Xk; 
+
+> 10:
+
+Classify the Eulerian node xk as a forcing node if at least one of the scalar products Nk · vk,n is negative.  
+
+> 11:
+
+end if  
+
+> 12:
+
+end for  
+
+> 13:
+
+end for 
+
+linear system of Equations (5) is solved using FFTs along the periodic directions, and the Thomas algorithm to invert the resulting tridiagonal matrix in the non-periodic direction [6, 7]. Finally, the pressure field is updated as: 
+
+ps+1 = ps + φ − αs∆tn
+
+2Re Lcφ. (6) 
+
+3. A fast and consistent sharp-interface immersed boundary method 
+
+The IBM proposed in this work is built upon [8], where, for a fixed body en-closing a solid volume, the velocity field was linearly reconstructed at the nearest point to the surface on the fluid side to enforce the no-slip condition. However, several key di ff erences distinguish the proposed formulation. First, the no-slip condition is here enforced through IB forcing on both sides of the wet surface, with the interpolation performed along the local normal direction rather than along the Cartesian directions [25], thus enabling the treatment of zero-thickness structures. Furthermore, to e ffi ciently cope with moving walls, a novel fast and parallel tagging algorithm to identify the forcing nodes at each time step 7xk xk,n=1
+
+xk,n=2
+
+xk,n=3
+
+xk,n=4
+
+Xk
+
+(a) (b) 
+
+Xf
+
+xf
+
+xe
+
+h
+
+Analyzed point Wall points Forcing points 
+
+Neighbor points Interpolation points External points 
+
+Surface of the body      
+
+> Figure 2: Two-dimensional sketch of (a) the tagging procedure and (b) the interpolation step. The point xkin (a) is identified as a forcing point, denoted as xfin (b).
+
+is introduced. As anticipated in Section 2, the spurious e ff ect of fresh cells in the presence of moving walls is prevented by performing the IB step prior the solution of the momentum equation in the fluid cells. Importantly, the hydrodynamic loads are evaluated using MLS kernels, yielding a smooth stress distribution over the wet surface and enabling FSI problems. Finally, the elliptic equation is modified to ensure a consistent treatment of boundary cells, hence reducing the splitting error. 
+
+3.1. Fast tagging and IB on provisional velocity 
+
+Let us consider one of the three staggered grids of the velocity. The first step of the proposed IB formulation is the identification of the forcing nodes, which is performed using a novel tagging algorithm summarized in Algorithm 1 and illus-trated in Figure 2a, which requires the immersed body surface to be discretized into Nt triangular elements. Once a point xk is identified as a forcing node (hereafter indicated as xf ), the 8Forcing points 
+
+Fluid points 
+
+Stencil of the Laplacian 
+
+Surface of the body 
+
+> Figure 3: Stencil of the Laplacian operator near the immersed surface. Since on the forcing points the provisional equation is not solved, the stencil never crosses the immersed interface.
+
+IB forcing is performed. A probe in the wall-normal direction Nf passing through 
+
+xf is casted at distance h from the corresponding wall point Xf , thus identifying the external point xe (see the two-dimensional sketch in Figure 2b): 
+
+xe = Xf + hnf , (7) where nf = Nf / Nf is the unit normal vector to the surface passing through xf .The flow velocity component on the forcing point uf is reconstructed through linear interpolation, using the component of body velocity U at Xf and the flow velocity component ue at point xe, as: 
+
+uf = (1 − α)U + αue, (8) being α = Nf /h. The velocity at the wall is given from the boundary condition (that may be known analytically or coming from the structural dynamics in FSI problems), while the velocity at the external point is interpolated from the Eulerian grid using the trilinear interpolation of the surrounding Eulerian nodes. The same procedure is applied to the opposite side of the wall for both zero-thickness and finite-thickness bodies, as illustrated in Figure 2b. The length of the probe h must be su ffi ciently large to prevent point xf from being inside the interpolation stencil of ue. Thus, in the following h is chosen to be twice the diagonal length of the local Eulerian cell. For a uniform grid, h = 2 √3∆, being ∆ the grid size. The same procedure is repeated for the other velocity components defined on the corresponding staggered grids. Once this IB step is completed, the provisional 9(a) tn before moving the surface (b) tn after moving the surface 
+
+Forcing points at tn Forcing points at tn+1 Fresh cells at tn+1
+
+Body surface at current time Body surface at previous time       
+
+> Figure 4: Treatment of the fresh cells with the novel IBM. For clarity, only the forcing points on the upper side of the wall are depicted. Position of the moving surface at tn(a) before moving the structure and (b) after moving the structure. Once the structure is displaced, the time step tnis completed and the fresh cells at tn+1have become forcing points.
+
+velocity on the forcing nodes is determined, and the provisional velocity on the fluid nodes is obtained by solving Equation (3) on all points but the forcing points. The advantages of the proposed method, which is based on a two-sides Eule-rian IBM, are multiple. Firstly, the IB force is applied only to the forcing points, thus avoiding a smearing of the interface (as happens in Lagrangian IBMs) in fa-vor of a sharp representation of the solid-fluid interface. Then, the two-sided flow reconstruction allows to deal with zero-thickness bodies, requiring to impose the no-slip condition on both sides of the wet wall. Consequently, in the provisional velocity the two flow regions are completely decoupled as the stencil of the dif-ferential operators never crosses the immersed boundary (see, for instance, the stencil of L in Figure 3). In addition, the flow derivatives at points adjacent to the forcing nodes are evaluated using velocity values that already incorporate the IB condition. Furthermore, applying the IB forcing before Equation (3) allows to deal with fresh cells without any additional e ff ort. If the CFL number is suf-ficiently small, at most one layer of fresh cells can emerge between the end of the n-th time step and the beginning of the ( n + 1)-th due to the displacement of the immersed surface. Hence, the fresh cells are also forcing points for which the 10 RF
+
+RF RB
+
+> > > > > > > > > > >
+
+> > > > > > > > > > >
+
+> > > > > > > > > > >
+
+> > > > > > > > > > >
+
+> > > > > > > > > > >
+
+> > > > > > > > > > >
+
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+
+CF CB C = CF ∪ C B F       
+
+> Figure 5: Identification of fluid cells CFand boundary cells CB. The truncation error RFis defined on the centers of the fluid cells, while RBon the boundary cells.
+
+provisional flow velocity at time tn+1 is determined by Equation (8) (see Figure 4). Therefore, if the velocity field at time-step n − 1 is not required for the evalua-tion of the non-linear terms (as happens in a self-starting time scheme, like the RK2 +CN described above since ρ1 = 0), the fresh cells are automatically handled by the proposed IBM. As a final remark, the proposed tagging and forcing procedures are inherently parallel, since each Eulerian point is treated independently. Furthermore, as in Lagrangian IBMs, the main computational loop is performed over the surface triangles rather than on the Eulerian points. Once a forcing node is identified, the IB step is carried out "on-line", without requiring storage of the wall-point locations. Consequently, the computational cost is comparable to that of existing Lagrangian IBMs. 
+
+3.2. Modified elliptic equation 
+
+To obtain the solenoidal velocity field, the provisional velocity ˆ u is projected on a divergence-free space using Equation (4). However, since Gφ is nonzero at the forcing points, this projection alters the immersed boundary treatment, and the 11 > > >
+
+> > > >
+> > > >
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+X
+
+> ∆α−
+> ∆α+
+
+xb
+
++
+
+−
+
+p grid points 
+
+> u1 grid points 
+
+> >
+
+u2 grid points 
+
+Intersection point X
+
+Boundary cells 
+
+Surface of the body 
+
++ Positive side 
+
+− Negative side 
+
+x1
+
+x2 
+
+> Figure 6: Identification of the geometrical properties of a boundary cell whose center is xb.
+
+resulting velocity us+1 may no longer satisfy the no-slip condition. As discussed in the introduction, this is a well known issue arising when IBMs are coupled with the fractional step method, referred to as splitting error. Furthermore, we note that the projection step yields another source of error. With reference to the two-dimensional sketch of Figure 5, let us consider a surface immersed in the staggered grid described in Section 2. A cell is tagged as bound-ary cell if all of its faces contain forcing nodes, and the set of boundary cells is denoted as CB; The set of the remaining fluid cells is called CF . Thus, C = CF ∪C B
+
+is the set of all the cells composing Ω. Let us consider a smooth flow u resulting from the exact solution of the incompressible Navier-Stokes equations on the box 
+
+Ω. For the sake of clarity, we consider a uniform grid of constant size ∆. The discrete divergence operator D applied to u is defined at the cell center xk, k ∈ C 
+
+(where the pressure is located), and is given by: 
+
+Duk =
+
+> 3
+
+X
+
+> i=1
+
+ui
+
+xk + 12 ∆ei
+
+ − ui
+
+xk − 12 ∆ei
+
+
+
+∆ , (9) being ei the axis unit vectors. For a fluid cell the terms of the previous expression can be expanded in Taylor series around xk as follows: 
+
+ui xk ± 12∆ei
+
+!
+
+= ui
+
+xk ± 12
+
+∂ui
+
+∂xi k
+
+∆ + 18
+
+∂2ui
+
+∂x2 
+
+> ik
+
+∆2 ± 148 
+
+∂3ui
+
+∂x3 
+
+> ik
+
+∆3 + O∆4. (10) 12 Inserting Equation (10) into the definition of Du leads to the equivalent continuous equation: 
+
+Duk = ∇ · uk
+
+|{z} 
+
+> =0
+
++ 124 
+
+> 3
+
+X
+
+> i=1
+
+∂3ui
+
+∂x3 
+
+> ik
+
+∆2 + O∆3| {z } 
+
+> RkF=O
+
+(∆2)on CF , (11) where RF is the truncation error of the discrete divergence operator on the fluid cells. Let us now consider the boundary cell whose center is xb, highlighted in Figure 6. The discrete divergence of u is again given by Equation (9), but the Taylor series expansion in direction x2 cannot be performed around the same point 
+
+xb and the + and − sides of the wall must be treated separately. In particular, in direction x1 and x3 the expansion in Equation (10) can be employed, while the Taylor expansion in direction x2 centered at the wall is given by: 
+
+u2 xb ± 12∆e2
+
+!
+
+= u2
+
+ X ± α±∆e2
+
+ = u2(X) ± ∂u2
+
+∂x2 ±
+
+α±∆ + O∆2, (12) being ∂u2/∂x2 |± the derivative of u2 along the x2 direction evaluated on the ± sides of the wall, X the coordinate of the intersection between the solid surface and the 
+
+x1 = xb 
+
+> 1
+
+line, and α± the fractions of cell in the ± side of the wall. Therefore, using the continuity of u across the immersed surface, the discrete divergence can be rewritten as: 
+
+Dub = ∂u1
+
+∂x1 b
+
++ α+ ∂u2
+
+∂x2 +
+
++ α− ∂u2
+
+∂x2 −
+
+!
+
++ ∂u3
+
+∂x3 b
+
++ O(∆)
+
+| {z }
+
+> RbB=O(1)
+
+on CB, (13) being RB the truncation error on the boundary cells. The last equality shows that 
+
+Du = 0 is not a consistent approximation of ∇ · u = 0 at the boundary cells as the right-hand-side of Equation (13) (hence, the truncation error) may not vanish for ∆ → 0. In other words, the presence of an immersed interface yields a O(1) sink /source in the boundary cells when the discrete continuity operator is applied to an exact flow solution around a solid interface: 
+
+Du =
+
+
+
+RF = O∆2 on CF ,
+
+RB = O(1) on CB. (14) Importantly, even if the numerical scheme yields a spatial distribution of sinks /sources, it can be demonstrated that the total mass is conserved exactly at a discrete level. 13 Indeed, integrating Du over the whole domain and using the discrete divergence theorem (see Appendix A), it results: 0 =
+
+X 
+
+> f∈F
+
+uf · nf ∆S f =
+
+X
+
+> k∈C
+
+Duk∆Vk =
+
+X
+
+> k∈C F
+
+RkF ∆Vk +
+
+X
+
+> k∈C B
+
+RkB∆Vk, (15) being ∆Vk the volume of the k-th cell, F the set of boundary faces of C (see Fig-ure 5), ∆S f their surfaces and nf their outer normals. The first equality holds due to the well-posedness of the incompressible boundary value problem, with the net discrete flux through ∂Ω equal to zero. Hence, even if the mass is not locally con-served on the boundary cells CB, the mass imbalance is satisfied in integral form. It follows that, although O(1) sinks /sources are present in the boundary cells, they are balanced by the distribution of the O∆2 truncation errors on the fluid cells, and the conservation of mass over the whole domain is automatically guaranteed. Therefore, in order to obtain a consistent approximation of the divergence of the velocity field on the boundary cells, the truncation errors RF and RB should be added to the discrete conservation of mass Dus+1. However, this approach is in-feasible, as by definition the truncation errors cannot be evaluated. Therefore, Equation (14) applied to the discrete solution us+1 is rewritten as: 
+
+Dus+1 = q =
+
+
+
+qF on CF ,
+
+qB on CB, (16) where the sinks /sources qF and qB are some proxy of the exact RB and RF to be defined. Thus, the modified elliptic equation (to be used in the fractional step in place of Equation (5)) becomes: 
+
+Lcφ = D ˆu − q
+
+αs∆tn . (17) 
+
+qB is estimated from the provisional velocity ˆ u evaluated at the faces of the bound-ary cells: 
+
+qB = D ˆu on CB. (18) Indeed, ˆ u incorporates the boundary condition through the IB forcing, providing a good approximation of the flow field in the vicinity of the boundary, and hence of the associated sink /source terms. Moreover, since RB is O(1), qB converges to RB
+
+for ∆ → 0 if the numerical solution converges to the exact one. It should be noted that the form of qB sets the right-hand side of the modified elliptic Equation (17) to zero on the boundary cells. As a result, qB implicitly prevents to enforce Dus+1 = 0on the boundary cells as usually done for IBMs, consistently with Equation (14). 14 On the other hand, the distribution of qF should follow the one of RF , which is proportional to the third derivative of the exact solution of the problem, which is clearly unavailable and it cannot be estimated with su ffi cient accuracy given the spatially second-order accuracy of the numerical scheme. Nevertheless, for the discrete divergence theorem (see Equation (15)), qF should satisfy: 
+
+X
+
+> k∈C F
+
+qkF ∆Vk +
+
+X
+
+> k∈C B
+
+qkB∆Vk = 0. (19) A simple shape for qF satisfying the previous constraint is given by the following expression: 
+
+qF = − 1
+
+|C F |
+
+X
+
+> k∈C B
+
+D ˆuk∆Vk, (20) namely a uniform distribution of qF among the fluid cells, being |C F | the total volume of the fluid cells. In addition, such an expression for qF corresponds to the solution of the constraint (19) having the minimal L2 norm (see Appendix B) and it can be demonstrated that qF = O∆2 (see Appendix C), which is consistent with the numerical scheme. Importantly, since Equation (19) holds true to machine precision, the total mass of the flow is conserved during the time integration [26], and, since only the right hand side of Equation (5) has been altered with the novel method, the struc-ture of the Laplacian system has not changed, allowing the use of fast FFT-based algorithm for solving Equation (17). Hence, the computational e ff ort required to obtain the pseudo-pressure φ is practically unaltered: the only additional step with respect to the standard case is evaluating q, while the cost for the direct solution of Equation (17) remains the same as Equation (5). Equation (19) ensures mass conservation within the computational domain to machine precision. Nevertheless, the distribution of qF can be shaped to also achieve kinetic energy conservation in the inviscid limit, as described in Ap-pendix B. Consistently with the modified continuity equation at the boundary cells (see Equation (16)) the pressure field is not defined therein, since in those cells φ is not obtained from the enforcement of the incompressibility constraint, but rather from a requirement on the velocity field. Therefore, the pressure on CB is reconstructed from the surrounding pressure field using the same strategy employed for the re-construction of the velocity field for the IB forcing. This is just a post-processing step as the pressure evaluated at the boundary cells does not enter directly in the flow solution at next steps. 15 3.3. Smooth evaluation of the hydrodynamic-loads 
+
+The evaluation of the hydrodynamic loads acting on the body is based on the Lagrangian approach detailed in [27], where the MLS kernels are used to interpo-late the flow quantities on the probe points. The use of a MLS-based interpolation allows to obtain smooth hydrodynamic stresses on the surface of the body. Here the method is briefly summarized. The same triangulation employed for the IB tagging is used, and the triangle centers are the Lagrangian markers Xl, l ∈ [1 , Nt]. For each marker, a probe in the wall normal direction is casted from the marker Xl to the bulk of the fluid xe at distance h:
+
+xe = Xl + hnl, (21) being nl the normal of the l-th triangle and h the length of the probe. The pressure and the gradient of u are expanded in Taylor series from xe backwards to Xl,leading to the following expressions: 
+
+pl = pe − ∂p
+
+∂n e
+
+h + 12
+
+∂2 p
+
+∂n2 e
+
+h2, (22a) 
+
+∇u|l = ∇u|e − ∂∂n(∇u) e
+
+h + 12
+
+∂2
+
+∂n2 (∇u) e
+
+h2. (22b) The coe ffi cients of the Taylor series on the point xe are evaluated through a second order MLS interpolation of the flow quantities defined on the Eulerian grid. The traction on each marker is given by: 
+
+tl = −plnl + 1
+
+Re 
+
+∇u|l + ∇uT |l
+
+ · nl. (23) Finally, the total force and torque around given by: 
+
+F =
+
+> Nt
+
+X
+
+> l=1
+
+tlAl, Mp =
+
+> Nt
+
+X
+
+> l=1
+
+Xl − Xp × tlAl, (24) being Al the triangle area and Xp the pole of the torque. 
+
+4. Numerical results 
+
+In this section, several benchmark flows are presented to assess the capability of the method to handle zero-thickness structures, FSI problems, and flows with large pressure drop across the interface, such as pressurized membranes. Impor-tantly, in addition to the macroscopic behavior of the flow, we measure the error on the no-slip condition to quantify the improvement achieved by the proposed method. 16 0 0.5 1 1.5 2
+
+> 0
+> 0.5
+> 1
+
+U U(a) (b) 
+
+x1/L
+
+> x2
+> L
+> Immersed surface
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>      
+
+> > > >
+> > > >
+> > > >
+> (−)(+)
+> 00.20.40.60.81
+> -.2
+> 0
+> .2
+
+x1/L
+
+(c)      
+
+> 00.20.40.60.81
+> -.5
+> 0
+> .5
+> 1
+
+x2/L
+
+(d) 
+
+u1/U u− 
+
+> 1
+
+/U u+ 
+
+> 1
+
+/U u2/U u− 
+
+> 2
+
+/U u+ 
+
+> 2
+
+/U                   
+
+> Figure 7: a) Streamlines of the double lid driven cavity flow with a vertical immersed surface placed at x1=L. b) Magnification of the computational grid around the immersed surface. In the lower panels, the velocity profiles at (c) x2=L/2 and (d) x1=L/2 (symbols, apex ±) are compared against a body fitted solution (solid line). For ease of comparison, u+
+> 1and u+
+> 2are shifted to 0 <x1<L+ ∆ /π .
+
+4.1. Double lid driven cavity with a vertical immersed surface 
+
+As a first test case, the flow in a two-dimensional double lid-driven cavity with a vertical immersed surface is considered, as shown in Figure 7a. The no-slip condition on the immersed surface is enforced using the proposed IB forcing and, to avoid placing an Eulerian grid point on the immersed surface, the considered computational domain is the rectangle [0 , 2( L + ∆ /π )] ×[0 , L], where ∆ = 0.0125 L
+
+is the uniform grid spacing. The sketch of the Eulerian grid near the immersed surface is shown in Figure 7b. The flow quantities are made non-dimensional using the lid velocity U and the side-length L of the lid, and the Reynolds number is fixed to 100. At the top wall, the Dirichlet boundary condition u = Ue1 is enforced, while at the other boundaries acts the homogeneous Dirichlet condition. 17 Thus, the same flow is expected on the left ( −) and on the right ( +) of the immersed surface. The temporal integration scheme is the AB +CN, with a constant time step of 
+
+∆t = 0.01 L/U. As a reference, a comparative numerical simulation made with the same temporal and spatial scheme is performed on the domain [0 , L + ∆ /π ] ×
+
+[0 , L], thus using a body-fitted discretization. In Figures 7c and d, the velocity components on the line x2 = L/2 and x1 =
+
+L/2 are reported, showing a perfect agreement with the reference solution. In particular, the L1 norm of the di ff erence between the IB solution and the body fitted solution is evaluated, yielding u− 
+
+> 1
+
+− u1 1 = 0.5 × 10 −4U, u+ 
+
+> 1
+
+− u1 1 = 1.7 ×
+
+10 −4U for the horizontal component and u− 
+
+> 2
+
+− u2 1 = 3.9 × 10 −4U, u+ 
+
+> 2
+
+− u2 1 =
+
+1.1 × 10 −4U for the vertical component. 
+
+4.2. Poiseuille flow with a bottom immersed surface 
+
+The Poiseuille flow in a three dimensional channel is investigated to address the convergence of the proposed IB method, where the lower wall is represented by an immersed surface. The domain is the box [ −δ, δ ] × [−δ, δ ] × [−δ/ 4, 2δ], being δ the half-height of the channel, chosen as reference length. The ref-erence velocity is the maximum velocity U of the plane Poiseuille flow, and the Reynolds number based on U and δ is Re = 100. As schematically de-picted in Figure 8a, the domain is divided into two subregions by the immersed surface placed at x3 = 0. For x3 > 0 ( + region), a constant pressure gradi-ent along x1 drives the flow, while for x3 < 0 ( − region) a volumetric forcing term F = 50 ρU2/δ sin [ π(x3 + δ/ 4) /(δ/ 4)] cos ( πx1/δ ) acting in the x3 direction is added to momentum equation. On the immersed surface the no-slip condition is enforced using the IB method. The computational grid is made of N uniformly spaced points in the x1 and x2
+
+directions, with uniform grid spacing ∆. Along the wall-normal direction, x3, a non-uniform grid is adopted to prevent any grid node from lying on the immersed surface. In the upper half of the channel ( x3 > δ ), the cells are uniformly spaced with size ∆, while in the lower half the grid spacing is scaled by a factor α =
+
+1 + ∆ /(4 δ) so as to avoid the placement of grid points on the immersed surface. In the remaining part of the domain ( x3 < −∆/4), ( N + 1) /4 − 1 uniformly sized cells are employed. A close-up of the Eulerian grid in the vicinity of the immersed surface is shown in Figure 8a. On the upper-half of the box the plane Poiseuille flow ue(x3) = −U x 3(x3 −
+
+2δ)/δ 2 is expected, while in the lower-half the forcing produces a steady structure of vortices, invariant for translation along x2.18 (a) 2δ
+
+δ/ 4
+
+x3
+
+x1
+
+x2
+
+− ∂p
+
+> ∂x1
+
+F
+
+(+)(−)
+
+> ∆/4
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+>
+
+> > > >
+> > > >
+> > > >
+
+(b) 
+
+−2 −1 0 1 2012
+
+u/U
+
+x3
+
+δ
+
+u1
+
+u3
+
+ue
+
+40 60 80 120 180 
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+N−2
+
+N−1
+
+N
+
+> u+
+> 1 − ue
+> 1/U
+
+(c) 
+
+40 60 80 120 180 
+
+10 −4
+
+10 −3
+
+10 −2
+
+N−2
+
+N−1
+
+N
+
+> |I+(0) |/U
+
+(d) Present method Present method without modified elliptic equation 
+
+Figure 8: a) Sketch of the Poiseuille flow with a bottom immersed surface. For x3 > 0 a constant pressure gradient drives the flow, while for x3 < 0 a forcing acts on the fluid in the wall normal direction. At x3 = 0 an immersed surface is placed, indicated by a dashed line. The magnification shows the computational grid around the immersed surface on the plane x2 = 0. b) Velocity com-ponents of the Poiseuille flow along x3 at x1 = x2 = δ/ 2. c) Spatial convergence of u+ 
+
+> 1
+
+− ue
+
+
+
+> 1
+
+/U
+
+for the novel IBM. d) Convergence analysis of the IB error on the ( +) side of the immersed surface. 
+
+The numerical flow solution at x1 = δ/ 2 and x2 = 0 along the x3 direction is shown in Figure 8b for N = 180 (notice that u2 = 0 everywhere). In the lower part of the channel, both the vertical ( u− 
+
+> 3
+
+) and horizontal ( u− 
+
+> 1
+
+) components are present, but due to the IB forcing, the upper side of the channel is not influenced by the lower region, recovering the correct plane Poiseuille flow, with the only non-zero component u+ 
+
+> 1
+
+.To assess the order of accuracy of the proposed method, the L1 norm of the error u+ 
+
+> 1
+
+− ue, is reported in Figure 8c as a function of N. The novel IB formulation exhibits clear second-order spatial accuracy. The results are compared with those obtained using the same IB forcing but without the modification of the elliptic 19 10 0 10 1 10 2
+
+> 0
+> 5
+> 10
+> 15
+> 20
+
+x+
+
+> 3
+
+⟨u+ 
+
+> 1
+
+⟩
+
+(a)     
+
+> 050 100 150 200
+> 0
+> 1
+> 2
+> 3
+
+σ1
+
+σ2
+
+σ3
+
+x+
+
+> 3
+
+σ+
+
+(b) 
+
+Body-fitted Present method 
+
+> Figure 9: Turbulent channel flow with a lower immersed surface: (a) mean velocity profile and (b) turbulent intensities.
+
+equation, i.e. using Equation (5) instead of Equation (17), which shows reduced accuracy and precision. These results confirm that the introduction of the forcing term q in Equation (17) is essential to recover the same level of accuracy as that attained by the underlying flow solver away from the solid boundaries. Finally, the convergence rate associated with the enforcement of the no-slip condition is assessed. The velocity component u+ 
+
+> 1
+
+is interpolated using a Cheby-shev polynomial of order 4, yielding the polynomial I+(x3) defined over the inter-val 0 < x3 < 2δ. The polynomial is then evaluated at the interface location x3 = 0, providing the quantity I+(0), representing the Chebyshev interpolant of the veloc-ity field at the immersed surface from the + side. In Figure 8d, the convergence of |I+(0) | as N increases is reported: the no-slip condition enforced through the IB forcing is second-order accurate. On the other hand, the two-sided Eulerian IB method without the modified elliptic equation exhibits a convergence rate ON−1,indicating that the accuracy of the bulk field u+ 
+
+> 1
+
+− ue 1 is limited by the reduced accuracy in the enforcement of the no-slip condition on the immersed surface. 
+
+4.3. Turbulent channel flow with a lower immersed surface 
+
+The turbulent counterpart of Section 4.2 is now considered. The reference length is the channel half-height δ, while the reference velocity is the friction velocity uτ. The friction Reynolds number Re τ = uτδ/ν is fixed to 200 [28] and the domain is [ −2πδ, 2πδ ] × [−πδ, πδ ] × [−δ/ 4, 2δ]. Similarly to the previous case, at x3 = 0 an immersed rigid wall is placed, where the no-slip condition is imposed 20 using the IB method, while for x3 > 0, a constant pressure gradient along the x1
+
+direction drives the flow, and for x3 < 0 the forcing F = −5( u3 − uτ)uτ/δ acting in the wall-normal direction is added to Equation (3) to trigger a flow impinging on the immersed surface. The computational grid is uniform in the x1 and x2 directions, both discretized with 256 points. As in the Poiseuille flow configuration, the wall-normal grid is constructed so as to avoid the placement of Eulerian points on the immersed sur-face. Specifically, the grid on the channel side is obtained by scaling the following non-uniform grid defined on [0 , 2δ] with N points, whose N + 1 faces are given by: 
+
+x13 = 0, xN+13 = 2δ, xk
+
+> 3
+
+δ = 1 − 2
+
+∆g
+
+cos 
+
+" π
+
+2α k + α − 12
+
+!# 
+
+, k ∈ [2 , N], (25) with α = 8 and ∆g = cos hπ(α+1/2)2α
+
+i − cos hπ(α+N−1/2)2α
+
+i. The resulting grid is then scaled by a factor s = 1 + ∆ /(4 δ), where ∆ = x23 − x13, in order to ensure that no grid point lies on the immersed surface. Finally, ( N + 1) /4 − 1 uniformly spaced cells are placed in the interval [ −δ/ 4, −∆/4]. In the following, N is fixed to 127, for a total of 158 points in the x3 direction. The time integration is performed using the AB +CN scheme up to convergence of the first order moments of the flow. The simulations performed with IBM are compared against a body fitted simulation performed in the box [ −2πδ, 2πδ ] × [−πδ, πδ ] × [0 , 2δ]. The mean velocity ⟨u1⟩ for x3 > 0 obtained with the novel IB formulation and the body-fitted simulation are shown in Figure 9a in wall units. The mean velocity profile of the two simulations are superimposed. The standard deviations 
+
+σi = √⟨ui − ⟨ ui⟩⟩ , i = 1, 2, 3, of the flow for both the simulations are reported in Figure 9b in wall units. The σi curves obtained with the IB forcing collapse over the results of the body-fitted simulation. Thus, the proposed method is able to recover the results of the body-fitted simulation despite the imposition of the no-slip condition on the lower wall through the IB forcing, and the impinging lower flow (in x3 < 0) does not perturb the upper flow field. Moreover, the addition of the source term q in the conservation of mass equation does not modify the long time integration properties of the numerical scheme. 
+
+4.4. Flow around a square plate: steady and unsteady cases 
+
+The next test case is the incident flow U around a fixed, zero-thickness, square plate of side L. Such a flow configuration is particularly challenging due to the zero thickness of the body, as impermeability and no-slip boundary conditions 21 (a)     
+
+> −2024
+> −0.5
+> 0
+> 0.5
+> 1
+
+u3/U
+
+x3/L
+
+(b)     
+
+> −2024
+> -.5
+> 0
+> .5
+
+p/ρ U2
+
+x3/L
+
+(c)    
+
+> 200 300 400 500
+> 10 −3
+> 10 −2
+
+N−2
+
+N
+
+> |I(0) |
+> U
+
+(d) (−) side (+) side             
+
+> Figure 10: a) Streamlines of the flow around the plate superimposed on the contour field of the u3
+> velocity component. In the lateral panels, profiles of (b) u3and (c) palong x3at x1=x2=0. d) Convergence analysis of the IB error on the ( −) and ( +) sides of the plate.
+
+cannot rely on the help of the forcing in the inner points. The di ffi culty is exac-erbated by the strong boundary layer separation occurring at the plate edges and the large pressure drop across the plate. The domain is [ −2L, 2L] × [−2L, 2L] ×
+
+[−2L, 4L], and the center of the plate is placed at the origin. The Reynolds number is fixed to 100, based on L and U.The computational grid is made of N × N × 3/2N cells, for a uniform grid size 
+
+∆, and the time integration is performed using the AB +CN scheme, with a con-stant ∆t = 10 −3L/U. At the selected Reynolds number, the flow attains a steady state characterized by a recirculation region downstream of the plate, as illustrated by the streamlines on the x1 − x3 plane in Figure 10a. The u3 (streamwise) and 
+
+p profiles on the line x1 = x2 = 0 along x3 are reported in Figure 10b-c, respec-22 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1 
+
+> 0
+> 2
+> 4
+> 6
+> 8×10 −3
+
+t/T
+
+∥ε∥1
+
+U   
+
+> 0.40.50.6
+> 1
+> 4×10 −4
+
+Present method 
+
+Present method without modified elliptic equation   
+
+> Figure 11: Temporal evolution of ∥ε∥1for the flow around the heaving plate.
+
+tively. Velocity and pressure profiles show that the novel IB method is capable of capturing the fast variation of the velocity field near the plate and sustain the large pressure drop across the surface. Then, the convergence of the IB forcing is investigated as done for the Poiseuille flow. In particular, for the upstream ( x3 < 0) and downstream ( x3 > 0) flow re-gions, the normal velocity u3(0 , 0, x3) is interpolated using the Chebyshev poly-nomial of order 64, obtaining I−(x3) and I+(x3), respectively. The resulting poly-nomials are evaluated on x3 = 0, and the convergence of |I−(0) | and |I+(0) | as the number of grid points is increased is depicted in Figure 10d. For both the sides of the plate, the imposition of the no-slip condition using the novel IBM is clearly second-order accurate. To assess the method in a flow with moving walls, for the plate is prescribed a time-dependent rigid-body motion in an otherwise quiescent fluid, superimposing a heaving motion along e3 and a pitching motion around the x2 axis, yielding 
+
+X(t) = b(t)e3 + hX01 cos θ(t), X02 , −X01 sin θ(t)iT
+
+, where b(t) = B sin ( ωt) and θ(t) =Θ sin (2 ωt). X0 = hX01 , X02 , 0iT
+
+is the initial configuration of the plate, B = 6L and 
+
+Θ = π/ 6 are, respectively, the amplitude of the heaving and pitching motion of the plate, and ω is the heaving pulsation. The reference velocity for this configuration is the maximal heaving velocity Bω, and the Reynolds number Re = ρBωL/μ is set to 100. The plate is initially placed at the center of the computational domain [−L, L] × [−L, L] × [−6.5L, 6.5L], which is discretized using 100 × 100 × 650 cells, owning a constant grid size ∆ = 0.02 L. At the north and south boundaries, the homogeneous Dirichlet boundary condition is enforced. The temporal integration 23 is performed using the RK2 +CN scheme with constant time-step ∆t = 10 −5 Bω/ L.The precision on the imposition of the no-slip condition is assessed by eval-uating the mismatch ε between the velocity of the plate and the flow velocity, interpolated on the surface of the body using the same interpolator defined in Sec-tion 3 for the IB forcing (see Equation (8)). ∥ε∥1 = P3 
+
+> i=1
+
+∥εi∥1/3 is evaluated, being ∥εi∥1 the L1 norm of εi on the forcing points in the i-th direction. The time evolution of ∥ε∥1 for one heaving period T = 2π/ω is reported in Figure 11, and compared with the ∥ε∥1 obtained with the two-sided Eulerian IB introduced for the Poiseuille flow. For this highly unsteady flow, the transpiration error of the novel IB method is of the order of 10 −4U, while the two-sided Eulerian IB shows a re-duction of the precision of one order of magnitude. This result confirms the e ff ect of the modified elliptic equation on the correct enforcing of the no-slip condition. 
+
+4.5. Settling of buoyancy driven spheres and spheroids 
+
+The capability of the novel IBM to handle the FSI of rigid bodies is assessed by examining the rising or falling motion of di ff erent solids of revolution under the action of gravity in a viscous fluid. All the solids considered have a major axis of length d, volume V, and uniform density ρb (Figure 12a). The reference velocity is the gravitational velocity Ug = p|ρs − 1|V∗gd , being πs = ρb/ρ the body-to-fluid density ratio, V∗ = V/d3 the non-dimensional volume and g the gravitational acceleration. The Reynolds number based on d and Ug is the Galileo number Ga = p|πs − 1|V∗gd 3/ν .The Navier-Stokes equation for the fluid are solved in a frame of reference translating with the center of the solid, the Newton’s equations for the body trans-lation are solved in an inertial frame and the Euler equations for the body rotation are solved in the frame fixed with its principal axes, while the orientation of the solid is described using quaternions [3]. The gravity vector is g = − sgn( πs)ge3, so that at the south boundary the unsteady Dirichlet boundary condition u = −v is en-forced, being v the velocity of the center of the body, while at the north boundary the radiative condition is imposed. The solid is placed at the origin of the domain [−L1/2, L1/2] × [−L2/2, L2/2] × [−ℓ, L3 − ℓ], being L1, L2 and L3 the length of the computational domain in the corresponding direction and ℓ the distance of the origin from the south wall. A loose-coupling strategy is adopted to for the FSI: The fluid equations are advanced in time using the RK2 +CN scheme, whereas the solid equations are in-tegrated using the AB scheme. In all the cases, a fixed time step of ∆t = 10 −4d/Ug
+
+is employed. 24 (a) 
+
+d
+
+L3
+
+L2
+
+L1
+
+x3
+
+x2x1
+
+ℓ
+
+(b)      
+
+> 020 40 60 80 100
+> 0.02
+> 0.08
+> 0.14
+
+tU g/d
+
+vV
+
+U
+
+Present method Ref. [29] (c)         
+
+> 010 20 30 40 50 60 70 80
+> 0
+> 0.5
+> 1
+> 1.5
+> 2
+> ×10 −3
+
+tU g/d
+
+> ∥ε∥1
+> U
+
+Present method L-MLS       
+
+> 45 55 65
+> 0
+> 2
+> 4
+> 6×10 −5
+> Figure 12: a) Sketch of the setting employed for the buoyancy-driven test cases. b) Rising velocity
+> vVof the light sphere case. c) Comparison of the temporal evolution of ∥ε∥1obtained with the novel IBM and a L-MLS for the VP falling regime. In the inset, magnification of the IBM error.
+
+The first test case considers the rise of a light sphere with Ga = 66, πs = 0.8, and V∗ = π/ 6. For this configuration, the sphere undergoes an initial acceleration and subsequently reaches a steady vertical trajectory [29]. For this test case, L1 =
+
+L2 = 6d, L3 = 8d and ℓ = 3d and the computational domain is discretized using 300 × 300 × 400 cells, for a constant grid size ∆ = 0.02 d. The time evolution of the rising vertical velocity vV is shown in Figure 12b. The present IB method accurately captures the initial acceleration phase and the terminal rising velocity, with an error on the estimation of the terminal vV around 1%. Then, the settling of a heavy oblate spheroid is considered, for which πs = 2.14 and V∗ = π/ (6 χ), being χ = 1.5 the aspect ratio of the oblate spheroid. In the following, two values of the Galileo number are considered to obtain di ff erent falling regimes: For Ga = 110 the spheroid settles down to a steady oblique (SO) 25 Table 1: Metrics of the SO and VP falling regimes for the oblate spheroid obtained with the novel IBM (the velocities are normalized by Ug). The reference values are extracted from [30]. 
+
+Steady oblique Vertical periodic 
+
+vH |vV | Re V α(◦) S t v′ 
+
+> H
+
+|vV | v′ 
+
+> V
+
+/Ug Re V
+
+Present method 0.111 1.645 181 3.845 0.198 0.202 1.742 0.0036 261 L-MLS 0.117 1.639 180 4.097 0.196 0.197 1.738 0.0035 261 Ref. [30] 0.113 1.682 185 3.842 0.198 0.194 1.740 0.0038 261 path, while for Ga = 150 the solid reaches a vertical periodic (VP) motion [30]. For these test cases, L1 = L2 = 4d, L3 = 6d and ℓ = 2d and the computational domain is discretized using 200 × 200 × 300 cells, for a constant grid size ∆ = 
+
+0.02 d.For the SO case ( Ga = 110), the steady state metrics of the system are reported in Table 1. The horizontal vH and vertical vV velocities of the center of the spheroid compare well with the literature results, as well as the Reynolds number based on the terminal falling velocity Re V = Ga |vV |. Also the terminal geometrical configuration of the spheroid obtained with our method agrees with the literature data, as confirmed by the angle of trajectory α = arctan ( uH /|uV |). The same test case is performed using the Lagrangian IBM based on the MLS kernels introduced in [14], keeping an average size of the triangles edges to 0 .7∆. Hereinafter, such Lagrangian IBM will be referred to as L-MLS. The steady state metrics obtained with L-MLS are also reported for comparison in Table 1. Finally, the VP case ( Ga = 150) is analyzed. The metrics of the limit-cycle attained by the system evaluated using our method are reported in Table 1. The novel IBM correctly captures the limit cycle of the system, and all the quantities of interest are evaluated with an error below 5% with respect to data from the literature. For reference, the limit-cycle metrics obtained with L-MLS are reported on the same table. For this falling regime, the transpiration errors ε of the novel IBM and L-MLS are compared. In particular, ε is defined for the IBM as in Section 4.4, while for L-MLS is defined as the mismatch between the flow velocity interpolated on the Lagrangian markers using the MLS kernels and the velocity of the Lagrangian markers: in each case the error is defined based on the corresponding IB interpo-lation rule, which are both second order. In Figure 12c, the temporal evolution of 
+
+∥ε∥1 is depicted for the novel IBM and L-MLS: In the limit cycle, the mean value of ∥ε∥1 obtained with our method is approximately 2 × 10 −5U, whereas L-MLS 26 (a) 5L 5L
+
+4L Q
+
+x1
+
+x2
+
+x3
+
+L
+
+U(b)     
+
+> 02468
+> -.5
+> 0
+> .5
+
+tU /L
+
+> x2
+> L
+
+Present method Ref. [5] (c)     
+
+> 0510 15 20
+> 0
+> 2
+> 4
+> ×10 −3
+
+tU /L
+
+> ∥ε∥1
+> U
+
+Present method L-MLS                  
+
+> 6810
+> 0
+> 2×10 −4
+> Figure 13: a) Sketch of the flapping flag case. The red vertical line indicates the fixed leading edge of the flag. b) Initial dynamics of x2/Lof the trailing edge point Q. c) Comparison of the temporal evolution of ∥ε∥1obtained with the novel IBM and L-MLS for the flapping flag for ∆t1=10 −4L/U
+> (solid line) and ∆t2=10 −5L/U(dashed line). In the inset, magnification of the IBM error.
+
+yields a mean error of about 1 .5 × 10 −3U.
+
+4.6. Flow around a flapping flag 
+
+The flow around a square flapping flag hinged at the leading edge is inves-tigated to test the novel IB method in a deformable FSI problem. A sketch of the problem is depicted in Figure 13a, where the free-stream velocity U and the length of the flag edge L are the reference velocity and length, respectively, and the Reynolds number is fixed to Re = 200. The flag has thickness s = 0.01 L, and it is made of an inextensible linear-elastic uniform material of density ρb = 100 ρ with bending modulus B = 10 −4ρU2L3.The flag is treated as a two-dimensional surface within a three-dimensional flow, and the spring-mass network approach detailed in [31] is used to describe its struc-tural dynamics, prescribing a large Young modulus to the spring-mass model to 27 Table 2: Normalized peak-to-peak amplitude and Strouhal number of the x2 coordinate of the trailing-edge point Q shown in Figure 13b obtained with ∆t = 10 −4 L/U.
+
+Present method L-MLS Ref. [5] Peak-to-peak amplitude 0.784 0.767 0.780 Strouhal number 0.277 0.264 0.260 replicate the inextensibility of the flag, namely E = 10 3ρU2L/s. The flag is ini-tially planar and tilted by an angle 0 .1π with respect to the x1 − x3 plane, and its leading edge is placed at the center of the domain [ −2L, 2L] × [−2.5L, 2.5L] ×
+
+[−2L, 3L]. The computational domain is discretized using 200 ×250 ×250 cells, for a uniform grid size ∆ = 0.02 L. The fluid is advanced in time using the RK2 +CN scheme, loosely coupled with the AB method for the advancement of the solid equation, with a constant time step ∆t = 10 −4L/U.The onset of the oscillation of the trailing edge point Q obtained with the proposed IB method is depicted in Figure 13b and compared against literature [5]. The corresponding peak-to-peak amplitude and Strouhal number of the limit-cycle method are reported in Table 2 for the same value of ∆t. For comparison, on the same table the metrics obtained with L-MLS are listed as well. The no-slip error ε is evaluated for ∆t1 = 10 −4L/U and ∆t2 = ∆ t1/10 =
+
+10 −5L/U. The corresponding ∥ε∥1 values are shown in Figure 13c, from the initial time up to the onset of the limit cycle. Using the novel IBM, the average ∥ε∥1
+
+is 10 −4U for ∆t1 and 3 × 10 −5U for ∆t2, whereas L-MLS yields a mean error of 2 × 10 −3U for both time-steps. Thus, although both methods accurately capture the macroscopic behavior of the system, such as the peak-to-peak amplitude and the oscillation frequency, the Lagrangian method yields a no-slip error that is or-ders of magnitude larger than the one of the novel IBM. Moreover, for this test case, although the macroscopic flow features have reached temporal convergence, reducing the time-step size does not improve the accuracy of the L-MLS method. In contrast, the proposed IBM further reduces the transpiration error by one order of magnitude when the time step is decreased by a factor of ten. 
+
+4.7. Bubble drop 
+
+In the next test case the capability of the method to sustain large pressure drops across membranes is tested. In particular, a bubble of diameter d and surface tension γ is considered. The reference length is the diameter of the bubble, while the reference velocity is the capillary velocity Uγ = pγ/ (ρd). The spherical 28 (a) 
+
+d
+
+2d
+
+2d
+
+2d
+
+(b)    
+
+> 0510 15
+> 0.8
+> 1
+
+(c) V/V0   
+
+> 0510 15
+> 0.8
+> 1
+
+(d) S /S 0   
+
+> 0510 15
+> 1
+> 1.2
+
+(e) ∆p/∆p0   
+
+> 0510 15
+> 0.6
+> 0.8
+> 1
+
+tU γ/d
+
+(f)    
+
+> 0510 15
+> 0.8
+> 1
+
+tU γ/d
+
+(g)    
+
+> 0510 15
+> 1
+> 1.2
+
+tU γ/d
+
+(h) Present method L-MLS                
+
+> Figure 14: a) Sketch of the computational setting for the steady bubble case. b) Slice of the pressure field around the bubble on the x3=0 plane. The black line denotes the trace of the bubble surface on the plane. The red dots denotes the cells for which p= ∆ p0, while the blue dots are the cells with p=0. On the lower panels, variation of (c) volume V, (d) surface area Sand (e) pressure drop ∆pof the fixed bubble with respect to the analytical values. In (f) - (h) the same quantities are reported for the oscillating bubble.
+
+bubble is initially placed in a quiescent fluid with uniform pressure fixed to 0. After a transient in which the internal fluid pressurizes the bubble, the system reaches a steady regime in which the bubble keeps its spherical shape, with volume 
+
+V0 = πd3/6, surface area S 0 = πd2 and a pressure drop across the interface given by the Young-Laplace law ∆p0 = 4γ/ d.The bubble is placed at the center of the fluid domain [ −d, d]3, as depicted in Figure 14a. The surface of the bubble is treated as a two-dimensional surface im-mersed in a three-dimensional fluid, and the same structural solver of the flag case is employed. The internal forces arising from the surface tension are introduced in the spring-mass network using a surface potential V = γS , being S the surface 29 area of the sphere (see Appendix D for a detailed derivation). The computational domain is discretized using 120 3 cells, for a constant grid size ∆ = 0.02 d. The fluid equations are advanced in time up to t = 15 d/Uγ with the RK2 +CN method, loosely coupled with the AB method for the structural solver, using a constant time step ∆t = 10 −4d/Uγ.The steady state pressure field around the bubble obtained with the novel IBM is depicted in Figure 14b. The pressure drop across the surface is the one pre-dicted by the Young-Laplace law, and its variation is sharp across the bubble. The temporal evolution of the volume V, surface and pressure drop ∆p across the membrane obtained with our method and L-MLS are reported in Figure 14c-e. As the system evolves, the proposed IB method preserves the initial bubble volume, whereas in L-MLS it decreases at a constant rate. The same trend is observed in the evolution of the surface area, as shown in Figure 14d. Finally, Figure 14e reports the pressure jump across the interface for both IB approaches. After the initial transient, the proposed IBM yields the correct ∆p across the membrane, while L-MLS predicts a progressively increasing pressure drop. Then, a non-inertial observer oscillating in the x3 direction with constant am-plitude d and frequency Uγ/(2 πd) is introduced, while keeping the bubble fixed. Thus, in the non-inertial frame of reference, the bubble performs a sinusoidal mo-tion with the same amplitude and frequency of the observer, but the pressure drop across its membrane is still equal to ∆p0. Nevertheless, from the computational point of view, the bubble and the pressure field move over the grid, changing cells during the motion. For this test case, the computational domain is modified to [ −0.6d, 0.6d] ×
+
+[−0.6d, 0.6d] × [−0.6d, 2.6d], and the bubble is initially placed in the origin of the computational domain. The grid is made of 120 × 120 × 320 cells, for a uniform grid size ∆ = 0.01 d. Also in this case, the same physical setting is simulated using L-MLS. A video of the pressure field is provided in the Supplementary Material. As in the fixed configuration, the novel IBM preserves the bubble volume and surface, whereas L-MLS exhibits a continuous volume /surface loss, see Fig-ures 14f,g. In Figure 14h, the pressure jump across the bubble interface is re-ported: the novel IBM yields the correct ∆p, while L-MLS produces an increas-ing pressure jump due to the small curvature radius which, in turn, yields larger transpiration error. 
+
+4.8. Over-pressurized deformable aorta 
+
+The last test case examined is inspired by the hemodynamics within the human aorta, whose simplified geometry is shown in Figure 15a. The aorta has an inlet 30 (a) 5.5D3D
+
+> 9D
+
+2.2D
+
+> 2.8D
+
+D
+
+123
+
+> −Ku
+
+x3
+
+x1
+
+x2
+
+(b) 
+
+|u|hm s −1i
+
+(c) 
+
+p
+
+mmHg   
+
+> 00.51
+> 0
+> .5
+> 1
+
+Q
+
+t/T
+
+> Uin /U
+
+(d)   
+
+> 00.51
+> 0
+> 50
+> 100
+> 150
+> 200
+
+t/T
+
+> p [mmHg]
+
+(e)   
+
+> 00.51
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+
+t/T
+
+> ∥ε∥1/U
+
+(f) Present method L-MLS L-MLS (4 iterations)          
+
+> Figure 15: a) Sketch of the computational setting for the pressurized aorta case. b) Slice of the velocity field at point Q. c) Slice of the pressure field at point Q. d) Inflow profile Uin (t) for one period T. Point Qdenotes the time instant in which panels (b) and (c) are shown. e) Temporal evolution of the pressure within the aorta. f) Transpiration error ∥ε∥1as a function of time.
+
+diameter D = 21 mm and begins with a rigid cylindrical segment (region 1) that allows the flow to develop. The aortic arch (region 2) is deformable and gradually tapers toward the outlet. A final rigid cylindrical segment (region 3) guides the flow towards the outlet of the aorta. The initial (free-stress) geometry of the aorta is provided in the Supplementary Material. The inflow profile to the aorta is given by uin (t, r) = Uin (t) tanh [ α(1 − 2r/D)] / tanh ( α), being r the radial coordinate of the inflow region, α = 20 and Uin (t) is the 
+
+T -periodic temporal profile depicted in Figure 15d, whose maximum is U =
+
+0.5 m s −1 (also provided in the Supplementary Material). The blood density is set to ρ = 1000 kg /m3, while the dynamic viscosity is μ = 3.5 mPa s, corresponding to a Reynolds number based on U and D of Re = 3000, and the heart-rate is fixed 31 to 60 bpm. Region 2 is modeled as a two-dimensional, linearly elastic body with Young’s modulus E = 0.6 MPa, bending sti ff ness B = Es 3 
+
+> 6√3
+
+(1−ν2), where ν = 0.4 is the Poisson ratio of the structure, and density ρb = 2ρ, thickness s = 3.2 mm. The computational domain is [ −1.3D, 4.2D] × [−1.5D, 1.5D] × [0 , 9D], where the porous region [2 D, 4.2D] × [−1.5D, 1.5D] × [0 , 2.8D] is introduced, in which a Darcy-like term −Ku is added to Equation (3) to model the outlet impedance of the aorta, with K = 80 U/D, that has been chosen to get an over-pressurized aorta. The inflow profile is enforced at the south wall using the unsteady Dirichlet boundary condition, while at the northern wall the radiative boundary condition is prescribed. The computational domain is discretized using 275 × 150 × 450 cells, yielding a constant grid size ∆ = 0.02 D. The fluid equations are advanced using the RK2 +CN scheme, loosely coupled with the same structural solver used for the flag case, which is advanced with the AB scheme. The size of the time step is kept fixed to ∆t = 5 × 10 −5D/U.The velocity field at peak pressure (point Q of Figure 15d) is presented in Figure 15b. The flow remains relatively uniform along the aorta, with a local-ized low-velocity region in the lower portion of the aortic arch. Remarkably, no spurious transpiration velocity is observed. The corresponding pressure field at the same instant is shown in Figure 15c. Within the aorta, the pressure is nearly uniform at approximately 200 mmHg (26 600 Pa), whereas in the porous region it exhibits a linear decrease toward the bulk pressure ( ≈ 0 mmHg), in agreement with Darcy’s law. The time evolution of the pressure within the aorta is shown in Figure 15e. For the chosen value of K, the peak pressure within the aorta is about 200 mmHg, which is well above the values observed even under pathological conditions ( ≈
+
+120 mmHg). Nevertheless, the transpiration error remains below 8 × 10 −5U for all the time steps considered, as shown in Figure 15f. The same test case is ana-lyzed using both L-MLS and an iterative L-MLS approach [16], in which the IB forcing is applied four times per sub-stage to enhance the accuracy of the no-slip condition. The Lagrangian simulations predict a peak pressure in the aorta which is below 50 mmHg, and the transpiration across the immersed surface is two order of magnitude larger than the one obtained with the proposed Eulerian IBM. Inter-estingly, the L-MLS method with four iterations yields a slightly higher pressure within the aorta. This increase amplifies the pressure drop across the immersed surface and, despite the use of four iterations, results in a stronger flux across the aortic surface, as shown in Figure 15d. 32 5. Conclusions 
+
+In the present work, a novel sharp-interface immersed boundary method is proposed. The method exhibits the following features: 
+
+• Sharp flow reconstruction in the vicinity of the interface, based on an Eule-rian IBM; 
+
+• Applicability to zero-thickness bodies by enforcing the Eulerian IBM on both sides of the immersed interface; 
+
+• Applicability to moving or deformable bodies with a novel e ffi cient tagging algorithm; 
+
+• Automatic handling of fresh cells, as the IBM forcing step is done before the predictor of the fluid nodes; 
+
+• Numerical consistency at boundary cells through the inclusion of source and sink terms arising from the numerical scheme; 
+
+• Small transpiration error with second-order accuracy, due to the proposed elliptic correction; 
+
+• Computational e ffi ciency, as the Laplacian system matrix is preserved by the consistent pressure correction, enabling the use of FFT-based direct Poisson solvers without iterative multigrid methods; 
+
+• Lagrangian evaluation of hydrodynamic loads using MLS kernels, yielding smooth load distributions. These properties make it well suited for the simulation of complex flows involving moving boundaries, zero-thickness structures, and FSI. It should be noted that, the proposed method does not attempt to improve mass conservation in the boundary cells (as in [20, 10]), but rather avoids enforcing it in order to get a numerically consistent approximation of the exact solution. The proposed IBM has been extensively assessed across a series of representa-tive flow configurations, including turbulent flows, and both rigid and deformable FSI. The test cases further include flows characterized by a large pressure drop across immersed surfaces, as well as complex biologically inspired configura-tions. Overall, the numerical experiments demonstrate second-order accuracy in the imposition of the no-slip condition on solid walls and highlight the versatility of the method in addressing diverse flow regimes. The method can be readily integrated into existing numerical frameworks based on the fractional-step method with second-order finite di ff erences. Al-though the forcing strategy is Eulerian, the main computational loop for tagging and forcing Eulerian points is performed over the surface triangles, making its 33 cost comparable to that of existing Lagrangian IBMs. Moreover, the additional cost associated with the modification of the elliptic equation is limited to the di-rect evaluation of a single Eulerian field, q, whereas the cost of solving the elliptic system remains unchanged. Therefore, the overall computational cost of the pro-posed IBM is similar to that of Lagrangian IBMs; for instance, in the test cases here reported, a single time step of the L-MLS method with four iterations has the same cost of the proposed method. 
+
+6. Acknowledgements 
+
+This project has received funding from the European Research Council (ERC) under the European Union’s Horizon Europe research and innovation program (Grant No. 101039657, CARDIOTRIALS to F.V.). 
+
+7. Declaration of Competing Interest 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this document 
+
+Appendix A. The discrete divergence theorem 
+
+Let us consider a smooth vector field u = [u1, u2, u3]T within the domain Ω
+
+introduced in Section 2. In this setting, the divergence theorem holds: 
+
+Z
+
+> Ω
+
+∇ · u dV =
+
+Z
+
+> ∂Ω
+
+u · n dS . (A.1) Introducing the staggered grid, and denoting with c = (k1, k2, k3) the Cartesian in-dex of the cells, ki ∈ [1 , Ni], the integrals can be approximated using the midpoint rule, while the divergence operator is approximated by D, leading to: 
+
+Z
+
+> Ω
+
+∇ · u dV =
+
+X
+
+> c∈C
+
+Duc∆Vc + O∆2
+
+> M
+
+,
+
+Z
+
+> ∂Ω
+
+u · n dS =
+
+> 3
+
+X
+
+> i=1
+
+X
+
+> f∈F i
+
+uf 
+
+> i
+
+nf 
+
+> i
+
+∆S f + O∆2
+
+> M
+
+,
+
+(A.2) 34 being ∆M the maximum grid size, ∆Vc the volume of the cell, Fi the set of bound-ary faces of Ω with normal in the i-th direction, nf 
+
+> i
+
+their outer normal i-th compo-nent and ∆S f their surfaces. In this setting, the discrete divergence theorem holds true: X
+
+> c∈C
+
+Duc∆Vc =
+
+> 3
+
+X
+
+> i=1
+
+X
+
+> f∈F i
+
+uf 
+
+> i
+
+nf 
+
+> i
+
+∆S f . (A.3) Importantly, the equality holds for any grid size and for any vector field up to machine precision when evaluated numerically. Indeed, the discrete divergence on the cell c can be written as: 
+
+Duc =
+
+> 3
+
+X
+
+> i=1
+
+uc+ 12 ei 
+
+> i
+
+− uc− 12 ei
+
+> i
+
+∆xc
+
+> i
+
+= 1
+
+∆Vc
+
+> 3
+
+X
+
+> i=1
+
+uc+ 12 ei 
+
+> i
+
+∆S c+ 12 ei 
+
+> i
+
+− uc− 12 ei 
+
+> i
+
+∆S c− 12 ei 
+
+> i
+
+, (A.4) being ∆S c± 12 ei 
+
+> i
+
+the surface of the cell-face in the i-direction on the ± side. Thus, integrating over the whole domain using the midpoint rule leads to: 
+
+X
+
+> c∈C
+
+Duc∆Vc =
+
+X
+
+> c∈C
+> 3
+
+X
+
+> i=1
+
+uc+ 12 ei 
+
+> i
+
+∆S c+ 12 ei 
+
+> i
+
+− uc− 12 ei 
+
+> i
+
+∆S c− 12 ei 
+
+> i
+
+==
+
+> 3
+
+X
+
+> i=1
+
+X
+
+> c∈C
+
+uc+ 12 ei 
+
+> i
+
+∆S c+ 12 ei 
+
+> i
+
+− uc− 12 ei 
+
+> i
+
+∆S c− 12 ei 
+
+> i
+
+=
+
+> 3
+
+X
+
+> i=1
+
+X
+
+> f∈F i
+
+uf 
+
+> i
+
+∆S f 
+
+> i
+
+nf 
+
+> i
+
+.
+
+(A.5) The last equality holds true since the sum is telescopic and only the terms on the boundary of Ω are not canceled. 
+
+Appendix B. Evaluation of qF
+
+As discussed in Section 3.2, the shape of qF is chosen to satisfy the constraint (19) and having minimum L2 norm over CF . Accordingly, the Lagrangian of the problem is: 
+
+Lqk, λ 1
+
+ = 12
+
+X
+
+> k∈C F
+
+qk2
+
+∆Vk − λ1
+
+X
+
+> k∈C F
+
+qk∆Vk +
+
+X
+
+> k∈C B
+
+Duk∆Vk
+
+, (B.1) where λ1 is the Lagrange multiplier associated to the mass constraint and qF is determined by setting ∂L.∂qk = 0 and ∂L/∂λ 1 = 0, leading to: 
+
+qF = − 1
+
+|C F |
+
+X
+
+> k∈C B
+
+D ˆuk∆Vk. (B.2) 35 10 0 10 1 10 2
+
+> 0
+> 5
+> 10
+> 15
+> 20
+
+x+
+
+> 3
+
+⟨u+ 
+
+> 1
+
+⟩
+
+(a)     
+
+> 050 100 150 200
+> 0
+> 1
+> 2
+> 3
+
+σ1
+
+σ2
+
+σ3
+
+x+
+
+> 3
+
+σ+
+
+(b) 
+
+Mass constraint Energy /mass constraint 
+
+> Figure B.16: Comparison of the turbulent channel flow with a lower immersed surface with the mass and mass /energy constraints: (a) mean velocity profile and (b) turbulent intensities.
+
+This expression for qF assures the conservation of mass throughout the simulation within the whole domain as in standard fractional step. Alternatively, another constraint can be added to the previous Lagrangian to also enforce the conservation of kinetic energy in the inviscid limit within the whole domain. The total kinetic energy equation in the inviscid limit reads: dE
+
+dt = −
+
+Z
+
+> Ω
+
+u · (∇ · uu ) d V −
+
+Z
+
+> Ω
+
+u · ∇ p dV , (B.3) being e = u · u/2 the local kinetic energy and E = R 
+
+> Ω
+
+e dV the total kinetic energy. Using integration by parts, the previous equation can be rewritten as follows: dE
+
+dt = −
+
+Z
+
+> Ω
+
+e∇ · u dV −
+
+Z
+
+> Ω
+
+∇ · (eu) d V −
+
+Z
+
+> Ω
+
+∇ · (pu) d V +
+
+Z
+
+> Ω
+
+p∇ · u dV ==
+
+Z
+
+> Ω
+
+(p − e)∇ · u dV −
+
+Z
+
+> Ω
+
+∇ · (e + p)u dV .
+
+(B.4) The last term is conservative and acts as a redistribution of kinetic energy. On the other hand, if ∇ · u = q , 0, the first integral does not vanish, and kinetic energy is globally conserved only if the following constraint holds: 
+
+Z
+
+> Ω
+
+(p − e)q dV = 0 ∀(p − e), (B.5) 36 which in discrete form reads: 
+
+X
+
+> k∈C F
+
+pk − ekqkF ∆Vk +
+
+X
+
+> k∈C B
+
+pk − ekDuk∆Vk = 0. (B.6) Thus, the following augmented Lagrangian is considered: 
+
+Lqk, λ 1, λ 2
+
+ = 12
+
+X
+
+> k∈C F
+
+qk2
+
+∆Vk − λ1
+
+X
+
+> k∈C F
+
+qk∆Vk +
+
+X
+
+> k∈C B
+
+Duk∆Vk
+
+−− λ2
+
+X
+
+> k∈C F
+
+pk − ekqk∆Vk +
+
+X
+
+> k∈C B
+
+pk − ekDuk∆Vk
+
+,
+
+(B.7) being λ2 the Lagrange multiplier associated to the energy constraint. Setting 
+
+∂L.∂qk = 0, ∂L/∂λ 1 = 0 and ∂L/∂λ 2 = 0 leads to: 
+
+qkF = −AS 2 + BS 1
+
+C + AS 1 − BS 0
+
+C
+
+pk − ek, (B.8) being S i = Pk∈C F
+
+pk − eki
+
+∆Vk, A = Pk∈C B Duk∆Vk, B = Pk∈C B
+
+pk − ekDuk∆Vk
+
+and C = S 0S 2 − S 21.To assess the e ff ect of the shape of qF , the turbulent channel flow with a lower immersed surface described in Section 4.3 is simulated using the mass-conserving (Equation (B.8)) and the mass /energy-conserving (Equation (B.2)) shapes of qF .The resulting mean velocity profile and turbulent intensities are shown in Fig-ure B.16. 
+
+Appendix C. Scaling of truncation errors 
+
+The modified elliptic Equation (17) incorporates a distribution of sinks /sources on the fluid cells, which vanish as the grid is refined. Indeed, with reference to the setting of Section 3.1, the truncation error on the regular cells can be casted as follows: 
+
+RkF = ∆2
+
+24 
+
+> 3
+
+X
+
+> i=1
+
+∂3ui
+
+∂x3 
+
+> ik
+
++O∆3 = ∆2
+
+24 ∇· (D2u)k +O∆3 = ∆2
+
+24 D(D2u)k +O∆3, (C.1) being D2u = h∂2u1
+
+.∂x21 , ∂ 2u2
+
+.∂x22 , ∂ 2u3
+
+.∂x23
+
+iT
+
+, and the last equality holding true since RF is defined on the regular cells. Thus, using the discrete divergence theo-rem, the discrete integral of RF over the regular cells is given by: 
+
+X
+
+> k∈C F
+
+RkF ∆Vk = ∆2
+
+24 
+
+X 
+
+> f∈F F
+
+D2uf · nf ∆S f + O∆3, (C.2) 37 xf
+
+> 0
+
+xf
+
+> 1
+
+xf
+
+> 2
+
+nf
+
+Ff
+
+> 0
+
+Ff
+
+> 1
+
+Ff   
+
+> 2
+> Figure D.17: Forces acting on the vertices of triangle fdue to the surface tension γ.
+
+being FF the boundary faces of CF . The term D2u·n is linked to the hydrodynamic stress acting on ∂CF , hence, at convergence, it is fixed by the specific flow under investigation, leading to D2u · n = O(1). Therefore, the mean value of RF is given by: 
+
+RF = 1
+
+|C F |
+
+X
+
+> k∈C F
+
+RkF ∆Vk = ∆ 2 D2u · n |∂CF |
+
+24 |C F |
+
+| {z }
+
+> O(1)
+
+= O∆2, (C.3) being |C F | the volume of the fluid cells and |∂CF | the total area of the boundary faces of the fluid cells. Thus, from Equation (15), the following estimation for the mean value of RB holds: 
+
+RB = 1
+
+|C B|
+
+X
+
+> k∈C B
+
+RkB∆Vk = O(∆). (C.4) The same order of convergence is inherited by qB and qF . Indeed, assuming that on the boundary cells D ˆu is a good approximation of Du, then qB is expected to scale as RB, thus, in force of Equation (19) follows that: 
+
+qF = qF = O∆2, (C.5) showing that qF → 0 as ∆ → 0 with the same order of RF .
+
+Appendix D. Spring network formulation of surface tension 
+
+The potential energy associated to a body of surface area S and surface tension 
+
+γ is given by: 
+
+Vγ = γS . (D.1) 38 Given a triangular spring network made of Nv vertices, Nf faces and Ne edges, the potential becomes: 
+
+Vγ = γ 
+
+> Nf
+
+X 
+
+> f=1
+
+S f , (D.2) being S f the surface area of each triangle, given by xf 
+
+> 1
+
+− xf
+
+> 0
+
+ × xf 
+
+> 2
+
+− xf
+
+> 0
+
+ /2, where xfi , i = 0, 1, 2 are the coordinates of the vertices of face f (see Figure D.17). The force acting on the node i of triangle f due to the surface tension is given by the variation of the potential γS f with respect to the variation of the position of its vertices: 
+
+Ffi = −γ δS f
+
+δxfi
+
+. (D.3) The first variation of S f can be expressed as δS f = nf · δNf /2, being Nf =xf 
+
+> 1
+
+− xf
+
+> 0
+
+ × xf 
+
+> 2
+
+− xf
+
+> 0
+
+ and nf = Nf / Nf . From the definition of Nf follows that: 
+
+δNf = δxf 
+
+> 1
+
+− δxf
+
+> 0
+
+ × xf 
+
+> 2
+
+− xf
+
+> 0
+
+ + xf 
+
+> 1
+
+− xf
+
+> 0
+
+ × δxf 
+
+> 2
+
+− δxf
+
+> 0
+
+. (D.4) Using the triple product properties is possible to obtain the following expression for the variations of S f :
+
+δS f
+
+δxf
+
+> 0
+
+= 12
+
+xf 
+
+> 1
+
+− xf
+
+> 2
+
+ × nf , δS f
+
+δxf
+
+> 1
+
+= 12
+
+xf 
+
+> 2
+
+− xf
+
+> 0
+
+ × nf , δS f
+
+δxf
+
+> 2
+
+= 12
+
+xf 
+
+> 0
+
+− xf
+
+> 1
+
+ × nf .
+
+(D.5) Thus, the force acting on a vertex is given by the sum of the contributes that each face provides to such node. 
+
+References 
+
+[1] R. Mittal, G. Iaccarino, Immersed Boundary Methods, Annual Review of Fluid Mechanics 37 (1) (2005) 239–261. [2] R. Verzicco, Immersed Boundary Methods: Historical Perspective and Fu-ture Outlook, Annual Review of Fluid Mechanics 55 (1) (2023) 129––55. [3] R. Verzicco, M. D. de Tullio, F. Viola, An Introduction to Immersed Bound-ary Methods, Cambridge Monographs on Applied and Computational Math-ematics, Cambridge University Press, Cambridge, 2025. 39 [4] F. Viola, G. Del Corso, R. Verzicco, High-fidelity model of the human heart: An immersed boundary implementation, Physical Review Fluids 8 (10) (2023) 100502. [5] W.-X. Huang, H. J. Sung, Three-dimensional simulation of a flapping flag in a uniform flow, Journal of Fluid Mechanics 653 (2010) 301–336. [6] J. Kim, P. Moin, Application of a fractional-step method to incompressible Navier-Stokes equations, Journal of Computational Physics 59 (2) (1985) 308–323. [7] X. Zhu, E. Phillips, V. Spandan, J. Donners, G. Ruetsch, J. Romero, R. Ostilla-Mónico, Y. Yang, D. Lohse, R. Verzicco, M. Fatica, R. J. A. M. Stevens, AFiD-GPU: A versatile Navier–Stokes solver for wall-bounded turbulent flows on GPU clusters, Computer Physics Communications 229 (2018) 199–210. [8] E. A. Fadlun, R. Verzicco, P. Orlandi, J. Mohd-Yusof, Combined Immersed-Boundary Finite-Di ff erence Methods for Three-Dimensional Complex Flow Simulations, Journal of Computational Physics 161 (1) (2000) 35–60. [9] Y.-H. Tseng, J. H. Ferziger, A ghost-cell immersed boundary method for flow in complex geometry, Journal of Computational Physics 192 (2) (2003) 593–623. [10] R. Mittal, H. Dong, M. Bozkurttas, F. M. Najjar, A. Vargas, A. von Loebbecke, A versatile sharp interface immersed boundary method for in-compressible flows with complex boundaries, Journal of Computational Physics 227 (10) (2008) 4825–4852. [11] J. H. Seo, R. Mittal, A sharp-interface immersed boundary method with im-proved mass conservation and reduced spurious pressure oscillations, Jour-nal of Computational Physics 230 (19) (2011) 7347–7363. [12] C. S. Peskin, The immersed boundary method, Acta Numerica 11 (2002) 479–517. [13] M. Uhlmann, An immersed boundary method with direct forcing for the simulation of particulate flows, Journal of Computational Physics 209 (2) (2005) 448–476. 40 [14] M. Vanella, E. Balaras, A moving-least-squares reconstruction for embedded-boundary formulations, Journal of Computational Physics 228 (18) (2009) 6617–6628. [15] S. Gsell, U. D’Ortona, J. Favier, Explicit and viscosity-independent immersed-boundary scheme for the lattice Boltzmann method, Physical Re-view E 100 (3) (2019) 033306. [16] G. Vagnoli, M. A. Scarpolini, R. Verzicco, F. Viola, A local and explicit forcing correction for Lagrangian immersed boundary methods, Computer Physics Communications 315 (2025) 109741. [17] F. Capuano, An analysis of splitting errors in projection-based immersed boundary methods, in: Proceedings of the 15th ERCOFTAC Sympo-sium on Engineering Turbulence Modelling and Measurements (ETMM15): Dubrovnic, Croatia, September 22-24, 2025, 2025, pp. 733–738. [18] S.-W. Su, M.-C. Lai, C.-A. Lin, An immersed boundary technique for simu-lating complex flows with rigid boundary, Computers & Fluids 36 (2) (2007) 313–324. [19] I. N. Yildiran, N. Beratlis, F. Capuano, Y.-H. Loke, K. Squires, E. Balaras, Pressure boundary conditions for immersed-boundary methods, Journal of Computational Physics 510 (2024) 113057. [20] J. Kim, D. Kim, H. Choi, An Immersed-Boundary Finite-Volume Method for Simulations of Flow in Complex Geometries, Journal of Computational Physics 171 (1) (2001) 132–150. [21] S. He, Z. Yang, F. Sotiropoulos, L. Shen, Numerical simulation of interaction between multiphase flows and thin flexible structures, Journal of Computa-tional Physics 448 (2022) 110691. [22] K. Taira, T. Colonius, The immersed boundary method: A projection ap-proach, Journal of Computational Physics 225 (2) (2007) 2118–2137. [23] G.-R. Liu, Y. T. Gu, An Introduction to Meshfree Methods and Their Pro-gramming, Springer, Dordrecht, 2010. [24] C. Ericson, Real-Time Collision Detection, CRC Press, Boca Raton, 2004. 41 [25] J. Yang, E. Balaras, An embedded-boundary formulation for large-eddy sim-ulation of turbulent flows interacting with moving boundaries, Journal of Computational Physics 215 (1) (2006) 12–40. [26] Y. Morinishi, T. S. Lund, O. V. Vasilyev, P. Moin, Fully Conservative Higher Order Finite Di ff erence Schemes for Incompressible Flow, Journal of Com-putational Physics 143 (1) (1998) 90–124. [27] G. Vagnoli, M. A. Scarpolini, R. Verzicco, F. Viola, A moving-least-squares reconstruction of the hydrodynamic loads on deformable bodies: Applica-tion to immersed boundary methods, Journal of Computational Physics 556 (2026) 114804. [28] M. Quadrio, B. Frohnapfel, Y. Hasegawa, Does the choice of the forcing term a ff ect flow statistics in DNS of turbulent channel flow?, European Jour-nal of Mechanics - B /Fluids 55 (2016) 286–293. [29] J. Yang, F. Stern, A non-iterative direct forcing immersed boundary method for strongly-coupled fluid–solid interactions, Journal of Computational Physics 295 (2015) 779–804. [30] M. Moriche, M. Uhlmann, J. Dušek, A single oblate spheroid settling in un-bounded ambient fluid: A benchmark for simulations in steady and unsteady wake regimes, International Journal of Multiphase Flow 136 (2021) 103519. [31] M. D. de Tullio, G. Pascazio, A moving-least-squares immersed boundary method for simulating the fluid–structure interaction of elastic bodies with arbitrary thickness, Journal of Computational Physics 325 (2016) 201–225. 42

@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-10",
+  "date": "2026-06-10",
+  "generated_at": "2026-06-10T22:43:58",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/10/2606.09799v1-a-fast-and-consistent-sharp-interface-immersed-boundary-method-for-moving-bodies-of-arbitrary-thicknes",
+      "section": "quick",
+      "title_en": "A fast and consistent sharp-interface immersed boundary method for moving bodies of arbitrary thicknes",
+      "authors": "Giovanni Vagnoli, Martino Andrea Scarpolini, Roberto Verzicco, Francesco Viola",
+      "date": "2026-06-08",
+      "pdf": "https://arxiv.org/pdf/2606.09799v1",
+      "score": "6.0",
+      "evidence": "适用于多相CFD的运动体锐界面浸入边界法",
+      "tldr": "浸入边界法在模拟移动物体时需在精度与计算效率间权衡，传统欧拉与拉格朗日方法各自存在虚假振荡和滑移误差。本文提出一种快速一致的锐利界面IBM，结合快速标记、双侧欧拉强迫和质量修正，保留直接泊松求解效率。该方法实现二阶精度的无滑移条件，渗透误差小，可处理任意厚度移动体。数值测试涵盖刚性、变形、湍流及生物流，验证了高效性与鲁棒性，为复杂动边界模拟提供了可靠方案。",
+      "tags": "query:falling-film",
+      "abstract_en": "Immersed boundary methods (IBMs) are widely used to simulate flows around complex geometries and moving bodies, but they often involve a trade-off between precision and computational efficiency. Eulerian formulations require special treatments for moving walls and may generate spurious force oscillations, whereas Lagrangian formulations can suffer from slip errors at the immersed surfaces. We propose a novel sharp-interface IBM for incompressible flows involving moving, deformable, and arbitrary-thickness bodies. The method combines a fast tagging algorithm, a two-sided Eulerian forcing strategy, and a consistent mass correction that reduces the splitting error of fractional-step schemes, while preserving the structure of the discrete Laplacian operator. This formulation retains the efficiency of direct Poisson solvers, thus avoiding the overhead of cut-cell, multigrid, and projection-based approaches. The method naturally handles moving boundaries, and yields small transpiration errors with second-order accuracy in the enforcement of the no-slip condition. Numerical tests using rigid, deformable, turbulent, and biologically inspired flows demonstrate the accuracy, robustness, and efficiency of the method, without compromising computational cost.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
