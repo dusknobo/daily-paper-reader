@@ -6,26 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-10
-- 运行时间：2026-06-10 22:43:51 UTC
+- 最新运行日期：2026-06-11
+- 运行时间：2026-06-11 22:21:31 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：2
 - 精读区：0
-- 速读区：1
+- 速读区：2
 
 ### 今日简报（AI）
-今日速读一篇关于锐利界面浸入边界法的研究，该方法专为任意厚度运动体设计，追求快速且一致的计算。  
-论文提出了一种新数值格式，在处理复杂动边界问题时能兼顾效率与界面一致性，值得关注流体力学与计算物理领域读者。  
-下周可继续跟进此类贴体网格替代方案，看是否有更多精度验证与实际工程案例。
-- 详情：[/202606/10/README](/202606/10/README)
+今日速读两篇流体建模论文：薄膜排液在鞍点处出现奇异性，以及漂移模型用于代理流动建模。  
+值得关注薄膜排液的鞍点奇异性结论，会对微流体与涂层工艺有启发；漂移模型则提供了一种简化流动模拟的思路。  
+建议从事多相流或数值模拟的读者优先查看薄膜排液那篇，并留意其鞍点附近的物理机制。
+- 详情：[/202606/11/README](/202606/11/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [A fast and consistent sharp-interface immersed boundary method for moving bodies of arbitrary thicknes](/202606/10/2606.09799v1-a-fast-and-consistent-sharp-interface-immersed-boundary-method-for-moving-bodies-of-arbitrary-thicknes)  
+1. [Thin-film drainage becomes singular at saddles](/202606/11/2606.11881v1-thin-film-drainage-becomes-singular-at-saddles)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：分析曲面上的薄膜排液及厚度奇异性，与降膜厚度相关。
+2. [Drifting Models for Surrogate Flow Modeling](/202606/11/2606.07481v1-drifting-models-for-surrogate-flow-modeling)  
    标签：评分：6.0/10、query:falling-film
-   evidence：适用于多相CFD的运动体锐界面浸入边界法
+   evidence：针对CFD的生成式代理模型加速流场预测，可用于加速多相流模拟如降膜问题。
 
 
 <div class="dpr-home-promo-card">

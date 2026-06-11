@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-11",
+  "date": "2026-06-11",
+  "generated_at": "2026-06-11T22:21:39",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/11/2606.11881v1-thin-film-drainage-becomes-singular-at-saddles",
+      "section": "quick",
+      "title_en": "Thin-film drainage becomes singular at saddles",
+      "authors": "Simeon Djambov, Alice Marcotte, François Gallaire, Pier Giuseppe Ledda",
+      "date": "2026-06-10",
+      "pdf": "https://arxiv.org/pdf/2606.11881v1",
+      "score": "7.0",
+      "evidence": "分析曲面上的薄膜排液及厚度奇异性，与降膜厚度相关。",
+      "tldr": "薄液膜在曲面上的排水和积聚行为对涂层、制造和地球物理流等领域至关重要，传统奇异性通常与接触线、边界或缺陷相关。本研究却发现，光滑鞍部本身就能产生局部奇异的厚度分布。此奇异性的根源在于曲面几何导致的流体汇聚与发散流动竞争，该竞争在一个动力选择的局部区域内，通过排水、静水压强和毛细力三者的平衡得到正则化。因此，鞍部构成复杂地形上薄液膜排水的通用构建块，为相关流动的预测和控制提供了新理论基础。",
+      "tags": "query:falling-film",
+      "abstract_en": "Thin films draining on top of curved surfaces occur in coating, manufacturing, and geophysical flows, where predicting accumulation and thinning is crucial. Unlike singularities associated with contact lines, boundaries, defects, a smooth saddle alone can produce a locally singular drainage thickness distribution. The singularity stems from competing converging and diverging flow and is regularized within a dynamically selected region where drainage, hydrostatic pressure, and capillarity balance. Saddles thus emerge as generic building blocks for thin-film drainage on complex topographies.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/11/2606.07481v1-drifting-models-for-surrogate-flow-modeling",
+      "section": "quick",
+      "title_en": "Drifting Models for Surrogate Flow Modeling",
+      "authors": "Chris R. Jung, Markus Dörr, Natalie Jüngling, Jennifer Niessner, Adam T. Müller, Nicolaj C. Stache",
+      "date": "2026-06-05",
+      "pdf": "https://arxiv.org/pdf/2606.07481v1",
+      "score": "6.0",
+      "evidence": "针对CFD的生成式代理模型加速流场预测，可用于加速多相流模拟如降膜问题。",
+      "tldr": "CFD流场模拟高保真但计算成本高，现有生成替代模型能够较好分布建模，但迭代采样缓慢。本文引入生成式漂移框架，在VAE潜空间执行条件漂移，并采用标签感知掩码对齐边界条件，实现单步高质量流场生成。该模型在精度和流场一致性上与迭代扩散相当，而推理速度提升两个数量级。条件漂移作为扩散的高效替代，为实时CFD代理奠定了基础。",
+      "tags": "query:falling-film",
+      "abstract_en": "While Computational Fluid Dynamics (CFD) provides high-fidelity flow fields for optimizing indoor environments, its computational cost limits rapid exploration. To solve this problem generative surrogates offer better distribution modeling than deterministic networks, but iterative sampling is slow. To enable high-quality, single-pass generation, we adapt the novel generative drifting framework to fluid mechanics. We introduce a conditional architecture that performs drifting in a learned VAE latent space and uses label-aware masking to align generated samples with their boundary conditions. Our label-conditioned model matches iterative diffusion in accuracy and flow consistency while running two orders of magnitude faster. Additionally, we propose a spatial-conditioning variant that establishes a promising path towards generalization to unseen geometries. Ultimately, conditional drifting serves as a highly efficient alternative to diffusion based approaches, unlocking real-time CFD surrogates where inference speed is critical.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

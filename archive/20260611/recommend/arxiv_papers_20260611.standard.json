@@ -1,0 +1,95 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-11T22:20:03.195551+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.11881v1",
+      "source": "arxiv",
+      "title": "Thin-film drainage becomes singular at saddles",
+      "abstract": "Thin films draining on top of curved surfaces occur in coating, manufacturing, and geophysical flows, where predicting accumulation and thinning is crucial. Unlike singularities associated with contact lines, boundaries, defects, a smooth saddle alone can produce a locally singular drainage thickness distribution. The singularity stems from competing converging and diverging flow and is regularized within a dynamically selected region where drainage, hydrostatic pressure, and capillarity balance. Saddles thus emerge as generic building blocks for thin-film drainage on complex topographies.",
+      "authors": [
+        "Simeon Djambov",
+        "Alice Marcotte",
+        "François Gallaire",
+        "Pier Giuseppe Ledda"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-06-10T10:03:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.11881v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Analyzes thin-film drainage and thickness singularities on curved surfaces, relevant to falling film thickness.",
+      "llm_evidence_cn": "分析曲面上的薄膜排液及厚度奇异性，与降膜厚度相关。",
+      "llm_evidence": "分析曲面上的薄膜排液及厚度奇异性，与降膜厚度相关。",
+      "canonical_evidence": "分析曲面上的薄膜排液及厚度奇异性，与降膜厚度相关。",
+      "llm_tldr_en": "This paper demonstrates that thin-film drainage on curved surfaces develops singular thickness distributions at saddle points, arising from competing converging/diverging flows, and identifies the regularization mechanism, providing fundamental insight for film thickness prediction in applications like falling films.",
+      "llm_tldr_cn": "针对曲面上薄膜排液问题，本文发现光滑鞍点可导致局部的奇异排液厚度分布，这种奇异性源于收敛与发散流动的竞争，并在排液、静压和毛细力的平衡区域被正则化。该成果揭示了复杂地形上薄膜排液的普适构建单元，对降膜厚度预测和工业涂层过程具有重要理论指导意义。",
+      "llm_tldr": "针对曲面上薄膜排液问题，本文发现光滑鞍点可导致局部的奇异排液厚度分布，这种奇异性源于收敛与发散流动的竞争，并在排液、静压和毛细力的平衡区域被正则化。该成果揭示了复杂地形上薄膜排液的普适构建单元，对降膜厚度预测和工业涂层过程具有重要理论指导意义。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "liquid film thickness measurement",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.07481v1",
+      "source": "arxiv",
+      "title": "Drifting Models for Surrogate Flow Modeling",
+      "abstract": "While Computational Fluid Dynamics (CFD) provides high-fidelity flow fields for optimizing indoor environments, its computational cost limits rapid exploration. To solve this problem generative surrogates offer better distribution modeling than deterministic networks, but iterative sampling is slow. To enable high-quality, single-pass generation, we adapt the novel generative drifting framework to fluid mechanics. We introduce a conditional architecture that performs drifting in a learned VAE latent space and uses label-aware masking to align generated samples with their boundary conditions. Our label-conditioned model matches iterative diffusion in accuracy and flow consistency while running two orders of magnitude faster. Additionally, we propose a spatial-conditioning variant that establishes a promising path towards generalization to unseen geometries. Ultimately, conditional drifting serves as a highly efficient alternative to diffusion based approaches, unlocking real-time CFD surrogates where inference speed is critical.",
+      "authors": [
+        "Chris R. Jung",
+        "Markus Dörr",
+        "Natalie Jüngling",
+        "Jennifer Niessner",
+        "Adam T. Müller",
+        "Nicolaj C. Stache"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-06-05T17:35:09+00:00",
+      "link": "https://arxiv.org/pdf/2606.07481v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Generative surrogate model for CFD accelerates flow predictions; applicable to speed up multiphase flow simulations like falling film.",
+      "llm_evidence_cn": "针对CFD的生成式代理模型加速流场预测，可用于加速多相流模拟如降膜问题。",
+      "llm_evidence": "针对CFD的生成式代理模型加速流场预测，可用于加速多相流模拟如降膜问题。",
+      "canonical_evidence": "针对CFD的生成式代理模型加速流场预测，可用于加速多相流模拟如降膜问题。",
+      "llm_tldr_en": "Adapts a generative drifting framework to fluid mechanics, creating a fast single-pass surrogate for CFD flow fields, matching diffusion model accuracy at much lower cost, suitable for rapid exploration in multiphase flow design.",
+      "llm_tldr_cn": "室内环境优化通常依赖高保真CFD模拟，但其计算成本高昂，限制了快速探索和设计迭代。现有生成式代理模型虽能建模流场分布，但迭代采样缓慢。为此，本文提出将生成式飘逸框架引入流体力学，构建在VAE潜空间中进行飘逸的条件生成模型，并采用标签感知掩码和空间条件来对齐边界条件。实验表明，该模型在精度和流场一致性上与扩散模型相当，但单步生成速度提升两个数量级。该方法为多相流系统如降膜换热器提供了快速代理方案，可大幅加速性能预测与设计优化。",
+      "llm_tldr": "室内环境优化通常依赖高保真CFD模拟，但其计算成本高昂，限制了快速探索和设计迭代。现有生成式代理模型虽能建模流场分布，但迭代采样缓慢。为此，本文提出将生成式飘逸框架引入流体力学，构建在VAE潜空间中进行飘逸的条件生成模型，并采用标签感知掩码和空间条件来对齐边界条件。实验表明，该模型在精度和流场一致性上与扩散模型相当，但单步生成速度提升两个数量级。该方法为多相流系统如降膜换热器提供了快速代理方案，可大幅加速性能预测与设计优化。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
