@@ -1,0 +1,2688 @@
+Title: Symmetric structure-preserving discretization of N-phase incompressible fluid mixtures with arbitrary density ratios
+
+URL Source: https://arxiv.org/pdf/2606.12256v1
+
+Published Time: Thu, 11 Jun 2026 01:16:08 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+# Symmetric structure-preserving discretization of N-phase incompressible fluid mixtures with arbitrary density ratios 
+
+Marco F.P. ten Eikelder ∗1 and Aaron Brunk †2
+
+> 1
+
+Institute for Mechanics, Computational Mechanics Group, Technical University of Darmstadt, Germany 
+
+> 2
+
+Institute of Mathematics, Johannes Gutenberg-University Mainz, Germany 
+
+Abstract 
+
+Diffuse-interface models are a widely used framework for interfacial dynamics in complex fluids, in which interfaces are represented through smooth transition layers and capillary effects are encoded by a free-energy functional. For incompressible mixtures with more than two phases, however, robust computation is substantially more difficult because the numerical method should preserve the balance structure of the continuum model, maintain the saturation constraint, dissipate energy, and treat all phases symmetrically even when density ratios are arbitrary. Existing structure-preserving methods are largely developed for binary flows or for formulations that distinguish a reference phase, so a genuinely symmetric N-phase discretization remains lacking. The practical problem is therefore to construct a fully-discrete method for N-phase incompressible Navier–Stokes–Cahn–Hilliard mixture models that retains the key thermodynamic and conservation properties of the continuum equations for arbitrary density ratios. Here we propose a symmetric fully-discrete method for the N-phase incompressible Navier–Stokes–Cahn–Hilliard mixture model with arbitrary density ratios. The method yields a fully-discrete problem in which every solution satisfies exact phase volume conservation, phase mass conservation, total volume conservation, total mass conservation, and a discrete energy-dissipation law. In addition, if the volume-saturation constraint holds for the initial data, then it is preserved at every time step. We numerically verify these structure-preserving properties and demonstrate the robustness of the method in representative multiphase flow problems. The resulting scheme provides a computational framework for incompressible N-phase mixture flows with complex interfacial dynamics and arbitrary density contrasts. 
+
+1. Introduction 
+
+𝑁 -phase incompressible fluid mixtures arise in applications where several immiscible or partially miscible phases interact through moving interfaces. Diffuse-interface models provide a natural description of such systems by replacing sharp material boundaries with smooth transition layers and representing interfacial effects through phase-field energies. The model class considered in this work belongs to the Navier–Stokes–Cahn–Hilliard (NSCH) family, whose binary form is rooted in the hydrodynamic phase-field coupling introduced by [ 1 ], now commonly referred to as model H. Early two-phase NSCH formulations were mainly developed for fluids with matched densities, whereas many applications require models that allow density contrasts. This has led to several non-matching-density extensions, including influential contributions by [ 2 –5 ]. Although these formulations pursue the same physical objective, they can differ in their balance-law structure, dissipation statements, and behavior in limiting single-fluid regimes. A continuum-mixture-theory framework has recently clarified these relationships and identified a two-phase NSCH mixture model that is invariant with respect to the choice of fundamental variables [6]. 
+
+> ∗marco.eikelder@tu-darmstadt.de
+> †abrunk@uni-mainz.de
+
+1
+
+> arXiv:2606.12256v1 [math.NA] 10 Jun 2026
+
+2 M.F.P. ten Eikelder and A. Brunk 
+
+The numerical approximation of binary NSCH systems has generated a substantial literature, in particular on methods that retain key structural properties of the continuum equations. For matched densities, energy-stable and structure-preserving schemes have been developed in a variety of settings; see, for example, [ 7 – 11 ] for matched density models. The non-matching-density case introduces additional coupling through the density and mass balance, and has motivated further schemes such as those in [ 12 – 17 ]. Closest to the present work is the recent fully-discrete method [ 18 ], proposed by the authors, for the two-phase NSCH mixture model with arbitrary density ratios. There, unconditional energy stability is obtained despite the use of a positive density extension in the kinetic energy, as required by phase-field modifications. For ternary and genuinely multiphase systems, fewer fully-discrete structure-preserving schemes are available. For the model developed by Boyer and co-authors [ 19 ], several discretization schemes have been proposed and applied, mostly for the ternary case 𝑁 = 3 [20 –23 ], with a multigrid extension considered in [ 24 ]. Later developments include SAV/EIQ schemes [ 25 , 26 ]. Extensions to 𝑁 > 3
+
+are only briefly outlined in [ 19 ]. For the multiphase model developed by [ 27 ], additional numerical schemes and extensions, such as wall contributions, have been developed and tested for 𝑁 ≥ 3 [28 – 31 ]. It should be noted that 𝑁 = 3 is a separate case as the number of pairwise interfaces equals the number of phases, whereas for 𝑁 > 3 the number of pairwise interfaces is larger than the number of phases. For 𝑁 -phase flow, diffuse-interface modelling is even more flexible and substantially more challenging. Multiphase NSCH-type models have been proposed in a variety of forms [ 19 , 27 , 32 , 33 ]. Most recently, a unified mixture-theory framework for 𝑁 -phase NSCH mixture models with a single mixture momentum equation has been established in [ 34 ]. While such a general 𝑁 -phase framework is now available, its practical use requires constitutive closure, interfacial calibration, and a numerical method that preserves the structural properties of the resulting equations. In [ 35 ], we derive mixture-aware constitutive closures for 𝑁 -phase NSCH mixture models by imposing reduction consistency under merging physically identical phases, leading to admissible multiphase free energies and mobilities. Furthermore, in [ 36 ], we develop a surface-tension calibration procedure that determines capillarity parameters from prescribed pairwise surface tensions and mesh-resolvable interface widths. These results provide the modeling input for 𝑁 -phase simulations. The remaining question, and the focus of the present work, is how to discretize the resulting 𝑁 -phase equations so that their defining conservation and dissipation structure is retained at the fully-discrete level. This task is substantially more delicate in the 𝑁 -phase setting than in the binary case. The phase volume fractions are coupled through the saturation constraint, the densities enter both phase and total mass balances, capillarity acts through chemical potentials derived from an 𝑁 -phase free energy, and the flow is governed by a single mixture momentum equation. A useful discretization should therefore do more than remain energy stable. Ideally, it should also preserve phase-wise volume and mass balances, conserve total volume and total mass, and maintain the saturation constraint exactly. If these properties are lost at the discrete level, even small local defects can accumulate into nonphysical drift in composition, density, or total volume, especially over long time integrations and in strongly coupled multiphase regimes. A further difficulty is symmetry. At the continuum level, the mixture model treats the phases on equal footing, and this symmetry is important both conceptually and practically. In many numerical formulations, however, symmetry is broken early: one phase is eliminated through the saturation constraint, auxiliary variables are introduced relative to a designated reference phase, or the discrete equations are organized in a way that privileges particular labels. Such choices may be convenient algebraically, but they also build a distinction between phases into the discrete formulation. For 
+
+𝑁 -phase simulations, it is therefore desirable to develop a discretization that remains symmetric with respect to the phase set while preserving the underlying thermodynamic structure. The present work addresses this problem. We develop a symmetric structure-preserving dis-M.F.P. ten Eikelder and A. Brunk 3cretization for the 𝑁 -phase incompressible NSCH mixture model with arbitrary density ratios. The method is formulated directly in terms of the full set of phase variables and a single mixture velocity, without introducing a distinguished reference phase. Its construction is close in spirit to the recent fully-discrete energy-stable methodology for the two-phase problem [ 18 ], but is adapted here to the genuinely multiphase setting. Its central property is that the fully-discrete problem inherits the key structural identities of the continuum model. In particular, we prove that every discrete solution satisfies exact phase volume conservation, phase mass conservation, total volume conservation, total mass conservation, and a discrete energy-dissipation inequality. Moreover, if the initial data satisfy the volume-saturation constraint, then this constraint is preserved pointwise at all subsequent time steps. The structure of the remainder of the paper is as follows. In Section 2 we present the NSCH model with its properties. Next, in Section 3 we provide an equivalent alternative formulation amenable for a fully-discrete method. Then, in Section 4 we present the numerical scheme and its structural properties. In Section 5 we demonstrate the structural properties of the scheme numerically. Finally, we close the paper with a conclusion and outlook in Section 6. 
+
+2. The Navier–Stokes–Cahn–Hilliard model 
+
+This section is concerned with the Navier–Stokes–Cahn–Hilliard model. Following the presentation of [ 35 ], Section 2.1 presents the governing equations, and Section 2.2 provides its structural properties. Next, Section 2.3 discusses the Helmholtz free energy. The associated surface tension and interface width are provided in Section 2.4 and Section 2.5, respectively. Finally, the equilibrium conditions are stated in Section 2.6, and Section 2.7 provides the mixture-aware properties. 
+
+2.1. Governing equations 
+
+We consider the 𝑁 -phase Navier–Stokes–Cahn–Hilliard mixture system with non-matching densities given by ten Eikelder [34]: 
+
+𝜕 𝑡 (𝜌 v) + div (𝜌 v ⊗ v) + ∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 ∇𝜇 𝛽 + ∇ 𝜆 − div τ − 𝜌 b = 0, (2.1a) 
+
+𝜕 𝑡 𝜙 𝛼 + div (𝜙 𝛼 v) + 𝜌 −1 
+
+> 𝛼
+
+div J𝛼 = 0. (2.1b) The system couples the mixture momentum balance (2.1a) to the 𝑁 -phase mass balances (2.1b) . The equations are posed in a spatial domain Ω ⊂ R𝑑 of dimension 𝑑 = 2, 3, with boundary 𝜕 Ω and outward unit normal n. The unknowns are the fluid (mass-averaged) velocity v : Ω → R𝑑 , the volume fractions 
+
+𝜙 𝛼 : Ω → R, 𝛼 = 1, ..., 𝑁 , and the Lagrange multiplier pressure 𝜆 : Ω → R. We assume the absence of void spaces so that the volume fractions are subject to the saturation constraint ∑︁ 
+
+> 𝛼
+
+𝜙 𝛼 = 1. (2.2) In addition, the physical values of the volume fractions are 0 ≤ 𝜙 𝛼 ≤ 1. Hence, the volume fractions lie in the Gibbs simplex G = {ϕ ∈ R𝑁 : 0 ≤ 𝜙 𝛼 ≤ 1, Í𝛼 𝜙 𝛼 = 1}. The system is supplemented with the initial conditions v(x, 0) = v0 (x) and 𝜙 𝛼 (x, 0) = 𝜙 𝛼, 0 (x). The specific phase densities 𝜌 𝛼 
+
+are constant, the partial mass densities are defined by ˜𝜌 𝛼 = 𝜌 𝛼 𝜙 𝛼 , and the total mixture density is 
+
+𝜌 = Í𝛼 ˜𝜌 𝛼 . The body force is taken to be gravitational and is represented by g = −𝑔 j, where 𝑔 is the gravitational constant, j = ∇𝑦 is the vertical unit vector, and 𝑦 denotes the vertical coordinate. The viscous stress is given by τ = 𝜈 (2∇𝑠 v + ¯𝜆 (div v)I), with dynamic viscosity 𝜈 , coefficient ¯𝜆 = −2/𝑑 ,and symmetric velocity gradient ∇𝑠 v = (∇ v + (∇ v)𝑇 )/ 2. The Helmholtz free energy Ψ associated 4 M.F.P. ten Eikelder and A. Brunk 
+
+with (2.1) is assumed to belong to the constitutive class 
+
+Ψ = Ψ ({ 𝜙 𝛼 } , {∇ 𝜙 𝛼 }) . (2.3) The corresponding chemical potentials are denoted by 𝜇 𝛼 and 𝑔 𝛼 , with 
+
+𝜇 𝛼 = 𝜕 Ψ
+
+𝜕𝜙 𝛼 
+
+− div 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+, (2.4) and 𝑔 𝛼 = 𝜌 −1 
+
+> 𝛼
+
+(𝜇 𝛼 + 𝜆 ).Invoking the saturation constraint in the addition of the mass balance equations (2.1b) provides: 
+
+div v +∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+div J𝛼 = 0, (2.5) where the diffusive fluxes are J𝛼 = − Í𝛽 𝑀 𝛼𝛽 ∇𝑔 𝛽 , with 𝑀 𝛼𝛽 denoting the degenerate mobility matrix. We employ the mixture-aware mobility introduced in [35], namely 
+
+𝑀 𝛼𝛽 (ϕ) = − 𝑚 𝛼𝛽 𝜙 𝛼 𝜙 𝛽 (𝛼 ≠ 𝛽 ), (2.6a) 
+
+𝑀 𝛼𝛼 (ϕ) = 𝜙 𝛼 ∑︁ 
+
+> 𝛽 ≠𝛼
+
+𝑚 𝛼𝛽 𝜙 𝛽 . (2.6b) The coefficients 𝑚 𝛼𝛽 specify the pairwise mobilities and are chosen according to the constitutive closure described there. In the case of pure phases ( 𝜙 𝛼 = 1 for some 𝛼 = 1, ..., 𝑁 ) the mobility tensor is zero, and consequently, the peculiar velocities vanish ( J𝛼 = 0) so that the fluid velocity is divergence-free (div v = 0). By treating the chemical potentials as independent unknowns, the model can be written as a closed system of 2𝑁 + 2 equations for the 2𝑁 + 2 state variables (v, {𝜙 𝛼 }𝛼 =1,..., 𝑁 , 𝜆, {𝜇 𝛼 }𝛼 =1,..., 𝑁 ):
+
+𝜕 𝑡 (𝜌 v) + div (𝜌 v ⊗ v) + ∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 ∇𝜇 𝛽 + ∇ 𝜆 − div τ − 𝜌 b = 0, (2.7a) 
+
+𝜕 𝑡 𝜙 𝛼 + div (𝜙 𝛼 v) + 𝜌 −1 
+
+> 𝛼
+
+div (J𝛼 ) = 0, (2.7b) 
+
+div v +∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+div J𝛼 = 0, (2.7c) 
+
+𝜇 𝛼 − 𝜕 Ψ
+
+𝜕𝜙 𝛼 
+
++ div 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+= 0. (2.7d) The pressure 𝜆 acts as a Lagrange multiplier that enforces (2.7c) (which follows from (2.2) ), see also [34]. The system (2.7) is symmetric in terms of the volume fraction variables. 
+
+2.2. Structural properties 
+
+The continuum system satisfies several structural identities that are central to the construction of the numerical method. Under suitable boundary conditions, the phase masses and volume-fraction integrals are conserved, while the total energy is dissipated according to: 
+
+dd𝑡 
+
+∫
+
+> Ω
+
+˜𝜌 𝛼 dΩ = 0, 𝛼 = 1, ..., 𝑁, (2.8a) 
+
+dd𝑡 
+
+∫
+
+> Ω
+
+𝜙 𝛼 dΩ = 0, 𝛼 = 1, ..., 𝑁, (2.8b) 
+
+dd𝑡 E ( v, {𝜙 𝛼 }) = − D ( v, {𝑔 𝛼 }) ≤ 0, (2.8c) M.F.P. ten Eikelder and A. Brunk 5The energy functional E and the corresponding dissipation rate D are defined by 
+
+E ( v, {𝜙 𝛼 }) :=
+
+∫
+
+> Ω
+
+𝐾 (v, {𝜙 𝛼 }) + 𝐺 ({ 𝜙 𝛼 }) + Ψ ({ 𝜙 𝛼 } , {∇ 𝜙 𝛼 }) dΩ, (2.9a) 
+
+𝐾 (v, {𝜙 𝛼 }) = 12 𝜌 ({ 𝜙 𝛼 }) | v|2, (2.9b) 
+
+𝐺 ({ 𝜙 𝛼 }) = 𝜌 ({ 𝜙 𝛼 }) 𝑔𝑦, (2.9c) 
+
+D ( v, {𝑔 𝛼 }) :=
+
+∫
+
+> Ω
+
+2𝜈 
+
+
+
+∇𝑠 v − 1
+
+𝑑 (div v)I
+
+
+
+:
+
+
+
+∇𝑠 v − 1
+
+𝑑 (div v)I
+
+
+
++ 𝜈 
+
+
+
+¯𝜆 + 2
+
+𝑑 
+
+
+
+(div v)2
+
++∑︁ 
+
+> 𝛼,𝛽
+
+(∇ 𝑔 𝛼 )𝑇 𝑀 𝛼𝛽 ∇𝑔 𝛽 dΩ ≥ 0. (2.9d) Thus, the energy consists of the kinetic contribution 𝐾 , the gravitational contribution 𝐺 , and the Helmholtz free-energy density Ψ, while D collects the viscous and diffusive dissipation mechanisms. In the absence of gravity ( g = 0), the momentum equation can alternatively be expressed in conservative form by using the Korteweg tensor identity 
+
+div ∑︁ 
+
+> 𝛼
+
+𝜇 𝛼 𝜙 𝛼 − Ψ
+
+!
+
+I +∑︁ 
+
+> 𝛼
+
+∇𝜙 𝛼 ⊗ 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
++ ∇ 𝜆 =∑︁ 
+
+> 𝛼
+
+˜𝜌 𝛼 ∇𝑔 𝛼 . (2.10) This conservative form is compatible with angular momentum conservation only when the correspond-ing Korteweg contribution is symmetric. Hence, the tensor Í𝛼 ∇𝜙 𝛼 ⊗ 𝜕 Ψ/𝜕 ∇𝜙 𝛼 must be symmetric, which restricts the thermodynamically admissible choices of the free energy. 
+
+2.3. Helmholtz free energy 
+
+The Cahn–Hilliard free energy per unit volume is written as: 
+
+Ψ = Ψ 0
+
+  𝜙 𝛽 
+
+ + Ψ∇
+
+  ∇𝜙 𝛽 
+
+ , (2.11a) 
+
+Ψ∇
+
+  ∇𝜙 𝛽 
+
+ = 𝜀 0
+
+2∑︁ 𝛼,𝛽 
+
+¯𝜅 𝛼𝛽 ∇𝜙 𝛼 · ∇ 𝜙 𝛽 , (2.11b) where Ψ0 is the bulk free energy that does not contain any gradient contributions, whereas the gradient term represents an excess free energy in the interfacial region. Here ¯𝜅 𝛼𝛽 = ¯𝜅 𝛽 𝛼 defines the symmetric (volume-based) capillarity matrix that includes both self- and cross-interaction terms among phases, and 𝜀 0 represents the interface thickness measure. We note that the symmetry assumptions yield a symmetric Korteweg stress, cf. (2.10). The associated chemical potential takes the form: 
+
+𝜇 𝛼 = 𝜕 𝜙 𝛼 Ψ0 − 𝜀 0∑︁ 
+
+> 𝛽
+
+¯𝜅 𝛼𝛽 Δ𝜙 𝛽 , (2.12) where we used the independence of the state variables {𝜙 𝛼 }.With the aid of the saturation constraint (2.2) we reformulate the gradient contribution as [36]: 
+
+𝜀 0
+
+2∑︁ 𝛼,𝛽 
+
+¯𝜅 𝛼𝛽 ∇𝜙 𝛼 · ∇ 𝜙 𝛽 = − 𝜀 0
+
+2∑︁ 𝛼,𝛽 𝛼<𝛽 
+
+¯𝜎 𝛼𝛽 ∇𝜙 𝛼 · ∇ 𝜙 𝛽 , (2.13a) 
+
+¯𝜎 𝛼𝛽 = ¯𝜅 𝛼𝛼 + ¯𝜅 𝛽𝛽 − 2 ¯ 𝜅 𝛼𝛽 ≥ 0, (2.13b) where we used that κ is positive semidefinite on the tangent space. The (symmetric) capillarity tensor ¯𝜎 𝛼𝛽 = ¯𝜎 𝛽 𝛼 captures only the interfacial contributions between different phases, excluding 6 M.F.P. ten Eikelder and A. Brunk 
+
+self-interactions: ¯𝜎 𝛼𝛼 = 0. The choice ¯𝜅 𝛼𝛽 = 12 ( ¯𝜅 𝛼𝛼 + ¯𝜅 𝛽𝛽 ) causes the gradient contribution in (2.11) to vanish. The chemical potential may now be written as: 
+
+𝜇 𝛼 = 𝜕 𝜙 𝛼 Ψ0 + 𝜀 0∑︁ 
+
+> 𝛽 𝛽> 𝛼
+
+¯𝜎 𝛼𝛽 Δ𝜙 𝛽 . (2.14) Note that on the continuous level all these formulations are equivalent by using the saturation condition. For the numerical approximation, we prefer the formulation (2.11) . Under the assumption that the matrix 𝜅 𝛼𝛽 is symmetric positive semi-definite, this yields a convex gradient energy, which is more amendable during discretization. We emphasize that the reduced form 𝜎 𝛼𝛽 without the saturation constraint, does not imply a convex energy functional, as this matrix is not symmetric positive semi-definite. In the current article we adopt the free energy proposed in [35]: 
+
+Ψ0
+
+  𝜙 𝛽 
+
+ = ¯Ψ0
+
+𝜀 0
+
+, (2.15a) 
+
+¯Ψ0
+
+  𝜙 𝛽 
+
+ = ¯𝑊  ∑︁ 
+
+> 𝛼
+
+𝜙 𝛼 log 𝜙 𝛼 −∑︁ 
+
+> 𝛼𝛾
+
+𝜒 𝛼𝛾 𝜙 𝛼 𝜙 𝛾 
+
+!
+
+, (2.15b) where 𝜒 𝛼𝛾 = 𝜒 𝛾 𝛼 are symmetric interaction parameters. Rearrangement of the summation and use of the saturation constraint (2.2) yields 
+
+¯Ψ0
+
+  𝜙 𝛽 
+
+ = ¯𝑊  ∑︁ 
+
+> 𝛼
+
+𝜙 𝛼 log 𝜙 𝛼 −∑︁ 
+
+> 𝛼
+
+𝜒 𝛼𝛼 𝜙 𝛼 +∑︁ 
+
+> 𝛼<𝛾
+
+𝜒 FH  
+
+> 𝛼𝛾
+
+𝜙 𝛼 𝜙 𝛾 
+
+!
+
+. (2.16) In the above form, we can drop the linear term since only gradients of 𝜕 𝜙 𝛽 Ψ0 contribute to the system, while the typical parameters of the Flory interactions are given by 𝜒 FH  
+
+> 𝛼𝛾
+
+:= 𝜒 𝛼𝛼 + 𝜒 𝛾𝛾 − 2𝜒 𝛼𝛾 . Note that only 𝜒 FH  
+
+> 𝛼𝛾
+
+are the free parameters, while the 𝜒 𝛼𝛾 can be shifted without changing the corresponding 
+
+𝜒 FH  
+
+> 𝛼𝛾
+
+.
+
+2.4. Surface tension 
+
+We briefly discuss the definition of surface tension for the present free-energy class. The details are provided in [36]. Let p( 𝛼𝛽 ) be a curve connecting two coexistence points b( 𝛼 ) and b(𝛽 ) ,
+
+p( 𝛼𝛽 ) : [0, 1] → G , p( 𝛼𝛽 ) (0) = b( 𝛼 ) , p( 𝛼𝛽 ) (1) = b(𝛽 ) , (2.17) and let 𝑠 : R → [ 0, 1] be a strictly monotone parameterization of this path. The corresponding free energy per unit interfacial area is [36]: 
+
+𝛾 𝛼𝛽 [p( 𝛼𝛽 ) ] =
+
+∫ 10√︄ 2 ¯ Ωb( 𝛼 ) (p( 𝛼𝛽 ) (𝑠 )) ∑︁ 
+
+> 𝛾, 𝛿
+
+¯𝜅 𝛾 𝛿 𝑝 ( 𝛼𝛽 )′  
+
+> 𝛾
+
+(𝑠 ) 𝑝 ( 𝛼𝛽 )′  
+
+> 𝛿
+
+(𝑠 )d𝑠, (2.18) where ¯Ωb( 𝛼 ) (p( 𝛼𝛽 ) (𝑠 )) is the grand potential of the bulk free energy ¯Ψ0 relative to b( 𝛼 ) . The equilibrium profile minimizes (2.18) subject to the boundary conditions (2.17) , and the surface tension between phases 𝛼 and 𝛽 is defined as the minimal free energy per unit interfacial area 
+
+𝛾 𝛼𝛽 = inf  
+
+> p(𝛼𝛽 )
+
+𝛾 𝛼𝛽 [p( 𝛼𝛽 ) ]. (2.19) M.F.P. ten Eikelder and A. Brunk 7The surface tension (2.18) thus depends on both the homogeneous and gradient parts of the free energy. The parameter 𝜀 0 changes the diffuse-interface thickness but does not alter the values of the surface tensions 𝛾 𝛼𝛽 ; see also [ 36 ]. The paper [ 36 ] provides an algorithm for choosing ¯𝜅 𝛾 𝛿 so that prescribed pairwise surface tensions are matched. 
+
+2.5. Interface width 
+
+Next, we briefly recall the notion of interface widths for the present free-energy class and refer to [ 36 ]for the detailed derivation and discussion. The interface width between phases 𝛼 and 𝛽 is defined as the extent in the normal coordinate 𝑧 = x · ν over which the one-dimensional equilibrium profile passes between two prescribed transition 
+
+𝜀 𝛼𝛽 (𝑎, 𝑏 ) := |𝑧 𝑏 − 𝑧 𝑎 |, (2.20) where 𝑧 𝑎 and 𝑧 𝑏 are the locations at which the profile reaches the prescribed levels 𝑎 and 𝑏 . We provide precise numerical values of 𝑎 and 𝑏 in [ 36 ]. The interface width may also be expressed using the following formula: 
+
+𝜀 𝛼𝛽 (𝑎, 𝑏 ) = 𝜀 0
+
+∫ 𝑏 𝑎 √︄ 
+
+p( 𝛼𝛽 )′ (𝑠 )⊤ ¯κp( 𝛼𝛽 )′ (𝑠 )
+
+2 ¯ Ωb( 𝛼 ) (p( 𝛼𝛽 ) (𝑠 )) d𝑠. (2.21) The definition depends on the path of integration. In [ 36 ] we provide a symmetry-consistent choice for the path of integration. Furthermore, we observe that the interface widths are determined by the competition between the capillarity metric ¯κ and the grand potential ¯Ωb( 𝛼 ) , and scale with 𝜀 0. We note that there is in general no single diffuse-interface thickness in an 𝑁 -phase model; different coexistence pairs may have different interface widths. We define the practical interface width 
+
+𝜀 := min  
+
+> 𝛼<𝛽
+
+𝜀 𝛼𝛽 . (2.22) 
+
+2.6. Equilibrium conditions 
+
+The general equilibrium conditions for the 𝑁 -phase NSCH mixture model are discussed in [ 34 – 36 ]. In the absence of gravity and with no-slip boundary conditions, one has 
+
+v = 0, 𝑔 𝛼 = const , J𝛼 = 0 for all 𝛼. (2.23) In [ 35 , 36 ] it is shown that the equilibrium profiles ϕeq are given by the constrained minimization problem 
+
+ϕeq = arg inf ϕ
+
+(∫
+
+> Ω
+
+Ψ(ϕ, ∇ϕ)d𝑥 :
+
+> 𝑁
+
+∑︁ 
+
+> 𝛼 =1
+
+𝜙 𝛼 = 1 in Ω,
+
+∫
+
+> Ω
+
+𝜙 𝛼 d𝑥 = 𝑚 𝛼 for all 𝛼 
+
+)
+
+, (2.24) where the constants 𝑚 𝛼 denote the total volume-fraction integrals. 
+
+2.7. Mixture-aware closure 
+
+A central feature of the thermodynamic closure derived in [ 35 ] is its mixture awareness : the constitutive model remains consistent under changes in the effective phase set. This concerns three properties, of which the first one (reduction under merging of identical phases) is the decisive requirement, in the sense that it uniquely determines the closure class introduced in Section 2.3. The other two properties 8 M.F.P. ten Eikelder and A. Brunk 
+
+(reduction on simplex faces when a phase is absent, and invariance of absent phases) are then natural consequences of this mixture-aware structure. We recall these three properties below, since they provide important structural reference points for the discretization developed in this paper. The first property concerns merging identical phases . In applications, it is common that a phase is split into sublabels for modelling or numerical convenience, or that two labels happen to have identical constitutive parameters. In such a situation, the 𝑁 -phase model should reduce exactly to an 
+
+(𝑁 −1)-phase model after merging the corresponding volume fractions. 
+
+Theorem 2.1 (Reduction by merging identical phases [ 35 ]) . Assume 𝑁 ≥ 3 and consider two phases, without loss of generality phases 1 and 𝑁 , which are identical in the sense that 
+
+𝜌 1 = 𝜌 𝑁 , (2.25a) 
+
+𝜒 1𝛼 = 𝜒 𝑁 𝛼 , 𝛼 = 1, . . . , 𝑁, (2.25b) 
+
+𝜅 1𝛼 = 𝜅 𝑁 𝛼 , 𝛼 = 1, . . . , 𝑁, (2.25c) 
+
+𝑚 1𝛼 = 𝑚 𝑁 𝛼 , 𝛼 = 2, . . . , 𝑁 − 1. (2.25d) 
+
+Define the merged variables by 
+
+b𝜙 1 := 𝜙 1 + 𝜙 𝑁 , (2.26a) 
+
+b𝜙 𝛼 := 𝜙 𝛼 , 𝛼 = 2, . . . , 𝑁 − 1. (2.26b) 
+
+Then the 𝑁 -phase NSCH system reduces to the (𝑁 − 1)-phase NSCH system for 
+
+bϕ = ( b𝜙 1, b𝜙 2, . . . , b𝜙 𝑁 −1), (2.27) 
+
+with the reduced coefficients: 
+
+ˆ𝜌 1 := 𝜌 1, ˆ𝜌 𝛼 := 𝜌 𝛼 , 𝛼 = 2, . . . , 𝑁 − 1, (2.28a) 
+
+ˆ𝜒 11 := 𝜒 11 = 𝜒 1𝑁 = 𝜒 𝑁 𝑁 , (2.28b) 
+
+ˆ𝜒 1𝛼 := 𝜒 1𝛼 = 𝜒 𝑁 𝛼 , 𝛼 = 2, . . . , 𝑁 − 1, (2.28c) 
+
+ˆ𝜒 𝛽 𝛼 := 𝜒 𝛽 𝛼 , 𝛽, 𝛼 = 2, . . . , 𝑁 − 1, (2.28d) 
+
+ˆ𝜅 11 := 𝜅 11 = 𝜅 1𝑁 = 𝜅 𝑁 𝑁 , (2.28e) 
+
+ˆ𝜅 1𝛼 := 𝜅 1𝛼 = 𝜅 𝑁 𝛼 , 𝛼 = 2, . . . , 𝑁 − 1, (2.28f) 
+
+ˆ𝜅 𝛽 𝛼 := 𝜅 𝛽 𝛼 , 𝛽, 𝛼 = 2, . . . , 𝑁 − 1, (2.28g) 
+
+ˆ𝑚 1𝛼 := 𝑚 1𝛼 = 𝑚 𝑁 𝛼 , 𝛼 = 2, . . . , 𝑁 − 1, (2.28h) 
+
+ˆ𝑚 𝛽 𝛼 := 𝑚 𝛽 𝛼 , 𝛽, 𝛼 = 2, . . . , 𝑁 − 1. (2.28i) The second property concerns reduction on simplex faces . If one phase is identically zero, then the governing equations should coincide with those of the reduced system obtained by deleting that phase. In other words, the closure remains consistent when the dynamics is restricted to a face of the Gibbs simplex. 
+
+Theorem 2.2 (Reduction on simplex faces [ 35 ]) . If a solution of the 𝑁 -phase NSCH system satisfies 
+
+𝜙 𝛼 ≡ 0 for some 𝛼 , then the restriction of the 𝑁 -phase system to the Gibbs-simplex face 
+
+G𝛼 := {ϕ ∈ G | 𝜙 𝛼 = 0} (2.29) 
+
+coincides with the (𝑁 −1)-phase NSCH system obtained by deleting phase 𝛼 and canonically relabeling the remaining indices. M.F.P. ten Eikelder and A. Brunk 9The third property is the dynamical consequence of the second one: once a phase is absent, it remains absent throughout the evolution. 
+
+Corollary 2.3 (Absence invariance [ 35 ]) . If a phase is absent initially, i.e. 𝜙 𝛼 (· , 0) ≡ 0, then it remains absent for all times, 
+
+𝜙 𝛼 (· , 𝑡 ) ≡ 0 for all 𝑡 ≥ 0. (2.30) 
+
+3. Equivalent alternative formulation 
+
+In this section we provide an alternative but equivalent formulation of the system (2.7) . This forms the basis for the structure-preserving discretization provided in Section 4. In Section 3.1 we provide the strong formulation, and subsequently in Section 3.2 the corresponding variational formulation. 
+
+3.1. Strong formulation 
+
+The energy evolution (2.8c) of the system (2.7) results from multiplying the balance laws with particular weights. 
+
+Lemma 3.1 (Energy evolution) . The energy evolution of system (2.7) is obtained by taking a linear combination of equations (2.7a) –(2.7d) , weighted respectively by v, − 12 |v|2 𝜌 𝛼 + 𝜇 𝛼 + 𝑔𝑦𝜌 𝛼 , 𝜆 , and 
+
+−𝜕 𝑡 𝜙 𝛼 .Proof. See Appendix A. □
+
+Lemma 3.1 demonstrates that the standard variational formulation associated with (2.7) is energy-stable, provided the required test functions belong to the appropriate function spaces. However, the weights corresponding to the mass balance equations – specifically, − 12 𝜌 𝛼 |v|2 + 𝜇 𝛼 + 𝑔𝑦𝜌 𝛼 – do not lie in standard function spaces due to the presence of the nonlinear kinetic term − 12 𝜌 𝛼 |v|2. To address this issue, we introduce an equivalent formulation in which the energy evolution is derived using test functions drawn from conventional Sobolev spaces, thereby ensuring compatibility with standard finite element discretizations. The nonlinear kinetic weight term − 12 𝜌 𝛼 |v|2 accounts for the contribution of the mass balance law to the energy evolution. Hence, the nonlinear contribution of the mass balance weight vanishes when substituting the mass balance equations (2.7b) into the momentum balance equation (2.7a) . This provides an alternative form of the momentum equation: 
+
+0 = 𝜕 𝑡 (𝜌 v) + div (𝜌 v ⊗ v) − div S + ∇ 𝜆 +∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 ∇𝜇 𝛽 − 𝜌 g
+
+− 12 v∑︁ 
+
+> 𝛼
+
+𝜌 𝛼 
+
+
+
+𝜕 𝑡 𝜙 𝛼 + div (𝜙 𝛼 v) + 𝜌 −1 
+
+> 𝛼
+
+div J𝛼 
+
+
+
+= v
+
+2 𝜕 𝑡 𝜌 + 𝜌𝜕 𝑡 v + 12 v div (𝜌 v) + 𝜌 v · ∇ v − div S + ∇ 𝜆 +∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 ∇𝜇 𝛽 − 𝜌 g, (3.1) where we have used the identities: 
+
+𝜕 𝑡 (𝜌 v) − 12 v∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 ˜𝜌 𝛼 = v
+
+2 𝜕 𝑡 𝜌 + 𝜌𝜕 𝑡 v, (3.2a) 
+
+div (𝜌 v ⊗ v) − 12 v∑︁ 
+
+> 𝛼
+
+div ( ˜𝜌 𝛼 v) = 12 v div (𝜌 v) + 𝜌 v · ∇ v, (3.2b) 10 M.F.P. ten Eikelder and A. Brunk ∑︁ 
+
+> 𝛼
+
+div J𝛼 = 0. (3.2c) Thus, the system comprised of the balance laws (2.7b) -(2.7d) and the latter expression of (3.1) provides an energy-stable formulation where the weights – specifically, v, 𝜇 𝛼 + 𝑔𝑦𝜌 𝛼 , 𝜆 , and −𝜕 𝑡 𝜙 𝛼 – are members of standard Sobolev spaces. In what follows, we introduce another modification that is essential for the development of the fully-discrete energy-stable system. By substituting the identity 𝑔 𝛼 = 𝜌 −1 
+
+> 𝛼
+
+(𝜇 𝛼 + 𝜆 ) along with relation (3.1), we reformulate system (2.1) into an equivalent strong form: 
+
+𝜌𝜕 𝑡 v + 12 v div (𝜌 v) + 𝜌 v · ∇ v +∑︁ 
+
+> 𝛽
+
+˜𝜌 𝛽 ∇𝑔 𝛽 + ( 1 −∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 )∇ 𝜆 − div τ − 𝜌 g = 0, (3.3a) 
+
+𝜕 𝑡 𝜙 𝛼 + div (𝜙 𝛼 v) + 𝜌 −1 
+
+> 𝛼
+
+div (J𝛼 ) = 0, (3.3b) 
+
+div v +∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+∇ · J𝛼 = 0, (3.3c) 
+
+𝜌 𝛼 𝑔 𝛼 − 𝜕 Ψ
+
+𝜕𝜙 𝛼 
+
++ div 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+− 𝜆 = 0. (3.3d) System (3.3) contains 2𝑁 + 2 equations for 2𝑁 + 2 (independent) state variables ( v, {𝜙 𝛼 }𝛼 =1,..., 𝑁 , 𝜆 ,
+
+{𝑔 𝛼 }𝛼 =1,..., 𝑁 ). 
+
+Lemma 3.2 (Energy evolution alternative formulation) . The energy evolution of the system (3.3) 
+
+follows from a linear combination of (3.3a) -(3.3d) with the weights: v, 𝑔 𝛼 𝜌 𝛼 + 𝑔𝑦𝜌 𝛼 − 𝜆 , 𝜆 , and 
+
+−𝜕 𝑡 𝜙 𝛼 .Proof. Taking the inner product of the momentum equation (3.3a) with v yields: 
+
+0 = 𝜕 𝑡 𝐾 + div (𝐾 v) − v · div S +∑︁ 
+
+> 𝛼
+
+˜𝜌 𝛼 v · ∇ 𝑔 𝛼 + ( 1 −∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 )v · ∇ 𝜆 − 𝜌 v · g, (3.4) where we have used the identity: 
+
+𝜕 𝑡 𝐾 + div (𝐾 v) = v ·
+
+ v
+
+2 𝜕 𝑡 𝜌 + 𝜌𝜕 𝑡 v + 12 v div (𝜌 v) + 𝜌 v · ∇ v
+
+
+
+. (3.5a) Next, multiplying (3.3b) with 𝜌 𝛼 𝑔 𝛼 + 𝜌 𝛼 𝑔𝑦 − 𝜆 and (3.3d) with −𝜕 𝑡 𝜙 𝛼 , and subsequently summing over 𝛼 yields: 
+
+0 = 𝜕 𝑡 (𝐺 + Ψ) + ∑︁ 
+
+> 𝛼
+
+(𝑔 𝛼 𝜌 𝛼 + 𝑔𝑦𝜌 𝛼 − 𝜆 ) div (𝜙 𝛼 v)+∑︁ 
+
+> 𝛼
+
+(𝑔 𝛼 − 𝜌 −1 
+
+> 𝛼
+
+𝜆 ) div J𝛼 − div  ∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+, (3.6) where we have used the identities: 
+
+𝜕 𝑡 𝐺 = 𝑔𝑦 ∑︁ 
+
+> 𝛼
+
+𝜌 𝛼 𝜕 𝑡 𝜙 𝛼 , (3.7a) 
+
+𝜕 𝑡 Ψ − div 
+
+
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+
+
+=∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕𝜙 𝛼 
+
+−∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 div 
+
+ 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+
+
+, (3.7b) ∑︁ 
+
+> 𝛼
+
+𝑔𝑦 div J𝛼 = 0. (3.7c) M.F.P. ten Eikelder and A. Brunk 11 Multiplying (2.7c) with 𝜆 provides: 
+
+0 = 𝜆 div v + 𝜆 ∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+div J𝛼 . (3.8) Addition of (3.4), (3.8), and (3.6) gives: 
+
+𝜕 𝑡 (𝐾 + 𝐺 + Ψ) + div (( 𝐾 + Ψ + 𝐺 )v) − div (Sv ) + div (v𝑇 K)+ div (( 1 −∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 )v𝜆 ) + div (∑︁ 
+
+> 𝛼
+
+𝑔 𝛼 J𝛼 ) − div  ∑︁ 
+
+> 𝛼
+
+¤𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+= −S : ∇v +∑︁ 
+
+> 𝛼
+
+∇𝑔 𝛼 · J𝛼 , (3.9) where we have used the identities: 
+
+div (𝐺 v) = − 𝜌 v · g +∑︁ 
+
+> 𝛼
+
+(𝑔𝑦𝜌 𝛼 ) div (𝜙 𝛼 v), (3.10a) ∑︁ 
+
+> 𝛼
+
+𝑔 𝛼 div J𝛼 = −∑︁ 
+
+> 𝛼
+
+∇𝑔 𝛼 · J𝛼 +∑︁ 
+
+> 𝛼
+
+div (𝑔 𝛼 J𝛼 ), (3.10b) ∑︁ 
+
+> 𝛼
+
+div (𝑔 𝛼 ˜𝜌 𝛼 v) =∑︁ 
+
+> 𝛼
+
+˜𝜌 𝛼 v · ∇ 𝑔 𝛼 + 𝑔 𝛼 𝜌 𝛼 div (𝜙 𝛼 v), (3.10c) 
+
+div (( 1 −∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 )v𝜆 ) = (1 −∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 )v · ∇ 𝜆 + 𝜆 div (( 1 −∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 )v), (3.10d) 
+
+− div  ∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+= − div  ∑︁ 
+
+> 𝛼
+
+¤𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
++ div v𝑇 ∑︁ 
+
+> 𝛼
+
+∇𝜙 𝛼 ⊗ 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+, (3.10e) and where the (modified) Korteweg tensor K is given by: 
+
+K = (∑︁ 
+
+> 𝛼
+
+(𝑔 𝛼 ˜𝜌 𝛼 ) − Ψ)I +∑︁ 
+
+> 𝛼
+
+∇𝜙 𝛼 ⊗ 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+, (3.11) and where ¤𝜙 𝛼 := 𝜕 𝑡 𝜙 𝛼 + v · ∇ 𝜙 𝛼 is the material derivative of 𝜙 𝛼 . Integration over Ω provides: 
+
+dd𝑡 E = −D ( v, {𝑔 𝛼 }) + B , (3.12) where B is the boundary contribution: 
+
+B = − ⟨( 𝐾 + 𝐺 + Ψ)v, n⟩𝜕 Ω + ⟨ Sv , n⟩𝜕 Ω − ⟨ v𝑇 K, n⟩𝜕 Ω
+
+− ⟨( 1 −∑︁ 
+
+> 𝛽
+
+𝜙 𝛽 )v𝜆, n⟩𝜕 Ω − ⟨ ∑︁ 
+
+> 𝛼
+
+𝑔 𝛼 J𝛼 , n⟩𝜕 Ω + ⟨ ∑︁ 
+
+> 𝛼
+
+¤𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+, n⟩𝜕 Ω (3.13) and where we note the identities: 
+
+S : ∇v = 2𝜈 
+
+
+
+∇𝑠 v − 1
+
+𝑑 (div v)I
+
+
+
+:
+
+
+
+∇𝑠 v − 1
+
+𝑑 (div v)I
+
+
+
++ 𝜈 
+
+
+
+¯𝜆 + 2
+
+𝑑 
+
+
+
+(div v)2 ≥ 0, (3.14a) 
+
+−∑︁ 
+
+> 𝛼
+
+∇𝑔 𝛼 · J𝛼 =∑︁ 
+
+> 𝛼,𝛽
+
+(∇ 𝑔 𝛼 )𝑇 𝑀 𝛼𝛽 ∇𝑔 𝛽 ≥ 0. (3.14b) 
+
+□
+
+3.2. Variational formulation 
+
+In the following we only consider the following sets of boundary conditions 12 M.F.P. ten Eikelder and A. Brunk 
+
+(A) Ω is a hypercube and identified with the 𝑑 -dimensional torus, i.e. we impose periodic boundary conditions. (B) The volume fractions satisfy Í𝛽 𝜅 𝛼𝛽 ∇𝜙 𝛽 · n|𝜕 Ω = 0
+
+(C) The chemical potentials satisfy Í𝛽 𝑀 𝛼𝛽 ∇𝑔 𝛽 · n|𝜕 Ω = 0.(D) The velocity satisfies v|𝜕 Ω1 = 0 and v · n|𝜕 Ω2 = 0, where 𝜕 Ω = 𝜕 Ω1 ∪ 𝜕 Ω2.To derive the weak formulation we introduce the notation ⟨𝑎, 𝑏 ⟩ := ∫ 
+
+> Ω
+
+𝑎𝑏 , for arbitrary functions 
+
+𝑎, 𝑏 : Ω → R𝑘 , 𝑘 ∈ N+. Guided by the alternative strong form of the momentum equation (3.1) , we utilize the skew-symmetric form of the convection term in the weak formulation of the momentum equation: 
+
+c𝑠𝑘𝑤 (u, v, w) := 12 ⟨( u · ∇) v, w⟩ − 12 ⟨( u · ∇) w, v⟩, (3.15) where we note the identity: 
+
+⟨w, 12 v div (𝜌 v) + 𝜌 v · ∇ v⟩ = c𝑠𝑘𝑤 (𝜌 v, v, w). (3.16) With this we can recast the system into a variational formulation. Every smooth solution satisfies the variational formulation 
+
+⟨ v
+
+2 𝜕 𝑡 𝜌 + 𝜌𝜕 𝑡 v, w⟩ + cskw (𝜌 v, v, w) + ⟨ S, ∇w⟩ − ⟨ 𝜆, div w⟩ (3.17a) 
+
++∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝛼 ∇( 𝜌 𝛼 𝑔 𝛼 − 𝜆 ), w⟩ − ⟨ 𝜌 g, w⟩ = 0, (3.17b) 
+
+⟨𝜕 𝑡 𝜙 𝛼 , 𝜓 𝛼 ⟩ − ⟨ 𝜙 𝛼 v, ∇𝜓 𝛼 ⟩ + 1
+
+𝜌 𝛼 ∑︁ 𝛽 
+
+⟨M𝛼,𝛽 ∇𝑔 𝛽 , ∇𝜓 𝛼 ⟩ = 0, (3.17c) 
+
+⟨div (v), 𝑞 ⟩ + ∑︁ 
+
+> 𝛼,𝛽
+
+1
+
+𝜌 𝛼 
+
+⟨M𝛼,𝛽 ∇𝑔 𝛽 , ∇𝑞 ⟩ = 0 (3.17d) 
+
+⟨𝜌 𝛼 𝑔 𝛼 , 𝜉 𝛼 ⟩ − ⟨ 𝜕 ∇ 𝜙 𝛼 Ψ, ∇𝜉 𝛼 ⟩ − ⟨ 𝜕 𝜙 𝛼 Ψ, 𝜉 𝛼 ⟩ − ⟨ 𝜆, 𝜉 𝛼 ⟩ = 0, (3.17e) for smooth test functions (𝜓, 𝜉, w, 𝑞 ) with mean-free 𝑞 .
+
+Lemma 3.3 (Structure-preserving properties variational form) . The variational formulation (3.17) 
+
+satisfies the following structure-preserving properties: (phase volume conservation) dd𝑡 ⟨𝜙 𝛼 (𝑡 ), 1⟩ = 0, (3.18a) 
+
+(phase mass conservation) dd𝑡 ⟨ ˜𝜌 𝛼 (𝑡 ), 1⟩ = 0, (3.18b) 
+
+(energy dissipation) dd𝑡 E ( v(𝑡 ), {𝜙 𝛼 (𝑡 )}) = −D ( v, {𝑔 𝛼 }) . (3.18c) 
+
+Proof. The conservation of the phase volume results when substituting 𝜓 𝛼 = 1. Next, phase mass conservation follows when multiplying (3.18a) by 𝜌 𝛼 .We proceed with the energy dissipation relation. Selecting w = v provides: 
+
+0 = dd𝑡 ⟨𝐾, 1⟩ + ⟨ S, ∇v⟩ − ⟨ 𝜆, div v⟩ + ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝛼 ∇( 𝜌 𝛼 𝑔 𝛼 − 𝜆 ), v⟩ + ⟨ 𝜌𝑔 j, v⟩, (3.19) M.F.P. ten Eikelder and A. Brunk 13 where we have used the identities: 
+
+dd𝑡 ⟨𝐾, 1⟩ = ⟨ 12 v𝜕 𝑡 𝜌 + 𝜌𝜕 𝑡 v, v⟩, (3.20a) 
+
+0 = cskw (𝜌 v, v, v). (3.20b) Next, taking 𝜓 𝛼 = 𝜌 𝛼 𝑔 𝛼 + 𝜌 𝛼 𝑔𝑦 − 𝜆 and 𝜉 𝛼 = −𝜕 𝑡 𝜙 𝛼 , and subsequently summing over 𝛼 yields: 
+
+dd𝑡 ⟨𝐺 + Ψ, 1⟩ − ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝛼 v, ∇( 𝜌 𝛼 𝑔 𝛼 )⟩ − ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝛼 v, ∇( 𝜌 𝛼 𝑔𝑦 )⟩ + ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝛼 v, ∇𝜆 ⟩+∑︁ 
+
+> 𝛼,𝛽
+
+⟨M𝛼,𝛽 ∇𝑔 𝛽 , ∇𝑔 𝛼 ⟩ − ∑︁ 
+
+> 𝛼,𝛽
+
+⟨M𝛼,𝛽 ∇𝑔 𝛽 , ∇( 𝜌 −1 
+
+> 𝛼
+
+𝜆 )⟩ = 0, (3.21) where we have used the identities: 
+
+dd𝑡 ⟨𝐺, 1⟩ =∑︁ 
+
+> 𝛼
+
+⟨𝜕 𝑡 𝜙 𝛼 , 𝜌 𝛼 𝑔𝑦 ⟩ (3.22a) 
+
+dd𝑡 ⟨Ψ, 1⟩ =∑︁ 
+
+> 𝛼
+
+⟨𝜕 ∇ 𝜙 𝛼 Ψ, ∇𝜕 𝑡 𝜙 𝛼 ⟩ + ∑︁ 
+
+> 𝛼
+
+⟨𝜕 𝜙 𝛼 Ψ, 𝜕 𝑡 𝜙 𝛼 ⟩, (3.22b) ∑︁ 
+
+> 𝛼,𝛽
+
+⟨M𝛼,𝛽 ∇𝑔 𝛽 , 𝑔 j⟩ = 0. (3.22c) Next, taking 𝑞 = 𝜆 provides: 
+
+0 = ⟨div v, 𝜆 ⟩ + ∑︁ 
+
+> 𝛼,𝛽
+
+1
+
+𝜌 𝛼 
+
+⟨M𝛼,𝛽 ∇𝑔 𝛽 , ∇𝜆 ⟩, (3.23) where we used ⟨div (v), ¯𝑦 ⟩ = 0 and ∇ ¯𝑦 = 0, and where ¯𝑦 := ⟨𝑦, 1⟩ denotes the mean-value of 𝑦 .Addition of (3.19) and (3.21) and (3.23), provides: 
+
+dd𝑡 E = − ⟨ S, ∇v⟩ − ∑︁ 
+
+> 𝛼,𝛽
+
+⟨M𝛼,𝛽 ∇𝑔 𝛽 , ∇𝑔 𝛼 ⟩ = −D ( v, {𝑔 𝛼 }) , (3.24) where we have used the identity: 
+
+−𝑔 ∑︁ 
+
+> 𝛼
+
+𝜌 𝛼 ⟨𝜙 𝛼 v, ∇𝑦 ⟩ + ⟨ 𝜌𝑔 j, v⟩ = 0. (3.25) 
+
+□
+
+The variational formulation inherits the mixture-aware properties provided in Section 2.7. 
+
+Lemma 3.4 (Mixture-aware properties of the variational formulation) . Every smooth solution of the variational formulation (3.17) inherits the three mixture-aware properties of the continuum model provided in Section 2.7. Proof. Because the solutions of the variational formulation are assumed smooth, the identities established pointwise in the proofs of Theorems 2.1 and 2.2, and Corollary 2.3 may be inserted directly into the duality pairings of (3.17) . In this sense, the present proof is the variational counterpart of the corresponding strong-form reductions. □14 M.F.P. ten Eikelder and A. Brunk 
+
+4. Numerical scheme & structural properties 
+
+In this section, we will propose a fully-discrete finite element method and prove our main result on the structure-preservation properties. As a preparatory step, we first introduce the time-discretization in Section 4.1, and subsequently the spatial discretization in Section 4.2. 
+
+4.1. Time discretization 
+
+We partition the time interval [0, 𝑇 ] with a family of time parameter {𝜏 𝑘 } > 0 and introduce 
+
+I𝜏 := {0 = 𝑡 0, 𝑡 1 = 𝜏 1, . . . , 𝑡 𝑛 𝑇 = 𝑇 = Í𝑘 𝜏 𝑘 }, where 𝑛 𝑇 is the absolute number of time steps. We denote by Π1 
+
+> 𝑐
+
+(I 𝜏 ), Π0 (I 𝜏 ) the spaces of continuous piece-wise linear and piecewise constant functions on I𝜏 . We introduce 𝑔 𝑛 +1 := 𝑔 (𝑡 𝑛 +1) and 𝑔 𝑛 := 𝑔 (𝑡 𝑛 ) . We use superscripts to indicate possibly different time-level choices in the discrete terms. The notation 𝑔 ★ serves as a placeholder for the time level used in the skew-symmetric convection term, 𝑔 † for the time level used in the stress tensor, and 
+
+𝑔 ‡ for the time level used in the mobility tensor. Typical choices are 𝑔 ★, 𝑔 †, 𝑔 ‡ ∈ { 𝑔 𝑛 , 𝑔 𝑛 +1}. Finally, we introduce the time difference and the discrete time derivative via 
+
+𝑑 𝑛 +1 
+
+> 𝜏
+
+𝑔 = 𝑔 𝑛 +1 − 𝑔 𝑛 
+
+𝜏 𝑛 
+
+. (4.1) The gradient-free part of the free energy, i.e Ψ0 (𝜙 ), is treated using time-averages in the spirit of [37], i.e. 
+
+𝜕 𝜙 𝛼 Ψ(𝜙 𝑛 𝛼 , 𝜙 𝑛 +1 
+
+> 𝛼
+
+) := 1
+
+𝜏 𝑛 
+
+∫ 𝑡 𝑛 +1
+
+> 𝑡 𝑛
+
+𝜕 𝜙 𝛼 Ψ({ 𝜙 𝛼 (𝑠 )}) 𝑑𝑠, (4.2a) 
+
+{𝜙 𝛼 (𝑠 )} = (𝜙 𝑛 +1 
+
+> 𝛼
+
+− 𝜙 𝑛 𝛼 ) (𝑠 − 𝑡 𝑛 +1)
+
+𝜏 𝑛 
+
++ 𝜙 𝑛 +1 
+
+> 𝛼
+
+. (4.2b) We note that one can also employ the well-known convex-concave splitting. Next, we introduce three regularizations. First, accommodating that 𝜙 𝛼 might leave the desired interval [0, 1], we propose a regularization of the density 𝜌 as follows: 
+
+˜𝜌 :=∑︁ 
+
+> 𝛼
+
+𝜌 𝛼 ˜𝜙 𝛼 , ˜𝜙 𝛼 :=
+
+
+
+𝜙 𝛼 , 𝜙 𝛼 ∈ [ 𝛿, 1]
+
+1, 𝜙 𝛼 ≥ 1,𝛿, 𝜙 𝛼 ≤ 𝛿. 
+
+(4.3) Second, we also use the regularization of the volume fractions in the mobility matrix: 
+
+˜𝑀 𝛼𝛽 (ϕ) = − 𝑚 𝛼𝛽 ˜𝜙 𝛼 ˜𝜙 𝛽 (𝛼 ≠ 𝛽 ), (4.4) which is compatible with the row and column summation constraints of the mobility matrix. Lastly, we utilize the polynomial regularization of the mixture-aware bulk free energy introduced in [35]. We now propose the structure-preserving time-integration scheme: 
+
+v𝑛 +1
+
+2 𝑑 𝑛 +1 
+
+> 𝜏
+
+˜𝜌 + ˜𝜌 𝑛 𝑑 𝑛 +1 
+
+> 𝜏
+
+v + 12 v𝑛 +1 div (𝜌 ∗v∗) + 𝜌 ∗v∗ · ∇ v𝑛 +1
+
+− div S(𝜙 † 
+
+> 𝛼
+
+, ∇v𝑛 +1) + ∇ 𝜆 𝑛 +1 +∑︁ 
+
+> 𝛼
+
+𝜙 𝑛 𝛼 ∇( 𝜌 𝛼 𝑔 𝑛 +1 
+
+> 𝛼
+
+− 𝜆 𝑛 +1) − 𝜌 (𝜙 𝑛 𝛼 )g = 0, (4.5a) 
+
+𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼 + div (𝜙 𝑛 𝛼 v𝑛 +1) − div 1
+
+𝜌 𝛼 ∑︁ 𝛽 
+
+˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1
+
+> 𝛽
+
+!
+
+= 0, (4.5b) M.F.P. ten Eikelder and A. Brunk 15 
+
+𝜌 𝛼 𝑔 𝑛 +1 
+
+> 𝛼
+
+− 𝜕 𝜙 𝛼 Ψ(𝜙 𝑛 𝛼 , 𝜙 𝑛 +1 
+
+> 𝛼
+
+) + div (𝜕 ∇ 𝜙 𝛼 Ψ(𝜙 𝑛 +1 
+
+> 𝛼
+
+)) − 𝜆 𝑛 +1 = 0, (4.5c) 
+
+div (v𝑛 +1) − ∑︁ 
+
+> 𝛼,𝛽
+
+div 
+
+ 1
+
+𝜌 𝛼 
+
+˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1
+
+> 𝛽
+
+
+
+= 0, (4.5d) Note that one can show that solutions of (4.5) conserve (total) phase volume, (total) phase mass, and satisfy a discrete energy dissipation law with respect to the regularized total energy 
+
+˜E  v, {𝜙 𝛼 } :=
+
+∫
+
+> Ω
+
+Ψ {𝜙 𝛼 }, {∇ 𝜙 𝛼 } + ˜𝐾 ({ 𝜙 𝛼 } , v) + 𝐺 ({ 𝜙 𝛼 }) , (4.6a) 
+
+˜𝐾 ({ 𝜙 𝛼 } , v) := ˜𝜌 
+
+2 |v|2. (4.6b) The proof follows the same lines as Lemma 3.3 and is postponed to the proof for the fully-discrete scheme, i.e. Theorem 4.2 which we will consider below. 
+
+4.2. Space discretization 
+
+For the spatial discretisation we require that Tℎ is a geometrically conforming partition of Ω into elements where ℎ is the maximal diameter of the elements in Tℎ. The space of continuous and piecewise linear and quadratic functions over Tℎ as well as the mean free are introduced via 
+
+Vℎ := {𝑣 ∈ 𝐻 1 (Ω) ∩ 𝐶 0 ( ¯Ω) : 𝑣 |𝐾 ∈ 𝑃 1 (𝐾 ) ∀𝐾 ∈ T ℎ }, (4.7a) 
+
+Xℎ := {v ∈ 𝐻 1 (Ω)𝑑 ∩ 𝐶 0 ( ¯Ω)𝑑 : v|𝐾 ∈ 𝑃 𝑑  
+
+> 2
+
+(𝐾 ) ∀𝐾 ∈ T ℎ } ∩ { v|𝜕 Ω1 = 0, v · n|𝜕 Ω2 = 0}, (4.7b) 
+
+Qℎ := {𝑣 ∈ V ℎ : ⟨𝑣, 1⟩ = 0}. (4.7c) Here 𝑃 𝑘 (𝐾 ) denote the space of polynomials with maximal degree 𝑘 on 𝐾 . In the case of periodic boundary conditions, the boundary conditions incorporated in Xℎ are omitted. This variational formulation allows to directly deduce a structure-preserving approximation. 
+
+Problem 4.1. Let ({ 𝜙 0 
+
+> 𝛼,ℎ
+
+}, v0
+
+> ℎ
+
+) ∈ V 𝑁 ℎ × X ℎ be given. We seek functions ({ 𝜙 𝛼,ℎ }, vℎ) ∈ 𝑃 𝑐  
+
+> 1
+
+(I 𝜏 ; V 𝑁 ℎ ×Xℎ) and ({ 𝑔 𝛼,ℎ }, 𝜆 ℎ) ∈ 𝑃 0 (I 𝜏 ; V 𝑁 ℎ × Q ℎ) such that 
+
+⟨ v𝑛 +1 
+
+> ℎ
+> 2
+
+𝑑 𝑛 +1 
+
+> 𝜏
+
+˜𝜌 ℎ + ˜𝜌 𝑛 ℎ 𝑑 𝑛 +1 
+
+> 𝜏
+
+vℎ, wℎ⟩ + cskw (𝜌 ∗
+
+> ℎ
+
+v∗
+
+> ℎ
+
+, v𝑛 +1 
+
+> ℎ
+
+, wℎ) + ⟨ S({ 𝜙 † 
+
+> 𝛼,ℎ
+
+}, ∇v𝑛 +1 
+
+> ℎ
+
+), ∇wℎ⟩−⟨ 𝜆 𝑛 +1 
+
+> ℎ
+
+, div wℎ⟩ + ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝑛 𝛼,ℎ ∇( 𝜌 𝛼 𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
+− 𝜆 𝑛 +1 
+
+> ℎ
+
+), wℎ⟩ + ⟨ 𝜌 (𝜙 𝑛 𝛼,ℎ )𝑔 j, wℎ⟩ = 0, (4.8a) 
+
+⟨𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ , 𝜓 𝛼,ℎ ⟩ − ⟨ 𝜙 𝑛 𝛼,ℎ v𝑛 +1 
+
+> ℎ
+
+, ∇𝜓 𝛼,ℎ ⟩ + ⟨ 1
+
+𝜌 𝛼 ∑︁ 𝛽 
+
+˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝜓 𝛼,ℎ ⟩ = 0, (4.8b) 
+
+⟨𝜌 𝛼 𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
+, 𝜉 𝛼,ℎ ⟩ − ⟨ 𝜕 𝜙 𝛼,ℎ Ψ({ 𝜙 𝑛 𝛼,ℎ }, {𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) , 𝜉 𝛼,ℎ ⟩ − ⟨ 𝜕 ∇ 𝜙 𝛼,ℎ Ψ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) , ∇𝜉 𝛼,ℎ ⟩−⟨ 𝜆 𝑛 +1 
+
+> ℎ
+
+, 𝜉 𝛼,ℎ ⟩ = 0, (4.8c) 
+
+⟨div v𝑛 +1 
+
+> ℎ
+
+, 𝑞 ℎ⟩ + ⟨ ∑︁ 
+
+> 𝛼,𝛽
+
+1
+
+𝜌 𝛼 
+
+˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝑞 ℎ⟩ = 0, (4.8d) 
+
+holds for all ({ 𝜓 𝛼,ℎ }, {𝜉 𝛼,ℎ }, wℎ, 𝑞 ℎ) ∈ V 𝑁 ℎ × V 𝑁 ℎ × X ℎ × Q ℎ and for all 0 ≤ 𝑛 < 𝑛 𝑇 .
+
+Theorem 4.2 (Fully-discrete structure-preserving properties) . Every solution of Problem 4.1 satisfies the following structure-preserving properties: (phase volume conservation) ⟨𝜙 𝑛 +1
+
+> 𝛼,ℎ
+
+, 1⟩ = ⟨𝜙 0
+
+> 𝛼,ℎ
+
+, 1⟩, (4.9a) 
+
+(phase mass conservation) ⟨ ˜𝜌 𝑛 +1 
+
+> 𝛼,ℎ
+
+, 1⟩ = ⟨ ˜𝜌 0
+
+> 𝛼,ℎ
+
+, 1⟩, (4.9b) 16 M.F.P. ten Eikelder and A. Brunk 
+
+(total volume conservation) ⟨∑︁ 
+
+> 𝛼
+
+𝜙 𝑛 +1
+
+> 𝛼,ℎ
+
+, 1⟩ = ⟨∑︁ 
+
+> 𝛼
+
+𝜙 0
+
+> 𝛼,ℎ
+
+, 1⟩, (4.9c) 
+
+(total mass conservation) ⟨𝜌 𝑛 +1 
+
+> ℎ
+
+, 1⟩ = ⟨𝜌 0
+
+> ℎ
+
+, 1⟩, (4.9d) 
+
+(energy dissipation) ˜E
+
+
+
+v𝑛 +1 
+
+> ℎ
+
+, 𝜙 𝑛 +1
+
+> 𝛼,ℎ
+
+
+
++ 𝜏 𝑛 D𝑛 +1 
+
+> ℎ
+
+≤ ˜E
+
+
+
+v𝑛 ℎ, 𝜙 𝑛 𝛼,ℎ 
+
+
+
+, (4.9e) 
+
+for all 𝛼 = 1, ..., 𝑁 , and for all 0 ≤ 𝑛 ≤ 𝑛 𝑇 − 1, where the physical dissipation is: 
+
+D𝑛 +1 
+
+> ℎ
+
+:= ⟨S({ 𝜙 † 
+
+> 𝛼
+
+}, ∇v𝑛 +1 
+
+> ℎ
+
+), ∇v𝑛 +1 
+
+> ℎ
+
+⟩ + ∑︁ 
+
+> 𝛼,𝛽
+
+⟨ ˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
+⟩. (4.10) 
+
+In addition, if the volume saturation constraint holds for the initial data, then it holds for all time steps, i.e. ∑︁ 
+
+> 𝛼
+
+𝜙 0 
+
+> 𝛼,ℎ
+
+(𝑥 ) = 1 =⇒∑︁ 
+
+> 𝛼
+
+𝜙 𝑘 𝛼,ℎ (𝑥 ) = 1, 𝑘 = 1, ..., 𝑛 𝑇 , 𝑥 ∈ Ω. (4.11) 
+
+Proof. Conservation of phase volume follows again by insertion of 𝜓 𝛼,ℎ = 1 ∈ V ℎ, and conservation of phase mass follows from multiplying (4.9a) with 𝜌 𝛼 . Next, conservation of total volume and total mass results from summing (4.9a) and (4.9b) over 𝛼 .We proceed with the energy dissipation property. Taking wℎ = v𝑛 +1 
+
+> ℎ
+
+∈ X ℎ provides: 
+
+0 = 1
+
+𝜏 𝑛 
+
+⟨ ˜𝐾 (𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+, v𝑛 +1 
+
+> ℎ
+
+) − ˜𝐾 (𝜙 𝑛 𝛼,ℎ , v𝑛 ℎ), 1⟩ + 𝜏 𝑛 
+
+˜𝜌 𝑛 ℎ
+
+2 ∥𝑑 𝑛 +1 
+
+> 𝜏
+
+vℎ ∥20 + ⟨ S({ 𝜙 † 
+
+> 𝛼
+
+}, ∇v𝑛 +1 
+
+> ℎ
+
+), ∇v𝑛 +1 
+
+> ℎ
+
+⟩− ⟨ 𝜆 𝑛 +1 
+
+> ℎ
+
+, div v𝑛 +1 
+
+> ℎ
+
+⟩ + ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝑛 𝛼,ℎ ∇( 𝜌 𝛼 𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
+− 𝜆 𝑛 +1 
+
+> ℎ
+
+), v𝑛 +1 
+
+> ℎ
+
+⟩ + ⟨ 𝜌 (𝜙 𝑛 𝛼,ℎ )𝑔 j, v𝑛 +1 
+
+> ℎ
+
+⟩, (4.12) where we have used the identities: 
+
+⟨ 12 v𝑛 +1 
+
+> ℎ
+
+𝑑 𝑛 +1 
+
+> 𝜏
+
+˜𝜌 ℎ + ˜𝜌 𝑛 ℎ 𝑑 𝑛 +1 
+
+> 𝜏
+
+v𝑛 +1 
+
+> ℎ
+
+, v𝑛 +1 
+
+> ℎ
+
+⟩ = 1
+
+𝜏 𝑛 
+
+⟨ ˜𝐾 (𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+, v𝑛 +1 
+
+> ℎ
+
+) − ˜𝐾 (𝜙 𝑛 𝛼,ℎ , v𝑛 ℎ), 1⟩+ 𝜏 𝑛 
+
+˜𝜌 𝑛 ℎ
+
+2 ∥𝑑 𝑛 +1 
+
+> 𝜏
+
+vℎ ∥20 (4.13a) 
+
+cskw (𝜌 ∗
+
+> ℎ
+
+v∗
+
+> ℎ
+
+, v𝑛 +1 
+
+> ℎ
+
+, v𝑛 +1 
+
+> ℎ
+
+) = 0. (4.13b) Next, we select 𝜓 𝛼,ℎ = 𝜌 𝛼 𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
++ 𝜌 𝛼 𝑔𝑦 − 𝜆 𝑛 +1 
+
+> ℎ
+
+∈ V ℎ and 𝜉 𝛼,ℎ = −𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ ∈ V ℎ, summing over 𝛼 ,and subsequently adding the results provides: 
+
+0 =∑︁ 
+
+> 𝛼
+
+⟨𝜕 𝜙 𝛼,ℎ Ψ0 (𝜙 𝑛 𝛼,ℎ , {𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) , 𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ ⟩ + ∑︁ 
+
+> 𝛼
+
+⟨𝜕 ∇ 𝜙 𝛼,ℎ Ψ∇ ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) , ∇𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ ⟩−∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝑛 𝛼,ℎ v𝑛 +1 
+
+> ℎ
+
+, ∇( 𝜌 𝛼 𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
+)⟩ + ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝑛 𝛼,ℎ v𝑛 +1 
+
+> ℎ
+
+, ∇𝜆 𝑛 +1 
+
+> ℎ
+
+⟩+∑︁ 
+
+> 𝛼,𝛽
+
+⟨ ˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
+⟩ − ∑︁ 
+
+> 𝛼,𝛽
+
+⟨ ˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇( 𝜌 −1 
+
+> 𝛼
+
+𝜆 𝑛 +1 
+
+> ℎ
+
+)⟩ + 1
+
+𝜏 𝑛 
+
+⟨𝐺 ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) − 𝐺 ({ 𝜙 𝑛 𝛼,ℎ }) , 1⟩ − ∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝑛 𝛼,ℎ v𝑛 +1 
+
+> ℎ
+
+, ∇( 𝜌 𝛼 𝑔𝑦 )⟩ , (4.14) where we have used the identities: ∑︁ 
+
+> 𝛼
+
+⟨𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ , 𝜌 𝛼 𝑔𝑦 ⟩ = 1
+
+𝜏 𝑛 
+
+⟨𝐺 ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) − 𝐺 ({ 𝜙 𝑛 𝛼,ℎ }) , 1⟩, (4.15a) M.F.P. ten Eikelder and A. Brunk 17 ∑︁ 
+
+> 𝛼,𝛽
+
+⟨ ˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, 𝑔 j⟩ = 0. (4.15b) Lastly, taking 𝑞 ℎ = 𝜆 𝑛 +1 
+
+> ℎ
+
+∈ Q ℎ provides: 
+
+0 = ⟨div v𝑛 +1 
+
+> ℎ
+
+, 𝜆 𝑛 +1 
+
+> ℎ
+
+⟩ + ∑︁ 
+
+> 𝛼,𝛽
+
+1
+
+𝜌 𝛼 
+
+⟨ ˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝜆 𝑛 +1 
+
+> ℎ
+
+⟩, (4.16) where we used that ⟨div (v𝑛 +1 
+
+> ℎ
+
+), ¯𝑦 ⟩ = 0 and ∇ ¯𝑦 = 0. Addition of (4.12), (4.14), and (4.16) provides: 
+
+1
+
+𝜏 𝑛 
+
+( ˜E ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}, v𝑛 +1 
+
+> ℎ
+
+) − ˜E
+
+𝜙 𝑛 𝛼,ℎ , v𝑛 ℎ)
+
+
+
+= − ⟨ S({ 𝜙 † 
+
+> 𝛼
+
+}, ∇v𝑛 +1 
+
+> ℎ
+
+), ∇v𝑛 +1 
+
+> ℎ
+
+⟩ − ∑︁ 
+
+> 𝛼,𝛽
+
+⟨ ˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝑔 𝑛 +1 
+
+> 𝛼,ℎ
+
+⟩− 𝜏 𝑛 
+
+˜𝜌 𝑛 ℎ
+
+2 ∥𝑑 𝑛 +1 
+
+> 𝜏
+
+vℎ ∥20 − 𝜏 𝑛 
+
+2∑︁ 𝛼𝛽 
+
+⟨𝜅 𝛼𝛽 ∇𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ , ∇𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛽,ℎ ⟩≤ − D 𝑛 +1 
+
+> ℎ
+
+, (4.17) where the inequality follows from the positive semi-definiteness of 𝜅 𝛼𝛽 and the positivity of ˜𝜌 .Furthermore we used the relations: 
+
+−∑︁ 
+
+> 𝛼
+
+⟨𝜙 𝑛 𝛼,ℎ v𝑛 +1 
+
+> ℎ
+
+, ∇( 𝜌 𝛼 𝑔𝑦 )⟩ + ⟨ 𝜌 (𝜙 𝑛 𝛼,ℎ )𝑔 j, v𝑛 +1 
+
+> ℎ
+
+⟩ = 0, (4.18a) ∑︁ 
+
+> 𝛼
+
+⟨𝜕 𝜙 𝛼,ℎ Ψ0 ({ 𝜙 𝑛 𝛼,ℎ }, {𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) , 𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ ⟩ = 1
+
+𝜏 𝑛 
+
+⟨Ψ0 ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) − Ψ0 ({ 𝜙 𝑛 𝛼,ℎ }) , 1⟩, (4.18b) ∑︁ 
+
+> 𝛼
+
+⟨𝜕 ∇ 𝜙 𝛼,ℎ Ψ∇ ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) , ∇𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ ⟩ = 1
+
+𝜏 𝑛 
+
+⟨Ψ∇ ({ 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+}) − Ψ∇ ({ 𝜙 𝑛 𝛼,ℎ }) , 1⟩+ 𝜏 𝑛 
+
+2∑︁ 𝛼,𝛽 
+
+⟨𝜅 𝛼𝛽 ∇𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛼,ℎ , ∇𝑑 𝑛 +1 
+
+> 𝜏
+
+𝜙 𝛽,ℎ ⟩.
+
+(4.18c) Finally, we consider the saturation constraint (4.11) . Inserting 𝜓 𝛼,ℎ = 1 and summation over 𝛼 
+
+shows 
+
+⟨𝑑 𝑛 +1 
+
+> 𝜏
+
+(∑︁ 
+
+> 𝛼
+
+𝜙 𝛼,ℎ − 1), 1⟩ = 0, (4.19) i.e. the mean value, zero, of the constraint is preserved. Next, we suppose that the constraint holds for time-step 𝑛 and consider the discrete evolution at time step 𝑛 + 1. We insert 𝜓 𝛼,ℎ = 𝜓 ℎ ∈ Q ℎ ⊂ V ℎ,
+
+𝑞 ℎ = 𝜓 ℎ ∈ Q ℎ and sum the phase equation over 𝛼 to find: 
+
+⟨𝑑 𝑛 +1
+
+> 𝜏
+
+∑︁ 𝛼 
+
+𝜙 𝛼,ℎ , 𝜓 ℎ⟩ − ⟨ ∑︁ 
+
+> 𝛼
+
+𝜙 𝑛 𝛼,ℎ v𝑛 +1 
+
+> ℎ
+
+, ∇𝜓 ℎ⟩ + ⟨ ∑︁ 
+
+> 𝛼,𝛽
+
+1
+
+𝜌 𝛼 
+
+˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝜓 ℎ⟩ = 0, (4.20a) 
+
+⟨div v𝑛 +1 
+
+> ℎ
+
+, 𝜓 ℎ⟩ + ⟨ ∑︁ 
+
+> 𝛼,𝛽
+
+1
+
+𝜌 𝛼 
+
+˜𝑀 ‡ 
+
+> 𝛼,𝛽
+
+∇𝑔 𝑛 +1 
+
+> 𝛽,ℎ
+
+, ∇𝜓 ℎ⟩ = 0. (4.20b) Subtracting these equations provides: 
+
+⟨𝑑 𝑛 +1
+
+> 𝜏
+
+∑︁ 𝛼 
+
+𝜙 𝛼,ℎ , 𝜓 ℎ⟩ − ⟨ ∑︁ 
+
+> 𝛼
+
+𝜙 𝑛 𝛼,ℎ v𝑛 +1 
+
+> ℎ
+
+, ∇𝜓 ℎ⟩ = ⟨div v𝑛 +1 
+
+> ℎ
+
+, 𝜓 ℎ⟩. (4.21) 18 M.F.P. ten Eikelder and A. Brunk 
+
+Integration by parts and rearranging the equations yields: 
+
+⟨𝑑 𝑛 +1 
+
+> 𝜏
+
+(∑︁ 
+
+> 𝛼
+
+𝜙 𝛼,ℎ − 1), 𝜓 ℎ⟩ = −⟨( 1 −∑︁ 
+
+> 𝛼
+
+𝜙 𝑛 𝛼,ℎ ), v𝑛 +1 
+
+> ℎ
+
+· ∇ 𝜓 ℎ⟩, (4.22) where we used the assumed boundary conditions. Since the constraint holds for the old time-step we obtain 
+
+⟨( ∑︁ 
+
+> 𝛼
+
+𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+− 1), 𝜓 ℎ⟩ = 0, ∀𝜓 ℎ ∈ Q ℎ . (4.23) By mean-freedom we are allowed to take 𝜓 ℎ = Í𝛼 𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+− 1 and conclude that the constraint holds pointwise everywhere in Ω:∑︁ 
+
+> 𝛼
+
+𝜙 𝑛 +1 
+
+> 𝛼,ℎ
+
+(𝑥 ) = 1, 𝑥 ∈ Ω. (4.24) 
+
+□
+
+Remark 4.3 (Finite element spaces) . Note that the results in Theorem 4.2 are not restricted to this particular choice of finite element spaces. We only require that Vℎ and Qℎ are 𝐻 1-conforming spaces containing at least piecewise-linear functions and that the finite element pair Xℎ × Q ℎ is inf-sup stable for the (Navier-)Stokes equation. 
+
+5. Numerical results 
+
+In this section we test the proposed numerical scheme. First, we consider a convergence test ( 𝑁 = 3)in Section 5.1, and a phase separation test ( 𝑁 = 3) in Section 5.2. Next, we consider a well-known rising bubble test case ( 𝑁 = 2) in Section 5.3. Finally, we show a test of a rising bubble through two stratified liquid layers ( 𝑁 = 3) in Section 5.4. The resulting nonlinear systems are tackled by Newton’s method, and the resulting linear systems are solved using a direct solver. The placeholder quantities are all evaluated at time-step 𝑛 + 1. The code is implemented in Fenics [ 38 ] as well as NGSolve [ 39 ]. 
+
+5.1. Convergence test 
+
+For the convergence test we consider 𝑁 = 3 phases, final time 𝑇 = 0.1, and domain Ω = [0, 1]2. For the specific densities we choose 𝜌 1 = 1, 𝜌 2 = 2, 𝜌 3 = 3, and for the partial viscosities 𝜂 1 = 0.01 , 𝜂 2 =
+
+0.02 , 𝜂 3 = 0.03 . For the bulk potential and the mobility we consider the choices from Section 4.1 and as capillary matrix we choose 
+
+𝜅 = 3 · 10 −5 ©«
+
+5.93776285 −4.93135582 −1.00640703 
+
+−4.93135582 7.79781882 −2.86646300 
+
+−1.00640703 −2.86646300 3.87287003 
+
+ª®®¬
+
+. (5.1) This capillary matrix is computed using the algorithm proposed in [ 36 ] and corresponds to the surface tensions 𝛾 12 = 0.007 , 𝛾 13 = 0.005 , 𝛾 23 = 0.006 . This implies that the corresponding interface widths are 
+
+𝜀 12 = 0.0084 , 𝜀 13 = 0.0060 , 𝜀 23 = 0.0071 . (5.2) The different density values ensure that the test is genuinely quasi-incompressible. Finally we consider periodic boundary conditions and the initial data: 
+
+𝜙 1 (𝑥, 𝑦 ) = 0.3 + 0.21 sin (𝜋𝑥 ) sin (2𝜋𝑦 ), (5.3a) M.F.P. ten Eikelder and A. Brunk 19 
+
+𝜙 2 (𝑥, 𝑦 ) = 0.3 + 0.24 cos (4𝜋𝑥 ) sin (4𝜋𝑦 )2, (5.3b) 
+
+𝜙 3 (𝑥, 𝑦 ) = 1 − 𝜙 1 (𝑥, 𝑦 ) − 𝜙 2 (𝑥, 𝑦 ), (5.3c) 
+
+v0 (𝑥, 𝑦 ) = 10 −1 (sin (𝜋𝑥 )2 sin (2𝜋𝑦 ), sin (𝜋𝑦 )2 sin (2𝜋𝑥 )) ⊤. (5.3d) Since no exact solution is available we compute the error using a refined solution for a constant and fixed time step size 𝜏 = 5 · 10 −3. The error quantities we consider are err ({ 𝜙 𝛼 } , ℎ 𝑘 ) := max 
+
+> 𝑛 ∈ I 𝜏
+
+n
+
+𝜙 𝑛 𝛼,ℎ 𝑘 
+
+o
+
+−
+
+n
+
+𝜙 𝑛 𝛼,ℎ 𝑘 +1
+
+o 2  
+
+> 𝐿 2(Ω)
+
+, err (v, ℎ 𝑘 ) := max 
+
+> 𝑛 ∈ I 𝜏
+
+∥v𝑛 ℎ𝑘 − v𝑛 ℎ𝑘 +1 ∥20
+
+err ({ 𝑔 𝛼 } , ℎ 𝑘 ) := 𝜏 
+
+> 𝑛 𝑇
+
+∑︁ 
+
+> 𝑛 =1
+
+n
+
+𝑔 𝑛 𝛼,ℎ 𝑘 
+
+o
+
+−
+
+n
+
+𝑔 𝑛 𝛼,ℎ 𝑘 +1
+
+o 2  
+
+> 𝐻 1(Ω)
+
+, err (∇ v, ℎ 𝑘 ) := 𝜏 
+
+> 𝑛 𝑇
+
+∑︁ 
+
+> 𝑛 =1
+
+∥v𝑛 ℎ𝑘 − v𝑛 ℎ𝑘 +1 ∥2  
+
+> 𝐻 1(Ω)
+
+,
+
+err ( 𝑝, ℎ 𝑘 ) := 𝜏 
+
+> 𝑛 𝑇
+
+∑︁ 
+
+> 𝑛 =1
+
+∥ 𝑝 𝑛 ℎ𝑘 − 𝑝 𝑛 ℎ𝑘 +1 ∥2  
+
+> 𝐿 2(Ω)
+
+.
+
+We consider mesh refinements with the mesh sizes ℎ𝑘 ≈ 2− ( 𝑘 +2) for 𝑘 = 1, . . . , 6. In Table 1 we show the errors and experimental orders of convergence. 
+
+Table 1. Errors and experimental order of convergence (eoc) 
+
+𝑘 err ({ 𝜙 𝛼 }) eoc err ({ 𝑔 𝛼 }) eoc err (v) eoc err (∇ v) eoc err ( 𝑝 ) eoc 2 2.61 · 10 −2 – 3.17 · 10 −1 – 9.68 · 10 −4 – 7.35 · 10 −2 – 3.16 · 10 −4 –3 1.20 · 10 −3 4.45 4.22 · 10 −1 −0.41 6.85 · 10 −4 0.50 7.23 · 10 −2 0.02 2.06 · 10 −4 0.62 
+
+4 2.18 · 10 −4 2.45 1.38 · 10 −1 1.61 5.52 · 10 −5 3.63 9.38 · 10 −3 2.95 1.72 · 10 −5 3.58 
+
+5 1.43 · 10 −5 3.92 3.36 · 10 −2 2.04 3.09 · 10 −6 4.16 6.61 · 10 −4 3.83 1.11 · 10 −6 3.95 
+
+6 9.19 · 10 −7 3.96 8.12 · 10 −3 2.05 1.91 · 10 −7 4.01 3.71 · 10 −5 4.15 6.81 · 10 −8 4.02 
+
+We observe that the obtained rates are in perfect agreement with the employed finite element spaces up to the 𝐿 2 norm of the velocity. Here approximation properties theoretically allow higher order, which is polluted here by the coupling terms with lower approximation rate. 
+
+5.2. Phase separation test 
+
+As a next test case we consider a phase separation example. In such cases, the evolution of concentration fields is governed by diffusion driven by chemical potential differences, leading to the formation of distinct phases and interfaces. A three-phase model captures a richer interplay between all phases, allowing investigation of ternary mixture separation, morphology development, and stability. For simplicity we will consider constant specific densities, i.e. 𝜌 𝛼 = 1. The effects of unmatched specific densities for 𝑁 = 2 are considered in [ 18 ] and leads to slower evolutions of the denser phases. From modeling perspective this means the model reduces to the incompressible 𝑁 -phase NSCH model. We choose the final time 𝑇 = 5, viscosities 𝜂 𝛼 = 0.1. The initial data is inspired by [26] and given by 
+
+𝜓 𝛼 = 0.5 + U ( 𝑥, 𝑦 ), 𝜙 𝛼 = 𝜓 𝛼 (𝑥, 𝑦 )
+
+Í𝛽 𝜓 𝛽 (𝑥, 𝑦 ) , v0 (𝑥, 𝑦 ) = 0, (5.4) where U ( 𝑥, 𝑦 ) samples the uniform distribution such that U ( 𝑥, 𝑦 ) ∈ [− 0.0025 , 0.0025 ] with zero mean. The capillary matrix is chosen as in the convergence test and amounts to three different surface tensions. This amounts to a mixed initial state with small perturbations. In Figure 1 we show snapshots of the temporal evolution. For 𝑁 = 2 the result of such an experiment is fast droplet formation and then slow movement due to diffusion. In the binary ( 𝑁 = 2) case, phase separation is driven by the minimization of a single interfacial energy. As a result, the system reduces its total interface by 20 M.F.P. ten Eikelder and A. Brunk 
+
+forming rounded droplets, whose shape minimizes curvature and surface tension effects. In contrast, the ternary ( 𝑁 = 3) system involves three competing phases with different pairwise interfacial energies. Instead of forming isolated droplets, the system must balance multiple interfaces simultaneously, which promotes the formation of interconnected structures and triple junctions. Consequently, droplet formation is less favorable in 𝑁 = 3, as it would increase the total interfacial energy with the other phases. As visualized in Figure 2 the energy is non-increasing over time and the partial volume conservation holds up to machine precision. Since all related total volume and mass conservation laws arise from linear combinations of these, they are also at the level of machine precision, as predicted by the numerical scheme.                    
+
+> (a) 𝑡 =0.1(b) 𝑡 =1.0(c) 𝑡 =2.5(d) 𝑡 =4(e) 𝑡 =5
+
+Figure 1. Phase separation test. Temporal evolution of the phase field 𝜙 1 + 0.5𝜙 2.   
+
+> (a) Energy dissipation over time (b) Mass conservation error over time
+
+Figure 2. Phase separation test. Energy dissipation and mass conservation M.F.P. ten Eikelder and A. Brunk 21 
+
+5.3. Two-fluid rising bubble test cases 
+
+1
+
+2
+
+𝐷 0 = 0.5
+
+0.5
+
+𝑣 1 = 𝑣 2 = 0
+
+𝑣 1 = 𝑣 2 = 0
+
+𝑣 1 = 0 𝑣 1 = 0
+
+fluid 2 
+
+fluid 1  
+
+> Figure 3. Rising bubble: Schematic repre-sentation of the problem setup
+
+We consider the classical two-dimensional rising bubble benchmark of Hysing et al. [ 40 ]. The computational domain is Ω = [0, 1] × [ 0, 2]. Initially, a circular bubble of the lighter fluid is placed in the lower part of the column, with diameter 𝐷 0 = 2𝑅 0 = 0.5 and center x𝑐 = (0.5, 0.5).The surrounding fluid is the heavier phase. The boundary conditions are no-penetration on the vertical walls and no-slip on the horizontal walls, i.e., 
+
+v · n = 0 on {0, 1} × [ 0, 2],
+
+v = 0 on [0, 1] × { 0, 2}. (5.5) A schematic representation of the configuration is shown in Figure 3. Simulations were conducted on a uniform rectangu-lar mesh. We simulate half of the domain and apply symmetry boundary conditions along the vertical line 
+
+𝑥 = 1/2. The time step size is set as Δ𝑡 𝑛 = 0.128 ℎ,while 𝜀 = ℎ. The benchmark problem consists of two cases, each defined by different parameter values, as listed in Table 2. Case 𝜌 1 𝜌 2 𝜈 1 𝜈 2 𝛾 12 𝑔 Ar Eo
+
+1 1000 100 10 1 24 .5 0.98 35 10 
+
+2 1000 1 10 0.1 1.96 0.98 35 125    
+
+> Table 2. Parameters for the two-dimensional rising bubble cases ( 𝑁 =2).
+
+The calibrated capillarity matrices, interface widths, and scale factors (for details, see [ 36 ]) take the form Case 1 : Case 2 :¯κ = 10 2
+
+ 4.0209152514 −8.0418305027  
+
+> −8.0418305027 4.0209152514
+
+
+
+, ¯κ =
+
+ 2.5703710049 −5.1407420098  
+
+> −5.1407420098 2.5703710049
+
+
+
+(5.6a) 
+
+𝜀 12 = 24 .3042511 , 𝜀 12 = 1.94308232 (5.6b) 
+
+𝜀 0 = 3.2144625 × 10 −4, 𝜀 0 = 4.02066622 × 10 −3 (5.6c) We show in Figures 4 and 5 the evolution of the rising bubble (using mesh width ℎ = 1/128 ) for cases 1 and 2, respectively. In Case 1, the bubble remains close to its initial shape and only undergoes mild deformation. On the other hand, Case 2 shows significant shape changes due to relatively stronger inertial effects. 22 M.F.P. ten Eikelder and A. Brunk                        
+
+> (a) 𝑡 =0.0(b) 𝑡 =0.6(c) 𝑡 =1.2(d) 𝑡 =1.8(e) 𝑡 =2.4(f) 𝑡 =3.0
+
+Figure 4. Case 1. Visualization of the phase field 𝜙 2 for element size ℎ = 1/128 .                       
+
+> (a) 𝑡 =0.0(b) 𝑡 =0.6(c) 𝑡 =1.2(d) 𝑡 =1.8(e) 𝑡 =2.4(f) 𝑡 =3.0
+
+Figure 5. Case 2. Visualization of the phase field 𝜙 2 for element size ℎ = 1/128 .
+
+Next, we verify conservation of the volume fractions and energy dissipation for both cases in Figures 6 and 7, respectively. We observe that the total volume fractions are preserved throughout the simulations for all element sizes ℎ = 1/32 , 1/64 , 1/128 . The errors of the volume fractions are zero up to machine precision. Finally, the energy evolution plots confirm the energy-dissipative structure of the method. These results are compatible with Theorem 4.2. M.F.P. ten Eikelder and A. Brunk 23 1.798 1.799 1.8 1.801 1.802 1.803 1.804 1.805 0 0.5 1 1.5 2 2.5 3Volume Time 32x64 64x128 128x256 
+
+(a) Volume fraction evolution fluid 1 - Case 1. 0.196 0.197 0.198 0.199 0.2 0.201 0.202 0.203 0 0.5 1 1.5 2 2.5 3Volume Time 32x64 64x128 128x256 (b) Volume fraction evolution fluid 2 - Case 1. 1.798 1.799 1.8 1.801 1.802 1.803 1.804 1.805 0 0.5 1 1.5 2 2.5 3Volume Time 32x64 64x128 128x256 
+
+(c) Volume fraction evolution fluid 1 - Case 2. 0.196 0.197 0.198 0.199 0.2 0.201 0.202 0.203 0 0.5 1 1.5 2 2.5 3Volume Time 32x64 64x128 128x256 (d) Volume fraction evolution fluid 2 - Case 2. -1.0e-20 -5.0e-21 0.0e+00 5.0e-21 1.0e-20 0 0.5 1 1.5 2 2.5 3Volume Time Case 1 Case 2 
+
+(e) Volume fraction evolution error fluid 1. Cases 1 and 2. -1.0e-20 -5.0e-21 0.0e+00 5.0e-21 1.0e-20 0 0.5 1 1.5 2 2.5 3Volume Time Case 1 Case 2 (f) Volume fraction evolution error fluid 2. Cases 1 and 2. 
+
+Figure 6. Evolution of the volume conservation (error); (a), (b) Case 1 for ℎ = 1/32 , 1/64 , 1/128 , (c), (d) Case 2 for ℎ = 1/32 , 1/64 , 1/128 , (e),(f) Error for ℎ = 1/128 for fluid 1 and 2. 1830 1840 1850 1860 1870 1880 1890 1900 1910 1920 0 0.5 1 1.5 2 2.5 3Energy Time 32x64 64x128 128x256 
+
+(a) Case 1. 1780 1790 1800 1810 1820 1830 1840 1850 1860 1870 0 0.5 1 1.5 2 2.5 3Energy Time 32x64 64x128 128x256 (b) Case 2. 
+
+Figure 7. Evolution of the energy 𝐸 for different mesh widths ℎ = 1/32 , 1/64 , 1/128 .24 M.F.P. ten Eikelder and A. Brunk 
+
+To compare the simulations quantitatively with benchmark data, we track the bubble center of mass and rise velocity. These quantities are respectively defined by 
+
+𝑦 𝑏 :=
+
+∫
+
+𝜙 2 >1/2 𝑦 d𝑥 
+
+∫
+
+𝜙 2 >1/2 d𝑥 , 𝑣 𝑏 :=
+
+∫
+
+𝜙 2 >1/2 𝑣 2 d𝑥 
+
+∫
+
+𝜙 2 >1/2 d𝑥 , (5.7) where {𝜙 < 0} denotes the bubble region. In Figures 8 to 11, we show for different mesh sizes the center of mass and rise velocity for both cases. We compare these results with reference data from the literature. These are the simulations performed using the TP2D, FreeLIFE, and MooNMD codes [ 40 ], as well as the (single-phase field) NSCH models proposed by Abels et al. [ 4 ], Boyer [ 41 ], and Ding et al. [ 3 ]. These (single phase-field) NSCH simulations were conducted by Aland and Voigt [ 42 ]. Furthermore, we compare with the volume-averaged and mass-averaged velocity formulations of the (single-phase field) NSCH model provided by [ 17 ] and [ 18 ], respectively. In the figures we denote the single phase-field volume-averaged and mass-averaged velocity formulations as ‘ NSCH vol ’, and ‘ NSCH mass ’ respectively, and we denote the current computations by ‘NSCH mix ’. 0.5 0.6 0.7 0.8 0.9 11.1 1.2 0 0.5 1 1.5 2 2.5 3Center of Mass Time 32x64 64x128 128x256 
+
+(a) ℎ = 1/32 , 1/64 , 1/128 .0.5 0.6 0.7 0.8 0.9 11.1 1.2 0 0.5 1 1.5 2 2.5 3Center of Mass Time TP2D FreeLIFE MooNMD NSCH mass NSCH vol NSCH mix NSCH Abels NSCH Boyer NSCH Ding (b) Comparison with data from the literature. 
+
+Figure 8. Case 1. Center of mass (a) for different mesh sizes, and (b) a comparison of the finest mesh results to reference data. 00.05 0.1 0.15 0.2 0.25 0.3 0 0.5 1 1.5 2 2.5 3Rise Velocity Time 32x64 64x128 128x256 
+
+(a) ℎ = 1/32 , 1/64 , 1/128 .00.05 0.1 0.15 0.2 0.25 0.3 0 0.5 1 1.5 2 2.5 3Rise Velocity Time TP2D FreeLIFE MooNMD NSCH mass NSCH vol NSCH mix NSCH Abels NSCH Boyer NSCH Ding (b) Comparison with data from the literature. 
+
+Figure 9. Case 1. Rise velocity (a) for different mesh sizes, and (b) a comparison of the finest mesh results to reference data. 
+
+For both benchmark cases, the center of mass agrees well with the reference data. The rise velocity also closely follows the reference trends. In Case 2, larger deviations appear for 𝑡 > 1.5
+
+when compared with the TP2D, FreeLIFE, and MooNMD data. In this later regime, however, the present results remain close to the other NSCH computations, indicating that the difference is mainly associated with the differences between sharp-interface and diffuse-interface formulations, rather than M.F.P. ten Eikelder and A. Brunk 25 0.5 0.6 0.7 0.8 0.9 11.1 1.2 0 0.5 1 1.5 2 2.5 3Center of Mass Time 32x64 64x128 128x256 
+
+(a) ℎ = 1/16 , 1/32 , 1/64 , 1/128 .0.5 0.6 0.7 0.8 0.9 11.1 1.2 0 0.5 1 1.5 2 2.5 3Center of Mass Time TP2D FreeLIFE MooNMD NSCH mass NSCH vol NSCH mix NSCH Abels NSCH Boyer NSCH Ding (b) Comparison with data from the literature. 
+
+Figure 10. Case 2. Center of mass (a) for different mesh sizes, and (b) a comparison of the finest mesh results to reference data. 00.05 0.1 0.15 0.2 0.25 0.3 0 0.5 1 1.5 2 2.5 3Rise Velocity Time 32x64 64x128 128x256 
+
+(a) ℎ = 1/32 , 1/64 , 1/128 .00.05 0.1 0.15 0.2 0.25 0.3 0 0.5 1 1.5 2 2.5 3Rise Velocity Time TP2D FreeLIFE MooNMD NSCH mass NSCH vol NSCH mix NSCH Abels NSCH Boyer NSCH Ding (b) Comparison with data from the literature. 
+
+Figure 11. Case 2. Rise velocity (a) for different mesh sizes, and (b) a comparison of the finest mesh results to reference data. 
+
+the particular NSCH formulation/discretization. 
+
+5.4. Three-fluid problem 
+
+We also consider a two-dimensional version of the three-fluid rising-bubble benchmark. The setup is such that a gas bubble (phase 1) rises from the lower liquid layer (phase 2) toward the liquid–liquid interface separating phases 2 and 3. To reduce the computational cost, we compute only half of the symmetric domain and impose symmetry boundary conditions on the symmetry axis. The half-domain is discretized by 64 × 480 finite elements. We use Δ𝑡 = ℎ and 𝜀 = ℎ, where ℎ denotes the mesh width. The target surface tensions are prescribed as 
+
+𝛾 12 = 𝛾 13 = 0.07 N m −1, 𝛾 23 = 0.05 N m −1. (5.8) Using the algorithm provided in [ 36 ], we calibrate the capillary matrix κ and interface width parameters to match the target surface tensions and target interface width 𝜀 :
+
+¯κ = 10 −3 ©«
+
+4.1361833328 −6.5504823549 −1.7218843107 
+
+−6.5504823549 6.5504823549 −6.5504823549 
+
+−1.7218843107 −6.5504823549 4.1361833328 
+
+ª®®¬
+
+(5.9a) 
+
+¯𝜀 12 = 0.0819004278 , ¯𝜀 13 = 0.0581144728 , ¯𝜀 23 = 0.0819004278 , (5.9b) 
+
+𝑟 1 : 𝜀 0 = 1.07546309 × 10 −3, 𝑟 2 : 𝜀 0 = 1.55942257 × 10 −3. (5.9c) 26 M.F.P. ten Eikelder and A. Brunk 
+
+The other material parameters are listed in Table 3. Gravity acts in the negative vertical direction, phase density 𝜌 [kg m −3] viscosity 𝜂 [Pa s ]bubble ( 𝜙 1) 1 10 −4
+
+heavy liquid ( 𝜙 2) 1200 0.15 
+
+light liquid ( 𝜙 3) 1000 0.10  
+
+> Table 3. Material parameters for the three-fluid rising-bubble problem.
+
+g = −𝑔 e𝑦 , 𝑔 = 9.81 m s −2. On the outer boundary we impose no-penetration conditions for the velocity. For the phase fields and chemical potentials, homogeneous Neumann conditions are used. In this two-dimensional setting, the critical size for penetration is estimated by balancing buoyancy against the capillary force at the liquid–liquid interface. For the parameters used here, the critical radius is 𝑟 𝑝 ≈ 1.8 × 10 −3 m. The resulting critical radius for the two-dimensional case is lower than that of the axisymmetric case (see e.g. [36]). 
+
+Remark 5.1 (Derivation critical radius for penetration) . For a circular bubble of radius 𝑟 and area 
+
+𝐴 = 𝜋𝑟 2, the buoyancy force per unit out-of-plane length is estimated by 𝐹 𝑏 = (𝜌 3 − 𝜌 1)𝑔 𝐴 . The capillary force opposing penetration is estimated by 𝐹 𝛾 = 2𝛾 23 , because the liquid–liquid interface meets the bubble in two points in the two-dimensional cross-section. The critical area is obtained from 
+
+𝐹 𝑏 = 𝐹 𝛾 , which provides 𝐴 𝑝 = 𝜋𝑟 2 
+
+> 𝑝
+
+= (2𝛾 23 )/(( 𝜌 3 − 𝜌 1)𝑔 ) so that the corresponding critical radius is 
+
+𝑟 𝑝 =√︄ 2𝛾 23 
+
+𝜋 (𝜌 3 − 𝜌 1)𝑔 . (5.10) We consider two bubble radii 𝑟 1 = 1.5 × 10 −3 m and 𝑟 2 = 2.0 × 10 −3 m. The first radius satisfies 
+
+𝑟 1 < 𝑟 𝑝 , so the bubble is expected to remain trapped at the liquid–liquid interface. The second radius satisfies 𝑟 2 > 𝑟 𝑝 , and the criterion predicts penetration into the upper liquid layer.                                        
+
+> (a) 𝑡 =0.00 (b) 𝑡 =0.10 (c) 𝑡 =0.20 (d) 𝑡 =0.25 (e) 𝑡 =0.30 (f) 𝑡 =0.60 (g) 𝑡 =0.80 (h) 𝑡 =1.00
+> Figure 12. Three-fluid problem. Evolution of the quantity 0.5𝜙 1+𝜙 2for 𝑟 =0.0015 m .
+
+The computed evolutions are shown in Figures 12 and 13. For 𝑟 1 = 1.5 × 10 −3 m, the bubble rises toward the liquid–liquid interface, deforms it, and remains trapped. For 𝑟 2 = 2.0 × 10 −3 m, the M.F.P. ten Eikelder and A. Brunk 27                                        
+
+> (a) 𝑡 =0.00 (b) 𝑡 =0.10 (c) 𝑡 =0.20 (d) 𝑡 =0.60 (e) 𝑡 =1.05 (f) 𝑡 =1.07 (g) 𝑡 =1.10 (h) 𝑡 =1.40
+> Figure 13. Three-fluid problem. Evolution of the quantity 0.5𝜙 1+𝜙 2for 𝑟 =0.0020 m .
+
+bubble overcomes the capillary barrier and passes into the upper liquid layer. The observed transition is therefore consistent with the two-dimensional criterion in (5.10). 
+
+6. Conclusions 
+
+We have developed a structure-preserving fully-discrete method for an 𝑁 -phase incompressible Navier–Stokes–Cahn–Hilliard model. Starting from the continuum formulation, we first provided the conservation and dissipation properties that should be retained at the discrete level. We then introduced an equivalent reformulation that is suitable for time discretization and finite element approximation, while keeping the treatment of the 𝑁 phases symmetric. The resulting scheme preserves the main structural properties of the model. In particular, the fully-discrete formulation maintains the saturation constraint and the phase mass balances, and it satisfies a discrete energy-dissipation law. The numerical experiments confirm the theoretical properties of the method: the discrete energy decays consistently, the relevant conserved quantities are maintained up to solver tolerance, and the method produces stable evolutions for multiphase configurations with density and viscosity differences. Several directions remain open for future work. First, it would be valuable to extend the analysis to schemes that also preserve the mixture-aware structural properties of more general 𝑁 -phase closures, including the corresponding mobility and reduction-consistency properties. Second, higher-order temporal discretizations are of interest. A main challenge in this direction is to retain the pointwise saturation constraint at the fully-discrete level while preserving the energy-dissipation structure. Third, the ideas developed here could be extended to compressible 𝑁 -phase flows, for example for the model proposed in [43]. 
+
+A. Proof of the energy evolution 
+
+Lemma A.1 (Energy evolution) . The energy evolution of the system (2.7) follows from a linear combination of (2.7a) -(2.7d) with the weights: v, − 12 |v|2 𝜌 𝛼 + 𝜇 𝛼 + 𝑔𝑦𝜌 𝛼 , 𝜆 , and −𝜕 𝑡 𝜙 𝛼 .28 M.F.P. ten Eikelder and A. Brunk 
+
+Proof. Taking the inner product of the momentum equation (2.7a) with v yields: 
+
+0 = 𝜕 𝑡 𝐾 + div (𝐾 v) + 12 |v|2 (𝜕 𝑡 𝜌 + div (𝜌 v)) − v · div S +∑︁ 
+
+> 𝛼
+
+𝜙 𝛼 v · ∇ 𝜇 𝛼 + v · ∇ 𝜆 − 𝜌 v · g, (A.1) where we have used the identity: 
+
+𝜕 𝑡 𝐾 + div (𝐾 v) + 12 |v|2 (𝜕 𝑡 𝜌 + div (𝜌 v)) = v · ( 𝜕 𝑡 (𝜌 v) + div (𝜌 v ⊗ v)) . (A.2a) Next, multiplying (2.7b) with 𝜇 𝛼 + 𝜌 𝛼 𝑔𝑦 − 12 |v|2 𝜌 𝛼 and (2.7d) with −𝜕 𝑡 𝜙 𝛼 , and subsequently summing over 𝛼 yields: 
+
+0 = 𝜕 𝑡 (𝐺 + Ψ) + ∑︁ 
+
+> 𝛼
+
+(𝜇 𝛼 + 𝑔𝑦𝜌 𝛼 ) div (𝜙 𝛼 v) + ∑︁ 
+
+> 𝛼
+
+𝜇 𝛼 𝜌 −1 
+
+> 𝛼
+
+div J𝛼 
+
+− div  ∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+− 12 |v|2 (𝜕 𝑡 𝜌 + div (𝜌 v)) , (A.3) where we have used the identities: 
+
+𝜕 𝑡 𝐺 = 𝑔𝑦 ∑︁ 
+
+> 𝛼
+
+𝜌 𝛼 𝜕 𝑡 𝜙 𝛼 , (A.4a) 
+
+𝜕 𝑡 Ψ − div 
+
+
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+
+
+=∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕𝜙 𝛼 
+
+−∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 div 
+
+ 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+
+
+, (A.4b) ∑︁ 
+
+> 𝛼
+
+(𝑔𝑦 − 12 |v|2) div J𝛼 = 0, (A.4c) 
+
+− 12 |v|2 (𝜕 𝑡 𝜌 + div (𝜌 v)) = −∑︁ 
+
+> 𝛼
+
+𝜌 𝛼 
+
+12 |v|2 (𝜕 𝑡 𝜙 𝛼 + div (𝜙 𝛼 v)) . (A.4d) Multiplying (2.7c) with 𝜆 provides: 
+
+0 = 𝜆 div v + 𝜆 ∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+div J𝛼 . (A.5) Addition of (A.1), (A.5), and (A.3) gives: 
+
+𝜕 𝑡 (𝐾 + 𝐺 + Ψ) + div (( 𝐾 + Ψ + 𝐺 )v) − div (Sv ) + div (v𝑇 K)+ div (v𝜆 ) + div (∑︁ 
+
+> 𝛼
+
+(𝜇 𝛼 + 𝜆 )𝜌 −1 
+
+> 𝛼
+
+J𝛼 ) − div  ∑︁ 
+
+> 𝛼
+
+¤𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+= −S : ∇v
+
++∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+∇( 𝜇 𝛼 + 𝜆 ) · J𝛼 , (A.6) where we have used the identities: 
+
+div (𝐺 v) = − 𝜌 v · g +∑︁ 
+
+> 𝛼
+
+(𝑔𝑦𝜌 𝛼 ) div (𝜙 𝛼 v), (A.7a) ∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+(𝜇 𝛼 + 𝜆 ) div J𝛼 = −∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+∇( 𝜇 𝛼 + 𝜆 ) · J𝛼 +∑︁ 
+
+> 𝛼
+
+𝜌 −1 
+
+> 𝛼
+
+div (( 𝜇 𝛼 + 𝜆 )J𝛼 ), (A.7b) ∑︁ 
+
+> 𝛼
+
+div (𝜇 𝛼 𝜙 𝛼 v) =∑︁ 
+
+> 𝛼
+
+𝜙 𝛼 v · ∇ 𝜇 𝛼 + 𝜇 𝛼 div (𝜙 𝛼 v), (A.7c) 
+
+div (v𝜆 ) = v · ∇ 𝜆 + 𝜆 div (v), (A.7d) M.F.P. ten Eikelder and A. Brunk 29 
+
+− div  ∑︁ 
+
+> 𝛼
+
+𝜕 𝑡 𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+= − div  ∑︁ 
+
+> 𝛼
+
+¤𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
++ div v𝑇 ∑︁ 
+
+> 𝛼
+
+∇𝜙 𝛼 ⊗ 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+!
+
+, (A.7e) and where the Korteweg tensor K is given by: 
+
+K = (∑︁ 
+
+> 𝛼
+
+(𝜙 𝛼 𝜇 𝛼 ) − Ψ)I +∑︁ 
+
+> 𝛼
+
+∇𝜙 𝛼 ⊗ 𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+. (A.8) Integration over Ω provides: 
+
+dd𝑡 E = −D ( v, {𝑔 𝛼 }) + B , (A.9) where B is the boundary contribution: 
+
+B = − ⟨( 𝐾 + 𝐺 + Ψ)v, n⟩𝜕 Ω + ⟨ Sv , n⟩𝜕 Ω − ⟨ v𝑇 K, n⟩𝜕 Ω
+
+− ⟨ 𝜆 v, n⟩𝜕 Ω − ⟨ ∑︁ 
+
+> 𝛼
+
+𝑔 𝛼 J𝛼 , n⟩𝜕 Ω + ⟨ ∑︁ 
+
+> 𝛼
+
+¤𝜙 𝛼 
+
+𝜕 Ψ
+
+𝜕 ∇𝜙 𝛼 
+
+, n⟩𝜕 Ω, (A.10) and where we note the identities: 
+
+S : ∇v = 2𝜈 
+
+
+
+∇𝑠 v − 1
+
+𝑑 (div v)I
+
+
+
+:
+
+
+
+∇𝑠 v − 1
+
+𝑑 (div v)I
+
+
+
++ 𝜈 
+
+
+
+¯𝜆 + 2
+
+𝑑 
+
+
+
+(div v)2 ≥ 0, (A.11a) 
+
+−∑︁ 
+
+> 𝛼
+
+∇𝑔 𝛼 · J𝛼 =∑︁ 
+
+> 𝛼,𝛽
+
+(∇ 𝑔 𝛼 )𝑇 𝑀 𝛼𝛽 ∇𝑔 𝛽 ≥ 0. (A.11b) 
+
+□
+
+Funding 
+
+MtE acknowledges support from the German Research Foundation (Deutsche Forschungsgemeinschaft DFG), project number 566600860. A.B. acknowledges support by the German Research Foundation (DFG) via TRR 146, subproject C3, project number 233630050 and via SPP 2256 within the project “Variational quantitative phase-field modeling and simulation of powder bed fusion additive manufacturing” project number 441153493. MtE and AB acknowledges support by the RMU via the joined project "MULTIMIX". 
+
+References 
+
+[1] P.C. Hohenberg and B.I. Halperin. Theory of dynamic critical phenomena. Reviews of Modern Physics , 49:435, 1977. [2] J. Lowengrub and L. Truskinovsky. Quasi-incompressible Cahn–Hilliard fluids and topological transitions. Proc. R. Soc. Lond. A , 454:2617–2654, 1998. [3] H. Ding, P.D.M. Spelt, and C. Shu. Diffuse interface model for incompressible two-phase flows with large density ratios. Journal of Computational Physics , 226:2078–2095, 2007. [4] H. Abels, H. Garcke, and G. Grün. Thermodynamically consistent, frame indifferent diffuse interface models for incompressible two-phase flows with different densities. Mathematical Models and Methods in Applied Sciences , 22:1150013, 2012. 30 M.F.P. ten Eikelder and A. Brunk 
+
+[5] H. Abels. Mixture theory for diffuse interface models of two-phase flows. Journal of Fluid Mechanics , 992:F1, 2024. [6] M.F.P. ten Eikelder, K.G. van der Zee, I. Akkerman, and D. Schillinger. A unified framework for Navier-Stokes Cahn-Hilliard models with non-matching densities. Mathematical Models and Methods in Applied Sciences , 33:175–221, 2023. [7] X. Feng. Fully discrete finite element approximations of the Navier–Stokes–Cahn-Hilliard diffuse interface model for two-phase fluid flows. SIAM journal on numerical analysis , 44:1049–1072, 2006. [8] D. Kay and R. Welford. Efficient numerical solution of Cahn–Hilliard–Navier–Stokes fluids in 2D. SIAM Journal on Scientific Computing , 29:2241–2257, 2007. [9] Y. Chen and J. Shen. Efficient, adaptive energy stable schemes for the incompressible Cahn– Hilliard Navier–Stokes phase-field models. Journal of Computational Physics , 308:40–56, 2016. [10] A.E. Diegel, C. Wang, X. Wang, and S.M. Wise. Convergence analysis and error estimates for a second order accurate finite element method for the Cahn–Hilliard–Navier–Stokes system. 
+
+Numerische Mathematik , 137:495–534, 2017. [11] A. Brunk, H. Egger, O. Habrich, and M. Lukáčová-Medviďová. A second-order fully-balanced structure-preserving variational discretization scheme for the Cahn–Hilliard–Navier–Stokes system. Mathematical Models and Methods in Applied Sciences , 33:2587–2627, 2023. [12] M.A. Khanwale, K. Saurabh, M. Ishii, H. Sundar, J.A. Rossmanith, and B. Ganapathysubramanian. A projection-based, semi-implicit time-stepping approach for the Cahn-Hilliard Navier-Stokes equations on adaptive octree meshes. Journal of Computational Physics , 475:111874, 2023. [13] F. Guillén-González and G. Tierra. Splitting schemes for a Navier-Stokes-Cahn-Hilliard model for two fluids with different densities. Journal of Computational Mathematics , pages 643–664, 2014. [14] H. Garcke, M. Hinze, and C. Kahle. A stable and linear time discretization for a thermodynamically consistent model for two-phase incompressible flow. Applied Numerical Mathematics , 99:151– 171, 2016. [15] J. Shen, X. Yang, and Q. Wang. Mass and volume conservation in phase field models for binary fluids. Communications in Computational Physics , 13:1045–1065, 2013. [16] J. Giesselmann and T. Pryer. Energy consistent discontinuous galerkin methods for a quasi-incompressible diffuse two phase flow model. ESAIM: Mathematical Modelling and Numerical Analysis , 49:275–301, 2015. [17] M.F.P. ten Eikelder and D. Schillinger. The divergence-free velocity formulation of the consis-tent Navier-Stokes Cahn-Hilliard model with non-matching densities, divergence-conforming discretization, and benchmarks. Journal of Computational Physics , page 113148, 2024. [18] A. Brunk and M.F.P. ten Eikelder. A simple, fully-discrete, unconditionally energy-stable method for the two-phase Navier-Stokes Cahn-Hilliard model with arbitrary density ratios. Journal of Computational Physics , 548:114558, 2026. M.F.P. ten Eikelder and A. Brunk 31 [19] F. Boyer and S. Minjeaud. Hierarchy of consistent n-component Cahn–Hilliard systems. 
+
+Mathematical Models and Methods in Applied Sciences , 24:2885–2928, 2014. [20] F. Boyer and C. Lapuerta. Study of a three component Cahn-Hilliard flow model. ESAIM: Mathematical Modelling and Numerical Analysis , 40:653–687, 2006. [21] F. Boyer, C. Lapuerta, S. Minjeaud, B. Piar, and M. Quintard. Cahn–Hilliard/Navier–Stokes model for the simulation of three-phase flows. Transport in Porous Media , 82:463–483, 2010. [22] S. Minjeaud. An unconditionally stable uncoupled scheme for a triphasic Cahn–Hilliard/Navier– Stokes model. Numerical Methods for Partial Differential Equations , 29:584–618, 2013. [23] H. G. Lee and J. Kim. A second-order accurate non-linear difference scheme for the N -component Cahn–Hilliard system. Physica A: Statistical Mechanics and its Applications , 387(19):4787–4799, 2008. [24] J. Kim, K. Kang, and J. Lowengrub. Conservative multigrid methods for ternary Cahn-Hilliard systems. Communications in Mathematical Sciences , 2:53 – 77, 2004. [25] X. Yang, J. Zhao, Q. Wang, and J. Shen. Numerical approximations for a three-component Cahn–Hilliard phase-field model based on the invariant energy quadratization method. Mathe-matical Models and Methods in Applied Sciences , 27:1993–2030, 2017. [26] X. Yang. Efficient and energy stable scheme for the hydrodynamically coupled three components Cahn-Hilliard phase-field model using the stabilized-Invariant Energy Quadratization (S-IEQ) Approach. Journal of Computational Physics , 438:110342, 2021. [27] S. Dong. Multiphase flows of N immiscible incompressible fluids: A reduction-consistent and thermodynamically-consistent formulation and associated algorithm. Journal of Computational Physics , 361:1–49, 2018. [28] S. Dong. Wall-bounded multiphase flows of N immiscible incompressible fluids: Consistency and contact-angle boundary condition. Journal of Computational Physics , 338:21–67, 2017. [29] S. Dong. Physical formulation and numerical algorithm for simulating N immiscible incompress-ible fluids involving general order parameters. Journal of Computational Physics , 283:98–128, 2015. [30] S. Dong. An efficient algorithm for incompressible N-phase flows. Journal of Computational Physics , 276:691–728, 2014. [31] J. Zhang and X. Yang. Decoupled, non-iterative, and unconditionally energy stable large time stepping method for the three-phase Cahn-Hilliard phase-field model. Journal of Computational Physics , 404:109115, 2020. [32] M.F.P. ten Eikelder, K.G. Van Der Zee, and D. Schillinger. Thermodynamically consistent diffuse-interface mixture models of incompressible multicomponent fluids. Journal of Fluid Mechanics , 990:A8, 2024. [33] H. Abels, H. Garcke, and J. Wittmann. Diffuse Interface Models for Two-Phase Flows with Phase Transition: Modeling and Existence of Weak Solutions. Journal of Mathematical Fluid Mechanics , 28, 2025. ISSN 1422-6952. [34] M.F.P. ten Eikelder. A unified framework for N-phase Navier–Stokes Cahn–Hilliard Allen–Cahn mixture models with non-matching densities. Journal of Fluid Mechanics , 1013:A26, 2025. 32 M.F.P. ten Eikelder and A. Brunk 
+
+[35] M.F.P. ten Eikelder and A. Brunk. Mixture-aware closure of the N-phase Navier–Stokes–Cahn– Hilliard mixture model. arXiv preprint arXiv:2604.27999 , 2026. [36] M.F.P. ten Eikelder and A. Brunk. Surface-tension calibration for N-phase mixtures. in preparation , 2026. [37] A. Brunk and M. Fritz. Structure-preserving approximation of the Cahn-Hilliard-Biot system. 
+
+Numerical Methods for Partial Differential Equations , 41:e23159, 2025. [38] M. Alnæs, J. Blechta, J. Hake, A. Johansson, B. Kehlet, A. Logg, C. Richardson, J. Ring, M.E. Rognes, and G.N. Wells. The FEniCS Project Version 1.5. Archive of Numerical Software , 3: 9–23, 2015. [39] J. Schöberl. C ++ 11 implementation of finite elements in NGSolve. ASC (Institute for Analysis and Scientific Computing) Report, TU Wien , 30:1–23, 2014. [40] S. Hysing, S. Turek, D. Kuzmin, N. Parolini, E. Burman, S. Ganesan, and L. Tobiska. Quantitative benchmark computations of two-dimensional bubble dynamics. International Journal for Numerical Methods in Fluids , 60:1259–1288, 2009. [41] F. Boyer. A theoretical and numerical model for the study of incompressible mixture flows. 
+
+Computers & fluids , 31:41–68, 2002. [42] S. Aland and A. Voigt. Benchmark computations of diffuse interface models for two-dimensional bubble dynamics. International Journal for Numerical Methods in Fluids , 69:747–761, 2012. [43] M.F.P. ten Eikelder, E.H. van Brummelen, and D. Schillinger. Compressible N-phase fluid mixture models. Journal of Fluid Mechanics , 1032:A25, 2026.

@@ -6,29 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-11
-- 运行时间：2026-06-11 22:21:31 UTC
+- 最新运行日期：2026-06-12
+- 运行时间：2026-06-12 21:53:42 UTC
 - 运行状态：成功
 - 本次总论文数：2
-- 精读区：0
-- 速读区：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-今日速读两篇流体建模论文：薄膜排液在鞍点处出现奇异性，以及漂移模型用于代理流动建模。  
-值得关注薄膜排液的鞍点奇异性结论，会对微流体与涂层工艺有启发；漂移模型则提供了一种简化流动模拟的思路。  
-建议从事多相流或数值模拟的读者优先查看薄膜排液那篇，并留意其鞍点附近的物理机制。
-- 详情：[/202606/11/README](/202606/11/README)
+今日精读一篇对称保结构离散化研究、速读一篇锐界面浸没边界法，聚焦多相流与动边界高保真模拟。  
+最值得关注：任意密度比N相流的保对称离散格式，以及任意厚度运动物体的快速一致浸没边界技术。  
+建议后续跟进这两类方法在高雷诺数湍流与流固耦合问题中的验证与组合应用。
+- 详情：[/202606/12/README](/202606/12/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Symmetric structure-preserving discretization of N-phase incompressible fluid mixtures with arbitrary density ratios](/202606/12/2606.12256v1-symmetric-structure-preserving-discretization-of-n-phase-incompressible-fluid-mixtures-with-arbitrary-density-ratios)  
+   标签：评分：8.0/10、query:falling-film
+   evidence：N相不可压缩流体混合物的结构保持离散化模拟
 
 ### 速读区论文标签
-1. [Thin-film drainage becomes singular at saddles](/202606/11/2606.11881v1-thin-film-drainage-becomes-singular-at-saddles)  
+1. [A fast and consistent sharp-interface immersed boundary method for moving bodies of arbitrary thickness](/202606/12/2606.09799v2-a-fast-and-consistent-sharp-interface-immersed-boundary-method-for-moving-bodies-of-arbitrary-thickness)  
    标签：评分：7.0/10、query:falling-film
-   evidence：分析曲面上的薄膜排液及厚度奇异性，与降膜厚度相关。
-2. [Drifting Models for Surrogate Flow Modeling](/202606/11/2606.07481v1-drifting-models-for-surrogate-flow-modeling)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：针对CFD的生成式代理模型加速流场预测，可用于加速多相流模拟如降膜问题。
+   evidence：提出一种尖锐界面浸没边界法，适用于运动/可变形体，可用于含自由面的多相流CFD
 
 
 <div class="dpr-home-promo-card">

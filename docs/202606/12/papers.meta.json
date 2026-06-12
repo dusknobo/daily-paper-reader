@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-12",
+  "date": "2026-06-12",
+  "generated_at": "2026-06-12T21:53:48",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/12/2606.12256v1-symmetric-structure-preserving-discretization-of-n-phase-incompressible-fluid-mixtures-with-arbitrary-density-ratios",
+      "section": "deep",
+      "title_en": "Symmetric structure-preserving discretization of N-phase incompressible fluid mixtures with arbitrary density ratios",
+      "authors": "M. F. P. ten Eikelder, A. Brunk",
+      "date": "2026-06-10",
+      "pdf": "https://arxiv.org/pdf/2606.12256v1",
+      "score": "8.0",
+      "evidence": "N相不可压缩流体混合物的结构保持离散化模拟",
+      "tldr": "扩散界面模型中，超过两相的不压缩流体模拟由于密度比任意且需对称处理，现有方法难以同时保持守恒、耗散及饱和约束。本文针对N相Navier-Stokes-Cahn-Hilliard模型，提出一种对称全离散格式，在离散层面精确保证相体积、相质量、总体积、总质量守恒，严格满足能量耗散律，并自动保持局部体积饱和约束。数值实验验证了理论性质，并在任意密度比下准确模拟多相界面动力学，展示了鲁棒性。该工作为复杂多相流提供了结构保持的通用计算框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "Diffuse-interface models are a widely used framework for interfacial dynamics in complex fluids, in which interfaces are represented through smooth transition layers and capillary effects are encoded by a free-energy functional. For incompressible mixtures with more than two phases, however, robust computation is substantially more difficult because the numerical method should preserve the balance structure of the continuum model, maintain the saturation constraint, dissipate energy, and treat all phases symmetrically even when density ratios are arbitrary. Existing structure-preserving methods are largely developed for binary flows or for formulations that distinguish a reference phase, so a genuinely symmetric N-phase discretization remains lacking. The practical problem is therefore to construct a fully-discrete method for N-phase incompressible Navier--Stokes--Cahn--Hilliard mixture models that retains the key thermodynamic and conservation properties of the continuum equations for arbitrary density ratios.   Here we propose a symmetric fully-discrete method for the N-phase incompressible Navier--Stokes--Cahn--Hilliard mixture model with arbitrary density ratios. The method yields a fully-discrete problem in which every solution satisfies exact phase volume conservation, phase mass conservation, total volume conservation, total mass conservation, and a discrete energy-dissipation law. In addition, if the volume-saturation constraint holds for the initial data, then it is preserved at every time step. We numerically verify these structure-preserving properties and demonstrate the robustness of the method in representative multiphase flow problems. The resulting scheme provides a computational framework for incompressible N-phase mixture flows with complex interfacial dynamics and arbitrary density contrasts.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/12/2606.09799v2-a-fast-and-consistent-sharp-interface-immersed-boundary-method-for-moving-bodies-of-arbitrary-thickness",
+      "section": "quick",
+      "title_en": "A fast and consistent sharp-interface immersed boundary method for moving bodies of arbitrary thickness",
+      "authors": "Giovanni Vagnoli, Martino Andrea Scarpolini, Roberto Verzicco, Francesco Viola",
+      "date": "2026-06-08",
+      "pdf": "https://arxiv.org/pdf/2606.09799v2",
+      "score": "7.0",
+      "evidence": "提出一种尖锐界面浸没边界法，适用于运动/可变形体，可用于含自由面的多相流CFD",
+      "tldr": "针对浸入边界法模拟运动物体时欧拉法力振荡和拉格朗日法滑移误差问题，提出一种快速一致的尖锐界面IBM。该方法集成快速标记、双侧欧拉力和质量校正，保持拉普拉斯离散结构，在直接泊松求解效率下减少分裂误差。数值实验表明，方法实现二阶无滑移精度与小穿透误差，适用于刚体、变形、湍流及仿生流动，在不增加计算成本的同时提升鲁棒性与精确性，为复杂动边界模拟提供高效工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "Immersed boundary methods (IBMs) are widely used to simulate flows around complex geometries and moving bodies, but they often involve a trade-off between precision and computational efficiency. Eulerian formulations require special treatments for moving walls and may generate spurious force oscillations, whereas Lagrangian formulations can suffer from slip errors at the immersed surfaces. We propose a novel sharp-interface IBM for incompressible flows involving moving, deformable, and arbitrary-thickness bodies. The method combines a fast tagging algorithm, a two-sided Eulerian forcing strategy, and a consistent mass correction that reduces the splitting error of fractional-step schemes, while preserving the structure of the discrete Laplacian operator. This formulation retains the efficiency of direct Poisson solvers, thus avoiding the overhead of cut-cell, multigrid, and projection-based approaches. The method naturally handles moving boundaries, and yields small transpiration errors with second-order accuracy in the enforcement of the no-slip condition. Numerical tests using rigid, deformable, turbulent, and biologically inspired flows demonstrate the accuracy, robustness, and efficiency of the method, without compromising computational cost.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
