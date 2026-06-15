@@ -1,0 +1,2745 @@
+Title: Data-Driven Equation Discovery for Nonlinear Liquid Film Flows
+
+URL Source: https://arxiv.org/pdf/2606.13336v1
+
+Published Time: Fri, 12 Jun 2026 01:08:12 GMT
+
+Number of Pages: 55
+
+Markdown Content:
+Journal of Nonlinear Waves (YEAR), xx :xx 1–55 
+
+RESEARCH ARTICLE 
+
+# Data-Driven Equation Discovery for Nonlinear Liquid Film Flows 
+
+Sebastian T. Dooley 1, Albert P. Bartók 2,3 , James E. Sprittles 1 and Radu Cimpeanu 1
+
+> 1
+
+Mathematics Institute, University of Warwick, Coventry, CV4 7AL, United Kingdom. E-mail: Radu.Cimpeanu@warwick.ac.uk. 
+
+> 2
+
+Warwick Centre for Predictive Modelling, School of Engineering, University of Warwick, Coventry, CV4 7AL, United Kingdom. 
+
+> 3
+
+Department of Physics, University of Warwick, Coventry, CV4 7AL, United Kingdom. 
+
+Keywords: Thin Liquid Films, Equation Discovery, Identifiability, Nonlinear Waves 
+
+MSC Codes: Primary – 76A20; Secondary – 76D08, 93B30, 62J07 
+
+Abstract 
+
+Over the past decade data-driven equation discovery emerged as a powerful alternative to first principles-based methodologies traditionally used in mathematical modelling cycles. The approach provides a promising path towards deep, physical insight into systems that have previously evaded rigorous mathematical derivation procedures, often due to intractable complexity. The strengths of such techniques have been successfully established for many problem classes described by systems of ordinary differential equations and continue to be extended, with their reach into partial differential equation systems gaining momentum, though comparatively nascent. Herein we tackle such a frontier: elucidating the dynamics of liquid film flows, a problem space providing a rich backdrop in terms of asymptotic analytical building blocks. By leveraging expert knowledge and the ability to carefully curate data, we establish a best-case scenario for identifying the underlying governing equations. Even here, multi-collinearity, stemming from the choice of monomial basis functions in our multi-scale flow configuration, introduces complex identifiability issues. Early-time transients compound this further, as the most dynamically rich behaviour carries the largest residuals in training data. Pinpointing such vulnerabilities allows us to better define the boundaries of current discovery techniques and paves the way for the next generation of more resilient, numerically stable algorithms. 
+
+Contents 1 Introduction 2
+
+1.1 Mathematical Modelling . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31.2 Equation Discovery . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31.3 Data-Driven Mathematical Modelling of Liquid Film Flows . . . . . . . . . . . . . . . 5
+
+2 Methodology 6
+
+2.1 Equation Discovery through Sparse Regression . . . . . . . . . . . . . . . . . . . . . 62.1.1 Core Algorithm . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 62.1.2 Ridge Regression . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 72.1.3 Sequential Thresholding . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82.1.4 Hyperparameter Optimisation . . . . . . . . . . . . . . . . . . . . . . . . . . 82.1.5 Bootstrapping . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 82.1.6 Recalibration . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 92.2 Preprocessing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 92.3 Numerical Differentiation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10 2.4 Choice of Optimiser . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10 
+
+> arXiv:2606.13336v1 [physics.flu-dyn] 11 Jun 2026
+
+2 Dooley et al. 
+
+2.5 Improving Conditioning of the Linear System . . . . . . . . . . . . . . . . . . . . . . 11 2.6 Bootstrapping and Aggregating . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11 2.7 Model Selection . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12 2.8 Training Dataset Selection . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 
+
+3 Thin Film Equations 13 
+
+3.1 Analytical Setup . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 14 3.2 Equation Discovery and Thin Film Modelling . . . . . . . . . . . . . . . . . . . . . . 15 
+
+4 Surface Tension Driven Thin Film Equation 16 
+
+4.1 Parameter Removal through Time Rescaling . . . . . . . . . . . . . . . . . . . . . . . 17 4.2 Synthetic Data Generation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17 4.3 Numerical Experiments . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19 4.3.1 Feature Selection . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20 4.3.2 Model Testing and Selection . . . . . . . . . . . . . . . . . . . . . . . . . . . 22 4.3.3 Recovery . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24 4.3.4 Time Proportion Study . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 25 4.3.5 Fixed Temporal Resolution Study . . . . . . . . . . . . . . . . . . . . . . . . 26 4.4 Key Insights . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 
+
+5 Gravity and Constant Surface Tension Affected Thin Liquid Film 28 
+
+5.1 Model Inspection . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 5.2 Data Generation Considerations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29 5.3 Alterations to Equation Discovery . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31 5.4 Numerical Experiments and Results . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 5.4.1 Strong Performing Models . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33 5.4.2 Model Recovery Frequencies . . . . . . . . . . . . . . . . . . . . . . . . . . . 34 
+
+6 Discussion and Conclusions 36 A Derivation Details for a Surface Tension Driven Thin Film Equation 39 B Residual Scaling 41 C Critical Tolerance and the Relation to Row Sub-Sampling 41 D Noisy Surface Tension Driven Thin Film Equation 41 
+
+D.1 Smoothing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 42 D.2 Results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 44 
+
+E A Sufficient Bound for Recovery 44 F Derivation Details for Thin Liquid Films under Gravity 47 G Existence and Uniqueness of a Constrained Cubic Root 50 1. Introduction 
+
+Liquid film flows have practical applications and experimentally realisable configurations that provide valuable data for analysis and validation (Reeves et al 2025). Associated industrial applications include coating flows (Schmitt et al 2013), heat transfer through falling film evaporators (Ribatski and Jacobi 2005), and chemical mass transfer (Hessel et al 2000). Practical relevance is a strong motivation for modelling thin liquid film flows, which provide a canonical system that has been at the heart of modelling and the development of partial differential equation (PDE) theory for decades (Craster and Matar 2009). Modelling efforts allow researchers to probe non-observable fields, analysing flows in regimes that are difficult to access experimentally, such as at very small scales or within enclosed devices. Falling liquid films are one such thin film flow and liquid films running downhill produce beautiful natural phenomena that are scientifically interesting (Kalliadasis et al 2011). The system can display instabilities dependent on film thickness in which, after onset, quasi-2D waves develop and propagate before resulting in 3D Journal of Nonlinear Waves 3disordered patterns that may demonstrate chaotic behaviour (Oron, Davis et al 1997; AB Thompson et al 2016). 
+
+1.1. Mathematical Modelling 
+
+There is currently a well-established hierarchy of thin film equations (Kalliadasis et al 2011; Tomlin et al 2018) including the Kuramoto-Sivashinsky (KS) equation, the Benney equation (first-order), the weighted-residual equations (WRIBL) and full Navier-Stokes formulations, with each respective equation representing an increase in accuracy, but also computational cost, for solution data (Cimpeanu et al 2021). The full Navier-Stokes systems are at the head of this hierarchy. Whilst well-studied, an analytical solution to such systems is famously unknown. Numerical solutions are available, but the cost of direct numerical simulation (DNS) is often prohibitively high. Meanwhile, alternative reduced-dimensional models are not universally valid long-wave models, with either very limited applicability in the case of the KS equation, or exhibiting finite-time blow-up, as for the Benney equation (Scheid et al 2005). Weighted residual approaches are often utilised (Ruyer-Quil and Manneville 2000; A Thompson et al 2015; Cimpeanu et al 2021; Holroyd et al 2024) as a powerful bridge in this modelling landscape, balancing analytical tractability and numerical efficiency. However, the weighted residual approach remains fundamentally constrained by the requirement of scale separation between the film thickness and streamwise length-scales. These restrictions are overcome only in geometrically privileged configurations, such as the scenarios studies by Wray, Papageorgiou et al (2017) and Wray and Cimpeanu (2020). This motivates the need for development of new reduced-dimensional model derivation capabilities in this space. Due in no small part to the vast improvement in computing hardware, researchers can routinely gener-ate simulation data and numerically validate theoretical results (Craster and Matar 2009; Papageorgiou 2019; Chatzigiannakis et al 2021). Combined with the gradual incorporation of more sophisticated modelling approaches, modern hardware has enabled a transition from reliance on simplified analytical solutions to approaches using high-fidelity numerical simulations. Existing models have progressively been supplemented with more complex physics. For example, surface-active molecules and particles may collect at fluid interfaces to yield interesting nonlinear behaviour of these complex fluid-fluid interfaces (Mayer et al 2026). Whilst this combination of modelling and computation has been transfor-mative, limitations remain. Given complex mathematical models, computational power still represents a bottleneck in many cases, particularly 3D scenarios, and model reduction is of key interest to many researchers (Chang 1994; Lavalle et al 2015). Extending existing thin film models to more demanding flow regimes, such as from well-characterised low-Reynolds-number flows towards moderate Reynolds numbers, remains challenging. Additional physical complexity, such as the effects of surfactants (Swan-son et al 2014) or capturing film dewetting phenomena (Volodin and Kondyurin 2008; Witelski 2020), compounds this further, yet lies beyond the present scope of our exploration. Collectively, these chal-lenges indicate the need for modelling approaches that provide a route towards more general and physically representative models that can later incorporate unresolved physical effects beyond the reach of conventional modelling assumptions. Therefore, to build on previous modelling work, we can use the plethora of readily available experimental and numerical datasets they provide to facilitate such an approach. 
+
+1.2. Equation Discovery 
+
+The wide range of accessible datasets mark thin liquid film systems as a prime candidate for data-driven equation discovery techniques. The goal of PDE discovery is to determine a governing PDE system that explains the observations provided well and is physically interpretable. As a result, this body of work is distinct from that of surrogate modelling purely for quantitative prediction. Equation 4 Dooley et al. 
+
+discovery can serve researchers in a variety of ways. It provides an alternative to standard first principles-based methodologies used for mathematical modelling. It can complement analytical foundations where there is good understanding for at least a subset of the solution structure. It may also be used for purely exploratory purposes. As discussed previously, there exist regimes currently outside the reach of traditional approaches involving modelling and computing discrete solutions. It is hoped that data-driven methodologies will eventually provide rapid insight into these regimes for physical interpretation and predictive capabilities. PDE models are highly desirable as a form of governing equation to explain physical phenomena and are ubiquitous throughout scientific literature. PDEs allow the use of the full range of mathematical tech-niques developed over previous centuries. This includes producing analytical and numerical solutions to resolve models produced by data-driven processes. There are many well-developed mathematical tools that we can apply to PDEs, such as asymptotic analysis, which allow us to create benchmark solutions in certain parameter regimes. Some PDE systems may only model a subset of an associated parameter space well, so there is the ability to extend existing PDE models. This can be done in numerous ways, including modelling additional physics (Lewin-Jones et al 2024), or fitting a data-driven corrective term, such as in the case of residual networks (D Chen et al 2020; Martin-Linares et al 2023; Cui et al 2024). Extending existing models provides an exciting initial use case of equation discovery. Through the careful provision of training data and physically informing algorithms, one can discover the mathe-matical form of errors within models. Equation discovery could also aid research by informing models that attempt to work at scales between well-studied regions (Brunton, Noack et al 2020). In principle, one could attempt to produce models over an unbounded function space and yield an arbitrarily complex model. As is commonly observed in machine learning literature (Brunton, Noack et al 2020), such a model would likely fit training data well and fail to generalise for unseen, out-of-distribution conditions. An excessively complex model is also likely to have terms that result in an impractical numerical solution, due to ill-posedness or stiffness, making reliable simulation and quantitative comparison with data unfeasible (Kassam and Trefethen 2005). Thus, obtaining parsimo-nious models is an important goal when discovering equations and evaluating their solutions. Under this assumption, the problem of discovering PDEs from data can be formulated as one of identifying a sparse representation within a high-dimensional candidate space. This desire for sparsity results in equation discovery literature frequently referencing the problem-solving principle of Occam’s razor (Kaheman et al 2020) and so the sparsity assumption underlies the majority of work produced in the field (Brun-ton, Zolman et al 2025). This aligns with broader developments in data-driven and physics-informed modelling, where learning governing equations is posed as an optimisation problem that balances data fidelity and model complexity (Kutz 2017; Karniadakis et al 2021). Sparse regression methodologies therefore form a key branch of equation discovery literature. They were popularised with the introduction of the sparse identification of nonlinear dynamics (SINDy) (Brunton, Proctor et al 2016), which was extended to constant coefficient PDEs (SH Rudy et al 2017) and then to parametric PDEs (S Rudy et al 2019). Equation discovery requires performing structural identification and determining coefficient values, so researchers must consider the loss function used and optimisation routines. SINDy popularised the use of sequentially thresholded least squares (STLSq) to promote sparsity, with SH Rudy et al (2017) recommending sequentially thresholded ridge regression (STRidge), though both works recognised alternative optimisers, such as the least absolute shrinkage and selection operator (LASSO). LASSO is an intensely-studied, convex and principled regression approach (Hastie, Tibshirani and Tibshirani 2020) that was applied by Schaeffer (2017) for equation discovery, with successes on a variety of PDEs including variants of Burgers’ equation and Navier-Stokes systems. However, other works have shown mixed performance with high computational cost (SH Rudy et al 2017; Kaptanoglu et al 2023). A major extension to the SINDy framework was that of weak-SINDy (Messenger and Bortz 2021), which uses Galerkin projection and a smooth, compact test function to ‘move’ derivatives to the test function. Doing so mitigates numerous issues relating to Journal of Nonlinear Waves 5numerical differentiation and instead relies on numerical integration, which is a far more numerically robust process. This method is analogous to a convolution performing low-pass filtering, thus removing high-frequency dynamics/noise. More recently, there have been further developments to the family of sparse regression based methodologies including Laplace enhanced SINDy (LES-SINDy) (Zheng and Lin 2026), which uses the Laplace transform to relax assumptions of absolute integrability of candidate functions that are required when applying weak-SINDy with the Fourier transform. Another key methodology is that of E-SINDy (Fasel et al 2022), which utilises bootstrapping and a frequentist framework to improve the robustness of equation discovery. Bayesian alternatives exist, such as Bayes PDE_FIND (Martina-Perez et al 2021), which uses PDE_FIND to define prior distributions that are updated by approximate Bayesian computation. Another key approach from a Bayesian perspective is that of the BINDy framework (Champneys and Rogers 2025). This work uses reversible-jump Markov-chain Monte-Carlo sampling methods to overcome difficulties regarding the dimension of the parameter vector depending on the particular model it parameterises. Using this sampling method, the work allows access to the joint posterior over both models and their parameterisations, though focuses on application to ODE cases. Taken together, these developments reflect significant progress in sparse model discovery, yet operate within a shared framework of representing governing dynamics from a prescribed library of candidate functions. The success of sparse regression methodologies is closely tied to the completeness of the function library and whether all relevant terms are known a priori . In many applications, this is a key issue drawing the attention of numerous researchers. Rather than fixing a function library at the start of the discovery process and searching for strong candidate systems within the span of a finite dimensional sub-space, many works involve building or altering a function library (Cranmer 2020; Y Chen et al 2022; Xu et al 2025). Some methods involve fixing functional forms of library terms and optimising nonlinear parameters within the function library, such as the frequency of trigonometric terms (Viknesh et al 2026). We see then that for the sparse regression methodologies we employ, the requirement of candidate library selection shifts the burden of modelling from equation derivation to library design. Overall, this emerging field has provided success for numerous test cases that probe varying degrees of nonlinearity for ODEs and PDEs. The constructed framework is flexible and modular in the sense that a variety of extensions (many described above) have been proposed to address specific challenges and can be quickly implemented into base codes. Through careful, expert-guided sparsity tuning, the generated PDEs can explain out-of-sample data and be thought of as generalisable. In environments where a ‘correct’ model is unclear, comparison of models is viable to attempt to uncover such a general governing PDE. Applying these equation discovery frameworks in these unknown environments remains one of the key challenges in this research space, with a significant proportion of prior development restricted to relatively well-known regions of interest. 
+
+1.3. Data-Driven Mathematical Modelling of Liquid Film Flows 
+
+In the above, we have highlighted how the emerging area of equation discovery has already led to significant empirical success (Heinrich et al 2025). Several canonical PDE-based models have been robustly retrieved, some in the presence of significant noise (SH Rudy et al 2017). We look to present the behaviour of the algorithm for more complicated reduced-order models and look to build on previous works through the study of two equations of interest to the thin liquid film community with single-equation form ℎ𝑡 = N ( ℎ), where N represents a highly nonlinear differential operator. Whilst there is overlap in the modelled physics, we show that there is increased complexity when recovering systems with coupled physical effects, such as gravity and surface tension. However, having discussed a wide, though non-exhaustive, list of equation discovery methods, the numerous variants and proliferation of names of new methods in the past decade are potentially symptomatic of theoretically thin grounding, and some researchers have compared machine learning practice with alchemy (Hutson 2018). Nevertheless, 6 Dooley et al. 
+
+the development of such variants is productive in tackling particular modes of failure of prior studies. Looking towards model equations governing liquid film dynamics that lie beyond traditional benchmarks, guarantees of success are lacking and there exist limitations in the study of the practical identifiability of PDE systems (Salmaniw and Browning 2025). Thus, further study is motivated when looking to apply equation discovery methods to novel environments, and we deem confidence in a well understood area of modelling to be critical. The paper is structured as follows. We begin by formulating the building blocks for an equation discovery methodology and delving into relevant numerical approaches in Section 2. We then refocus our attention to thin liquid films in Section 3, highlighting the details of existing analytical work that can inform the discovery process. Results are then discussed in Section 4 for a surface tension driven flow, before Section 5 where gravity is introduced to form a classical model described by competing physical mechanisms. This structure allows for the application and analysis of equation discovery for a highly nonlinear system that is extremely relevant to thin liquid film modelling. Finally, a discussion and conclusions follow as part of Section 6. 
+
+2. Methodology 
+
+Having discussed a collection of thin liquid film models that balance complexity and fidelity, we look to construct an equation discovery framework from existing tools. This framework will allow for systematic interrogation through varying the training data provided and the targeted system for retrieval. 
+
+2.1. Equation Discovery through Sparse Regression 
+
+To perform equation discovery, we use a foundational basis derived from the combination of the STability-based Robust IDEntification of PDEs (PDE-STRIDE) framework (Maddu et al 2022) and the Ensemble Sparse Identification of nonlinear Dynamics (E-SINDy) (Fasel et al 2022) approach, to which we apply suitable adaptations for thin liquid film dynamics equation discovery. This includes incorporating a tolerance sampling approach (Supekar et al 2023), referred to as line searching, and data sub-sampling considerations (VandenHeuvel, Buenzli et al 2024). 
+
+> 2.1.1. Core Algorithm
+
+We begin by discussing SINDy (Brunton, Proctor et al 2016). This popular method has been successfully applied to numerous classical PDE settings through the PDE_FIND algorithm (SH Rudy et al 2017). The use of SINDy assumes that physical systems, in general, have only a few relevant terms that encapsulate the dynamics of the system, which means that the governing equations are sparse in high-dimensional nonlinear function spaces. As input, the algorithm uses a matrix of the data collected. For our scalar thin film data, this will be given by 𝐻 ∈ R𝑁 𝑥 × 𝑁 𝑡 , where 𝑁 𝑥 is the total number of spatial grid points and 𝑁 𝑡 is the number of time steps. The entries 𝐻 𝑖 𝑗 correspond to the interfacial height at point 𝑥 𝑖 and time 𝑡 𝑗 , with 
+
+𝑖 = 1, . . . , 𝑁 𝑥 and 𝑗 = 1, . . . , 𝑁 𝑡 . Our inputted data is typically noiseless; however, in the appendix, we consider the impact of pointwise, additive Gaussian noise included as a post-process to data generation. The methodology requires the user to specify a closed library of functions that are to be numerically approximated. This may consist of a family of polynomials to a finite, maximum degree, as well as cross products with low-order spatial derivatives. The assumed form of the partial differential equation to describe the input dataset is 
+
+ℎ𝑡 (𝑥, 𝑡 ) = N ( 𝑓 1 (ℎ), 𝑓 2 (ℎ), . . . , 𝑄 ), (2.1) Journal of Nonlinear Waves 7where the operator N ∈ span {𝑁 1, 𝑁 2, . . . , 𝑁 𝑟 } for 𝑟 basis operators, so 
+
+N =
+
+> 𝑟
+
+∑︁ 
+
+> 𝑗 =1
+
+𝑁 𝑗 ( 𝑓 1 (ℎ), 𝑓 2 (ℎ), . . . , 𝑄 )𝜉 𝑗 ,
+
+with elements of the function library 𝑓 𝑖 (ℎ) being functions of the observed, potentially high-dimensional, state variable, and 𝜉 is a column vector containing the coefficients of each term 𝑁 𝑗 (. . . ) (see SH Rudy et al (2017) for additional details on this construction). The parameter 𝑄 is representative of additional information that may be known about the system, such as a velocity field that is discretised on the same spatio-temporal domain. Thus, considering equation (2.1) shows the importance of the choice of library, as excluded terms will not be recovered, regardless of their importance. A typical initial application of the method may involve a library of monomial-based terms such as 
+
+{ℎ𝑘 , ℎ 𝑘 ℎ𝑥 , ℎ 𝑘 ℎ𝑥 𝑥 , ℎ 𝑘 ℎ𝑥 𝑥 𝑥 , ℎ 𝑘 ℎ𝑥 𝑥 𝑥 𝑥 }𝑛 𝑚𝑎𝑥 
+
+> 𝑘 =0
+
+to provide a rich function library. For such a library, a maximum derivative order and monomial degree requires careful specification, which can incorporate a priori known information about the physical problem to be modelled. With an established library of basis functions, we look to form a linear system in which an assumed form of left hand side specified a priori , such as ℎ𝑡 , may be expressed as a linear combination of the elements of the function library that can themselves be nonlinear in ℎ. The nonlinearity of the basis functions enables recovery of nonlinear systems. Forming the linear system requires using the inputted data to estimate a first-order temporal derivative, ℎ𝑡 (𝑥, 𝑡 ), evaluated at each point in the spatio-temporal mesh. A simple second-order central finite difference scheme may be applied to spatial and temporal derivatives, using only local information and suitable boundary conditions. Having estimated derivative values, a linear system may be formed by vectorising point-wise values, 
+
+𝐻 𝑡 = Θ (𝐻, 𝑄 )𝜉, where 𝐻 𝑡 ∈ R𝑛 ×𝑞 , Θ ∈ R𝑛 × 𝑝 , 𝜉 ∈ R𝑝 ×𝑞 , (2.2) with 𝑞 = 1 for single-equation applications. This system can be sparsely regressed to provide coefficient values. To enforce sparsity, ridge regression and hard sequential thresholding are applied. 
+
+2.1.2. Ridge Regression 
+
+Ridge regression is a commonly used regularisation method in supervised machine learning (Hastie 2020). It applies a 𝐿 2 regularisation penalty to the least squares estimate of the regression, thus restricting the size of coefficients and in a sense rewarding sparsity in high-dimensional systems, 
+
+𝜉 ridge = arg min   
+
+> 𝜉 ∈R𝑝
+
+{|| Θ𝜉 − 𝐻 𝑡 || 22 + 𝜆 ridge || 𝜉 || 22 }.
+
+The weighting of the regularisation penalty is controlled by a regularisation hyper-parameter 𝜆 , which has a value to be optimised for the environment in which it is deployed. Ridge regression makes coefficients of highly correlated variables similar to each other instead of performing selection (Hastie, Tibshirani and Friedman 2009; James et al 2013). Consequently, ridge regression alone suffers from over-fitting, as weight is assigned in all dimensions. This motivates the use of hard sequential thresholding to enforce sparsity (Herrity et al 2006; Blumensath and Davies 2008; SH Rudy et al 2017), as described in the following subsection. 8 Dooley et al. 
+
+> 2.1.3. Sequential Thresholding
+
+A hard thresholding technique is used to detect coefficients with values below a specified threshold 
+
+Δ ∈ R≥0 and discard the corresponding basis functions to leave a reduced support set supp ( ˆ𝜉 ) ≔ { 𝑗 : ˆ 𝜉 𝑗 ≠ 0}, where ˆ𝜉 𝑗 ≔ 𝜉 ridge  
+
+> 𝑗
+
+· 1(| 𝜉 ridge  
+
+> 𝑗
+
+| ≥ Δ).
+
+The support set is initially equivalent to the function library. This allows for regression to be performed recursively on a shrinking library of basis functions. The regression can be halted when the results stop changing or when a specified maximum number of regressions has been performed, or indeed when a further iteration would result in an empty set of remaining features and thus a null model. Previous studies have confirmed the convergence to a stable support set of this sequentially thresholded ridge regression procedure with at most 𝑝 steps required (Zhang and Schaeffer 2019). The result is a local minimiser of the non-convex problem. Subsequently, sequential thresholding introduces an additional hyper-parameter, in the form of the sequential thresholding tolerance, Δ. As a result, the optimiser uses coefficient magnitude as a proxy for importance and naturally one may question the ability to detect features with small magnitude coefficients. To combat this, we may normalise columns of the design matrix with respect to the 𝐿 2 norm before sequential thresholding, which preconditions the system and aids in detecting important features with small coefficient magnitudes. A remaining valid concern may be for subtle features with substantial impacts on the long-term evolution of a system. We comment on this aspect later in subsection 4.3.2. 
+
+> 2.1.4. Hyperparameter Optimisation
+
+The original PDE_FIND algorithm employs an algorithmic approach to searching the hyper-parameter space, but results in trajectories dependent on the initial hyper-parameter values chosen (Huang et al 2022). Thus it may fail to robustly identify a globally optimal model (Maddu et al 2022; Kaptanoglu et al 2023). Instead of optimising the threshold value, we instead opt for a line search methodology. A critical tolerance is naturally defined by the tolerance value at which all features would be removed by a single application of thresholding to the ridge solution. When using a tolerance value slightly less than such a critical value, it is likely that model complexity will be low, and so a 1D line search of decreasing tolerance values starting from the critical thresholding value will produce a collection of models of typically increasing complexity. A lower bound is naturally formed by the value at which thresholding would not remove any features, although this would result in high-complexity models that we would deem to be overfitted, through the assumption of sparsity. Consequently, we terminate the line search at a potentially larger threshold value of 𝜖 Δ𝑐 , where a heuristically chosen 𝜖 = 10 −3 is used. A log-linear line search is chosen. For each value of tolerance sampled, a thresholding path is taken in which features are removed in an order dependent on the path taken. Whilst convergence is assured, important terms may be removed seemingly erratically, which could result in spurious terms remaining in the final model structure. When thresholding terminates, a set of features remains that define the structure of a potential model. 
+
+> 2.1.5. Bootstrapping
+
+Through numerical experimentation, we have encountered that the initial linear system can be very ill-conditioned due to the choice of function library and structural multi-collinearity, a property also remarked upon in previous studies (Kaheman et al 2020; Delgado-Cano et al 2025), as the design matrix columns are constructed from the same inputted training dataset. Due to this ill-conditioning, we note that the thresholding path is sensitive to the data samples used. Therefore, we apply bootstrap sampling to reduce this sensitivity. Doing so, we generate normalised feature importance scores related to the proportion of times a feature is retained in the final generated model (when thresholding terminates). Journal of Nonlinear Waves 9With these importance scores, we may apply an importance threshold in [0, 1] to retain important terms and form a final set of features that determine the candidate model. This is the case for all sampled tolerance values, so we take unique combinations of terms to generate a collection of candidate models. The cardinality of such a set of candidate models is bounded above by the number of threshold samples taken and below by 1, due to the threshold values being sampled from [𝜖 Δ𝑐 , Δ𝑐 ]. At this stage, one may analyse the collection of models further to remove models based on a complexity threshold or from an identifiability-based condition, for example. 
+
+> 2.1.6. Recalibration
+
+The feature selection within the framework is complete at this stage, but the coefficients of each candidate model are yet to be fixed. We re-apply bootstrap sampling with a recalibration method, such as Levenberg-Marquardt (Levenberg 1944; Marquardt 1963) or least squares to produce coefficient vectors to accompany the selected features and produce the set of calibrated candidate models. Once again, bootstrap sampling is used to mitigate sensitivity to the dataset samples used, due to the potential ill-conditioning of the reduced linear system, which is of particular concern to moderate to high complexity candidate models. Bootstrapping provides coefficient distributions from data, from which a median value is used to reduce sensitivity to potential anomalous results. We highlight that these distributions can be used to form a prior distribution for Bayesian equation discovery methods, and can be manually inspected for multi-modality. One may view this bootstrapping procedure as unnecessary, because of the prior bootstrapping procedure. The feature selection bootstrap does generate weights associated with terms and, due to the importance cut-off being applied, there are a reasonable number of samples of the coefficient. However, the distribution of each coefficient is over a mixture of potentially numerous different model configurations. Such model configurations may yield zero weights in the case of exclusion and otherwise there may be competition with different subsets of the other features as model structure varies. Thus, once a fixed collection of terms is selected to generate a final model structure, the mixed distribution is no longer appropriate. To obtain coefficient distributions that are not distorted by the selection step, conditioning on the selected model and applying a separate recalibration bootstrapping procedure is required. Therefore, coefficient distributions no longer reflect covariance patterns that arise from varying feature sets. This leaves us with a set of calibrated candidate models and we may now apply a model selection criterion if a single output equation is desired. This is discussed in section 2.7. Having carefully described a roadmap for an equation discovery method suitable for our general target system up to this stage, in what follows we address associated computational details including data handling, optimisation and regression practices. 
+
+2.2. Preprocessing 
+
+Without prior knowledge of any highly localised dynamics, we interpolate to standardise the inputted data on a uniform mesh with a fixed number of points. We can then apply numerical differentiation methods to uniform data and have a strong base of comparison. Interpolation methods commonly rely on the provided data points being the ground truth, so noise-corrupted data can generate poor interpolated data, especially if the magnitude of variance of the noise is larger or comparable to the magnitude of values of the data. Our numerical experiments include interpolation as a standard pre-processing step, and we apply cubic interpolation with anti-aliasing to a uniform mesh described by (𝑁 𝑥 , 𝑁 𝑡 ) = (512 , 256 ), which is still reasonably dense and allows for sufficient accuracy of the approximation of high-order derivatives 10 Dooley et al. 
+
+with clean data. Our mesh is given by 
+
+ 𝑑𝑥 
+
+2 , . . . , 𝐿 𝑋 − 𝑑𝑥 
+
+2
+
+
+
+× { 0, 𝑑𝑡, . . . , 𝑡 𝐹 } ∈ [ 0, 𝐿 𝑋 ] × [ 0, 𝑡 𝐹 ].
+
+2.3. Numerical Differentiation 
+
+For strong form equation discovery, we require point-wise derivative estimates, which are found from input data {ℎ(𝑥 𝑖 , 𝑡 𝑗 )} 𝑗 =1,..., 𝑁 𝑡  
+
+> 𝑖 =1,..., 𝑁 𝑥
+
+.With a periodic spatial domain, it is natural to apply spectral differentiation. We use the fast Fourier transform to do this, enabled by the regularity of our typical solution data. Whilst training data involves nonlinear wave behaviour, it does not contain discontinuous or complicated e.g. multi-valued regimes such as those involving wave breaking that may lead to issues with spectral derivatives. For temporal derivatives, we use central differencing methods, with equal order accuracy for-ward/backward methods for derivative approximations at the temporal boundaries. For clean data cases, our data is assumed to be smooth and sufficiently regular such that higher-order finite difference methods make little difference for temporal derivatives, so we use second-order accurate methods. 
+
+2.4. Choice of Optimiser 
+
+It is at this stage of the process that a linear system can be formed reliably, so sparse regression is required to satisfy parsimony assumptions. Solving 
+
+|| Θ𝜉 − 𝑏 || 22 + 𝜆 0 || 𝜉 || 0, Θ ∈ R𝑛 × 𝑝 , 𝑏 ∈ R𝑛 , 𝜉 ∈ R𝑝 (2.3) is an NP-Hard problem (Natarajan 1995). A standard technique is to solve a convex relaxation that approximates the non-convex global solution reliably. We choose to use sequentially thresholded ridge regression (STRidge), which is an algorithm known to converge within a number of steps bounded above by the number of features of our design matrix (Zhang and Schaeffer 2019). Whilst convergence is guaranteed, it is not necessarily to the correct system structure, even when correct terms are included. STRidge approximates best subset selection (Bertsimas and Gurnee 2023). The ridge component of STRidge improves the numerical stability of coefficient estimates when library terms are correlated and so multi-collinearity is handled predictably. Near-collinear terms are grouped and their effects are distributed more uniformly, although scale separation can result in varied coefficient values. Correlated library terms are a common issue in PDE discovery settings. The stability STRidge provides in these settings affects variable selection and, when applied to bootstrapped datasets, STRidge yields consistent term inclusion (Fasel et al 2022), unlike alternatives like LASSO, which is known to select spurious terms due to correlated predictors (Freijeiro-González et al 2022). Ridge regression also offers a simple, closed form solution. PDE discovery typically involves a tall-and-skinny design matrix, due to a small to moderate sized function library with many observations. Therefore, from a computational speed perspective, ridge regression is particularly attractive when compared to alternate convex regularisers that rely on iterative methods for solving. A key element of these regularisation methods lies in selecting a regularisation strength, 𝜆 . We select the regularisation strength heuristically from observing the strength of performance of STRidge. The use of STRidge appeared relatively insensitive to the choice of regularisation strength compared to other hyper-parameters, such as the thresholding tolerance, in our investigation. An arguably more principled selection and common method from the machine learning community is to apply k-fold cross-validation (Hastie, Tibshirani and Friedman 2009), however this is computationally costly. It is also common in the equation discovery community to apply a Pareto frontier analysis, (Brunton, Proctor et al 2016; Journal of Nonlinear Waves 11 SH Rudy et al 2017) though this is commonly used for selecting just a thresholding tolerance and not jointly tuning multiple hyper-parameters. This choice has been shown to produce sparse estimates of equations that typically avoid additional spurious terms that are included by cross-validation based methods that overfit to reduce prediction error (Cortiella et al 2021). Alternatively, one may apply a Bayesian perspective to ridge regression, injecting prior knowledge of coefficient magnitudes to choose a stronger centred normal distribution prior with variance 1/𝜆 . This requires knowledge of expected coefficient magnitudes, which we do not assume. 
+
+2.5. Improving Conditioning of the Linear System 
+
+The formed linear system is typically initially poorly conditioned. The use of monomials within the function library worsens this. We use 𝐿 2 normalisation of the columns of the design matrix to reduce the condition number, which typically reduces the condition number by a large factor of O( 10 ). With this normalisation, we then apply a re-scaling to enforce || Θ|| 2 = 1, so our linear system is consistent with the convergence analysis of Zhang and Schaeffer (2019). The full system is still commonly ill-conditioned, impeding us from obtaining results in a streamlined manner. Conditioning improves as sequential thresholding reduces the support of the regression. The initial conditioning could be improved by using a smaller function library, but this compromises the use of equation discovery for systems with unknown dynamics. In section 5 we discuss the use of a smaller function library spanning a rich function space. Furthermore, we also consider sampling strategies to mitigate the near-linear dependence between rows of the design matrix Θ in equation (2.2) that comes from high spatio-temporal resolution required for accurate derivative approximations. 
+
+2.6. Bootstrapping and Aggregating 
+
+With poor conditioning likely, we are motivated to look towards bootstrap sampling to improve robust-ness of equation discovery. To perform bootstrap sampling, we take subsamples of rows of the design matrix Θ with replacement. This produces subsets with an expected unique proportion 1 − 𝑒 −1 ≈ 63 .2% 
+
+of the original rows and we use 200 of these subsets to produce statistics about the predictors. The choice of 200 bootstraps is typically deemed sufficient (Efron and Tibshirani 1994). As mentioned previously, we apply bootstrap sampling to generate a set of model structures as well as to independently recalibrate each model. Our subsampling procedure is equivalent to generating sampling matrices {𝑆 𝑖 }200 
+
+> 𝑖 =1
+
+, in which each 𝑆 𝑖 
+
+is a row sampling matrix obtained by selecting rows of 𝐼 𝑛 with replacement. With these samples, we have a linear system 𝑆 𝑖 Θ𝜉 = 𝑆 𝑖 𝑏 with solution ˆ𝜉 ∈ R𝑝 . Previous work (Jones and Nakatsukasa 2025), has revealed that the residual of the sub-sampled least squares problem is related to the full least squares problem by the inequality, 
+
+1 ≤ || Θ ˆ𝜉 − 𝑏 || 2
+
+|| Θ𝜉 ∗ − 𝑏 || 2
+
+≤ || 𝑆 𝑖 || 2
+
+𝜎 min (𝑆 𝑖 𝑈 ) ,
+
+where 𝑈 relates to the polar decomposition Θ = 𝑈𝐻 and 𝜉 ∗ is the minimiser of the full least squares problem. We note that 𝑆 𝑖 𝑈 with full column rank is required for a finite bound. Whilst dependent on the structure of the matrix Θ, we have a large number of expected unique samples with 𝑛 ≫ 𝑝 and assume that the probability of selecting a rank-deficient subset is negligible. Thus, with a bounded residual, we have improved confidence in the quality of the estimate of model coefficients, and taking the median is now well justified. 12 Dooley et al. 
+
+2.7. Model Selection 
+
+Given that the methodology is inspired by a bagging approach, we are left with multiple potential models from which to choose, thus motivating a method of model selection. Information-theoretical approaches are becoming increasingly common in modern machine learning (Dong et al 2022). Typical choices include the Akaike information criterion (AIC) or the Bayesian information criterion (BIC). These approaches differ subtly, both balancing goodness-of-fit with a model complexity penalty. Typically, the BIC complexity penalty is greater per active term. Researchers indicate that these penalties are philosophically different and Burnham and Anderson (2010) suggest classifying such model selections based on purpose with AIC targeting efficiency, selecting the model with the best predictive accuracy, and BIC targeting consistency, selecting the true model from the candidate set as sample size grows. We consider the AIC for the general setting of equation discovery in which the true model may not be a part of the candidate set. Furthermore, both AIC and BIC assume a correctly specified likelihood function. In the following derivation, Gaussian assumptions are made, but with the nature of equation discovery the observables are themselves numerically estimated derivatives over a dense spatio-temporal mesh. Therefore, a Gaussian based likelihood is likely misspecified, although the criteria still aids heuristically. The AIC can be derived from considering KL-divergence as a way to quantify the difference between distributions. The metric is based on a linear combination of a model complexity parameter and quality of fit metric 
+
+AIC (h; 𝜉 ) = −2𝑙𝑛 (L) + 2𝑝, (2.4) where L is the likelihood function and 𝑝 is the number of active parameters in the model, corresponding to the number of non-zero values of the model weight vector 𝜉 . A lower value of AIC indicates a better model. The residuals between predictions and data are then assumed to be Gaussian with zero-mean, thus resulting in a log-likelihood of the form 
+
+ln (L) = − 𝑚 
+
+2 ln (2𝜋 ) − 𝑚 
+
+2 ln (𝜎 2) − 12𝜎 2
+
+> 𝑚
+
+∑︁ 
+
+> 𝑗 =1
+
+ h(𝑥, 𝑡 ) − ¯h(𝑥, 𝑡 ; 𝜉 )2 , (2.5) with 𝜎 2 the estimated variance of the residuals of the 𝑚 measurements. Substituting (2.5) into the definition of AIC gives 
+
+AIC (h; 𝜉 ) = 2𝑝 + 𝑚 ln (2𝜋𝜎 2) + 1
+
+𝜎 2
+
+> 𝑚
+
+∑︁ 
+
+> 𝑗 =1
+
+ h(𝑥, 𝑡 ) − ¯h(𝑥, 𝑡 ; 𝜉 )2 . (2.6) This approach assumes that the number of measurements is much larger than the number of predictors, 
+
+𝑚 ≫ 𝑝 . A finite sample additive correction can be applied to improve the AIC estimate, 
+
+CorrectedAIC (h; 𝜉 ) = AIC (h; 𝜉 ) + 2( 𝑝 + 1)( 𝑝 + 2)
+
+𝑚 − 𝑝 − 2 . (2.7) Inspecting the correction, we see that 
+
+lim 
+
+> 𝑚 →∞
+
+
+
+2𝑝 + 2( 𝑝 + 1)( 𝑝 + 2)
+
+𝑚 − 𝑝 − 2
+
+
+
+= 2𝑝, (2.8) so for a large number of measurements, the corrected result is consistent with the AIC. Consequently, we use the corrected version for model selection. Information-theoretical scores provide a way to assess and compare the quality of models, but doing so introduces potential for misuse and misinterpretation (Arnold 2010). An example is due to the Journal of Nonlinear Waves 13 inclusion of uninformative predictors that have a benign, albeit mildly positive influence on the log-likelihood. This is exacerbated by large sample to predictor ratios, so is particularly pertinent to equation discovery, as the case of 𝑛 ≫ 𝑝 is standard. Consequently, we must be aware that it is possible to see a group of models strongly supported by these evaluation metrics that are the result of a good model being supplemented by terms with poor additional explanatory power. Hence, some higher complexity models may appear competitive by these metrics. This may be seen in results through a clustering of scores for similar complexity models. This weakness of information-theoretical approaches motivates us to also consider Pareto frontier optimisation (Deb 2011) as an alternative approach to model selection. This is a popular technique within PDE discovery literature (Mangan, Kutz et al 2017; SH Rudy et al 2017) that characterises the trade-off between model complexity and quality of fit. The curve of quality of fit against model complexity may be non-injective, so we reduce this to models with the best quality of fit for a given complexity to form a frontier. From this frontier, we may still select a single model. To do so, we consider the marginal gain in error reduction, measured as the one-sided gradient from the most sparse end of the frontier, and look for when this drops below a normalised unit threshold to provide a principled selection criterion. We discuss our application of Pareto frontier optimisation further as part of section 5. 
+
+2.8. Training Dataset Selection 
+
+The production of physical models relies on training data that satisfy the underlying, modelled physics. We believe that data generated numerically from previously derived governing equations should pro-vide a physically coherent foundation to work from. Varying the selection of training data can alter the discovered equations. This data-selection dependence is often either not touched upon or is not well characterised by previous empirical studies. We provide training data for feature selection and recali-bration, with reserved test data for model evaluation and, when desired, selection. The sparse regression methodology scales naturally to allow for multiple inputted training datasets. When it is assumed that training datasets were generated from the same governing equation with the same parameters, then the data and corresponding basis functions may simply be vectorised and vertically stacked to form the design matrix Θ, effectively appending the linear system. For inputted datasets in which the same gov-erning equation is believed to hold but potentially different parameters are used, a block matrix setup may be used to expand the linear system (S Rudy et al 2019). To guide the generation of training datasets, we must incorporate existing understanding of thin liquid film dynamics. We outline relevant modelling and analytical building blocks in this canonical setting in the following section. 
+
+3. Thin Film Equations 
+
+We look to apply state-of-the-art equation discovery techniques to thin liquid film systems. Whilst being shown to be relevant to a host of industrial processes from coating technologies to modern cooling systems for data centres as well as the subject of continued research interest supported by modern computational resources, thin liquid films offer the key benefit of mathematical representa-tion via reduced-order models that allow strong integration with (nonlinear) analytical solutions that lie beyond traditional benchmarks for equation discovery methods. Such benchmarks have typically included simplified models with a small number of polynomial terms and derivatives up to the fourth order, starting from the canonical Kuramoto-Sivashinsky equation. Its formulation, as well as more specialised counterparts such as the Benney equation and weighted residual models frequently used in the fluid dynamics community, are described in detail in subsection 3.2. Thin liquid film models offer an excellent exploratory direction as they can be underpinned by higher-order nonlinear fluxes, multiplicative derivative terms, coupled fields and additional multi-physics mechanisms. This increases 14 Dooley et al. 
+
+the complexity of candidate libraries of terms and provide a challenge for sparse regression methods through having more active terms that represent competing processes. This is the result of centuries of mathematical focus on such flows (Kalliadasis et al 2011) and thus provides a foundation from which modern data-driven techniques can be applied. In the next section, we highlight how we draw on this knowledge for equation discovery. 
+
+3.1. Analytical Setup 
+
+The setup for our problem, illustrated in figure 1, for the following analysis is that of an inclined thin film flow. The film height is described relative to a flat substrate with the 𝑥 -axis along it and the 𝑦 -axis perpendicular to it. This choice of coordinates ensures the flat substrate is located at 𝑦 = 0. Although this could in principle be tackled as a 3D problem (Tomlin et al 2018), our framework is simplified to a 2D system to focus on the developed numerical capabilities in a tractable manner. The substrate is inclined at a fixed angle 𝜃 and the immiscible fluid is assumed to have fixed, homogeneous properties, with constant density 𝜌 , dynamic viscosity 𝜇 and surface tension coefficient 𝜎 . The height of the film is described by ℎ(𝑥, 𝑡 ) and is a liquid-gas boundary. The liquid is assumed to be Newtonian and the gas is modelled as hydrodynamically passive with constant pressure, 𝑝 𝑎 . The only body force acting on 
+
+Figure 1. Schematic of a falling liquid film down an inclined plane. The inclination angle is denoted by 
+
+𝜃 and a rotated Cartesian coordinate system aligning with the flat, smooth substrate is used. The gravity vector g, fluid properties, spatio-temporally varying interfacial height ℎ(𝑥, 𝑡 ) and mean film height ℎ∗
+
+> 0
+
+are also illustrated. 
+
+the fluid is gravity, which acts at an angle 𝜃 to the 𝑦 -axis. Surface tension acts at the interface between the liquid and gas. Periodic boundary conditions are imposed in the streamwise direction on a periodic domain with length 𝐿 𝑥 .We choose to non-dimensionalise in-line with previous works (H Ockendon and JR Ockendon 1995; Cimpeanu et al 2021), allowing for a dimensionless formulation of the governing equations to provide a universal framework applicable across different scales and setups. The length-scale of this problem is typically characterised by the mean film height, ℎ∗
+
+> 0
+
+, and its velocity scale may be characterised by a function of the mean film height ℎ∗
+
+> 0
+
+, gravity 𝑔 and the inclination angle 𝜃 (Oron, Davis et al 1997) of the form 
+
+𝑥 = ˜𝑥𝐿, 𝑦 = ˜𝑦𝐿, 𝑢 = ˜𝑢𝑈, 𝑣 = ˜𝑣𝑈, 𝑡 = ˜𝑡 𝐿 𝑈 , 𝑝 = ˜𝑝 𝜇𝑈 𝐿 , 𝑔 = ˜𝑔 𝑈 2
+
+𝐿 , (3.1) with 𝐿 and 𝑈 chosen to satisfy 
+
+𝐿 = ℎ∗ 
+
+> 0
+
+= 1
+
+𝐿 𝑥 
+
+∫ 𝐿 𝑥 
+
+> 0
+
+ℎ(𝑥, 𝑡 )𝑑𝑥, 𝑈 = 𝑈 𝑠 = 𝜌𝑔ℎ ∗20 sin (𝜃 )
+
+2𝜇 , (3.2) Journal of Nonlinear Waves 15 where 𝑈 𝑠 denotes Nusselt surface velocity (Nusselt 1923) and 𝐿 𝑥 is the dimensional length of the domain. Additional re-scalings may then be applied to address the multi-scale nature of the problem. These scalings are often dependent upon a dimensionless long-wave parameter, 𝛿 ≔ 1 
+
+> 𝐿 𝛿
+
+, introduced by considering solutions with characteristic wavelength 𝐿 𝛿 relative to the mean fluid thickness, where 𝐿 𝛿 
+
+is non-dimensional and it is assumed that 𝐿 𝛿 ≫ 1. The characterisation of different flow regimes can be naturally achieved through non-dimensional groupings, which include the Reynolds, Capillary and Stokes numbers, 
+
+Re := 𝜌𝑈 𝐿 𝜇 , Ca := 𝜇𝑈 𝜎 , St ≔ 𝜌𝑔𝐿 2
+
+𝜇𝑈 (3.3) respectively. As well as providing excellent points of comparison between different flows, non-dimensional numbers are convenient regarding writing and manipulating equations. For equation discovery, the use of non-dimensionalisation can minimise the number of independent parameters and simplify the form of the discovered equation. This often leads to more compact representations and can reveal simple power-law relationships, which is helpful in forming a candidate library of terms that meaningfully represents the dynamics (Udrescu and Tegmark 2020). To provide a concrete starting point grounded in realistic experimental conditions, typical regimes of interest in the context of this study for gravity driven water film flows are described by liquid film thicknesses of approximately 100 −200 𝜇 m. In this setup, typical Reynolds number values are of O( 1) to 
+
+O( 10 ), whilst common Capillary number values are O( 10 −3), which describe the edge of applicability of the widely used reduced-order mathematical models described previously. 
+
+3.2. Equation Discovery and Thin Film Modelling 
+
+Having previously discussed the history and interest in thin film modelling, we look to existing models relating to our problem setup and consider their use to augment our data-driven pipeline that was outlined in section 2. A key insight from prior work is the existence of a stable steady state, the Nusselt solution, which is when a film is flat with unit dimensionless thickness (Nusselt 1923). A known steady state impacts the equation discovery procedure. The training data used can be altered to select stable or unstable initial perturbations to evolve. Error analysis on testing datasets can vary through loss function alteration, error re-scalings, or inspection of long-time behaviour of proposed PDEs. In sections 4.2 and 4.3, we consider these implications in more detail. Section 2.1 introduces the function library that required defining prior to discovery. The need to pre-specify this library is a criticised element of popular sparse regression methods (Y Chen et al 2022). Prior thin film modelling can be used to inspire a pre-defined library and overcome this limitation. Therefore, we inspect the reduced-order models from the aforementioned mathematical model hierarchy introduced at the start of section 3 above. We have previously mentioned the KS equation (G Sivashinsky 1977; Kuramoto 1978; GI Sivashinsky 1980), as a common equation discovery target and a very simplified long-wave model, 
+
+ℎ𝑡 = −ℎℎ 𝑥 − ℎ𝑥 𝑥 − ℎ𝑥 𝑥 𝑥 𝑥 . (3.4) Through weakly nonlinear asymptotic analysis, the KS equation can be obtained from the more complex Benney equation (Benney 1966). The Benney model provides a single equation model, though is commonly written as a coupled system with an explicit formulation of horizontal velocity flux, 
+
+(ℎ𝑡 + 𝑞 𝑥 = 0,𝑞 (𝑥, 𝑡 ) = − 23 ℎ3 − 815 Re ℎ6 ℎ𝑥 + 23 𝑐𝑜𝑡 (𝜃 )ℎ3 ℎ𝑥 − 13 ˆ Ca ℎ3 ℎ𝑥 𝑥 𝑥 . (3.5) 16 Dooley et al. 
+
+It is found through linearisation about the Nusselt steady state and solving reduced systems of equations. However, the equation exhibits finite-time blow-up, motivating the need for more robust models. Using an alternative long-wave approximation, the Weighted Residuals model is a well studied reduced model for thin film flows (Oron, Gottlieb et al 2009; Kalliadasis et al 2011; AB Thompson et al 2016) 
+
+ℎ𝑇 + 𝑞 𝑋 = 0,𝑞 + 25 Re 𝛿ℎ 2𝑞 𝑇 = 2ℎ3
+
+3 − 𝛿ℎ 3
+
+3
+
+
+
+2ℎ𝑋 cot (𝜃 ) − ℎ𝑋𝑋𝑋 
+
+ˆCa 
+
+
+
++ Re 𝛿 
+
+ 18 35 𝑞 2 ℎ𝑋 − 34 35 ℎ𝑞𝑞 𝑋 
+
+
+
+, (3.6) written in non-dimensional form. This more complex formulation involves a coupling of interfacial height and flux that can no longer be combined into a single PDE. The model was derived by Ruyer-Quil and Manneville (2000), and built upon in subsequent work (Ruyer-Quil and Manneville 2002). This coupling turns out to be vitally important for ensuring solutions adhere to physical laws and provides a substantial improvement over single-equation models (Richard et al 2019). Turning our attention back to the formulation of a pre-defined function library, we inspect the terms in equations (3.5) and (3.6). We see models appear sparse with respect to a monomial basis and would otherwise greatly increase in complexity if an orthogonal polynomial basis were used. This indicates that the use of a monomial based function library for thin film data will likely be a strong choice. Similarly, monomials with respect to ℎ are favoured as opposed to perturbation amplitude for example, due to sparsity with respect to the basis. Having considered prior thin film modelling and methods relating to equation discovery, we now focus on the objective of applying state-of-the-art discovery techniques to thin liquid film systems. As mentioned, models such as (3.5)-(3.6) lie well beyond traditional benchmarks, whereas the KS equation has been recovered by a number of methodologies. We look to bridge the gap between such systems through the study of highly nonlinear, single-equation models involving high-order nonlinear fluxes. 
+
+4. Surface Tension Driven Thin Film Equation 
+
+Our initial focus in terms of developing the aforementioned methodology in the context of a particular problem brings us to the surface tension driven thin film equation. With our thin film schematic 1 in mind, we apply lubrication theory in order to simplify the fully nonlinear multi-phase Navier-Stokes equations that underlie the unsimplified flow dynamics. We denote the vertical film thickness by 𝐻 
+
+and the horizontal streamwise length-scale by 𝐿 = 𝐿 𝑥 , using the domain length 𝐿 𝑥 . It is assumed that the length-scale disparity 𝜖 between the horizontal streamwise length-scale and vertical film thickness directions is small, 𝜖 ≔ 𝐻 𝐿 ≪ 1. We additionally assume 𝜖 2Re ≪ 1, where Re ≔ 𝜌𝑈𝐿 𝜇 is the Reynolds number. These assumptions allow for a simple closed form equation that uses the low Reynolds number assumption to ignore inertial terms dependent on fluid density from the 2D Navier-Stokes equations. A derivation of equation (4.1) and details of the non-dimensionalisation used can be found in Appendix A. We define the surface tension driven thin film equation as 
+
+ℎ𝑡 = − 13 ¯ 𝐶𝑎 
+
+
+
+ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+(4.1) 
+
+= − 13 ¯ 𝐶𝑎 ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 − 1¯𝐶𝑎 ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 , (4.2) which is written in non-dimensional form with dropped tilde decorations, and we consider the PDE with periodic spatial boundary conditions. This is a fourth-order nonlinear parabolic equation that represents a surface tension driven flow (Myers 1998). The non-dimensional Capillary number, Ca := 𝜇𝑈 𝜎 , represents the ratio of viscosity and surface tension effects. A re-scaled version of the Capillary number is employed, 
+
+¯𝐶𝑎 ≔ 𝜖 −3Ca . The model is built from a two-dimensional description of the flow, assuming invariance Journal of Nonlinear Waves 17 in the spanwise direction. We restrict our attention to films with unit mean film height, and so a corresponding stable steady state of ℎ ≡ 1 is assumed to exist. This two-term single equation model is highly nonlinear and includes what can be referred to as a derivative interaction term, ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 , yet it remains a viable candidate for testing the numerical capabilities we have developed. The complexity of this term naturally increases the size of the function library used. Typical applications of equation discovery methods are applied to long-domain KS-based models (3.4), which commonly result in chaotic behaviour for long time simulations (Kalogirou et al 2015). This is a direct contrast to the known stable steady state applicable for equation (4.1). Thus late time sampling of datasets may be thought to yield differing information. With the long-domain KS equation being well-studied, this aids in motivating the use of model (4.1) as an alternative thin-film equation that is set in a long, periodic spatial domain, whilst minimising complexity through a single equation setup with a small number of terms. We now inspect the surface tension driven thin film equation more closely. 
+
+4.1. Parameter Removal through Time Rescaling 
+
+Looking to equation (4.1), we see that the non-dimensional parameter multiplies the differential operator and can be removed though a re-scaling 𝜏 ≔ 13 ¯ 𝐶 𝑎 ˜𝑡 = 13 ¯ 𝐶 𝑎 𝑇 −1𝑡 to give a canonical version of the PDE, 
+
+ℎ𝜏 = −
+
+
+
+ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+. (4.3) Tracking the re-scaling, we see that 𝑇 𝜏 ≔ 3𝜖 −4 𝜇𝐻 𝜎 , where 𝜏 = 𝑇 𝜏 𝑡 . Previously the non-dimensional parameter ¯𝐶𝑎 simply set the characteristic time scale. Additionally, a parameter sweep of equation (4.1) over ¯𝐶𝑎 for a fixed dimensionless final time, ˜𝑡 𝐹 , is equivalent to solving (4.3) to fixed 𝜏 𝐹 = 13 ¯ 𝐶 𝑎 ˜𝑡 𝐹 .With the most compact form of governing equation formulated, we look to generate associated datasets for equation discovery. 
+
+4.2. Synthetic Data Generation 
+
+We consider the domain over which we solve equation (4.3) with periodic boundary conditions imposed. The spatial domain is set to be unit length [0, 1], following from the choice of non-dimensionalisation using 𝐿 = 𝐿 𝑥 . We now consider the temporal domain used and need to calibrate the time interval used for simulation. The long-time behaviour of the system (4.3) was studied by Bertozzi and Pugh (1996), who displayed that a strictly positive initial condition with periodic boundary conditions relaxes to the constant steady state with equal mass. Thus, the dynamics are known to evolve to this stable steady state - a flat film - for all wavenumbers. With this knowledge, we balance a range of criteria for selecting the final non-dimensional time, 𝜏 𝐹 , to simulate towards as follows. We choose to apply a slow dynamics condition, defining 
+
+𝜏 𝐹 ≔ max  
+
+> 𝜏
+
+{𝜏 : || ℎ𝜏 || 2 < 𝛿 max  
+
+> 𝜏
+
+{|| ℎ𝜏 || 2 }} , (4.4) with 𝛿 = 0.01 . This defines 𝜏 𝐹 to be when the average interface speed is a proportion 𝛿 of the maximum average interface speed. We may rescale proportional to 1√𝑁 𝑥 
+
+to ensure independence with respect to spatial resolution. Due to the error in |ℎ𝜏 | appearing monotonic with respect to the temporal resolution, 
+
+𝑑𝜏 , this choice introduces some level of mesh dependence on the selected time 𝜏 𝐹 . In particular, simulations performed with a fixed number of time steps and varying temporal resolution may yield 18 Dooley et al. 
+
+slightly different 𝜏 𝐹 values compared with those using a fixed time resolution. Considering this and finite representation, the value 𝜏 𝐹 is selected to within three significant figures (rounding down). An alternative selection mechanism may be to utilise the linear dispersion relation and choose 
+
+𝜏 𝐹 = max 𝜏 {𝜏 : |ℎ| > 𝑒 −1 max 𝑥 {| ℎ|𝜏 =0 }} , thus attempting to simulate to approximately 𝜏 𝐹 = 𝑘 −4
+
+> 𝑚𝑖𝑛
+
+, with this final time approximation accuracy depending on the linearity of the system. This stopping condition is easy to implement, but generally results in over-sampling of near steady state dynamics that impacts identifiability. With a stopping criterion selected, we have a fixed non-dimensional mesh, [0, 1]×[ 0, 𝜏 𝐹 ], on which to simulate the target spatio-temporal dynamics. The value of 𝜏 𝐹 is not known a priori , but is found by using a coarse simulation to provide a strong initial guess of 𝜏 𝐹 , before refinement to the previously mentioned precision. We choose a fixed aspect ratio 𝜖 = 1/64 to reflect the long-wave assumption reflective of the intended thin liquid film dynamics, as well as height 𝐻 = O( 10 −4) m for dimensional interpretation. For this (𝜖, 𝐻 ) pair and using water-air physical properties at room temperature, the corresponding Capillary number is defined as Ca = 𝜇𝐿 𝜎𝑇 𝜏 = 1.27 × 10 −6, indicating a strong surface-tension regime. To produce training and testing datasets, we use finite difference techniques, applying a first-order backward differentiation formula (BDF 1) time-stepping scheme with second-order spatial central dif-ferences. The BDF 1 scheme is implicit and L-stable, so is chosen for the numerical stability it provides. For our target equation, high-order derivatives are anticipated to introduce high levels of stiffness, mak-ing explicit methods undesirable (Hairer and Wanner 2010). We also note that this choice of method may introduce some numerical dissipation, though our initial conditions involve excitation of low-frequency modes. BDF 1 provided sufficiently accurate datasets for the thin film equation studied, so higher-order methods were deemed unnecessary. Additionally, the central difference scheme used is quick to implement compared to spectral and higher-order schemes. The scheme allowed for excel-lent mass conservation and reduced the dispersion error from propagating waves relative to one-sided schemes (Olver 2013). Based on a combination of intuition and careful numerical experimentation, we found that the use of large perturbation training datasets was beneficial. These datasets contain ℎ(𝑥, 𝑡 ) far from equilibrium, thus involving solutions with rich spectral structure that aids the underlying learning procedure in identifying the target dynamics. These types of initial conditions align intuitively with the notion of being more informative through large perturbations indicating stronger nonlinearity and multiple modes showing their interaction and dispersion. Consequently, an example of such an initial condition is 
+
+ℎ(𝑥, 0) = 1 +
+
+> 5
+
+∑︁ 
+
+> 𝑖 =1
+
+14 cos 
+
+ 2𝜋 𝑝 𝑖 
+
+𝐿 𝑋 
+
+
+
+𝑥 − 10 𝑖 
+
+64 
+
+ 
+
+, (4.5) where 𝑝 𝑖 is the 𝑖 -th prime and 𝐿 𝑋 = 1 is the re-scaled domain length. This initial condition is physically valid, satisfying ℎ > 0, ∀𝑥 ∈ [ 0, 𝐿 𝑋 ], and satisfies the mass constraint ∫ 𝐿 𝑋  
+
+> 0
+
+ℎ0 𝑑𝑥 = 1.We now solve the initial value problem (IVP) and, looking to figure 2, we see an example of a generated dataset, which has been evolved over the reference time span, satisfying the aforementioned stopping criteria. We recall 𝑇 𝜏 = 3𝜖 −4 𝜇𝐻 𝜎 , which for a room temperature water-air system is 𝑇 𝜏 ≈ 0.0374 𝜖 −4 𝐻 .Interpreting the final dimensional time, we see 𝑇 𝜏 𝜏 𝐹 = 6.39 × 10 −5 𝑠 . This is a very short evolution, showing a fast decay in amplitude of the initially excited highest frequency modes and slower decay of lower frequency mode amplitude. At the reference final time, we see that the perturbation amplitude is still large, with a maximum of ℎ(𝑥, 𝜏 ) ≈ 1.5. A small number of low wavenumber modes appear to dominate the solution with energy concentrated into these modes, despite the generation of a broadband Fourier spectrum from the nonlinear evolution. Consequently, dynamics in this region have few effective degrees of freedom with limited information content. Journal of Nonlinear Waves 19 
+
+Figure 2. The non-dimensional system (4.3) evolved from the initial condition (4.5) over spatio-temporal mesh ( ˜𝑥, 𝜏 ) ∈ [ 0, 1]×[ 0, 𝑡 ∗ 
+
+> 𝐹
+
+]. The evolution shows rapid decay of high-frequency waves and slower decay of lower frequency waves. The initial perturbation amplitude is large and all values satisfy ℎ(𝑥, 𝑡 ) > 0.
+
+A range of alternative periodic initial conditions can be used to specify the IVP and produce datasets. For a classical solution, one may consider ℎ0 ∈ 𝐶 4 
+
+> 𝑝𝑒𝑟
+
+([ 0, 𝐿 𝑋 ]) that are positive everywhere, ℎ0 > 0,and restricted to satisfy ∫ 𝐿 𝑋  
+
+> 0
+
+ℎ0 𝑑𝑥 = 1. Thus we may consider finite Fourier sums or localised periodic bumps for example. 
+
+4.3. Numerical Experiments 
+
+Having outlined the data generation process, we look to perform PDE discovery. For our numerical experiments, we use a reference final time value denoted as 𝜏 ∗ 
+
+> 𝐹
+
+, which is found by applying the slow dynamics condition (4.4) to the irreducible PDE (4.3), as described previously. This is equivalent to taking 1/3 as a reference re-scaled Capillary number for the original equation (4.1), which produces 
+
+O( 1) coefficient values for the PDE of interest. We initially choose to look at recovering equation (4.3), using clean data produced in the manner previously described on a dense, uniform spatio-temporal mesh. For the following results, a single training dataset is used, shown in figure 2 and evolved from the initial condition (4.5). This training dataset is chosen because of its spectral structure and large initial perturbation amplitudes that result in the clear exhibition of nonlinear behaviour. With input training data established, we may define a function library of potential terms and the equation discovery process may be performed. In the case of a known governing equation, we may also use the equation discovery process to provide a form of validation on the input datasets by choosing a function library of only correct terms and inspecting recovered coefficients. This also provides an ‘easiest case’ for recovery. We have found that, when fixing the model terms to the two expected terms from equation (4.3) and sample bootstrapping with ordinary least squares, there are no anomalous 20 Dooley et al. 
+
+outlying values. We recover median values of −0.875 and −2.44 that yield the model 
+
+ℎ𝑡 = −0.875 ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 − 2.44 ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 . (4.6) The mean relative coefficient error is found to be 15 .6% . This error may be explained by inspecting the residual 
+
+𝑟 (𝑥, 𝑡 ) ≔ ℎ𝑡 + ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 + 3ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 , (4.7) which is large for early time data, of O( 10 6), and quickly decays to O( 10 2) within our studied time interval. The numerical scheme used to produce our datasets, a BDF1 scheme, typically results in numer-ical dissipation. This is consistent with the under-estimated coefficients seen for this case. Appendix B contains information on the scaling of residuals and their consistency with our data. Within equation discovery frameworks, pipelines with suitable calibration geared towards prototypi-cal cases may reach error levels below 1% for numerous successful recoveries of known equations (SH Rudy et al 2017; Zheng and Lin 2026) when using clean datasets. Many studies have shown that errors increase greatly when datasets are noise-corrupted (Messenger and Bortz 2021; Fasel et al 2022), with model identification commonly failing for large enough levels of noise. Similarly, using experimentally sourced datasets, larger errors of O( 10% ) are presented (Schmid et al 2024; Heinrich et al 2025). There-fore, we deem the obtained coefficient error to lie at a moderate level, particularly in the context of a new target nonlinear equation. We also highlight that we observed a reduction in coefficient error as the temporal resolution of the dataset was increased. The error was found via numerical experimentation to scale linearly with the temporal resolution 𝑑𝑡 , saturating at a level approximately 100 times lower than the reference dataset used within the present section. Our chosen reference value in the discussion above was selected to strike a suitable balance between efficiency and sensitivity considerations, providing valuable insight into the capabilities of the suggested pipeline especially in the context in which relying on data with arbitrary frequency may not be a viable option. 
+
+4.3.1. Feature Selection 
+
+We perform feature selection following the discovery algorithm outlined in section 2.1 and deviate slightly by using an extended line search interval. We line search on the interval [1.5𝜖 Δ𝑐𝑟𝑖𝑡 , 1.5Δ𝑐𝑟𝑖𝑡 ],with 𝜖 = 10 −3. We call the half-line [Δ𝑐𝑟𝑖𝑡 , ∞) the critical region and its intersection with the searched region is non-empty. Inspection of the intersection improves confidence that the critical tolerance is accurately determined for the full system, explaining the choice of deviation. Considering the bootstrap sampled case of ordinary least squares 
+
+arg min  
+
+> 𝑥
+
+{|| 𝑆 (𝑖 ) ( 𝐴𝑥 − 𝑏 )|| 2 } = ˆ𝑥 ≠ 𝑥 ∗ = arg min  
+
+> 𝑥
+
+{|| 𝐴𝑥 − 𝑏 || 2 },
+
+where 𝑆 (𝑖 ) ∈ R𝑚 𝑖 ×𝑛 sub-samples rows of the design matrix, there is typically a difference in estimators 
+
+ˆ𝑥 ≠ 𝑥 ∗ between the full system and sub-sampled systems. With differences in the magnitudes of elements of the least squares solutions, it may be the case that the critical tolerance of the sub-sampled system is not equal to that of the full system, Δ𝑐𝑟𝑖𝑡 ≠ Δ (𝑆 (𝑖 ) ) 
+
+> 𝑐𝑟𝑖𝑡
+
+. This gives a misaligned sample-dependent critical region, [Δ(𝑆 (𝑖 ) ) 
+
+> 𝑐𝑟𝑖𝑡
+
+, ∞) . For the case Δ𝑆 (𝑖 ) 
+
+> 𝑐𝑟𝑖𝑡
+
+< Δ𝑐𝑟𝑖𝑡 , this merely reduces effective sampling density of the line search. The extension of the sampled region is to detect the alternate case Δ𝑆 (𝑖 ) 
+
+> 𝑐𝑟𝑖𝑡
+
+> Δ𝑐𝑟𝑖𝑡 , which could result in a line search that fails to sample tolerance values just below the associated critical tolerance. This being the region that would likely yield the sparsest models. This would be undesirable, due to the previously discussed typical sparsity assumptions. For the numerical experiments to follow, we do not observe the undesirable case and provide our hypothesis for the reason for this in Appendix C. Looking to figure 3, we see an overview of the line search process using the training data described in 4.2. The choice of 𝜖 results in full-complexity models being recovered, despite the effective density Journal of Nonlinear Waves 21 of tolerance sampling being reduced due to samples greater than the critical tolerance value being used. We inspect the figure starting from high tolerance regions and moving to low tolerance regions. In the region above the critical tolerance, we see that the empty set is returned and so no candidate terms are deemed important. Below the critical tolerance value, meaningful feature selection begins. In the high tolerance region, we see the sparsest models produced, which are commonly single- or two-term models. As tolerance reduces, alternative terms may be selected. We see correlated feature selection, shown by importance score correlation. In the region [0.55 , 0.65 ], we see ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 gain importance, whilst ℎ𝑥 ℎ𝑥 𝑥 𝑥 and ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 decrease in importance at the same rate with respect to tolerance. With these features deactivated, there is another single-term model region, before a clean re-activation of the other correct term, ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 . 1 Thus, a region of tolerance exists in which a model with terms matching those that generated the training dataset can be selected. This is the region where researchers applying hyper-parameter optimisation approaches usually hope to find an optimised tolerance value. In lower tolerance regions, more and more terms are activated and model sparsity reduces. For a small enough tolerance value, all terms are active. 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4
+
+Normalised Tolerance 
+
+0.0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1.0
+
+> Importance score
+
+λf ixed = 1 e − 05 
+
+Target: ht = −1.00( h3hxxx )x
+
+1
+
+hh2
+
+h3
+
+hx
+
+hh x
+
+h2hx
+
+h3hx
+
+hxx 
+
+hh xx 
+
+h2hxx 
+
+h3hxx 
+
+hxxx 
+
+hh xxx 
+
+h2hxxx 
+
+h3hxxx 
+
+hxxxx 
+
+hh xxxx 
+
+h2hxxxx 
+
+h3hxxxx 
+
+hxhx
+
+hh xhx
+
+h2hxhx
+
+h3hxhx
+
+hxhxx 
+
+hh xhxx 
+
+h2hxhxx 
+
+h3hxhxx 
+
+hxhxxx 
+
+hh xhxxx 
+
+h2hxhxxx 
+
+h3hxhxxx 
+
+hxhxxxx 
+
+hh xhxxxx 
+
+h2hxhxxxx 
+
+h3hxhxxxx 
+
+hxx hxx 
+
+hh xx hxx 
+
+h2hxx hxx 
+
+h3hxx hxx 
+
+hxx hxxx 
+
+hh xx hxxx 
+
+h2hxx hxxx 
+
+h3hxx hxxx 
+
+hxx hxxxx 
+
+hh xx hxxxx 
+
+h2hxx hxxxx 
+
+h3hxx hxxxx 
+
+hxxx hxxx 
+
+hh xxx hxxx 
+
+h2hxxx hxxx 
+
+h3hxxx hxxx 
+
+hxxx hxxxx 
+
+hh xxx hxxxx 
+
+h2hxxx hxxxx 
+
+h3hxxx hxxxx 
+
+hxxxx hxxxx 
+
+hh xxxx hxxxx 
+
+h2hxxxx hxxxx 
+
+h3hxxxx hxxxx 
+
+1
+
+hh2
+
+h3
+
+hx
+
+hh x
+
+h2hx
+
+h3hx
+
+hxx 
+
+hh xx 
+
+h2hxx 
+
+h3hxx 
+
+hxxx 
+
+hh xxx 
+
+h2hxxx 
+
+h3hxxx 
+
+hxxxx 
+
+hh xxxx 
+
+h2hxxxx 
+
+h3hxxxx 
+
+hxhx
+
+hh xhx
+
+h2hxhx
+
+h3hxhx
+
+hxhxx 
+
+hh xhxx 
+
+h2hxhxx 
+
+h3hxhxx 
+
+hxhxxx 
+
+hh xhxxx 
+
+h2hxhxxx 
+
+h3hxhxxx 
+
+hxhxxxx 
+
+hh xhxxxx 
+
+h2hxhxxxx 
+
+h3hxhxxxx 
+
+hxx hxx 
+
+hh xx hxx 
+
+h2hxx hxx 
+
+h3hxx hxx 
+
+hxx hxxx 
+
+hh xx hxxx 
+
+h2hxx hxxx 
+
+h3hxx hxxx 
+
+hxx hxxxx 
+
+hh xx hxxxx 
+
+h2hxx hxxxx 
+
+h3hxx hxxxx 
+
+hxxx hxxx 
+
+hh xxx hxxx 
+
+h2hxxx hxxx 
+
+h3hxxx hxxx 
+
+hxxx hxxxx 
+
+hh xxx hxxxx 
+
+h2hxxx hxxxx 
+
+h3hxxx hxxxx 
+
+hxxxx hxxxx 
+
+hh xxxx hxxxx 
+
+h2hxxxx hxxxx 
+
+h3hxxxx hxxxx 
+
+Figure 3. An example of a feature selection tolerance line search. For each term in the function library, an importance score is calculated over the range of tolerance values, relating to whether it was frequently retained from the sequentially thresholded feature selection process. The tolerance values are rescaled with respect to the critical tolerance. 
+
+Applying an importance cut-off heuristically set to 0.8, we obtain a wide collection of 90 unique linear combinations of terms from the function library. High complexity combinations form the majority of the collection and 5 models have less than 5 terms. Such combinations of terms require an associated weight vector to form a model ℎ𝑡 = N ( ℎ, 𝑄 ). Consequently, we apply a recalibration bootstrap step, as discussed in section 2.1.6. 
+
+> 1
+
+We refer to clean activations when a term’s importance score against tolerance is well approximated by a sigmoid function or, equivalently, is similar to a Heaviside step function. 22 Dooley et al. 
+
+A clean dataset is used for training and there is non-zero sample variance, which we believe is reflective of numerical conditioning and coherence. With a low sample variance and unimodal coefficient distributions, we can be confident in the predictions generated. Large sample variances from recalibration can be indicative of overfitting and a multi-modal distribution affects the validity of taking the median coefficient value. Once recalibrated, we then have a selection of 90 models. Although this seems to be a large set, we note that with 60 function library terms, 260 ≈ 1.15 × 10 18 unique combinations of terms exist, so this is a major reduction in the size of the model space to consider. Considering only sparse models with less than 5 terms, Í4
+
+> 𝑘 =1
+
+ 60 
+
+> 𝑘
+
+ = 523685 potential models exist, so the reduction to only 5 candidates is significant. This level of reduction appears roughly in-line with other studies (Mangan, Brunton et al 2016; Dong et al 2022). Sizes of candidate libraries to which model selection are applied also vary significantly and appear to be strongly dependent on the underlying model complexity, as well as the size of the library. We deem the size of the candidate set we generate to be small to moderate relative to other related works when accounting for the size of function library we use (Mangan, Kutz et al 2017; Maddu et al 2022; Wu et al 2025). With a significant number of candidate models remaining, we are motivated to use an automatic selection process. 
+
+> 4.3.2. Model Testing and Selection
+
+We look to rank candidate models from the collection, which can enable the proposal of a single model if desired. A model hierarchy also enables further analysis, as one may inspect similarities in features between strong performing models. We desire a test metric that balances model complexity with model fit and so the previously mentioned finite sample corrected AIC (2.7) is a common choice (Mangan, Kutz et al 2017). To test models, we now utilise a reserved test dataset. The choice of test dataset is important. A poor choice includes a dataset that is too similar to the training data. Doing so would yield excellent scores for overfitted models that would not generalise and there would exist correlation between model complexity and test performance, as can be seen in the top-left panel of the upcoming figure 4, in which the training data is used for model evaluation. Therefore, we choose a dataset with a longer time span, [0, 97 .1𝜏 ∗ 
+
+> 𝐹
+
+],whilst still applying the slow dynamics condition (4.4). The time-scale underlying this dataset may result in errors from poor quality coefficient estimates or the inclusion of overly strong/weak features to be seen, e.g. over-damping, under-damping, etc. Given the focus of interfacial flows, our chosen validation set is sinusoidal in nature with a small Gaussian bump and with mass correction applied to the initial wave profile to satisfy ∫ 𝐿 𝑋  
+
+> 0
+
+ℎ0 𝑑𝑥 = 1. We note that a strong alternate validation dataset may be that of soliton data for thin film dynamics. A further consideration is that of the active modes of the test dataset. This is relevant for the dissipative system we study, which is stable for all wavenumbers. As a result, a fitted model may display instability, but after sufficient damping of the highest-frequency modes in the training data it may appear to be a good model to describe the remainder of the evolution. Therefore, such a discovered model is only conditionally valid, as its apparent stability is an artefact of the dissipative nature of the true system. This underscores the importance of testing learned models on initial conditions that span the range of dynamics they are intended to model and not just conditions seen in training data. With a test dataset selected, we note a choice between a solution based AIC application and a linear system based AIC application. The candidate models are generated through solving the linear system 
+
+Θ𝜉 = 𝑏 , so one may use the residuals of the system resolved with recovered coefficients for the quality of fit metric. Doing so compares the linear combination of derivative estimates to the estimate of the assumed left hand side of the equation, ℎ𝑡 . As a result, errors in derivative estimation have a large effect on the resulting model rankings and is of particular concern with noisy datasets. The solution-based application requires solving the candidate PDEs for testing. For our single equation models, Journal of Nonlinear Waves 23 we note that this is typically inexpensive, but stiffness and instability to the test initial conditions can complicate numerical solutions. Instability to the initial conditions of test datasets can result in seemingly disparate errors between the derivative-based and solution-based losses. The associated loss landscapes 
+
+|| Θ𝑡𝑒𝑠𝑡 𝜉 𝑑𝑖𝑠𝑐 − 𝐻 𝑡 ,𝑡𝑒𝑠𝑡 || 2 and || ℎ𝑑𝑖𝑠𝑐 − ℎ𝑖𝑛 𝑝𝑢𝑡 || 2 for both options can differ greatly. Working with a coarse-grained example, Martina-Perez et al (2021) compares these landscapes, showing favour to the solution-based loss landscape for their application. We showcase in figure 4 the result of using training and testing datasets, as well as the difference between the solution and derivative-based information-theoretic based metric evaluations. A striking difference can be seen between loss function scores using training or reserved testing data. Panel (𝑎 ) in particular shows the strong performance of high complexity models. Fitted to the training data and with numerous terms to provide flexibility, this overfitting is expected. Meanwhile, panels (𝑏 ) and (𝑑 ) show that such models may not generalise well. Contrast can also be seen between panels (𝑎 ) and (𝑐 ). The outcome of using solution data is shown to be effective, with low-complexity models being favoured in panel (𝑐 ). This difference is juxtaposed by the similarity of panels (𝑏 ) and (𝑑 ) in which test data is used and loss scores appear qualitatively similar. 
+
+Figure 4. An array of model evaluation metrics. The overall minimum corrected AIC score (best) is highlighted in red and a line connects the minimum value for each model complexity. Additional points show scores of alternative models that were outperformed by an equally complex model. The top row uses residuals from the fitted linear system for error calculation. The bottom row panels involve the solution of discovered PDEs for error calculation. The left column panels use training data for evaluation, and the right column panels use separate testing data. Panel a) is produced by using training data and calculating errors using residuals of the fitted linear system. Panel b) is produced by using separate test data and calculating errors using residuals of the fitted linear system. Panel c) is produced by using training data and calculating errors with the solution of discovered PDEs against the observable, 
+
+ℎ(𝑥, 𝑡 ). Panel d) is produced by using separate testing data and calculating errors with the solution of discovered PDEs against the observable, ℎ(𝑥, 𝑡 ).24 Dooley et al. 
+
+From inspecting scores, we see strong performance from low complexity models. An example is 
+
+ℎ𝑡 = −0.699 ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 ,
+
+which includes one of the expected terms, so can meaningfully resolve some of the dynamics. We see a bias in the coefficient, as a consequence of underfitting. Another strong performing model includes a 
+
+O( 10 −10 ) additive correction to this single-term model. A slightly higher complexity model with strong performance is 
+
+ℎ𝑡 = −0.860 ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 − 3.76 ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 + 1.23 ℎ3 ℎ𝑥 ℎ𝑥 𝑥 𝑥 .
+
+The three-term model shown contains the correct (anticipated) terms, as well as an additional term. This additional term is similar to one of the correct terms, but has a higher degree of nonlinearity. The sum of these two coefficients is approximately −2.53 , so is close to the coefficients of the generating equation. Consequently, we see strong performance coming from this similarity, exacerbated by small perturbation regions of data. Candidate models similar to that of the correct model, but with varying degree of algebraic nonlinearity are a common occurrence. It is common as well for such collections of terms to have coefficients that sum up to a value equal in magnitude to a corresponding term in the governing equation. This is effectively redistributing the coefficient value among correlated basis functions. 
+
+4.3.3. Recovery 
+
+We inspect the list of proposed models to see a strong performing low-complexity model 
+
+ℎ𝑡 = −0.875 ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 − 2.44 ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 ,
+
+which includes all model terms used to generate the dataset with no spurious terms. When solved and compared to the reserved test dataset, this yields an 𝐿 2 error (normalised with respect to the null model error) of 0.0345 . We recall having previously recovered a mean relative coefficient error of 15 .6% in subsection 4.3. Figure 5 shows the evolution of this discovered model against reserved test data. We note this is equivalent to model (4.6), which is expected from the methodology. 
+
+Figure 5. a) The dynamics of the discovered equation. b) The evolution of the governing equation and is the testing data used. We compare the two surfaces in panel c), displaying relative percentage error. Errors include: RMSE= 0.00413 , MAE = 0.00340 and || 𝑒 || ∞ = 0.0116 .
+
+With the thin film equation recovered using clean data, we can briefly consider the robustness of this result to artificial noise, which can be found in Appendix D. Journal of Nonlinear Waves 25 
+
+4.3.4. Time Proportion Study 
+
+We now consider varying the training dataset and the sensitivity of equation discovery to the time-span of training data for the constant coefficient PDE (4.3). Recall from section 4.1 that we find a reference final time value 𝜏 ∗ 
+
+> 𝐹
+
+by applying the slow dynamics condition to the irreducible PDE. The time scaling, relating to this equation, results in dimensional time values 𝑡 = 𝑇 𝜏 𝜏 = 3𝜖 −4 𝜇𝐻 𝜎 𝜏 .Looking to the training datasets, we sweep final times, 𝜏 𝐹 ∈ [ 0.1𝜏 ∗ 
+
+> 𝐹
+
+, 10 𝜏 ∗ 
+
+> 𝐹
+
+] in a linearly spaced manner. We more coarsely sweep additional values 𝜏 𝐹 ∈ [ 0.0001 𝜏 ∗ 
+
+> 𝐹
+
+, 0.1𝜏 ∗ 
+
+> 𝐹
+
+]. This is equivalent to taking a different proportion of the reference time span [0, 𝜏 ∗ 
+
+> 𝐹
+
+] and we write proportions 𝛼 > 1 to indicate time spans of [0, 𝛼𝜏 ∗ 
+
+> 𝐹
+
+]. For these values, we look to whether a successful recovery of the thin film equation places it among the ensemble of suggested models and inspect associated errors. During data generation, we initially ensure that the number of samples is consistent across datasets, (𝑁 𝑥 , 𝑁 𝑡 ) = (1024 , 2048 ),thus varying temporal resolution appropriately with a fixed spatial resolution. The results of this are summarised in figure 6. This varying temporal resolution means that small time proportion datasets, such as those evolved to 0.1𝜏 ∗ 
+
+> 𝐹
+
+, will have finer temporal resolution and improve the accuracy at which the initial transient is resolved. With worsening temporal resolution for long time proportion datasets, such as 𝜏 ∗ 
+
+> 𝐹
+
+, adaptive time step schemes are implemented to obtain datasets, though these only affect internal data generation steps. Refinement is determined by a residual condition with fixed tolerance and a maximum refinement factor of 1/24 specifies a computational budget for data generation. 0.2 0.4 0.6 0.8Space x             
+
+> 468Time  t tF
+> t∗
+> F
+> = 1
+> 0.0005 t∗
+> F
+> 0.20.40.60.8Space x
+> 0.003 t∗
+> F
+> 0.20.40.60.8Space x
+> 2.424 t∗
+> F
+> 0.00 0.05 0.10
+> 10 −410 −310 −210 −110 010 1
+> Proportion of time span used
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> Global Normalised L2 Model Error
+> Minimum Correct Model Success Failure
+
+Figure 6. Varying temporal resolution in the training data, as the number of temporal samples remains constant. 
+
+We begin by noting a large region of success for ever-decreasing proportions of the time span used. This indicates that sampling from the initial transient region with highly nonlinear dynamics is fruitful for 26 Dooley et al. 
+
+equation discovery. This region includes rapidly decaying high-frequency modes that are well sampled with respect to time. We note that for the time spans studied, we did not find a transition to a non-successful regime, which would be eventually expected due to almost static dynamics over a very small time-span, though one may run into issues regarding machine representation of floating point numbers before this. For increasing proportions of time spans used, we see a transition to a non-successful regime. We theorise that this transition is driven by a combination of worsening representations of initial decay dynamics as the temporal resolution decreases and over-sampling of later in time dynamics after substantial relaxation of high-frequency modes. The minimum model error for those with the expected terms appears to be for a time span proportion of 0.017 . This minimum model error is unique and model errors increase monotonically as values of the time span proportion differ from that associated with the minimum. The overall minimum error seen is from a model that uses alternative terms and is highlighted with the red, vertical dashed line. We highlight sampling in this region includes {0.002 , 0.003 , 0.006 }, so there is only a single point of significant visible out-performance. This model is 
+
+ℎ𝑡 = −0.00339 ℎℎ 𝑥 𝑥 𝑥 𝑥 + 0.00653 ℎ2 ℎ𝑥 𝑥 𝑥 𝑥 − 1.00 ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 + 28 .8ℎ2 ℎ𝑥 ℎ𝑥 
+
+− 28 .2ℎ3 ℎ𝑥 ℎ𝑥 + 0.0123 ℎℎ 𝑥 ℎ𝑥 𝑥 𝑥 − 3.01 ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 + 0.000131 ℎ3 ℎ𝑥 ℎ𝑥 𝑥 𝑥 .
+
+Inspecting around this region for systematic outperformance, we do note that there is mild out-performance by a higher complexity model for time proportion 0.006 with 
+
+ℎ𝑡 = −0.998 ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 + 0.0169 ℎℎ 𝑥 ℎ𝑥 𝑥 𝑥 − 3.03 ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 + 0.0163 ℎ3 ℎ𝑥 ℎ𝑥 𝑥 𝑥 ,
+
+however the equation structure is quite different from the other out-performing model. Otherwise, the green success region indicates that the models containing just the correct features generally outperform other models on our test dataset for the majority of time span proportions sampled. We highlight that what is referred to as the correct model may have non-zero error due to coefficient fitting errors. Our definition of success regards only feature selection. Perhaps expectedly, we also note a spike in model error in the region transitioning from correct model identification and some non-monotonic behaviour of the error curve. Having looked to inspect the small-time region and utilise small-time asymptotics to support our explanation for success in the low proportion region, we provide a sufficient condition for exact support recovery via thresholding given in Appendix E. While the condition is not tight in practice, it does encapsulate many requirements for successful equation discovery. Firstly, the coefficients must have a sufficiently large magnitude relative to one another, so that the associated terms can be recovered. Secondly, strong conditioning of the constructed linear system is desirable. Finally, a strong estimation of basis functions and accurate data that minimises the residual 𝛿𝑏 is needed. Furthermore, one may even consider a system with similar magnitude coefficients and using || 𝜉 ∗ || 2 ≈ min 𝑗 ∈𝑆 ∗ {| 𝜉 ∗ 
+
+> 𝑗
+
+|} √︁ |𝑆 ∗ | to show a stronger sufficient requirement for systems represented by larger true supports. This is consistent with the behaviour observed empirically. This type of bound is common in signal processing literature, relating to minimum signal strength and have been referred to as beta-min conditions (Bühlmann and Geer 2013). However, the requirement for a priori knowledge of the true coefficient vector renders such bounds of limited practical use. 
+
+4.3.5. Fixed Temporal Resolution Study 
+
+The previous study involved maintaining the size of the dataset used, and so involved a constant number of temporal samples which required varying temporal resolution. From the prior success in the low-data limit, we see that this likely optimistically distorts the effectiveness of the equation discovery method in Journal of Nonlinear Waves 27 this region. Therefore, we apply a fixed resolution scheme that involves varying the number of samples used. To implement this, we use the prior reference dataset (proportion of time span equal to 1 previously) to set a reference 𝑑𝑡 value. We generate a large dataset with the maximum final time value of interest, 
+
+𝑡 𝐹 = 10 𝑡 ∗ 
+
+> 𝐹
+
+and subsample this dataset. We note that pointwise derivative estimates are calculated using the full dataset before sub-sampling. Therefore, we choose to remove the extreme time value samples from the dataset to ensure a consistent central finite difference scheme is applied for all time proportions. We also highlight that the number of spatial samples 𝑁 𝑥 is greater than the size of the function library used, so it is possible with one time sample to have a design matrix that is of full rank. The results of this study can be seen in figure 7. We see a large successful region and note that there is failed recovery for low quantities of temporal data, below the proportion 0.017 . This is in direct contrast to the previous variable resolution case. Regions of outperformance to the model with correct features are visible for a range of proportions, [0.036 , 0.113 ]𝐶 , though model out-performance is within distance 0.01 with respect to the normalised error metric, with maximum outperformance of 14 .3% . We see in the region of failure for equation discovery that the error increases slowly, remaining comparable to the successful region until a proportion of approximately 0.01 . The error increases greatly at the next sampled point. The failure region relates to single digit temporal samples being supplied, as the final time value used approaches the reference temporal resolution and limits our ability to sample more densely. 
+
+Figure 7. Fixing the temporal resolution in the training data and varying the number of temporal samples to account for this. Successful recovery continues to the maximum tested value of 10 .0𝜏 ∗ 
+
+> 𝐹
+
+.28 Dooley et al. 
+
+4.4. Key Insights 
+
+From these numerical experiments, we see that it is highly important to have a well-resolved initial transient region. These highly nonlinear regions appear to greatly aid in structural identification of PDEs, when well-resolved. Comparing the results of the variable and fixed temporal resolution cases, it appears that the failure for the variable resolution case was triggered due to worsening of the the temporal resolution rather than over-sampling later time dynamics. The worsening resolution had a strong effect on the early time dynamics that involved the fast decay of high-frequency modes. The failure of the fixed-resolution case appears to be from overly coarse sampling. Successes for high sample numbers indicate the transient region to be sufficiently resolved and successes from the variable resolution case over short time-spans indicate sufficiently rich dynamics when well-sampled. This is despite moderate to large residuals present within the training data for the reference temporal resolution used (see Appendix B for additional details). Augmenting the process with an additional training dataset used for fitting coefficient values, after structurally identifying the model with our nonlinear transient dataset could improve performance on test datasets, leading to a potentially competitive alternative to the fixed resolution case, thus aiding in model selection. A strong candidate for this additional dataset would be one evolved from an initial condition with low-frequency active modes. We conclude at this stage that one requires a well-sampled and well-resolved transient region within training datasets to aid with the structural identification of PDEs. We further posit that this transient richness is of greater importance than sampling the relatively uninformative long-term dynamics. We are now well equipped to use this insight in order to tackle a more complex version of our problem, which incorporates the competing effect of gravity as part of the following section. 
+
+5. Gravity and Constant Surface Tension Affected Thin Liquid Film 
+
+Building on the previously discussed scenario where the effects of gravitational acceleration were unaccounted for, we now look towards a thin film dynamics model under gravity, and introduce 
+
+ℎ𝑡 = −
+
+
+
+ℎ3 − Φℎ3 ℎ𝑥 + ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+, (5.1) where Φ := 𝜖 cot (𝜃 ). The parameter 𝜃 is the angle of inclination of the flat substrate to the horizontal and 𝜖 is the length-scale discrepancy, as previously. The equation is written in non-dimensional form with dropped tildes. A full derivation is included in Appendix F. 
+
+5.1. Model Inspection 
+
+The choice of scales to produce the form of model seen in equation (5.1) results in coefficients being normalised by sin (𝜃 ), so the balance between gravitational and surface tension based hydrostatic forces is implicitly altered as the angle of inclination 𝜃 is varied. We study acute angles and see the divergence of Φ → ∞ as 𝜃 → 0+, indicating a failure of the model for a flat substrate. For the other extremal case of 𝜃 = 𝜋  
+
+> 2
+
+, a valid model remains with Φ = 0. With the choice of characteristic scales 
+
+𝐿 = 3√︄ 𝜎𝐻 𝜌𝑔 sin (𝜃 ) , 𝑇 = 3𝜇 𝐻 2 𝜌𝑔 
+
+> 3
+
+√︄ 𝜎𝐻 𝜌𝑔 
+
+1sin (𝜃 ) 43
+
+,
+
+we notice that 𝐿 ∝ 3√︃ 𝐻    
+
+> sin (𝜃 )
+
+, so 𝜖 = 𝐻 𝐿 ( 𝜃 ;𝐻 ) varies with 𝜃 .Journal of Nonlinear Waves 29 The PDE system depends on a single parameter Φ, so for the following analysis we look to define our quantities of interest with respect to Φ. To observe 𝐿 (Φ) and 𝑇 (Φ), we generate the quadratic 
+
+sin 2 (𝜃 ) + sin 43 (𝜃 )Φ2 1
+
+𝐻 2
+
+ 𝜎𝐻 𝜌𝑔 
+
+ 23
+
+− 1 = 0, (5.2) to yield 𝜃 (Φ). Taking 𝑠 := sin 2/3 (𝜃 ), we may solve the cubic equation to find such roots that connect 
+
+Φ to 𝜃 . Taking only valid values of 0 < 𝑠 ≤ 1, using 0 < 𝜃 ≤ 𝜋  
+
+> 2
+
+, we may find 𝐿 (Φ) and 𝑇 (Φ). The Appendix G includes a proof of the existence and uniqueness of such a root. Looking to figure 8, we see a graph of the relation. We note that 𝜖 (𝜃 (Φ)) is also defined from a choice of Φ ≥ 0.0 1 2 3 4Φ
+
+0
+
+1
+
+2
+
+3
+
+4Characteristic time,  T (Φ) 
+
+a) 
+
+0 1 2 3 4Φ
+
+0.0
+
+0.1
+
+0.2
+
+0.3
+
+0.4Characteristic length,  L(Φ) 
+
+b) 
+
+Figure 8. a) Characteristic time, 𝑇 (Φ), b) Characteristic length, 𝐿 (Φ).
+
+We see that the constant solution ℎ = 1 is a steady state of the system. Performing a linear stability analysis, one recovers the dispersion relation 
+
+𝜔 (𝑘 ) = −3𝑖𝑘 − Φ𝑘 2 − 𝑘 4, (5.3) with ℜ( 𝜎 (𝑘 )) < 0, ∀𝜃 ∈  0, 𝜋 
+
+> 2
+
+ indicating a linearly stable film. With a better understood reduced-dimensional model of the system of interest, we now look to generate synthetic datasets from the governing equation (5.1). 
+
+5.2. Data Generation Considerations 
+
+Having obtained a suitable PDE model, we look to produce a discrete numerical solution that can be used for equation discovery. A BDF1 scheme with second-order spatial central differences was used for the previously studied equation. We use this scheme again and highlight that implicit time-stepping schemes paired with second-order accurate spatial stencils have shown to provide accurate solutions of similar thin-film equations (Ha et al 2008). The choice of parameter dependent scalings introduces a layer of complication. We produce datasets that correspond to a fixed value of Φ chosen a priori .With a varying 𝜖 (𝜃 (Φ)) , we choose to maintain the length of the dimensional spatial domain and consequently vary the non-dimensional spatial domain with 𝜃 (Φ). The relative sampling density is maintained between re-scalings, but the non-dimensional spatial resolution, ˜𝑑𝑥 = 𝐿 𝑋  
+
+> 𝑁 𝑥
+
+∝ 3√︃ 1sin ( 𝜃 (Φ) ) 30 Dooley et al. 
+
+varies, potentially affecting dataset solution quality. With spatial resolution becoming finer as 𝜃 (Φ)
+
+decreases, the stability of the solver used for data generation is eventually impacted. This is in contrast to the previously studied equations, which allowed for static, uniform meshes to be used and produced accurate solutions for a range of parameter values. To combat this, adaptive time stepping while maintaining a similar overall computational budget is utilised. Step size adjustment is used to ensure that the solution is evaluated at pre-defined output times. After generation, these datasets are immediately interpolated to the common reference mesh size of all other training data, as is our standard pre-process to equation discovery. Solutions ℎ(𝑥, 𝑡 ) remain smooth and regular with the governing PDE system lacking spatially-dependent coefficients, so we expect the generated solutions to remain valid for comparison between Φ values. Fixing the dimensional spatial domain also ensures that the geometry of the system remains consistent. For the temporal domain of training datasets, we fix a reference non-dimensional temporal domain with respect to Φ. We mark the reference non-dimensional final time time with a star ˜𝑡 ∗ 
+
+> 𝐹
+
+, and may then take proportions of the reference domain during experimentation. This is for consistency to allow for more direct comparison with the previous variable resolution non-gravity case. As 𝜃 (Φ) decreases, the characteristic time-scale increases and a much greater proportion of the data is near the steady state ℎ = 1, which is intuitively supported by inspecting the varying characteristic time-scales and dimensional final times in table 1. The non-dimensional final time is chosen using the slow dynamics criteria for the evolution of the training initial condition (4.5) for a small reference value Φ ≈ 0.089 ,corresponding to 𝜃 = 𝜋 /3. The fixed non-dimensional temporal domain ensures that datasets span an equivalent fraction of the characteristic time-scale. Doing so ensures we compare stages of evolution relative to the dynamics over Φ.
+
+𝜃 𝐿 𝑐ℎ𝑎𝑟 𝜖 𝐿 𝑋 𝐿 𝑋 𝐿 𝑐ℎ𝑎𝑟 𝑇 𝑐ℎ𝑎𝑟 ˜𝑡 ∗ 
+
+> 𝐹
+
+𝑡 𝐹 Φ
+
+1.57 0.00109 0.161 10 .3 0.0112 0.00976 0.00812 0.0000793 0.00100 1.51 0.00109 0.161 10 .3 0.0112 0.00979 0.00812 0.0000795 0.0101 1.05 0.00114 0.153 9.82 0.0112 0.0118 0.00812 0.0000960 0.0885 0.735 0.00124 0.141 9.01 0.0112 0.0166 0.00812 0.000135 0.156 0.516 0.00138 0.127 8.14 0.0112 0.0251 0.00812 0.000203 0.224 0.362 0.00154 0.114 7.28 0.0112 0.0390 0.00812 0.000317 0.301 0.254 0.00172 0.102 6.50 0.0112 0.0616 0.00812 0.000500 0.391 0.178 0.00194 0.0904 5.78 0.0112 0.0980 0.00812 0.000796 0.502 0.125 0.00218 0.0804 5.14 0.0112 0.157 0.00812 0.00127 0.640 0.0877 0.00245 0.0715 4.57 0.0112 0.251 0.00812 0.00204 0.813 0.0616 0.00276 0.0635 4.07 0.0112 0.402 0.00812 0.00326 1.03 0.0432 0.00310 0.0564 3.61 0.0112 0.644 0.00812 0.00523 1.31 0.0303 0.00349 0.0502 3.21 0.0112 1.03 0.00812 0.00839 1.65 0.0213 0.00393 0.0446 2.85 0.0112 1.66 0.00812 0.0135 2.10 0.0149 0.00442 0.0396 2.54 0.0112 2.66 0.00812 0.0216 2.65 0.0105 0.00497 0.0352 2.25 0.0112 4.26 0.00812 0.0346 3.36 
+
+Table 1. Values important to the setup of the gravity affected thin film numerical simulations. Values are for training data. We see: angle of inclination to the horizontal, 𝜃 , characteristic length (m), 𝐿 𝑐ℎ𝑎𝑟 ,the length-scale discrepancy, 𝜖 = 𝐻 𝐿 , the non-dimensional domain length 𝐿 𝑋 = 64 𝜖 , the dimensional domain length (m), the characteristic time-scale, 𝑇 𝑐ℎ𝑎𝑟 , the reference non-dimensional final time ˜𝑡 ∗ 
+
+> 𝐹
+
+,dimensional final time (s) and corresponding parameter Φ.Journal of Nonlinear Waves 31 Looking to table 1, we see how the non-dimensional spatial domain length, 𝐿 𝑋 , varies with the parameter Φ. It is chosen so that the length will be 64 times the length-scale discrepancy and so the dimensional length will be 64 times the dimensional height, thus fixing the aspect ratio. The initial perturbations will then have the same frequency in dimensional space, though their frequency changes with respect to non-dimensional space. The choices made allow for comparison of identified governing structures across regimes. The parameter-dependent scalings necessitate a choice between fixing dimensional or non-dimensional domains. 
+
+5.3. Alterations to Equation Discovery 
+
+In the previous system without gravity, we recovered terms relating to a single source of dynamics. Now we target a collection of nonlinear terms arising from a dataset built on competing physical mechanisms. To do so effectively, we introduce modifications to our equation discovery process and provide reasoning for their use. The most prominent change is that of an altered function library. Previously, we had a moderate to large 60 term library that produced good results. Using this previous library for the now gravity-affected thin film gave poor results with advective terms commonly being missed. For the new system with gravity that we study, we introduce a ‘flux library’ of a moderate size characterised by 15 terms. Doing so reduces the number of competing linear dependencies when regressing and alleviates some of the destabilising effects of significant multi-collinearity. To build the flux library, we use the known structure of thin liquid film models 
+
+ℎ𝑡 = −𝑞 𝑥 , (5.4) 
+
+𝑞 = 𝑞 (ℎ), (5.5) in which a mass conservation equation is coupled to a horizontal velocity flux that is enslaved to interfacial height in the case of single-equation thin film models. Applying this knowledge is a way of physics informing the PDE discovery process that allows us to assume the form of the governing equation. Thus, we require only a library of terms to fit 𝑞 (ℎ). With this imposed form, we see that whilst the span of the smaller flux library is strictly contained within that of the 60 term library, this span still describes a rich set of dynamics. The library contains the terms 
+
+
+
+(ℎ)𝑥 ,
+
+
+
+ℎ2 
+
+> 𝑥
+
+,
+
+
+
+ℎ3 
+
+> 𝑥
+
+, (ℎ𝑥 )𝑥 , (ℎℎ 𝑥 )𝑥 ,
+
+
+
+ℎ2 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+,
+
+
+
+ℎ3 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+, (ℎ𝑥 𝑥 )𝑥 , (ℎℎ 𝑥 𝑥 )𝑥 ,
+
+
+
+ℎ2 ℎ𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+,
+
+
+
+ℎ3 ℎ𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+,
+
+(ℎ𝑥 𝑥 𝑥 )𝑥 , (ℎℎ 𝑥 𝑥 𝑥 )𝑥 ,
+
+
+
+ℎ2 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+,
+
+
+
+ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+
+
+. (5.6) Inspecting a term, we see that the ratios of coefficients of terms that were previously free to vary are now fixed, such as  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+= 3ℎ2 ℎ𝑥 ℎ𝑥 𝑥 𝑥 + ℎ3 ℎ𝑥 𝑥 𝑥 𝑥 . This results in a great improvement in the conditioning of the original system. Additionally, the smaller library size results in fewer candidate models being generated and this library size is still comparable to those used in other state-of-the-art studies (VandenHeuvel, Buenzli et al 2024; Heinrich et al 2025). To further improve conditioning, we utilise ‘temporal trimming’ of our dataset. We subsample the design matrix to remove rows corresponding to early/late times of the evolution. With additional con-vective terms we see more sustained nonlinear dynamics compared to the previous case, which may reduce the reliance on the inclusion of well-resolved initial transient dynamics. The use of temporal trimming was not required to see robust success for the previous case although, as noted in section 4.3, it could improve coefficient estimates of the final model. For this case with gravity, the conditioning 32 Dooley et al. 
+
+improvements provided by trimming improve structural identification. Furthermore, the temporal trim-ming process improves coefficient estimates and thus makes models matching the governing equation structure more competitive in model selection processes. The ‘temporal trimming’ process is inspired by the data thresholding process of VandenHeuvel, Drovandi et al (2022) and their matrix pruning (VandenHeuvel, Buenzli et al 2024) procedures. For this system, applying matrix pruning would mean removing extreme values of the estimated observable 
+
+ℎ𝑡 (𝑥, 𝑡 ). We therefore observe significant overlap in the regions of data that would be removed by applying temporal trimming compared to matrix pruning, because of the dissipative nature of the underlying system. An additional effect is that data at the initial condition and final time are removed, which require the use of one-sided finite differences for estimation of ℎ𝑡 . This improves conditioning and performance of equation discovery. 
+
+5.4. Numerical Experiments and Results 
+
+Having considered the implication of varying the parameter Φ on characteristic scalings, shown in table 1, we may proceed with a parameter sweep. We evolve the same initial condition (4.5) as before. For the system without gravity, we varied the time proportion of training data supplied. We do this for the gravity case and concurrently sweep Φ ∈ [ 0.001 , 1.654 ]. Therefore, for a fixed Φ value, we supply varying training datasets. We evaluate candidate models on a testing dataset with fixed dimensional final time. The time span of the testing dataset is determined through the use of the slow dynamics criteria applied with a small reference value Φ ≈ 0.089 , corresponding to 𝜃 = 𝜋 /3. The testing datasets simulate to 
+
+𝑡 𝐹 = 0.1545 s with non-dimensional final times ranging between 0.03627 and 15 .83 for the associated characteristic times and Φ values shown in table 1. Testing datasets are equivalent for a fixed Φ.To generate error metrics, we can compare the simulated candidate models to the inputted solution data, as previously. However, comparison between Φ values is affected by the change in simulated time intervals. Previously, we normalised errors by the null error (defined as the error of the model ℎ𝑡 = 0)with respect to the testing dataset. Applying the same process, we normalise errors with a null error dependent on Φ, which ensures all errors that are less than the null error of the associated dataset are contained in [0, 1).Sweeping over both parameter values of Φ and final non-dimensional times of training data, we generate a set of calibrated candidate models for each pair (˜𝑡 𝐹 , Φ) from our equation discovery process. Within each set of models, we are interested in strong performing models and models that match the governing equation used to generate datasets. A 2D array of results are shown in figure 9, presenting minimum 𝐿 2 errors across models for each (˜𝑡 𝐹 , Φ) alongside 𝐿 2 errors of models matching the form of the known governing equation. We also colour with a success or failure classification and extend to include a near-success region, in which models with three terms for which one or more have incorrect degree of algebraic nonlinearity are classified as near-success. We see that the error for a fixed Φ varies minimally. This reflects the results of the case without gravity, particularly for successful regions. This may suggest a saturation of model quality is reached, requiring additional trajectories to improve errors further. The discovered success region is non-convex, however, there exist numerous Φ values for which the success region is connected by areas of near-success. The overall union of the near-success and success regions from this study is nearly convex with exceptions occurring at large Φ values and only one such exception in our displayed results. We see errors generally increase with Φ. Some recovered models align with the no gravity case. As 
+
+Φ varies, such models will produce a constant error with respect to the downslope driving and an error scaling linearly with Φ for the normal hydrostatic effect of gravity. The dependence of the error on Φ
+
+may partially be explained by minimum 𝐿 2 error models potentially not capturing the hydrostatic effect of gravity on the film. Journal of Nonlinear Waves 33 
+
+Figure 9. (a) Minimum 𝐿 2 error normalised with respect to the null error for corresponding Φ. (b) Where valid, the normalised 𝐿 2 error on the testing dataset associated with the correct model. (c) The success-failure classification with near-successes also coloured. 
+
+For the lowest value case of Φ ≈ 0.001 , we see models 
+
+ℎ𝑡 =
+
+
+
+−1.01 ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+and 
+
+ℎ𝑡 =
+
+
+
+−0.998 ℎ3 − 0.998 ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+.
+
+The first such model shows correspondence to the previous case without gravity. The two-term model shows the inclusion of the downslope gravitational driving, though fails to include the small normal hydrostatic effect of gravity that is present. The 𝐿 2 error of the two term model is lower for all training time spans studied and is typically of an order of magnitude of difference. This is expected, given that 
+
+Φ ≪ 1 corresponds to an inclination of near 𝜋 /2. Difficulty recovering the hydrostatic term is expected for low values of Φ, partially due to its weakness, but also due to the magnitude disparity in coefficients of the governing equation. A region of erratic behaviour is also visible for high values of Φ and ˜𝑡 𝐹 . This correlates to a region where the design matrix formed for sparse regression has a very high condition number. The condition number increases sharply as both Φ and ˜𝑡 𝐹 increase, reaching values of O( 10 9).
+
+> 5.4.1. Strong Performing Models
+
+Having performed a sweep of (˜𝑡 𝐹 , Φ) and with a collection of models for each pair, we may use a selection method to indicate the best model for each pair. In the previous section, we used AICc analysis. We now switch to applying Pareto frontier optimisation (Deb 2011), as mentioned in section 2.7, to balance the 𝐿 2 error on testing data against the number of terms in the model. The switch is motivated by the additional model complexity considered, in which the additional terms are qualitatively distinct from those of the surface-tension-driven thin film equation (4.1). The introduction of these terms provides additional sources of multi-collinearity, as spurious advective candidates such as ℎ𝑥 are now more correlated with terms in the governing equation (5.1). This is reflected in the AICc curve, which becomes notably flat for model complexities at or beyond that of the governing equation, leading to potentially unstable selections of a globally optimal model. Thus, we may interpret this behaviour as the Pareto frontier analysis providing a locally-informed criterion that increases the stability of model selection for our numerical experiments. 34 Dooley et al. 
+
+Applying this selection criterion yields figure 10, which displays the model coefficient values for each term in the function library over (˜𝑡 𝐹 , Φ) for the selected model. A diverging colour map is used to highlight cancellation of terms with differing algebraic nonlinearity, which is particularly noticeable for terms of the form ℎ𝑛 ℎ𝑥 𝑥 𝑥 . A transition between Φ = 0.502 and Φ = 0.640 appears, where strong model structures change quite sharply. This corresponds to a critical switching inclination of between 
+
+55 .7◦ and 62 .4◦ or between 0.619 𝜋 /2 and 0.693 𝜋 /2. Models change from complex, likely overfitted, suggestions with 8 − 15 terms per model to more sparse suggestions. We see that the normal hydrostatic effect due to gravity ( ℎ3 ℎ𝑥 ) is commonly not recovered for low values of Φ, reflecting the use of coefficient magnitude as a proxy for importance. Training data with short time spans have seemingly produced models with greater uncertainty in the algebraic degree of ℎ𝑛 ℎ𝑥 . The previously mentioned conditioning correlation may relate to the performance deterioration for models corresponding to long time span training datasets. 
+
+> 5.4.2. Model Recovery Frequencies
+
+With a vast collection of models identified over the parameter sweep, we may look at the proportion of candidate sets that include specific model structures. Table 2 shows these proportions for the most frequently recovered models and we briefly discuss a selection of these models below. The 15-term model is always recovered, indicating the choice of minimum tolerance value was sufficient for each case, as the least squares result without thresholding was obtained. The single-term model corresponds to the no-gravity case and also indicates that the sampling around the critical thresholding value has occurred. We note that only a single case of (˜𝑡 𝐹 , Φ) = (0.812 , 1.654 )
+
+does not recover this as the single term model and instead recovers ℎ𝑡 = 𝛼 (ℎ3 ℎ𝑥 )𝑥 , 𝛼 ≠ 0.The only other one-term model recovered in the sweep was ℎ𝑡 = 𝛽 (ℎ2 ℎ𝑥 𝑥 𝑥 )𝑥 for (˜𝑡 𝐹 , Φ) ∈{( 0.812 , 1.030 ), (0.812 , 1.306 )} .The two-term model, as previously discussed, omits the normal hydrostatic effect of gravity. The high proportion of cases with this omission may be inflated by a sample unintentionally biased towards ‘small’ Φ values. The 9-term model forms an initially unexpected inclusion, though it is related to a model of the form 
+
+ℎ𝑡 = 𝛼 0 ℎ3 +
+
+> 3
+
+∑︁ 
+
+> 𝑖 =0
+
+𝛽 𝑖 ℎ𝑖 ℎ𝑥 +
+
+> 3
+
+∑︁ 
+
+> 𝑖 =0
+
+𝛾 𝑖 ℎ𝑖 ℎ𝑥 𝑥 𝑥 
+
+!
+
+> 𝑥
+
+.
+
+The next most common model is the ‘correct’ one that aligns with the system used to generate the datasets. Then we have a two-term model that includes the normal hydrostatic effect of gravity, but excludes the downslope gravitational driving term. And another two-term model which relates to an overfitting of the surface-tension term with competing terms of varying algebraic degree. We may inspect the region of recovery for each model, as shown in figure 11. For specific sub-panels, such as (𝑑 ), (𝑔 ) and (𝑖 ), we see a banded structure of recovery. This aligns with the structured, banded variation of the condition number across the parameter space. We see from table 2 that 30 .8% of the datasets used yielded a correct model, and from figure 11 that these recovery successes are concentrated towards intermediate Φ values with slightly longer time intervals than our reference case. Despite the use of clean data, we see a number of cases in which the correct model was not retrieved. Such cases show a variety of models with similarities to the PDE (5.1) used for data generation. We observed robust recovery of the highly nonlinear term (ℎ3 ℎ𝑥 𝑥 𝑥 )𝑥 associated with surface tension effects. Inspecting the recovered two-term models (𝑐 ) and ( 𝑓 ) shows ambiguity in the selection of the secondary term with recovery locations that, on taking the union, approximately partition the explored parameter space, (˜𝑡 𝐹 , Φ). Correct model recovery is difficult for extremal values of Φ. This could be explained by the terms (ℎ3)𝑥 , (ℎ3 ℎ𝑥 )𝑥 requiring intermediate values of Φ to have a Journal of Nonlinear Waves 35 
+
+Figure 10. Heat map of low 𝐿 2 error models selected from the Pareto frontier with coefficients pro-portional to colour. Grey squares indicate an unselected term with a corresponding coefficient value of 
+
+0, as indicated by the provided colour bar. Model selection is performed using a marginal gain crite-rion. One-sided gradients of error with respect to model complexity are evaluated. Then, starting from the lowest complexity model, the most complex model for which the normalised marginal gain in error reduction still exceeds a unit threshold is selected . 
+
+balanced effect on dynamics. In extremal Φ cases, one of the terms may appear to dominate and, with near-collinearity of the terms, mask the presence of the other term. Extending the region of successful recovery remains challenging. As highlighted, we see multi-collinearity of the terms (ℎ3)𝑥 , (ℎ3 ℎ𝑥 )𝑥 capturing the advective dynamics that results in competition between various representations of the governing equation. We also uncover instabilities in correct model recovery, which is reflected through the non-convex recovery region. This may relate to the initial 36 Dooley et al. 
+
+Case Complexity Score Terms 
+
+(𝑎 ) 15 1.000 
+
+n  ℎ3 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+,
+
+
+
+(ℎ)𝑥 ,  ℎ2 
+
+> 𝑥
+
+, (ℎ𝑥 )𝑥 , (ℎℎ 𝑥 )𝑥 ,  ℎ2 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+,
+
+(ℎ𝑥 𝑥 𝑥 )𝑥 , (ℎℎ 𝑥 𝑥 𝑥 )𝑥 ,  ℎ2 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+
+
+, (ℎ𝑥 𝑥 )𝑥 , (ℎℎ 𝑥 𝑥 )𝑥 ,  ℎ2 ℎ𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 
+
+
+
+> 𝑥
+
+(𝑏 ) 1 0.992 
+
+n
+
+(ℎ3 ℎ𝑥 𝑥 𝑥 )𝑥 
+
+o
+
+(𝑐 ) 2 0.573 
+
+n  ℎ3 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+(𝑑 ) 9 0.453 
+
+n  ℎ3 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+,
+
+
+
+(ℎ𝑥 )𝑥 , (ℎℎ 𝑥 )𝑥 ,  ℎ2 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+, (ℎ𝑥 𝑥 𝑥 )𝑥 ,
+
+(ℎℎ 𝑥 𝑥 𝑥 )𝑥 ,  ℎ2 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+
+
+(𝑒 ) 3 0.308 
+
+n  ℎ3 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+( 𝑓 ) 2 0.282 
+
+n  ℎ3 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+(𝑔 ) 2 0.265 
+
+n  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+,
+
+  ℎ2 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+
+
+(ℎ) 3 0.205 
+
+n  ℎ3 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+,
+
+  ℎ2 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+
+
+(𝑖 ) 10 0.205 
+
+n  ℎ3 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 
+
+ 
+
+> 𝑥
+
+,  ℎ3 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+o
+
+,
+
+
+
+(ℎ)𝑥 ,  ℎ2 
+
+> 𝑥
+
+, (ℎ𝑥 )𝑥 , (ℎℎ 𝑥 )𝑥 , (ℎ𝑥 𝑥 𝑥 )𝑥 ,
+
+(ℎℎ 𝑥 𝑥 𝑥 )𝑥 ,  ℎ2 ℎ𝑥 𝑥 𝑥 
+
+
+
+> 𝑥
+
+
+
+Table 2. Model Complexity, Recovery proportion of specific model structure (combination of terms, not any weights), and Associated Terms. These are models that are recovered at least 20% of the time. Text surrounded by large curly braces indicates an expected term, matching a term in the governing equation used for data generation. Text surrounded by large parentheses indicates a term with incorrect algebraic degree. Any terms outside of curly braces or large parentheses indicate spurious terms. A visual representation of this table is provided in figure 11. 
+
+conditioning of the design matrix Θ, as there is structured, banded variation of the condition number across the parameter space. We review these challenges in the discussion that follows. 
+
+6. Discussion and Conclusions 
+
+In this article we numerically investigated the applicability of equation discovery techniques to surface-tension driven flows of thin viscous liquid films, a canonical problem of wide theoretical and practical interest. We focused on sparse regression methodologies and applied them to systems both with and without the effects of gravity. The studied mathematical models were highly nonlinear and distinct from prototypical validation cases often found within equation discovery methodologies, leading to new challenges and potential solutions that were systematically explored as part of this work. Together, the studied systems allowed us to outline the capabilities and limitations of sparse regression based equation discovery for thin liquid film models. The system without gravity shows robust identi-fication, demonstrating that the approach is viable in this setting. The introduction of gravity reveals where the methodology is strained. This three term case, modelling two physical effects, sits below the complexity threshold of the leading first-principles models discussed in section 3, yet we see reliable identification becomes difficult. This may point to a complexity ceiling in the sparse regression frame-work we applied. Such a ceiling may emerge due to the stable nature of the training data, all choices of which eventually decay to a film of constant height, limiting the informational content of the dataset. Journal of Nonlinear Waves 37 
+
+Figure 11. Panel (𝑎 ) − ( 𝑖 ) correspond to the models in table 2. This shows a green-pink binary clas-sification of regions in the parameter space in which the corresponding model structure was recovered. Green corresponds to a successful recovery. 
+
+Limitations were also identified for the gravity-enriched model. Disparities in the magnitudes of coefficients appeared to obstruct recovery of the governing equation and is consistent with the findings of Fung et al (2025). This issue seems to be compounded by the choice of monomials for our function library that contributed to generating initially ill-conditioned systems for regression, thus affecting the quality of identification. With monomials, we see the structure of the design matrix Θ(𝐻, 𝑄 ) is similar to that of a Vandermonde matrix, which is notoriously ill-conditioned in general (Pan 2016), and is well studied within the context of interpolation and quadrature applications. However, using a more numerically stable basis, such as Chebyshev polynomials, may no longer be sparse with respect to the governing equation. This is also the case for a function library constructed from monomials of the perturbation of the film 𝜂 (𝑥, 𝑡 ) ≔ ℎ(𝑥, 𝑡 ) − ℎ0. This violation of the sparsity assumption that underpins 38 Dooley et al. 
+
+sparse regression based equation discovery typically results in performance degradation, despite a better-conditioned design matrix being available. This once again highlights a potential complexity ceiling for the models recovered by sparse regression based equation discovery. The use of knowledge of the system to tailor the construction of the function library alleviated some of these issues. The introduction of gravity produces a non-convex success region that points to a more fragile environment for recovery when compared to the system without gravity. Consequently, even with large volumes of clean data, a guarantee of robustness was still found to be lacking. Practical deployment of equation discovery methods require careful experimental design, such as through the choice of initial conditions, rather than relying solely on data quality and quantity. We believe that there are numerous promising extensions to this work. More immediately, we have established a pipeline for equation discovery that is agnostic to the data source and could, in principle, be readily applied to DNS or experimental data. Our results may be particularly useful in experimental settings, where trajectory length and resolution are constrained. In the purely theoretical context, we may also look to use additional fields such as horizontal velocity flux to probe true two-equation models. Some researchers have suggested going beyond two equation models (Ruyer-Quil and Manneville 2000; Richard et al 2019), however we highlight two-equation models have been subjected to decades of benchmarking and tuning across parameter regimes that three-equation models have not (yet at least) undergone. Thus two-equation models provide a natural step for providing additional complexity, whilst mitigating some of the risk associated with additional stiffness and complicated numerics. With access to new datasets, we can perform exploratory work for very thin liquid films in regimes where additional micro-scale effects, potentially including stochastic contributions, become non-negligible. Conversely, in a high-fidelity simulation pipeline the developed methodology would allow us to access regimes that lie beyond the reach of traditional asymptotic approaches and their multi-scale assumption underpinnings towards films of moderate thickness. For longer-term algorithmic developments, we may be interested in taking advantage of the low-dimensional representation of our systems of interest in Fourier space, in which one could consider a system of ODEs representing the evolution of modes. Resolving the choice of dimension of this system presents a challenge and is complicated by nonlinear evolution. Another avenue of development may be the choice of sampling methodology, which could connect to randomised numerical linear algebra. Selecting specific regions of space-time to sample from or weight differently for regression promises to improve results, but sampling in a principled manner presents another challenge. Journal of Nonlinear Waves 39 
+
+A. Derivation Details for a Surface Tension Driven Thin Film Equation 
+
+We begin with a 2D incompressible Navier-Stokes system 
+
+
+
+𝜌  𝑢 𝑡 + [ 𝑢𝑢 𝑥 + 𝑣𝑢 𝑦 ] = −𝑝 𝑥 + 𝜇 (𝑢 𝑥 𝑥 + 𝑢 𝑦𝑦 ) + 𝜌𝑔 sin (𝜃 ),𝜌  𝑣 𝑡 + [ 𝑢𝑣 𝑥 + 𝑣𝑣 𝑦 ] = −𝑝 𝑦 + 𝜇 (𝑣 𝑥 𝑥 + 𝑣 𝑦𝑦 ) − 𝜌𝑔 cos (𝜃 ),𝑢 𝑥 + 𝑣 𝑦 = 0.
+
+(A.1) We use the following non-dimensionalisation, 
+
+𝑥 = ˜𝑥𝐿, 𝑦 = ˜𝑦𝜖 𝐿, 𝑢 = ˜𝑢𝑈, 𝑣 = ˜𝑣𝜖𝑈, 𝑡 = ˜𝑡 𝐿 𝑈 , 𝑝 = ˜𝑝 𝜇𝑈 𝐿 , 𝑔 = ˜𝑔 𝑈 2
+
+𝐿 ,
+
+Re ≔ 𝜌𝑈 𝐿 𝜇 , Ca ≔ 𝜇𝑈 𝜎 , St ≔ 𝜌𝑔𝐿 2
+
+𝜇𝑈 ,
+
+where 𝜖 ≔ 𝐻 𝐿 ≪ 1 and 𝐻 represents the vertical length-scale which is disparate from the horizontal length-scale 𝐿 . This leads to a 2D non-dimensionalised incompressible Navier-Stokes system 
+
+
+
+𝜖 2Re   ˜𝑢 𝑡 + [ ˜𝑢 ˜𝑢 𝑥 + ˜𝑣 ˜𝑢 𝑦 ] = − ˜𝑝 𝑥 + ( 𝜖 2 ˜𝑢 𝑥 𝑥 + ˜𝑢 𝑦𝑦 ) + 𝜖 2St sin (𝜃 ),𝜖 4Re   ˜𝑣 𝑡 + [ ˜𝑢 ˜𝑣 𝑥 + ˜𝑣 ˜𝑣 𝑦 ] = − ˜𝑝 𝑦 + ( 𝜖 4 ˜𝑣 𝑥 𝑥 + 𝜖 2 ˜𝑣 𝑦𝑦 ) − 𝜖 3St cos (𝜃 ),
+
+˜𝑢 𝑥 + ˜𝑣 𝑦 = 0.
+
+(A.2) We then additionally assume that 𝜖 2Re ≪ 1 and 𝜖 2St ≪ 1 to obtain the reduced system 
+
+
+
+− ˜𝑝 𝑥 + ˜𝑢 𝑦𝑦 = 0,
+
+− ˜𝑝 𝑦 = 0,
+
+˜𝑢 𝑥 + ˜𝑣 𝑦 = 0.
+
+(A.3) With this simplified system, we now consider boundary conditions. A no-slip boundary is applied at 
+
+𝑦 = 0,
+
+˜𝑢 = ˜𝑣 = 0 at 𝑦 = 0. (A.4) A kinematic condition exists at the free surface, which after considering leading order dynamics yields 
+
+˜ℎ𝑡 + ˜𝑢 ˜ℎ𝑥 = ˜𝑣. (A.5) Additionally, a dynamic condition of the form 
+
+−𝑝 𝑎 n − T · n = (𝜎 ∇ · n)n, (A.6) is applied with 𝑝 𝑎 representing atmospheric pressure, n the outward normal to the fluid, and the stress tensor T = −𝑝 I + 2𝜇 E with rate-of-strain tensor E = sym (∇ u). Utilising the length-scale disparity, one 40 Dooley et al. 
+
+notes 
+
+n = (− ℎ𝑥 , 1)√︁ 
+
+1 + ℎ2
+
+> 𝑥
+
+=
+
+ −𝜖 ˜ℎ𝑥 , 1√︁ 
+
+1 + 𝜖 2 ˜ℎ2
+
+> 𝑥
+
+≈  −𝜖 ˜ℎ𝑥 , 1 , (A.7) 
+
+t = (1, ℎ 𝑥 )√︁ 
+
+1 + ℎ2
+
+> 𝑥
+
+≈  1, 𝜖 ˜ℎ𝑥 
+
+ , (A.8) 
+
+∇ · n = − ℎ𝑥 𝑥 
+
+√︁ 
+
+1 + ℎ2
+
+> 𝑥
+
+3 ≈ − 𝜖 𝐿 ˜ℎ𝑥 𝑥 . (A.9) Returning to condition (A.6), one can divide this into a tangential and normal stress balance through the use of a scalar product on (A.6), using t and n respectively. This evaluates to 
+
+˜𝑢 𝑦 = 0 at ˜𝑦 = ˜ℎ, (A.10) 
+
+˜𝑝 − 𝑝 𝑎 = − 1
+
+𝜖 −3Ca ˜ℎ𝑥 𝑥 at ˜𝑦 = ˜ℎ, (A.11) for the tangential and normal stress balances respectively. We may integrate the non-dimensional continuity equation with respect to ˜𝑦 from ˜𝑦 = 0 to ˜𝑦 = ˜ℎ.Applying Leibniz’s theorem then the kinematic boundary condition and no-slip condition yields, 
+
+∫ ˜ℎ
+
+> 0
+
+˜𝑢𝑑 ˜𝑦 
+
+!
+
+> 𝑥
+
++ ˜ℎ𝑡 = 0. (A.12) Looking to the simplified, non-dimensionalised 𝑦 -momentum equation, we see pressure is independent of 𝑦 . Consequently, the normal stress balance implies 
+
+˜𝑝 𝑥 = − 1
+
+𝜖 −3Ca ˜ℎ𝑥 𝑥 𝑥 , (A.13) which results in a modified 𝑥 -momentum equation 
+
+− 1
+
+𝜖 −3Ca ˜ℎ𝑥 𝑥 𝑥 = ˜𝑢 𝑦𝑦 . (A.14) Integrating and applying boundary conditions yields a parabolic horizontal velocity profile, 
+
+˜𝑢 = − 1
+
+𝜖 −3Ca ˜ℎ𝑥 𝑥 𝑥 𝑦 
+
+ ˜𝑦 
+
+2 − ˜ℎ
+
+
+
+. (A.15) With this expression, we evaluate (A.12), 
+
+˜ℎ𝑡 + 13𝜖 −3Ca 
+
+ ˜ℎ3 ˜ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+= 0, (A.16) to give a thin film evolution equation in the desired form. It is then convenient to define a re-scaled capillary number, ¯𝐶𝑎 ≔ 𝜖 −3Ca . Returning to a dimensional form, we obtain 
+
+ℎ𝑡 = − 𝜎 
+
+3𝜇 
+
+
+
+ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+. (A.17) Journal of Nonlinear Waves 41 
+
+B. Residual Scaling 
+
+We know the residuals scale as 
+
+𝑟 (𝑥, 𝑡 ) ∼ Δ𝑡ℎ 𝑡𝑡 (B.1) from the local truncation error of the BDF1 scheme used. From applying a temporal derivative to (4.3) with Schwarz’s theorem we can see that 
+
+ℎ𝑡𝑡 ∼ 𝜕 𝑥 (𝜕 𝑡 (ℎ3 ℎ𝑥 𝑥 𝑥 )) 
+
+ℎ𝑡𝑡 ∼ 𝜕 𝑥 (3ℎ2 ℎ𝑡 ℎ𝑥 𝑥 𝑥 + ℎ3 ℎ𝑡 𝑥 𝑥 𝑥 )
+
+ℎ𝑡𝑡 ∼ 𝜕 𝑥 (3ℎ2 ℎ𝑥 𝑥 𝑥 (𝜕 𝑥 (ℎ3 ℎ𝑥 𝑥 𝑥 )) + ℎ3𝜕 𝑥 𝑥 𝑥 (𝜕 𝑥 (ℎ3 ℎ𝑥 𝑥 𝑥 ))) . (B.2) Considering ℎ0 (𝑥 ) ≔ ℎ(𝑥, 0) = 1 + 𝐴𝑒 𝑖𝑘 𝑥 with 𝐴 < 1,
+
+ℎ𝑡𝑡 |𝑡 =0 ∼ ℎ60 𝑘 8,
+
+so 
+
+𝑟 (𝑥, 0) ∼ Δ𝑡𝑘 8 ℎ60.
+
+Using max 𝑥 {ℎ(𝑥, 0)} ≈ 1.75 and inspecting the highest activated angular wavenumber of 𝑘 = 11 × 2𝜋 ,then 𝑟 (𝑥, 0) = O( 10 6), which is consistent with our data. Excluding early-time data improves the coefficient estimates. Performance could also be improved by generating datasets with an alternative scheme to reduce early-time residuals. 
+
+C. Critical Tolerance and the Relation to Row Sub-Sampling 
+
+We assess why the undesirable case discussed in section 4.3.1 is not realised. To see whether the critical tolerance value of the sub-sampled system is greater, we start by considering the sign of max 𝑗 {𝑥 ∗ 
+
+> 𝑗
+
+− ˆ𝑥 𝑗 }.We may look to randomised numerical linear algebra and sub-space embeddings. Relating to regression problems, 𝑆 ∈ R𝑚 ×𝑛 is a sub-space embedding (Woodruff 2014) of the column space of 𝐴 if 
+
+||| 𝑆 𝐴𝑥 || 2 − || 𝐴𝑥 || 2 | < 𝛿, for some small 𝛿 > 0, with high probability. In essence stating that the geometry of the column space of 𝐴 is approximate to 𝑆 𝐴 . Re-calling that the row-sampling matrix 𝑆 is constructed by uniform random sampling with replacement, it is not guaranteed to be a sub-space embedding. However, we are aided by a number of factors. Using clean data and large over-sampling with 𝑛 ≫ 𝑝 and the expected number of uniquely sampled rows E[𝑚 ] = (1 − 𝑒 −1)𝑛 ≫ 𝑝 
+
+increases the probability of a sub-space embedding, which would constrain || 𝑥 ∗ − ˆ𝑥 || 2. Furthermore, we recall the use of ridge regression and column normalisation with system re-scaling, so define ˜𝑥 ∗, ˆ˜𝑥 as the solutions to the altered full and sub-sampled systems respectively. The regularisation parameter 𝜆 is kept constant, so has increased influence on the solution to the sub-sampled system, which is pre-conditioned in the same manner. Consequently explaining our observations that max 𝑗 { ˜𝑥 ∗ 
+
+> 𝑗
+
+− ˆ˜𝑥 𝑗 } > 0.
+
+D. Noisy Surface Tension Driven Thin Film Equation 
+
+To ensure robustness to errors relating to interface reconstruction and interpolation, which can be present in direct numerical simulation data, we look to the case of artificially contaminating finite difference based solution data with small additive Gaussian noise. The point-wise application of this Gaussian noise is more corrupting than the typical errors expected from DNS results (Scardovelli and Zaleski 1999). 42 Dooley et al. 
+
+We focus on the case of 1% additive Gaussian noise, defined with respect to the range of the data. We introduce the noise point-wise, 
+
+˜ℎ(𝑥 𝑖 , 𝑡 𝑗 ) = ℎ(𝑥 𝑖 , 𝑡 𝑗 ) + 𝜖 𝑖 𝑗 , ∀𝑖, 𝑗 ∈ [[ 𝑁 𝑥 ]] × [[ 𝑁 𝑡 ]] 
+
+with 𝜖 𝑖 𝑗 identically and independently distributed according to 
+
+𝜖 𝑖 𝑗 ∼ N ( 0, 0.01 (max  
+
+> 𝑥,𝑡
+
+{ℎ(𝑥, 𝑡 )} − min  
+
+> 𝑥,𝑡
+
+{ℎ(𝑥, 𝑡 )})) .
+
+A key consideration is whether to mass-correct, because prior system knowledge informs us of mass conservation of wave profiles over time. We can apply this to post-process the artificially corrupted data, but doing so alters the statistical properties of the noise, as 𝜖 𝑐 𝑖 𝑗 = 𝜖 𝑖 𝑗 − 1
+
+> 𝑁 𝑥
+
+Í𝑖 𝜖 𝑖 𝑗 . Consequently, the noise is no longer uncorrelated with respect to space. Our treatment means it remains uncorrelated with respect to time, so 𝜖 satisfies 
+
+Var (𝜖 𝑐 𝑖 𝑗 ) = 𝜎 2
+
+
+
+1 − 1
+
+𝑁 𝑥 
+
+
+
+, Cov (𝜖 𝑐 𝑖 𝑗 , 𝜖 𝑐 𝑘 𝑗 ) = − 𝜎 2
+
+𝑁 𝑥 
+
+.
+
+We choose to additively mass correct for all studied cases, enforcing 
+
+1
+
+𝐿 𝑋 𝑁 𝑥 ∑︁ 
+
+> 𝑖 =1
+
+˜ℎ(𝑥 𝑖 , 𝑡 𝑗 )Δ𝑥 = 1, ∀ 𝑗 ∈ [[ 𝑁 𝑡 ]] .
+
+We study the case of adding Gaussian noise to every data-point, adding Gaussian noise to a sub-sample of data-points, and a boundary processed case, where point-wise noise is pre-multiplied by a function, 
+
+14
+
+
+
+1 + tanh 
+
+
+
+𝛼 
+
+
+
+𝑥 − 𝐿 𝑋 
+
+10 
+
+  
+
+1 − tanh 
+
+
+
+𝛼 
+
+
+
+𝑥 − 9𝐿 𝑋 
+
+10 
+
+ 
+
+− 𝑓 0,
+
+with a steepness parameter 𝛼 ∈ R, before being added to clean data. We use 𝑓 0 ∈ R to ensure that noise is zero at the endpoints of our finite length domain. We see 𝑓 0 → 0 as 𝛼𝐿 𝑋 → ∞ .With noisy input data, we discuss alterations to our numerical differentiation schemes from 2.3. 
+
+D.1. Smoothing 
+
+Cases with noise require more careful consideration and real-world data is rarely provided in a clean format, so we are motivated to study methods of de-noising data. To de-noise data, we apply a two-stage process of de-noising then discovery, using standard techniques, instead of attempting to optimise and de-noise concurrently through solving a dual-problem. This pre-smoothing paradigm is readily applicable to systems with direct observations and predictors. For equation discovery, the observable and the linear system as a whole requires construction from data, so pre-smoothing is motivated by improving the stability of numerical differentiation. The application of low-pass spectral filters and Gaussian convolution are considered for pre-processing before applying equation discovery techniques. We begin by considering a Gaussian convolution of data, which is a fast de-noising technique that can remove high-frequency noise and gives strong performance for cases with small, uncorrelated, non-skewed noise with zero mean (D’Haeyer 1989). We take the 2D convolution over a finite domain 
+
+(ℎ ∗ 𝐺 )( 𝑥, 𝑡 ) =
+
+∫ 𝐿 𝑋 
+
+> 0
+
+∫ 𝑡 𝐹 
+
+> 0
+
+ℎ( ˜𝑥, ˜𝑡 )𝐺 (𝑥 − ˜𝑥, 𝑡 − ˜𝑡 )𝑑 ˜𝑡𝑑 ˜𝑥, Journal of Nonlinear Waves 43 and in the discrete setting this becomes a ‘sliding’ matrix multiplication 
+
+(ℎ ∗ 𝐺 )𝑖 𝑗 = 
+
+> 𝑁 𝑥 −1
+
+∑︁  
+
+> 𝑛 =0
+> 𝑁 𝑡 −1
+
+∑︁ 
+
+> 𝑚 =0
+
+ℎ𝑛𝑚 𝐺 𝑖 −𝑛, 𝑗 −𝑚 , where 0 ≤ 𝑖 < 𝑁 𝑥 + 𝑁 𝐺 − 1 and 0 ≤ 𝑗 < 𝑁 𝑡 + 𝑀 𝐺 − 1,
+
+with a Gaussian kernel, 𝐺 ∈ R𝑁 𝐺 ×𝑀 𝐺 , that approximates the function 
+
+𝐺 (𝑥, 𝑦 ) = 12𝜋𝜎 2 𝑒 (− 𝑥 2+𝑦 22𝜎 2 ) .
+
+A commonly used Gaussian kernel is that of 𝐺 ∈ R3×3 with 
+
+𝐺 = 116 
+
+©«
+
+1 2 1 2 4 2 1 2 1 
+
+ª®¬
+
+. (D.1) Looking to a 1D variant, the discrete setting yields 
+
+(ℎ ∗ 𝐺 )𝑖 𝑗 = 
+
+> 𝑁 𝑡 −1
+
+∑︁ 
+
+> 𝑚 =0
+
+ℎ𝑖𝑚 𝐺 𝑗 −𝑚 , where 0 ≤ 𝑗 < 𝑁 𝑡 + 𝑀 𝐺 − 1,
+
+with a Gaussian kernel 𝐺 ∈ R𝑀 𝐺 . This is analogous when applied to the spatial dimension. We use kernel 
+
+𝐺 = 14 (1 2 1) .
+
+One consideration with the application of Gaussian blurring is that of edge handling. The data is the solution of a non-trivial IVP and the temporal boundaries are non-periodic, whereas spatial boundaries are periodic. When applying the convolution at the edges of the domain, the multiplication attempts to access values from outside of the domain. In our work, we use the periodicity of spatial values and don’t apply the convolution at temporal boundaries. For applying equation discovery to our systems of interest, fourth-order spatial derivatives are required. Consequently, Gaussian blurring alone was found to be insufficient. To remove the noise, a larger kernel is required to approximate 𝐺 (𝑥, 𝑦 ) with large 𝜎 , degrading the data quality too greatly. We now consider a global Butterworth filter, which is a spectral method that involves applying the Fourier transform for low pass filtering within frequency space. Spectral filtering can use a pre-defined hard threshold, so high frequency oscillations above the threshold are discarded. Whilst this is effective at reducing aleatoric error, it requires careful consideration of the threshold value and indiscriminately removes noise and high-frequency dynamics. A typical cut-off is that of (2/3)𝑘 𝑚𝑎𝑥 , meaning that the highest 1/3 of frequencies are removed (Boyd 2001), although tailoring this cut-off is highly recommended (Ahnert and Abel 2007). The Butterworth filter provides a smooth variant that is applied in Fourier space to smoothly reduce Fourier coefficients of high frequency signal components. This still requires a choice of cut-off wavenumber as well as a filter steepness parameter. The Butterworth filter can be applied as a 1D or 2D variant. The 2D variant accounts for joint spatial and temporal frequencies, so can respect the full spatio-temporal structure of the data. Alternatively, one may apply the 1D Butterworth filter sequentially along dimensions for a fast application of the scheme. We select sequential 1D application, due to the lack of periodicity of our data with respect to time. Spectral methods have implicit periodicity assumptions, so we apply the 1D Butterworth filter in the spatial dimension only. Some literature suggests padding to apply spectral filters to non-periodic data (Boyd 2002). 44 Dooley et al. 
+
+Rather than manually choosing the filter hyper-parameters, we use an automatic selection scheme. To enable this, a range of filter hyper-parameter values is manually inputted and selection is done via a grid-search of values. For every tested hyper-parameter pair, the Butterworth filter is applied to the dataset and a mean square error is calculated using a comparison dataset. This comparison data is the original dataset that has been 2D Gaussian convolved (Li and Carvalho 2024) and had a hard spectral filter with cut-off ratio 0.5 applied. The minimiser of this mean square error is the selected hyper-parameter pair. 
+
+D.2. Results 
+
+With noisy inputted data, we apply the techniques discussed in section D.1. To produce high quality point-wise spatial derivative estimates, we apply the 1D Butterworth filter along the spatial dimension of the noisy dataset for each point in time and automatically select filter parameters using a dense linear sampling of threshold values and a log-linear sampling of steepness values for a grid search. With this smoothing, derivative estimates are calculated using spectral differentiation. The choice of this filtering method respects the periodicity of the data and effectively removes high-frequency noise, because the dataset initial condition is composed of a sparse selection of activated frequencies with low associated wavenumbers. To produce temporal derivative estimates, we process the data separately. Taking the original noisy dataset, a 1D Gaussian convolution is applied and the observable is calculated using finite differences. The low order of the temporal derivative required, relative to the spatial derivatives, allows for a simpler de-noising process. Having applied smoothing to the training data and generating an associated linear system, the remaining equation discovery process remains unchanged. All studied cases of noise corrupted data are treated in the same manner. Figure 12 shows an overview of our results with the best corrected AIC models shown for the noise affected cases. There is strong qualitative agreement between the original data and the discovered equation on clean datasets, as well as a low 𝐿 2 error to support this. The inclusion of noise with no handling, such as filtering or smoothing, yields a very poor result that is similar to a null model, ℎ𝑡 = 0. This is expected. Applying a filtering/smoothing process to noise applied point-wise improves results significantly and the recovered equations are quite distinct from the null model. We see that despite recovery of the exact form failing, equations that give lower errors than the naively processed noisy case are produced. Slightly worse performance is seen for the case of sparsely applied noise. Inspecting the sets of candidate models produced, we see single-term and two-term models proposed before a large jump in model complexity to 7 to 12 terms. The jump in complexity is larger for the case of sparsely applied noise and may indicate that it is important to consider applying different processes for sparse and dense noise, with knowledge of the density of noise needed a priori . Existing techniques such as robust principal component analysis (r-PCA) have shown great success when applied to cases in which noise is sparse (Candès et al 2011; Scherl et al 2020). Our results reinforce that noise affected datasets present complication to strong-form equation dis-covery and that this is the case for thin liquid film datasets. However, we see significant improvements in model quality from the application of simple de-noising techniques to the additive Gaussian cases studied. 
+
+E. A Sufficient Bound for Recovery 
+
+We consider a PDE system ℎ𝑡 = N ( ℎ) that we may represent by Í𝑝 𝑖 =1 𝜉 ∗ 
+
+> 𝑖
+
+𝜙 𝑖 (ℎ(𝑥, 𝑡 )) with a sparse, true coefficient vector 𝜉 ∗ ∈ R𝑝 and 𝑝 elements of a function library. We define the set 𝑆 ∗ ≔ supp (𝜉 ∗).We assume all terms describing the PDE are contained within the function library and that the formed design matrix is full-rank. We also assume the library is generated from products and derivatives of observations ℎ(𝑥, 𝑡 ).Journal of Nonlinear Waves 45 
+
+Figure 12. (a) shows the solution data for a validation initial condition solved using finite differences. (b) shows the evolution of the same initial condition, using the equation discovered from clean data using our pipeline. (c) shows the evolution of the same initial condition, using the equation discovered from noisy data using our pipeline without filtering/smoothing. The evolution (d) relates to the equation found using data corrupted by noise at every point on the input data. The evolution (e) relates to the equation found using data corrupted by noise at every point pre-multiplied by a tanh like function. So there is effectively clean data within 0.1L of the spatial boundaries, x=0, x=L and noisy data in the "bulk". The evolution (f) relates to the equation found using data corrupted by noise at a uniform sub-sampling of points on the input data. Roughly every 64 points, so 16 noise affected points per wave profile. Coefficients rounded to 2d.p. 
+
+We take a multi-modal initial condition ℎ(𝑥, 0) = 1 + 𝐴 (cos (𝑘 1𝑥 ) + cos (𝑘 2𝑥 )) for fixed 𝑘 1, 𝑘 2 ∈ N
+
+that are co-prime. For small time, we see ℎ(𝑥, 𝑡 ) = 1 + 𝐴 (cos (𝑘 1𝑥 ) + cos (𝑘 2𝑥 )) + 𝜓 (𝑥, 𝑡 ), where 𝜓 (𝑥, 𝑡 )
+
+is a small perturbation to the initial condition. Then 𝜓 (𝑥, 𝑡 ) = 𝜓 0 + 𝑡 Ψ(𝑥 ) + O( 𝑡 2) with 𝜓 0 ≡ 0. So 
+
+ℎ(𝑥, 𝑡 ) = 1 + 𝐴 (cos (𝑘 1𝑥 ) + cos (𝑘 2𝑥 )) + 𝑡 Ψ(𝑥 ) + O( 𝑡 2). Taking the temporal derivative and evaluating at 𝑡 = 0, we see Ψ(𝑥 ) = ℎ𝑡 |𝑡 =0 and to leading order ℎ𝑡 = Ψ (𝑥 ) + O( 𝑡 ).We consider basis functions 
+
+𝜙 𝑗 (ℎ(𝑥, 𝑡 )) = 𝜙 𝑗 (ℎ(𝑥, 0)) + 𝑡𝐷𝜙 𝑗 [ℎ0]N ( ℎ0) + O( 𝑡 2).
+
+Consider Θ0, 𝑏 0 defined by [Θ0]𝑖 𝑗 = 𝜙 𝑗 (ℎ0 (𝑥 𝑖 )) and [𝑏 0]𝑖 = N ( ℎ0)( 𝑥 𝑖 ). Then Θ0 ∈ R𝑁 𝑥 × 𝑝 , 𝑏 0 ∈
+
+R𝑁 𝑥 are row subsampled forms of Θ, 𝑏 respectively that relate to the observations of the initial condition and we further assume 𝑁 𝑥 > 𝑝 to allow Θ0 to also be of full-rank, given a sufficiently spectrally rich initial condition is selected. In the small time limit, Θ(𝑡 𝐹 ) = Θ 0 + O( 𝑡 𝐹 ) and 𝑏 (𝑡 𝐹 ) = 𝑏 0 + O( 𝑡 𝐹 ). We consider the leading order linear system Θ0𝜉 = 𝑏 0.46 Dooley et al. 
+
+We have the ridge regression solution ˆ𝜉 (𝜆 ) = (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+𝑏 0 with regularisation constant 
+
+𝜆 ∈ R≥0. With small time, we assume 𝑏 0 = Θ 0𝜉 ∗ + 𝛿𝑏 , where 𝛿𝑏 ∈ R𝑁 𝑥 represents the residual. So 
+
+ˆ𝜉 (𝜆 ) = (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+Θ0𝜉 ∗ + ( Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+𝛿𝑏. 
+
+We see 
+
+(Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+Θ0𝜉 ∗ = (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1 (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 − 𝜆𝐼 )𝜉 ∗ (E.1) 
+
+= (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1 (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )𝜉 ∗ − ( Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1𝜆𝐼𝜉 ∗ (E.2) 
+
+= 𝜉 ∗ − 𝜆 (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1𝜉 ∗, (E.3) so 
+
+ˆ𝜉 (𝜆 ) = 𝜉 ∗ − 𝜆 (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1𝜉 ∗ + ( Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+𝛿𝑏. 
+
+Therefore 
+
+|| ˆ𝜉 (𝜆 ) − 𝜉 ∗ || 2 = || − 𝜆 (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1𝜉 ∗ + ( Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+𝛿𝑏 || 2, (E.4) with triangle inequality 
+
+|| ˆ𝜉 (𝜆 ) − 𝜉 ∗ || 2 ≤ || 𝜆 (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1𝜉 ∗ || 2 + ||( Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+𝛿𝑏 || 2, (E.5) and by submultiplicativity 
+
+|| ˆ𝜉 (𝜆 ) − 𝜉 ∗ || 2 ≤ || 𝜆 (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1 || 2 || 𝜉 ∗ || 2 + ||( Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+|| 2 || 𝛿𝑏 || 2. (E.6) With the symmetric nature of the gram matrix Θ𝑇  
+
+> 0
+
+Θ0, we consider the largest eigenvalue of (Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )
+
+for the first term. For the second additive term, we consider the singular value decomposition of 
+
+Θ0 = 𝑈 Σ𝑉 𝑇 with orthogonal 𝑈, 𝑉 to give 
+
+(Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1 = (𝑉 (Σ𝑇 Σ + 𝜆𝐼 )𝑉 𝑇 )−1 (E.7) 
+
+= 𝑉 (Σ𝑇 Σ + 𝜆𝐼 )−1𝑉 𝑇 . (E.8) Thus, using the orthogonality of 𝑈 and 𝑉 
+
+||( Θ𝑇  
+
+> 0
+
+Θ0 + 𝜆𝐼 )−1Θ𝑇  
+
+> 0
+
+|| 2 = || 𝑉 (Σ𝑇 Σ + 𝜆𝐼 )−1𝑉 𝑇 𝑉 Σ𝑇 𝑈 𝑇 || 2 (E.9) 
+
+= || 𝑉 (Σ𝑇 Σ + 𝜆𝐼 )−1Σ𝑇 𝑈 𝑇 || 2 (E.10) 
+
+= ||( Σ𝑇 Σ + 𝜆𝐼 )−1Σ𝑇 || 2, (E.11) leaving the norm of a diagonal matrix. 
+
+|| ˆ𝜉 (𝜆 ) − 𝜉 ∗ || 2 ≤ 𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 + max 
+
+> 𝑖
+
+ 𝜎 𝑖 (Θ0)
+
+𝜎 𝑖 (Θ0)2 + 𝜆 
+
+
+
+|| 𝛿𝑏 || 2 (E.12) 
+
+≤ 𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 + 12√𝜆 || 𝛿𝑏 || 2. (E.13) Now we know that | ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+| =√︃ ( ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+)2 ≤√︃ Í 𝑗 ( ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+)2 = || ˆ𝜉 (𝜆 ) − 𝜉 ∗ || 2, ∀ 𝑗 and so 
+
+| ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+| ≤ 𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 + 12√𝜆 || 𝛿𝑏 || 2, (E.14) Journal of Nonlinear Waves 47 with reverse triangle inequality 
+
+| ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+| = |𝜉 ∗ 
+
+> 𝑗
+
++ ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+| (E.15) 
+
+≥ |𝜉 ∗ 
+
+> 𝑗
+
+| − | ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+| (E.16) 
+
+≥ | 𝜉 ∗ 
+
+> 𝑗
+
+| − | ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+|, (E.17) so 
+
+| ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+| ≥ | 𝜉 ∗ 
+
+> 𝑗
+
+| − 𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 − 12√𝜆 || 𝛿𝑏 || 2. (E.18) Considering also 
+
+| ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+| − | 𝜉 ∗ 
+
+> 𝑗
+
+| ≤ | ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+| − | 𝜉 ∗ 
+
+> 𝑗
+
+| ≤ | ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+− 𝜉 ∗ 
+
+> 𝑗
+
+|, (E.19) and taking the case of terms outside of the true support with 𝜉 ∗ 
+
+> 𝑗
+
+= 0
+
+| ˆ𝜉 (𝜆 ) 
+
+> 𝑗
+
+| ≤ 𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 + 12√𝜆 || 𝛿𝑏 || 2. (E.20) Considering the lower bound on components of the ridge regression solution corresponding to the true support 𝑆 ∗ and the upper bound on the components associated with spurious terms in (𝑆 ∗)𝐶 , we see a gap between terms in the true support requiring 
+
+|𝜉 ∗ 
+
+> 𝑗
+
+| − 𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 − 12√𝜆 || 𝛿𝑏 || 2 > 𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 + 12√𝜆 || 𝛿𝑏 || 2. (E.21) for a strict separation. Thus, for the minimum coefficient we need 
+
+min   
+
+> 𝑗 ∈𝑆 ∗
+
+{| 𝜉 ∗ 
+
+> 𝑗
+
+|} > 2𝜆 || 𝜉 ∗ || 2
+
+𝜎 𝑚𝑖𝑛 (Θ𝑇  
+
+> 0
+
+Θ0) + 𝜆 + 1
+
+√𝜆 || 𝛿𝑏 || 2 ≥ 0. (E.22) Consequently, we have a sufficient, though not necessary, condition. The condition is conservative and is similar to classical variable selection literature (Bühlmann and Geer 2013), effectively specifying a sufficient signal strength. For our system, the condition (E.22) was not satisfied for any training datasets considered. However, we see a sufficiently spectrally rich initial condition was selected, evidenced by successful recoveries and intuitively supported through the activation of co-prime frequencies. We observed that Θ was numerically of full rank. The number of spatial samples was sufficient ( 𝑁 𝑥 = 256 > 60 = 𝑝 ) and reduced aliasing effects, particularly with low-frequencies being initially excited. Furthermore, we may deem the PDE to be amenable to recovery, as the fourth-order parabolic system lacks advective terms and models a single physical effect. 
+
+F. Derivation Details for Thin Liquid Films under Gravity 
+
+Once again, we begin with a 2D incompressible Navier-Stokes system 
+
+
+
+𝜌  𝑢 𝑡 + [ 𝑢𝑢 𝑥 + 𝑣𝑢 𝑦 ] = −𝑝 𝑥 + 𝜇 (𝑢 𝑥 𝑥 + 𝑢 𝑦𝑦 ) + 𝜌𝑔 sin (𝜃 ),𝜌  𝑣 𝑡 + [ 𝑢𝑣 𝑥 + 𝑣𝑣 𝑦 ] = −𝑝 𝑦 + 𝜇 (𝑣 𝑥 𝑥 + 𝑣 𝑦𝑦 ) − 𝜌𝑔 cos (𝜃 ),𝑢 𝑥 + 𝑣 𝑦 = 0,
+
+(F.1) 48 Dooley et al. 
+
+and apply non-dimensionalisation using, 
+
+𝑥 = ˜𝑥𝐿, 𝑦 = ˜𝑦𝜖 𝐿, 𝑢 = ˜𝑢𝑈, 𝑣 = ˜𝑣𝜖𝑈, 𝑡 = ˜𝑡 𝐿 𝑈 , 𝑝 = ˜𝑝 𝜇𝑈 𝐿 , 𝑔 = ˜𝑔 𝑈 2
+
+𝐿 ,
+
+Re ≔ 𝜌𝑈 𝐿 𝜇 , Ca ≔ 𝜇𝑈 𝜎 , St ≔ 𝜌𝑔𝐿 2
+
+𝜇𝑈 ,
+
+where 𝜖 ≔ 𝐻 𝐿 ≪ 1 and 𝐻 represents the vertical length-scale which is disparate from the horizontal length-scale. This yields the 2D non-dimensional incompressible Navier-Stokes system 
+
+
+
+𝜖 2Re   ˜𝑢 𝑡 + [ ˜𝑢 ˜𝑢 𝑥 + ˜𝑣 ˜𝑢 𝑦 ] = − ˜𝑝 𝑥 + ( 𝜖 2 ˜𝑢 𝑥 𝑥 + ˜𝑢 𝑦𝑦 ) + 𝜖 2St sin (𝜃 ),𝜖 4Re   ˜𝑣 𝑡 + [ ˜𝑢 ˜𝑣 𝑥 + ˜𝑣 ˜𝑣 𝑦 ] = − ˜𝑝 𝑦 + ( 𝜖 4 ˜𝑣 𝑥 𝑥 + 𝜖 2 ˜𝑣 𝑦𝑦 ) − 𝜖 3St cos (𝜃 ),
+
+˜𝑢 𝑥 + ˜𝑣 𝑦 = 0.
+
+(F.2) We then additionally assume that 𝜖 2Re ≪ 1, 𝜖 3St cos (𝜃 ) ∼ O( 1), and 𝜖 2St sin (𝜃 ) ∼ O( 1) to obtain 
+
+
+
+− ˜𝑝 𝑥 + ˜𝑢 𝑦𝑦 + 𝜖 2St sin (𝜃 ) = 0,
+
+− ˜𝑝 𝑦 − 𝜖 3St cos (𝜃 ) = 0,
+
+˜𝑢 𝑥 + ˜𝑣 𝑦 = 0.
+
+(F.3) With this simplified system, we now consider boundary conditions. A no-slip boundary is applied at 
+
+𝑦 = 0,
+
+˜𝑢 = ˜𝑣 = 0 at 𝑦 = 0. (F.4) A kinematic condition exists at the free surface, which after considering leading order dynamics gives 
+
+˜ℎ𝑡 + ˜𝑢 ˜ℎ𝑥 = ˜𝑣, at 𝑦 = ℎ(𝑥, 𝑡 ). (F.5) Additionally, a dynamic condition of the form 
+
+−𝑝 𝑎 n − T · n = n𝜎 ∇ · n, (F.6) is applied with 𝑝 𝑎 representing atmospheric pressure, n the outward normal to the fluid, and the stress tensor T = −𝑝 I + 2𝜇 E with rate-of-strain tensor E = sym (∇ u). Utilising the length-scale disparity, one notes 
+
+n ≈  −𝜖 ˜ℎ𝑥 , 1 , (F.7) 
+
+t ≈  1, 𝜖 ˜ℎ𝑥 
+
+ , (F.8) 
+
+∇ · n ≈ − 𝜖 𝐿 ˜ℎ𝑥 𝑥 . (F.9) Returning to the dynamic condition (F.6), one can divide this into a tangential and normal stress balance, through the use of a scalar product on (F.6) using t and n respectively. This evaluates to 
+
+˜𝑢 𝑦 = 0 at ˜𝑦 = ˜ℎ, (F.10) 
+
+˜𝑝 − 𝑝 𝑎 = − 1
+
+𝜖 −3Ca ˜ℎ𝑥 𝑥 at ˜𝑦 = ˜ℎ, (F.11) for the tangential and normal stress balances respectively. Journal of Nonlinear Waves 49 We may integrate the non-dimensional continuity equation with respect to ˜𝑦 from ˜𝑦 = 0 to ˜𝑦 = ˜ℎ.Applying Leibniz’s theorem then the kinematic boundary condition and no-slip condition yields, 
+
+∫ ˜ℎ
+
+> 0
+
+˜𝑢𝑑 ˜𝑦 
+
+!
+
+> 𝑥
+
++ ˜ℎ𝑡 = 0 (F.12) However, pressure is no longer independent of 𝑦 . Inspecting the 𝑦 -momentum equation and defining 
+
+¯𝑆𝑡 = 𝜖 3St ,
+
+𝑝 = − ¯𝑆𝑡 cos (𝜃 )𝑦 + 𝐶, (F.13) so we resolve the constant using the normal stress balance to evaluate the surface pressure, 𝑝 |𝑦 =ℎ,
+
+𝑝 = − ¯𝑆𝑡 cos (𝜃 )( 𝑦 − ℎ) + 𝑝 𝑎 − 1¯𝐶𝑎 ℎ𝑥 𝑥 . (F.14) Looking to the 𝑥 -momentum equation is now quite different, 
+
+− 1¯𝐶𝑎 ℎ𝑥 𝑥 𝑥 + ¯𝑆𝑡 cos (𝜃 )ℎ𝑥 = ˜𝑢 𝑦𝑦 + ¯𝑆𝑡𝜖 −1 sin (𝜃 ). (F.15) After integration we have 
+
+¯𝑆𝑡 
+
+
+
+cos (𝜃 )ℎ𝑥 − 𝜖 −1 sin (𝜃 ) − 1¯𝐶𝑎 ¯𝑆𝑡 ℎ𝑥 𝑥 𝑥 
+
+  𝑦 2
+
+2 − ℎ𝑦 
+
+
+
+= 𝑢 (𝑥, 𝑦, 𝑡 ). (F.16) Substituting this into (F.12), yields 
+
+ℎ𝑡 −
+
+ ℎ3
+
+3 ¯𝑆𝑡 
+
+
+
+cos (𝜃 )ℎ𝑥 − 𝜖 −1 sin (𝜃 ) − 1¯𝐶𝑎 ¯𝑆𝑡 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+= 0. (F.17) Re-arranging and re-scaling with 𝜏 ≔ 𝑇  
+
+> ¯𝐶 𝑎
+
+˜𝑡 gives 
+
+ℎ𝜏 = − 13
+
+
+
+ℎ3 
+
+ℎ𝑥 𝑥 𝑥 + ¯𝐵𝑜 
+
+
+
+𝜖 −1 sin (𝜃 ) − ℎ𝑥 cos (𝜃 )
+
+  
+
+> 𝑥
+
+, (F.18) where we define a Bond number Bo ≔ 𝜌𝑔𝐿 2 
+
+> 𝜎
+
+and a re-scaled Bond number ¯𝐵𝑜 ≔ 𝜖 −1Bo . We can then dimensionalise this equation to form 
+
+ℎ𝑡 = − 13𝜇 
+
+
+
+ℎ3 (𝜎ℎ 𝑥 𝑥 𝑥 + 𝜌𝑔 (sin (𝜃 ) − ℎ𝑥 cos (𝜃 ))) 
+
+ 
+
+> 𝑥
+
+. (F.19) Alternatively, with equation (F.19), we can inspect the flux, 
+
+𝑞 (𝑥, 𝑡 ) = 13𝜇 
+
+
+
+ℎ3 (𝜎ℎ 𝑥 𝑥 𝑥 + 𝜌𝑔 (sin (𝜃 ) − ℎ𝑥 cos (𝜃 ))) 
+
+
+
+, (F.20) and notice that the Nusselt scaling is apparent with 𝑄 0 = 𝐻 3 
+
+> 3𝜇
+
+𝜌𝑔 sin (𝜃 ). Thus, with 𝑞 = 𝑄 0 ˜𝑞 , one sees 
+
+𝑞 𝑄 0
+
+= ˜ℎ3 − 𝐻 𝐿 cot (𝜃 ) ˜ℎ3 ˜ℎ𝑥 + 𝜎 𝜌𝑔 sin (𝜃 )
+
+ℎ𝐿 3 ˜ℎ3 ˜ℎ𝑥 𝑥 𝑥 . (F.21) 50 REFERENCES 
+
+Thus, defining 𝐿 = 3√︃ 𝜎𝐻 𝜌𝑔 sin ( 𝜃 ) , yields 
+
+𝑞 𝑄 0
+
+= ˜ℎ3 − 𝜖 cot (𝜃 ) ˜ℎ3 ˜ℎ𝑥 + ˜ℎ3 ˜ℎ𝑥 𝑥 𝑥 . (F.22) Then, analysing ℎ𝑡 + 𝑞 𝑥 = 0, we see 
+
+𝐻 𝑇 ˜ℎ𝑡 = − 𝑄 0
+
+𝐿 ˜𝑞 𝑥 , (F.23) which we resolve through the choice of time-scale, 𝑇 = 𝐻 𝐿 𝑄 0 = 3𝜇𝐿 𝐻 2 𝜌𝑔 sin ( 𝜃 ) .Consequently, the final non-dimensional model is 
+
+ℎ𝑡 = −
+
+
+
+ℎ3 − 𝜖 cot (𝜃 )ℎ3 ℎ𝑥 + ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+, (F.24) which we may write with Φ ≔ 𝜖 cot (𝜃 ), as 
+
+ℎ𝑡 = −
+
+
+
+ℎ3 − Φℎ3 ℎ𝑥 + ℎ3 ℎ𝑥 𝑥 𝑥 
+
+ 
+
+> 𝑥
+
+. (F.25) 
+
+G. Existence and Uniqueness of a Constrained Cubic Root 
+
+From equation (5.2), we analyse the cubic 𝑓 (𝑠 ) = 𝑠 3 +𝛼𝑠 2 −1, where 𝛼 ≔ Φ 2 1
+
+> 𝐻 2
+
+ 𝜎𝐻 𝜌𝑔 
+
+ 23
+
+. We inspect the regime 0 < 𝜃 < 𝜋  
+
+> 2
+
+and see that Φ = 𝜖 cot (𝜃 ) > 0, so 𝛼 > 0. Taking a derivative, 𝑓 ′ (𝑠 ) = 3𝑠 2 + 2𝛼𝑠 , we see 𝑓 ′ (𝑠 ) > 0, ∀𝑠 > 0. For 𝜃 ∈  0, 𝜋 
+
+> 2
+
+, 𝑠 = sin 23 (𝜃 ) ∈ ( 0, 1). Inspecting 𝑓 (0) = −1 and 𝑓 (1) = 𝛼 > 0,we apply the intermediate value theorem to note the existence of a root for 𝑠 ∈ ( 0, 1). Thus, with strict monotonicity we see that the root 𝑠 ∈ ( 0, 1) is also unique for this cubic. For 𝜃 = 𝜋  
+
+> 2
+
+, Φ = 0, so 𝛼 = 0. 𝑓 (𝑠 ) = 𝑠 3 − 1 with real root 𝑠 = 1.
+
+Acknowledgments. Sebastian T. Dooley is grateful for the computing resources supplied by the University of Warwick Scientific Computing Research Technology Platform (SCRTP). 
+
+Funding Statement. All co-authors gratefully acknowledge funding from the UK Engineering and Physical Sciences Research Council (EPSRC) grant EP/S022848/1 for the University of Warwick Centre for Doctoral Training in Modelling of Heterogeneous Systems (HetSys). 
+
+Competing Interests. The authors report no conflict of interest. 
+
+Data Availability Statement. A compact version of the code used for this paper, along with installation instructions and documentation, can be found on GitHub via the following URL: https://github.com/SebDooley/equation_discovery_liquid_film_ flows. For the purpose of open access, the authors have applied a Creative Commons Attribution (CC BY) licence to any arising Author Accepted Manuscript version. 
+
+Ethical Standards. The research meets all required ethical guidelines. 
+
+Author Contributions. Conceptualisation: S.T.D; A.P.B; J.E.S; R.C. Investigation: S.T.D; A.P.B; J.E.S; R.C. Methodology: S.T.D; A.P.B; J.E.S; R.C. Software: S.T.D. Data curation: S.T.D. Formal analysis: S.T.D. Data visualisation: S.T.D. Writing -original draft: S.T.D; J.E.S; R.C. Writing - review & editing: S.T.D; A.P.B; J.E.S; R.C. All authors approved the final submitted draft. 
+
+References 
+
+Nusselt W (1923) Der wärmeaustausch am berieselungskühler. VDI-Z 67 (9), 206–216. 
+
+Levenberg K (1944) A Method for the Solution of Certain Non-Linear Problems in Least Squares. Quarterly of Applied Mathematics 2(2), 164–168. doi: https://doi.org/10.1090/qam/10666. REFERENCES 51 
+
+Marquardt DW (1963) An Algorithm for Least-Squares Estimation of Nonlinear Parameters. Journal of the Society for Industrial and Applied Mathematics 11 (2), 431–441. doi: https://doi.org/10.1137/0111030. 
+
+Benney DJ (1966) Long waves on liquid films. Journal of Mathematics and Physics 45 (1-4), 150–155. doi: 10 . 1002 / sapm1966451150. 
+
+Sivashinsky G (1977) Nonlinear analysis of hydrodynamic instability in laminar flames—I. Derivation of basic equations. Acta Astronautica 4(11-12), 1177–1206. doi: 10.1016/0094-5765(77)90096-0. 
+
+Kuramoto Y (1978) Diffusion-induced chaos in reaction systems. Progress of Theoretical Physics Supplement 64 , 346–367. doi: 10.1143/ptps.64.346. 
+
+Sivashinsky GI (1980) On flame propagation under conditions of stoichiometry. SIAM Journal on Applied Mathematics 39 (1), 67–82. doi: 10.1137/0139007. 
+
+D’Haeyer JP (1989) Gaussian filtering of images: A regularization approach. Signal processing 18 (2), 169–181. 
+
+Chang H (1994) Wave Evolution on a Falling Film. Annual Review of Fluid Mechanics 26 (Volume 26, 1994), 103–136. issn :1545-4479. doi: https://doi.org/10.1146/annurev.fl.26.010194.000535. https://www.annualreviews.org/content/journals/10. 1146/annurev.fl.26.010194.000535. 
+
+Efron B and Tibshirani R (1994) An Introduction to the Bootstrap . Chapman and Hall/CRC, 52–53. isbn : 9781000064988. doi: https://doi.org/10.1201/9780429246593. 
+
+Natarajan BK (1995) Sparse Approximate Solutions to Linear Systems. SIAM Journal on Computing 24 (2), 227–234. doi: 10 . 1137 / S0097539792240406. eprint: https : / / doi . org / 10 . 1137 / S0097539792240406. https : / / doi . org / 10 . 1137 / S0097539792240406. 
+
+Ockendon H and Ockendon JR (1995) Viscous Flow . Cambridge Texts in Applied Mathematics. Cambridge University Press. 
+
+Bertozzi AL and Pugh MC (1996) The Lubrication Approximation for Thin Viscous films: Regularity and long-time Behavior of Weak Solutions. Communications on Pure and Applied Mathematics 49 (2), 85–123. doi: https://doi.org/10.1002/(sici)1097-0312(199602)49:2%3C85::aid-cpa1%3E3.0.co;2-2. 
+
+Oron A, Davis SH and Bankoff SG (3 1997) Long-scale evolution of thin liquid films. Rev. Mod. Phys. 69 (3), 931–980. doi: 10.1103/RevModPhys.69.931. https://link.aps.org/doi/10.1103/RevModPhys.69.931. 
+
+Myers TH (1998) Thin Films with High Surface Tension. Siam Review 40 (3), 441–462. doi: https : / / doi . org / 10 . 1137 / s003614459529284x. 
+
+Scardovelli R and Zaleski S (1999) DIRECT NUMERICAL SIMULATION OF FREE-SURFACE AND INTERFACIAL FLOW. 
+
+Annual Review of Fluid Mechanics 31 (Volume 31, 1999), 567–603. issn : 1545-4479. doi: https://doi.org/10.1146/annurev. fluid.31.1.567. https://www.annualreviews.org/content/journals/10.1146/annurev.fluid.31.1.567. 
+
+Hessel V, Ehrfeld W, Golbig K, Haverkamp V, Löwe H, Storz M, Wille C, Guber AE, Jähnisch K and Baerns M 
+
+(2000) Gas / Liquid Microreactors for Direct Fluorination of Aromatic Compounds Using Elemental Fluorine. In Ehrfeld W (ed), Microreaction Technology: Industrial Prospects . Berlin, Heidelberg: Springer Berlin Heidelberg, 526–540. isbn :978-3-642-59738-1. 
+
+Ruyer-Quil C and Manneville P (2000) Improved modeling of flows down inclined planes. The European Physical Journal B 
+
+15 (2), 357–369. doi: 10.1007/s100510051137. 
+
+Boyd JP (2001) Chebyshev and Fourier Spectral Methods . Mineola, New York: Dover Publications, 211–213. isbn :9780486411835. 
+
+Boyd JP (2002) A Comparison of Numerical Algorithms for Fourier Extension of the First, Second, and Third Kinds. Journal of Computational Physics 178 (1), 118–160. doi: https://doi.org/10.1006/jcph.2002.7023. 
+
+Ruyer-Quil C and Manneville P (2002) Further accuracy and convergence results on the modeling of flows down inclined planes by weighted-residual approximations. Physics of Fluids 14 (1), 170–183. doi: 10.1063/1.1426103. 
+
+Kassam AK and Trefethen LN (2005) Fourth-Order Time-Stepping for Stiff PDEs. SIAM Journal on Scientific Computing 
+
+26 (4), 1214–1233. doi: https://doi.org/10.1137/s1064827502410633. 
+
+Ribatski G and Jacobi AM (2005) Falling-film evaporation on horizontal tubes—a critical review. International Journal of Refrigeration 28 (5), 635–653. issn : 0140-7007. doi: https://doi.org/10.1016/j.ijrefrig.2004.12.002. https://www.sciencedirect. com/science/article/pii/S0140700704002622. 
+
+Scheid B, Ruyer-Quil C, Thiele U, Kabov O, Legros JC and Colinet P (2005) Validity domain of the Benney equation including the Marangoni effect for closed and open flows. Journal of Fluid Mechanics 527 , 303–335. 
+
+Herrity KK, Gilbert AC and Tropp JA (2006) Sparse approximation via iterative thresholding. In 2006 IEEE International Conference on Acoustics Speech and Signal Processing Proceedings . vol 3. IEEE, III–III. 
+
+Ahnert K and Abel M (2007) Numerical differentiation of experimental data: local versus global methods. Computer Physics Communications 177 (10), 764–774. issn : 0010-4655. doi: https : / / doi . org / 10 . 1016 / j . cpc . 2007 . 03 . 009. https : / / www. sciencedirect.com/science/article/pii/S0010465507003116. 
+
+Blumensath T and Davies M (2008) Iterative Thresholding for Sparse Approximations. Journal of Fourier Analysis and Applications 14 (5-6), 629–654. doi: https://doi.org/10.1007/s00041-008-9035-z. 
+
+Ha Y, Kim YJ and Myers TG (2008) On the numerical solution of a driven thin film equation. Journal of Computational Physics 227 (15), 7246–7263. issn : 0021-9991. doi: https://doi.org/10.1016/j.jcp.2008.04.007. https://www.sciencedirect. com/science/article/pii/S0021999108002222. 52 REFERENCES 
+
+Volodin P and Kondyurin A (2008) Dewetting of Thin Polymer Film on Rough substrate: I. Theory. Journal of physics. D, Applied Physics 41 (6), 065306–065306. doi: https://doi.org/10.1088/0022-3727/41/6/065306. 
+
+Craster RV and Matar OK (2009) Dynamics and stability of Thin Liquid Films. Reviews of Modern Physics 81 (3), 1131–1198. doi: 10.1103/revmodphys.81.1131. 
+
+Hastie T, Tibshirani R and Friedman J (2009) The Elements of Statistical learning, Second Edition : Data mining, inference, and Prediction , 2nd ed. New York: Springer. isbn : 9780387848570. 
+
+Oron A, Gottlieb O and Novbari E (2009) Numerical Analysis of a weighted-residual Integral boundary-layer Model for Nonlinear Dynamics of Falling Liquid Films. European Journal of mechanics. B, Fluids 28 (1), 1–36. doi: https://doi.org/10. 1016/j.euromechflu.2007.12.002. 
+
+Arnold TW (2010) Uninformative Parameters and Model Selection Using Akaike’s Information Criterion. The Journal of Wildlife Management 74 (6), 1175–1178. doi: https : / / doi . org / 10 . 1111 / j . 1937 - 2817 . 2010 . tb01236 . x. eprint: https : //wildlife.onlinelibrary.wiley.com/doi/pdf/10.1111/j.1937-2817.2010.tb01236.x. https://wildlife.onlinelibrary.wiley.com/doi/ abs/10.1111/j.1937-2817.2010.tb01236.x. 
+
+Burnham KP and Anderson DR (2010) Model Selection and Multimodel Inference : a Practical Information-Theoretic Approach .New York: Springer, 284–293. isbn : 9781441929730. 
+
+Hairer E and Wanner G (2010) Solving Ordinary Differential Equations II , 2nd ed. Springer Berlin, Heidelberg. isbn :9783642052217. 
+
+Candès EJ, Li X, Ma Y and Wright J (2011) Robust principal component analysis? J. ACM 58 (3). issn : 0004-5411. doi: 10.1145/1970392.1970395. https://doi.org/10.1145/1970392.1970395. 
+
+Deb K (2011) KanGAL Report. Multi-Objective Optimization Using Evolutionary Algorithms: An Introduction. 2011003. Indian Institute of Technology Kanpur. Available at https://www.egr.msu.edu/~kdeb/papers/k2011003.pdf. 
+
+Kalliadasis S, Ruyer-Quil C, Scheid B and Velarde MG (2011) Falling Liquid Films . Springer Science & Business Media. 
+
+isbn : 9781848823679. 
+
+Bühlmann P and Geer S van de (2013) Statistics for High-Dimensional Data : Methods, Theory and Applications . Berlin: Springer, 187–189. isbn : 9783642268571. 
+
+James G, Witten D, Hastie T and Tibshirani R (2013) An Introduction to Statistical Learning . Springer. isbn : 9781461471394. 
+
+Olver P (2013) Introduction to Partial Differential Equations . Springer, 181–214. isbn : 9783319021003. 
+
+Schmitt M, Baunach M, Wengeler L, Peters K, Junges P, Scharfer P and Schabel W (2013) Slot-die processing of lithium-ion battery electrodes—Coating window characterization. Chemical Engineering and Processing: Process Intensification 68 ,Advances in Coating and Drying of Thin Films, 32–37. issn : 0255-2701. doi: https://doi.org/10.1016/j.cep.2012.10.011. https://www.sciencedirect.com/science/article/pii/S0255270112001997. 
+
+Swanson ER, Strickland SL, Shearer M and Daniels KE (2014) Surfactant Spreading on a Thin Liquid film: Reconciling Models and Experiments. Journal of Engineering Mathematics 94 (1), 63–79. doi: https://doi.org/10.1007/s10665-014-9735-0. 
+
+Woodruff DP (2014) Sketching as a Tool for Numerical Linear Algebra. Found. Trends Theor. Comput. Sci. 10 (1–2), 1–157. 
+
+issn : 1551-305X. doi: 10.1561/0400000060. https://doi.org/10.1561/0400000060. 
+
+Kalogirou A, Keaveny EE and Papageorgiou DT (2015) An in-depth numerical study of the two-dimensional Kuramoto-Sivashinsky equation. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 471 (2179), 20140932. issn : 1364-5021. doi: 10.1098/rspa.2014.0932. eprint: https://royalsocietypublishing.org/rspa/article-pdf/doi/10. 1098/rspa.2014.0932/367522/rspa.2014.0932.pdf. https://doi.org/10.1098/rspa.2014.0932. 
+
+Lavalle G, Vila JP, Blanchard G, Laurent C and Charru F (2015) A numerical reduced model for thin liquid films sheared by a gas flow. Journal of Computational Physics 301 , 119–140. issn : 0021-9991. doi: https://doi.org/10.1016/j.jcp.2015.08.018. https://www.sciencedirect.com/science/article/pii/S0021999115005458. 
+
+Thompson A, Tseluiko D and Papageorgiou D (2015) Falling liquid films with blowing and suction. Journal of Fluid Mechanics 
+
+787 , 292–330. doi: 10.1017/jfm.2015.683. 
+
+Brunton SL, Proctor JL and Kutz JN (2016) Discovering governing equations from data by sparse identification of nonlinear dynamical systems. Proceedings of the National Academy of Sciences 113 (15), 3932–3937. doi: 10.1073/pnas.1517384113. 
+
+Mangan NM, Brunton SL, Proctor JL and Kutz JN (2016) Inferring Biological Networks by Sparse Identification of Nonlinear Dynamics. IEEE Transactions on Molecular, Biological and Multi-Scale Communications 2(1), 52–63. doi: https://doi.org/ 10.1109/tmbmc.2016.2633265. 
+
+Pan VY (2016) How Bad Are Vandermonde Matrices? SIAM Journal on Matrix Analysis and Applications 37 (2), 676–694. doi: 10.1137/15M1030170. eprint: https://doi.org/10.1137/15M1030170. https://doi.org/10.1137/15M1030170. 
+
+Thompson AB, Gomes SN, Pavliotis GA and Papageorgiou DT (2016) Stabilising falling liquid film flows using feedback control. Physics of Fluids 28 (1), 012107. issn : 1070-6631. doi: 10.1063/1.4938761. eprint: https://pubs.aip.org/aip/pof/article-pdf/doi/10.1063/1.4938761/16066180/012107_1_online.pdf. https://doi.org/10.1063/1.4938761. 
+
+Kutz JN (2017) Deep learning in fluid dynamics. Journal of Fluid Mechanics 814 , 1–4. doi: 10.1017/jfm.2016.803. 
+
+Mangan NM, Kutz JN, Brunton SL and Proctor JL (2017) Model selection for dynamical systems via sparse regression and information criteria. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 473 (2204), REFERENCES 53 
+
+20170009. issn : 1364-5021. doi: 10.1098/rspa.2017.0009. eprint: https://royalsocietypublishing.org/rspa/article-pdf/doi/10. 1098/rspa.2017.0009/365284/rspa.2017.0009.pdf. https://doi.org/10.1098/rspa.2017.0009. 
+
+Rudy SH, Brunton SL, Proctor JL and Kutz JN (2017) Data-driven discovery of partial differential equations. Science Advances 
+
+3(4). doi: 10.1126/sciadv.1602614. 
+
+Schaeffer H (2017) Learning partial differential equations via data discovery and sparse optimization. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 473 (2197), 20160446. doi: 10.1098/rspa.2016.0446. 
+
+Wray AW, Papageorgiou DT and Matar OK (2017) Reduced Models for Thick Liquid Layers with Inertia on Highly Curved Substrates. SIAM Journal on Applied Mathematics 77 (3), 881–904. doi: 10.1137/16M1060686. eprint: https://doi.org/10. 1137/16M1060686. https://doi.org/10.1137/16M1060686. 
+
+Hutson M (2018) Has artificial intelligence become alchemy? Science 360 (6388), 478–478. doi: 10.1126/science.360.6388.478. eprint: https://www.science.org/doi/pdf/10.1126/science.360.6388.478. https://www.science.org/doi/abs/10.1126/science. 360.6388.478. 
+
+Tomlin RJ, Gomes SN, Pavliotis GA and Papageorgiou DT (2018) Optimal Control of Thin Liquid Films and Transverse Mode Effects. SIAM J. Appl. Dyn. Syst. 18 , 117–149. https://api.semanticscholar.org/CorpusID:51681554. 
+
+Papageorgiou DT (2019) Film Flows in the Presence of Electric Fields. Annual Review of Fluid Mechanics 51 (Volume 51, 2019), 155–187. issn : 1545-4479. doi: https://doi.org/10.1146/annurev-fluid-122316-044531. https://www.annualreviews. org/content/journals/10.1146/annurev-fluid-122316-044531. 
+
+Richard G, Gisclon M, Ruyer-Quil C and Vila J (2019) Optimization of consistent two-equation models for thin film flows. 
+
+European Journal of Mechanics - B/Fluids 76 , 7–25. issn : 0997-7546. doi: https://doi.org/10.1016/j.euromechflu.2019.01.004. https://www.sciencedirect.com/science/article/pii/S0997754618304655. 
+
+Rudy S, Alla A, Brunton SL and Kutz JN (2019) Data-Driven Identification of Parametric Partial Differential Equations. 
+
+SIAM Journal on Applied Dynamical Systems 18 (2), 643–660. doi: 10.1137/18M1191944. eprint: https://doi.org/10.1137/ 18M1191944. https://doi.org/10.1137/18M1191944. 
+
+Zhang L and Schaeffer H (2019) On the Convergence of the SINDy Algorithm. Multiscale Modeling & Simulation 17 (3), 948– 972. doi: 10.1137/18M1189828. eprint: https://doi.org/10.1137/18M1189828. https://doi.org/10.1137/18M1189828. 
+
+Brunton SL, Noack BR and Koumoutsakos P (2020) Machine Learning for Fluid Mechanics. Annual Review of Fluid Mechanics 
+
+52 (1), 477–508. doi: 10.1146/annurev-fluid-010719-060214. 
+
+Chen D, Hu F, Nian G and Yang T (2020) Deep Residual Learning for Nonlinear Regression. Entropy 22 (2). issn : 1099-4300. doi: 10.3390/e22020193. https://www.mdpi.com/1099-4300/22/2/193. 
+
+Cranmer M (2020) Pysr: Fast & parallelized symbolic regression in python/julia. Zenodo, September .
+
+Hastie T (2020) Ridge Regularization: An Essential Concept in Data Science. Technometrics 62 (4), PMID: 36033922, 426–433. doi: 10.1080/00401706.2020.1791959. eprint: https://doi.org/10.1080/00401706.2020.1791959. https://doi.org/10.1080/ 00401706.2020.1791959. 
+
+Hastie T, Tibshirani R and Tibshirani R (2020) Best Subset, Forward Stepwise or Lasso? Analysis and Recommendations Based on Extensive Comparisons. Statistical Science 35 (4). doi: https://doi.org/10.1214/19-sts733. 
+
+Kaheman K, Kutz JN and Brunton SL (2020) SINDy-PI: a robust algorithm for parallel implicit sparse identification of nonlinear dynamics. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 476 (2242), 20200279. issn : 1364-5021. doi: 10.1098/rspa.2020.0279. eprint: https://royalsocietypublishing.org/rspa/article-pdf/doi/10. 1098/rspa.2020.0279/638633/rspa.2020.0279.pdf. https://doi.org/10.1098/rspa.2020.0279. 
+
+Scherl I, Strom B, Shang JK, Williams O, Polagye BL and Brunton SL (5 2020) Robust principal component analysis for modal decomposition of corrupt fluid flows. Phys. Rev. Fluids 5 (5), 054401. doi: 10.1103/PhysRevFluids.5.054401. https://link.aps.org/doi/10.1103/PhysRevFluids.5.054401. 
+
+Udrescu SM and Tegmark M (2020) AI Feynman: A physics-inspired method for symbolic regression. Science Advances 
+
+6(16), eaay2631. doi: 10.1126/sciadv.aay2631. eprint: https://www.science.org/doi/pdf/10.1126/sciadv.aay2631. https: //www.science.org/doi/abs/10.1126/sciadv.aay2631. 
+
+Witelski TP (2020) Nonlinear dynamics of dewetting thin films. AIMS Mathematics 5(5), 4229–4259. issn : 2473-6988. doi: 10.3934/math.2020270. https://www.aimspress.com/article/doi/10.3934/math.2020270. 
+
+Wray AW and Cimpeanu R (2020) Reduced-order modelling of thick inertial flows around rotating cylinders. Journal of Fluid Mechanics 898 , A1. doi: 10.1017/jfm.2020.421. 
+
+Chatzigiannakis E, Jaensson N and Vermant J (2021) Thin liquid films: Where hydrodynamics, capillarity, surface stresses and intermolecular forces meet. Current Opinion in Colloid & Interface Science 53 , 101441. issn : 1359-0294. doi: https: //doi.org/10.1016/j.cocis.2021.101441. https://www.sciencedirect.com/science/article/pii/S135902942100025X. 
+
+Cimpeanu R, Gomes SN and Papageorgiou DT (2021) Active control of liquid film flows: Beyond reduced-order models. 
+
+Nonlinear Dynamics 104 (1), 267–287. doi: 10.1007/s11071-021-06287-5. 
+
+Cortiella A, Park KC and Doostan A (2021) Sparse identification of nonlinear dynamical systems via reweighted ℓ1-regularized least squares. Computer Methods in Applied Mechanics and Engineering 376 , 113620–113620. doi: https://doi.org/10.1016/ j.cma.2020.113620. 54 REFERENCES 
+
+Karniadakis GE, Kevrekidis IG, Lu L, Perdikaris P, Wang S and Yang L (2021) Physics-informed Machine Learning. Nature Reviews Physics 3(6), 422–440. doi: https://doi.org/10.1038/s42254-021-00314-5. https://www.nature.com/articles/s42254-021-00314-5. 
+
+Martina-Perez S, Simpson MJ and Baker RE (2021) Bayesian uncertainty quantification for data-driven equation learning. 
+
+Proceedings of the Royal Society A: Mathematical Physical and Engineering Sciences 477 (2254). doi: https://doi.org/10. 1098/rspa.2021.0426. 
+
+Messenger DA and Bortz DM (2021) Weak SINDy for partial differential equations. Journal of Computational Physics 443 ,110525. issn : 0021-9991. doi: https://doi.org/10.1016/j.jcp.2021.110525. https://www.sciencedirect.com/science/article/pii/ S0021999121004204. 
+
+Chen Y, Luo Y, Liu Q, Xu H and Zhang D (2 2022) Symbolic genetic algorithm for discovering open-form partial differential equations (SGA-PDE). Phys. Rev. Res. 4 (2), 023174. doi: 10.1103/PhysRevResearch.4.023174. https://link.aps.org/doi/10. 1103/PhysRevResearch.4.023174. 
+
+Dong X, Bai YL, Lu Y and Fan M (2022) An improved sparse identification of nonlinear dynamics with Akaike information criterion and group sparsity. Nonlinear Dynamics 111 (2), 1485–1510. doi: https://doi.org/10.1007/s11071-022-07875-9. 
+
+Fasel U, Kutz JN, Brunton BW and Brunton SL (2022) Ensemble-SINDy: Robust sparse model discovery in the low-data, high-noise limit, with active learning and control. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 478 (2260), 20210904. issn : 1364-5021. doi: 10.1098/rspa.2021.0904. eprint: https://royalsocietypublishing.org/ rspa/article-pdf/doi/10.1098/rspa.2021.0904/355985/rspa.2021.0904.pdf. https://doi.org/10.1098/rspa.2021.0904. 
+
+Freijeiro-González L, Febrero-Bande M and González-Manteiga W (2022) A Critical Review of LASSO and Its Derivatives for Variable Selection Under Dependence Among Covariates. International Statistical Review 90 (1), 118–145. doi: https: //doi.org/10.1111/insr.12469. eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1111/insr.12469. https://onlinelibrary.wiley. com/doi/abs/10.1111/insr.12469. 
+
+Huang Y, Mabrouk Y, Gompper G and Sabass B (2022) Sparse Inference and Active Learning of Stochastic Differential Equations from Data. Scientific Reports 12 (1). doi: https://doi.org/10.1038/s41598-022-25638-9. 
+
+Maddu S, Cheeseman BL, Sbalzarini IF and Müller CL (2022) Stability selection enables robust learning of differential equations from limited noisy data. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 
+
+478 (2262), 20210916. issn : 1364-5021. doi: 10.1098/rspa.2021.0916. eprint: https://royalsocietypublishing.org/rspa/article-pdf/doi/10.1098/rspa.2021.0916/345916/rspa.2021.0916.pdf. https://doi.org/10.1098/rspa.2021.0916. 
+
+VandenHeuvel DJ, Drovandi C and Simpson MJ (2022) Computationally efficient mechanism discovery for cell invasion with uncertainty quantification. PLoS Computational Biology 18 (11), e1010599–e1010599. doi: https://doi.org/10.1371/journal. pcbi.1010599. 
+
+Bertsimas D and Gurnee W (2023) Learning sparse nonlinear dynamics via mixed-integer optimization. Nonlinear Dynamics 
+
+111 . doi: https://doi.org/10.1007/s11071-022-08178-9. 
+
+Kaptanoglu AA, Zhang L, Nicolaou ZG, Fasel U and Brunton SL (2023) Benchmarking sparse system identification with low-dimensional chaos. en. Nonlinear Dynamics , 6 February 111 (14), 13143–13164. issn : 1573-269X. doi: 10.1007/s11071-023-08525-4. https://doi.org/10.1007/s11071-023-08525-4 (accessed 6 February 2025). 
+
+Martin-Linares CP, Psarellis YM, Karapetsas G, Koronaki ED and Kevrekidis IG (2023) Physics-agnostic and physics-infused machine learning for thin films flows: modelling, and predictions from small data. Journal of Fluid Mechanics 975 .
+
+issn : 1469-7645. doi: 10.1017/jfm.2023.868. http://dx.doi.org/10.1017/jfm.2023.868. 
+
+Supekar R, Song B, Hastewell A, Choi GPT, Mietke A and Dunkel J (2023) Learning hydrodynamic equations for active matter from particle simulations and experiments. Proceedings of the National Academy of Sciences 120 (7), e2206994120. doi: 10.1073/pnas.2206994120. eprint: https://www.pnas.org/doi/pdf/10.1073/pnas.2206994120. https://www.pnas.org/doi/ abs/10.1073/pnas.2206994120. 
+
+Cui T, Bertalan T, Ndahiro N, Khare P, Betenbaugh M, Maranas C and Kevrekidis IG (2024) Data-driven and physics informed modeling of Chinese Hamster Ovary cell bioreactors. Computers & Chemical Engineering 183 , 108594. issn :0098-1354. doi: https://doi.org/10.1016/j.compchemeng.2024.108594. https://www.sciencedirect.com/science/article/pii/ S0098135424000127. 
+
+Holroyd OA, Cimpeanu R and Gomes SN (2024) Linear Quadratic Regulation Control for Falling Liquid Films. SIAM Journal on Applied Mathematics 84 (3), 940–960. doi: 10.1137/23M1548475. eprint: https://doi.org/10.1137/23M1548475. https: //doi.org/10.1137/23M1548475. 
+
+Lewin-Jones P, Lockerby DA and Sprittles JE (2024) Collision of liquid drops: bounce or merge? Journal of Fluid Mechanics 
+
+995 , A1. doi: 10.1017/jfm.2024.722. 
+
+Li W and Carvalho R (2024) Automating the discovery of partial differential equations in dynamical systems. Machine Learning: Science and Technology 5(3), 035046. 
+
+Schmid AC, Doostan A and Pourahmadian F (2024) Ensemble wsindy for data driven discovery of governing equations from laser-based full-field measurements. arXiv preprint arXiv:2409.20510 .
+
+VandenHeuvel DJ, Buenzli PR and Simpson MJ (2024) Pushing coarse-grained models beyond the continuum limit using equation learning. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 480 (2281), REFERENCES 55 
+
+20230619. issn : 1364-5021. doi: 10 . 1098 / rspa . 2023 . 0619. eprint: https : / / royalsocietypublishing . org / rspa / article - pdf / doi/10.1098/rspa.2023.0619/512400/rspa.2023.0619.pdf. https://doi.org/10.1098/rspa.2023.0619. 
+
+Brunton SL, Zolman N, Kutz JN and Fasel U (2025) Machine Learning for Sparse Nonlinear Modeling and Control. Annual Review of Control, Robotics, and Autonomous Systems 8(Volume 8, 2025), 127–152. issn : 2573-5144. doi: https://doi.org/10. 1146/annurev-control-030123-015238. https://www.annualreviews.org/content/journals/10.1146/annurev-control-030123-015238. 
+
+Champneys MD and Rogers TJ (2025) BINDy: Bayesian identification of nonlinear dynamics with reversible-jump Markov-chain Monte Carlo. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 481 (2319), 20240620. issn : 1364-5021. doi: 10.1098/rspa.2024.0620. eprint: https://royalsocietypublishing.org/rspa/article-pdf/doi/10. 1098/rspa.2024.0620/2814324/rspa.2024.0620.pdf. https://doi.org/10.1098/rspa.2024.0620. 
+
+Delgado-Cano D, Kracht E, Fasel U and Herrmann B (2025) Sindy on Attracting Manifolds. Nonlinear Dynamics 114 (1). doi: https://doi.org/10.1007/s11071-025-11884-9. 
+
+Fung L, Fasel U and Juniper M (2025) Rapid Bayesian identification of sparse nonlinear dynamics from scarce and noisy data. 
+
+Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 481 (2307). doi: https://doi.org/10. 1098/rspa.2024.0200. 
+
+Heinrich KS, Seth DS, Ehrnstrom M and Ellingsen SÅ (2025) Rediscovering shallow water equations from experimental data. 
+
+arXiv preprint arXiv:2511.05486 .
+
+Jones E and Nakatsukasa Y (2025) SubApSnap: Solving parameter-dependent linear systems with a snapshot and subsampling .arXiv: 2510.04825 [math.NA] . Available at https://arxiv.org/abs/2510.04825. 
+
+Reeves MT, Wasserman WW, Harrison RA, Marinković I, Luu N, Sawadsky A, Sfendla YL, Harris GI, Bowen WP and Baker CG (2025) Nonlinear wave dynamics on a chip. Science 390 (6771), 371–376. doi: 10.1126/science.ady3042. eprint: https://www.science.org/doi/pdf/10.1126/science.ady3042. https://www.science.org/doi/abs/10.1126/science.ady3042. 
+
+Salmaniw Y and Browning AP (2025) Structural Identifiability of linear-in-parameter Parabolic PDEs through Auxiliary Elliptic Operators. Journal of Mathematical Biology 91 (1). doi: https://doi.org/10.1007/s00285-025-02225-w. 
+
+Wu X, McDermott M and MacLean AL (2025) Data-driven model discovery and model selection for noisy biological systems. 
+
+PLoS Computational Biology 21 (1), e1012762–e1012762. doi: https://doi.org/10.1371/journal.pcbi.1012762. 
+
+Xu H, Chen Y, Cao R, Tang T, Du M, Li J, Callaghan AH and Zhang D (2025) Generative Discovery of Partial Differential Equations by Learning from Math Handbooks. Nature Communications 16 (1). doi: https://doi.org/10.1038/s41467- 025-65114-2. 
+
+Mayer MD, Oswald N and Papageorgiou DT (2026) Liquid mixing and sculpting using light-actuated photosurfactants. Journal of Fluid Mechanics 1030 , A29. doi: 10.1017/jfm.2026.11264. 
+
+Viknesh S, Tatari Y, Christenson C and Arzani A (1 2026) ADAM-SINDy: An efficient optimization framework for parame-terized nonlinear dynamical system identification. Phys. Rev. Res. 8 (1), 013040. doi: 10.1103/dwkk-5g2h. https://link.aps. org/doi/10.1103/dwkk-5g2h. 
+
+Zheng H and Lin G (2026) LES-SINDy: Laplace-enhanced sparse identification of nonlinear dynamical systems. Journal of Computational Physics 546 , 114443. issn : 0021-9991. doi: https : / / doi . org / 10 . 1016 / j . jcp . 2025 . 114443. https : / / www. sciencedirect.com/science/article/pii/S0021999125007259.

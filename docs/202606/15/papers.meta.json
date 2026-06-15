@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-15",
+  "date": "2026-06-15",
+  "generated_at": "2026-06-15T22:49:03",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/15/2606.13336v1-data-driven-equation-discovery-for-nonlinear-liquid-film-flows",
+      "section": "quick",
+      "title_en": "Data-Driven Equation Discovery for Nonlinear Liquid Film Flows",
+      "authors": "Sebastian T. Dooley, Albert P. Bartók, James E. Sprittles, Radu Cimpeanu",
+      "date": "2026-06-11",
+      "pdf": "https://arxiv.org/pdf/2606.13336v1",
+      "score": "7.0",
+      "evidence": "采用数据驱动方程发现研究液膜流动动力学，直接关联降膜建模。",
+      "tldr": "传统第一性原理方法难以严格推导非线性液膜流动的控制方程，数据驱动方程发现技术为此类复杂系统提供了新途径。本研究针对液膜流动问题，利用专家知识精心构建数据，在最佳场景下尝试识别偏微分方程，但揭示出基于单项式基函数的多重共线性导致严重辨识困难，且早期瞬态丰富的动态行为引入最大残差。这些发现准确界定了当前数据驱动发现技术的脆弱性，为开发数值稳定、更具韧性的下一代算法铺平了道路。",
+      "tags": "query:falling-film",
+      "abstract_en": "Over the past decade data-driven equation discovery emerged as a powerful alternative to first principles-based methodologies traditionally used in mathematical modelling cycles. The approach provides a promising path towards deep, physical insight into systems that have previously evaded rigorous mathematical derivation procedures, often due to intractable complexity. The strengths of such techniques have been successfully established for many problem classes described by systems of ordinary differential equations and continue to be extended, with their reach into partial differential equation systems gaining momentum, though comparatively nascent. Herein we tackle such a frontier: elucidating the dynamics of liquid film flows, a problem space providing a rich backdrop in terms of asymptotic analytical building blocks. By leveraging expert knowledge and the ability to carefully curate data, we establish a best-case scenario for identifying the underlying governing equations. Even here, multi-collinearity, stemming from the choice of monomial basis functions in our multi-scale flow configuration, introduces complex identifiability issues. Early-time transients compound this further, as the most dynamically rich behaviour carries the largest residuals in training data. Pinpointing such vulnerabilities allows us to better define the boundaries of current discovery techniques and paves the way for the next generation of more resilient, numerically stable algorithms.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

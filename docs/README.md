@@ -6,28 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-14
-- 运行时间：2026-06-14 20:53:27 UTC
+- 最新运行日期：2026-06-15
+- 运行时间：2026-06-15 22:48:57 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：1
+- 本次总论文数：1
+- 精读区：0
 - 速读区：1
 
 ### 今日简报（AI）
-今日研读两篇流体力学前沿，其中数据驱动方程发现获9.0高分，混合液滴蒸发动力学速读铺垫背景。  
-最值得关注的是用数据驱动方法直接挖掘出非线性液膜流动的控制方程，避免了传统人为假设。  
-读者若想窥见“AI assisted 流体建模”的现状，从这篇高分精读入手即可快速抓住核心。
-- 详情：[/202606/14/README](/202606/14/README)
+今日速读一篇关于数据驱动方程发现的论文，探索非线性液膜流动的建模。  
+该研究揭示如何从数据中自动提取非线性液膜流动的支配方程，为复杂流体建模提供新路径。  
+建议结合实验数据验证方法，可关注其对工业涂布或微流控的潜在应用。
+- 详情：[/202606/15/README](/202606/15/README)
 
 ### 精读区论文标签
-1. [Data-Driven Equation Discovery for Nonlinear Liquid Film Flows](/202606/14/2606.13336v1-data-driven-equation-discovery-for-nonlinear-liquid-film-flows)  
-   标签：评分：9.0/10、query:falling-film
-   evidence：液膜流动的数据驱动方程发现
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Translation dynamics of evaporating sessile binary-mixture droplet populations](/202606/14/2606.11388v1-translation-dynamics-of-evaporating-sessile-binary-mixture-droplet-populations)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：研究蒸发薄二元混合液滴，考虑蒸发冷却和浓度梯度引起的Marangoni应力，与薄液膜传热传质相关。
+1. [Data-Driven Equation Discovery for Nonlinear Liquid Film Flows](/202606/15/2606.13336v1-data-driven-equation-discovery-for-nonlinear-liquid-film-flows)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：采用数据驱动方程发现研究液膜流动动力学，直接关联降膜建模。
 
 
 <div class="dpr-home-promo-card">
