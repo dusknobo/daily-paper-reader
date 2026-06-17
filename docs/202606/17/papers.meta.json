@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-17",
+  "date": "2026-06-17",
+  "generated_at": "2026-06-17T22:20:14",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/17/2606.17862v1-riemann-invariant-based-alternative-weno-scheme-for-a-two-layer-thin-film-model",
+      "section": "quick",
+      "title_en": "Riemann invariant-based alternative WENO scheme for a two-layer thin film model",
+      "authors": "Biswarup Biswas, Rahul Barthwal, Rakesh Kumar",
+      "date": "2026-06-16",
+      "pdf": "https://arxiv.org/pdf/2606.17862v1",
+      "score": "7.0",
+      "evidence": "基于黎曼不变量为两层薄膜模型开发WENO方法，与降膜模拟相关",
+      "tldr": "本文扩展了原有仅适用于Marangoni数为1的两层薄液膜模型，证明了更一般条件下系统具有完整的Riemann不变量集。基于此，提出一种利用Riemann不变量进行局部特征分解的WENO（RI-WENO）格式，通过巧妙的变量变换使特征向量矩阵稀疏化，显著降低标准LCD-WENO的计算量。数值试验展示了该方法在多个新基准测试上具有与传统方法相当的精度，同时大幅提升了计算效率，为两层液膜模拟提供了高效的数值工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this article, we develop a multi-dimensional two-layer thin film model extending the thin film model proposed in \\cite{barthwal2025hyperbolic}. The model considered in \\cite{barthwal2025hyperbolic} considered a very specific Marangoni scale by choosing Marangoni numbers in both layers to be $1$. We relax this condition here and prove that the obtained system possesses a full set of Riemann invariants. Based on these findings, we develop a Riemann Invariant-based Local Characteristic Decomposition WENO (RI-WENO) method for the two-layer thin film model in one and two dimensions. The method is built upon a specially designed variable transformation constructed from the derived Riemann invariants of the system. This transformation partially diagonalizes the governing equations and yields a sparse structure in the transformed eigenvector matrices. As a result, the proposed RI-WENO framework significantly reduces the computational cost of the standard Local Characteristic Decomposition WENO approach while retaining its strong capability to suppress spurious oscillations. Numerical experiments, including new benchmark test cases, demonstrate that the RI-WENO method achieves an effective balance between accuracy and computational efficiency, making it a promising and practical choice for solving the two-layer thin film model.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

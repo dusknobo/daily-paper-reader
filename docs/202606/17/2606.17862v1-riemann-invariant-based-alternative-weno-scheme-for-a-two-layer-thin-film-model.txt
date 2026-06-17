@@ -1,0 +1,2250 @@
+Title: Riemann invariant-based alternative WENO scheme for a two-layer thin film model
+
+URL Source: https://arxiv.org/pdf/2606.17862v1
+
+Published Time: Wed, 17 Jun 2026 00:58:33 GMT
+
+Number of Pages: 27
+
+Markdown Content:
+# Riemann invariant-based alternative WENO scheme for a two-layer thin film model 
+
+Biswarup Biswas 
+
+Department of Mathematics École Centrale School of Engineering Mahindra University Hyderabad, 500043, Telangana, India. 
+
+biswarupb7@gmail.com 
+
+Rahul Barthwal 
+
+Institute of Applied Analysis and Numerical Simulation, University of Stuttgart, Stuttgart, Germany 
+
+rahul.barthwal@mathematik.uni-stuttgart.de 
+
+Rakesh Kumar 
+
+Department of Mathematics École Centrale School of Engineering Mahindra University Hyderabad, 500043, Telangana, India. 
+
+rakesh.kumar@mahindrauniversity.edu.in 
+
+## Abstract 
+
+In this article, we develop a multi-dimensional two-layer thin film model extending the thin film model proposed in [ 1 ]. The model considered in [ 1 ] considered a very specific Marangoni scale by choosing Marangoni numbers in both layers to be 1. We relax this condition here and prove that the obtained system possesses a full set of Riemann invariants. Based on these findings, we develop a Riemann Invariant-based Local Characteristic Decomposition WENO (RI-WENO) method for the two-layer thin film model in one and two dimensions. The method is built upon a specially designed variable transformation constructed from the derived Riemann invariants of the system. This transformation partially diagonalizes the governing equations and yields a sparse structure in the transformed eigenvector matrices. As a result, the proposed RI-WENO framework significantly reduces the computational cost of the standard Local Characteristic Decomposition WENO approach while retaining its strong capability to suppress spurious oscillations. Numerical experiments, including new benchmark test cases, demonstrate that the RI-WENO method achieves an effective balance between accuracy and computational efficiency, making it a promising and practical choice for solving the two-layer thin film model. 
+
+## 1 Introduction 
+
+The study of thin-film equations constitutes a rich and intricate research area, especially when the flow dynamics are affected by soluble or insoluble substances that induce variations in the surface and interfacial tension. These flows appear in many technical and environmental applications, including coating technologies, thin-film solar cells, and surfactant replacement therapies (see, e.g., [ 2, 3, 4]). Surface-tension-driven flow, usually referred to as Marangoni flow, has been widely studied over the last few decades; see, for example, [ 3, 5, 6] and references cited therein. Surface and interfacial tension variations may arise due to temperature gradients or due to the presence of solute particles such as surfactants and anti-surfactants. Mathematically, thin-film equations are typically formulated as fourth-order degenerate hyperbolic–parabolic equations, with degeneracy occurring as the film height vanishes. Even in the scalar case, the analysis of these equations and the design of robust, accurate, and high-order numerical schemes for the full lubrication models remain highly challenging. In suitable asymptotic regimes, however, the large-scale lubrication dynamics 
+
+> arXiv:2606.17862v1 [math.NA] 16 Jun 2026
+
+can be reduced to a first-order hyperbolic subsystem; see, e.g., [ 1 , 7, 8, 9]. From this perspective, thin-film flows have also been extensively studied within the framework of hyperbolic balance laws, particularly in the context of gravity-driven films, inclined-plane flows, and dynamics induced by surfactants or solute particles; see, e.g., [1, 7, 8, 10, 11, 12, 13]. Nevertheless, stable and physically consistent numerical discretizations for the underlying hyperbolic subsystems remain relatively scarce, even though they seem crucial for the reliable numerical approximation of the full model. Recently, Barthwal & Rohde [ 1] proposed a two-layer thin film flow lubrication model, which governs the dynamics of two immiscible fluids under the influence of surface and interfacial tension induced by the presence of anti-surfactant particles. The full model turns out to be a coupled fourth-order system. However, they were able to obtain a first-order hyperbolic system from this lubrication model, which possesses a complete entropy structure and for which Riemann solutions can be constructed. Their first order system takes the following form. ∂f ∂t + 12
+
+∂∂x 
+
+(f 2b) = 0 ,∂b ∂t + 12
+
+∂∂x 
+
+(f b 2) = 0 ,∂g ∂t + ∂∂x 
+
+( g2q
+
+2 + f gb 
+
+)
+
+= 0 ,∂q ∂t + ∂∂x 
+
+( gq 2
+
+2 + f bq 
+
+)
+
+= 0 ,
+
+(1) where f and g denote the positive film thicknesses in the two layers. The quantities b and q denote the spatial derivatives of the concentrations of the solute in each layer. It is noteworthy that the system (1) describes the motion of two-dimensional thin film flow under a very specific fluid regime. To be precise, Barthwal & Rohde [ 1] considered their Marangoni numbers in both layers to be equal and to be 1. Under this simplification, they were able to obtain explicit Riemann invariants for the system (1) , which converts the system (1) into a completely diagonal form. Even though this is a physically attainable regime, it is still very restrictive and describes only a very limited physical dynamics of the underlying system. In this article, we extend the model developed in [ 1] to its multi-dimensional counterpart while relaxing the condition on the Marangoni numbers. Precisely, the multi-dimensional first-order two-layer thin film system takes the following form: 
+
+∂f ∂t + ∇x ·
+
+( f 2
+
+2 (Ma 1b)
+
+)
+
+= 0 ,∂b
+
+∂t + ∇x ·
+
+( f
+
+2
+
+(Ma 1|b|2) I
+
+)
+
+= 0 
+
+∂g ∂t + ∇x ·
+
+(
+
+f g (Ma 1b) + Ma 2g2
+
+2 q
+
+)
+
+= 0 
+
+∂q
+
+∂t + ∇x ·
+
+(( gMa 2|q|2
+
+2 + f (Ma 1b · q)
+
+)
+
+I
+
+)
+
+= 0 ,
+
+(2) where f and g denote the film thicknesses in the two layers. The quantities b and q denote the concentration gradient vectors of the solute in each layer, and Ma 1 and Ma 2 are the Marangoni numbers inducing the interfacial and surface tension, respectively. To study the hyperbolic structure of the model, we analyze the system (2) by projecting the multidimensional equations onto a one-dimensional direction. This allows us to explicitly characterize the hyperbolicity of the resulting projected system. Moreover, the mathematical structure of (2) makes it particularly well suited for the construction of higher-order accurate numerical schemes. In fact, when the tangential component of the concentration gradient vanishes, we are able to derive a complete set of explicit Riemann invariants for (2) . These invariants diagonalize the system completely and therefore provide a natural framework for the design of higher-order numerical methods based on reconstruction in Riemann invariant variables. Among high-order methods for problems with discontinuities, Weighted Essentially Non-Oscillatory (WENO) schemes have become one of the most widely used approaches, particularly for hyperbolic conservation laws. The WENO methodology was first introduced in the finite volume framework in [ 14 ] and later extended to the finite difference setting in [ 15 ]. Over the past three decades, WENO schemes have undergone significant development, both theoretically and in their application to increasingly complex problems. Several improved 2variants have been proposed, including WENO-JS [ 15 ], WENO-Z [ 16 ], and WENO-AO [ 17 , 18 , 19 ], among others. Beyond the classical finite difference and finite volume formulations, WENO methodologies have also been extended to alternative frameworks that incorporate Riemann solvers within a finite difference setting [ 20 ]. While WENO schemes perform remarkably well for scalar problems, their extension to systems of equations may lead to spurious oscillations [ 15 , 21 , 22 , 23 ]. A common strategy to mitigate these oscillations is to perform reconstruction in the characteristic space [ 15 ]. However, this approach necessitates the computation of eigenvectors, thereby increasing the computational cost. To alleviate this issue, several hybrid strategies have been developed, wherein characteristic-wise reconstruction is employed near discontinuities, while component-wise reconstruction is used in smooth regions to reduce computational overhead [ 21 , 22 , 24 ]. More recently, methods based on local characteristic decomposition using Riemann invariants have been proposed, demonstrating significant computational savings without compromising accuracy [25, 26]. Motivated by these developments, we exploit the Riemann-invariant structure of the governing system (2) to design an alternative WENO reconstruction in Riemann-invariant variables. Although the system admits a set of Riemann invariants that forms a coordinate system, recovering the physical variables through the inverse transformation requires solving a nonlinear quartic equation, which increases the computational cost of the scheme. To avoid this difficulty, we instead introduce a modified set of Riemann invariants that yields a sparser characteristic decomposition. This choice not only reduces the computational expense but also improves the accuracy of the numerical method. Moreover, we introduce new benchmark test cases in both one and two space dimensions for the system (2) . In particular, we investigate the effect of two distinct Marangoni numbers on the flow. Moreover, under the assumption that the corresponding concentration gradient vectors are aligned with the line y = x, we are able to employ the Riemann invariant structure even in the two-dimensional setting. Physically, this assumption implies that the concentration varies at the same rate in the x- and y-directions, so that no coordinate direction is preferred. Consequently, the steepest variation occurs along the diagonal direction, reflecting a symmetric influence of the concentration gradient in both spatial directions. The rest of the article is structured as follows. In section 2, we formulate the multi-dimensional two-layer thin film model and obtain the governing system (2) . Section 3 is devoted to discuss the hyperbolicity and the underlying Riemann invariant structure of the system (2) . In Section 4, we define the numerical schemes and complement them with some numerical examples in Section 5. Conclusions and future outlook are provided in Section 6. 
+
+## 2 Multi-dimensional two-layer thin film model under the influence of a perfectly soluble anti-surfactant 
+
+In this section, we develop the multi-dimensional version of the hyperbolic model developed in [ 1 ], which governs the first-order dynamics of a two-layer thin film flow under the influence of a perfectly soluble anti-surfactant solute. As the model considered here is a natural extension of the model developed in [ 1], we leave most of the physical details of the model and refer the interested reader to [1, 27]; see also [9, 12, 28]. 
+
+2.1 Evolution equations for the film heights and concentrations 
+
+Here, we consider the model considered in [ 12 ] and [ 28 ], but consider the geometry such that the substrate is on a two-dimensional plane. The free surface is assumed to be located at a height z = ( f + g)( x, y, t ),while the interface is assumed to be located at z = g(x, y, t ). This, in particular, implies that the model here governs the three-dimensional thin film flows. Following [ 1 , 12 ], we assume that ϵ = H/L << 1 for thin film flow, where H and L are characteristic height and length, respectively. We use a similar non-dimensional scaling as in [ 1 , 12 ] and [ 3], and neglect the terms of order ϵ2 in the two-phase incompressible Navier-Stokes equations, along with the concentration transport equations for a perfectly soluble solute. This then leads to a reduced system of governing equations of the form 
+
+∇x · ui + ∂z wi = 0 , (3a) 
+
+∇xpi = ∂2 
+
+> z
+
+ui, (3b) 
+
+∂z pi = 0 , (3c) 
+
+∂tc0 
+
+> i
+
++ ui · ∇ c0 
+
+> i
+
+= (Pb i)−1 (∆xc0 
+
+> i
+
++ ∂2 
+
+> z
+
+c1
+
+> i
+
+) . (3d) In (3a) - (3d) , ui = ( ui, v i) is the x − y components while wi is the z-component of the non-dimensional velocity vectors, pi is the pressure in the ith layer for i ∈ { 1, 2}. x = ( x, y ) is the horizontal coordinates such 3that ∇x = ( ∂x, ∂ y ) denotes the gradient operator while ∆x = ( ∂2
+
+> x
+
+, ∂ 2 
+
+> y
+
+) is the Laplacian operator. Moreover, 
+
+Pb i , i ∈ { 1, 2} are the Péclet numbers with Pb i = O(1) and the concentrations ci are assumed to satisfy an expansion of the form [1, 12] 
+
+ci = c0 
+
+> i
+
+(x, t ) + ϵ2c1 
+
+> i
+
+(x, z, t ) + O(ϵ4).
+
+Neglecting the terms of order ϵ2 and simplifying, we obtain non-dimensional boundary conditions of the form [1, 12] 
+
+(u1, w 1) = ( 0, 0) on {z = 0 }, (4a) 
+
+u1 = u2 on {z = f }, (4b) 
+
+∂tf + u1 · ∇ f = w1 on {z = f }, (4c) 
+
+∂tg + u2 · ∇ g = w2 on {z = f + g}, (4d) 
+
+μp 2 − p1 = (Ca 1)−1∆2
+
+> x
+
+f on {z = f }, (4e) 
+
+−p2 = (Ca 2)−1∆2
+
+> x
+
+(f + g) on {z = f + g}, (4f) 
+
+∂z u1 = μ∂ z u2 + Ma 1∇xc1 on {z = f }, (4g) 
+
+∂z u2 = Ma 2∇xc2 on {z = f + g}, (4h) 
+
+∂z c11 = 0 , on {z = 0 }, (4i) 
+
+∂z c11 = ∇xc01 · ∇ xf, on {z = f }, (4j) 
+
+∂z c12 = ∇xc02 · ∇ xf, on {z = f }, (4k) 
+
+∂z c12 = ∇xc02 · ∇ x(f + g), on {z = f + g}. (4l) In (4) , μ = μ∗
+
+> 2
+
+/μ ∗ 
+
+> 1
+
+denotes the ratio of the viscosities of two fluids, Ma i denote Marangoni numbers, and 
+
+Ca i are the capillarity numbers all of order 1 (see [1] for more details on the scalings of these dimensionless numbers). 
+
+2.2 Evolution equation for the film thicknesses 
+
+Using the kinematic boundary conditions (4c) - (4d) , the evolution equation of film thicknesses f and g are then given by 
+
+∂f ∂t +
+
+(∫ f
+
+> 0
+
+u1dz 
+
+)
+
++
+
+(∫ f
+
+> 0
+
+v1dz 
+
+)
+
+= 0 , (5) 
+
+∂g ∂t +
+
+(∫ f +gf
+
+u2dz 
+
+)
+
++
+
+(∫ f +gf
+
+v2dz 
+
+)
+
+= 0 . (6) Now using (3c) and normal stress balances (4e)-(4f), we have 
+
+p2(x, z, t ) = −(Ca 2)−1∆2
+
+> x
+
+(f + g), and p1(x, z, t ) = −μ(Ca 2)−1∆2
+
+> x
+
+(f + g) − (Ca 1)−1∆2
+
+> x
+
+f ∀(x.z ) ∈ Ω
+
+Hence, by (3b), we have 
+
+∂z u1 = ∇xp1 z + a1.
+
+Thus, using the no-slip condition (4a), we get 
+
+u1 = ∇xp1
+
+z2
+
+2 + a1z. (7) Now from the tangential stress balance (4g), we obtain 
+
+a1 = μ∂ z u2
+
+∣∣∣∣z=f
+
++ Ma 1∇xc1 −
+
+[
+
+∇xp1
+
+]
+
+f. (8) Moreover, again from (3b), we have 
+
+∂z u2 = z∇xp2 + a2.
+
+Thus, using the tangential stress balance we get 
+
+a2 = Ma 2∇xc2 − ∇ xp2(f + g)
+
+4or 
+
+∂z u2 = −∇ xp2(( f + g) − z) + Ma 2∇xc2, (9) which implies 
+
+∂z u2
+
+∣∣∣∣z=f
+
+= −g ∇xp2 + Ma 2∇xc2.
+
+Hence by (8), we have 
+
+a1 = −μg ∇xp2 + μMa 2∇xc2 + Ma 1∇xc1 − f ∇xp1.
+
+Therefore, by (7), we obtain 
+
+u1 = −μ∇xp2 gz + μMa 2∇xc2 z − ∇ xp1 z
+
+(
+
+f − z
+
+2
+
+)
+
++ Ma 1∇xc1 z. (10) Now (9) implies 
+
+u2 = −∇ xp2 z
+
+(
+
+(f + g) − z
+
+2
+
+)
+
++ Ma 2∇xc2z + a3.
+
+At {z = f }, we have u2 = u1 from (4a), therefore 
+
+a3 = −∇ xp2 f
+
+(
+
+g(μ − 1) − f
+
+2
+
+)
+
+− ∇ xp1
+
+f 2
+
+2 + Ma 2∇xc2 f (μ − 1) + Ma 1∇xc1 f, 
+
+and hence 
+
+u2 = −∇ xp2
+
+[
+
+f
+
+(
+
+g(μ − 1) − f
+
+2
+
+)
+
++ z
+
+(
+
+(f + g) − z
+
+2
+
+) ]
+
+− ∇ xp1
+
+f 2
+
+2+ Ma 2∇xc2 (f (μ − 1) + z) + Ma 1∇xc1 f. (11) Then, by integrating (10) from z = 0 to z = f and (9) from z = f to z = f + g and using (5) and (6) , we obtain the evolution equations for the film heights as 
+
+∂f ∂t + ∇x ·
+
+( f 2
+
+2 ∇x(Ma 1c1 + Ma 2μc 2)
+
+)
+
+= ∇x · Q1, (12) 
+
+∂g ∂t + ∇x ·
+
+(
+
+f g ∇x(Ma 1c1 + Ma 2μc 2) + Ma 2g2
+
+2 ∇xc2
+
+)
+
+= ∇x · Q2, (13) where 
+
+Q1 = − μf 2∇x∆x(f + g)2Ca 2
+
+( 2f
+
+3 + g
+
+)
+
+−
+
+[ f 3∇x∆xf
+
+3Ca 1
+
+]
+
+(14) 
+
+Q2 = − ∇x∆x(f + g)Ca 2
+
+[ ( (μ − 1)( f 2g + 2 f g 2)2
+
+)
+
++ (f + g)3
+
+3 − f 2(2 f + 3 g)6
+
+]
+
+− f 2g ∇x∆xf
+
+2 Ca 1
+
+. (15) 
+
+2.3 Evolution equations for concentrations in each layer 
+
+The evolution equation for the leading order term c0 
+
+> i
+
+can be obtained by integrating (3d) with respect to 
+
+z from {z = 0 } to {z = f } for i = 1 and from {z = f } to {z = f + g} for i = 2 with boundary conditions (4i)-(4l). The evolution equation of c0 
+
+> i
+
+(x, t ), i ∈ { 1, 2} reads as 
+
+∂tc01 +
+
+( f
+
+2 ∇x(Ma 1c01 + μMa 2c02)
+
+)
+
+· ∇ xc01 = (Pb 1)−1
+
+f ∇ · (f ∇xc01) + Q1 · ∇ xc01, (16) 
+
+∂tc02 +
+
+(
+
+f ∇x(Ma 1c01 + μMa 2c02) + Ma 2g
+
+2 ∇xc02
+
+)
+
+· ∇ xc02 = (Pb 2)−1
+
+g ∇ · (g∇xc02) + Q2 · ∇ xc02, (17) where Qi, i ∈ { 1, 2} are the higher order nonlinear terms as defined in (14)-(15). 52.4 Reduced evolution equations for first-order dynamics 
+
+Following [ 1, 27 , 29 ], we assume that the capillarity and diffusivity effects are negligible. Under these simplified assumptions, we can leave the higher-order terms from the evolution equations (12) - (17) and obtain reduced first-order governing equations of the form 
+
+∂f ∂t + ∇x ·
+
+( f 2
+
+2 ∇x(Ma 1c1 + μMa 2c2)
+
+)
+
+= 0 ,∂g ∂t + ∇x ·
+
+(
+
+f g ∇x(Ma 1c1 + μMa 2c2) + Ma 2g2
+
+2 ∇xc2
+
+)
+
+= 0 
+
+∂c 1
+
+∂t + f
+
+2
+
+(Ma 1|∇ xc1|2 + μMa 2∇xc1 · ∇ xc2
+
+) = 0 ,∂c 2
+
+∂t + gMa 2|∇ xc2|2
+
+2 + f (Ma 1|∇ xc1|2 + μMa 2∇xc1 · ∇ xc2
+
+) = 0 ,
+
+(18) where we have dropped the subscript from c0 
+
+> i
+
+for i ∈ { 1, 2}.
+
+2.5 A purely conservative first order subsystem 
+
+To uncover the conservative structure of the reduced evolution equations (18) , we take gradient of the concentration evolution equations, which gives us for the film thicknesses f , g and the concentration gradient 
+
+b = ∇xc1 = (∂xc1, ∂ y c1)⊤ = ( b1, b 2)⊤ and q = ∇xc2 = (∂xc2, ∂ y c2)⊤ = ( q1, q 2)⊤ the following set of nonlinear, first-order hyperbolic equations. 
+
+∂f ∂t + ∇x ·
+
+( f 2
+
+2 (Ma 1b + μMa 2q)
+
+)
+
+= 0 ,∂b
+
+∂t + ∇x ·
+
+( f
+
+2
+
+(Ma 1|b|2 + μMa 2b · q)) I
+
+)
+
+= 0 
+
+∂g ∂t + ∇x ·
+
+(
+
+f g (Ma 1b + μMa 2q) + Ma 2g2
+
+2 q
+
+)
+
+= 0 
+
+∂q
+
+∂t + ∇x ·
+
+(( gMa 2|q|2
+
+2 + f (Ma 1b · q + μMa 2|q|2))
+
+I
+
+)
+
+= 0 .
+
+(19) Without loss of generality, we take Ma 1 = α > 0 and Ma 2 = β > 0 . Moreover, we choose the viscosity ratio very low, which is typically true in oil-water type flows, such that μ = 0 . With these simplifications, the system reduces to 
+
+∂f ∂t + ∇x ·
+
+( f 2
+
+2 (αb)
+
+)
+
+= 0 ,∂b
+
+∂t + ∇x ·
+
+( f
+
+2
+
+(α|b|2) I
+
+)
+
+= 0 
+
+∂g ∂t + ∇x ·
+
+(
+
+f g (αb) + βg 2q
+
+2
+
+)
+
+= 0 
+
+∂q
+
+∂t + ∇x ·
+
+(( βg |q|2
+
+2 + f (αb · q)
+
+)
+
+I
+
+)
+
+= 0 .
+
+(20) 
+
+Remark 2.1. It is noteworthy that the system (29) reduces to the one-dimensional system considered in [ 1 ]for α = β = 1 . This indicates the consistency of our modelling approach. 
+
+## 3 Preliminaries, Hyperbolicity of the System (20) , and Riemann Invariants 
+
+3.1 Preliminaries 
+
+In this section, we recall some foundational facts on hyperbolicity and Riemann invariants for systems of conservation laws, following [26, 30, 31]. 6Consider a system of conservation laws of m components in one space dimension, 
+
+ut + f (u)x = 0, (21) where u = ( u1, u 2, . . . , u m)T ∈ Rm are the conserved variables and f (u) = ( f1(u), f 2(u), . . . , f m(u)) T ∈
+
+C1(Rm) are the flux functions. For smooth solutions, the system (21) can be rewritten in the quasilinear form 
+
+ut + A(u) ux = 0, (22) where A(u) = ∂f
+
+∂u is the Jacobian matrix. 
+
+Definition 3.1 (Hyperbolicity in 1D) . The quasilinear system (22) is hyperbolic if the Jacobian matrix 
+
+A(u) is diagonalizable for all u, that is, there exists an invertible matrix R(u) such that 
+
+A(u) = R(u) Λ(u) R(u)−1,
+
+where 
+
+Λ(u) = diag (λ1(u), λ 2(u), . . . , λ m(u))
+
+is the diagonal matrix of real eigenvalues, R(u) = (r1(u), r2(u), . . . , rm(u)) is the right eigenmatrix whose columns are the right eigenvectors, and R(u)−1 = L(u) = (l1(u)T , l2(u)T , . . . , lm(u)T )T is the left eigenmatrix whose rows are the left eigenvectors. 
+
+The one-dimensional notion extends naturally to multiple spatial dimensions. 
+
+Definition 3.2 (Hyperbolicity in multiple dimensions) . A system of conservation laws in d spatial dimensions, 
+
+ut +
+
+> d
+
+∑
+
+> i=1
+
+fi(u)xi = 0,
+
+is called hyperbolic if, for every unit vector n = ( n1, n 2, . . . , n d)T ∈ Rd, the associated one-dimensional problem 
+
+ut +
+
+( d∑
+
+> i=1
+
+ni fi(u)
+
+)
+
+> x
+
+= 0
+
+is hyperbolic in the sense of Definition 3.1. 
+
+3.2 Change of Variables and Transformed Jacobian 
+
+We next consider variable transformations derived from the eigen-structure of the Jacobian A(u). Such transformations play a fundamental role in the Local Characteristic Decomposition (LCD) procedure described in Section 4. Let V(u) : U → Rm be a differentiable and invertible transformation defined on the state space U ⊆ Rm.The system (21) can then be rewritten in the new variables V as 
+
+Vt + ˜A(V) Vx = 0, (23) where the transformed Jacobian matrix is 
+
+˜A = ∂V
+
+∂u A ∂u
+
+∂V . (24) 
+
+Proposition 3.1 (Change of variables) . If the transformation V(u) is differentiable and invertible, then the transformed Jacobian ˜A has the same eigenvalues λk as the original Jacobian A. Moreover, the right and left eigenmatrices transform according to 
+
+˜R = ∂V
+
+∂u R, ˜L = L ∂u
+
+∂V . (25) 73.3 Riemann Invariants 
+
+The structure of the transformed Jacobian ˜A depends critically on how the new variables relate to the characteristic fields of the system. This relationship is made precise through the notion of a Riemann invariant. 
+
+Definition 3.3 (Riemann invariant) . A scalar function w : U → R is called a k-Riemann invariant of the hyperbolic system (21) if it satisfies 
+
+∇u w(u) · rk(u) = 0 , ∀ u ∈ U , (26) 
+
+where rk(u) is the k-th right eigenvector of A(u).
+
+The following result [ 25 ], which is central to the design of characteristic-based numerical schemes, shows that choosing Riemann invariants as the transformation variables introduce zeros into the transformed Jacobian. 
+
+Proposition 3.2 (Sparsity of the transformed Jacobian) . Let V(u) = ( v1, v 2, . . . , v m)T be a differentiable and invertible transformation, and let ˜A be the transformed Jacobian defined in (24) . If the component vi(u)
+
+is a k-Riemann invariant, then the (i, k )-th entry of ˜A vanishes: 
+
+˜Aik = 0 .
+
+The following remark identifies the strongest possible consequence of Proposition 3.2: a coordinate system composed entirely of Riemann invariants completely diagonalizes the system. 
+
+Remark 3.3 (Full diagonalization via Riemann invariants) . Suppose there exists an invertible transformation 
+
+V(u) = ( v1, v 2, . . . , v m)T such that, for each index i ∈ { 1, . . . , m }, the component vi is a k-Riemann invariant for every k̸ = i. Then, by Proposition 3.2, every off-diagonal entry of ˜A vanishes, and the transformed Jacobian reduces to ˜A = diag (λ1(u), λ 2(u), . . . , λ m(u)).
+
+In this coordinate system, the quasilinear system (23) decouples completely into m independent scalar advection equations, each governed by a single characteristic speed λi.Such a global coordinate system of Riemann invariants always exists for hyperbolic systems of two equations [30 ]. For systems of three or more equations, it exists only in special cases; in general, only local (i.e. in a neighbourhood of a point in state space) coordinates of this type can be guaranteed, and only under genuine nonlinearity or linear degeneracy conditions on the characteristic fields [ 30 , 31 ]. When such a coordinate system is available, it is the natural setting for the construction of Riemann solvers and high-order characteristic-based schemes. 
+
+3.4 Hyperbolicity of the system (20) In what follows, we prove that the two-dimensional system (20) is a hyperbolic system of conservation laws in the sense of Definition 3.2. Let n := ( n1, n 2) ∈ R2 be a unit normal vector and let t := ( t1, t 2) ∈ R2 be a unit tangent vector such that {n, t} form an orthonormal basis of R2. Then we can decompose the concentration gradient vectors b and q as a linear combination of these vectors. Precisely, we can express 
+
+b = ( b · n)n + ( b · t)t, q = ( q · n)n + ( q · t)t
+
+Assuming that the solutions of the system (20) depend only on the direction x = x · n, we have 
+
+∇x := n∂x.
+
+Therefore, one can rewrite the system (20) as the one-dimensional directional system 
+
+ft + ∂x
+
+( α
+
+2 f 2b
+
+)
+
+= 0 ,bt + ∂x
+
+( α
+
+2 f (b2 + η2)
+
+)
+
+= 0 ,ηt = 0 ,gt + ∂x
+
+(
+
+αf bg + β
+
+2 g2q
+
+)
+
+= 0 ,qt + ∂x
+
+( β
+
+2 g(q2 + ζ2) + αf (bq + ηζ )
+
+)
+
+= 0 ,ζt = 0 ,
+
+(27) 8where b = b · n, q = q · n, η = b · t and ζ = q · t.Hence, in the variables un = ( f, b, η, g, q, ζ )T , the system (27) can be written in a compact form as 
+
+ut + Fn(u)x = 0 
+
+where 
+
+Fn(u) = 
+
+( α
+
+2 f 2b, α
+
+2 f (b2 + η2), 0, αf gb + β
+
+2 g2q, β
+
+2 g(q2 + ζ2) + αf (bq + ηζ ), 0
+
+)⊤
+
+.
+
+with the flux Jacobian 
+
+An(u) = ∂Fn(u)
+
+∂u =
+
+
+
+αf b α
+
+2 f 2 0 0 0 0
+
+α
+
+2 (b2 + η2) αf b αf η 0 0 00 0 0 0 0 0
+
+αgb αf g 0 αf b + βgq β
+
+2 g2 0
+
+α(bq + ηζ ) αf q αf ζ β
+
+2 (q2 + ζ2) αf b + βgq βgζ 
+
+0 0 0 0 0 0
+
+
+
+.
+
+We note that the Jacobian An(u) is a 6 × 6 matrix, corresponding to the six variables (f, b, η, g, q, ζ ). In particular, the tangential components η and ζ satisfy 
+
+ηt = 0 , ζt = 0 ,
+
+and therefore give rise to two zero characteristic speeds. Thus, the full directional system has six eigenvalues, which include four nontrivial characteristic speeds and two zeros. To identify the four nonzero eigenvalues, observe that the 4 × 4 block is 
+
+A4×4 =
+
+
+
+αf b α
+
+2 f 2 0 0
+
+α
+
+2 (b2 + η2) αf b 0 0
+
+αgb αf g αf b + βgq β
+
+2 g2
+
+α(bq + ηζ ) αf q β
+
+2 (q2 + ζ2) αf b + βgq 
+
+
+
+,
+
+which is a lower block triangular matrix. Hence, its eigenvalues are those of the two diagonal 2 × 2 blocks. The eigenvalues of An(u) are 
+
+˜λ1,2 = αf b ± αf 
+
+2 |b|, ˜λ3,4 = σ ± βg 
+
+2 |q|, ˜λ5,6 = 0 , (28) where 
+
+|b| = √b2 + η2, |q| = √q2 + ζ2.
+
+9The corresponding right eigenvectors are given by 
+
+˜r1(u) = 
+
+
+
+−f ∆−
+
+|b| ∆−
+
+0
+
+−αf g 
+
+[
+
+δ−(|b| − b) − βg 
+
+> 2
+
+(|b|q − (bq + ηζ ))]
+
+αf 
+
+[ βg  
+
+> 2
+
+|q|2(|b| − b) − δ−
+
+(|b|q − (bq + ηζ ))]
+
+0
+
+
+
+, ˜r2(u) = 
+
+
+
+f ∆+
+
+|b| ∆+
+
+0
+
+−αf g 
+
+[
+
+δ+(|b| + b) − βg 
+
+> 2
+
+(|b|q + ( bq + ηζ ))]
+
+αf 
+
+[ βg  
+
+> 2
+
+|q|2(|b| + b) − δ+
+
+(|b|q + ( bq + ηζ ))]
+
+0
+
+
+
+,
+
+˜r3(u) = 
+
+
+
+000
+
+− g
+
+|q|
+
+10
+
+
+
+, ˜r4(u) = 
+
+
+
+000
+
+g
+
+|q|
+
+10
+
+
+
+, ˜r5(u) = 
+
+
+
+2f η ∆0
+
+−4bη ∆0
+
+(3 b2 − η2) ∆ 0
+
+αf g 
+
+2
+
+(
+
+4αb 2ηf + βg (2 bηq + (3 b2 + η2)ζ)
+
+)
+
+αf 
+
+(
+
+σ(2 bηq − (3 b2 + η2)ζ) − βbgη |q|2
+
+)
+
+0
+
+
+
+,
+
+˜r6(u) = 
+
+
+
+0002β2g3ζ
+
+−4βgζ σ 
+
+4σ2 − β2g2|q|2
+
+
+
+,
+
+where 
+
+σ = αf b + βgq, δ± = βgq ± αf 
+
+2 |b|,
+
+∆± = δ2 
+
+> ±
+
+− β2g2
+
+4 |q|2,
+
+∆0 = σ2 − β2g2
+
+4 |q|2.
+
+Thus, for every unit vector n ∈ R2, the projected one-dimensional system has six real eigenvalues. Moreover, for a fixed direction n, the repeated eigenvalue ˜λ5,6 = 0 has geometric multiplicity 2 provided 
+
+∆0̸ = 0 , f > 0, b̸ = 0 , 3b2̸ = η2.
+
+On the other hand, a direct computation shows that the four eigenvectors ˜ri, i ∈ { 1, 2, 3, 4}, are linearly independent provided 
+
+f > 0, g > 0, ∆±̸ = 0 , |q|̸ = 0 , |b|̸ = 0 .
+
+Hence, for each fixed unit vector n, the set of eigenvectors {˜ri}6 
+
+> i=1
+
+is linearly independent whenever 
+
+f > 0, g > 0, |b|̸ = 0 , |q|̸ = 0 , ∆±̸ = 0 , ∆0̸ = 0 , 3b2̸ = η2.
+
+Therefore, for every fixed direction n, the projected system is diagonalizable under the above nondegeneracy conditions. Consequently, the two-dimensional system (20) is hyperbolic in the sense of Definition 3.2 at every state for which the directional matrix An(u) is diagonalizable for all unit vectors n ∈ R2.
+
+3.5 Hyperbolic structure of the system (20) with zero tangential concentration gradients 
+
+We now consider the special case in which the tangential components of the concentration gradients vanish. Recall that, in the directional system (27), these components satisfy 
+
+ηt = 0 , ζt = 0 .
+
+Hence, if the initial data satisfy 
+
+η(·, 0) = 0 , ζ(·, 0) = 0 ,
+
+then 
+
+η(·, t ) = 0 , ζ(·, t ) = 0 
+
+10 for all t > 0. Therefore, the manifold 
+
+{η = ζ = 0 }
+
+is invariant under the projected dynamics. On this invariant subclass of solutions, the directional system reduces to a 4×4 system of conservation laws involving only the normal variables (f, b, g, q ), and the hyperbolic structure becomes considerably simpler. More precisely, restricting (27) to the invariant manifold {η = ζ = 0 }, we obtain 
+
+ut + F(u)x = 0 , (29) where 
+
+u = ( f, b, g, q )⊤, F(u) = 
+
+( α
+
+2 f 2b, α
+
+2 f b 2, αf gb + β
+
+2 g2q, β
+
+2 gq 2 + αf bq 
+
+)⊤
+
+.
+
+The corresponding flux Jacobian is 
+
+A(u) = ∂F(u)
+
+∂u =
+
+
+
+αf b α
+
+2 f 2 0 0
+
+α
+
+2 b2 αf b 0 0
+
+αgb αf g αf b + βgq β
+
+2 g2
+
+αbq αf q β
+
+2 q2 αf b + βgq 
+
+
+
+.
+
+In what follows, we consider the system (20) along the invariant manifold {η = ζ = 0 } and thus consider (29) as our main system. Moreover, we consider the state space as 
+
+U = {u = ( f, b, g, q )⊤ ∈ R4 : f > 0, b̸ = 0 , g > 0, q > 0, αf b < βgq, 2αf b + βgq > 0} .
+
+The positivity conditions f > 0 and g > 0 select the physically relevant regime, while the additional inequalities 
+
+αf b < βgq, 2αf b + βgq > 0
+
+ensures the strict hyperbolicity of the system (29) . We take the assumption q > 0 to ensure the existence of an explicit Riemann invariant defined in U; see (33) below. The eigenvalues λk = λk(u) of A(u) can be deduced from (28) by setting η = ζ = 0 and can be ordered for 
+
+u = ( f, b, g, q )⊤ ∈ U based on the sign of b. In particular, for b > 0 we have the following set of eigenvalues 
+
+λ1(u) = αf b 
+
+2 < λ2(u) = 3αf b 
+
+2 < λ3(u) = αf b + βgq 
+
+2 < λ4(u) = αf b + 3βgq 
+
+2 . (30) along with the associated right eigenvectors rk = rk(u), which reduces to 
+
+r1(u) = 
+
+(
+
+− fb , 1, 0, 0
+
+)⊤
+
+, r2(u) = 
+
+( αf b − 3βgq 
+
+4αbq , αf b − 3βgq 
+
+4αf q , gq , 1
+
+)⊤
+
+,
+
+r3(u) = 
+
+(
+
+0, 0, − gq , 1
+
+)⊤
+
+, r4(u) = 
+
+(
+
+0, 0, gq , 1
+
+)⊤
+
+.
+
+(31) Similarly, for b < 0, we have the following ordering of eigenvalues for u ∈ U 
+
+λ1(u) = 3αf b 
+
+2 < λ2(u) = αf b 
+
+2 < λ3(u) = αf b + βgq 
+
+2 < λ4(u) = αf b + 3βgq 
+
+2 . (32) The eigenvectors are linearly independent in U. This implies the hyperbolicity of the reduced system (29) in 
+
+U.
+
+3.6 Riemann Invariants of the system (29) Using the Definition 3.3, one can obtain the complete set of Riemann invariants for the system (29) associated with each characteristic field. The explicit Riemann invariants are tabulated in Table 1. Selecting one invariant from each characteristic family in Table 1, we define the transformation 
+
+u = ( f, b, g, q )T 7 −→ V = ( v1, v 2, v 3, v 4)T ,
+
+11 Characteristic Speed Independent Riemann Invariants 
+
+λ1 = αf b 
+
+2 f b, g, q λ2 = 3αf b 
+
+2
+
+bf , qg , αf b + βgq α(gq )1/4
+
+λ3 = αf b + βgq 
+
+2 f, b, gq λ4 = αf b + 3βgq 
+
+2 f, b, gq
+
+Table 1: All independent Riemann invariants associated with each characteristic field. with 
+
+v1 = bf , v2 = f b, v3 = qg , v4 = αf b + βgq α(gq )1/4 . (33) This choice yields a complete coordinate system of Riemann invariants, and therefore fully diagonalizes the system in the V–variables. The transformed system reads 
+
+(v1)t + αv 2
+
+2 (v1)x = 0,
+
+(v2)t + 3αv 2
+
+2 (v2)x = 0,
+
+(v3)t +
+
+(
+
+αv 2 + βψ (v1, v 4)2
+
+)
+
+(v3)x = 0,
+
+(v4)t +
+
+(
+
+αv 2 + 3βψ (v1, v 4)2
+
+)
+
+(v4)x = 0,
+
+(34) where ψ(v1, v 4) = gq , which can be obtained by solving the nonlinear quartic equation 
+
+αv 2 + βx − αx 1/4v4 = 0 .
+
+Though this transformation fully diagonalizes the system, the inversion V 7 → u is algebraically complex and requires a quartic equation to be solved, which turns out to be computationally expensive while being less accurate due to the iterative solvers required for the inversion process; see test problem 1 in Section 5.1. To get a more computationally efficient transformation, we select different Riemann invariants from Table 1 that still yield a sparse structure in the transformed eigenvector matrices but allow for a simpler inversion. In particular, we select the following Riemann invariants: 
+
+v1 = bf , v2 = f b, v3 = qg , v4 = gq. (35) The normalized transformed right and left eigenvector matrices then take the following sparse form: 
+
+R =
+
+
+
+1 0 0 00 1 0 00 0 1 00 4αgq αbf − 3βgq 0 1
+
+ , L =
+
+
+
+1 0 0 00 1 0 00 0 1 00 − 4αgq αbf − 3βgq 0 1
+
+ . (36) It is worth noting that, for the system (1) , the entropy–entropy flux pairs derived in [ 1] were constructed using the fact that the Riemann invariants form a coordinate system. In particular, the diagonal structure of the system was exploited to identify a broad class of entropy functions; see [ 1] for more details. A similar approach can also be employed in the present setting to derive explicit entropy/entropy-flux pairs, including a strictly convex entropy. We provide one such strictly convex entropy of the hyperbolic system (29) without proof. The entropy of the hyperbolic system (29) takes the form 
+
+E(f, b, g, q ) = 1
+
+|f b | + 1
+
+αf b + βgq 
+
+Consequently, the local well-posedness of classical solutions for the Cauchy problem for the system (29) can be established using the classical theory of hyperbolic balance laws. However, in order to keep the focus of the present article on the computational aspects, we do not pursue the entropy structure and associated nonlinear waves of (29) in detail and instead refer the interested readers to [ 1 ] for a more intensive analysis. 12 4 Numerical Methodology 
+
+We are interested in developing a high-order finite difference WENO scheme for the hyperbolic system (29) . We adopt the alternative WENO (AWENO) formulation proposed in [ 26 ], which uses a Riemann invariant-based local characteristic decomposition (RI-LCD) to achieve high-order accuracy and non-oscillatory properties with a more computationally efficient implementation compared to the classical WENO schemes. We start by considering the one-dimensional system (29) . We discretize the computational domain with a uniform grid Ij = [ xj−1/2, x j+1 /2] with grid size ∆x. Then a semi-discrete finite difference scheme for (29) can be written as ddt uj + 1∆x
+
+( ˆFj+1 /2 − ˆFj−1/2
+
+)
+
+= 0, (37) where uj approximates u(t, x j ) and ˆFj+1 /2 is the numerical flux at the cell interface xj+1 /2 and k-th order accurate in the sense that 
+
+1∆x
+
+( ˆFj+1 /2 − ˆFj−1/2
+
+)
+
+= F(u(x)) x|xj + O(∆ xk).
+
+4.1 Alternative WENO Formulations 
+
+Unlike classical finite difference WENO schemes, which reconstruct split fluxes, the AWENO scheme operates on the point values of conserved variables. The numerical flux ˆFj+1 /2 is computed via the following steps [32, 20]: 1. Preparation: Obtain ghost point values via boundary conditions. Compute the flux function values 
+
+Fj = F(uj ) for all grid points. 2. WENO Interpolation: Apply the WENO interpolation to the conserved variables u component-wise to obtain high-order reconstructed values u± 
+
+> j+1 /2
+
+at the interface to obtain 
+
+u− 
+
+> j+1 /2
+
+= WENO (uj−r+1 , . . . , uj+r−1), (38) 
+
+u+ 
+
+> j+1 /2
+
+= WENO (uj+r, . . . , uj−r+2 ). (39) 3. Flux Assembly: The final numerical flux is the sum of a low-order flux and a high-order correction: 
+
+ˆFj+1 /2 = ˆFlow  
+
+> j+1 /2
+
++ ˆFcor 
+
+> j+1 /2
+
+. (40) Here, ˆFlow  
+
+> j+1 /2
+
+= F(u−
+
+> j+1 /2
+
+, u+
+
+> j+1 /2
+
+) is computed using an approximate Riemann solver (e.g., HLL flux). The high-order correction term ˆFcor  
+
+> j+1 /2
+
+is computed directly from the flux values Fj .The high-order flux correction terms ˆFcor  
+
+> j+1 /2
+
+ensure the scheme achieves the desired order of accuracy k = 2 r−1.The coefficients for various orders can be found in [ 20 ]. In this work, we will use the following correction terms for the 5th order scheme, which corresponds to r = 3 , and given by 
+
+ˆFcor ,3 
+
+> j+1 /2
+
+= 19 3840 (Fj−2 + Fj+3 ) − 137 3840 (Fj−1 + Fj+2 ) + 59 1920 (Fj + Fj+1 ). (41) If we apply WENO interpolation to the conservative variable u, the resulting scheme is called the Componen-twise WENO (CP-WENO) scheme. This is the simplest approach but can lead to spurious oscillations near discontinuities which we will demonstrate in the numerical results section. We will now present two more approaches that are designed to mitigate these oscillations by reconstructing in the characteristic space. 
+
+4.2 Local Characteristic Decomposition 
+
+In the LCD (local characteristic decomposition) approach, the characteristic decomposition is performed locally at each interface xj+ 12 . We first compute the Jacobian matrix of the flux function and evaluate it at the interface using locally averaged states. In our implementation, we use simple arithmetic averaging. In particular, 
+
+uj+ 12 = uj + uj+1 
+
+2 .
+
+13 Using this interface state, the Jacobian is diagonalized as 
+
+Aj+ 12 = A(uj+ 12 ) = Rj+ 12 Λj+ 12 Lj+ 12 ,
+
+where Rj+ 12 and Lj+ 12 denote the right and left eigenvector matrices, respectively, and Λj+ 12 is the diagonal matrix of eigenvalues. The conservative variables in the reconstruction stencil are then projected onto the local characteristic space: 
+
+wk = Lj+ 12 uk, k = j − r + 1 , . . . , j + r. (42) The WENO interpolation is then carried out component-wise on the characteristic variables as 
+
+w− 
+
+> j+1 /2
+
+= WENO (wj−r+1 , . . . , wj+r−1), (43) 
+
+w+ 
+
+> j+1 /2
+
+= WENO (wj+r , . . . , wj−r+2 ). (44) These are finally transformed back to physical space via 
+
+u± 
+
+> j+12
+
+= Rj+ 12 w± 
+
+> j+12
+
+.
+
+4.3 Riemann Invariant based Local Characteristic Decomposition 
+
+The LCD approach removes spurious oscillations from the solution but is computationally expensive due to the need for several matrix-vector products in (42) and (43) . To mitigate this cost, we can use the Riemann invariant-based LCD (RI-LCD) approach. Instead of projecting onto the local characteristic space, we perform the WENO interpolation directly on the Riemann invariants defined in (35) . This allows us to achieve a sparse structure in the transformed eigenvector matrices, which significantly reduces the computational cost while still effectively suppressing oscillations. The following steps summarize the RI-LCD procedure: 1. Variable Transformation: Transform the conservative variables uj to the Riemann invariant variables Vj using the transformation defined in (35). 2. WENO Interpolation: Apply the WENO interpolation to the Riemann invariant variables V
+
+using the LCD approach presented in Section 4.2 with the transformed eigenvector matrices defined in (36) to obtain V± 
+
+> j+1 /2
+
+.3. Inverse Transformation: Transform the reconstructed Riemann invariant values V± 
+
+> j+1 /2
+
+back to conservative variables using the inverse of the transformation defined in (35). 
+
+4.4 Time Integration 
+
+For time integration of the semi-discrete scheme, we use the following third-order strong stability preserving Runge-Kutta (SSP-RK3) method [33]: 
+
+u(1) = un + ∆ t L (un), (45a) 
+
+u(2) = 34 un + 14 u(1) + 14 ∆t L (u(1) ), (45b) 
+
+un+1 = 13 un + 23 u(2) + 23 ∆t L (u(2) ). (45c) where L(u) represents the spatial discretization operator defined by the right-hand side 
+
+L(uj ) = − 1∆x
+
+( ˆFj+1 /2 − ˆFj−1/2
+
+)
+
+.
+
+Time step ∆t is chosen according to the CFL condition 
+
+∆t ≤ CFL · ∆x
+
+max j |λmax (uj )| .
+
+In one exception, for the accuracy verification test problem, we use ∆t = ∆ x 53 to ensure that the temporal error does not dominate the spatial error, allowing us to accurately measure the convergence rates of the schemes. 14 4.5 Two dimensional Extension 
+
+The proposed schemes can be extended to two dimensions using a dimension-by-dimension approach. Consider the two-dimensional system 
+
+ut + F(u)x + G(u)y = 0 .
+
+We can discretize the spatial domain with uniform grid cells Ii,j = [ xi−1/2, x i+1 /2] × [yj−1/2, y j+1 /2] with grid sizes ∆x and ∆y. The semi-discrete scheme can be written as 
+
+ddt ui,j + 1∆x
+
+( ˆFi+1 /2,j − ˆFi−1/2,j 
+
+)
+
++ 1∆y
+
+( ˆGi,j +1 /2 − ˆGi,j −1/2
+
+)
+
+= 0,
+
+where ˆFi+1 /2,j and ˆGi,j +1 /2 are the numerical fluxes in the x and y directions, respectively. The numerical fluxes can be computed using the same AWENO procedure as described in the one-dimensional case, applied separately in each spatial direction. The time integration can be performed using the same SSP-RK3 method as in the one-dimensional case (45), with 
+
+L(ui,j ) = − 1∆x
+
+( ˆFi+1 /2,j − ˆFi−1/2,j 
+
+)
+
+− 1∆y
+
+( ˆGi,j +1 /2 − ˆGi,j −1/2
+
+)
+
+,
+
+and the time step ∆t chosen as 
+
+∆t ≤ CFL · 1 
+
+> λx
+> max
+> ∆x
+
++ λy
+
+> max
+> ∆y
+
+,
+
+where λx 
+
+> max
+
+and λy 
+
+> max
+
+are the maximum wave speeds in the x and y directions, respectively. 
+
+## 5 Numerical Results 
+
+In this section, we present a set of numerical experiments to evaluate the performance of the proposed schemes. We compare the Componentwise WENO (CP-WENO), Local Characteristic Decomposition WENO (LCD-WENO), Riemann Invariant-based Local Characteristic Decomposition WENO (RI-WENO), and Complete set of Riemann invariant-based Local Characteristic Decomposition WENO (CRI-WENO) schemes for several test problems involving both smooth and discontinuous solutions. Whenever possible, analytical solutions are provided for reference, and the solution by the Godunov scheme is included as a baseline for comparison. We have used the fifth-order WENO interpolation for all the schemes in the numerical experiments. The CFL is set to 0.4 for all simulations. 
+
+5.1 One-dimensional test cases 
+
+In this section, we take some one-dimensional test cases from [ 1] and [ 27 ] and validate the numerical results using the scheme developed in Section 4. To investigate the effect of different Marangoni numbers on the evolution of the film heights, we also provide a new test case. 
+
+Test Problem 1. (Accuracy and efficiency test) 
+
+To verify the formal order of accuracy of the scheme, we consider a smooth manufactured solution with periodic boundary conditions in the x-direction from [27]. The exact solution is given by 
+
+f (x, t ) = 2 + sin( x + t), b(x, t ) = − 2
+
+f (x, t ) , g(x, t ) = 2 , q(x, t ) = 1 .
+
+The computational domain is x ∈ [−π, π ]. The final simulation time is taken as t = 1 . We have presented the 
+
+L1, L2, and L∞ errors and convergence rates for all three schemes in Table 2. The results confirm that all schemes achieve the expected fifth-order accuracy for smooth solutions. In addition, the RI-WENO scheme demonstrates slightly smaller errors compared to the CP-WENO, LCD-WENO, and CRI-WENO schemes, which can be attributed to the more efficient handling of the characteristic structure of the system. 15 In Figure 1, we compare the performance of the considered schemes in terms of CPU time required to achieve the L1 error on a log–log scale, along with the corresponding convergence plots on a log–log scale. From Figure 1 (a), it can be observed that the RI-WENO scheme requires significantly less CPU time to attain the same L1 error compared to the other schemes. Furthermore, Figure 1 (b) shows that the RI-WENO scheme provides better accuracy than the other considered schemes. In particular, the scheme based on the full set of Riemann invariants, namely CRI-WENO, is less accurate and computationally more expensive because of the iterative solver required for the inversion process. This observation indicates that, even when a system possesses a full set of Riemann invariants, the computational cost may still be high if the transformation back to the original variables is algebraically complex. It also suggests that, although Riemann-invariant-based methods can improve accuracy, careful selection of a suitable set of Riemann invariants is essential, rather than relying directly on the set of Riemann invariants forming a coordinate system. Table 2: Convergence study for CP-WENO, LCD-WENO, RI-WENO, and CRI-WENO schemes. 
+
+N L1 error L1 rate L2 error L2 rate L∞ error L∞ rate 
+
+CP-WENO 
+
+20 2.378658e-03 – 2.817288e-03 – 5.589221e-03 –40 1.247322e-04 4.253 1.718981e-04 4.035 4.212099e-04 3.730 80 4.763562e-06 4.711 7.066511e-06 4.604 2.268759e-05 4.215 160 1.553167e-07 4.939 2.369187e-07 4.899 8.659043e-07 4.712 320 4.914033e-09 4.982 7.499654e-09 4.981 2.834420e-08 4.933 640 1.539123e-10 4.997 2.345452e-10 4.999 8.909335e-10 4.992 
+
+LCD-WENO 
+
+20 3.086493e-03 – 3.770919e-03 – 8.741611e-03 –40 1.084724e-04 4.831 1.441619e-04 4.709 3.213477e-04 4.766 80 3.814721e-06 4.830 5.608207e-06 4.684 1.652505e-05 4.281 160 1.155005e-07 5.046 1.791501e-07 4.968 6.219107e-07 4.732 320 3.521138e-09 5.036 5.557993e-09 5.010 2.049343e-08 4.923 640 1.085128e-10 5.020 1.722960e-10 5.012 6.469862e-10 4.985 
+
+RI-WENO 
+
+20 1.453345e-03 – 1.731971e-03 – 3.585057e-03 –40 4.830865e-05 4.911 5.984330e-05 4.855 1.453204e-04 4.625 80 1.608455e-06 4.909 1.919781e-06 4.962 4.628580e-06 4.973 160 5.108325e-08 4.977 6.010381e-08 4.997 1.396106e-07 5.051 320 1.603981e-09 4.993 1.868474e-09 5.008 4.146463e-09 5.073 640 5.016161e-11 4.999 5.813561e-11 5.006 1.234901e-10 5.069 
+
+CRI-WENO 
+
+20 5.322221e-03 – 6.957962e-03 – 1.387233e-02 –40 3.705585e-04 3.844 5.581100e-04 3.640 1.286650e-03 3.431 80 1.537824e-05 4.591 2.491730e-05 4.485 7.390992e-05 4.122 160 5.063395e-07 4.925 8.549406e-07 4.865 3.125959e-06 4.563 320 1.602438e-08 4.982 2.719388e-08 4.974 1.068161e-07 4.871 640 5.021174e-10 4.996 8.508649e-10 4.998 3.413641e-09 4.968 
+
+Test Problem 2. (Large rarefaction test case) 
+
+We consider a one-dimensional Riemann problem from [ 27 ]. The domain is x ∈ [−20 , 5] with outflow boundary conditions. The initial condition consists of two constant states separated by a discontinuity at x = 0 , given by 
+
+(f, b, g, q )( x, 0) = 
+
+{(2 .0, −2.0, 16 .0, 16 .0/7.0) , x ≤ 0,
+
+(1 .0, −1.0, 4.0, 4.0/7.0) , x > 0.
+
+16 10 0 10 1 
+
+> 10 −12
+> 10 −11
+> 10 −10
+> 10 −9
+> 10 −8
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> CPU Time ( t)
+> L1 Error
+> CP-WENO
+> LCD-WENO
+> RI-WENO
+> CRI-WENO 10 210 3
+> 10 −12
+> 10 −11
+> 10 −10
+> 10 −9
+> 10 −8
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> N
+> L1 Error
+> CP-WENO
+> LCD-WENO
+> RI-WENO
+> CRI-WENO
+
+(a) CPU time versus L1-error (b) N versus L1-error. Figure 1: Comparison plots for Test Problem 5.1 of RI-WENO, CP-WENO, LCD-WENO and CRI-WENO schemes. The problem is computed on a uniform mesh with Nx = 200 cells, and the solution is evolved up to the final time t = 2 .5. The numerical solutions obtained using different schemes are compared in Figure 2. The results show that the CP-WENO, LCD-WENO, and RI-WENO schemes successfully capture the large rarefaction wave and yield very similar solution profiles. We also provide a CPU time comparison for different Riemann data in Table 3. It can be observed that the RI-WENO scheme outperforms its counterparts in the CPU time here as well. 
+
+Test Problem 3. (Shock tube type test case) 
+
+We choose the second Riemann problem from [ 1] to test the performance of the schemes in capturing shock waves and contact discontinuities. We fill the initial condition within the domain x ∈ [−2, 12] with two constant states separated at x = 0 , given by 
+
+(f, b, g, q )( x, 0) = 
+
+{(1 .5, 1.6, 1.6, 2.00) , x ≤ 0,
+
+(1 .25 , 1.15 , 2.0, 2.10) , x > 0.
+
+We impose outflow boundary conditions on both ends of the domain. The final time is taken as t = 1 .0.We compute the solution on a uniform grid with Nx = 200 cells. The numerical solutions obtained using CP-WENO, LCD-WENO, and RI-WENO are compared against the exact solution and the Godunov scheme in Figure 3. The CP-WENO scheme exhibits spurious oscillations near the discontinuity, while both LCD-WENO and RI-WENO effectively suppress these oscillations. The RI-WENO scheme achieves accuracy comparable to LCD-WENO while being computationally more efficient, as demonstrated by the CPU time comparison in Table 3. 
+
+Test Problem 4. (SOD type Riemann Problem ) 
+
+This test problem is an SOD-type Riemann problem from [ 27 ]. The domain is x ∈ [−15 , 10] with outflow boundary conditions. The initial profile is given by 
+
+(f, b, g, q )( x, 0) = 
+
+{(1 .0, −1.5, 2.2, 1.3) , x ≤ 0,
+
+(0 .125 , −1.5, 0.9, 0.9) , x > 0.
+
+The computation is evolved up to the final time t = 5 .0 on a uniform grid with Nx = 200 cells. The numerical solutions obtained using CP-WENO, LCD-WENO, and RI-WENO are compared against the exact solution and the Godunov scheme in Figure 4. The CP-WENO scheme does not exhibit spurious oscillations in this test case, likely due to the nature of the solution profile. Both LCD-WENO and RI-WENO schemes effectively 17 −20 −15 −10 −5 0 5     
+
+> x
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2.0
+> f
+> −16 .5−16 .0−15 .5−15 .0−14 .5−14 .0
+> 1.900
+> 1.925
+> 1.950
+> 1.975
+> 2.000
+> 2.025
+> 2.050
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(a) Film height ( f )−20 −15 −10 −5 0 5 
+
+> x
+> 15 .2
+> 15 .4
+> 15 .6
+> 15 .8
+> 16 .0
+> g
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(b) Film height ( g)−20 −15 −10 −5 0 5
+
+> x
+> −2.0
+> −1.8
+> −1.6
+> −1.4
+> −1.2
+> −1.0
+> b
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(c) Concentration gradient ( b)−20 −15 −10 −5 0 5 
+
+> x
+> 2.16
+> 2.18
+> 2.20
+> 2.22
+> 2.24
+> 2.26
+> 2.28
+> q
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(d) Concentration gradient ( q)
+
+Figure 2: Comparison of the CP-WENO, LCD-WENO, and RI-WENO schemes with the exact and Godunov solutions for Test Problem 2 on a mesh with Nx = 200 at the final time t = 2 .5.capture the solution features and closely match the exact solution, with the RI-WENO scheme performing better at the peak of the concentration gradient b compared to the LCD-WENO scheme. Moreover, the RI-WENO scheme turns out to be computationally effective as presented in Table 3. 
+
+Test Problem 5. (Riemann Problem 3) 
+
+The next test problem is another Riemann problem. The domain is x ∈ [−2, 12] with outflow boundary conditions. We fill the following initial condition, 
+
+(f, b, g, q )( x, 0) = 
+
+{(1 .07 , 1.08 , 2.7, 1.90) , x ≤ 0,
+
+(1 .5, 1.15 , 2.4, 2.30) , x > 0.
+
+The computational domain is discretized using a uniform grid with Nx = 200 cells, and the solution is evolved up to the final time t = 1 .0. The numerical solutions are compared in Figure 5. We again observe that the CP-WENO scheme exhibits spurious oscillations near the discontinuity, while both LCD-WENO and RI-WENO effectively suppress these oscillations. Solution profile by RI-WENO scheme almost coincides with that of LCD-WENO while being computationally more efficient as presented in Table 3. 18 −2 0 2 4 6 8 10 12     
+
+> x
+> 1.25
+> 1.30
+> 1.35
+> 1.40
+> 1.45
+> 1.50
+> 1.55
+> 1.60
+> f
+> 1.01.52.02.53.0
+> 1.600
+> 1.605
+> 1.610
+> 1.615
+> 1.620
+> 1.625
+> 1.630
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(a) Film height ( f )−2 0 2 4 6 8 10 12  
+
+> x
+> 1.6
+> 1.7
+> 1.8
+> 1.9
+> 2.0
+> 2.1
+> g
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(b) Film height ( g)−2 0 2 4 6 8 10 12 
+
+> x
+> 1.2
+> 1.3
+> 1.4
+> 1.5
+> 1.6
+> b
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(c) Concentration gradient ( b)−2 0 2 4 6 8 10 12  
+
+> x
+> 2.0
+> 2.1
+> 2.2
+> 2.3
+> 2.4
+> q
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(d) Concentration gradient ( q)
+
+Figure 3: Comparison of CP-WENO, LCD-WENO, and RI-WENO with the exact and Godunov solutions for Test Problem 3 at Nx = 200 and t = 1 .0.
+
+Computational cost comparison for Riemann problems 
+
+In this section, we evaluate the speed-up factor of the proposed scheme relative to the CRI-WENO scheme for the Riemann test cases. The speed-up factor is defined as the ratio of the CPU time of a given scheme to that of the CRI-WENO scheme. A speed-up factor less than one indicates that the scheme is faster than CRI-WENO, whereas a value greater than one indicates slower performance. Table 3: CPU Time Comparison, normalized by CRI-WENO 
+
+Problem CRI-WENO LCD-WENO RI-WENO CP-WENO 
+
+Test Problem 2 1.000 0.787 0.671 0.542 Test Problem 3 1.000 0.892 0.840 0.783 Test Problem 4 1.000 0.892 0.853 0.797 Test Problem 5 1.000 0.870 0.820 0.751 Table 3 presents the speed-up factors of various schemes for the Riemann problems. It can be observed that LCD-WENO requires 11–22% less computational time, RI-WENO requires 15–33% less time, and CP-WENO requires 20–46% less time compared to the CRI-WENO scheme. 19 −15 −10 −5 0 5 10 
+
+> x
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> f
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(a) Film height ( f )−15 −10 −5 0 5 10  
+
+> x
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2.0
+> 2.2
+> g
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(b) Film height ( g)−15 −10 −5 0 5 10    
+
+> x
+> −1.4
+> −1.2
+> −1.0
+> −0.8
+> −0.6
+> b −2.0−1.5−1.0−0.5
+> −0.60
+> −0.58
+> −0.56
+> −0.54
+> −0.52
+> −0.50
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(c) Concentration gradient ( b)−15 −10 −5 0 5 10  
+
+> x
+> 0.9
+> 1.0
+> 1.1
+> 1.2
+> 1.3
+> q
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(d) Concentration gradient ( q)
+
+Figure 4: Comparison of CP-WENO, LCD-WENO, and RI-WENO with the exact and Godunov solutions for Test Problem 4 at Nx = 200 and t = 5 .0.
+
+Test Problem 6. (Two-Marangoni regime test: Effect of concentration gradients on the film heights) 
+
+To investigate the effect of two-Marangoni numbers on the dynamics of flow, we choose α = kβ for some 
+
+k ∈ R and choose the initial data of the form 
+
+f (x, 0) = f0, c1(x, 0) = c1,− + c1,+ − c1,−
+
+2
+
+(
+
+1 + tanh 
+
+( x − x0
+
+δ
+
+)) 
+
+,g(x, 0) = g0, c2(x, 0) = c2,− + c2,+ − c2,−
+
+2
+
+(
+
+1 + tanh 
+
+( x − x0
+
+δ
+
+)) 
+
+.
+
+Physically, this initial condition represents two initially flat liquid layers with the concentrations c1 and c2
+
+each take one approximately constant value inside the region x < x 0 and another approximately constant value outside the region x > x 0, with a smooth transition across a narrow region of thickness δ. Thus, c1,−
+
+and c1,+ denote the inner and outer concentration levels for the first layer, while c2,− and c2,+ denote the corresponding levels for the second layer. 20 −2 0 2 4 6 8 10 12    
+
+> x
+> 1.1
+> 1.2
+> 1.3
+> 1.4
+> 1.5
+> f
+> 0.51.01.52.0
+> 1.220
+> 1.225
+> 1.230
+> 1.235
+> 1.240
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(a) Film height ( f )−2 0 2 4 6 8 10 12  
+
+> x
+> 2.1
+> 2.2
+> 2.3
+> 2.4
+> 2.5
+> 2.6
+> 2.7
+> g
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(b) Film height ( g)−2 0 2 4 6 8 10 12 
+
+> x
+> 0.95
+> 1.00
+> 1.05
+> 1.10
+> 1.15
+> b
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(c) Concentration gradient ( b)−2 0 2 4 6 8 10 12  
+
+> x
+> 1.8
+> 1.9
+> 2.0
+> 2.1
+> 2.2
+> 2.3
+> q
+> Exact Godunov CP-WENO LCD-WENO RI-WENO
+
+(d) Concentration gradient ( q)
+
+Figure 5: Comparison of CP-WENO, LCD-WENO, and RI-WENO with the exact and Godunov solutions for Test Problem 5 at Nx = 200 and t = 1 .0.Further, we assume that 
+
+c1,+ > c 1,−, c2,+ > c 2,−,
+
+so that c1 and c2 increases across the interface x0.The corresponding initial data for the conservative variables (f, b, g, q ) then are 
+
+f (x, 0) = f0, b(x, 0) = − c1,− − c1,+
+
+2δ sech 2
+
+( x − x0
+
+δ
+
+)
+
+,g(x, 0) = g0, q(x, 0) = c2,+ − c2,−
+
+2δ sech 2
+
+( x − x0
+
+δ
+
+)
+
+.
+
+(46) As concrete parameter values, we choose in particular 
+
+x0 = 0 , δ = 0 .5, f0 = 1 , g0 = 0 .8, c1,− = 1 .0, c1,+ = 0 .6, c2,− = 0 .2, c2,+ = 0 .6.
+
+We plot the evolution of the film heights f and g at time t = 1 .00 in Figures 6 and 7 for different values of k,distinguishing between the regimes k < 1 and k ≥ 1, respectively. For k < 1, corresponding to α < β , the Marangoni effect associated with the second layer plays the dominant role in the dynamics. In this regime, the height of the second layer is strongly affected and is transported to the right as β increases, with the peak of the post-shock wave governing the flow behaviour. As k increases, however, the Marangoni effect of the first layer becomes dominant. Consequently, the influence of the second Marangoni number is significantly 21 reduced, and the flow is driven increasingly towards the direction of the concentration gradient in the first layer, namely to the left. In addition, the second wave observed in the evolution of the film height g becomes progressively damped as k increases; see Figure 6. For larger values of k, the left-moving shock becomes sharper, and its strength increases considerably. Moreover, a secondary shock appears in the evolution of the film height g for k = 2 , which sharpens for k = 4 ; see Figure 7.   
+
+> (a) Film height ( f)(b) Film height ( g)
+
+Figure 6: Comparison of film heights f and g for different values of k < 1 at t = 1 .00 .  
+
+> (a) Film height ( f)(b) Film height ( g)
+
+Figure 7: Comparison of film heights f and g for different values of k ≥ 1 at t = 1 .00 .
+
+5.2 Two-dimensional test cases 
+
+As pointed out in section 3, we are interested in developing solutions for the system (20) along a normal direction. In particular, one can take the normal vector as n = (1 /√2, 1/√2). In other words, the concentration gradient affects are along y = x line. Physically, this implies that the concentration changes at the same rate in the x- and y-directions, so there is no preferred coordinate direction. Therefore, the steepest variation occurs along the diagonal direction, which reflects a symmetric influence of the concentration gradient in both spatial directions. In this case, the system (20) can be rewritten as a simplified two-dimensional hyperbolic 22 system of the form 
+
+∂f ∂t + ∂∂x 
+
+( α
+
+2 f 2b
+
+)
+
++ ∂∂y 
+
+( α
+
+2 f 2b
+
+)
+
+= 0 ,∂b ∂t + ∂∂x 
+
+( α
+
+2 f b 2)
+
++ ∂∂y 
+
+( α
+
+2 f b 2)
+
+= 0 , (47) 
+
+∂g ∂t + ∂∂x 
+
+( βg 2q
+
+2 + αf gb 
+
+)
+
++ ∂∂y 
+
+( βg 2q
+
+2 + αf gb 
+
+)
+
+= 0 ,∂q ∂t + ∂∂x 
+
+( βgq 2
+
+2 + αf bq 
+
+)
+
++ ∂∂y 
+
+( βgq 2
+
+2 + αf bq 
+
+)
+
+= 0 
+
+This particular form of the system (20) allows us to utilize the numerical scheme developed in Section 4 even for multi-dimensional examples. 
+
+Test Problem 7. (Smooth circular perturbation test) 
+
+In this test case, we consider a smooth circular perturbation problem for the two-dimensional system on the domain [−4, 4] × [−4, 4] with periodic boundary conditions in both spatial directions. The simulation is performed up to the final time t = 1 .0. The initial perturbation is centered at (xc, y c) = ( −1, −1) , and the radial coordinate is defined by 
+
+r(x, y ) = √(x − xc)2 + ( y − yc)2.
+
+To construct a smooth interface, we introduce the profile function 
+
+ϕ(r) = 12 (1 + tanh (2(2 − r))) .
+
+The initial condition is prescribed as 
+
+f (x, y, 0) = 1 .0,b(x, y, 0) = 0 .5 + 0 .1 ϕ(r),g(x, y, 0) = 2 .0,q(x, y, 0) = 0 .5 + 0 .2 ϕ(r).
+
+(48) Thus, the variables b and q contain smooth localized perturbations, while the background states of f and 
+
+g remain spatially constant. The perturbation amplitude in q is chosen larger than that in b, leading to different nonlinear transport effects in the two layers. Since the initial data are smooth and radially symmetric, this test problem is well suited for assessing multidimensional wave propagation. The plots of the primitive variables show that the concentration-gradient profiles generate a Marangoni-driven flow. As a result, the initially constant film heights evolve into nonlinear wave patterns. More precisely, the localized Marangoni forcing redistributes the fluid layers and transports mass throughout the computational domain. Consequently, even though the film heights are initially constant, the solution develops alternating regions of larger and smaller height. 
+
+Test Problem 8. (Perturbed circular solutal front test) 
+
+In this test case, we consider the 2D version of the test case considered in Test problem 6 in section 5.1. In particular, we consider a circular concentration-front initial condition centered at (x0, y 0), and define 
+
+r(x, y ) = √(x − x0)2 + ( y − y0)2
+
+and θ as the polar angle around (x0, y 0) such that x − x0 = r cos θ and y − y0 = r sin θ. Moreover, for simplicity we assume the same Marangoni scale such that α = β = 1 .The initial data in terms of the film heights f, g and concentrations c1, c 2 are given by 
+
+f (x, y, 0) = f0, c1(x, y, 0) = c1,− + c1,+ − c1,−
+
+2
+
+(
+
+1 + tanh 
+
+( r(x, y ) − R(θ)
+
+δ
+
+)) 
+
+,g(x, y, 0) = g0, c2(x, y, 0) = c2,− + c2,+ − c2,−
+
+2
+
+(
+
+1 + tanh 
+
+( r(x, y ) − R(θ)
+
+δ
+
+)) 
+
+.
+
+23 2 0 2
+
+> x
+> 2
+> 0
+> 2
+> y
+> 0.975
+> 0.990
+> 1.005
+> 1.020
+> 1.035
+> f
+
+(a) Film height ( f )2 0 2 
+
+> x
+> 2
+> 0
+> 2
+> y
+> 0.50
+> 0.52
+> 0.54
+> 0.56
+> 0.58
+> b
+
+(b) Concentration gradient ( b)2 0 2
+
+> x
+> 2
+> 0
+> 2
+> y
+> 1.80
+> 1.95
+> 2.10
+> 2.25
+> 2.40
+> g
+
+(c) Film height ( g)2 0 2 
+
+> x
+> 2
+> 0
+> 2
+> y
+> 0.52
+> 0.56
+> 0.60
+> 0.64
+> 0.68
+> q
+
+(d) Concentration gradient ( q)
+
+Figure 8: Test Problem 7 with 400 × 400 grids and t = 1 .0.Here, R(θ) = R0 + ϵ cos (2 θ) > 0 for a sufficiently small ϵ > 0 denotes the perturbed radius of the circular front and δ > 0 is the transition thickness. In this spirit, the circular front actually is a perturbed domain and not a fixed domain. In contrast to 1D test, we assume that 
+
+c1,+ < c 1,−, c2,+ > c 2,−,
+
+so that c1 decreases while c2 increases across the circular interface. This allows us to consider the competing effects of the concentration difference in each layer. Interpreting the scalar variables b and q as reduced gradient amplitudes associated with the circular front, the corresponding initial data are 
+
+f (x, y, 0) = f0, b(x, y, 0) = − c1,− − c1,+
+
+2δ sech 2
+
+( r(x, y ) − R(θ)
+
+δ
+
+)
+
+,g(x, y, 0) = g0, q(x, y, 0) = c2,+ − c2,−
+
+2δ sech 2
+
+( r(x, y ) − R(θ)
+
+δ
+
+)
+
+.
+
+(49) 24 As concrete parameter values, we choose in particular 
+
+(x0, y 0) = (0 , 0) , R0 = 0 .35 , δ = 0 .2, ϵ = 0 .03 
+
+f0 = 1 , g0 = 0 .8, c1,− = 1 .0, c1,+ = 0 .6, c2,− = 0 .2, c2,+ = 0 .6.
+
+We plot the results at time t = 0 .2 for this choice of initial data in Figure 9. From the plots of primitive variables, one can observe that the concentration gradient profiles and induced Marangoni forcing remain concentrated around the thin annular region, while the constant initial film heights evolve as nonlinear waves. In particular, the localized Marangoni forcing redistributes the film heights, and the fluids are thus transported away from some parts of the interface and accumulate in others. That is why, although initial film heights are constant, the solution at time t = 0 .2 develops alternating regions of larger and smaller heights. 0.8 0.4 0.0 0.4 0.8 
+
+> x
+> 0.8
+> 0.4
+> 0.0
+> 0.4
+> 0.8
+> y
+> 0.8
+> 0.9
+> 1.0
+> 1.1
+> 1.2
+> 1.3
+> f
+
+(a) Film height ( f )0.8 0.4 0.0 0.4 0.8  
+
+> x
+> 0.8
+> 0.4
+> 0.0
+> 0.4
+> 0.8
+> y
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> b
+
+(b) Concentration gradient ( b)0.8 0.4 0.0 0.4 0.8 
+
+> x
+> 0.8
+> 0.4
+> 0.0
+> 0.4
+> 0.8
+> y
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> g
+
+(c) Film height ( g)0.8 0.4 0.0 0.4 0.8  
+
+> x
+> 0.8
+> 0.4
+> 0.0
+> 0.4
+> 0.8
+> y
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> q
+
+(d) Concentration gradient ( q)
+
+Figure 9: Test Problem 8 with 400 × 400 grids and t = 0 .2.
+
+## 6 Conclusions and future outlook 
+
+In this article, we developed a multidimensional two-layer thin-film model extending the model proposed by Barthwal and Rohde [ 1]. We analyzed its hyperbolicity and Riemann invariant structure. The resulting system admits a Riemann invariant structure in multidimensions along a prescribed spatial direction, which enables 25 the construction of a Riemann invariant-based alternative WENO finite difference scheme. This scheme is computationally cheaper while remaining highly efficient compared with its LCD-based counterparts. A key aspect of the proposed approach is the careful selection of Riemann invariants so as to reduce the computational cost. Although the system admits a full set of Riemann invariants that can be used as a coordinate system, the corresponding inversion process requires an iterative solver, thereby increasing the computational expense. Therefore, a suitable choice of Riemann invariants, leading to a sparser eigenstructure, is essential for designing more efficient high-order numerical methods. Since the model possesses an entropy structure and the film heights must remain positive in thin-film flows, a natural next step is to develop a provably positivity-preserving and entropy-stable numerical scheme. Finally, in the present work, we considered only the reduced first-order model and neglected capillarity and diffusivity effects. Another important direction for future work is therefore to analyze the full lubrication model and develop robust numerical schemes for it. 
+
+Acknowledgments Authors Biswarup Biswas and Rakesh Kumar acknowledge the Mahindra Uni-versity Super Computing facility for providing computational resources. Biswarup Biswas is supported by the State University Research Excellence (SURE) Scheme of the Anusandhan National Research Foundation (ANRF), India, under File No. SUR/2022/001786. Rakesh Kumar is supported by the Prime Minister Early Career Research Grant (PMECRG) of the ANRF, India, under Grant No. ANRF/ECRG/2025/004846/PMS. 
+
+## References 
+
+[1] R. Barthwal and C. Rohde. A hyperbolic model for two-layer thin film flow with a perfectly soluble anti-surfactant. Accepted for publication at SIAM Journal on Applied Mathematics , 2026. [2] R. V. Craster and Omar K. Matar. Dynamics and stability of thin liquid films. Reviews of Modern Physics , 81(3):1131–1198, 2009. [3] O.K. Matar and S. Kumar. Rupture of a surfactant-covered thin liquid film on a flexible wall. SIAM Journal on Applied Mathematics , 64(6):2144–2166, 2004. [4] S. B. G O’Brien and L. W. Schwartz. Theory and modeling of thin film flows. Encyclopedia of surface and colloid science , 1:5283–5297, 2002. [5] O.E. Jensen and J.B. Grotberg. Insoluble surfactant spreading on a thin viscous film: shock evolution and film rupture. Journal of Fluid Mechanics , 240:259–288, 1992. [6] T.G. Myers. Thin films with high surface tension. SIAM Review , 40(3):441–462, 1998. [7] R. Levy and M. Shearer. The motion of a thin liquid film driven by surfactant and gravity. SIAM Journal on Applied Mathematics , 66(5):1588–1609, 2006. [8] B.P. Cook, A. L. Bertozzi, and A.E. Hosoi. Shock solutions for particle-laden thin films. SIAM Journal on Applied Mathematics , 68(3):760–783, 2008. [9] R. Barthwal, C. Rohde, and A. Sen. Existence and stability of the Riemann solutions for a non-symmetric Keyfitz–Kranzer type model. Nonlinearity , 39(3):035006, 2026. [10] R. Barthwal and T. Raja Sekhar. Two-dimensional non-self-similar Riemann solutions for a thin film model of a perfectly soluble anti-surfactant solution. Quarterly of Applied Mathematics , 80(4):717–738, 2022. [11] A.L. Bertozzi, A. Münch, and M. Shearer. Undercompressive shocks in thin film flows. Physica D: Nonlinear Phenomena , 134(4):431–464, 1999. [12] R. Barthwal, T. Raja Sekhar, and G. P. Raja Sekhar. Construction of solutions of a two-dimensional Riemann problem for a thin film model of a perfectly soluble antisurfactant solution. Mathematical Methods in the Applied Sciences , 46(6):7413–7434, 2023. [13] A. Pandey, R. Barthwal, and T Raja Sekhar. Construction of solutions of the Riemann problem for a two-dimensional Keyfitz-Kranzer type model governing a thin film flow. Applied Mathematics and Computation , 498:129378, 2025. [14] X. D. Liu, S. Osher, and T. Chan. Weighted essentially non-oscillatory schemes. Journal of Computational Physics , 115(1):200–212, 1994. [15] G. S. Jiang and C.W. Shu. Efficient implementation of weighted ENO schemes. Journal of Computational Physics , 126(1):202–228, 1996. 26 [16] R. Borges, M. Carmona, B. Costa, and W. S. Don. An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws. Journal of Computational Physics , 227(6):3191–3211, 2008. [17] D. S. Balsara, S. Garain, and C.W. Shu. An efficient class of WENO schemes with adaptive order. 
+
+Journal of Computational Physics , 326:780–804, 2016. [18] R. Kumar and P. Chandrashekar. Simple smoothness indicator and multi-level adaptive order WENO scheme for hyperbolic conservation laws. Journal of Computational Physics , 375:1059–1090, 2018. [19] R. Kumar and P. Chandrashekar. Efficient seventh order WENO schemes of adaptive order for hyperbolic conservation laws. Computers & Fluids , 190:49–76, 2019. [20] D. S. Balsara, D. Bhoriya, C. W. Shu, and H. Kumar. Efficient alternative finite difference WENO schemes for hyperbolic conservation laws. Communications on Applied Mathematics and Computation ,7(6):2189–2242, 2025. [21] R. Kumar and P. Chandrashekar. Multi-level WENO schemes with an adaptive characteristic-wise reconstruction for system of Euler equations. Computers & Fluids , 239:Paper No. 105386, 24, 2022. [22] K. R. Arun, A. K. Dond, and R. Kumar. WENO Smoothness Indicator Based Troubled-cell Indicator for Hyperbolic Conservation Laws. Computers & Fluids , 2023. [23] K. R. Arun, R. Kumar, and A. K. Meena. Hybrid finite difference WENO schemes for the ten-moment Gaussian closure equations with source term. Wave Motion , 139:Paper No. 103614, 22, 2025. [24] G. Y. Zhao, M. B. Sun, and S. Pirozzoli. On shock sensors for hybrid compact/WENO schemes. 
+
+Computers & Fluids , 199:104439, 17, 2020. [25] Z. Xu and C.W. Shu. Local characteristic decomposition–free high-order finite difference WENO schemes for hyperbolic systems endowed with a coordinate system of Riemann invariants. SIAM Journal on Scientific Computing , 46(2):A1352–A1372, 2024. [26] Y. Wu and C.W. Shu. Finite difference alternative WENO schemes with Riemann invariant-based local characteristic decompositions for compressible Euler equations. Journal of Computational Physics ,537:114104, 2025. [27] R. Barthwal, C. Rohde, and Y. Wang. A generalized Riemann problem solver for a hyperbolic model of two-layer thin film flow. Journal of Scientific Computing , 106(1):25, 2026. [28] J.J.A. Conn, B. R. Duffy, D. Pritchard, Stephen K. Wilson, P. J. Halling, and K. Sefiane. Fluid-dynamical model for antisurfactants. Physical Review E , 93(4):043121, 2016. [29] J.J.A. Conn, B.R. Duffy, D. Pritchard, S.K. Wilson, and K. Sefiane. Simple waves and shocks in a thin film of a perfectly soluble anti-surfactant solution. Journal of Engineering Mathematics , 107(1):167–178, 2017. [30] C. M. Dafermos. Hyperbolic conservation laws in continuum physics , volume 325 of Grundlehren der Mathematischen Wissenschaften . Berlin: Springer, 4th edition, 2016. [31] D. Serre. Systems of conservation laws 1: hyperbolicity, entropies, shock waves . Cambridge University Press, 1999. [32] Y. Jiang, C.W. Shu, and M. Zhang. An alternative formulation of finite difference weighted ENO schemes with Lax–Wendroff time discretization for conservation laws. SIAM Journal on Scientific Computing ,35(2):A1137–A1160, 2013. [33] S. Gottlieb, C.W. Shu, and E. Tadmor. Strong stability-preserving high-order time discretization methods. 
+
+SIAM Review , 43(1):89–112, 2001. 27
