@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-18",
+  "date": "2026-06-18",
+  "generated_at": "2026-06-18T21:09:50",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/18/2606.17969v1-high-order-simulation-of-particle-laden-flows-in-moving-domains-using-coupled-ale-and-sliding-mesh-approaches",
+      "section": "quick",
+      "title_en": "High-Order Simulation of Particle-Laden Flows in Moving Domains Using Coupled ALE and Sliding Mesh Approaches",
+      "authors": "Anna Schwarz, Patrick Kopper",
+      "date": "2026-06-16",
+      "pdf": "https://arxiv.org/pdf/2606.17969v1",
+      "score": "7.0",
+      "evidence": "用于可压缩颗粒负载流的高保真欧拉-拉格朗日框架，直接支持多相流CFD",
+      "tldr": "可压缩含粒子流动在运动几何中涉及多尺度湍流作用，精确模拟需高效算法。本文构建耦合高阶间断伽辽金谱元法与拉格朗日点粒子追踪的欧拉-拉格朗日框架，集成ALE和滑动网格策略处理运动变形域，利用径向基函数变形捕获表面拓扑与连续相的非线性反馈。通过严格基准验证，并应用于压缩机转子侵蚀及上游尾流工况，证实高阶精度与鲁棒性。",
+      "tags": "query:falling-film",
+      "abstract_en": "In practical applications, compressible particle-laden flows in moving geometries involve complex, non-linear, and multi-scale inter-actions with turbulent structures. Resolving these dynamics numerically requires careful algorithmic treatment to accurately predict particle trajectories. This work presents a high-fidelity Euler-Lagrange framework that couples a high-order discontinuous Galerkin spectral element method for the continuous phase with a Lagrangian point-particle tracking scheme. To manage moving and deforming domains, the framework integrates two distinct mesh movement strategies: the arbitrary Lagrangian-Eulerian method for general mesh deformations such as time-resolved particle-induced surface deformations and its special interface case, the sliding mesh approach, uniquely suited for rigid rotational or translational movements. A primary focus is placed on tightly coupling the arbitrary Lagrangian-Eulerian formulation into the temporal evolution step by utilizing radial basis function morphing to capture the non-linear feedback loop between evolving surface topologies and the continuous phase. Concurrently, the framework ensures time- and high-order accurate coupling of the mesh movement algorithms with the dispersed phase. In particular, the proposed algorithm resolves the sliding mesh tracking problem by enforcing strict spatial and temporal accuracy as Lagrangian particles cross non-conforming grid interfaces between adjacent moving zones. The algorithms are rigorously validated against multiple benchmarks and subsequently applied to two challenging compressor rotor applications: the first focusing on solid-particle erosion, and the second featuring an upstream cylindrical wake generator.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/18/2606.17862v2-riemann-invariant-based-alternative-weno-scheme-for-a-two-layer-thin-film-model",
+      "section": "quick",
+      "title_en": "Riemann invariant-based alternative WENO scheme for a two-layer thin film model",
+      "authors": "Biswarup Biswas, Rahul Barthwal, Rakesh Kumar",
+      "date": "2026-06-16",
+      "pdf": "https://arxiv.org/pdf/2606.17862v2",
+      "score": "6.0",
+      "evidence": "为双层薄膜方程开发WENO数值格式，实现两相流模拟。",
+      "tldr": "针对二维双层薄膜模型，本文放松了原始Marangoni数限制，证明了系统具有一组完备的Riemann不变量。在此基础上，构建了基于Riemann不变量的局部特征分解WENO方法（RI-WENO），通过变量变换部分对角化方程并获得稀疏特征结构，大幅降低标准WENO计算成本。数值实验包含新基准测试，结果表明RI-WENO能有效抑制非物理振荡，平衡了精度与效率，是求解该模型的有力工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this article, we develop a multi-dimensional two-layer thin film model extending the thin film model proposed in \\cite{barthwal2025hyperbolic}. The model considered in \\cite{barthwal2025hyperbolic} considered a very specific Marangoni scale by choosing Marangoni numbers in both layers to be $1$. We relax this condition here and prove that the obtained system possesses a full set of Riemann invariants. Based on these findings, we develop a Riemann Invariant-based Local Characteristic Decomposition WENO (RI-WENO) method for the two-layer thin film model in one and two dimensions. The method is built upon a specially designed variable transformation constructed from the derived Riemann invariants of the system. This transformation partially diagonalizes the governing equations and yields a sparse structure in the transformed eigenvector matrices. As a result, the proposed RI-WENO framework significantly reduces the computational cost of the standard Local Characteristic Decomposition WENO approach while retaining its strong capability to suppress spurious oscillations. Numerical experiments, including new benchmark test cases, demonstrate that the RI-WENO method achieves an effective balance between accuracy and computational efficiency, making it a promising and practical choice for solving the two-layer thin film model.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

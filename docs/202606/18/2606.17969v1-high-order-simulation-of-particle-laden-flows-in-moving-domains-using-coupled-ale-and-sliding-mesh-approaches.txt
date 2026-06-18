@@ -1,0 +1,657 @@
+Title: High-Order Simulation of Particle-Laden Flows in Moving Domains Using Coupled ALE and Sliding Mesh Approaches
+
+URL Source: https://arxiv.org/pdf/2606.17969v1
+
+Published Time: Wed, 17 Jun 2026 01:19:55 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# High-Order Simulation of Particle-Laden Flows in Moving Domains Using Coupled ALE and Sliding Mesh Approaches 
+
+Anna Schwarz a,1, ∗, Patrick Kopper a,1, ∗
+
+> aUniversity of Stuttgart, Institute of Aerodynamics and Gas Dynamics, Wankelstr. 3, Stuttgart, 70563, Germany
+
+Abstract 
+
+In practical applications, compressible particle-laden flows in moving geometries involve complex, non-linear, and multi-scale inter-actions with turbulent structures. Resolving these dynamics numerically requires careful algorithmic treatment to accurately predict particle trajectories. This work presents a high-fidelity Euler–Lagrange framework that couples a high-order discontinuous Galerkin spectral element method for the continuous phase with a Lagrangian point-particle tracking scheme. To manage moving and de-forming domains, the framework integrates two distinct mesh movement strategies: the arbitrary Lagrangian–Eulerian method for general mesh deformations such as time-resolved particle-induced surface deformations and its special interface case, the sliding mesh approach, uniquely suited for rigid rotational or translational movements. A primary focus is placed on tightly coupling the arbitrary Lagrangian–Eulerian formulation into the temporal evolution step by utilizing radial basis function morphing to capture the non-linear feedback loop between evolving surface topologies and the continuous phase. Concurrently, the framework ensures time- and high-order accurate coupling of the mesh movement algorithms with the dispersed phase. In particular, the proposed algorithm resolves the sliding mesh tracking problem by enforcing strict spatial and temporal accuracy as Lagrangian particles cross non-conforming grid interfaces between adjacent moving zones. The algorithms are rigorously validated against multiple benchmarks and subsequently applied to two challenging compressor rotor applications: the first focusing on solid-particle erosion, and the second featuring an upstream cylindrical wake generator. 
+
+Keywords: high-order, discontinuous Galerkin, high-performance computing, large eddy simulation, Lagrangian particle tracking, moving mesh 
+
+1. Introduction 
+
+High-fidelity simulations of particle-laden turbulent flows in moving domains, such as those found in turbomachinery applications [1], must handle the complex coupling between multi-scale, high-velocity fluid dynamics and transient parti-cle trajectories. To accurately capture these localized physics and understand their impact on macroscopic phenomena like surface erosion, component degradation, and phase distribu-tion, predictive numerical modeling has become an indispens-able tool [2, 3]. These challenges have driven the devel-opment of numerous modeling approaches aimed at enabling high-fidelity simulations of such particle-laden flows. One prominent approach is the Euler–Lagrange or point-particle method, in which the continuous phase is resolved in an Eu-lerian frame of reference while the particles are tracked as discrete points evolving in a Lagrangian manner according to Newton’s second law of motion. Compared to Euler–Euler frameworks, Euler–Lagrange methods are able to manage large counts of disparate particles with high accuracy while circum-venting the prohibitive computational costs associated with    
+
+> ∗Corresponding author
+> Email addresses: schwarz@iag.uni-stuttgart.de (Anna Schwarz),
+> kopper@iag.uni-stuttgart.de (Patrick Kopper)
+> 1P. Kopper and A. Schwarz share first authorship.
+
+fully particle-resolved strategies [4]. When coupled with a high-order approach such as the discontinuous Galerkin (DG) method, Euler–Lagrange methods provide high-fidelity solu-tions for turbulent flows with millions of particles [5, 6]. However, the classical point-particle formulation assumes a static spatial domain; when boundaries move, the primary computational challenge shifts to accurately tracking these par-ticles across dynamically altering mesh topologies. Depending on the problem under consideration, di ff erent numerical meth-ods are best suited to handle the underlying grid deformation or motion. In this paper, the primary focus is on the inte-gration of particle tracking within two of the most prominent mesh movement algorithms: the arbitrary Lagrangian–Eulerian (ALE) method [7, 8, 9] and a special case of ALE, the slid-ing mesh approach [10, 11]. While Chimera (overset) grid techniques [12] are also commonly applied to handle complex multi-body movements in particle-laden flows [13], they are not utilized in the present work. The ALE method, which tracks moving boundaries dynam-ically through displacement of the mesh nodes, is highly ef-fective for localized or arbitrary mesh deformations, which are permitted to be arbitrary under the condition that mesh qual-ity is maintained. To prevent highly skewed or unphysically collapsed mesh elements, this framework is typically coupled with volume-mesh morphing techniques such as a radial basis 
+
+> arXiv:2606.17969v1 [physics.comp-ph] 16 Jun 2026
+
+function (RBF) interpolation [14] or inverse distance weight-ing to smoothly propagate surface boundary deformations into the interior volume. Transformation of the continuous phase from the physical, moving domain to a static reference do-main, as commonly done in DG methods, introduces a metric evolution equation, known as the geometric conservation law (GCL) [15]. This condition ensures that the continuous and discrete conservative properties of the governing equations are perfectly preserved. While the ALE procedure inherently cap-tures complex macroscopic variations like fluid-structure inter-actions [16] or large surface deformations that exceed statisti-cal roughness models [17], it requires the continuous recom-putation of grid metric terms and is generally limited to mod-erate deformations. Consequently, for the discrete phase, this continuous spatial displacement of mesh nodes demands a ro-bust localization algorithm capable of accurately tracking parti-cle positions relative to the moving grid cells, particularly near boundaries. Conversely, the sliding mesh approach is utilized for do-mains undergoing large-scale, rigid translational or rotational movements, where distinct mesh zones slide past one another along a well-defined non-conformal interface [11]. For simpli-fication, this paper does not consider arbitrary mesh deforma-tion within the subdomains in the context of the sliding mesh approach, thus the individual grid cells do not deform. As such, the sliding mesh approach will be considered a special case of the ALE method for a-priori known translational or rotational rigid body movements without the need to recompute metric terms. Instead, the connectivity across the interface is updated dynamically at every time step to maintain flux conservation for the continuous phase. For the discrete phase, this architecture requires a robust intersection algorithm to seamlessly transition Lagrangian particles across the sliding interface from one mov-ing frame to another. This non-conformal crossing introduces sharp spatial discontinuities in the particle trajectory, rendering the algorithmic handling of the interface a critical bottleneck for particle tracking accuracy. Consequently, integrating a Lagrangian particle tracking scheme into either of these moving grid approaches demands exact temporal and spatial interpolation at the moving in-terfaces. Particle trajectories are subject to intense tempo-ral variations induced by both turbulent flow structures and the unsteady interactions associated with moving boundaries. High-fidelity simulations that combine these mesh-motion tech-niques with advanced Euler–Lagrange frameworks are there-fore essential for resolving transient accumulation, impact, and back-scattering phenomena that cannot be captured by simplified steady-state approaches. While segregated ap-proaches for dynamic grid movement and particle-surface in-teractions are well-established, literature detailing high-order Euler–Lagrange tracking on simultaneously moving, deform-ing, and non-conforming curvilinear meshes is, to the authors’ knowledge, exceptionally limited. Recent e ff orts, such as the parallel algorithm by [18] or the multi-zone approach by [19] for tracking particles across sliding non-conformal interfaces and /or deforming rigidly moving meshes, are restricted to a low-order finite volume (FV) discretization for the continuous phase. Furthermore, although particle-resolved methods utilize ALE or Chimera-type approaches to resolve the particle-fluid interface, these methods focus on the dispersed phase geome-try and are not designed for the point-particle coupling within moving, non-conforming curvilinear meshes, e.g. [20]. Motivated by this gap in the literature, this paper aims to present a high-order consistent, time-accurate particle tracking framework on moving and deforming, curvilinear meshes using the arbitrary Lagrangian–Eulerian method and a special case of ALE, the non-conformal sliding mesh interface. Special focus is placed on preserving conservation properties, high-order ac-curate particle tracking, and computational e ffi ciency. In this work, the ALE method is applied to arbitrary surface deforma-tions, while the sliding mesh procedure handles translational or rotational rigid-body motion across non-conforming interfaces. To maintain parallel scalability, the ALE framework interpo-lates surface displacements into the volume using compactly supported RBFs constructed locally on each compute core. Par-ticles are tracked within an absolute frame of reference, which naturally incorporates the mesh velocity and ensures accurate trajectories without additional correction terms. For the sliding mesh framework, special care is taken to maintain high-order temporal and spatial accuracy as Lagrangian particles transition across the non-conforming interface. The proposed algorithms are code-agnostic, facilitating straightforward integration into any existing Euler–Lagrange framework. For this study, the methods are implemented within E LEXI 2 [21, 6], a high-order Euler–Lagrange solver where the carrier phase is discretized using a hybrid operator that com-bines a high-order accurate discontinuous Galerkin spectral el-ement method (DGSEM) with a localized, low-order finite vol-ume operator. The discrete phase is tracked simultaneously us-ing a Lagrangian point-particle approach. Consequently, the new algorithm seamlessly leverages E LEXI’s native capabili-ties for handling complex geometries on unstructured grids, in-cluding curved elements, hanging nodes, and advanced bound-ary conditions. Combined, these features enable an e ffi cient, high-fidelity treatment of the complex, coupled interactions be-tween suspended particles, mesh movement, and the compress-ible carrier phase. The primary focus of this work is the numerical formula-tion, implementation, and application of methods handling dis-crete particles within moving geometries under compressible flow conditions. The remainder of this paper is structured as follows. In section 2, the underlying equations for both the con-tinuous and discrete phase are introduced, alongside the treat-ment of particle-wall interactions and particle-induced surface deformations. A brief outline of the numerical treatment and al-gorithmic implementation of these equations is provided in sec-tion 3. The framework is validated in section 4, followed by a demonstration of the solver’s capabilities in section 5 using two challenging, real-world engineering applications. Finally, sec-tion 6 o ff ers concluding remarks. 
+
+> 2https://github.com/flexi-framework/elexi
+
+22. Theory 
+
+2.1. Continuous Phase 
+
+The fluid field is governed by the compressible unsteady Navier–Stokes–Fourier equations. Defined on the time-varying domain Ωt ⊂ R3, t ∈ R+ 
+
+> 0
+
+, the equations are expressed in con-servative form as 
+
+dq
+
+dt + ∇ · F (q, ∇q) = 0, (1) where q = [ρ, ρ u1, ρ u2, ρ u3, ρ e]T represents the vector of con-servative variables with ρ as the fluid density, the i-th com-ponent of the velocity vector ui and the total energy per unit volume e. The physical flux F accounts for both inviscid (Eu-ler) and viscous contributions. To facilitate the numerical treat-ment of the moving domains, eq. (1) is transformed to a time-invariant reference domain, E = [−1, 1] 3 with q(ξ, τ ), by intro-ducing a di ff erentiable mapping χ : E → Ωt, (ξ, τ ) 7 → (x, t), with time τ ∈ R+ 
+
+> 0
+
+. Under this ALE formulation, the governing equations are reformulated as (Jq)t + ∇ξ · F = 0, F = MMM⊤ (F − q ⊗ ν) , (2) where J = det J denotes the determinant of the Jacobian and 
+
+MMM = adj J⊤ ⊗ nq is the adjoint of the Jacobian matrix J of the mapping. The mesh velocity is defined as ν = χτ ∈ R3, and the geometric evolution of the elements is constrained by the geometric conservation law (GCL), given as 
+
+Jt = ∇ξ · h  adj J⊤ · νi . (3) Here, τ = t (just a change of the notation) represents the time coordinate in the reference frame. To ensure that the metric identities ∇ξ · M MM = 0 are satisfied at the discrete level, a pre-requisite for maintaining free-stream preservation, the metric terms MMM⊤ are approximated using the conservative curl form [22]. Further details regarding the ALE derivation can be found in [7, 23]. The equation system is closed by the equation of state of a calorically perfect gas. The dynamic viscosity μ is obtained from Sutherland’s law [24], while the heat flux is modeled by Fourier’s law. In accordance with Stokes’ hypothesis, the bulk viscosity is set to zero. 
+
+2.2. Dispersed Phase 
+
+In the Lagrangian point-particle framework, particles are modeled as discrete points characterized by mass mp and virtual diameter dp. Their trajectory and physical state are governed by a system of ordinary di ff erential equations (ODEs), written as 
+
+dxp
+
+dt = vp,
+
+mp
+
+dvp
+
+dt = FD = 3πμ dp fD
+
+u f − vp
+
+ . (4) The particle position in physical space xp = [xp,1, xp,2, xp,3]T
+
+and velocity vp are determined by integrating the set of ODEs. Following the Maxey–Riley–Gatignol (MRG) formulation [25, 26], the momentum equation (4) is simplified by considering only the drag force. To account for high particle Reynolds num-bers, an empirical correction is incorporated via the drag factor 
+
+fD, which is computed according to [27]. 
+
+2.3. Intersection of Particles with Solid Walls 
+
+Particle-wall collisions are modeled via the hard-sphere ap-proach, i.e., they are not resolved in time but handled in an a posteriori manner. Thus, the timestep dt stage of the current Runge–Kutta (RK) stage has to be greater than the time a parti-cle requires to collide with a wall ( dt stage > dt coll ). The change in particle momentum is given as 
+
+mre f p (vre f p + 2( vimp p · n)n) − mimp p vimp p = J, (5) where the superscripts ( ·)imp and ( ·)re f denote quantities imme-diately before and after the impact, respectively, and n repre-sents the unit normal vector of the boundary in physical space. While eq. (5) defines the conservation of momentum, the en-ergy dissipation occurring during the impact is not inherently considered. In physical systems, collisions are typically non-elastic, meaning a portion of the kinetic energy is lost. In this context, the term J accounts for momentum changes due to these non-ideal e ff ects. For the perfectly elastic (reflective) col-lisions primarily considered here, J = 0, whereas for scenarios involving plastic deformation, J , 0.To close eq. (5) for J , 0 and in turn determine the post-impact states xre f , rebound models are employed which relate the pre- and post-collision kinematics. The central parameter in these models is the coe ffi cient of restitution (CoR), defined as the mapping ex : ximp 7 → xre f from the impinging to the re-flected value, given as 
+
+ex(ζ) = xre f 
+
+ximp . (6) The coe ffi cient ex is generally a function of several parameters 
+
+ζ that characterize the collision physics and can be computed using adequate rebound models, here the rebound model of [28] is used. The variable x are usually the particle velocities in normal, en, and tangential directions, et.
+
+2.4. Particle-Induced Wall Deformations 
+
+Each particle impact modifies the local geometry of the tar-get surface, either by removing material (erosion) or adding it (deposition), depending on the impact energy and material compatibility. In a numerical simulation, this means that the position of the respective boundary nodes of the fluid mesh can change. In this work, the mesh deformation is considered to be induced by an impacting particle through surface erosion, but the overall framework can handle both deposition and erosion. Since the displacement of the boundary nodes has to be known a priori, a mapping from the particle’s characteristics and tra-jectory to this displacement is necessary, i.e., the erosion rate has to be known. The erosion rate can be predicted by erosion models which correlate the dissipation energy of a particle upon an impact to the erosion rate ∆Q, such as in [29]. To convert this into a volume loss ∆Vp, the physical density of the wall material ρwall is used, leading to 
+
+∆Vp = ∆Qm p
+
+ρwall 
+
+. (7) 3In Euler–Lagrange simulations, particles are treated as point-masses, which would physically result in a singular Dirac im-pulse; an unrealistic representation of wall deformation. To re-solve this, particle impacts are modeled to induce a distributed displacement around the impact point, utilizing compactly sup-ported RBFs ψ : [0 , ∞) → R to approximate realistic local deformation. Following de Boer et al. [14], the compactly sup-ported RBF used here is defined as 
+
+ψ(ζ) =
+
+
+
+(1 − ζ)4(4 ζ + 1) : 0 ≤ ζ ≤ 1,
+
+0 : ζ > 1, (8) where ζ = ζ(xbi , xb j ) = xbi − xb j /R with i, j = 1 . . . , nb,
+
+R ∈ R+ being the support radius, xb the position of the boundary nodes, and nb the number of boundary nodes. To prevent ex-cessive mesh distortion, displacement is restricted to the wall-normal direction. As such, the displacement Dbi at a boundary node, xbi , in wall-normal direction is given as 
+
+Dbi =
+
+> np
+
+X
+
+> j=1
+
+ψp
+
+ xbi − xp j
+
+ γin, (9) where ψp = ψ and np is the number of impacting particles. The weight vector γi is calculated by matching the RBF to the node displacements of the impacting particle to ensure that the inte-gral displacement of the boundary nodes is equal to the particle-induced deformation of a single particle which impacts at xp j ,i.e., 
+
+> nb
+
+X
+
+> i=1
+
+ψp
+
+ xp j − xbi
+
+ γiVbi = ∆ Vp j , (10) with Vbi = wvol Jbi being the volume of the boundary node, wvol 
+
+are the volume quadrature weights, Jbi is the determinant of the Jacobian, and ∆Vp j is the volume loss imposed by the im-pacting particle coming from the particle erosion model, com-puted using eq. (7). As illustrated in fig. 1, the RBF ensures that deformations are localized to the vicinity of the impact point, 
+
+xbi − xp ≤ RS p for i = 1, . . . , nb, and vanish elsewhere. The support radius RS p ∈ R+ is defined as the maximum of the par-ticle diameter and the local grid spacing; the latter constraint ensures that at least one boundary degree of freedom is influ-enced by the impact. Finally, since the continuous form of the mesh velocity ν
+
+is unknown, it is derived from the discrete node positions via numerical di ff erentiation, leading to 
+
+νbi = Dbi
+
+∆tν
+
+, (11) with the time interval ∆tν over which the deformation takes places. To summarize, the particle-induced mesh deformation algo-rithm consists of the following two steps. First, the calculation of the particle-induced volume loss using eq. (10) and the mesh velocity used by the ALE approach, cf. eq. (11). Second, the displacement of the a ff ected boundary nodes according to the volume loss using compact RBFs to induce a distributed dis-placement around the impact point, cf. eq. (9). Further details are provided in [30]. Impacting Particle 
+
+> Reflected Particle
+> ∆Vp
+> ψp
+> Figure 1: Sketch of the particle-induced wall-deformation using RBFs to model the distributed displacement induced by a single impacting particle around the impact point.
+
+3. Numerical Methods and Implementation 
+
+In the following, we briefly discuss the numerical treatment of the governing equations for the fluid and dispersed phase, focusing on the ALE method for surface deformation and the non-conforming sliding mesh interface. The methods presented in this study are incorporated within the open-source frame-work E LEXI. 
+
+3.1. Continuous Phase 3.1.1. Discontinuous Galerkin Spectral Element Method 
+
+The computational domain Ωt ⊆ R3 is discretized by non-overlapping, (non-)conforming hexahedral elements with six possibly curved element faces, approximated in a tensor prod-uct manner by one-dimensional Lagrange polynomials ℓ up to degree Ngeo . The element-local solution q = q(ξ, t) is approx-imated by a tensor product of one-dimensional nodal Lagrange basis functions of degree N. The entropy stable DGSEM on Legendre–Gauss–Lobatto nodes can be retrieved using the diagonal-norm summation-by-parts property, QT + Q = B,and an adequate two-point flux, leading to the following semi-discrete formulation 
+
+M(Jq)t = −
+
+> 3
+
+X
+
+> p=1
+
+(2 Q ◦ F FF (p))1
+
++
+
+> 6
+
+X
+
+> ζ=1
+
+V⊤ 
+
+> f
+
+W f [J(ζ)(FFF (ζ) · n(ζ))∗ − F FF (ζ) · ˆn(ζ)](12) with the vector of all ones 1 ∈ R2, Q = MD , B =
+
+diag( −1, 0, . . . , 0, 1), the polynomial derivative matrix Di j =
+
+ℓ′
+
+> j
+
+(ξi), the mass matrix M = diag( w0, . . . , wN ) comprised of the quadrature weights w, V f being the Lagrange polynomi-als evaluated at the corresponding surface, and W f are the quadrature weights on the surface. The outward pointing nor-mal vector in physical space is n and in reference space ˆ n, and 
+
+J(ζ) =  adj J⊤ ˆn(ζ) is the surface element. The contravari-ant fluxes F are computed using an entropy-conservative flux function [31] and an adequate state function q# [23], and, if not stated otherwise, the numerical fluxes ( FFF (ζ) ·n(ζ))∗ are composed of the entropy-conservative flux and a Roe-type dissipation [32] with the entropy fix by [33]. The viscous fluxes are computed using the BR1 scheme [34]. 4To mitigate oscillations of the high-order DGSEM at dis-continuities, an element-wise convex blending procedure based on the work of [35, 9] is utilized as a shock capturing method. For this, a second-order total-variation diminishing FV sub-cell scheme is blended with the high-order DGSEM using the blending coe ffi cient αFV ∈ [0 , 1], triggered by a modal troubled-cell indicator. Note that surface fluxes and states must also be blended to account for general inconsistencies between the DG and FV grid velocities ( νFV f , ν f ) and solution states (qFV f , q f ). An explicit low-storage fourth-order accurate Runge–Kutta scheme with nRK = 5 stages [36] is employed for the integration in time, in accordance with the method of lines approach, with a relative Courant–Friedrichs–Lewy (CFL) number of CFL =
+
+0.9. Its update is given as 
+
+qi = qi−1 + Bidqi, i = 0, ..., nRK ,
+
+dqi = Aidqi−1 + ∆ tqt,i,
+
+with ∆t being the timestep, Ai and Bi are the low-storage equiv-alents of the Butcher variables. For further details on DGSEM and applications, readers are referred to [37, 38, 39, 40, 41]. 
+
+3.1.2. Discrete Geometric Conservation Law 
+
+Following [7], the GCL, eq. (3), is discretized by the same scheme as the considered conservation equations to guaran-tee free-stream preservation on a discrete level, The equivalent semi-discrete DGSE discretization for the GCL is given as 
+
+MJt =
+
+> 3
+
+X
+
+> p=1
+
+(2 Q ◦ V(p))1
+
++
+
+> 6
+
+X
+
+> ζ=1
+
+V⊤ 
+
+> f
+
+W f
+
+hJ(ζ)(V(ζ) · n) − V(ζ) · ˆni , (13) where V = {{adj J}} · { {ν}} is the arithmetic mean of the contravari-ant mesh velocities, and V(ζ) denotes the mesh velocities at the surface. In order to guarantee non-overlapping elements for 
+
+t > 0, it is necessary that the mesh velocities are continuous across the cells and thus unique. 
+
+3.1.3. Sliding Mesh Approach 
+
+When introducing subdomains with di ff erent movement, the relative motion of the domain boundaries introduces non-conforming grids on either side of the interface. The sliding mesh approach ensures conservative coupling of the flux ex-change between the subdomains via the mortar method. The mortar approach was originally proposed by Mavriplis [42] and later extended to compressible flows [43, 44]. It preserves the mesh geometry within each subdomain by introducing virtual mortar sides Ξ1,2 within the non-conforming interface such that each mortar side is exclusively connected to one element face on either side of the interface, cf. fig. 2. To guarantee a conser-vative coupling, the integration within the discrete projection from the virtual mortar sides to the big side is decoupled from the general solution representation and always performed on Legendre–Gauss quadrature nodes. Details on the implementa-tion for the continuous phase are given in [11]. B  
+
+> Ξ1
+> Ξ2
+> 1
+> 2
+> ν
+> Figure 2: Non-conforming element interface between a big element ( B) face and two small element (1 ,2) faces. The corresponding virtual mortar sides are denoted by Ξ1,2.
+
+3.1.4. Arbitrary Mesh Deformation 
+
+For the time-accurate mesh deformation, the interpolation of the mesh displacement into the volume is required, which can be accomplished using inverse distance weighting or, as in this paper, radial basis function interpolation. While the evalua-tion of RBFs is more expensive than an inverse distance weight-ing, RBFs provide a better balance between e ffi ciency and mesh quality. The values of the RBF interpolation in each direction at xi are given as 
+
+s(xi) =
+
+> n
+
+X
+
+> j=1
+
+ˆs jψ( xi − x j ) s .t. s(xi) = D(xi) (14) with the unknown coe ffi cients S = {ˆs j}nj=1 ∈ Rn×3, composed of the values of the interpolation s(xi) on each node {xi}ni=1, i.e., the displacement D(xi) of the mesh nodes, with n being the number of mesh nodes. Here, a deformation of the boundary points in normal direction, defined as Db ∈ Rn×3, is considered, leading to 
+
+Db = VRBF S ⇐⇒ S = V−1RBF Db, (15) where Dbi = D(xbi ) denotes the displacement in each direc-tion at {xbi }nb
+
+> i=1
+
+. The Vandermonde matrix VRBF ∈ Rn×n is com-prised of the evaluation of the RBFs on each node, V{i j } 
+
+> RBF
+
+=
+
+ψ( xi − x j ), i, j = 1, . . . , n. In this work, this displacement is computed using eq. (9) and the compactly supported RBF de-fined in eq. (8) is employed. Determining S requires inverting VRBF (cf. eq. (15)), an O(n2
+
+> b
+
+) operation that becomes prohibitive if the RBF is constantly rebuilt globally to accommodate load balancing or boundary node drift. While recent methods rely on state-of-the-art surface and volume point reduction schemes to manage grid deformation overhead [45], our approach utilizes localized RBFs. Using compactly supported RBFs ensures the interpola-tion matrix remains sparse, allowing for local grid construction exclusively using mesh points within the support radius. To minimize computational overhead, an MPI-3 shared-memory parallelization strategy [46] is employed, significantly reducing communication and memory consumption. 
+
+3.2. Dispersed Phase 
+
+The particle operator in each stage of the time stepping al-gorithm is depicted in fig. 3, including the particle interpolation, time integration, and tracking on arbitrarily moving meshes and across non-conforming sliding mesh interfaces. More details 5q    
+
+> Moving Mesh: Compute ν
+> BR1 Lifting / FV reconstruction
+> Particle Push & Collisions
+> Tracking & Compute Displacement
+> DG / FV Operator
+> Particle Source Term
+> GCL Operator
+> qt
+> Explicit RK Time Integration Figure 3: Flow chart of the DG operator for 4-way coupled particle-laden flow via the Euler–Lagrange approach. DG operations are shaded in white. Particle operations are shaded in gray with the particle routines a ff ected by the moving mesh method highlighted in orange and the moving mesh operator of the con-tinuous phase in green. See [21, 6] for a more detailed breakdown.
+
+on the numerical handling and implementation of the dispersed phase are given in [21, 6]. 
+
+3.2.1. Particle Interpolation, Time Integration and Tracking 
+
+At each stage, the particle push is determined which in-cludes the following steps. First, the localization of the particle in reference space, which is facilitated by a Cartesian background mesh that maps physical coordinates to overlapping computational elements [46]. For each candidate element, the particle’s reference co-ordinates ξp are resolved by finding the root of xp − χ(ξp) = 0via Newton’s method. The valid host element is uniquely iden-tified when the solution satisfies ξp ∈ [−1, 1] 3.Second, the conserved variables are interpolated to the par-ticle location. For DG or blended DG cells ( αFV < α FV max ), this is performed using the high-order polynomial expansion, given as 
+
+q(ξp, t) =
+
+> N
+
+X 
+
+> i,j,k=0
+
+ˆqi jk (t)li(ξ1
+
+> p
+
+)l j(ξ2
+
+> p
+
+)lk(ξ3
+
+> p
+
+). (16) Conversely, for cells utilizing the second-order FV subcell scheme, the operation reduces to a linear interpolation of the conserved variables. Third, the calculation of the corresponding force on the dis-crete particle, and the subsequent integration of the particle tra-jectories in time using the updated particle acceleration. The particle path within a single RK stage, t ∈ [tn, tn+1], is approxi-mated using linear segments, defined as 
+
+xp(t; α) = xp(tn) + α t
+
+|t| , t = xp(tn+1) − xp(tn), (17) where t represents the linear displacement vector and α ∈
+
+[0 , |t|], denotes the scalar distance along this segment. To en-sure temporal synchronization between the dispersed and con-tinuous phases, the particles are advanced using the same RK scheme as the fluid solver. Fourth, the final particle path is determined by tracking in-tersections with element boundaries and applying the relevant boundary conditions. For curvilinear boundaries, intersections are identified using a dimension-reduction approach based on Bézier clipping and de Casteljau subdivision. Each element side is represented as a Bézier polynomial surface, yielding 
+
+P(ξ, η ) =
+
+> Ngeo
+
+X
+
+> m=0
+> Ngeo
+
+X
+
+> n=0
+
+ˆPmn Bm(ξ)Bn(η), (18) where ˆ P are the Bézier control points and ( ξ, η ) ∈ [−1, 1] 2 the side coordinates in reference space. An intersection is con-firmed by finding a root such that xp(t; α) !
+
+= P(ξ, η ). Compu-tationally e ffi cient linear or bi-linear solvers are substituted for planar faces, see [47] for further details. To maintain geomet-ric watertightness, non-conforming interface intersections are evaluated exclusively on the smaller element faces [21]. 
+
+3.2.2. Sliding Mesh Approach 
+
+As the tracking of the discrete phase is conducted in physi-cal space via Bézier clipping, a continuous update of the Bézier polynomials to account for mesh motion would introduce sig-nificant computational overhead at each time step. To mitigate this overhead, tracking of the discrete phase within the moving mesh region is instead performed in the relative frame of refer-ence of the respective moving subdomain, where the crossing of a sliding mesh interface then corresponds to applying an in-stantaneous displacement of the particle path at the interface location and subsequent application of virtual forces. The algo-rithmic treatment of an intersection of a particle with the sliding mesh interface parallels then that of internal mortar sides, dif-fering by the change in the frame of reference for the dispersed phase required when a particle traverses an interface. This ap-proach is illustrated in fig. 4, which contrasts the particle path as observed from the stationary frame of reference of the contin-uous phase with the corresponding trajectory from the relative frame of reference. ℓs ν    
+
+> ℓs
+> Figure 4: Particle path in the stationary (left) and relative (right) frame of ref-erence of the continuous phase with ℓsbeing the displacement and νthe mesh velocity.
+
+Upon identifying an intersection with the big mortar side, cf. fig. 2, the instantaneous displacement of the small mor-tar sides at time tn is evaluated. Since the particle path given in eq. (17) assumes that the mesh position remains unchanged in t ∈ [tn, tn+1], the particle is virtually moved to the intersection 6point on the sliding mesh interface using eq. (17) and adjusted by the displacement ℓs(t) = νt − ℓs(t = t0), representing the physical translation of the moving sub-domain. It is evident that, owing to the tracking in the relative frame, the particle ve-locities require correction by the mesh velocity. This results in a discrete jump in the particle velocity as it passes across a slid-ing mesh interface. Consequently, the RK registers correspond-ing to the intermediate stages must be modified to account for the frame transformation. The corrected particle velocity in the 
+
+n-th RK stage, d(vp)n = d(vp)n + γn incorporates a correction factor γn derived from the following recursive relation 
+
+γ j = −ν − A jγ j−1, for j = 2, . . . , nRK , γ 1 = −ν. (19) Further details are provided in [48]. 
+
+3.2.3. Arbitrary Mesh Deformation 
+
+For arbitrary mesh deformations away from the sliding mesh interface, particles are tracked in an absolute frame of reference. This inherently accounts for the mesh movement, providing correct particle trajectories without the need for fur-ther modifications. Although rebuilding the Bézier polynomials after each mesh deformation introduces a higher computational cost, it is strictly necessary to guarantee the geometric fidelity required for accurate particle tracking on meshes with arbitrary deformations. 
+
+4. Validation 
+
+Prior to presenting some application cases, the individual building blocks for particle-laden flow on moving meshes are validated. These include the particle push in a compressible fluid, the spatial and temporal convergence for the two mov-ing mesh methods, and the local RBF interpolation. For fur-ther details on the validation of the particulate phase, such as convergence properties for the static domain, and the correct-ness of the one-, two-, and four-way coupling, the reader is referred to [21, 6]. A comprehensive validation of the contin-uous phase, the ALE method, and the sliding mesh approach is provided in [38, 11, 9]. In this section, it is assumed that particle collisions are purely elastic, i.e., en = 1. Under these assumption, the tangential component of the impulse is zero and the normal component reduces to Jn = −2mp,r(v(0)  
+
+> p,r
+
+· np). The high-order DGSE /FV subcell scheme is used for the spa-tial discretization of the continuous phase, which is assumed to be inviscid, i.e., only the Euler equations are considered in this section, if not stated otherwise. All meshes in this paper are generated using the open-source pre-processing framework py-HOPE [49]. It is imperative to acknowledge that all quantities are non-dimensional. 
+
+4.1. Particle Push 
+
+Following [50], the validity of the particle push in a com-pressible context is assessed via a single particle with u f = C,
+
+C = 3CDρ f 
+
+> 4ρpdp
+
+, and the drag coe ffi cient, CD = 1, moving in a Sod shock tube. The assumption that u f = C is only valid if the underlying fluid solution is piecewise constant, i.e., not for the rarefaction wave. Thus, the normalized relative velocity can be defined as 
+
+u f − vp
+
+u f
+
+= C (t − t0) u f + u f
+
+u f − vp|t=t0
+
+!−1
+
+. (20) The relative time t − t0 and the relative particle velocity u f −
+
+vp|t=t0 are chosen in accordance to the considered characteristic wave, i.e., t−t0 = 2−0.086, u f −vp|t=t0 = u f and t−t0 = 0.4−0.2, 
+
+u f − vp|t=t0 = vp(t = t0) − u f for the shock wave and the contact discontinuity, respectively. The particle is initialized at xp|t=t0 =
+
+[0 .65 , 0, 0] ⊤, to the right of the initial discontinuity, with the local fluid velocity and ρp = 10, dp = 0.001. The intersection with the shock wave at t = 0.086 results in an acceleration of the particle, which is again visible for the contact discontinuity at 
+
+t ≈ 0.2, as depicted in fig. 5 (left). The kink in the normalized relative velocity can be attributed to the jump in density, ρ f ,over the contact discontinuity. Altogether, the analytical and numerical results are in excellent agreement. 0 0.1 0.2 0.3 0.4        
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1
+> t
+> (uf, 1 − vp, 1)u−1
+> f, 1
+> numerical
+> analytical
+> 1234567
+> 10 −10
+> 10 −9
+> 10 −8
+> 10 −7
+> N
+> || xlocal  − xglobal || L2
+> Figure 5: Left: Normalized relative particle velocity for the Sod shock tube. Right: Validation of the local RBF interpolation. L2-error of the mesh node positions for p-refinement compared to its global counterpart.
+
+4.2. Convergence Tests 
+
+The following test cases validate the spatial and temporal convergence of the moving mesh approaches for the continuous and the discrete phase under mesh refinement ( h-convergence), refinement of the polynomial solution ( p-convergence), and re-finement of the time step ( t-convergence). 
+
+4.2.1. Arbitrary Lagrangian–Eulerian Approach 
+
+In order to validate the ALE approach for the continuous phase, the computational domain Ωt ∈ [0 , 4] 3 is tessellated into 43/83 hexahedral elements with fully periodic boundary condi-tions and the mesh is deformed sinusoidally in time [7]. Initial conditions are chosen according to [51], prescribing an oblique sine wave with unit frequency and amplitude a = 0.1. Exper-imental rates of convergence (EOC) for p-refinement and h-refinement are shown in fig. 6 (left) with the EOC confirming the expected spectral and geometric convergence of the error, respectively. Validation for the discrete phase is performed on a cubi-cal domain Ωt ∈ [−1, 1] 3, with the test case conditions given in [21]. A single particle is emitted at xp|t=0 = [−0.95 , 0.95 , 0] ⊤
+
+with an initial velocity of vp|t=0 = [0 , 0.01 , 0] ⊤ and integrated 710 −1 10 0                  
+
+> 10 −8
+> 10 −5
+> 10 −2
+> 10 1
+> 15
+> h
+> L2(ρ)
+> p-conv. 4 3cells
+> p-conv. 8 3cells
+> h-conv. N= 4
+> 10 −110 0
+> 10 −8
+> 10 −6
+> 10 −4
+> 10 −2
+> 1
+> 5
+> h
+> || xp|| L1
+> p-conv. 8 3cells
+> h-conv. N= 4 Figure 6: Experimental rate of convergence for p-refinement and h-refinement for the continuous (left) and discrete (right) phase with the arbitrary Lagrangian–Eulerian approach on a conformal grid.
+
+in time until t = 1 while the mesh is subjected to the same si-nusoidal motion as for the continuous phase. The EOC for the 
+
+L1 error of the particle position at the end of the simulation are depicted in fig. 6 (right) for the spatial convergence study and in fig. 7 (left) for the temporal convergence study. In all cases, the EOC confirms to the expected slope until numerical errors in the h-convergence study limit the accuracy due to the time step size. 10 −1 10 0                        
+
+> 10 −11
+> 10 −10
+> 10 −9
+> 10 −8
+> 1
+> 3
+> CFL
+> || xp|| L1
+> 10 −110 0
+> 10 −14
+> 10 −12
+> 10 −10
+> 10 −8
+> 1
+> 5
+> h
+> || xp|| L1
+> Figure 7: Experimental rate of convergence for t-convergence for the discrete phase with CFL ={0.0625 ·2k:k∈N,k∈[0 ,4] }and N=6 (left) and h-convergence for the discrete phase interacting with a moving curved face with
+> Ngeo =N=4 (right).
+
+Since only straight faces have been investigated so far, the accuracy of intersections of particles with moving curved faces is now evaluated. For this, a half circle with a radius of rC = 2and a perimeter of lC = 4π in the xy -plane is rotated around the z-axis with dϕ = 0.1◦ at each time step, cf. fig. 8. A single particle is placed in a quiescent fluid with ρ = p = 1 at xp|t=0 =
+
+[0 , 1.4, 0] ⊤ and moved until t = 0.6 with vp|t=0 = [1 .2, 1.2, 0] ⊤.The numerical intersection point of the particle with the circle is compared to the analytical one, and the discrete L 1 error for di ff erent grid resolutions with a solution and geometric poly-nomial order of N = Ngeo = 4 is chosen as error metric. The results in fig. 7 (right) demonstrate that the optimal convergence rate of Ngeo + 1 is reached for all grid resolutions. 
+
+4.2.2. Sliding Mesh Interface 
+
+Validation of the sliding mesh approach is performed using the identical setup as for the conforming grid test case. How-ever, for the validation of the continuous phase, the central sub-domain x ∈ [1 , 3] is translated with a constant grid velocity dϕ 
+
+xp
+
+x1
+
+x2
+
+x3              
+
+> Figure 8: Setup of the convergence test for curved faces. 10 −210 −110 0
+> 10 −14
+> 10 −10
+> 10 −6
+> 10 −2
+> 15
+> h
+> L2(ρ)
+> p-conv. 4 3cells p-conv. 8 3cells p-conv. 16 3cells h-conv. N= 4
+> 10 −110 0
+> 10 −8
+> 10 −6
+> 10 −4
+> 10 −2
+> 1
+> 5
+> h
+> || xp|| L1
+> Figure 9: Experimental rate of convergence for p-refinement and h-refinement for continuous (left) and discrete (right) phase with the arbitrary Lagrangian– Eulerian approach on a nonconforming grid with two sliding mesh interfaces.
+
+vector ν = [0 , 1, 0] ⊤ while the outer subdomains remain invari-ant. Again, EOC for p-refinement and h-refinement are shown in fig. 9 (left) with the EOC confirming the expected spectral and geometric convergence of the error, respectively. Similarly, the validation for the discrete phase is performed on the cubical domain Ωt ∈ [−1, 1] 3. The moving region is cho-sen as the central subdomain x ∈ [−0.5, 0.5] and translated with a constant grid velocity vector ν = [0 , 1, 0] ⊤ while the other subdomains remain at rest. The EOC for the L1 error of the par-ticle position at the end of the simulation are depicted in fig. 9 (right). Once more, the EOC confirm to the expected slope once the sinusoidal solution of the continuous phase is su ffi ciently approximated by the polynomial representation. The EOC for both t-convergence and h-convergence of the discrete phase along a moving curved interface was established in the preced-ing section. 
+
+4.2.3. RBF Interpolation 
+
+To validate the accuracy of the local RBF implementation, its performance is evaluated against a global RBF baseline. A particle-induced mesh deformation is simulated on a domain 
+
+Ωt ∈ [−1, 1] 3 featuring 8 3 elements with N = 4. A single particle ( xp|t=0 = [0 .55 , 0.55 , 0.05] ⊤) is evolved until t = 0.6on a uniform flow field using RS = RS p = 0.3. The result-ing mesh deformations for di ff erent polynomial degrees N are compared in fig. 5 (right). The L2 error between the locally and globally build RBFs is lower then O(10 −7), confirming imple-mentation consistency. Furthermore, an L2 error analysis across varying N illustrates that the mesh velocity interpolation error decreases with increasing polynomial degree, with convergence rates determined by the chosen support radius. 85. Applications 
+
+This section demonstrates the applicability of the E LEXI framework to complex, large-scale applications with moving domains. The ALE approach is applied to highly challeng-ing particle-laden flow around a supersonic compressor blade to predict the resulting surface erosion. To demonstrate the slid-ing mesh approach, the framework is utilized to simulate the computationally demanding particle-laden flow within a simi-lar transonic compressor cascade experiencing upstream wakes from a cylindrical generator. Although a unified simulation si-multaneously deploying both methodologies is fully supported by the underlying architecture, these two moving mesh algo-rithms are evaluated independently here, as a joint application falls outside the scope of the present study. These cases serve as numerical demonstrations; consequently, detailed physical investigations of the flow phenomena are beyond the scope of this study. 
+
+5.1. Particle-Wall Deformations 
+
+An infinite rectilinear compressor cascade with the uneroded NASA Rotor 37 profile [52, 53] at 50% span is uti-lized for the current investigations. The rotor operates at de-sign speed with an inflow Mach number of M = 1.4, ρ1 =
+
+0.968 kgm −3, p1 = 72 722 Pa, and a Reynolds number of 
+
+Re = 1 472 525, based on the chord length c = 0.0557 m. The computational domain around a single blade Ωt =
+
+[−0.23677 , 0.24702] × [−0.03576 , 0.08478] × [0 , 0.00278] [m] is tessellated into 1 202 760 elements with N = Ngeo = 4and periodic boundary conditions in y- and z-directions. Su-personic inflow conditions and a pressure outflow condition, 
+
+p2 = 136 900 Pa, are prescribed in x-direction (left to right), while adiabatic, no-slip conditions are imposed on the surface of the rotor blade. Wall-normal spacing is selected to obtain a non-dimensional wall distance of y+ ≤ 1.59, thus conforming to a wall-resolved LES. The hybrid DGSE /FV subcell scheme is utilized for shock capturing with αFV ∈ [0 .01 , 0.5], while for 
+
+αFV < 0.01, a pure DG and for αFV > 0.5 a pure FV sub-cell method is employed. The characteristic flow timescale is defined as T ∗ = L∗u−12 ≈ 9.62740 · 10 −5s with the character-istic length L∗ = 0.0377m given as the cascade pitch and u2 =
+
+391 .409 m s −1 as the inflow velocity in radial direction. The do-main is extended at the beginning and at the end by a sponge zone with grid stretching to prevent an interaction of the bow shock with the inlet boundary condition and to dampen turbu-lent structures near the outflow, respectively. Spherical quartz particles with a density of ρp = 2650kg m −3 are introduced at a distance of 1 .9 axial chord lengths upstream from the lead-ing edge, with their initial velocities set to match the instanta-neous fluid velocity. The particle diameters are fixed to specific values spanning a Stokes number range of St ∈ [0 .001 , 100], St = ρpd2    
+
+> puf
+> 18 μfc
+
+, utilizing identical emission probabilities for each Stokes number. The instantaneous flow field is visualized in fig. 10. A de-tached bow shock is observed at the leading edge of the rotor, followed by Prandtl–Meyer expansion waves and a complex 0.0 0.4 0.8 1.2 1.6 
+
+> M
+> Figure 10: Instantaneous flow field colored by the Mach number around the compressor blade at design speed and 312 T∗.
+
+passage shock wave system. Laminar boundary layers are vis-ible on both the pressure and suction sides, transitioning to the turbulent regime near the mid-chord. This transition interacts with the passage shock waves, resulting in a highly unsteady flow system. To model the particle-induced deformation of the blade’s surface, the boundary nodes of the blade are continuously de-formed during the simulation according to the algorithm pre-sented in section 2.4. There is no mesh deformation in the third (spanwise) direction and the displacement is identical for all boundary nodes which share the same z-position, since the cas-cade is assumed to represent the blade-to-blade plane. The particle impact and rebound distribution along the blade’s surface, as shown in fig. 11, highlights the distinct kine-matics driven by the empirical rebound model [28]. Prior to impact, the initial particle emission conditions restrict the in-coming particles to a highly concentrated range of velocities and impact angles, αp. Upon collision, however, the utilized rebound model introduces a pronounced scattering e ff ect, sig-nificantly broadening the distribution of both particle velocities and reflection angles post-rebound. To quantify the structural impact of these dynamics, the lo-cal material degradation along the blade surface is evaluated. The resulting surface erosion rate of the compressor blade nor-malized by the maximal erosion rate along the chord length is illustrated in fig. 12. Experimental data for measured sur-face variations due to particle erosion on the NASA Rotor 37 is adapted from Lorenz et al. [54]. Thus, this experimental data serves as reference for this validation case. The numerical re-sults demonstrate strong overall agreement with the measured rotor blade deformation, exhibiting only minor deviations near the leading and trailing edges in this complex multi-physis ap-plication. The slight underprediction near the leading and trail-ing edges stems from a fundamental limitation in the under-90 100 200       
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> vp[m/s ]
+> PDF
+> 020 40 60 80
+> 0.0
+> 0.2
+> 0.4
+> αp[◦]
+> PDF
+> Impact
+> Rebound Figure 11: Probability distribution function (PDF) of particle impact and re-bound along the blade’s surface predicted by the LES for the particle velocities (left) and impact /rebound angle (right).
+
+lying empirical framework. The utilized rebound and erosion models are traditionally derived from experimental data gath-ered using flat-plate specimens under uniform impact angles. Consequently, they lack the geometric fidelity required to in-herently account for the highly localized curvature and strong local flow deceleration characteristic of the leading and trail-ing edges. In these regions, particularly at the leading edge, the rapid deflection of the continuous phase creates a localized shielding e ff ect, turning smaller particles away before impact, while the steep, continuously varying surface curvature alters the e ff ective localized impact angles in a manner not fully cap-tured by flat-plate empirical correlations. The influence of these impacts on the particle dynamics is further highlighted in fig. 13, which depicts the normalized par-ticle distribution in the xy -plane, averaged over the spanwise ( z)direction for the final 32 characteristic flow times. Crucially, this distribution reveals a massive particle concentration local-ized along the pressure side, perfectly mirroring the high-wear zone identified in the erosion profiles. Furthermore, the visu-alization clearly captures the non-symmetric scattering of the particle cloud post-impact, a direct physical consequence of the asymmetric reflection angles dictated by the empirical rebound model. Ultimately, these altered trajectories propagate past the trailing edge, heavily reshaping the particle distribution profile in the blade’s wake. In summary, the coupled Euler–Lagrange approach success-fully captures the non-linear interaction between the compress-ible flow features and the particulate phase. By accurately pre-dicting both the high-velocity shock system and the resulting material degradation, the framework demonstrates its capabil-ity to resolve long-term surface evolution in complex, moving geometries. Furthermore, numerical analysis provided insight into the highly complex particle trajectories and interactions, which are inaccessible during standard erosion cascade experi-ments. 
+
+5.2. Cascade with Periodic Wakes 
+
+As second application case, the developed framework is ap-plied to a transonic compressor cascade, subjected to tempo-rally periodic wakes. Using the same cascade geometry as in section 5.1, cylindrical wake generators are added upstream of × 2.5       
+
+> Uneroded Eroded (measured) Eroded (segregated)
+> Eroded (coupled)
+> 025 50 75 100
+> 0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1
+> Nondimensional chord length [%]
+> Normalized erosion rate
+
+# Uneroded Eroded (measured) 
+
+# Eroded (coupled) 
+
+# 0 25 50 
+
+# 0
+
+# 0.2
+
+# 0.4
+
+# 0.6
+
+# 0.8
+
+# 1
+
+# Nondimensional chord lengt 
+
+> Normalized erosion rate
+
+# × 2
+
+# Uneroded Eroded (measured) Eroded (segregated) 
+
+# Eroded (coupled) 
+
+# 0 25 50 75 100 
+
+# 0
+
+# 0.2
+
+# 0.4
+
+# 0.6
+
+# 0.8
+
+# 1
+
+# Nondimensional chord length [%]         
+
+> Normalized erosion rate
+> Figure 12: Sketch of the rotor blade deformed by the ALE approach compared to the measured, eroded rotor blade given in [54, 3]. The solid, grey line indi-cates the uneroded blade profile. For reasons of clarity, in the present sketch, the rotor height is scaled by a factor of around two compared to the chord length.
+> Figure 13: Normalized, two-dimensional particle density distribution in the
+> x1x2- plane over the last 32 τ∗.The rotor blade is highlighted in gray. The uneroded rotor blade is illustrated and the particles are reflected at the blade’s surface with ∆Jp,0.
+
+the blade row at a distance of 0 .65 axial chord lengths from the leading edge. A sliding mesh interface is placed between the wake generators and the blade row to account for the relative motion. The wake generators are meshed as fully-structured O-grid, adding 83 640 additional cells for a total of 1 286 400 hex-ahedral mesh elements. Wall-normal spacing is selected to ob-tain a non-dimensional wall distance of y+ ≤ 1.4, thus conform-ing to a wall-resolved LES. The selected operating point corre-sponds to a near-stall flow condition at 60 % design speed at a relative inlet Mach number of M = 0.824, ρ1 = 1.173 kgm −3
+
+and p1 = 95 262 Pa, and a Reynolds number of Re = 972 550, assuming sea-level idle conditions. Subsonic inflow conditions and a pressure outflow condition, p2 = 113 332 Pa, are pre-scribed in x-direction (left to right), while adiabatic, no-slip conditions are imposed on the surface of the rotor blade and the cylindrical wake generator. The discrete phase is initialized in a similar manner as in section 5.1. A visualization of the instantaneous isocontour of the Q-criterion colored by Mach number is shown in fig. 14. Clearly visible is the vortical wake of the cylindrical wake generators which enters the passage at mid-pitch for the depicted point in time. The wake interacts with the transonic region near the leading edge and the detachment region downstream on the suction side while experiencing only minor wake bending while traversing the passage. Once the fluid exits the passage, the wake-wake interactions results in temporally varying vor-tex amplification and attenuation. The Schlieren visualization in the background indicates acoustic disturbances moving up-stream and interacting with the generated wakes. Instantaneous and time-averaged distributions of the pres-10 Figure 14: Instantaneous isocontour of Q-criterion colored by Mach number around the compressor blade including the wake generator with Schlieren visu-alization in the background.      
+
+> Figure 15: Distribution of instantaneous and mean pressure coe ffi cient Cp
+> and skin friction coe ffi cient Cfagainst relative position along the axial chord
+> xax /Cax .
+
+sure coe ffi cient Cp and the skin friction coe ffi cient C f are de-picted in fig. 15. After the initial transient, statistics are gath-ered for 20 blade passing periods (BPPs). As expected from the low operating point, overall pressure di ff erence between suc-tion and pressure side and consequently the work performed by the rotor stage remains small. The skin friction coe ffi cient dis-tributions reveals a bi-modal pattern on the pressure side as a thin separation region is periodically re-energized by the wake passage. This boundary layer re-energization facilitates the for-mation of a transient calmed region as the flow field gradually relaxes back towards a laminar boundary layer on the verge of separation. Naturally, these localized variations in boundary layer dynamics and fluid velocity directly modulate the trans-port and acceleration of the dispersed phase. Mean particle velocity vp and the standard deviation σ of the discrete phase as a function of axial position are shown in fig. 16. Here, darker colors correspond to particles with higher Stokes number, that is stronger inertial e ff ects. Distinctively visible on the left side of the plot are particles impacting on the wake generator and being reflected upstream, where the asso-ciated deceleration and acceleration depend on the local impact angle on the cylinder surface. A similar e ff ect is observed di-rectly upstream of the blade leading edge. Particles with lower inertia experience stronger deceleration within the blade pas-sage, with the lightest species remaining in the recirculation re-gion near the trailing edge, identifiable by average particle ve-locities approaching zero. Downstream of the blade row, only  
+
+> Figure 16: Mean and standard deviation σ, indicated by the root mean square (RMS), of the particle velocity against axial position normalized by the chord.
+> Figure 17: Fluid velocity and particle flow rate upstream and downstream of the blade row. Individual particle sizes are shaded lightly and the average of all particles in the simulation is highlighted in bold.
+
+particles leaving the recirculation region are represented with all considered particle sizes gradually relax toward the mean fluid velocity. Subsequently, the velocity fluctuations diminish as the wake vortices dissipate into internal energy. Despite the disparities between the simulated particle sizes, common features can still be identified in the fluid and parti-cle flow-rate fields. Fluid velocity and particle flow rate at dis-tances of 0 .5 axial chord lengths upstream and downstream of the blade row are illustrated in fig. 17. Here, the upstream po-sition corresponds to a sampling plane slightly downstream of the cylindrical wake generator. Upstream of the blade row, both the fluid velocity deficit and the minimum of the particle den-sity field appear approximately in phase, with a slight o ff set of the discrete-phase minimum caused by the motion of the wake generator. The spanwise extent of the flow rate deficit is narrow and comparable for both phases. Owing to particle inertia, the discrete-phase wake retains its narrow spatial extent even after traversing the blade passage, whereas the time-averaged fluid wake appears substantially more di ff use. Despite the di ff ering particle distributions observed in fig. 16, all simulated particle sizes relax towards a comparable wake state already at a dis-tance of just 0 .5 axial chord lengths downstream of the trailing edge. The average phase angle between the minima of the fluid and particle fields is approximately 132 ◦. Whether this behav-ior is transferable to di ff erent flow configurations or operating conditions remains an open question. In summary, the presented framework demonstrated its ability to perform scale-resolving simulation and analysis of particle-laden flow even with large displacements. The relative motion of the wake generations is correctly captured for both the continuous and the discrete phase. By successfully quan-11 tifying the phase lag between the both phases, this framework underscores the critical importance of accurately accounting for the temporal variance imposed by upstream stages. These tran-sient e ff ects are heavily influential but are frequently neglected when prescribing simplified inflow conditions in conventional turbomachinery stage simulations. 
+
+6. Conclusion 
+
+Compressible flow with suspended solid particles in mov-ing domains is present in a wide range of technical appli-cations. This work presents a high-fidelity Euler–Lagrange framework capable of resolving compressible particle-laden flows within complex, moving geometries. By coupling a high-order discontinuous Galerkin method for the continu-ous phase with a discrete Lagrangian point-particle tracking scheme, the framework achieves high-order accuracy with-out the prohibitive computational overhead of fully particle-resolved strategies. To handle moving domains, two promi-nent moving mesh techniques were successfully integrated: the arbitrary Lagrangian–Eulerian method for continuous, time-resolved particle-induced wall deformations, and its special case, the sliding mesh approach for rigid translational or ro-tational movements along non-conforming interfaces. Further-more, the compatibility of these algorithms with unstructured, curved high-order grids enables the seamless handling of com-plex geometric configurations. Special emphasis was placed on achieving high-order temporal and spatial accuracy for La-grangian particle tracking on moving meshes, specifically when transitioning across non-conforming sliding mesh interfaces. The capability of the framework was highlighted through its ap-plication to two highly challenging compressor rotor blade con-figurations: the first focusing on complex solid-particle erosion, and the second featuring an upstream cylindrical wake genera-tor. Although a unified simulation simultaneously leveraging both methodologies is fully supported by the underlying soft-ware architecture, these capabilities were evaluated indepen-dently here to cleanly isolate their respective performance char-acteristics, with a combined application left outside the scope of the present study. 
+
+Acknowledgements 
+
+The research presented in this paper was funded in parts by Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) under Germany’s Excellence Strategy - EXC 2075 - 390740016 and by the European Union. This work has re-ceived funding from the European High Performance Com-puting Joint Undertaking (JU) and Sweden, Germany, Spain, Greece, and Denmark under grant agreement No 101093393. We acknowledge the support by the Stuttgart Center for Simu-lation Science (SimTech). The authors gratefully acknowledge the support and the computing time on Hawk provided by the HLRS through the project “hpcdg”. 
+
+References 
+
+[1] A. Ghenaiet, Study of Sand Particle Trajectories and Ero-sion Into the First Fan Stage of a Turbofan, in: Volume 7: Turbomachinery, Parts A, B, and C, ASMEDC, 2010, pp. 183–201. doi: 10.1115/GT2010-22415 .[2] A. Beck, P. Ortwein, P. Kopper, N. Krais, D. Kempf, C. Koch, Towards high-fidelity erosion prediction: On time-accurate particle tracking in turbomachin-ery, International Journal of Heat and Fluid Flow 79 (2019) 108457. doi: 10.1016/j.ijheatfluidflow. 2019.108457 .[3] J. Hartmann, M. Lorenz, M. Klein, S. Staudacher, The Eff ect of an Entirely Eroded Airfoil on the Aerodynamic Performance of a Supersonic Compressor Cascade, in: Volume 10B: Turbomachinery — Axial Flow Turbine Aerodynamics; Deposition, Erosion, Fouling, and Icing; Radial Turbomachinery Aerodynamics, volume 81752, American Society of Mechanical Engineers, 2022, pp. 1–10. URL: https://asmedigitalcollection. asme.org/GT/proceedings/GT2022/86106/ V10BT31A011/1149292 . doi: 10.1115/GT2022-81752 .[4] S. Balachandar, J. K. Eaton, Turbulent dispersed multiphase flow, Annual Review of Fluid Mechan-ics 42 (2010) 111–133. doi: 10.1146/annurev.fluid. 010908.165243 .[5] E. J. Ching, M. Ihme, Development of a particle colli-sion algorithm for discontinuous Galerkin simulations of compressible multiphase flows, Journal of Computational Physics 436 (2021) 110319. doi: 10.1016/j.jcp.2021. 110319 .[6] A. Schwarz, P. Kopper, E. de Staercke, A. Beck, E ffi cient computation of particle-fluid and particle-particle interac-tions in compressible flow, Computer Physics Communi-cations 315 (2025) 109743. doi: 10.1016/j.cpc.2025. 109743 .[7] C. A. A. Minoli, D. A. Kopriva, Discontinuous Galerkin spectral element approximations on moving meshes, Jour-nal of Computational Physics 230 (2011) 1876–1902. doi: 10.1016/j.jcp.2010.11.038 .[8] L. Wang, P. O. Persson, High-order discontinuous Galerkin simulations on moving domains using an ALE formulation and local remeshing with projections, 53rd AIAA Aerospace Sciences Meeting (2015) 1–12. [9] A. Schwarz, J. Keim, C. Rohde, A. Beck, Entropy sta-ble shock capturing for high-order DGSEM on mov-ing meshes, 2025. doi: 10.48550/arXiv.2503.23237 .
+
+arXiv:2503.23237 .[10] M. J. Y., Cfd simulation of flows in stirred tank reac-tors using a sliding mesh technique, Instn. Chem. Engng. Symp. Ser. 136 (1994) 341–348. 12 [11] J. Dürrwächter, M. Kurz, P. Kopper, D. Kempf, C.-D. Munz, A. Beck, An e ffi cient sliding mesh interface method for high-order discontinuous Galerkin schemes, Computers & Fluids 217 (2021) 104825. doi: 10.1016/ j.compfluid.2020.104825 .[12] G. Wang, F. Duchaine, D. Papadogiannis, I. Duran, S. Moreau, L. Y. M. Gicquel, An overset grid method for large eddy simulation of turbomachinery stages, Journal of Computational Physics 274 (2014) 333–355. doi: 10. 1016/j.jcp.2014.06.006 .[13] J. R. Aarnes, N. E. L. Haugen, H. I. Andersson, High-order overset grid method for detecting particle impaction on a cylinder in a cross flow, International Journal of Computational Fluid Dynamics 33 (2019) 43–58. doi: 10. 1080/10618562.2019.1593385 .[14] A. de Boer, M. van der Schoot, H. Bijl, Mesh deforma-tion based on radial basis function interpolation, Com-puters & Structures 85 (2007) 784–795. doi: 10.1016/j. compstruc.2007.01.013 .[15] M. Lesoinne, C. Farhat, Geometric conservation laws for flow problems with moving boundaries and deformable meshes, and their impact on aeroelastic computations, Computer Methods in Applied Mechanics and Engineer-ing 134 (1996) 71–90. doi: 10.1016/0045-7825(96) 01028-6 .[16] N. Krais, Moving Mesh Methods and Wall Modelling for Discontinuous Galerkin Schemes, Ph.D. thesis, Univer-sity of Stuttgart, 2020. [17] C. Lo, J. P. Bons, Smoothing Techniques to Improve Flow Solution Convergence for Modeling Surface Erosion or Deposition in Two-Phase Flows, in: AIAA SCITECH 2023 Forum, American Institute of Aeronautics and As-tronautics, 2023. doi: 10.2514/6.2023-1642 .[18] Y. Xiao, Y. Peng, P. J. Ming, W. M. Yang, A robust par-allel algorithm for Eulerian-Lagrangian method crossing sliding non-conformal interfaces, Computers & Fluids 264 (2023) 105974. doi: 10.1016/j.compfluid.2023. 105974 .[19] M. Morelli, T. Bellosta, A. Guardone, Lagrangian Particle Tracking in Deforming Sliding Mesh for Rotorcraft Icing Applications, European Rotorcraft Forum (2019). [20] W. C. Maxon, T. Nielsen, N. Denissen, J. D. Regele, J. McFarland, A high resolution simulation of a single shock-accelerated particle, Journal of Fluids Engineering 143 (2021). doi: 10.1115/1.4050007 .[21] P. Kopper, A. Schwarz, S. M. Copplestone, P. Ortwein, S. Staudacher, A. Beck, A framework for high-fidelity particle tracking on massively parallel systems, Computer Physics Communications 289 (2023) 108762. doi: 10. 1016/j.cpc.2023.108762 .[22] D. A. Kopriva, Metric identities and the discontinuous spectral element method on curvilinear meshes, J. of Sci. Comput. 26 (2006) 301. [23] G. Schnücke, N. Krais, T. Bolemann, G. J. Gassner, En-tropy Stable Discontinuous Galerkin Schemes on Moving Meshes for Hyperbolic Conservation Laws, J. Sci. Com-put. 82 (2020) 69. doi: 10.1007/s10915-020-01171-7 .[24] W. Sutherland, Lii. the viscosity of gases and molecular force, The London, Edinburgh, and Dublin Philosophi-cal Magazine and Journal of Science 36 (1893) 507–531. doi: 10.1080/14786449308620508 .[25] M. R. Maxey, J. J. Riley, Equation of motion for a small rigid sphere in a nonuniform flow, Physics of Fluids 26 (1983) 883–889. doi: 10.1063/1.864230 .[26] R. Gatignol, The Faxén formulae for a rigid particle in an unsteady non-uniform Stokes flow, Journal de Mecanique Theorique et Appliquee 2 (1983) 143–160. [27] E. Loth, J. T. Daspit, M. Jeong, T. Nagata, T. Nono-mura, Supersonic and hypersonic drag coe ffi cients for a sphere, AIAA Journal 59 (2021) 3261–3274. doi: 10. 2514/1.J060153 .[28] A. Schwarz, P. Kopper, J. Keim, H. Sommerfeld, C. Koch, A. Beck, A neural network based framework to model particle rebound and fracture, Wear (2022) 204476. doi: 10.1016/j.wear.2022.204476 .[29] A. Uzi, A. Levy, On the relationship between erosion, energy dissipation and particle size, Wear 428-429 (2019) 404–416. doi: 10.1016/j.wear.2019.04.006 .[30] A. Schwarz, High-Fidelity Particle Tracking and Impact-Induced Deformations, Ph.D. thesis, University of Stuttgart, 2024. [31] P. Chandrashekar, Kinetic energy preserving and entropy stable finite volume schemes for compressible Euler and Navier-Stokes equations, Commun. Comput. Phys. 14 (2013) 1252–1286. [32] P. L. Roe, Approximate Riemann solvers, parame-ter vectors, and di ff erence schemes, Journal of Com-putational Physics 43 (1981) 357–372. doi: 10.1016/ 0021-9991(81)90128-5 .[33] A. Harten, J. M. Hyman, Self adjusting grid methods for one-dimensional hyperbolic conservation laws, Jour-nal of Computational Physics 50 (1983) 235–269. doi: 10. 1016/0021-9991(83)90066-9 .[34] F. Bassi, S. Rebay, A high-order accurate dis-continuous finite element method for the numeri-cal solution of the compressible Navier-Stokes equa-tions, Journal of Computational Physics 131 (1997) 267–279. URL: https://www.sciencedirect.com/ science/article/pii/S0021999196955722 . doi: 10. 1006/jcph.1996.5572 .13 [35] S. Hennemann, A. M. Rueda-Ramírez, F. J. Hindenlang, G. J. Gassner, A provably entropy stable subcell shock capturing approach for high order split form DG for the compressible Euler equations, J. Comput. Phys. 426 (2021) 109935. doi: 10.1016/j.jcp.2020.109935 .[36] M. H. Carpenter, a. Kennedy, Fourth-order Kutta schemes, Nasa Technical Memorandum 109112 (1994) 1–26. [37] A. D. Beck, T. Bolemann, D. Flad, H. Frank, G. J. Gassner, F. Hindenlang, C.-D. Munz, High-order dis-continuous Galerkin spectral element methods for transi-tional and turbulent flow simulations, International Jour-nal for Numerical Methods in Fluids 76 (2014) 522–548. doi: 10.1002/fld.3943 .[38] N. Krais, A. Beck, T. Bolemann, H. Frank, D. Flad, G. Gassner, F. Hindenlang, M. Ho ff mann, T. Kuhn, M. Sonntag, C.-D. Munz, FLEXI: A high order discon-tinuous Galerkin framework for hyperbolic-parabolic con-servation laws, Computers & Mathematics with Applica-tions 81 (2021) 186–219. doi: 10.1016/j.camwa.2020. 05.004 . arXiv:1910.02858 .[39] A. Schwarz, D. Kempf, J. Keim, P. Kopper, C. Rohde, A. Beck, Comparison of entropy stable collocation high-order DG methods for compressible turbulent flows, Com-puters & Fluids 303 (2025) 106874. doi: 10.1016/j. compfluid.2025.106874 .[40] M. Kurz, D. Kempf, M. P. Blind, P. Kopper, P. O ff en-häuser, A. Schwarz, S. Starr, J. Keim, A. Beck, GALÆXI: Solving complex compressible flows with high-order dis-continuous Galerkin methods on accelerator-based sys-tems, Computer Physics Communications 306 (2025) 109388. doi: 10.1016/j.cpc.2024.109388 .[41] J. Keim, A. Schwarz, P. Kopper, M. Blind, C. Ro-hde, A. Beck, Entropy stable high-order discontinuous Galerkin spectral-element methods on curvilinear, hybrid meshes, Journal of Computational Physics 557 (2026) 114829. doi: 10.1016/j.jcp.2026.114829 .[42] C. Mavriplis, Nonconforming discretizations and a poste-riori error estimators for adaptive spectral element tech-niques, Ph.D. thesis, Massachusetts Institute of Technol-ogy, 1989. [43] D. A. Kopriva, A conservative staggered-grid Chebyshev multidomain method for compressible flows. II. A semi-structured method, Journal of Computational Physics 128 (1996) 475–488. doi: 10.1006/jcph.1996.0225 .[44] D. A. Kopriva, A staggered-grid multidomain spectral method for the compressible Navier–Stokes equations, Journal of Computational Physics 143 (1998) 125–158. doi: 10.1006/jcph.1998.5956 .[45] M. Morelli, T. Bellosta, A. Guardone, E ffi cient radial ba-sis function mesh deformation methods for aircraft icing, Journal of Computational and Applied Mathematics 392 (2021) 113492. doi: 10.1016/j.cam.2021.113492 .[46] P. Kopper, S. M. Copplestone, M. Pfei ff er, C. Koch, S. Fasoulas, A. Beck, Hybrid parallelization of Eu-ler–Lagrange simulations based on MPI-3 shared mem-ory, Advances in Engineering Software 174 (2022) 103291. doi: 10.1016/j.advengsoft.2022.103291 .[47] P. Ortwein, S. M. Copplestone, C.-D. Munz, T. Binder, W. Reschke, S. Fasoulas, A particle localization al-gorithm on unstructured curvilinear polynomial meshes, Computer Physics Communications 235 (2019) 63–74. doi: 10.1016/j.cpc.2018.09.024 .[48] P. Kopper, An Euler–Lagrange Method for Compressible Dispersed Multiscale Flow, Ph.D. thesis, University of Stuttgart, 2024. [49] P. Kopper, M. P. Blind, A. Schwarz, M. Kurz, F. Rodach, S. M. Copplestone, A. D. Beck, PyHOPE: A Python Toolkit for Three-Dimensional Unstructured High-Order Meshes, Journal of Open Source Software 10 (2025) 8769. doi: 10.21105/joss.08769 .[50] J. Kaiser, D. Appel, F. Fritz, S. Adami, N. Adams, Amultiresolution local-timestepping scheme for particle-laden multiphase flow simulations using a level-set and point-particle approach, Computer Methods in Applied Mechanics and Engineering 384 (2021) 113966. doi: 10. 1016/j.cma.2021.113966 .[51] G. J. Gassner, F. Lörcher, C.-D. Munz, J. S. Hesthaven, Polymorphic nodal elements and their application in dis-continuous Galerkin methods, Journal of Computational Physics 228 (2009) 1573–1590. doi: 10.1016/j.jcp. 2008.11.012 .[52] L. Reid, R. Moore, Design and overall performance of four highly loaded, high speed inlet stages for an advanced high-pressure-ratio core compressor, Technical Report, NASA-TP-1337, 1978. [53] R. D. Moore, L. Reid, Performance of single-stage axial-flow transonic compressor with rotor and stator aspect ratios of 1.63 and 1.78, respectively, and with design pressure ratio of 1.82, Technical Report, NASA-TP-1338, 1978. [54] M. Lorenz, M. Klein, J. Hartmann, C. Koch, S. Stau-dacher, Prediction of Compressor Blade Erosion Experi-ments in a Cascade Based on Flat Plate Specimen, Fron-tiers in Mechanical Engineering 8 (2022) 1–14. doi: 10. 3389/fmech.2022.925395 .14
