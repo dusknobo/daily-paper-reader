@@ -1,0 +1,1749 @@
+Title: A hybrid sharp-diffuse interface approach to accurately model melt pool dynamics with rapid evaporation in laser-based processing of metals
+
+URL Source: https://arxiv.org/pdf/2606.19556v1
+
+Published Time: Fri, 19 Jun 2026 00:11:25 GMT
+
+Number of Pages: 44
+
+Markdown Content:
+# A hybrid sharp–diffuse interface approach to accurately model melt pool dynamics with rapid evaporation in laser-based processing of metals 
+
+Nils Much a, ∗, Andreas Koch a, Christoph Meier a, Magdalena Schreter-Fleischhacker a
+
+> aProfessorship of Simulation for Additive Manufacturing, Technical University of Munich, Freisinger Landstraße 52, Garching b. München, 85748, Germany
+
+Abstract 
+
+Predictive simulation of melt pool dynamics in laser-based processing of metals, e.g., laser beam welding or laser powder bed fusion additive manufacturing, requires accurate resolution of thermo-hydrodynamic interactions at the melt–gas interface. Here, evaporation-induced recoil pressure and temperature-dependent surface tension govern the flow. Because these mechanisms depend sensi-tively, often exponentially, on the interface temperature, reliable predictions demand highly accurate heat transfer models. Popular diffuse-interface formulations smear the extreme thermal gradients as typical for laser–metal interactions, leading to interface temperature errors that critically de-grade the accuracy of interface force predictions and melt pool dynamics. We present a hybrid sharp–diffuse interface approach for high-fidelity modelling of melt pool thermo-hydrodynamics with rapid evaporation. The heat transfer problem is represented using a sharp-interface unfitted finite element (CutFEM) formulation, enabling accurate prediction of the temperature field. The multi-phase flow problem, characterized by large density ratios and complex interface dynamics, is accurately captured using a robust level-set-based one-fluid diffuse-interface finite element formu-lation. Consistent coupling is achieved by extending the sharp-interface temperature into a narrow interface region to evaluate temperature-dependent interface forces within the diffuse-interface flow framework. In practically relevant benchmarks, the sharp-interface thermal model exhibits second-order spatial convergence, enabling finite element sizes two orders of magnitude larger than the diffuse-interface approach for 1% accuracy. In a novel coupled thermo-hydrodynamic benchmark representative of laser–metal interactions, the hybrid approach is one order of magnitude more accurate than a purely diffuse-interface model on the same mesh. Robustness is demonstrated in a 3D proof-of-principle simulation of stationary laser-induced melting of a bare metal plate. The methodology applies to basically all problems with temperature-driven flow, in particular when strongly localized heat sources are involved, as, e.g., in laser beam welding and laser powder bed fusion. 
+
+Keywords: laser-based metal additive manufacturing, laser beam welding, melt pool modelling, hybrid sharp–diffuse interface approach, Cut finite element method, high-fidelity modelling, thermal two-phase flow 
+
+> ∗Corresponding author
+> arXiv:2606.19556v1 [cs.CE] 17 Jun 2026
+
+1. Introduction 
+
+1.1. Background and challenges 
+
+Laser-based processing of metals, such as laser beam welding and additive manufacturing via laser powder bed fusion (PBF-LB/M), offers promising capabilities for producing high-performance parts [1]. These processes are governed by a complex interplay of physical mechanisms spanning multiple length and time scales [2]. In the vicinity of the laser, melt pool dynamics are governed by a complex, highly dynamic multi-phase thermo-hydrodynamic problem with a priori unknown, moving interfaces, complex topology changes, and large parameter jumps ( ∼ 10 2 to ∼ 10 5) at the melt–gas boundary [3]. The strongly localized laser superheats the melt far beyond its (equilibrium) boiling temperature, leading to extreme temperature gradients and rapid phase change, including melting, solidification, and non-equilibrium evaporation. The resulting evaporation-induced recoil pressure emerges as a major driving force for melt pool dynamics and can create deep vapor depres-sions, so-called keyholes, under typical process conditions [4]. Depending on the process conditions, strongly fluctuating keyholes at the melt pool front may foster the entrainment of gas bubbles that can solidify as pores in the final part, a phenomenon denoted as keyhole instability. Thereby, the intensity of evaporation effects is highly sensitive to the melt pool surface temperature, ne-cessitating highly accurate temperature prediction. In contrast, flow at the tail end of the melt pool is often surface-tension dominated: long, slender melt pool shapes combined with poor wet-tability promote Rayleigh–Plateau instabilities, i.e., the continuous melt track breaks into single droplets (balling), which significantly deteriorates the surface quality of the final part; accordingly, temperature-dependent surface tension strongly influences the melt pool dynamics [5] and is crucial for predicting undesired balling. Process-induced porosity and related defects are closely linked to melt pool instabilities such as keyholing, lack of fusion, balling, and denudation [6]. In practice, their mitigation still necessitates extensive parameter tuning via trial and error, reflecting the absence of a predictive, unified com-putational framework that links defect formation to process parameters and material properties. While computational modelling has emerged as a crucial tool, offering simulation-based insights into the complex physics of laser-based metal processing, a computational melt pool model that can accurately resolve the complex, temperature-sensitive process interactions across practically rel-evant time and length scales remains pending. Developing such a high-fidelity computational melt pool model is urgently needed to navigate and exploit new processing regimes that enable higher throughput without compromising quality, and is therefore the central objective of this work. 
+
+1.2. Related work on computational melt pool models 
+
+A predictive simulation tool for melt pool dynamics must combine physically sound mathe-matical multi-phase models with numerical schemes that are simultaneously accurate, robust, and computationally efficient. Although a wide range of melt pool simulation approaches has been pro-posed in recent years [7], existing studies consistently show that quantitatively reliable predictions either require prohibitively high computational costs or rely on extensive (artificial) calibration of poorly constrained parameters. A central modelling challenge arises from the transport of mass, momentum, and energy across the rapidly evolving metal–gas interface. Particularly, accurate prediction of evaporation-induced recoil pressure and cooling, as well as temperature-dependent surface tension, which are the defining driving forces of melt pool dynamics, especially in the key-hole regime, critically depends on precise resolution of the interface temperature and its gradients. Consequently, the representation of the metal–gas interface emerges as a key modelling choice 2that strongly influences both predictive accuracy and computational feasibility. Existing melt pool models can be broadly categorized into sharp-interface (SI) and diffuse-interface (DI) approaches. SI approaches maintain discontinuities and are therefore well-suited for high-fidelity modelling of interface problems. For Eulerian, unfitted frameworks, popular methods include the Cut Finite Element Method (CutFEM) [8], XFEM [9], and the ghost-fluid method [10], where the accuracy gains require modifications of the numerical schemes, such as stabilization for the small cut-element problem [11] or weak imposition of coupling conditions for interfaces not aligned with the mesh. In alternative fitted mesh methods, such as arbitrary Lagrangian–Eulerian (ALE) [12] approaches or particle-FEM [13], frequent remeshing is necessary. While this is manageable if interface movement is known a priori, melt pool dynamics typically involve highly dynamic, complex interface topology changes. Unfitted approaches require reconstruction of the interface and intersected quadrature generation for every interface movement, but this computational overhead remains comparatively constant even for complex interface movements. Therefore, unfitted SI approaches, such as Cut-FEM, appear better suited to melt pool dynamics compared to ALE approaches, which encounter difficulties in such scenarios. Furthermore, these SI multi-phase flow models often require spe-cial methods to reliably represent breakup and coalescence of the interface topology [14]. While these methods offer high physical fidelity, their numerical complexity and limited robustness have restricted SI melt pool simulations to only a few formulations, notably finite-difference (FDM) / ghost-fluid approaches [15, 16], and hybrid finite element (FEM) – finite volume (FVM) frameworks employing an ALE description [17–21]. Alternatively, allowing for a more straightforward and robust implementation, DI methods reg-ularize discontinuities across a finite thickness, often using the Continuum Surface Force (CSF) model [22] for surface tension and extensions for heat fluxes [23]. While less accurate compared to SI approaches, DI approaches are mathematically consistent, converging to sharp-interface so-lutions as the thickness decreases. They also robustly handle topology changes and integrate with standard single-phase solvers, as long as these solvers support variable material parameters and the augmentation of right-hand-side terms, which explains their frequent use in modelling melt pool dynamics. DI melt pool models include formulations based on FEM [23–30], FVM [31–36], FDM [37], lattice Boltzmann [5, 38–40], and smooth particle hydrodynamics [41–46]. Furthermore, melt pool models are distinguished by their type of evaporation model: Resolved 
+
+evaporation models consider the exchange of mass from liquid metal to metal vapor, e.g. [24], while the standard approach is the usage of unresolved evaporation models that neglect mass exchange and vapor flow and instead consider an approximate analytical model for the evaporation-induced pressure jump [47] and cooling at the melt–gas interface. Nevertheless, both approaches require a highly accurate interface temperature prediction. The predictive fidelity of computational melt pool models critically depends on accurately re-solving the thermal field and its gradients at the metal–gas interface, as evaporation-induced recoil pressure and cooling, which are the primary driving forces for melt pool dynamics, scale expo-nentially with the local melt pool surface temperature. Thus, small (discretization) errors in the temperature field can lead to drastic errors in the predicted melt pool dynamics. Despite their fre-quent use, DI methods smear interface jumps, such as those of temperature gradients, introducing critical modelling and discretization errors in the temperature field [23]. The resulting deviation from experimental measurements, as discussed in detail, e.g., in [18, 25, 27, 48], is often addressed by model calibration, i.e., fitting model parameters such as the laser absorptivity, such that simu-lation results better align with experimental measurements. However, this simple approach cannot 3compensate for the underlying problem, i.e., an insufficient interface resolution, in general. There-fore, our recent work [23] showed that SI thermal models are urgently needed for high-fidelity predictions of melt pool dynamics, as DI models would require extremely fine mesh resolutions, thus resulting in impermissibly high computational costs to achieve an acceptable level of accuracy. 
+
+1.3. Our contributions 
+
+Virtually no research addresses the combined use of sharp and DI methods for complex multi-phase, multi-physics problems such as melt pool dynamics. Such a hybrid approach is particularly promising in this setting, where thermal fields demand high precision at the interface, while flow fields – especially with extreme interface forces and complex interface dynamics – are more ro-bustly handled using DI methods. To close this gap, we present the first hybrid sharp–diffuse interface (HSDI) approach for two-phase thermo-hydrodynamics that couples SI CutFEM temper-ature modelling with DI FEM flow modelling, based on an unresolved evaporation model, achieving an unprecedented balance of predictive accuracy and computational efficiency. Departing from a well-established DI two-phase flow model based on a mass-conserving level-set framework [49] used in our previous works on melt pool dynamics [23, 24], we outline the main contributions as two-fold: First, we develop a CutFEM-based SI formulation that enables highly accurate predictions of the temperature field, particularly at the melt pool surface. We investigate two variants tailored to melt pool dynamics. The first is a coupled two-phase formulation defined over the full metal–gas domain, in which temperature continuity across the metal–gas interface is weakly enforced using Nitsche’s method [50]. The second is a reduced and thus more efficient single-phase formulation restricted to the metal domain, motivated by the negligible heat capacity of the ambient gas. In this case, the metal–gas interface is treated as adiabatic except for the heat fluxes induced by the laser heat source and evaporative cooling. Second, we propose a consistent coupling strategy between the SI thermal model and the DI flow model. Since key interface forces (recoil pressure, surface tension) depend sensitively on tempera-ture, we extend the SI temperature field into a narrow band surrounding the metal–gas interface using a closest-point projection. This enables accurate and consistent evaluation of temperature-dependent interface source terms within the DI framework. Furthermore, we propose a new benchmark example, resembling a laser-induced vapor depres-sion in 2D, tailored to investigate the accuracy of the proposed and existing melt pool models in comprehensive convergence studies with practically relevant error measures and in a setting repre-sentative of melt pool dynamics. In this benchmark example, the proposed HSDI approach turns out to be one order of magnitude more accurate than a standard DI model on the same mesh. With the HSDI approach, we aim to provide an efficient computational model that enables un-precedented accuracy for melt pool simulations on mesh resolutions feasible for industrially relevant length and time scales. To this end, we leverage state-of-the-art high-performance computing tech-niques, including matrix-free operator evaluation [51], adaptive mesh refinement, and MPI-based parallelization using domain decomposition provided by the deal.II library [52], which is suitable for exascale computing. The remainder of this article is structured as follows: Section 2 presents the governing equations of the underlying thermo-hydrodynamics model with phase change, the HSDI description including the two SI heat transfer model variants and their coupling with the DI two-phase flow model using the extension of the interface temperature, and the numerical framework. In Section 3, the accuracy of the presented approaches is verified using selected benchmark examples and compared to competing melt pool models. Furthermore, we demonstrate the capabilities of the presented 4methods using a practically relevant example of stationary laser illumination. Conclusions are drawn in Section 4. 
+
+2. Methods 
+
+Motivated by the accuracy limitations of purely DI melt pool dynamics models, as discussed in our previous work [23], we present a new HSDI approach for thermal two-phase flow. This model is specifically tailored to the stringent requirements of laser-induced melt pool modelling with rapid evaporation: While the thermal field demands the highest precision at the melt pool surface, as provided by a SI CutFEM approach, the complex interfacial flow dynamics can be captured robustly by the DI fluid formulation. Our mathematical model builds upon the following assumptions: 
+
+• Convective and conductive heat transfer, neglecting contributions due to viscous or capillary dissipation. 
+
+• Jump in thermal properties and a sharp representation of thermal fluxes at the interface. 
+
+• Immiscible, incompressible, viscous (Newtonian) two-phase flow at moderate Reynolds num-bers. 
+
+• Diffuse transition region at the interface for flow properties and interface forces between the phases, centred around the (sharp) interface with a finite but small thickness. 
+
+• Rigid and immobile solid phase. FEM diffuse-interface flow model                  
+
+> CutFEM sharp-interface thermal model quadrature point
+> Tℓ
+> Tgin Ω g
+> Ωℓ
+> Tliq
+> Tsol
+> Ωg
+> ϕ < 0
+> ϕ > 0Γ
+> ϕ= 0
+> ϕ, u, p in Ω discontinuities in Ω ℓ
+> Figure 1: Qualitative sketch of the domain and the computational HSDI thermal two-phase flow model for melt pool modelling. (left) The physical domain of interest Ωcomprises a metal phase Ωℓand an ambient gas phase Ωg. The metal phase is further distinguished into a melt and a solid phase, which are separated by the mushy zone between the liquidus temperature Tliq and the solidus temperature Tsol .(top right) For the two-phase flow submodel, a FEM-based DI approach is used, where properties and interface forces between phases are smeared smoothly in a diffuse transition region centred around the interface Γ. (bottom right) For the two-phase heat transfer submodel, a CutFEM-based SI approach is used, where discontinuities in the temperature field are accurately resolved.
+
+5In the left panel of Fig. 1, the domain of interest and the composition of the phases are shown. We consider an Eulerian domain Ω = Ω ℓ ∪ Ωg ⊂ { x ∈ Rd} with dimensionality d ∈ { 1, 2, 3}, which is divided into a metal phase Ωℓ and an ambient gas phase Ωg with Ωℓ ∩ Ωg = ∅. The metal phase Ωℓ
+
+comprises a melt and a solid phase with reversible phase change of melting and solidification, as well as a diffuse transition region in the mushy zone between the liquidus temperature Tliq and solidus temperature Tsol isosurfaces. The metal–gas interface Γ = ∂Ωℓ ∩ ∂Ωg ∈ Rd−1 is exposed to laser-induced heating, evaporation-induced recoil pressure and cooling, and temperature-dependent surface tension. 
+
+2.1. Governing equations 
+
+The following presents the governing equations that comprise the underlying mathematical model for melt pool simulations. The thermal two-phase flow is governed by the incompressible Navier–Stokes equation and the heat equation, along with their respective coupling conditions. Additionally, a level-set method is used for interface tracking. 
+
+2.1.1. Level-set 
+
+The metal–gas interface Γ is captured as the zero-isosurface of a regularized level-set function 
+
+ϕ := ϕ(x, t ) with ϕ ∈ [−1, 1] according to [49, 53]. We denote ϕ > 0 as inside the metal phase Ωℓ
+
+and ϕ < 0 as inside the ambient gas phase Ωg. The temporal evolution of the level-set function ϕ
+
+is governed by the advection equation 
+
+∂ϕ ∂t + u · ∇ ϕ = 0 in Ω × [0 , t ] (1) with the fluid velocity field u := u(x, t ) and time t. The initial condition of the level-set function is determined from the signed distance dΓ := dΓ(x, t ) to the initial metal–gas interface according to 
+
+ϕ(x) = tanh 
+
+ 3 dΓ(x)
+
+wΓ
+
+
+
+, (2) where wΓ is the thickness of the diffuse transition region, which we refer to as the interface thickness. To maintain the regularized characteristic shape of the level-set function, we perform an algebraic reinitialization procedure after every advection time step, as described in [49]. For the interpolation of physical properties between the phases, we define a localized, smoothed indicator function Hϕ := Hϕ(x, t ) with Hϕ ∈ [0 , 1] for which we choose a sine-based smoothed Heav-iside function according to [54, 55]: 
+
+Hϕ(dΓ) = 
+
+
+
+0 for dΓ ≤ − wΓ 
+
+> 212
+
++ dΓ 
+
+> wΓ
+
++ 12π sin 
+
+ 2πd Γ
+
+> wΓ
+
+
+
+for − wΓ 
+
+> 2
+
+< d Γ < wΓ
+
+> 2
+
+1 for dΓ ≥ wΓ
+
+> 2
+
+(3) with dΓ(ϕ) = wΓ
+
+6 log 
+
+ 1 + ϕ
+
+1 − ϕ
+
+
+
+62.1.2. Heat transfer 
+
+In the metal phase Ωℓ and ambient gas phase Ωg, the evolution of the temperature T := T (x, t )
+
+is governed by the heat equation, including conduction and convection 
+
+ρicp,i 
+
+ ∂T i
+
+∂t + u · ∇ Ti
+
+
+
+= ∇ (ki ∇Ti) in Ωi × [0 , t ] for i ∈ { ℓ, g}. (4) The density ρ, specific heat capacity cp and thermal conductivity k are phase-specific thermal properties which have the subscript (•)i := ( •)ℓ for the metal phase Ωℓ and the subscript (•)i := ( •)g
+
+for the ambient gas phase Ωg. The heat equation (4) is supplemented by an initial condition 
+
+Ti = T0 in Ωi × { t = 0 } for i ∈ { ℓ, g}, (5) as well as Dirichlet and Neumann boundary conditions on the outer boundary ∂Ω = ∂ΩD ∪ ∂ΩN
+
+with ∂ΩD ∩ ∂ΩN = ∅
+
+Ti = ˆT on ∂ΩD ∩ ∂Ωi × [0 , t ] for i ∈ { ℓ, g} (6) 
+
+−ki ∂nN Ti = ˆ q on ∂ΩN ∩ ∂Ωi × [0 , t ] for i ∈ { ℓ, g}, (7) where ˆT denotes the prescribed temperature at the boundary, ˆq denotes the prescribed heat flux at the boundary, and ∂nN is the directional derivative in the normal direction, indicated by the outward-pointing unit normal vector nN at the domain boundary ∂Ω. At the metal–gas interface Γ,a Dirichlet-type interface matching condition and a heat flux jump condition are imposed: 
+
+[T ]Γ = 0 on Γ × [0 , t ] (8) 
+
+[−k ∂ nΓ T ]Γ = qΓ on Γ × [0 , t ] (9) Here, [•]Γ denotes the interface jump operator [x]Γ = xℓ|Γ − xg|Γ, and ∂nΓ is the directional deriva-tive in the normal direction of the interface. The interface unit normal vector nΓ points into Ωℓ.We split the interface heat flux according to 
+
+qΓ = qL + qv(TΓ), (10) which comprises the laser heat source qL, the detailed form of which is defined in Section 3 for specific examples, and the temperature-dependent evaporation-induced cooling qv
+
+qv(TΓ) = −h(TΓ) ˙ mv(TΓ) for TΓ ≥ Tv with h(TΓ) = hv +
+
+Z TΓ 
+
+> T(0)
+> hv
+
+cp dT, (11) where h(TΓ) is the specific enthalpy of the vapor, and Tv is the boiling temperature at the am-bient pressure pa. The interface temperature TΓ is defined by the continuity condition (8) as 
+
+TΓ = Tℓ|Γ = Tg|Γ, where Tℓ|Γ and Tg|Γ indicate the temperature of the metal and ambient gas phase at the interface. In this work, we consider an unresolved evaporation model and thus neglect the explicit exchange of mass from liquid to vapor. Instead, the effects due to evaporative phase change at the melt–vapor interface are accounted for by phenomenological formulations for thermal and me-chanical fluxes, which is the standard approach for melt pool models [18, 27–31, 36–39, 41–45]. As a consequence, convective heat transfer in the gas phase resulting from the mass exchange across the interface is neglected. The expression for the evaporation-induced cooling qv is adapted to account 7for the enthalpy transported by the phenomenologically modelled vapor mass flux, considering the specific enthalpy of the vapor h(TΓ), which can be split into the latent heat of evaporation hv and a purely temperature-dependent contribution, which can be expressed via the specific heat capacity 
+
+cp and its reference temperature T (0)  
+
+> hv
+
+, according to (11). We determine the phenomenological vapor mass flux ˙mv at the metal–gas interface Γ using the model proposed by Knight [56] according to 
+
+˙mv(TΓ) = 0 .82 cs pv
+
+r M
+
+2π R T Γ
+
+for TΓ ≥ Tv (12) with the molar mass M and the molar gas constant R. For metals, the sticking constant is typically assumed as cs = 1 [18]. In Knight’s model [56], the vapor mass flux is computed based on the saturated vapor pressure, while it is directly formulated as a function of the recoil pressure pv in our simplified model. The evaporation-induced recoil pressure pv is determined by the phenomenological model by Anisimov and Khokhlov [47]: 
+
+pv(TΓ) = 0 .54 pa exp 
+
+
+
+− ¯hv
+
+R
+
+ 1
+
+TΓ
+
+− 1
+
+Tv
+
+ 
+
+for TΓ ≥ Tv (13) Here, ¯hv is the molar latent heat of evaporation, and pa = 10 5 Pa is the atmospheric pressure. 
+
+Remark 1. With the formulations in (11), (12), and (13), the evaporation-induced cooling qv, mass flux ˙mv, and recoil pressure pv exhibit a jump at the boiling temperature Tv, which results in difficulties for the numerical solution procedure. To mitigate this issue, we introduce an activation temperature Tac < T v, from which we ramp up those quantities ( f ∈ { qv, ˙mv, p v}) between Tac and 
+
+Tv via 
+
+f (TΓ) = max 
+
+
+
+f (Tv) TΓ − Tac 
+
+Tv − Tac 
+
+, 0
+
+
+
+for TΓ < T v, (14) such that f (TΓ) = 0 holds for TΓ ≤ Tac and f (TΓ) increases linearly to f (Tv) for Tac ≤ TΓ ≤ Tv. As an example, in Fig. 2, the resulting recoil pressure temperature dependency is shown. Tac Tv        
+
+> 0
+> pv(Tv)
+> TΓ(K)
+> pv (Pa)
+> Figure 2: Recoil pressure pv(TΓ)(13) over time, considering the linear activation function for TΓ≤Tvaccording to (14).
+
+82.1.3. Two-phase flow 
+
+The two-phase flow is modelled using a one-fluid DI approach, as shown in the top right panel of Fig. 1. In a one-fluid approach, the two material phases are treated as a single fluid with variable properties, which are determined based on the indicator function Hϕ(x) (3), which is provided by the level-set framework. The flow field is governed by the incompressible Navier–Stokes equations, composed of the momentum balance equation and continuity equation 
+
+ρeff 
+
+ ∂u
+
+∂t + ( u · ∇ ) u
+
+
+
+= −∇ p + ∇ · (2 μeff ε) + ˜fv + ˜fσ + fd in Ω × [0 , t ] (15) 
+
+∇ · u = 0 in Ω × [0 , t ] (16) with the pressure field p := p(x, t ), effective density ρeff , effective dynamic viscosity μeff , rate-of-deformation tensor ε = 12 (∇u+( ∇u)⊤), volume forces resulting from the evaporation-induced recoil pressure force ˜fv and surface tension ˜fσ, as well as the Darcy damping force fd. The equations (15) and (16) are supplemented by an initial condition, slip, and no-slip boundary conditions 
+
+u = u0 in Ω × { t = 0 } (17) 
+
+u · nN = 0 on ∂Ωslip × [0 , t ] (18) 
+
+u = 0 on ∂Ωno-slip × [0 , t ] (19) with ∂Ωslip ∩ ∂Ωno-slip = ∂Ω and ∂Ωslip ∪ ∂Ωno-slip = ∅. In addition, a zero-pressure boundary con-dition is applied at a single boundary point to normalize the pressure field. The effective physical flow properties, denoted by the subscript (•)eff , are assumed to be constant within the bulk re-gion of the individual (liquid/solid/gas) phases. Only in the diffuse-interface transition region, these effective fluid properties αeff ∈ { ρ, μ } are computed from the arithmetic mean of their phase contributions 
+
+αeff (Hϕ) = αℓ Hϕ + αg(1 − Hϕ), (20) considering the indicator function Hϕ (3). We formulate our model for melting and solidification based on the simplifying assumption that the solid phase is rigid and immobile. To that, we artificially increase the viscosity and employ a Darcy damping force [57] in the solid phase to inhibit its motion, adopted from [23, 24]. Note that comparative studies suggest that only employing a Darcy damping force would be sufficient here, resulting in the same material behaviour for the limit of high damping coefficients. For the dynamic viscosity in the metal phase μℓ, we interpolate between the molten and solid metal phase according to 
+
+μℓ(fsol ) = μmelt + ( μsol − μmelt )  −2f 3 
+
+> sol
+
++ 3 f 2
+
+> sol
+
+ , (21) using the temperature-dependent solid fraction 
+
+fsol (T, H ϕ) = 
+
+
+
+Hϕ for T ≤ Tsol 
+
+Hϕ Tliq −TTliq −Tsol for Tsol < T < T liq 
+
+0 otherwise 
+
+. (22) The temperature range between the liquidus temperature Tliq and the solidus temperature Tsol 
+
+defines the mushy zone, where the solid fraction transitions from 0 to 1. The remaining properties 9(density, thermal conductivity, and specific heat capacity) are assumed to be the same for the molten and solid metal phase. Eq. (21) enables us to assign a large viscosity to the solid phase, which suppresses spurious velocity gradients and, in combination with the Darcy damping force, described below, effectively represents our melting and solidification model, considering a rigid, immobile solid metal. The Darcy damping force fd in (15) is determined according to 
+
+fd(u, f sol ) = −Ck
+
+ f 2
+
+> sol
+
+(1 − fsol )3 + kC
+
+
+
+u (23) with the parameter Ck, which depends on the mushy zone morphology, and a parameter kC to avoid division by zero [57]. In (15), regularized interface forces are marked by a superscript tilde (˜ •), which include the evaporation-induced recoil pressure force ˜fv and the surface tension force ˜fσ. The corresponding equations will be specified in Section 2.4. 
+
+2.2. Discrete weak forms of the governing equations 
+
+The governing equations comprise the heat equation (4), the incompressible Navier–Stokes equa-tions (15) and (16), the advection equation (1), and additional equations for the level-set framework, which include the reinitialization [49], as well as regularization of normal vector and curvature. A detailed description of the additional level-set equations is provided in [58]. For the solution of the governing partial differential equations, we employ one Eulerian mesh with hexahedral continuous finite elements. The finite element side length h is defined as h = d
+
+√hmax ,where hmax is the longest element diagonal and d is the spatial dimension. We utilize a Bubnov– Galerkin ansatz and Lagrange polynomial shape functions for spatial discretization. Specifically, we use quadratic shape functions for the velocity field and linear shape functions for the pressure field to ensure inf-sup stability. We also use linear shape functions for the level-set framework and for the heat transfer solver. However, compared to the heat transfer and flow problem, we support refining the mesh of the level-set framework by subdividing each finite element once in each spatial dimension. This approach helps to improve accuracy, and in combination with the level-set reinitialization procedure [49], spurious oscillations of the level-set and interface topology are minimized. Thus, at moderate Reynolds numbers, no additional stabilization of the level-set advection is required [53]. 
+
+2.2.1. Navier–Stokes equations 
+
+The strong form of the Navier–Stokes equations (15) and (16) is transferred into the weak form by the method of weighted residuals. The solution space for the velocity is defined as Su = {u ∈  H1(Ω) d | u · nN = 0 on ∂Ωslip | u = 0 on ∂Ωno-slip } and for the corresponding test functions as Vu = {vu ∈  H1(Ω) d | vu · nN = 0 on ∂Ωslip | vu = 0 on ∂Ωno-slip }, considering the slip (18) and no-slip (19) boundary conditions. Here, H1(Ω) represents the space of square integrable functions with square integrable derivatives. The solution spaces for the pressure and its test functions are defined as Sp = {p ∈ H0(Ω) } and Vp = {vp ∈ H0(Ω) }, where H0(Ω) denotes the space of square integrable functions. By multiplication of (15) with vu and (16) with vp, inte-gration over the domain Ω, and application of the divergence theorem, we obtain the weak form of 10 the mechanical problem: Find u ∈ S u and p ∈ S p such that 
+
+
+
+ρeff 
+
+ ∂u
+
+∂t + ( u · ∇ ) u
+
+
+
+, vu
+
+
+
+> Ω
+
+−
+
+
+
+p , ∇ · vu
+
+
+
+> Ω
+
++
+
+
+
+2μeff ε , ∇vu
+
+
+
+> Ω
+
+=
+
+
+
+˜fv + ˜fσ + fd , vu
+
+
+
+> Ω
+
+(24) 
+
+
+
+∇ · u , v p
+
+
+
+> Ω
+
+= 0 (25) 
+
+∀ { vu, v p} ∈ V u × V p
+
+holds. Here, the operator (A, B )X = R 
+
+> X
+
+A · B dx is the L2-scalar product over the domain X. Note that no advection stabilization, such as a streamline upwind Petrov–Galerkin (SUPG) term, is considered, since we assume that Reynolds numbers are moderate and element Péclet numbers are sufficiently small, cf. [53]. 
+
+2.2.2. Heat equation 
+
+The strong form of the heat equation (4) defines the heat transfer for the metal phase Ωℓ and the ambient gas phase Ωg individually. The solution space for the metal temperature Tℓ is restricted to finite elements that contain parts of the metal phase Ωℓ, and, in variant 1, the same holds for the ambient gas temperature Tg in Ωg. Finite elements cut by the metal–gas interface Γ are referred to as intersected elements and provide shape functions for Tℓ that extend into Ωg; in variant 1, they also provide shape functions for Tg, leading to overlapping solution spaces, where temperature values in the domain of the other phase appear as ghost values used solely for ghost-penalty stabilization [11]. The interaction between the two phases is defined by the interface coupling conditions (8) and (9) at the metal–gas interface Γ, embedded in an Eulerian domain. In the following, we introduce a CutFEM [8] approach for solving the sharp-interface two-phase heat equation. We present two variants: Variant 1 considers the coupled heat transfer in both the metal and ambient gas phases. Variant 2 is a reduced and thus computationally more efficient approach, where the thermal problem is only solved in the metal domain, replacing the ambient gas phase with appropriate boundary conditions. This simplification is justified because vapor flow is absent in melt pool models with unresolved evaporation, the process gas (e.g., argon) contributes negligibly to heat transfer due to its low thermal conductivity and heat capacity compared to molten metal, and the key melt pool phenomena occur within the molten metal or at the melt–gas interface. However, variant 2 is unsuitable if vapor plume interactions are considered, e.g., through resolved evaporation models. 
+
+2.2.2.1. Variant 1: coupled two-phase heat transfer (SI-2P). 
+
+Variant 1 presents a sharp-interface CutFEM model for solving the coupled heat equation (4) in the metal and ambient gas phases, considering the interface coupling conditions (8) and (9). We denote this variant as the sharp-interface, two-phase (SI-2P) variant. Each phase car-ries its own temperature field, i.e., the metal phase temperature Tℓ in Ωℓ and the ambient gas phase temperature Tg in Ωg, as shown in the bottom right panel of Fig. 1. The solu-tion spaces for the temperature fields are defined as STℓ = {Tℓ ∈ H0(Ω ℓ) | Tℓ = ˆT on ∂ΩD} and 
+
+STg = {Tg ∈ H0(Ω g) | Tg = ˆT on ∂ΩD}, considering the Dirichlet boundary condition (6). The solu-tion spaces for the corresponding test functions are defined as VTℓ = {vℓ ∈ H0(Ω ℓ) | vℓ = 0 on ∂ΩD}
+
+and STg = {Tg ∈ H0(Ω g) | vg = 0 on ∂ΩD}. To obtain the weak form of the heat equation, we mul-tiply (4) by the test functions vℓ and vg, integrate over the respective domains, and apply the divergence theorem. For the Neumann boundary condition, we insert (7) in the boundary integral in ∂ΩN. The interface matching condition (8) is enforced by a Nitsche term according to [59], and 11 the heat flux jump condition (9) is applied to each phase’s interface integral proportional to its relative thermal conductivity. Including face-based ghost-penalty stabilization [11], the weak form of the heat equation reads as follows: Find Tℓ ∈ S Tℓ and Tg ∈ S Tg such that 
+
+0 = X
+
+> i∈{ ℓ, g}
+
+" 
+
+ρicp,i 
+
+ ∂T i
+
+∂t + u · ∇ Ti
+
+
+
+, v i
+
+
+
+> Ωi
+
++
+
+
+
+ki ∇Ti , ∇vi
+
+
+
+> Ωi
+
+| {z }
+
+> convective and conductive heat transfer
+
+−
+
+
+
+ˆq , v i
+
+
+
+> ∂ΩN∩Ωi
+
+| {z }
+
+> boundary heat flux
+
+#
+
+−
+
+
+
+{− k ∂ nΓ T } , [v]Γ
+
+
+
+> Γ
+
+| {z }
+
+> interface heat flux
+
++
+
+ γΓ
+
+h [T ]Γ , [v]Γ
+
+
+
+> Γ
+
+| {z }
+
+> Nitsche term
+
+−
+
+
+
+[T ]Γ , {− k ∂ nΓ v}
+
+
+
+> Γ
+
+| {z }
+
+> symmetry term
+
+−
+
+
+
+¯κg (qL + qv(Tℓ)) , v ℓ
+
+
+
+> Γ
+
+−
+
+
+
+¯κℓ (qL + qv(Tg)) , v g
+
+
+
+> Γ
+
+| {z }
+
+> interface heat flux jump
+
++ X
+
+> i∈{ ℓ, g}
+
+
+
+γM ji( ∂T i
+
+∂t , v i) + γA
+
+h2 ki ji(Ti, v i)
+
+| {z }
+
+> ghost-penalty stabilization
+
+(26) 
+
+∀ { vℓ, v g} ∈ V Tℓ × V Tg
+
+holds. The expression {•} denotes a convex combination {x} = ¯ κℓxℓ + ¯ κgxg with ¯κℓ = kg/(kℓ + kg)
+
+and ¯κg = kℓ/(kℓ + kg) [60]. Here, ¯κg + ¯ κℓ = 1 must hold to maintain unity. In (26), the summands in the first line represent the standard heat equation for the individual phases, including convec-tive and conductive heat transfer . The boundary heat flux term describes the Neumann boundary condition (7) along the (fitted) domain boundary ∂ΩN, while the interface heat flux term describes the heat transfer between the two phases at the (embedded) interface Γ. With the Nitsche term ,the Dirichlet-type interface matching condition (8) is enforced, considering Nitsche’s method [50]. The variable γΓ is determined according to Burman et al. [60] as γΓ = γD kg kℓ/(kg + kℓ), where γD
+
+is the Nitsche parameter. The symmetry term restores the symmetry of the weak formulation. To-gether with the Nitsche term, it maintains the coercivity of the weak formulation [61]. In practical simulations, the optimal value of the Nitsche parameter γD can be determined by initially choosing a relatively large value and then gradually reducing it until the limit of coercivity is reached. For the simulation cases discussed in Section 3, we found that a Nitsche parameter of γD = 500 was sufficient to ensure coercivity. The laser heat source and evaporation-induced cooling are imposed at the metal–gas interface Γ as the interface heat flux jump (9). With the face-based ghost-penalty stabilization [11], we address the ill-conditioned linear system of equations for the case of very small cut finite elements, where a detailed description is given by Appendix A, considering the definition of the function ji(•, v i) according to (A.1). The scalar constants γM and γA control the stabilization and influence the condition number of the linearized system of equations. Their values are chosen to be γM = 0 .75 and γA = 1 .5, following the investigations by Sticko and Kreiss [62] and Burman and Hansbo [63], respectively. In time-stepping schemes, ghost-penalty terms are only considered for implicit time evaluations. 12 2.2.2.2. Variant 2: single-phase heat transfer with an immersed boundary (SI-1P). 
+
+Based on the assumption that heat transfer in the ambient gas phase can be neglected for melt pool models with unresolved evaporation, variant 2 presents a single-phase sharp-interface heat transfer model for the metal phase, denoted as the sharp-interface, one-phase (SI-1P) variant. To that, we utilize an immersed boundary method [64] for the metal–gas interface, considering a CutFEM approach. For this purpose, we consider the heat transfer equation (4) and its initial and boundary conditions (5)-(7) only for the metal domain Ωℓ, and thus the unknown primary variable is the metal phase temperature Tℓ. At the metal–gas interface Γ, a Neumann boundary condition is imposed 
+
+−kℓ ∂nΓ T = qΓ(TΓ) on Γ × [0 , t ] (27) with the outward-pointing unit normal vector nΓ on Γ, and the external heat flux qΓ according to (10). Thus, we treat the metal–gas interface as adiabatic except for the externally applied heat flux qΓ. To arrive at the weak formulation for the CutFEM approach, we follow the procedure outlined in Section 2.2.2.1 for SI-2P, but restrict the domain to the metal phase Ωℓ. The weak form for SI-1P reads as follows: Find Tℓ ∈ S Tℓ such that 
+
+0 = 
+
+
+
+ρℓcp, ℓ
+
+ ∂T ℓ
+
+∂t + u · ∇ Tℓ
+
+
+
+, v ℓ
+
+
+
+> Ωℓ
+
++
+
+
+
+kℓ ∇Tℓ , ∇vℓ
+
+
+
+> Ωℓ
+
+| {z }
+
+> convective and conductive heat transfer
+
+−
+
+
+
+ˆq , v ℓ
+
+
+
+> ∂ΩN∩Ωℓ
+
+| {z }
+
+> boundary heat flux
+
+−
+
+
+
+qL + qv(Tℓ), v ℓ
+
+
+
+> Γ
+
+| {z }
+
+> interface heat flux
+
++ γM jℓ( ∂T ℓ
+
+∂t , v ℓ) + γA
+
+h2 kℓ jℓ(Tℓ, v ℓ)
+
+| {z }
+
+> ghost-penalty stabilization
+
+(28) 
+
+∀ vℓ ∈ V Tℓ
+
+holds. Here, the first line comprises the standard heat equation, including convective and conductive heat transfer , and the boundary heat flux term that considers the Neumann boundary condition (7) at the domain boundary ∂ΩN. The second line includes the boundary condition (27) at the (un-fitted) metal surface Γ through a prescribed interface heat flux , and the face-based ghost-penalty stabilization [11] to address the ill-conditioned linear system of equations for very small cut finite elements, considering the function jℓ(•, v ℓ) according to (A.1). Compared to SI-2P (26), SI-1P does not require a Nitsche term, since no Dirichlet-type interface matching condition needs to be weakly enforced in the one-phase formulation. 
+
+2.3. Extension of the interface temperature in a narrow band around the interface 
+
+In the DI two-phase flow model, regularized interface force distributions are spread across a finite transition layer of thickness wΓ centred around the sharp metal–gas interface Γ. The governing interface forces, namely recoil pressure and surface tension, depend on the interface temperature TΓ,which must therefore be known not only exactly on Γ but also throughout the associated narrow-band region where the regularized forces have support. Consequently, an algorithm is required to reconstruct TΓ in a narrow band around the sharp interface based on the CutFEM temperature field, so that the resulting interface temperature field can be consistently supplied to the DI two-phase flow model. Furthermore, for the reduced but computationally efficient heat transfer model (SI-1P, described in Section 2.2.2.2), the temperature is computed solely in the metal phase. Thus, the local temperature in the diffuse interface region outside the metal phase is not available. 13 ˜fσ ( ˜TΓ)                             
+
+> fd(Tℓ)
+> fd=
+> {
+> fd(Tg) for SI-2P
+> fd( ˜TΓ) for SI-1P
+> xxΓ
+> ˜TΓ(x) = Tℓ(xΓ)
+> T
+> ˜TΓ
+> Tℓ
+> Tg
+> dΓ
+> Ωℓ
+> Γin Ω g
+> qΓ
+> wΓ
+> δρ
+> dΓ
+> ˜fv( ˜TΓ)Figure 3: Sketch of the extended interface temperature and thereof dependent regularized interface forces in the diffuse transition region, which comprises a narrow band centred around the metal–gas interface Γwith a thickness of wΓ.The extended interface temperature ˜TΓis defined in the narrow band and at each point xcorresponds to the metal temperature Tℓvalue of the closest point on the interface xΓ. The regularized force distributions, i.e., the evaporation-induced recoil pressure force ˜fv(29) and the surface tension force ˜fσ(30), are computed based on the extended interface temperature ˜TΓ. In the metal phase, the Darcy damping force fd(23) is computed based on the local temperature Tℓ. In the ambient gas phase Ωg, the Darcy damping force fd(23) is evaluated differently for the two SI heat transfer variants (Section 2.2.2): For SI-2P it is based on the ambient gas temperature Tg, whereas for SI-1P it is based on the extended interface temperature ˜TΓ, obtained by extending the metal interface temperature from Γinto the fictitious gas domain.
+
+Therefore, for the HSDI approach, we propose to extend the interface temperature TΓ, obtained from the CutFEM heat transfer model, in a narrow band around the interface, i.e, the diffuse transition region. Fig. 3 provides a sketch of the diffuse transition region and the extension of the interface temperature. Based on the extended interface temperature ˜TΓ, temperature-dependent regularized interface forces are computed. In this work, we consider an interface extension procedure based on the closest-point projection, which builds on the algorithm described in [58, 65]. A careful comparison in terms of accuracy and performance with alternative projection schemes, such as the 
+
+L2-projection, is planned for future research. The key steps of temperature field extension are as follows: First, we discretize the melt pool surface as a set of interface points xΓ ∈ XΓ using the Marching Cubes Algorithm [66]. Second, we process all nodes of the fluid mesh within a narrow band around the interface: For each node x, we perform a closest-point search to identify the closest point xΓ from the set of discrete interface points XΓ. Third, we evaluate the interface temperature TΓ at the closest point in the narrow band and assign it to the corresponding value of the extended temperature field, i.e., ˜TΓ(x) = Tℓ(xΓ(x)) for both variants. 
+
+Remark 2. In most DI formulations, the interface temperature in the narrow band is approximated by the local temperature, i.e. TΓ ≈ T . However, as shown in our recent contribution [23], even for diffuse models, a higher accuracy is obtained when TΓ is computed by extending the temperature from the closest point on the interface Γ, i.e., the zero-level-set isosurface. 
+
+2.4. Computation of temperature-dependent forces in a regularized interface 
+
+The momentum balance equation (15) includes three volume forces: The evaporation-induced recoil pressure force ˜fv and the temperature-dependent surface tension force ˜fσ, including thermal Marangoni effects, read 
+
+˜fv( ˜TΓ, H ϕ) = pv( ˜TΓ) ˜ nΓ δρ(Hϕ), (29) 
+
+˜fσ( ˜TΓ, H ϕ) = 
+
+
+
+σ( ˜TΓ)˜ κΓ ˜nΓ + ( I − ˜nΓ ⊗ ˜nΓ) ∇σ( ˜TΓ)
+
+
+
+δρ(Hϕ) (30) 14 with the second-order identity tensor I and the temperature-dependent surface tension coefficient σσ( ˜TΓ) = max 
+
+
+
+σ0 + σ′( ˜TΓ − Tσ, 0), 0
+
+
+
+. (31) Here, σ0 is the surface tension coefficient at its reference temperature Tσ, 0, and σ′ is the temperature gradient of the surface tension. With (31), we ensure that the surface tension coefficient remains positive for arbitrary temperature values. The interface forces (29) and (30) are represented as CSF distributions using a regularized approximation of the Dirac delta function, which is contained in a finite but small transition region [22]. We employ a density-scaled CSF approach, employing the density-scaled delta function δρ
+
+δρ(Hϕ) = ||∇ Hϕ|| 2 ρeff (Hϕ) cδ,ρ with cδ,ρ = 2
+
+ρℓ + ρg
+
+, (32) which demonstrated an improved stability for surface tension force computations in two-phase flow [67]. This approach ensures that the magnitude of the interface-force-induced acceleration is well-balanced across the interface [68]. It has been used in melt pool simulations to model interface forces, such as recoil pressure and surface tension, e.g., by [23, 24, 26, 27]. The regularized interface normal ˜nΓ and the mean curvature ˜κΓ in the diffuse transition region are computed from a filtering procedure of the level-set function, as described in [58, 69]. Within the diffuse transition region, the regularized representations of the temperature-dependent interface forces in (29) and (30) are computed based on the extended interface temperature ˜TΓ, as described in Section 2.3 and shown in Fig. 3. The Darcy damping force fd (23) depends on the solid fraction fsol that is computed from the local temperature according to (22). For SI-1P, in the diffuse transition region, the local temperature in the diffuse interface region outside the metal phase is not computed. In that case, we propose computing the Darcy damping force (23) based on the extended interface temperature ˜TΓ
+
+in Ωg while using the local temperature Tℓ in the metal domain as depicted in Fig. 3. 
+
+Remark 3. Representing interface forces as CSF distributions within diffuse transition regions of finite thickness is not strictly conservative with respect to momentum unless additional constraints are imposed [70]. We expect that computing interface-temperature-dependent CSF distributions based on the extended interface temperature does not introduce additional conservation errors. 
+
+Remark 4. To obtain a well-resolved diffuse transition region, we set the interface thickness pro-portional to the finite element side length h so that the number of finite elements of the fluid mesh across the interface nΓ = wΓ/h is at least 8, following recommendations of [23, 49]. In the case of adaptive mesh refinement, the finite element size remains constant throughout the diffuse transition region. 
+
+2.5. Numerical framework 
+
+As the interface Γ moves, the set of intersected elements and thus the physically relevant solution space changes over time: Elements leaving the physical domain are deactivated, while previously inactive elements may become intersected and newly activated, with no prior solution available. To consistently initialize the temperature field in these newly activated elements, we employ the ghost-penalty extrapolation procedure of Schott [71], which extrapolates the previous solution onto the enlarged solution space by minimizing normal derivative jumps across faces between newly activated 15 Algorithm 1: Outline of the partitioned solution scheme for the multi-phase melt pool model with a HSDI approach.  
+
+> 1
+
+ϕ ← ϕ0, T ℓ ← T0, (Tg ← T0), u ← u0, p ← p0 ; ▷ set initial conditions  
+
+> 2
+
+while t < t end do  
+
+> 3
+
+t ← t + ∆ t ;
+
+▷ step 1: compute level-set and geometric quantities  
+
+> 4
+
+ϕ, ˜nΓ, ˜κΓ ← level_set_solver (ϕ, u) (cf. algorithm in [58]) ;  
+
+> 5
+
+Hϕ ← Hϕ(ϕ) (3) ; 
+
+▷ step 2: adapt to new interface location  
+
+> 6
+
+Tℓ, (Tg) ← ghost_penalty_extrapolation (Tℓ, (Tg)) (cf. algorithm in [71]) ; 
+
+▷ step 3: solve SI heat equation  
+
+> 7
+
+Tℓ, (Tg) ← heat_transfer_solver (Tℓ, (Tg), u) ;
+
+▷ step 4: extend interface temperature  
+
+> 8
+
+˜TΓ ← extension_algorithm (Tℓ) (cf. algorithm in [58, 65]) ; 
+
+▷ step 5: solve incompressible Navier–Stokes equations  
+
+> 9
+
+ρeff ← ρeff (Hϕ) (20), μeff ← μeff (Hϕ, T ) ((20) and (21)) ;  
+
+> 10
+
+˜fv ← ˜fv( ˜TΓ, H ϕ, ˜nΓ) (29), ˜fσ ← ˜fσ ( ˜TΓ, H ϕ, ˜nΓ, ˜κΓ) (30), fd ← fd(u, T ℓ, ( ˜TΓ), H ϕ) (23) ;  
+
+> 11
+
+u, p ← flow_solver (u, p, ρ eff , μ eff ,˜fv,˜fσ , fd) (cf. algorithm in [53]) ; 
+
+physical elements and their neighbouring elements. A detailed description of this procedure for adapting to a new interface position is given in Appendix B. We employ a standard tensor-product based Gaussian numerical integration for non-cut finite elements and Saye’s approach of dimension reduction of integrals [72] for intersected finite elements. For the efficient computational evaluation of structured and unstructured quadrature, we employ the computational design presented in [73], utilizing the tensor-product structure of the underlying finite element shape functions on the hexahedral element, while working on a single point at a time. The computation of the temperature-dependent regularized interface forces, as described in Section 2.4, requires the evaluation of the extended interface temperature ˜TΓ in the diffuse interface transition region. We pre-compute the extended interface temperature field ˜TΓ in the narrow band described in Section 2.3 with an extension algorithm [58, 65]. For time integration, we employ (semi-)implicit time stepping schemes, along with a weakly par-titioned operator-splitting approach, as outlined in Algorithm 1. Each field is propagated implicitly within each framework, i.e., the heat transfer, flow, and level-set framework. Coupling terms, such as convection velocity and temperature-dependent forces and physical properties, are treated ex-plicitly, which introduces a time-step limit. The overall time-step limit – which is influenced not only by the capillary time-step limit [22] but also by the explicit coupling terms – is empirically estimated in the following. Time integration is performed using the Crank–Nicolson method for heat transfer, the BDF-2 scheme for two-phase flow, and the backward Euler method for level-set advection. To achieve high computational efficiency, we employ adaptive meshing schemes ensuring a high spatial resolution of the diffuse transition region. Furthermore, we exploit highly efficient matrix-free operator evaluation [51] along with iterative solvers. The overall framework is parallelized using an MPI-based domain decomposition approach, leveraging the infrastructure of the deal.II 
+
+library [52] along with the incompressible Navier–Stokes solver adaflo [53]. 16 3. Numerical examples 
+
+The proposed approaches are investigated in the following using selected benchmark examples. Starting with purely thermal test cases mimicking laser–metal interactions, the accuracy of the SI heat transfer model variants is compared to standard DI models. In increasingly complex thermal two-phase flow problems, the HSDI approach is validated. Finally, the capabilities and robustness of the presented methods are demonstrated in a practically relevant example resembling laser-based processing of metals. 
+
+3.1. 1D laser-induced heating of a static surface 
+
+In this section, we assess the accuracy of the two variants of the SI heat transfer models, described in Sections 2.2.2.1 and 2.2.2.2, compared to a standard DI heat transfer model presented in [23]. To that end, we consider the benchmark example of laser-induced heating of a static surface , introduced in [23], which is a purely thermal problem mimicking laser–metal interactions. We consider a 1D two-phase domain Ω = {x ∈ [−a, a ]} with a = 100 μm, which contains the metal phase Ωℓ and the ambient gas phase Ωg, each occupying half of the domain, separated by the immobile interface at the centre. A domain sketch is shown in the top right corner of Fig. 4. The signed distance function is prescribed to dΓ(x) = −x. As no flow dynamics are considered ( u = 0), convective heat transfer is omitted. Typical material parameter values representative of Ti-6Al-4V are employed and are listed in Table 1. The initial temperature is uniform at T0 = 500 K . The interface is subjected to the heat flux qΓ comprising a constant laser heat flux qL = 10 10 W/m2 and temperature-dependent evaporation-induced cooling qv, while the boundaries of the domain ( ∂ΩD)are kept at ˆT = 500 K . For the subsequent convergence studies, the instationary temperature solution at t = 10 −5 s is considered. For the two SI heat transfer model variants, we discretize each simulation with a uniform finite element mesh with an odd number of elements to ensure that the metal–gas interface Γ is located inside a finite element and does not coincide with a finite element edge. A time step of ∆t = 10 −9 s
+
+is used for the Crank–Nicolson time integration, which showed a negligible temporal discretization error in a temporal convergence study. For comparison, we consider a DI heat transfer model, in which the volume-specific heat capacity 
+
+cv = ρc p is interpolated across the diffuse transition region via (20), and the parameter-scaled CSF approach [23] is chosen to be proportional to cv,eff . The temperature-dependent evaporation-induced cooling qv is determined based on the interface temperature TΓ, corresponding to the best-performing variant in [23]. For the spatial and temporal discretization, we choose a uniform finite element mesh and the backward Euler time integration scheme with a time step of ∆t = 10 −9 s.The interface thickness wΓ is chosen based on the number of finite elements across the diffuse transition region nΓ and thus depends on the finite element size h by wΓ = nΓh. We will evaluate the temperature accuracy for different interface thickness values by varying nΓ ∈ { 8, 16 , 32 }.The numerical reference solutions Tref are obtained using a fitted interface model, where the metal–gas interface Γ coincides with a finite element edge, applying the interface fluxes on that discrete edge. A very fine spatial and temporal discretization is employed to ensure a converged solution, i.e., h = 1 .56 × 10 −3 μm and ∆t = 10 −10 s. SI-2P and the DI heat transfer models are compared to a two-phase reference solution. Accordingly, SI-1P is compared to a single-phase reference solution that only comprises the metal phase Ωℓ with a Neumann boundary condition 
+
+−kℓnNT = qΓ at the interface position. 17 Table 1: Representative material parameters for Ti-6Al-4V. 
+
+Parameter Symbol Value Unit Reference thermal conductivity metal kℓ 28.63 W/(m K) [74] thermal conductivity gas kg 0.02863 W/(m K) factor of 10 3 w.r.t. kℓ
+
+density metal ρℓ 4087 kg /m3 [75] density gas ρg 4.087 kg /m3 factor of 10 3 w.r.t. ρℓ
+
+specific heat capacity metal cp, ℓ 1130 J/(kg K) [74] specific heat capacity gas cp,g 11 .3 J/(kg K) factor of 10 2 w.r.t. cp, ℓ
+
+dynamic viscosity melt μmelt 3.5 × 10 −3 kg /(m s) [75] dynamic viscosity gas μg 3.5 × 10 −4 kg /(m s) factor of 10 2 w.r.t. μℓ
+
+dynamic viscosity solid μsol 0.35 kg /(m s) numerical value surface tension at reference temperature σ0 1.493 N/m [75] surface tension reference temperature Tσ, 0 1933 K [75] surface tension gradient coefficient σ′ 1.9 × 10 −4 N/(m K) [75] laser absorptivity χL 0.35 (−) [18] boiling temperature Tv 3133 K [76] latent heat of evaporation hv 8.84 × 10 6 J/kg calculated using reference temperature for the sum of specific enthalpy T (0)  
+
+> hv
+
+538 K the latent heat of each component molar mass M 4.78 × 10 −2 kg /mol [44] sticking constant cs 1 (−) [18] liquidus temperature Tliq 2200 K numerical value solidus temperature Tsol 1933 K numerical value parameter that depends on the mushy zone morphology Ck 10 11 kg /(m 3s) numerical value parameter to avoid division by zero kC 1 (−) numerical value 
+
+In the following, we will discuss two increasingly complex cases: In Section 3.1.1, we neglect evaporation-induced cooling to simplify the problem, while in Section 3.1.2, we consider evaporation-induced cooling according to (11). 
+
+3.1.1. Without evaporation-induced cooling 
+
+For this section, the interface heat flux only contains the laser heat flux qΓ = qL, while the evaporation-induced cooling remains zero qv = 0 . This simplification results in a linear system of equations for solving the heat equation. In the top left panel of Fig. 4, the relative L2-error 
+
+Erel  
+
+> T
+
+= || T − Tref || L2 /|| Tref || L2 of the instationary temperature field solution is shown over the finite element size h at t = 10 −5 s. Both SI heat transfer model variants exhibit a similar convergence behaviour with a convergence order of O(h2), while SI-2P achieves a slightly better accuracy at every refinement level. Note that for SI-1P, i.e., the single-phase approach, the temperature field and thus the L2-norm are restricted to the metal domain Ωℓ. Additionally, Fig. 4 shows the L2-error for SI-1P compared to the two-phase reference solution. It exhibits asymptotic behaviour towards 
+
+Erel  
+
+> T
+
+≈ 3 × 10 −5, which represents the modelling error of SI-1P, as it neglects the heat transfer in the ambient gas phase. The comparative DI heat transfer model only exhibits a convergence order of O(h1), whereas the SI variants are at least two orders of magnitude more accurate for the same mesh. In [23], a benchmark tolerance level for DIDI approaches was specified to 1% relative error. 18 10 −6                         
+
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> factor 50
+> nΓ= 8 nΓ= 16 nΓ= 32
+> qΓ=qL
+> O(h1)
+> O(h2)
+> Erel
+> T
+> SI-2P
+> SI-1P
+> SI-1P, two-phase reference solution
+> DI
+> 10 −210 −110 0
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> factor 60
+> nΓ= 8 nΓ= 16
+> nΓ= 32
+> qΓ=qL+qv(TΓ)
+> O(h1)
+> O(h2)
+> h(μm)
+> Erel
+> T
+> 10 −210 −110 0
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> factor 50
+> nΓ= 8
+> nΓ= 16 nΓ= 32
+> qΓ=qL+qv(TΓ)
+> O(h1)
+> O(h2)
+> h(μm)
+> Erel
+> pv
+
+ˆT ˆTqΓ
+
+xa
+
+Ωℓ Ωg
+
+aFigure 4: Error measures of the instationary temperature solution at t = 10 −5 s for an example considering the laser-induced heating of a static surface benchmark [23], including a sketch of the domain (top right). Comparison between SI-2P, SI-1P, and the DI heat transfer model [23] with a number of nΓ ∈ { 8, 16 , 32 } finite elements across the diffuse transition region: relative temperature error over finite element size h (top left) without evaporation-induced cooling, i.e., Section 3.1.1 and (bottom left) with evaporation-induced cooling, i.e., Section 3.1.2; (bottom right) relative error in the evaporation-induced recoil pressure over finite element size h. The 1% error level is highlighted. 
+
+To achieve the benchmark accuracy, the SI variants allow for a finite element size h that is almost two orders of magnitude larger than that of the DI approach. 
+
+3.1.2. With evaporation-induced cooling 
+
+In this section, we investigate the laser-induced heating of a static surface benchmark exam-ple, including the evaporation-induced cooling qv according to (11), i.e., the interface heat flux is defined as qΓ = qL + qv(TΓ) (10). Since evaporation-induced cooling commences above the boiling temperature, which is only reached towards the end of the time interval for this specific example, no significant difference is expected in the temperature profile compared to Section 3.1.1. The bottom left panel of Fig. 4 shows the relative L2-error of the instationary temperature field over the finite element size h. Similar to the results in Section 3.1.1, the two SI variants achieve a convergence order of O(h2), while the DI heat transfer model shows only a convergence order of O(h1). SI-2P is slightly more accurate than SI-1P at every refinement level. At the same finite element size h,both SI variants are at least two orders of magnitude more accurate than the DI model. In addition to the temperature field, we analyze the recoil pressure error, as the recoil pres-sure pv is the dominant driving force in melt pool dynamics and is highly sensitive to the interface temperature. The bottom right panel of Fig. 4 shows the relative error Erel  
+
+> pv
+
+= |pv(TΓ) − pv,ref |/p v,ref 
+
+in the recoil pressure at the interface, which is computed from the instationary tempera-ture solution at the sharp metal–gas interface Γ = {x = 0 }, i.e., pv(TΓ) = pv(T (x = 0)) and 
+
+pv,ref (TΓ,ref ) = pv(Tref (x = 0)) . The SI approaches clearly outperform the DI model, considering the accuracy at the same finite element size h. The L2-error for SI-1P compared to the two-phase reference solution exhibits asymptotic behaviour towards Erel  
+
+> pv
+
+≈ 8 × 10 −4, representing its mod-elling error. To reach the benchmark tolerance level of 1%, the DI model requires a very narrow interface thickness and a very fine mesh resolution [23] ( h = 0 .07 μm for nΓ = 8 ), while the SI ap-19 proach achieves that tolerance with an extrapolated finite element side length of h ≈ 3 μm, meaning the mesh can be about 50 times coarser. In conclusion, for a given mesh, the SI heat transfer model variants presented in Sections 2.2.2.1 and 2.2.2.2 achieve significantly higher accuracy regarding temperature and, critically, recoil pres-sure (at least two orders of magnitude) than the best-performing DI model variant presented in [23]. To achieve the 1% error bound, the mesh resolution of the SI model is allowed to be one to two orders of magnitude coarser. 
+
+3.2. 2D laser-induced heating of a fixed melt pool surface 
+
+As a second test case, we consider the laser-induced heating of a fixed melt pool surface bench-mark example, which was introduced in [23] to study DI approaches. In this purely thermal problem, the flow dynamics are not resolved ( u = 0), thereby omitting convective heat transfer. With a spa-tially fixed interface geometry mimicking a laser-induced melt pool depression, this problem is used to assess the accuracy of temperature-dependent interface flux modelling on a curved interface. We consider the 2D domain Ω = {x ∈ [−a, a ]2} with the length parameter a = 100 μm, which is occupied by the metal phase Ωℓ and the ambient gas phase Ωg that are separated by the metal–gas interface Γ. The fixed interface geometry is shown in the left panel of Fig. 5 and characterized by the radii r = 50 μm and b = 10 μm. The signed distance dΓ to the metal–gas interface Γ is prescribed to 
+
+dΓ(x) = 
+
+
+
+|| x|| − r for |x| < r + b ∧ y < 0min ( || x|| − r, b − y) for |x| ≥ r + b ∧ y < 0
+
+b − y for |x| ≥ r + b ∧ y ≥ 0
+
+b − p(r + b − | x|)2 + y2 for |x| < r + b ∧ y ≥ 0
+
+.
+
+The temperature is initially uniform at T0 = 500 K and prescribed to ˆT = 500 K at the top and bottom boundaries ( ∂ΩD), while the left and right boundaries ( ∂ΩN) are adiabatic ( ˆq = 0 in (7)). The metal–gas interface is subject to the laser heat flux qL and the evaporation-induced cooling qv
+
+according to (10), where the laser heat source is defined as 
+
+qL(x) = χL PL
+
+2
+
+r2
+
+> L
+
+π ⟨nΓeL⟩ exp −2
+
+ dL(x)
+
+rL
+
+2!
+
+on Γ (33) and models a spatially fixed laser with a Gaussian profile [41] with the absorptivity χL, the laser power PL = 250 W , and the laser radius rL = 70 μm. Here, dL(x) is the distance between and the laser beam centre line, defined by the laser position pL = 0 and the laser direction eL = −ey
+
+corresponding to the negative y-direction, and a point x. The Macauley bracket ⟨•⟩ returns the input value if positive, and zero otherwise. Representative material parameter values for Ti-6Al-4V are employed, as listed in Table 1. We investigate the instationary temperature solution at t = 10 −5 s.For both SI heat transfer model variants, a uniform Cartesian mesh consisting of quadrilateral finite elements with an element side length of h = 0 .391 μm and the time step size ∆t = 10 −9 s are employed. For comparison, we consider the results from [23], which were obtained using a DI heat transfer model which employs a parameter-scaled delta CSF approach and computes temperature-dependent interface flux distributions based on the extended interface temperature. We consider the results of the finest spatial resolution in [23], i.e., an interface thickness of wΓ = 0 .2 μm and a Carte-sian finite element mesh of bilinear quadrilateral elements that is locally refined to a minimum finite 20 x
+
+ˆT
+
+ˆT
+
+Ωg
+
+Ωℓ
+
+Γ
+
+a
+
+ab bra
+
+y-100 -50 0 50 100          
+
+> 1000
+> 2000
+> 3000
+> y(μm)
+> T (K)
+> reference solution SI-2P SI-1P DI
+> -51 -50.5 -50 -49.5 -49
+> 3300
+> 3400
+> 3500
+> y(μm)
+
+Figure 5: Laser-induced heating of a 2D fixed melt pool surface benchmark example: (left) Sketch of the domain and interface geometry [23], with a = 100 μm, r = 50 μm, and b = 10 μm; (right) instationary temperature field at 
+
+t = 10 −5 s along the y-axis. Comparison between SI-2P, SI-1P, the DI heat transfer model [23], and the reference solution. The interface thickness wΓ of the diffuse transition region for the diffuse-interface model is highlighted. Table 2: Laser-induced heating of a 2D fixed melt pool surface benchmark example: comparison between the SI heat transfer model variants, and the DI model [23]. The relative maximum temperature error is computed by Erel   
+
+> Tmax
+
+= |T max − T max ref |/T max ref with the maximum reference temperature T max ref = 3529 .2 K , and the relative maximum recoil pressure error is computed by Erel  
+
+> pmax v
+
+= |pmax v − pmax v,ref |/p max v,ref with the maximum reference recoil pressure pmax v,ref = 332 .2 kPa .
+
+SI-2P SI-1P DI [23] 
+
+h 0.391 μm 0.391 μm 0.0061 μm
+
+T max 3529 .1 K 3529 .3 K 3567 .5 K 
+
+Erel   
+
+> Tmax
+
+0.0028 % 0.0028 % 1.1%
+
+pmax v 332 .0 kPa 332 .4 kPa 387 .6 kPa 
+
+Erel  
+
+> pmax v
+
+0.06 % 0.06 % 16 .7%
+
+element side length of h = 0 .0061 μm in the diffuse transition region. The reference solution Tref 
+
+was obtained in [23] by a fitted interface model using an aligned mesh whereby the metal–gas in-terface Γ coincides with finite element edges. A very fine spatial and temporal discretization with 
+
+h = 0 .047 μm at the interface and ∆t = 10 −10 s ensures a converged solution. The right panel of Fig. 5 shows the instationary temperature fields at t = 10 −5 s along the y-axis for the two SI variants and the comparative model compared to the reference solution. While the two variants of the SI heat transfer models are in good agreement with the reference solution, the comparative model deviates visibly in the close vicinity of the metal–gas interface Γ. Table 2 lists various quantities of interest and error measures for comparing the quality of the proposed SI models to the DI model. SI-1P achieves the same level of accuracy as the two-phase reference solution with respect to SI-2P. This demonstrates that our model assumption, that the ambient gas phase can be neglected due to its low energy contribution to heat transfer, results in a negligible modelling error. The DI model overestimates the interface temperature, resulting in a significant error (16.7%) in the recoil pressure. In addition, it has the finest spatial resolution with a finite element side length (h = 0 .0061 μm) that is two orders of magnitude smaller than the other approaches and impractical for use in 3D simulations. Both SI heat transfer model variants, presented in Sections 2.2.2.1 and 2.2.2.2, achieve a signif-icantly better accuracy compared to the DI model – even at significantly coarser spatial discretiza-tions. By accurately representing discontinuities at the interface, SI approaches not only improve 21 the accuracy of predicting the interface temperature but also enable accurate simulations at spatial resolutions suitable for practical 3D applications. 
+
+3.3. Thermo-capillary droplet migration 
+
+Before analyzing the proposed HSDI approach in complex melt pool dynamics, we perform a ver-ification for general thermal two-phase flows, including temperature-dependent Marangoni effects, based on the thermo-capillary droplet migration studied by Ma and Bothe [77]. This benchmark provides a valuable test for consistency, efficiency, and robustness, even though only minor accuracy gains are expected due to the small interfacial thermal gradients in this example. Thus, consider-ation of a laser heat source, evaporation effects, as well as melting and solidification, is postponed to the subsequent section. A circular droplet with a radius of a = 1 .44 × 10 −3 m is initially located at the centre of a square domain with a side length of 4a, i.e., Ω = {x ∈ [−2a, 2a]2}. The initial signed distance is dΓ(x) = a − || x|| . At the bottom boundary ( y = −2a), the temperature is prescribed to 
+
+ˆT1 = 290 K and at the top boundary ( y = 2 a), it is prescribed to ˆT2 = 291 .152 K , while the lat-eral boundaries are considered adiabatic. A uniform gradient of ||∇ T0|| = 200 K /m defines the initial temperature field. For the velocity, no-slip conditions (19) are applied to the top and bottom boundaries and slip conditions (18) to the lateral boundaries, and the initial velocity is at rest 
+
+u0 = 0. The material parameters of the ambient phase Ωg are chosen as kg = 2 .4 × 10 −6 W/(m K) ,
+
+ρg = 500 kg /m3, cp,g = 10 −4 J/(kg K) , and μg = 0 .024 kg /(m s) , while the droplet parameters in Ωℓ
+
+are taken as half of each of these values. The temperature-dependent surface tension (30) is defined by σ = 10 −2 N/m, Tσ, 0 = 290 K , and σ′ = 2 × 10 −3 N/(m K) . In terms of dimensionless numbers, this test case can be characterized by the Reynolds number Re = ρgau r/μ g = 0 .72 , the Marangoni number Ma = ρgcp,g au r/k g = 0 .72 , and the capillary number Ca = μgur/σ = 0 .0576 , where the reference velocity is defined as ur = σ′||∇ T0|| a/μ g = 0 .024 m /s.For the heat transfer model, we consider the SI-2P approach, cf. Section 2.2.2.1, and for the DI flow framework, we choose the interface thickness such that the number of finite elements across the interface is nΓ = 8 . We use the identical spatial discretization as in the reference solu-tion [77], i.e., a Cartesian mesh of quadrilateral finite elements with a uniform element side length of h = a/ 16 = 0 .09 × 10 −3 m, resulting in the interface thickness wΓ = 0 .72 × 10 −3 m. A constant time step size of ∆t = 0 .5 × 10 −3 s is employed. The left panel of Fig. 6 shows the dimensionless upward velocity ¯u/u r over the dimensionless time 
+
+t/t r, where the reference time is tr = a/u r = 0 .06 s . Here, ¯u is computed by numerical differentiation of the droplet centroid position with respect to time. Due to the prevailing temperature gradient, the temperature-dependent surface tension (30) causes Marangoni convection, leading to an upward droplet migration. The HSDI approach agrees well with the reference solution. In the right panel of Fig. 6, the temperature field and its isothermal lines are shown at dimensionless time t/t r = 2 . The isothermal lines exhibit kinks at the interface Γ, demonstrating the sharp-interface representation. Additionally, the velocity field and the extended interface temperature ˜TΓ, cf. Section 2.3 is shown in the diffuse transition region. The isotherms of the extended interface temperature field are perpendicular to the interface, demonstrating that the extension is accurately performed along the interface normal direction. 22 0 1 2           
+
+> 0
+> 0.05
+> 0.1
+> 0.15
+> t/t r
+> ¯u/u r
+> reference solution
+> HSDI, SI-2P 290
+> 291.152
+> T, ˜TΓ(K) Figure 6: Thermo-capillary droplet migration: (left) dimensionless velocity ¯u/u rover dimensionless time t/t rcom-pared with the reference solution [77]; (right) configuration at dimensionless time t/t r= 2 : The interface Γis indicated by a black line. Left half: temperature field and its isothermal lines; right half: extended interface temperature ˜TΓ
+> and its isothermal lines in the diffuse transition region, and arrows indicating the velocity field.
+
+3.4. Benchmark: 2D laser-induced vapor depression 
+
+In this section, we propose a laser-induced vapor depression benchmark example for assessing the accuracy of thermal two-phase flow models in a setting representative of melt pool dynamics and tailored to test its specific features. The setup includes the typically large contrast in phys-ical properties between metal and ambient gas, a laser-induced heat flux at the metal surface, evaporation-induced recoil pressure and cooling, and temperature-independent surface tension. We intentionally choose a 2D setup to allow for detailed convergence analyses, excluding the additional complexity of melting and solidification as well as the temperature dependence of surface tension and wetting forces. This provides controlled and robust test cases that are independent of any par-ticular melting and solidification or wetting-force model. Furthermore, it enables the assessment of the HSDI approach compared to a purely DI melt pool model. The analyzed metrics are vapor depression depth and interface geometry, which reflect practically relevant features of melt pool dynamics and can be readily verified. A domain sketch is shown in the top left panel of Fig. 7. We consider the 2D domain 
+
+Ω = {x ∈ [−a, a ]2}, with the length parameter a, which contains the metal phase Ωℓ and the ambient gas phase Ωg separated by the metal–gas interface Γ that is defined by its initial signed distance function dΓ(x) = −y in the initial state. The initial temperature is uniform at T0 = 500 K , and the initial velocity is at rest u0 = 0. At the top ( y = a) and bottom ( y = −a) boundaries, the temperature is prescribed to ˆT = 500 K while the lateral boundaries are considered adiabatic. For the velocity, slip conditions (18) are considered on all boundaries. At the metal–gas interface Γ,we consider a laser heat flux qL according to (33) with the laser power PL, radius rL = 70 μm,and position pL = 0. The laser direction eL = [ − sin α, − cos α]⊤ is tilted by an angle of α = 5 ◦ as shown in the top left panel of Fig. 7 to break symmetry. For simplicity, we neglect melting and solidification effects, i.e., we assume a vanishing Darcy damping force fd = 0 and the metal viscosity equals the melt viscosity μℓ = μmelt at any temperature. Furthermore, we assume a constant surface tension coefficient σ = 1 .493 N /m with σ′ = 0 , leading to vanishing Marangoni effects. Apart from the abovementioned exceptions, we employ material parameter values representative of Ti-6Al-4V, as listed in Table 1. In the following, we consider the HSDI approach with the two SI heat transfer model variants presented in Section 2.2.2. For the DI two-phase flow model, we choose the interface thickness wΓ
+
+to be proportional to the finite element side length h so that the number of elements across the 23 diffuse transition region is nΓ = 16 , aiming to minimize the spatial discretization error due to a poorly resolved diffuse transition region. For comparison, we consider the purely DI melt pool thermo-hydrodynamics model from [23]. In the DI heat transfer model, the volume-specific heat capacity cv = ρc p is interpolated across the diffuse transition region, and the parameter-scaled CSF approach [23] is proportional to cv. The temperature-dependent evaporation-induced cooling qv and recoil pressure ˜fv are determined based on the extended interface temperature ˜TΓ. We choose the interface thickness wΓ = 16 h identical to the HSDI approach. The underlying DI two-phase flow model is the same for the proposed HSDI and the purely DI thermal two-phase flow approach. A constant time step size ∆t is used for all simulations, as well as a Cartesian mesh of quadrilateral finite elements that is locally refined to a minimum element side length h in the vicinity of the diffuse transition region. For the numerical reference solution, we consider the results from the HSDI approach with the SI-2P heat transfer model using a minimum finite element side length h and interface thickness wΓ
+
+that are four times smaller than the finest mesh of the simulations discussed in the following. 
+
+3.4.1. Stable vapor depression 
+
+In this section, we focus on the initial stable formation of the vapor depression, before the high-frequency oscillations of the melt pool surface start to develop. Thereto, we employ a length parameter of a = 100 μm, a laser power of PL = 150 W , and a time step size of ∆t = 10 −8 s. The vapor depression becomes unstable after t = 0 .03 ms , so we consider the time interval up to that point. The centre left panel of Fig. 7 shows the configuration of the reference solution at t = 0 .03 ms .In the top right panel of Fig. 7, the depth of the laser-induced vapor depression ymin  
+
+> Γ
+
+over time is shown for the HSDI approach variants and the comparative DI model for different minimum finite element side lengths h. The two HSDI heat transfer model variants yield practically identical results at every investigated finite element side length h. For the coarsest mesh, the HSDI approach is already close to the reference solution and exhibits convergence. For the DI model, convergence towards the reference solution is noted; however, the deviations from the reference solution for the same finite element size are significantly larger compared to the HSDI approach. To quantify the error in the temporal evolution of the metal–gas interface contour xΓ, we employ a time-averaged interface error norm Erel  
+
+> xΓ
+
+according to 
+
+Erel  
+
+> xΓ
+
+=
+
+R t2
+
+> t1
+
+R a 
+
+> −a
+
+yΓ(x, t ) − yref  
+
+> Γ
+
+(x, t ) dx dt
+
+2ab (t2 − t1) , (34) where the deviation from the reference interface contour xref  
+
+> Γ
+
+is integrated over an interval from 
+
+t1 = 0 .01 ms to t2 = 0 .03 ms , which is highlighted in the top right panel of Fig. 7. To normalize the interface error norm Erel  
+
+> xΓ
+
+, the integral in (34) is divided by the time interval length (t2 − t1)
+
+and a reference area extending over the domain width 2a and an estimated characteristic height 
+
+b = 50 μm. The centre right panel of Fig. 7 shows the interface error norm Erel  
+
+> xΓ
+
+over the minimum finite element side length h. Both the HSDI approach variants and the comparative DI model achieve a convergence order of O(h1), which is limited by the DI formulation of the two-phase flow model in all variants. However, for the same mesh, the HSDI approach variants are roughly one order of magnitude more accurate than the comparative model. More precisely, to achieve the benchmark tolerance level of 1%, an interpolated minimum finite element side length of h ≈ 1.8 μm
+
+is required for the HSDI approach compared to h ≈ 0.19 μm of the comparative DI model. Thus, 24 x
+
+ˆT
+
+ˆT
+
+Ωg
+
+Ωℓ
+
+Γ
+
+a a
+
+aa
+
+yα
+
+eL0.01 0.015 0.02 0.025 0.03                           
+
+> 20
+> 15
+> 10
+> 5
+> 0
+> t(ms)
+> ymin Γ (μm)
+> reference solution
+> HSDI, SI-2P
+> HSDI, SI-1P
+> DI
+> h= 1 .56 μm
+> h= 0 .781 μm
+> h= 0 .391 μm
+> h= 0 .195 μm10 −110 0
+> 10 −3
+> 10 −2
+> 10 −1
+> O(h1)
+> h(μm)
+> Erel
+> xΓ HSDI, SI-2P
+> HSDI, SI-1P
+> DI
+> 500
+> 3200
+> T(K) -100 -50 050 100
+> -40
+> -20
+> 0
+> 20
+> h= 1 .56 μm
+> x(μm)
+> y (μm)
+> -100 -50 050 100
+> h= 0 .195 μm
+> x(μm)
+> reference solution
+> HSDI, SI-2P
+> HSDI, SI-1P
+> DI
+
+Figure 7: (top left) sketch of the domain, initial interface, and angled laser direction of the 2D vapor depression examples; stable vapor depression: (top right) vapor depression depth ymin  
+
+> Γ
+
+over time for different mesh resolutions. The time interval considered for the interface error norm Erel  
+
+> xΓ
+
+is highlighted. (centre left) Configuration of the reference solution at t = 0 .03 ms : The metal–gas interface Γ is indicated by a black line, and arrows indicate the velocity field. (centre right) Interface error norm Erel  
+
+> xΓ
+
+(34) over finite element size h; (bottom) metal–gas interface contours xΓ at t = 0 .03 ms for h = 1 .56 μm and h = 0 .195 μm. All plots compare the HSDI approach with SI-2P, SI-1P, and the purely DI melt pool model [23]. 
+
+the purely DI model requires a mesh resolution that is at least 9 times finer to achieve the same level of accuracy. To illustrate the deviation in the metal–gas interface contour xΓ for the benchmark accuracy level, the bottom panel of Fig. 7 shows the interface contours at t = 0 .03 ms for the two aforemen-tioned spatial resolutions. Here, the large deviation of the DI model with h = 1 .56 μm becomes visible, while the HSDI approach is very close to the reference solution for both considered mesh sizes. 
+
+3.4.2. Unstable vapor depression 
+
+This example aims to investigate the unstable keyhole dynamics that develop after the initial formation of a stable vapor depression. We adapt the previous setup from Section 3.4.1 by increasing the laser power to PL = 200 W and the length parameter to a = 200 μm, enlarging the domain. The unstable keyhole dynamics necessitate a smaller time step size at high spatial resolutions for 25 200                
+
+> 150
+> 100
+> 50
+> 0
+> ymin Γ (μm)
+> reference solution
+> HSDI, SI-2P
+> HSDI, SI-1P
+> DI
+> h= 1 .56 μm
+> h= 0 .781 μm
+> h= 0 .391 μm
+> 0
+> 20
+> 40
+> 60
+> 80
+> ¯Eabs
+> ymin Γ
+> (μm)
+> 00.02 0.04 0.06 0.08 0.1 0.12
+> 0
+> 2
+> 4
+> 6
+> 8
+> ·10 −5
+> h= 0 .391 μm
+> t(ms)
+> ekin ,ℓ  (J)  reference solution
+> HSDI, SI-2P
+> HSDI, SI-1P
+> DI
+> 0
+> 2
+> 4
+> 6
+> 8
+> ·10 −5
+> ¯ekin ,ℓ  (J)
+
+Figure 8: 2D unstable vapor depression: comparison between the HSDI approach with SI-2P, SI-1P, and the purely DI melt pool model [23]; (top) vapor depression depth ymin  
+
+> Γ
+
+over time for different mesh resolutions and time-averaged deviation ¯Eabs 
+
+> ymin
+> Γ
+
+(35); (bottom) kinetic energy of the metal phase ekin ,ℓ (36) over time and time-averaged kinetic energy ¯ekin ,ℓ (37) for the finite element side length h = 0 .391 μm.
+
+stability, so we employ a constant time step size of ∆t = 2 .5 × 10 −9 s for all simulations in this section. The top panel of Fig. 8 shows the depth of the laser-induced vapor depression ymin  
+
+> Γ
+
+over time. Within the shown time interval, the reference solution shows a fairly steady vapor depression growth with minor fluctuations until t ≈ 0.1 ms , followed by a subsequent major bounce back, which initiates the high-frequency oscillations typical of melt pool dynamics. The HSDI approach variants follow the same behaviour, and an increased spatial resolution results in a better correlation with the reference solution. For the purely DI melt pool model, only the result obtained with the finest spatial resolution, i.e. h = 0 .391 μm, resembles the behaviour of the reference solution. The right axis of the graph shows the time-averaged deviation ¯Eabs 
+
+> ymin
+> Γ
+
+of the vapor depression depth from the reference solution ymin ,ref  
+
+> Γ
+
+, according to 
+
+¯Eabs 
+
+> ymin
+> Γ
+
+=
+
+R t2 
+
+> t1
+
+ymin  
+
+> Γ
+
+− ymin ,ref  
+
+> Γ
+
+dtt2 − t1
+
+, (35) in the time interval from t1 = 0 to t2 = 0 .12 ms . Evidently, the HSDI variants achieve a smaller devi-ation ¯Eabs 
+
+> ymin
+> Γ
+
+with the coarsest resolution ( h = 1 .56 μm) than the DI model with the finest resolution (h = 0 .391 μm). The bottom panel of Fig. 8 shows the temporal evolution of the kinetic energy in the metal phase 
+
+ekin ,ℓ = 12 ¯a
+
+Z
+
+> Ωℓ
+
+ρeff u2dx (36) 26 for the finest spatial resolution. In (36), we assume a reference depth of ¯a = 1 m for the 2D problem. The system exhibits non-repeating, chaotic oscillations. While the results of the HSDI approach variants resemble the oscillation behaviour of the reference solution, the purely DI model significantly deviates, starting at t ≈ 0.06 ms . In the bottom panel of Fig. 8, the right axis of the graph shows the time-averaged kinetic energy in the metal phase ¯ekin ,ℓ , according to 
+
+¯ekin ,ℓ =
+
+R t2 
+
+> t1
+
+ekin ,ℓ dt, t2 − t1
+
+, (37) over the time interval from t1 = 0 to t2 = 0 .12 ms . This time-averaged measure captures the chaotic system behaviour in a representative scalar number. Here, the HSDI variants exhibit an error of 5%, while the DI model results in an error of approx. 20%. Thus, the novel HSDI variant yields an improved accuracy by a factor of approx. four. At any given spatial discretization, the two-phase flow computation is identical for the HSDI approach variants and the purely DI melt pool model. However, different formulations are employed by the HSDI and DI models to calculate the interface temperature as required for the evaluation of the evaporation-induced recoil pressure force ˜fv. The substantial improvement in accuracy observed for the HSDI approaches can therefore be attributed exclusively to a more reliable prediction of the temperature field, particularly the interface temperature and the resulting diffuse-interface forces. In this sense, an accurate interface representation enables the SI heat transfer model variants to supply the DI two-phase flow model with a markedly more accurate interface temperature than a purely DI heat transfer model, thereby allowing for a significantly more accurate description of melt pool dynamics. In practically relevant simulations, the improved accuracy enables the prediction of melt pool dynamics with significantly higher certainty at reasonable spatial resolutions. 
+
+3.5. 3D stationary laser-induced heating of a bare metal plate 
+
+In this section, we demonstrate the robustness of the HSDI approach and the capabilities of the numerical framework by means of a proof-of-principle simulation based on a practically rele-vant scenario of laser–metal interaction. To that, we consider the stationary laser-induced heating of a bare metal plate and reproduce the corresponding experimental setup by Cunningham et al. [4], which was also replicated, e.g., in [23, 24, 27, 41]. Here, a Ti-6Al-4V metal plate is illumi-nated by a vertical, stationary laser, leading to an unstable keyhole. We consider the 3D domain 
+
+Ω = {x ∈ [−a, a ]3}, with a = 200 μm, and an initial signed distance dΓ(x) = −z, placing the ini-tial metal–gas interface Γ on the xy -plane. In the initial state, the temperature is uniform at 
+
+T0 = 500 K , and the velocity is at rest u0 = 0. At the top ( z = a) and bottom( z = −a) boundaries, the temperature is prescribed to ˆT = 500 K while the remaining vertical boundaries are considered adiabatic. Slip conditions (18) are assumed on all boundaries. The metal–gas interface Γ is sub-ject to a laser heat flux qL according to (33) with the laser power PL = 156 W , radius rL = 70 μm,position pL = 0, and direction eL = −ez corresponding to the negative z-direction. We employ material parameters representing Ti-6Al-4V, as listed in Table 1. For this example, we consider the SI-1P heat transfer model, cf. Section 2.2.2.2, to model the heat transfer in the metal phase, neglecting the ambient gas. We use an interface thickness of 
+
+wΓ = 15 μm for the DI flow model. Moreover, we employ adaptive mesh refinement to ensure a high spatial resolution of the interface region and the melt phase while minimizing the overall number of finite elements. The base mesh, consisting of uniform hexahedral finite elements with a side length 27 t = 0 .060 ms t = 0 .088 ms t = 0 .093 ms t = 0 .225 ms         
+
+> t= 0 .645 ms t= 1 .246 ms t= 1 .606 ms t= 1 .878 ms
+> 1933 3500 temperature (melt) (K) Figure 9: Stationary laser-induced heating of a bare metal plate: time series illustrating a sectional view of the melt pool shape with the temperature field of the melt.
+
+of hmax = 12 .5 μm, is locally refined to hmin = 1 .56 μm, resulting in nΓ ≈ 9.6 finite elements across the interface. Extrapolating from the 1D laser-induced heating of a static surface benchmark in Section 3.1, this resolution should allow to predict the evaporation-induced recoil pressure within a tolerance of 0.2% (see bottom right panel of Fig. 4). In addition, as shown for the 2D laser-induced stable vapor depression in Section 3.4.1, it should suffice to resolve the melt pool surface geometry with an error below 1%. A time step size of ∆t = 2 × 10 −8 s is used for time integration. Fig. 9 shows a time-series of a sectional view in the melt pool, depicting the metal–gas interface Γ
+
+and the temperature of the melt phase. Additional illustrations are shown in Appendix C. The simulation reproduces typical melt pool characteristics observed in the experiment by Cunningham et al. [4]: Initially, a stable vapor depression forms due to the increasing recoil pressure. As the vapor depression grows, it becomes unstable at approx. t = 0 .09 ms in the simulation. The interplay between the laser absorption, evaporation-induced recoil pressure force, and temperature-dependent surface tension results in high-frequency oscillations that amplify with time. In the highly dynamic two-phase flow at the bottom of the melt pool, numerous breakup and coalescence events occur, demonstrating that the HSDI approach is capable of robustly handling these phenomena. With time, the vapor depression becomes deeper, forming a keyhole. Fig. 10 shows the keyhole depth over time. We deliberately refrain from comparing this result with the experiment, as we would not expect an agreement due to the simplified laser absorption model. The laser heat input is the catalyst of the melt pool dynamics and must therefore precisely replicate physical mechanisms, such as multiple reflections via a ray-tracing scheme and temperature-dependent absorptivity of metals [78, 79]. Furthermore, we hypothesize that the temperature-dependent surface tension and the resulting Marangoni convection have a significant impact on the molten metal surface geometry 28 0 0.5 1 1.5 2 
+
+> 150
+> 100
+> 50
+> 0
+> t(ms)
+> keyhole depth ( μm) Figure 10: Stationary laser-induced heating of a bare metal plate: maximum keyhole depth over time.
+
+during the stable vapor depression phase. However, precise measurement of temperature-dependent parameters remains challenging for typical laser-based metal processing conditions, and the selected values are subject to uncertainty, potentially influencing the onset of the vapor depression. These aspects are not the focus of the present work, which primarily deals with the numerical formulation of an HSDI approach and its accuracy. The extension of this model to include a ray-tracing scheme and other physical effects, such as wetting, will be addressed in our future research. Furthermore, we intentionally refrain from comparing with a standard purely DI melt pool model, because that approach demands prohibitively high computational effort to achieve spatial convergence, as we discussed in [23]. In the following, we estimate the Reynolds number Re and the element Péclet number Pe for the present simulation. 
+
+Re = ρℓ u L μℓ
+
+, Pe = u h min ρℓ
+
+2μℓ
+
+(38) Here, u denotes a characteristic velocity. For the characteristic length L, we choose the laser beam diameter, i.e., L = 2 rL, since the melt pool dynamics are mostly confined to the laser spot size. Moreover, we consider the minimum element side length hmin , since our adaptive mesh refinement strategy ensures the highest resolution in the melt phase. The relevant flow velocity in the predom-inant region of the melt pool is roughly in the order of u = 1 m /s. Using this value as an estimate, the Reynolds number results in Re = 163 , which is moderate and supports our model assumptions. The element Péclet number is Pe = 0 .911 , meaning advection is not dominating, and advection stabilization is not yet required, cf. [53]. However, the chaotic nature of the melt pool dynamics generates occasional high velocity peaks that can reach single maximal values of umax = 15 m /s and are typically located at the metal–gas interface. For these peak velocities, the Reynolds number is estimated by Re = 2452 , which falls within the transitional flow regime. Here, the element Péclet number Pe = 13 .7 suggests that advection is dominating. In this proof-of-principle simulation, we did not employ advection stabilization. For future research, especially for simulations with increased dynamics, advection stabilization methods, such as SUPG, are recommended. Using the proof-of-principle example of 3D stationary laser-induced heating of a bare metal plate, we demonstrated the capabilities and robustness of the numerical framework with the HSDI approach. The SI modelling approach for heat transfer enables the prediction of interface temper-ature with high accuracy, which is crucial for an accurate computation of temperature-dependent interface fluxes, such as surface tension (30) and the evaporation-induced recoil pressure (13). The latter is especially sensitive to the interface temperature due to its exponential dependency, and 29 represents the main driving force behind melt pool dynamics and keyhole formation. With the DI flow model, the melt pool’s complex and highly dynamic two-phase flow, including breakup and coalescence phenomena, is robustly and accurately represented. 
+
+4. Conclusion 
+
+Accurate prediction of melt pool dynamics in laser-based processing of metals, such as laser beam welding or additive manufacturing via laser powder bed fusion (PBF-LB/M), demands highly precise determination of the interface temperature, as the dominant driving forces, such as the evaporation-induced recoil pressure, are highly sensitive to the melt pool surface temperature. Standard diffuse-interface (DI) formulations, though robust, introduce significant temperature er-rors at practically feasible spatial resolutions, as critically discussed in our previous work [23]. As a result, model calibration procedures often compensate numerical rather than physical deficiencies. To overcome these limitations, this work proposed a hybrid sharp–diffuse interface (HSDI) approach that couples, for the first time, a sharp-interface (SI) CutFEM heat transfer formulation with a DI two-phase flow model. This combination is particularly well-suited for high-fidelity modelling of laser–metal interactions: The SI formulation provides a high thermal accuracy at the melt pool surface, whereas the DI formulation offers robust and efficient handling of the complex two-phase flow, including complex breakup and coalescence scenarios. Based on operator splitting and by extending the interface temperature within a narrow band around the (sharp) interface and embedding it into regularized force terms, our approach achieves a seamless and robust coupling between the SI thermal and DI flow submodels. We validated the HSDI approach using comprehensive test cases and demonstrated substantial accuracy gains compared to purely DI models. In purely thermal test cases representative of laser– metal interactions, the proposed SI thermal model consistently attains second-order convergence and, critically, at least two orders of magnitude higher accuracy than a standard DI model based on the same spatial discretization. To achieve a 1% error in interface temperature and evaporation-induced recoil pressure, the SI approach allowed up to two orders of magnitude coarser mesh resolu-tions than the DI approach. However, the accuracy of the coupled thermo-hydrodynamics may be constrained by the two-phase flow formulation for highly dynamic 3D scenarios. A novel benchmark example has been proposed mimicking the coupled thermal two-phase flow characteristics in laser-based metal processing. For this more complex, coupled thermo-hydrodynamics problem, the novel HSDI approach yields an overall accuracy gain of roughly one order of magnitude in the predicted vapor depression geometry as compared to the standard DI model. We further analyzed the effect of restricting the SI thermal problem to the metal phase, neglecting heat transfer in the gas phase. We found that this approach is well-justified for unresolved evaporation models. It preserves accu-racy compared to the fully coupled two-phase approach, thereby enabling more efficient modelling. Finally, we demonstrated the capabilities, robustness, and practical applicability of the proposed numerical framework using a 3D proof-of-principle simulation example of stationary laser-induced melting. The main findings of this work are summarized as follows: 
+
+• This work proposed a novel HSDI approach for thermal two-phase flow modelling that is tailored to the stringent requirements of laser-induced melt pool dynamics with rapid evapo-ration. 30 • In practically relevant 2D benchmarks, the SI thermal model exhibited second-order spatial convergence, enabling finite element sizes two orders of magnitude larger than standard DI approaches for 1% accuracy. 
+
+• The HSDI approach is facilitated by a robust, seamless coupling between the SI thermal and DI two-phase flow submodels by extending the interface temperature across the diffuse transition region. 
+
+• In a novel benchmark example representative of laser–metal interactions, the HSDI approach achieved an accuracy one order of magnitude higher than a standard DI model on the same mesh. Future work will incorporate more detailed physics of laser–material interaction, including temperature-dependent absorptivity and multiple reflections at the sharp metal–gas interface. The methodology is directly applicable to processes involving strongly localized heat sources, such as laser and electron beam powder bed fusion, directed energy deposition, laser beam welding, cutting, and more general problems of temperature-driven flow. 
+
+Funding sources 
+
+Financial support for this research was provided by the European Research Council through the ERC Starting Grant ExcelAM under award number 101117579. 
+
+CRediT authorship contribution statement Nils Much: Writing – original draft, Writing – review & editing, Conceptualization, Method-ology, Software, Investigation, Formal analysis, Data curation, Visualization. Andreas Koch: 
+
+Writing – review & editing, Software, Data curation, Visualization. Christoph Meier: Writing – review & editing, Conceptualization, Methodology, Supervision, Project administration, Resources, Funding acquisition. Magdalena Schreter-Fleischhacker: Writing – review & editing, Concep-tualization, Methodology, Software, Data curation, Visualization, Supervision, Project administra-tion, Funding acquisition. 
+
+Declaration of competing interest 
+
+The authors declare that they have no known competing financial interests or personal relation-ships that could have appeared to influence the work reported in this paper. 
+
+Acknowledgments 
+
+The authors acknowledge collaboration with Maximilian Bergbauer, Hélène Papillon-Laroche, Bruno Blais, Florian Kummer, Peter Munch and Martin Kronbichler, as well as the deal.II com-munity. 31 Appendix A. Face-based ghost-penalty stabilization 
+
+In intersected finite elements, domain integrals in Ωℓ and Ωg must only consider the part of the element that lies inside the respective domain. Since the metal–gas interface Γ may cut finite elements in any location, the intersections can get arbitrarily small, leading to very bad condition numbers of the mass and stiffness matrices. To mitigate this issue, we apply face-based ghost-penalty stabilization [11] to the mass and stiffness. The stabilization functions jℓ and jg are defined as 
+
+ji(Ti, v i) = X 
+
+> F∈F i
+> p
+
+X
+
+> m=1
+
+h2m+1 
+
+(2 m + 1)( m!) 2
+
+∂m 
+
+> nF
+
+Ti
+
+ 
+
+> F
+
+, ∂m 
+
+> nF
+
+vi
+
+
+
+> F
+
+
+
+> F
+
+for i ∈ { ℓ, g}, (A.1) where F is the domain of a finite element face that is in one of the sets of element faces Fℓ and Fg,which contain all faces of intersected finite elements except element faces that do not cover parts of the respective domain Ωℓ or Ωg [59] as shown in Fig. A.11. Furthermore, p is the degree of the Lagrange polynomial shape functions, nF is the outward-pointing unit normal vector of a face F ,
+
+∂m 
+
+> nF
+
+is the m-th order normal derivative on a face F , and the operator [x]F = x|F + − x|F − denotes the jump over a face F .             
+
+> (a) Ghost-penalty faces Fℓfor domain Ωℓ.
+> (b) Ghost-penalty faces Fgfor domain Ωg.Figure A.11: Visualization of the set of ghost-penalty faces Fℓfor subdomain Ωℓin (a), and Fgfor subdomain Ωg
+> in (b), respectively. The ghost-penalty faces are highlighted in blue.
+
+Appendix B. Solution projection between function spaces for moving interfaces 
+
+Consider a structured triangulation T that covers the domain Ω. We distinguish between the metal triangulation Tℓ ∈ T that includes all finite elements that have some part in Ωℓ and the ambient gas triangulation Tg ∈ T that includes all finite elements that have some part in Ωg. The set of interface elements TΓ = Tℓ ∩ T g includes all finite elements intersected by the interface Γ. In the following, the superscript n indicates the time step number and the subscript i ∈ { ℓ, g} indicates the phase. When dealing with a moving interface Γ, we encounter a problem if the solution at the old time step T ni and the solution at the new time step T n+1  
+
+> i
+
+differ in their solution function spaces. This occurs if the active subdomain meshes change their topology, i.e., T n+1 
+
+> i
+
+̸ = T ni , between two subsequent time steps tn and tn+1 . To address this issue, we apply the so-called ghost-penalty extrapolation procedure proposed by Schott [71]. We aim for a virtual solution ¯T ni , representing the solution T ni on the new active submesh topology T n+1  
+
+> i
+
+according to the moved interface posi-tion Γn+1 at time step tn+1 . For a moving interface Γn → Γn+1 , we can distinguish three scenarios 32 for the finite elements τi ∈ T i that were physically relevant for the subdomain Ωni at the time step tn.
+
+Scenario 1: Interface motion within a cut finite element or remaining a non-intersected physically relevant finite element with equal solution function space 
+
+For interface motions within the same finite element τi, i.e., τi ∈ T n 
+
+> Γ
+
+∩ T n+1 Γ , both finite element function spaces of the two subsequent time steps are based on the same function basis, so no ex-trapolation or any further special treatment is required for this scenario. The solution can easily be adopted ¯T ni = T ni . The same holds for finite elements, which are not intersected at both subsequent time steps, and belong to the physically relevant subdomain, i.e. τi ∈ (T ni \ T n 
+
+> Γ
+
+) ∩ (T n+1  
+
+> i
+
+\ T n+1 Γ ).
+
+Scenario 2: Interface motion across nodes with reduced solution function space 
+
+Suppose the interface moves across a finite element boundary ∂τ i, so that the corresponding finite element ansatz functions are not required anymore for representing the discrete projected solution ¯T ni , i.e., τi ∈ T n 
+
+> Γ
+
+\ T n+1  
+
+> i
+
+. In that case, the solution space is reduced accordingly. The topology of the active submeshes changes in this scenario T n+1 
+
+> i
+
+̸ = T ni , and the solution, which is no longer required, is removed. 
+
+Scenario 3: Interface motion across nodes with increased solution function space 
+
+If the interface moves across a finite element boundary ∂τ i, we encounter the most challenging scenario. Finite elements become physically relevant for the considered subdomain Ωi, i.e. 
+
+τi ∈ T n+1 Γ \ T ni , expanding the solution function space. Since the solution of the newly activated finite elements, which were located outside the physically active domain at tn, are unknown, we must determine appropriate virtual solution values without compromising the accuracy of our numerical scheme. We apply a ghost-penalty extrapolation procedure to estimate the virtual solution values ¯T ni , aiming to minimize the normal derivative jumps on the faces between the new physically relevant finite element τi and the neighbour elements belonging to the same considered subdomain Ωi. The algorithmic procedure consists of the following two steps: 
+
+• Move interface Γn → Γn+1 and determine the active subdomain meshes T n+1  
+
+> i
+
+at the new time step tn+1 . The physically irrelevant solution (scenario 2) is removed, new solution space (scenario 3) is created, and the solution from scenario 1 is adopted. 
+
+• Apply the ghost-penalty extrapolation procedure, similar to the face-based ghost-penalty terms in (26), for the newly arising unknown solution (scenario 3), by creating and solving a global system of equations for ¯T n = { ¯T nℓ , ¯T n 
+
+> g
+
+}, such that 
+
+X
+
+> i∈{ ℓ, g}
+
+X 
+
+> F∈F n+1
+> i
+> p
+
+X
+
+> m=1
+
+ki h2m−1
+
+(2 m + 1)( m!) 2
+
+∂m
+
+> nF
+
+¯T ni
+
+ 
+
+> F
+
+, ∂m 
+
+> nF
+
+vi
+
+
+
+> F
+
+
+
+> F
+
+= 0 
+
+holds for the continuous solution space. Note that the exponent in h2m−1 is chosen so that the relation is spatial dimension independent. For the extrapolation procedure, the function spaces at the new time step have to be used, corresponding to the new active submesh topologies T n+1  
+
+> i
+
+. The solution that is not newly introduced is enforced to remain the same via inhomogeneous Dirichlet constraints for the system of equations ¯T ni = T ni .For illustrating the ghost-penalty extrapolation, we consider a 2D example of a subdomain Ωℓ as shown in Fig. B.12a, which is moved as shown in Fig. B.12b. The two different active submeshes 33 (a) Active submesh T nℓ
+
+at time step tn.
+
+(b) Active submesh T n+1 
+
+> ℓ
+
+at time step tn+1 .
+
+(c) 3D wrap illustration of the 2D extrapolation example. Figure B.12: Sketches for visualizing the solution extrapolation process between the differing active submesh topolo-gies T nℓ̸ = T n+1  
+
+> ℓ
+
+in two subsequent time steps tn and tn+1 . For the illustration, we only consider the subdomain Ωℓ
+
+in our example. In (a), the original state at tn is shown and in (b), the horizontally moved interface Γn+1 with the new active submesh T n+1  
+
+> ℓ
+
+is shown. The grey points represent the solution, which can be adopted to the new projected solution ¯T nℓ = T nℓ via constraints (scenario 1). The red-marked solution is not relevant anymore, as it does not belong to the current active submesh (scenario 2). On the contrary, the green marked solution is new and needs an extrapolation process, so an accurate solution value ¯T nℓ can be predicted. The relevant set of ghost-faces for the solution projection process Fn+1  
+
+> ℓ
+
+is highlighted in blue. In (c), a 3D warp illustration is depicted, showing the solution fields T nℓ and ¯T nℓ for a 2D sine-bump-shaped solution. 
+
+T nℓ̸ = T n+1  
+
+> ℓ
+
+are shown in Fig. B.12b from a top view and clarify the terminologies and scenarios 1, 2, and 3 from above, as well as a spatial representation of the corresponding solution fields T nℓ
+
+and ¯T nℓ . Note that the presented procedure can be equally adopted for 3D problems and vector-valued approximations. 
+
+Appendix C. Illustration of 3D stationary laser-induced heating of a bare metal plate 
+
+In this section, additional illustrations of the 3D stationary laser-induced heating of a bare metal plate example, cf. Section 3.5, are shown (see Fig. C.13). 
+
+Appendix D. Temperature profiles of 1D laser-induced heating of a static surface 
+
+In this section, the final temperature profiles of the 1D laser-induced heating of a static surface benchmark example, cf. Section 3.1, are shown. Fig. D.14 presents the temperature profiles obtained without evaporation-induced cooling, as discussed in Section 3.1.1. In contrast, Fig. D.15 shows the temperature profiles incorporating evaporation-induced cooling, corresponding to the results in Section 3.1.2. 
+
+Data availability 
+
+The code we use is openly available at https://github.com/MeltPoolDG/paper-2026-CMAME-hybrid-melt-pool. 34 t = 0 .225 ms t = 0 .645 ms 
+
+t = 1 .246 ms t = 1 .878 ms  
+
+> 1933 3500 temperature (melt) (K)
+
+Figure C.13: Stationary laser-induced heating of a bare metal plate: time series illustrating the metal–gas interface geometry, along with the solidus temperature contour. The adaptive mesh of the xz -plane is projected on the left back face, while the extended interface temperature ˜TΓ at the yz -plane is projected on the right back face. 
+
+35 −100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+qΓ = qL
+
+x (μm) 
+
+> T (K)
+
+SI-2P 
+
+h = 2 .47 μm
+
+h = 1 .24 μm
+
+h = 0 .623 μm
+
+h = 0 .312 μm
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+Tref 
+
+−100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+x (μm) 
+
+> T (K)
+
+DI, nΓ = 8 
+
+h = 0 .625 μm
+
+h = 0 .312 μm
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+h = 0 .0391 μm
+
+h = 0 .0195 μm
+
+Tref 
+
+−100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+x (μm) 
+
+> T (K)
+
+DI, nΓ = 16 
+
+h = 0 .312 μm
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+h = 0 .0391 μm
+
+h = 0 .0195 μm
+
+h = 0 .00977 μm
+
+Tref 
+
+−100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+x (μm) 
+
+> T (K)
+
+DI, nΓ = 32 
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+h = 0 .0391 μm
+
+h = 0 .0195 μm
+
+h = 0 .00977 μm
+
+h = 0 .00488 μm
+
+Tref Figure D.14: 1D laser-induced heating of a static surface without evaporation-induced cooling, cf. Section 3.1.1: Instationary temperature profiles at t = 10 −5 s. (top left) SI-2P; DI heat transfer with (top right) nΓ = 8 ; (bottom left) nΓ = 16 ; (bottom right) nΓ = 32 finite elements across the diffuse transition region. 
+
+36 −100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+qΓ = qL + qv(TΓ)
+
+x (μm) 
+
+> T (K)
+
+SI-2P 
+
+h = 2 .47 μm
+
+h = 1 .24 μm
+
+h = 0 .623 μm
+
+h = 0 .312 μm
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+Tref 
+
+−100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+x (μm) 
+
+> T (K)
+
+DI, nΓ = 8 
+
+h = 0 .625 μm
+
+h = 0 .312 μm
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+h = 0 .0391 μm
+
+h = 0 .0195 μm
+
+Tref 
+
+−100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+x (μm) 
+
+> T (K)
+
+DI, nΓ = 16 
+
+h = 0 .312 μm
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+h = 0 .0391 μm
+
+h = 0 .0195 μm
+
+h = 0 .00977 μm
+
+Tref 
+
+−100 −50 0 50 100 
+
+2
+
+4 ·10 3
+
+x (μm) 
+
+> T (K)
+
+DI, nΓ = 32 
+
+h = 0 .156 μm
+
+h = 0 .0781 μm
+
+h = 0 .0391 μm
+
+h = 0 .0195 μm
+
+h = 0 .00977 μm
+
+h = 0 .00488 μm
+
+Tref Figure D.15: 1D laser-induced heating of a static surface with evaporation-induced cooling, cf. Section 3.1.2: Insta-tionary temperature profiles at t = 10 −5 s. (top left) SI-2P; DI heat transfer with (top right) nΓ = 8 ; (bottom left) 
+
+nΓ = 16 ; (bottom right) nΓ = 32 finite elements across the diffuse transition region. 
+
+37 References 
+
+[1] I. Gibson, D. Rosen, B. Stucker, M. Khorasani, Additive Manufacturing Technologies, 3rd Edition, Springer International Publishing, Cham, 2021. doi:10.1007/978-3-030-56127-7 .[2] C. Meier, R. W. Penny, Y. Zou, J. S. Gibbs, A. J. Hart, Thermophysical phenomena in metal additive manufacturing by selective laser melting: fundamentals, modeling, simulation, and experimentation, Annual Review of Heat Transfer 20 (1) (2017) 241–316. doi:10.1615/ AnnualRevHeatTransfer.2018019042 .[3] E. Li, Z. Zhou, L. Wang, R. Zou, A. Yu, Particle scale modelling of powder recoating and melt pool dynamics in laser powder bed fusion additive manufacturing: A review, Powder Technology 409 (July) (2022) 117789. doi:10.1016/j.powtec.2022.117789 .[4] R. Cunningham, C. Zhao, N. Parab, C. Kantzos, J. Pauza, K. Fezzaa, T. Sun, A. D. Rollett, Keyhole threshold and morphology in laser melting revealed by ultrahigh-speed x-ray imaging, Science 363 (6429) (2019) 849–852. doi:10.1126/science.aav4687 .[5] C. Körner, A. Bauereiß, E. Attar, Fundamental consolidation mechanisms during selective beam melting of powders, Modelling and Simulation in Materials Science and Engineering 21 (8) (2013) 085011. doi:10.1088/0965-0393/21/8/085011 .[6] M. C. Brennan, J. S. Keist, T. A. Palmer, Defects in Metal Additive Manufacturing Processes, Journal of Materials Engineering and Performance 30 (7) (2021) 4808–4818. doi:10.1007/ s11665-021-05919-6 .[7] P. S. Cook, A. B. Murphy, Simulation of melt pool behaviour during additive manufacturing: Underlying physics and progress, Additive Manufacturing 31 (2020) 100909. doi:10.1016/j. addma.2019.100909 .[8] A. Hansbo, P. Hansbo, An unfitted finite element method, based on Nitsche’s method, for elliptic interface problems, Computer Methods in Applied Mechanics and Engineering 191 (47-48) (2002) 5537–5552. doi:10.1016/S0045-7825(02)00524-8 .[9] J. Chessa, P. Smolinski, T. Belytschko, The extended finite element method (XFEM) for solidification problems, International Journal for Numerical Methods in Engineering 53 (8) (2002) 1959–1977. doi:10.1002/nme.386 .[10] R. P. Fedkiw, T. Aslam, B. Merriman, S. Osher, A Non-oscillatory Eulerian Approach to Interfaces in Multimaterial Flows (the Ghost Fluid Method), Journal of Computational Physics 152 (2) (1999) 457–492. doi:10.1006/jcph.1999.6236 .[11] E. Burman, Ghost penalty, Comptes Rendus. Mathématique 348 (21-22) (2010) 1217–1220. 
+
+doi:10.1016/j.crma.2010.10.006 .[12] C. Hirt, A. Amsden, J. Cook, An arbitrary Lagrangian-Eulerian computing method for all flow speeds, Journal of Computational Physics 14 (3) (1974) 227–253. doi:10.1016/ 0021-9991(74)90051-5 .38 [13] S. Février, E. Fernández, M. Lacroix, R. Boman, J.-P. Ponthot, Simulation of melt pool dynam-ics including vaporization using the particle finite element method, Computational Mechanics 75 (6) (2025) 1787–1815. doi:10.1007/s00466-024-02571-4 .[14] G. Tryggvason, R. Scardovelli, S. Zaleski, Direct Numerical Simulations of Gas–Liquid Multi-phase Flows, Cambridge University Press, Cambridge, 2011. doi:10.1017/CBO9780511975264 .[15] S. Pang, L. Chen, J. Zhou, Y. Yin, T. Chen, A three-dimensional sharp interface model for self-consistent keyhole and weld pool dynamics in deep penetration laser welding, Journal of Physics D: Applied Physics 44 (2) (2011) 025301. doi:10.1088/0022-3727/44/2/025301 .[16] W. Tan, N. S. Bailey, Y. C. Shin, Investigation of keyhole plume and molten pool based on a three-dimensional dynamic model with sharp interface formulation, Journal of Physics D: Applied Physics 46 (5) (2013) 055501. doi:10.1088/0022-3727/46/5/055501 .[17] S. A. Khairallah, A. Anderson, Mesoscopic simulation model of selective laser melting of stain-less steel powder, Journal of Materials Processing Technology 214 (11) (2014) 2627–2636. 
+
+doi:10.1016/j.jmatprotec.2014.06.001 .[18] S. A. Khairallah, A. T. Anderson, A. Rubenchik, W. E. King, Laser powder-bed fusion additive manufacturing: Physics of complex melt flow and formation mechanisms of pores, spatter, and denudation zones, Acta Materialia 108 (2016) 36–45. doi:10.1016/j.actamat.2016.02.014 .[19] M. J. Matthews, G. Guss, S. A. Khairallah, A. M. Rubenchik, P. J. Depond, W. E. King, Denudation of metal powder layers in laser powder bed fusion processes, Acta Materialia 114 (2016) 33–42. doi:10.1016/j.actamat.2016.05.017 .[20] S. Ly, A. M. Rubenchik, S. A. Khairallah, G. Guss, M. J. Matthews, Metal vapor micro-jet controls material redistribution in laser powder bed fusion additive manufacturing, Scientific Reports 7 (1) (2017) 4085. doi:10.1038/s41598-017-04237-z .[21] A. A. Martin, N. P. Calta, S. A. Khairallah, J. Wang, P. J. Depond, A. Y. Fong, V. Thampy, G. M. Guss, A. M. Kiss, K. H. Stone, C. J. Tassone, J. Nelson Weker, M. F. Toney, T. van Buuren, M. J. Matthews, Dynamics of pore formation during laser powder bed fu-sion additive manufacturing, Nature Communications 10 (1) (2019) 1987. doi:10.1038/ s41467-019-10009-2 .[22] J. Brackbill, D. Kothe, C. Zemach, A continuum method for modeling surface tension, Journal of Computational Physics 100 (2) (1992) 335–354. doi:10.1016/0021-9991(92)90240-Y .[23] N. Much, M. Schreter-Fleischhacker, P. Munch, M. Kronbichler, W. A. Wall, C. Meier, Im-proved accuracy of continuum surface flux models for metal additive manufacturing melt pool simulations, Advanced Modeling and Simulation in Engineering Sciences 11 (1) (2024) 16. 
+
+doi:10.1186/s40323-024-00270-6 .[24] M. Schreter-Fleischhacker, N. Much, P. Munch, M. Kronbichler, W. A. Wall, C. Meier, A con-sistent diffuse-interface finite element approach to rapid melt–vapor dynamics with application to metal additive manufacturing, Computer Methods in Applied Mechanics and Engineering 442 (2025) 117985. doi:10.1016/j.cma.2025.117985 .39 [25] R. Andreotta, L. Ladani, W. Brindley, Finite element simulation of laser additive melting and solidification of Inconel 718 with experimentally tested thermal properties, Finite Elements in Analysis and Design 135 (July) (2017) 36–43. doi:10.1016/j.finel.2017.07.002 .[26] J. Yan, W. Yan, S. Lin, G. Wagner, A fully coupled finite element formulation for liq-uid–solid–gas thermo-fluid flow with melting and solidification, Computer Methods in Applied Mechanics and Engineering 336 (2018) 444–470. doi:10.1016/j.cma.2018.03.017 .[27] Q. Zhu, J. Yan, A mixed interface-capturing/interface-tracking formulation for thermal multi-phase flows with emphasis on metal additive manufacturing processes, Computer Methods in Applied Mechanics and Engineering 383 (2021) 113910. doi:10.1016/j.cma.2021.113910 .[28] M. Courtois, M. Carin, P. Le Masson, S. Gaied, M. Balabane, A complete model of keyhole and melt pool dynamics to analyze instabilities and collapse during laser welding, Journal of Laser Applications 26 (4) (2014) 042001. doi:10.2351/1.4886835 .[29] K.-H. Leitz, C. Grohs, P. Singer, B. Tabernig, A. Plankensteiner, H. Kestler, L. Sigl, Fundamen-tal analysis of the influence of powder characteristics in Selective Laser Melting of molybdenum based on a multi-physical simulation model, International Journal of Refractory Metals and Hard Materials 72 (November 2017) (2018) 1–8. doi:10.1016/j.ijrmhm.2017.11.034 .[30] A. Queva, G. Guillemot, C. Moriconi, C. Metton, M. Bellet, Numerical study of the impact of vaporisation on melt pool dynamics in Laser Powder Bed Fusion - Application to IN718 and Ti–6Al–4V, Additive Manufacturing 35 (February) (2020) 101249. doi:10.1016/j.addma. 2020.101249 .[31] C. Panwisawas, C. Qiu, M. J. Anderson, Y. Sovani, R. P. Turner, M. M. Attallah, J. W. Brooks, H. C. Basoalto, Mesoscale modelling of selective laser melting: Thermal fluid dynamics and microstructural evolution, Computational Materials Science 126 (2017) 479–490. doi: 10.1016/j.commatsci.2016.10.011 .[32] M. Bayat, S. Mohanty, J. H. Hattel, Multiphysics modelling of lack-of-fusion voids formation and evolution in IN718 made by multi-track/multi-layer L-PBF, International Journal of Heat and Mass Transfer 139 (2019) 95–114. doi:10.1016/j.ijheatmasstransfer.2019.05.003 .[33] C. M. Grohol, Y. C. Shin, On the predictive accuracy and sensitivity to property varia-tions in the high-fidelity modeling of the molten pool dynamics in laser melting of met-als, International Journal of Heat and Mass Transfer 232 (June) (2024) 125894. doi: 10.1016/j.ijheatmasstransfer.2024.125894 .[34] T. Yu, S. Zhao, J. Zhao, A mechanism-based optimization strategy with adaptive laser power for laser powder bed fusion, Additive Manufacturing 92 (August) (2024) 104403. doi:10. 1016/j.addma.2024.104403 .[35] M. Geiger, K.-H. Leitz, H. Koch, A. Otto, A 3D transient model of keyhole and melt pool dynamics in laser beam welding applied to the joining of zinc coated sheets, Production Engi-neering 3 (2) (2009) 127–136. doi:10.1007/s11740-008-0148-7 .[36] H. Chen, W. Yan, Spattering and denudation in laser powder bed fusion process: Multiphase flow modelling, Acta Materialia 196 (2020) 154–167. doi:10.1016/j.actamat.2020.06.033 .40 [37] Y. S. Lee, W. Zhang, Mesoscopic simulation of heat transfer and fluid flow in laser powder bed additive manufacturing, in: Solid Free Form Fabrication Symposium, University of Texas at Austin, Austin, Texas, USA, 2015, pp. 1154–1165. [38] A. Zakirov, S. Belousov, M. Bogdanova, B. Korneev, I. Iskandarova, A. Perepelkina, B. Potap-kin, KiSSAM: efficient simulation of melt pool dynamics during PBF using GPUs, Progress in Additive Manufacturing 9 (5) (2024) 1491–1508. doi:10.1007/s40964-023-00561-1 .[39] K. Ikeda, S. Sakane, T. Aoki, T. Takaki, High-performance phase-field lattice Boltzmann simu-lations for accurate thermal fluid flow in metal additive manufacturing, IOP Conference Series: Materials Science and Engineering 1335 (1) (2025) 012016. doi:10.1088/1757-899X/1335/1/ 012016 .[40] R. Ammer, M. Markl, U. Ljungblad, C. Körner, U. Rüde, Simulating fast electron beam melting with a parallel thermal free surface lattice Boltzmann method, Computers & Mathematics with Applications 67 (2) (2014) 318–330. doi:10.1016/j.camwa.2013.10.001 .[41] C. Meier, S. L. Fuchs, A. J. Hart, W. A. Wall, A novel smoothed particle hydrodynamics formulation for thermo-capillary phase change problems with focus on metal additive manu-facturing melt pool modeling, Computer Methods in Applied Mechanics and Engineering 381 (2021) 113812. doi:10.1016/j.cma.2021.113812 .[42] S. L. Fuchs, P. M. Praegla, C. J. Cyron, W. A. Wall, C. Meier, A versatile SPH modeling framework for coupled microfluid-powder dynamics in additive manufacturing: binder jetting, material jetting, directed energy deposition and powder bed fusion, Engineering with Comput-ers 38 (6) (2022) 4853–4877. doi:10.1007/s00366-022-01724-4 .[43] C. Lüthi, M. Afrasiabi, M. Bambach, An adaptive smoothed particle hydrodynamics (SPH) scheme for efficient melt pool simulations in additive manufacturing, Computers & Mathemat-ics with Applications 139 (2023) 7–27. doi:10.1016/j.camwa.2023.03.003 .[44] Y. Lin, C. Lüthi, M. Afrasiabi, M. Bambach, Enhanced heat source modeling in particle-based laser manufacturing simulations with ray tracing, International Journal of Heat and Mass Transfer 214 (2023) 124378. doi:10.1016/j.ijheatmasstransfer.2023.124378 .[45] Y. Ma, Z. Zhang, C. Weißenfels, M. Zhou, L. Ma, X. Tang, M. Liu, GPU-accelerated multi-phase, multi-resolution SPH method with ray tracing for laser powder bed fusion, Computer Methods in Applied Mechanics and Engineering 448 (July 2025) (2025) 118423. doi:10.1016/ j.cma.2025.118423 .[46] M. Russell, A. Souto-Iglesias, T. Zohdi, Numerical simulation of Laser Fusion Additive Man-ufacturing processes using the SPH method, Computer Methods in Applied Mechanics and Engineering 341 (2018) 163–187. doi:10.1016/j.cma.2018.06.033 .[47] S. Anisimov, V. Khokhlov, Instabilities in Laser-Matter Interaction, CRC Press, Boca Raton, FL, 1995. [48] A. J. Ross, I. Bitharas, K. G. Perkins, A. J. Moore, Volumetric heat source calibration for laser powder bed fusion, Additive Manufacturing 60 (2022). doi:10.1016/J.ADDMA.2022.103267 .41 [49] E. Olsson, G. Kreiss, S. Zahedi, A conservative level set method for two phase flow II, Journal of Computational Physics 225 (1) (2007) 785–807. doi:10.1016/j.jcp.2006.12.027 .[50] J. Nitsche, Über ein Variationsprinzip zur Lösung von Dirichlet-Problemen bei Verwendung von Teilräumen, die keinen Randbedingungen unterworfen sind, Abhandlungen aus dem Math-ematischen Seminar der Universität Hamburg 36 (1) (1971) 9–15. doi:10.1007/BF02995904 .[51] M. Kronbichler, K. Kormann, A generic interface for parallel cell-based finite element operator application, Computers & Fluids 63 (2012) 135–147. doi:10.1016/j.compfluid.2012.04. 012 .[52] D. Arndt, W. Bangerth, M. Bergbauer, B. Blais, M. Fehling, R. Gassmöller, T. Heister, L. Heltai, M. Kronbichler, M. Maier, P. Munch, S. Scheuerman, B. Turcksin, S. Uzunbajakau, D. Wells, M. Wichrowski, The deal.II library, version 9.7, Journal of Numerical Mathematics 32 (4) (2025) 369–380. doi:10.1515/jnma-2025-0115 .[53] M. Kronbichler, A. Diagne, H. Holmgren, A fast massively parallel two-phase flow solver for microfluidic chip simulation, The International Journal of High Performance Computing Ap-plications 32 (2) (2018) 266–287. doi:10.1177/1094342016671790 .[54] M. Sussman, P. Smereka, S. Osher, A Level Set Approach for Computing Solutions to In-compressible Two-Phase Flow, Journal of Computational Physics 114 (1) (1994) 146–159. 
+
+doi:10.1006/jcph.1994.1155 .[55] C. S. Peskin, The immersed boundary method, Acta Numerica 11 (2002) 479–517. doi: 10.1017/S0962492902000077 .[56] C. J. Knight, Theoretical Modeling of Rapid Surface Vaporization with Back Pressure, AIAA Journal 17 (5) (1979) 519–523. doi:10.2514/3.61164 .[57] V. Voller, C. Prakash, A fixed grid numerical modelling methodology for convection-diffusion mushy region phase-change problems, International Journal of Heat and Mass Transfer 30 (8) (1987) 1709–1719. doi:10.1016/0017-9310(87)90317-6 .[58] M. Schreter-Fleischhacker, P. Munch, N. Much, M. Kronbichler, W. A. Wall, C. Meier, A consistent diffuse-interface model for two-phase flow problems with rapid evaporation, Ad-vanced Modeling and Simulation in Engineering Sciences 11 (1) (2024) 19. doi:10.1186/ s40323-024-00276-0 .[59] G. Ludvigsson, K. R. Steffen, S. Sticko, S. Wang, Q. Xia, Y. Epshteyn, G. Kreiss, High-Order Numerical Methods for 2D Parabolic Problems in Single and Composite Domains, Journal of Scientific Computing 76 (2) (2018) 812–847. doi:10.1007/s10915-017-0637-y .[60] E. Burman, S. Claus, P. Hansbo, M. G. Larson, A. Massing, CutFEM: Discretizing geometry and partial differential equations, International Journal for Numerical Methods in Engineering 104 (7) (2015) 472–501. doi:10.1002/nme.4823 .[61] J. Benzaken, J. A. Evans, R. Tamstorf, Constructing Nitsche’s Method for Variational Prob-lems, Archives of Computational Methods in Engineering 31 (4) (2024) 1867–1896. doi: 10.1007/s11831-023-09953-6 .42 [62] S. Sticko, G. Kreiss, A stabilized Nitsche cut element method for the wave equation, Comput. Methods Appl. Mech. Engrg 309 (2016) 364–387. doi:10.1016/j.cma.2016.06.001 .[63] E. Burman, P. Hansbo, Fictitious domain finite element methods using cut elements: II. A stabilized Nitsche method, Applied Numerical Mathematics 62 (4) (2012) 328–341. doi: 10.1016/j.apnum.2011.01.008 .[64] L. Lee, R. J. LeVeque, An Immersed Interface Method for Incompressible Navier–Stokes Equations, SIAM Journal on Scientific Computing 25 (3) (2003) 832–856. doi:10.1137/ S1064827502414060 .[65] M. Schreter-Fleischhacker, P. Munch, The deal.II tutorial step-87: Evaluation of finite element solutions at arbitrary points within a distributed mesh with application to two-phase flow (2023). URL https://dealii.org/developer/doxygen/deal.II/step_87.html 
+
+[66] W. E. Lorensen, H. E. Cline, Marching cubes: A high resolution 3D surface construction algorithm, in: Proceedings of the 14th annual conference on Computer graphics and interactive techniques, Vol. 21, ACM, New York, NY, USA, 1987, pp. 163–169. doi:10.1145/37401. 37422 .[67] D. Kothe, W. Rider, S. Mosso, J. Brock, J. Hochstein, Volume tracking of interfaces having surface tension in two and three dimensions, in: 34th Aerospace Sciences Meeting and Exhibit, American Institute of Aeronautics and Astronautics, Reston, Virigina, 1996, p. 859. doi: 10.2514/6.1996-859 .[68] K. Yokoi, A density-scaled continuum surface force model within a balanced force formulation, Journal of Computational Physics 278 (1) (2014) 221–228. doi:10.1016/j.jcp.2014.08.034 .[69] S. Zahedi, M. Kronbichler, G. Kreiss, Spurious currents in finite element based level set methods for two-phase flow, International Journal for Numerical Methods in Fluids 69 (9) (2012) 1433– 1456. doi:10.1002/fld.2643 .[70] M. M. Francois, S. J. Cummins, E. D. Dendy, D. B. Kothe, J. M. Sicilian, M. W. Williams, A balanced-force algorithm for continuous and sharp interfacial surface tension models within a volume tracking framework, Journal of Computational Physics 213 (1) (2006) 141–173. doi: 10.1016/j.jcp.2005.08.004 .[71] B. Schott, Stabilized Cut Finite Element Methods for Complex Interface Coupled Flow Prob-lems, Ph.D. thesis, Technical University of Munich (2017). [72] R. I. Saye, High-Order Quadrature Methods for Implicitly Defined Surfaces and Volumes in Hyperrectangles, SIAM Journal on Scientific Computing 37 (2) (2015) A993–A1019. doi: 10.1137/140966290 .[73] M. Bergbauer, P. Munch, W. A. Wall, M. Kronbichler, High-Performance Matrix-Free Unfitted Finite Element Operator Evaluation, SIAM Journal on Scientific Computing 47 (3) (2025) B665–B689. doi:10.1137/24M1653689 .43 [74] M. Boivineau, C. Cagran, D. Doytier, V. Eyraud, M. H. Nadal, B. Wilthan, G. Pottlacher, Thermophysical Properties of Solid and Liquid Ti-6Al-4V (TA6V) Alloy, International Journal of Thermophysics 27 (2) (2006) 507–529. doi:10.1007/PL00021868 .[75] M. Mohr, R. Wunderlich, R. Novakovic, E. Ricci, H.-J. Fecht, Precise Measurements of Ther-mophysical Properties of Liquid Ti–6Al–4V (Ti64) Alloy On Board the International Space Station, Advanced Engineering Materials 22 (7) (2020). doi:10.1002/adem.202000169 .[76] G. Zhang, J. Chen, M. Zheng, Z. Yan, X. Lu, X. Lin, W. Huang, Element Vaporization of Ti-6Al-4V Alloy during Selective Laser Melting, Metals 10 (4) (2020) 435. doi:10.3390/ met10040435 .[77] C. Ma, D. Bothe, Direct numerical simulation of thermocapillary flow based on the Volume of Fluid method, International Journal of Multiphase Flow 37 (9) (2011) 1045–1058. doi: 10.1016/j.ijmultiphaseflow.2011.06.005 .[78] M. Minissale, G. T. Zeweldi, R. Bisson, L. Gallais, The effect of surface temperature on optical properties of molybdenum mirrors in the visible and near-infrared domains, Nuclear Fusion 58 (9) (2018) 096012. doi:10.1088/1741-4326/aaca03 .[79] B. J. Simonds, J. Tanner, A. Artusio-Glimpse, P. A. Williams, N. Parab, C. Zhao, T. Sun, The causal relationship between melt pool geometry and energy absorption measured in real time during laser-based manufacturing, Applied Materials Today 23 (2021) 101049. doi: 10.1016/j.apmt.2021.101049 .44

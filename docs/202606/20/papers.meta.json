@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-20",
+  "date": "2026-06-20",
+  "generated_at": "2026-06-20T21:12:38",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/20/2606.16587v1-learning-interface-breakup-a-geometry-conditioned-latent-surrogate-for-spray-formation",
+      "section": "quick",
+      "title_en": "Learning Interface Breakup: A Geometry-Conditioned Latent Surrogate for Spray Formation",
+      "authors": "Julius H Ramlau, Friedrich Hastedt, Tolga Birdal, Ehecatl-Antonio del Río Chanona, Nausheen S Basha, Omar K Matar",
+      "date": "2026-06-15",
+      "pdf": "https://arxiv.org/pdf/2606.16587v1",
+      "score": "6.0",
+      "evidence": "使用两相VOF模拟与自适应网格细化研究液-气界面破碎",
+      "tldr": "在工业喷嘴设计中，预测几何参数如何影响瞬态两相破碎至关重要，但高保真流体体积法（VOF）模拟结合自适应网格细化（AMR）计算成本过高，限制了迭代设计探索。传统代理模型也难以直接处理随时间与几何变化的空间界面和离散化。为此，我们提出一种几何条件化潜在代理模型，基于797个喷嘴仿真数据，将AMR单元密度场编码为紧凑的潜在表示，而非完整流场通道，进而重建瞬态密度演化和喷嘴几何，并用轻量级阶段恢复其余变量。留出测试表明，该方法能以0.045秒代价准确捕获关键界面动力学，推理速度相对Basilisk CFD提升超过6×10^4倍。结果说明，AMR细化结构可作为紧凑且可学习的表示，用于瞬态两相流的几何条件化代理建模。",
+      "tags": "query:falling-film",
+      "abstract_en": "Designing spray nozzles requires predicting how geometry shapes transient two-phase breakup, but high-fidelity volume-of-fluid (VOF) simulations with adaptive mesh refinement (AMR) are too expensive for iterative design exploration. Standard surrogate models are also challenged by this setting because both the liquid--gas interface and the underlying adaptive discretization evolve across time and geometries. We introduce a geometry-conditioned latent surrogate trained on 797 two-phase nozzle simulations that addresses this by encoding the AMR cell-density field, rather than the full multi-channel flow state, as a compact proxy for where the solver concentrates resolution. From this representation, the model reconstructs transient density evolution and nozzle geometry, and a lightweight second stage recovers the remaining flow variables. On held-out simulations, the method accurately captures key interface dynamics while reducing inference time to 0.045 seconds per trajectory, corresponding to a speed-up of more than $6\\times10^4$ relative to Basilisk CFD. These results suggest that AMR refinement structure can serve as a compact and learnable representation for geometry-conditioned surrogate modeling of transient two-phase flows.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/20/2606.19556v1-a-hybrid-sharp-diffuse-interface-approach-to-accurately-model-melt-pool-dynamics-with-rapid-evaporation-in-laser-based-processing-of-metals",
+      "section": "quick",
+      "title_en": "A hybrid sharp-diffuse interface approach to accurately model melt pool dynamics with rapid evaporation in laser-based processing of metals",
+      "authors": "Nils Much, Andreas Koch, Christoph Meier, Magdalena Schreter-Fleischhacker",
+      "date": "2026-06-17",
+      "pdf": "https://arxiv.org/pdf/2606.19556v1",
+      "score": "6.0",
+      "evidence": "混合尖锐-扩散界面方法精确处理界面换热，可迁移至降膜蒸发模拟",
+      "tldr": "激光金属加工中，熔池动力学预测依赖精确的界面温度场，传统扩散界面方法因热梯度模糊导致较大误差。本文提出混合尖锐-扩散界面方法，采用CutFEM精确计算温度，与扩散界面流动求解器耦合。尖锐热模型具有二阶收敛性，网格尺寸可粗化百倍；在耦合基准测试中，精度比纯扩散方法提高一个数量级。该方法为高精度激光加工模拟提供了高效新途径。",
+      "tags": "query:falling-film",
+      "abstract_en": "Predictive simulation of melt pool dynamics in laser-based processing of metals, e.g., laser beam welding or laser powder bed fusion additive manufacturing, requires accurate resolution of thermo-hydrodynamic interactions at the melt-gas interface. Here, evaporation-induced recoil pressure and temperature-dependent surface tension govern the flow. Because these mechanisms depend sensitively, often exponentially, on the interface temperature, reliable predictions demand highly accurate heat transfer models. Popular diffuse-interface formulations smear the extreme thermal gradients as typical for laser-metal interactions, leading to interface temperature errors that critically degrade the accuracy of interface force predictions and melt pool dynamics. We present a hybrid sharp-diffuse interface approach for high-fidelity modelling of melt pool thermo-hydrodynamics with rapid evaporation. The heat transfer problem is represented using a sharp-interface unfitted finite element (CutFEM) formulation, enabling accurate prediction of the temperature field. The multi-phase flow problem, characterized by large density ratios and complex interface dynamics, is accurately captured using a robust level-set-based one-fluid diffuse-interface finite element formulation. Consistent coupling is achieved by extending the sharp-interface temperature into a narrow interface region to evaluate temperature-dependent interface forces within the diffuse-interface flow framework. In practically relevant benchmarks, the sharp-interface thermal model exhibits second-order spatial convergence, enabling finite element sizes two orders of magnitude larger than the diffuse-interface approach for 1 accuracy. In a novel coupled thermo-hydrodynamic benchmark representative of laser-metal interactions, the hybrid approach is one order of magnitude more accurate than a purely diffuse-interface model on the same mesh. Robu",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
