@@ -6,22 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-21
-- 运行时间：2026-06-21 21:20:51 UTC
+- 最新运行日期：2026-06-22
+- 运行时间：2026-06-22 22:19:31 UTC
 - 运行状态：成功
-- 本次总论文数：0
+- 本次总论文数：1
 - 精读区：0
-- 速读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-> 今日无新推荐，系统未产出可展示论文。
-- 详情：[/202606/21/README](/202606/21/README)
+今日速览评分7.0的新论文，探讨科学机器学习在耦合流动物理与输运问题中的应用。  
+其方向是将物理约束注入深度学习来提升多场耦合模拟的精度和可信度。  
+感兴趣可先关注PINNs或算子学习框架，它们正成为这类问题的主流工具。
+- 详情：[/202606/22/README](/202606/22/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Advances in Scientific Machine Learning for Coupled Fluid Flow and Transport](/202606/22/2606.19562v1-advances-in-scientific-machine-learning-for-coupled-fluid-flow-and-transport)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：综述用于耦合流体流动与标量输运的SciML方法，可直接用于降膜CFD
 
 
 <div class="dpr-home-promo-card">

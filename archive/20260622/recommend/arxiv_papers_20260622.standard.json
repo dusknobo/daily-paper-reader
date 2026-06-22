@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-22T22:17:27.941899+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.19562v1",
+      "source": "arxiv",
+      "title": "Advances in Scientific Machine Learning for Coupled Fluid Flow and Transport",
+      "abstract": "This chapter reviews recent advances in Scientific Machine Learning (SciML) for modeling coupled fluid flow and transport phenomena governed by the incompressible Navier-Stokes and scalar transport equations. Such systems, found in applications like turbidity currents and thermal convection, feature strong nonlinear coupling and multiscale behavior that make high-fidelity simulations computationally expensive. To address this, the chapter surveys state-of-the-art SciML methods for building efficient surrogate models, including linear reduced-order techniques based on Singular Value Decomposition (such as Dynamic Mode Decomposition) and nonlinear neural network approaches like Physics-Informed Neural Networks (PINNs) and $β$-Variational Autoencoders ($β$-VAEs). It first covers the authors' work combining these models with High Performance Computing strategies, including Adaptive Mesh Refinement/Coarsening (AMR/C) and scientific floating-point data compression. It then presents two new contributions: surrogate modeling of turbidity currents via PINNs, and the extraction of disentangled nonlinear modes from thermal flows using $β$-VAEs. Governing equations and representative benchmarks, including lock-exchange flows and Rayleigh-Bénard convection, illustrate these methodologies. The chapter is intentionally long, covering both the mathematical and physical foundations of coupled fluid flow and the computational aspects of state-of-the-art modeling. Overall, it demonstrates how SciML enables fast, accurate approximations of complex coupled systems within the specific data regimes and modeling assumptions considered, while substantially reducing computational cost relative to full-order simulations. Broader capabilities such as real-time prediction and uncertainty quantification remain active research directions whose feasibility depends strongly on the problem at hand.",
+      "authors": [
+        "Gabriel F. Barros",
+        "Rômulo M. Silva",
+        "Alvaro L. G. A. Coutinho"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "physics.flu-dyn"
+      ],
+      "published": "2026-06-17T20:02:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.19562v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "reviews SciML for coupled fluid flow and scalar transport, directly applicable to falling film CFD",
+      "llm_evidence_cn": "综述用于耦合流体流动与标量输运的SciML方法，可直接用于降膜CFD",
+      "llm_evidence": "综述用于耦合流体流动与标量输运的SciML方法，可直接用于降膜CFD",
+      "canonical_evidence": "综述用于耦合流体流动与标量输运的SciML方法，可直接用于降膜CFD",
+      "llm_tldr_en": "This chapter surveys Scientific Machine Learning methods for modeling coupled Navier-Stokes and scalar transport, which can accelerate simulations of falling film heat and mass transfer.",
+      "llm_tldr_cn": "针对耦合流体流动与输运现象的高保真模拟计算成本高的问题，综述了基于奇异值分解的线性降阶模型和物理信息神经网络等非线性神经网络的科学机器学习方法，这些方法可显著加速降膜传热传质的CFD模拟，为工程应用提供高效代理模型。",
+      "llm_tldr": "针对耦合流体流动与输运现象的高保真模拟计算成本高的问题，综述了基于奇异值分解的线性降阶模型和物理信息神经网络等非线性神经网络的科学机器学习方法，这些方法可显著加速降膜传热传质的CFD模拟，为工程应用提供高效代理模型。",
+      "llm_tags": [
+        "query:falling-film:composite"
+      ],
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD.",
+      "matched_requirement_id": "req-composite-falling-film",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
