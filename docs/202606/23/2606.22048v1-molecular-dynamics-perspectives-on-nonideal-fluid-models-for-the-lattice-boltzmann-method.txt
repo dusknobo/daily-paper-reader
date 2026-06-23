@@ -1,0 +1,966 @@
+Title: Molecular dynamics perspectives on nonideal fluid models for the lattice Boltzmann method
+
+URL Source: https://arxiv.org/pdf/2606.22048v1
+
+Published Time: Tue, 23 Jun 2026 02:21:10 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+## Molecular dynamics perspectives on nonideal fluid models for the lattice Boltzmann method 
+
+Hiroshi Otomo ∗
+
+Department of Mathematics, Tufts University, Medford, Massachusetts 02155, USA 
+
+Alexander J. Wagner 
+
+Department of Physics, North Dakota State University, Fargo, North Dakota 58108, USA 
+
+Despite their widespread use, mesoscopic models for non-ideal fluids have rarely been systematically vali-dated against microscopic simulations. In this work, molecular dynamics (MD) simulations of confined fluids are mapped onto a mesoscopic framework, enabling direct comparison with lattice Boltzmann (LBM) formula-tions. By analyzing the moments of the distribution function, we identify a force formulation that consistently reproduces the microscopic statistics and macroscopic force balance. The results show that a hybrid formulation combining pseudo-potential and free-energy approaches provides the most consistent description. These find-ings establish a direct link between microscopic particle dynamics and mesoscopic modeling, offering practical guidance for the development and selection of LBM models for non-ideal and multiphase flows. a
+
+INTRODUCTION 
+
+The gap between microscopic and macroscopic fluid dy-namics remains a central challenge due to computational and modeling limitations in fields such as computational fluid dy-namics and fluid engineering [1, 2]. In particular, the be-havior of non-ideal fluids involves complex particle interac-tions and thermodynamic effects, making multiscale modeling essential. To bridge microscopic and macroscopic descrip-tions, several mesoscopic approaches—including the lattice Boltzmann method (LBM) [3–5], dissipative particle dynam-ics [6, 7], and multi-particle collision dynamics [8] —have been developed over the past decades to capture non-ideal fluid behavior. Among these, LBM has become a widely used tool for simulating non-ideal and multiphase flows due to its computational efficiency and flexibility in modeling in-terfacial phenomena. Despite their practical success, meso-scopic models are often constructed with limited direct vali-dation against microscopic simulations such as molecular dy-namics (MD) [6–10]. In particular, multiple force formula-tions within the LBM framework—such as pseudo-potential and free-energy approaches—have been proposed and devel-oped independently, and systematic criteria for selecting or re-lating these models to underlying microscopic physics remain unclear [11–16]. In LBM, the evolution of a discrete distri-bution function provides a statistical representation of particle dynamics and serves as a key mesoscopic quantity connecting microscopic behavior to macroscopic flow properties. Estab-lishing a physically grounded multiscale framework therefore requires examining the consistency of this quantity between microscopic and mesoscopic descriptions, including its impli-cations for thermodynamic consistency and force balance. In the present study, MD simulations of particles confined by re-flective walls under external forcing are employed to provide a microscopic reference for mesoscopic modeling. Using a sys-tematic mapping from MD to the LBM [17], we analyze how   
+
+> aAccepted for publication in Physical Review Fluids. The definitive peer-reviewed version is available at https://aps.org
+
+the statistical properties of particle distributions relate to force formulations in the lattice Boltzmann models. This approach enables a direct comparison of distribution function moments and provides insight into how non-ideal interactions and ther-modynamic effects are represented at the mesoscopic level. The main findings are summarized in the concluding section. 
+
+MOLECULAR DYNAMICS SIMULATION 
+
+The motion of gas particles under a spatially uniform exter-nal force is simulated using LAMMPS [18, 19]. For interpar-ticle interactions, we employ the Lennard-Jones (LJ) poten-tial, V (r) = 4
+
+εLJ 
+
+[
+
+(
+
+σ /r)12 − (
+
+σ /r)6]
+
+for r ≤ rc, and V (r) = 0for r > rc, with cutoff rc = 5
+
+σ , which is sufficient for the present low-density conditions. Here, 
+
+εLJ is the potential well depth and 
+
+σ the particle diameter. Throughout this study, all quantities are non-dimensionalized: lengths by 
+
+σ , energies by 
+
+εLJ , and time by √m
+
+σ 2/
+
+εLJ , where m is the particle mass. A total of 12,000 particles are placed in the simulation do-main Ω ∈ [−15 , 15 ] × Lyz , where the spanwise domain size is 
+
+Lyz = 200 × 200. This configuration provides sufficient sam-pling of particles and results in an average number density of 
+
+ρ = 0.01. Reflective walls are imposed at the x-boundaries, while periodic boundary conditions are applied in the y- and 
+
+z-directions. Particle trajectories are computed by integrat-ing Newton’s equations of motion using the velocity-Verlet scheme, coupled with a Nosé–Hoover thermostat. The tem-perature is fixed at T = 1.0, and the time step size is set to 0.001. Simulations are run for 6 .0 × 10 6 time steps. All re-ported statistical quantities are obtained by averaging over the last 4 .0×10 6 time steps and within measurement boxes of size 
+
+Lx × Lyz at different x positions, where Lx = 1, after confirm-ing that the system has reached a statistical steady state. Aspatially uniform external force is applied in the x-direction, with a sufficiently large acceleration gx = 0.1 or gx = 0.3 to realize non-ideal gas behavior. As a result, from a statis-tical perspective, the system can be regarded as quasi-one-dimensional. 
+
+> arXiv:2606.22048v1 [physics.flu-dyn] 20 Jun 2026
+
+2    
+
+> 0
+> 0.01
+> 0.02
+> 0.03
+> -10 -5 0510
+> ρ
+
+x        
+
+> MD-simulation, g=0.1
+> MD-simulation, g=0.3
+> Analytic,n=1
+> Analytic,n=3
+> Analytic,n=4
+> FIG. 1. Number density profiles along xfor g=0.1 and g=0.3, with analytic solutions at first-, third-, and fourth-order in
+> ε.
+
+The averaged simulation results over each time window of 1.0 × 10 6 time steps yield static density profiles, with the macroscopic flow velocity remaining negligibly small (less than 10 −5). The resulting density profiles 
+
+ρ(x) for each value of gx are shown in Fig. 1, where the x-range is chosen to minimize boundary effects. According to fluid dynamics the-ory, the steady-state density profile satisfies the force balance equation, dP EOS /dx =
+
+ρgx, where PEOS denotes the pressure as a function of 
+
+ρ defined by an equation of state (EOS). To account for deviations from ideal gas behavior under compres-sion, we adopt a cubic EOS derived from the modified Bene-dict–Webb–Rubin (MBWR) equation [20], PEOS = ∑3
+
+> k=1
+
+κk
+
+ρk
+
+with coefficients 
+
+κ1 = 1.0, 
+
+κ2 = −5.291, and 
+
+κ3 = 4.695 at 
+
+T = 1. Using this equation of state, the force balance equation is approximately solved by assuming a perturbative expansion of the form ρanal (x) = 
+
+> n
+
+# ∑
+
+> k=1
+
+εk
+
+ρk exp (kg xx), (1) where n denotes the expansion order, and the solution is organized in powers of 
+
+ε. The coefficients up to n = 4are 
+
+ρ1 = 1, 
+
+ρ2 = −2
+
+κ2,
+
+ρ3 = − 3 
+
+> 2
+
+(
+
+κ1g − 4
+
+κ22 ), and 
+
+ρ4 =
+
+4κ2
+
+(2
+
+κ1 +
+
+κ1g − 4
+
+κ22 − 4
+
+> 3
+
+κ2
+
+) . As shown in Fig. 1, the series converges well with respect to 
+
+ε, and agreement with the sim-ulation results improves as higher-order terms are included. Specifically, the maximum deviation from the simulation is 0.77% for gx = 0.1 with expansion up to third order using ε = 6.01 × 10 −3, and 1 .32% for gx = 0.3 with expansion up to fourth order using 
+
+ε = 7.07 × 10 −4.
+
+> NON-IDEAL FLUIDS MODEL OF THE LATTICE BOLTZMANN METHOD (LBM)
+
+In the lattice Boltzmann method (LBM), the Boltzmann equation is solved in discrete space and time. Particle veloci-ties are represented by a finite set {ci}, where each index i de-notes both the direction and magnitude of a discrete velocity. This discretization naturally introduces spatial and temporal resolutions, ∆x and ∆t, respectively. The particle distribution function for velocity ci at position x and time t is denoted by 
+
+fi(x,t). The discrete Boltzmann equation in this framework takes the standard LBM form 
+
+fi (x + ci∆t,t + ∆t) − fi (x,t) = Ωi (x,t) + Fi (x,t) , (2) where Ωi is the collision operator and Fi represents the forcing term. For the single-relaxation-time Bhatnagar-Gross-Krook (BGK) model, these are expressed as 
+
+Ωi = − fi − f eq 
+
+> i
+
+τ , Fi = wi
+
+γ1
+
+( ci, 
+
+> α
+
+F
+
+> α
+
+c2
+
+> s
+
++ Rsec ,i
+
+)
+
+, (3) where 
+
+α ∈ { x, y, z},
+
+τ is the relaxation time, and cs is the lattice sound speed. The coefficient 
+
+γ1 and the term Rsec ,i, which satisfies ∑i wiRsec ,icki, 
+
+> α
+
+= 0 for k ≤ 1, are determined by the choice of force scheme. Macroscopic quantities such as the density 
+
+ρ and the fluid velocity uF are computed from the distribution function fi as 
+
+ρ = ∑
+
+> i
+
+fi, uF, 
+
+> α
+
+= u 
+
+> α
+
++ F
+
+> α
+
+2
+
+ρ , (4) where u 
+
+> α
+
+= ∑i fici, 
+
+> α
+
+/
+
+ρ. The prefactor 1 /2 accounts for force averaging before and after collision. The equilibrium distribu-tion f eq  
+
+> i
+
+is constructed to satisfy the following moment condi-tions: 
+
+# ∑
+
+> i
+
+f eq  
+
+> i
+
+=
+
+ρ, ∑
+
+> i
+
+f eq  
+
+> i
+
+ci, 
+
+> α
+
+=
+
+ρu 
+
+> α
+
++
+
+γ2F 
+
+> α
+
+, (5) and 
+
+# ∑
+
+> i
+
+f eq  
+
+> i
+
+c2 
+
+> i
+
+=
+
+ρc2 
+
+> s
+
++ ( 1 −
+
+θ )
+
+δ P +
+
+ρ
+
+(
+
+u 
+
+> α
+
++
+
+γ2
+
+F
+
+> α
+
+ρ
+
+)2
+
+. (6) These lattice Boltzmann (LB) formulations are presented in a unified and comprehensive manner. Here, 
+
+δ P denotes the pressure contribution arising from deviations from ideal-gas behavior, 
+
+δ P = PEOS −
+
+ρc2 
+
+> s
+
+, as modeled by the free-energy approach [14]. The force term F, in contrast, can be inter-preted as the pressure force due to non-ideal interactions, to-gether with any external forcing, in the context of the pseudo-potential model [12, 15, 16], 
+
+Fx =
+
+ρgx −
+
+θ ∂ δ P
+
+∂ x . (7) Here, 
+
+θ is defined as the switching parameter between the two models: when 
+
+θ = 0, the purely free-energy model is used, and when 
+
+θ = 1, the purely pseudo-potential model is used. The coefficients 
+
+γ1 and 
+
+γ2 are determined by the force scheme. Table I summarizes these parameters’ formulation for com-mon schemes, including the Shan-Chen ( S–C) model [12], Guo’s method ( Guo ) [15], and the exact difference method (EDM ) [16]. In all cases, the resulting macroscopic equations recover the Navier–Stokes equation with the applied force F at 3            
+
+> TABLE I. Parameters for typical three force schemes [12, 15, 16]
+> Force scheme
+> γ1
+> γ2
+> γ3
+> S−C0.0
+> τ1/4
+> Guo 1−1/(2
+> τ)0.50
+> EDM 1.00.0
+> τ2−
+> τ+1/4
+
+leading order. Applying the Chapman-Enskog expansion[21] to Eq. (2) and taking the first moment under uF = 0 yields: 
+
+# ∑
+
+> i
+
+(Ωi + Fi) ci, 
+
+> α
+
+=
+
+∂
+
+∂ x 
+
+> β
+
+# ∑
+
+> i
+
+ci, 
+
+> α
+
+ci, 
+
+> β
+
+f eq i + O
+
+(
+
+∂ 2 fi
+
+∂ x2
+
+)
+
+. (8) Using Eq. (3)-(6) and Table I, one obtains ∑i (Ωi + Fi) ci, 
+
+> α
+
+=
+
+Fα , leading to the force balance equation: 
+
+Fx ≈
+
+∂
+
+∂ x
+
+(
+
+ρc2 
+
+> s
+
++ ( 1 −
+
+θ )
+
+δ P) , (9) in the x-direction. This relation holds for all force schemes in Table I. Eq. (9) with Eq. (7) shows that the pressure force from deviations from ideal-gas behavior can be interpreted as either the body force Fx or corrections to the pressure ten-sor from the second moment of f eq  
+
+> i
+
+. Hence, the free-energy model ( 
+
+θ = 0) and the pseudo-potential model ( 
+
+θ = 1) yield the same macroscopic equation at leading order, though their mesoscopic mechanisms differ. Differences among the mod-els and schemes in Table I appear in the higher-order trunca-tion errors of Eq. (9). For the force scheme, they stem from corrections to the right-hand side of Eq. (8), mainly associated with the second moment of the equilibrium state and the force term, 
+
+# ∑
+
+> i
+
+( f eq  
+
+> i
+
++
+
+τFi
+
+) ci,xci,x − (
+
+ρc2 
+
+> s
+
++ ( 1 −
+
+θ )
+
+δ P) ≡
+
+γ3
+
+ρg2 
+
+> x
+
+, (10) where uF = 0, and the dependence of 
+
+γ3 on the force scheme is summarized in Table I. This term affects key properties such as viscosity independence and thermodynamic consis-tency [22–24]. 
+
+> MOLECULAR DYNAMICS LATTICE BOLTZMANN (MDLB)
+
+The MDLB approach [17, 25–29] interprets MD simula-tion results within the LBM framework by discretizing space and time with resolutions ∆x and ∆t for post-processing. The distribution function fi at x + ∆x 
+
+> 2
+
+and time t is computed as 
+
+fi
+
+(
+
+x + ∆x
+
+2 ,t
+
+)
+
+= ∑
+
+> j
+
+〈∆x[x j(t)] ∆x−ci [x j(t − ∆t)] 〉 , (11) where x j is the j-th particle position and 
+
+∆x[x′] = 
+
+{1, if xk < x′ 
+
+> k
+
+≤ xk + ∆xk, k ∈ { x, y, z},
+
+0, otherwise , (12) with x ∈ | ∆x|Z3, x′ ∈ R3, and 〈·〉 denoting a temporal and cell-volume average. The space and time resolution is character-ized by 
+
+a2 = 〈(
+
+δ x)2〉
+
+(∆x)2 , (13) where 〈(
+
+δ x)2〉 is the mean-squared displacement over ∆t.Here, for simplicity, we set ∆x = ∆t = 1, yielding a2 ∈
+
+[0.92 , 1.03 ] across the domain (see Supplementary Material). Assuming fi in Eq. (11) satisfies Eq. (2) with Eqs. (3)–(5), we analyze the combined term Ωi + Fi. From Eqs. (3)–(5), its first moment becomes −2 ∑i fici, 
+
+> α
+
+with uF = 0. Indeed, 
+
+∑i(Ωi + Fi)ci,x computed using Eq. (2) matches −2 ∑i fici,x
+
+for g = 0.1 and 0 .3, within 1 .9% in x > 0 (see Supplemen-tary Material). Next, referring Eq. (3), the second moment of Ωi + Fi is estimated. Direct evaluation of ∑i(Ωi + Fi)ci,xci,x
+
+from Eq. (2) and ∑i fici,xci,x gives characteristic magnitudes of 10 −6 and 10 −2, respectively. Furthermore, the typical scales of 
+
+ρT ,
+
+δ P, and 
+
+ρg2 
+
+> x
+
+, arising from f eq  
+
+> i
+
+and ∑i wiRsec ,ici,xci,x,lie in the range 10 −2–10 −4. These results suggest 
+
+# ∑
+
+> i
+
+fici,xci,x ≈ ∑
+
+> i
+
+( f eq  
+
+> i
+
++
+
+τwi
+
+γ1Rsec ,i
+
+) ci,xci,x, (14) provided |
+
+τ| ≤ O(1). Using this approximation and referring Eqs. (7)–(10), we assume 
+
+# ∑
+
+> i
+
+(Ωi + Fi) ci,x = Ψxx (∆t)2
+
+(
+
+ρgx −
+
+θ ∂ (PEOS −
+
+ρT )
+
+∂ x
+
+)
+
+,
+
+(15) 
+
+# ∑
+
+> i
+
+fici,xci,x = Ψxx (∆t)2
+
+[
+
+{
+
+ρT + ( 1 −
+
+θ )( PEOS −
+
+ρT )}
+
++
+
+γ3
+
+ρg2 
+
+> x
+
+(∆t)2
+
+]
+
+, (16) with uF = 0. Here, Ψxx (a2) denotes the ratio of the sec-ond moment of the discrete MDLB distribution in free space (no external forcing) to its continuum counterpart. Origi-nally introduced in Ref. [17], Ψxx quantifies discretization ef-fects from the Gaussian displacement probability and links the LBM and MDLB frameworks (see Supplementary Material for the explicit formula). In particular, it yields the relation 
+
+c2 
+
+> s
+
+= Ψxx (∆t/∆x)2T for the steady ideal gas. For the cur-rent setup, ∆x = ∆t = 1, c2 
+
+> s
+
+≈ 1. To assess these ansätze, we compare ∑i(Ωi + Fi)ci,x with the right-hand side of Eq. (15) in Fig. 2 for g = 0.1. The figure also shows a comparison between the measured ∑i fici,xci,x and the right-hand side of Eq. (16) (results for g = 0.3 are in the Supplementary Ma-terial). Here, we set 
+
+θ = 0.5 and 
+
+γ3 = 0.25. They agree very well, with maximum deviations of 3.3% and 1.0%, re-spectively. Similar levels of agreement are observed for dif-ferent discretization setups, such as ∆x = 1 and ∆t = 0.41, which yield c2 
+
+> s
+
+≈ 1/3 (see the Supplementary Material). Fig-ure 3 summarizes maximum deviations of ∑i(Ωi + Fi)ci,x and 4     
+
+> 0
+> 0.001
+> 0.002
+> 0.003
+> 0.004
+> 0.005
+> -10 -5 0510 0
+> 0.01
+> 0.02
+> 0.03
+
+x              
+
+> Measured Σi(Ωi+ F i) c i
+> Eq.(15) Σi(Ωi+ F i) c i
+> Measured Σificici
+> Eq.(16) Σificici
+
+FIG. 2. Comparison of the computed ∑i(Ωi + Fi)ci,x with the right-hand side of Eq. (15) (left axis), and of ∑i fici,xci,x with the right-hand side of Eq. (16) (right axis) for g = 0.1.      
+
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> 00.2 0.4 0.6 0.8 1
+> Deviation (%)
+
+θ, γ3
+
+> θ
+> γ3
+
+FIG. 3. Maximum deviation of ∑i(Ωi + Fi)ci,x and ∑i fic2 
+
+> i,x
+
+vs. 
+
+θ
+
+with 
+
+γ3 = 0.25, g = 0.1 (solid), and of ∑i fic2 
+
+> i,x
+
+vs. 
+
+γ3 with 
+
+θ = 0.5, 
+
+g = 0.3 (dotted). Vertical dotted and solid lines indicate x = 0.5 and 
+
+x = 0.25, respectively. 
+
+∑i fici,xci,x for different 
+
+θ with 
+
+γ3 = 0.25, evaluated using the 
+
+L1/2 norm to emphasize sensitivity to large deviations atop the geometric mean for g = 0.1. It also shows corresponding de-viations of ∑i fici,xci,x for different 
+
+γ3 with 
+
+θ = 0.5 at g = 0.3. These results confirm 
+
+θ = 0.5 and 
+
+γ3 = 0.25 as the most con-sistent choice. The choice 
+
+θ = 0.5 agrees with a hybrid LB model combining pseudo-potential and free-energy schemes. The value 
+
+γ3 = 0.25 rules out a pure Guo scheme and instead indicates S–C, EDM with specific 
+
+τ, or a hybrid forcing. Such higher-order effects are essential for thermodynamic consis-tency [22–24], with detailed analysis left for future work. The displacement probability P(x,
+
+δ x) gives the likelihood that a particle at x and time t was at x −
+
+δ x at t − ∆t, link-ing continuous dynamics to the discrete representation of fi.     
+
+> 0
+> 0.01
+> 0.02
+> 0.03
+> -10 -5 0510 -0.0015
+> -0.001
+> -0.0005
+> 0
+
+x                  
+
+> ΣifiEq.(11)
+> ΣifiEq.(17)
+> ΣificiEq.(11)
+> ΣificiEq.(17)
+> ΣificiciEq.(11)
+> ΣificiciEq.(17)
+
+FIG. 4. Moments of fi from Eqs. (11) and (17) with Gaussian 
+
+P(x,
+
+δ x) for g = 0.1. The left axis shows zeroth and second mo-ments, the right axis the first moment. 
+
+Using P, Eq. (11) becomes 
+
+fi
+
+(
+
+x + ∆x
+
+2 ,t
+
+)
+
+=
+
+1
+
+(∆x)d
+
+∫
+
+d ˜x
+
+∫
+
+d
+
+δ x ∆x [ ˜x] ∆x−ci [ ˜x −
+
+δ x]
+
+ρ( ˜x)P( ˜x,
+
+δ x), (17) where d is the spatial dimension, generalizing previous work [17] by explicitly including spatial dependence in both 
+
+ρ
+
+and P. Using the Gaussian P(x,
+
+δ x) = ( 1/√
+
+πC) exp [−(
+
+δ x −
+
+B)2/C], the double integral is evaluated numerically (Simp-son’s rule with linear interpolation for P and 
+
+ρ from Eq. (1)). Figure 4 compares results of moments from Eqs. (11) and (17) for g = 0.1 using nine discrete velocity states showing good convergence. The results exhibit excellent agreement, with maximum deviations below 1.4% across all moments and spatial positions. Similar agreement is observed for g = 0.3, with deviations within 2.2% (see Supplementary Material). To assess effects from spatial dependence of 
+
+ρ and P, fi from Eq. (17) is computed with zeroth-order approximations 
+
+ρ( ˜x) = 
+
+ρ(x + ∆x
+
+> 2
+
+) , P( ˜x,
+
+δ x) = P(x + ∆x 
+
+> 2
+
+,
+
+δ x) ,
+
+and compared with Eq. (11) for g = 0.1 and g = 0.3. Second moments agree within 1.4–2.2%, while first moments deviate up to 25%, indicating that the zeroth-order approximation suf-fices for practical use of the second moment. Following Parsa and Wagner [17], this yields 
+
+# ∑
+
+> i
+
+fi
+
+(
+
+x + ∆x
+
+2 ,t
+
+)
+
+c2 
+
+> i,x
+
+= Ψxx 
+
+ρ C
+
+(
+
+x + ∆x
+
+2
+
+)
+
+, (18) with 
+
+C = ( ∆t)2
+
+[
+
+2T + ( 1 −
+
+θ ) PEOS −
+
+ρT
+
+ρ + 2
+
+γ2g2(∆t)2
+
+]
+
+. (19) Figure 5 shows that C(x) in Eq. (19) reasonably matches es-timates from the second moments of P(x,
+
+δ x); error bars in-dicate percentage deviations from Fig. 4. In contrast, the 5    
+
+> 1.8
+> 1.85
+> 1.9
+> 1.95
+> 2
+> 2.05
+> -10 -5 0510
+> C
+
+x                   
+
+> Measured from P, g=0.1
+> Eq.(19),g=0.1
+> Measured from P, g=0.3
+> Eq.(19),g=0.3
+> FIG. 5. Comparison of C(x)from Eq. (19) with values measured directly from P(x,
+> δx)for g=0.1 and g=0.3. For g=0.3, only sufficiently sampled data at x>0 are shown.
+
+same approach cannot directly extract B, since zeroth-order approximations for 
+
+ρ and P distort ∑i fici,x. Applying a first-order expansion of 
+
+ρ( ˜x) around 
+
+ρ(x) (for detailed formula, see Supplementary Material) reduces the maximum deviation in ∑i fici,x from 25% to 3.3%, showing that a first-order spa-tial correction for 
+
+ρ significantly improves the first-moment accuracy of fi in Eq. (17). 
+
+> SUMMARY
+
+The consistency between molecular dynamics (MD) sim-ulations and mesoscopic kinetic models for non-ideal fluids is investigated using the molecular dynamics lattice Boltz-mann (MDLB) method. In this approach, the discrete dis-tribution function fi is directly constructed from MD simu-lations of particles confined between reflective walls under external forcing, enabling direct comparison with the LBM. Our results indicate that moments of fi derived from MD are most closely reproduced by a mesoscopic model that blends pseudo-potential and free-energy formulations equally. Sym-bolic expressions for the first moments of the collision and force term, corresponding to spatial and temporal variations of 
+
+fi, and the second moment of fi (Eqs. 15 and 16), match those of the hybrid formulation, reproducing macroscopic force bal-ance at leading order. The optimal agreement is obtained at a blending ratio 
+
+θ = 0.5, suggesting that a balanced combina-tion of the two approaches yields the most physically consis-tent mesoscopic representation. Beyond leading order, anal-ysis of Eq. (16) reveals higher-order corrections, including a ρg2 term. The best agreement occurs at 
+
+γ3 = 0.25, suggesting that the S−C model effectively captures microscopic behav-ior seen in MD simulations. This aligns with prior evidence that applying various EOS forms to the S−C model yields thermodynamic behavior consistent with theory [30]. Alter-natively, the EDM with a specific 
+
+τ or a hybrid scheme com-bining approaches in Table I could also achieve 
+
+γ3 = 0.25. The study further clarifies how microscopic statistical quan-tities contribute to macroscopic force balance. Specifically, the Gaussian probability distribution of particle displacements with mean B(x) and variance C(x) can accurately reproduce key moments of fi relevant to force balance. To achieve ac-curacy within a few percent, C(x) must take the form given in Eq. (19), while B(x) requires a first-order correction propor-tional to 
+
+∂ ρ /
+
+∂ x. The present results provide a direct connec-tion between microscopic particle dynamics and mesoscopic modeling in non-ideal fluids. By identifying the force formu-lation that ensures consistency at the level of distribution func-tion moments, this study offers a practical guideline for select-ing and constructing LBM models. Building on this frame-work, future work will extend the analytic expressions de-veloped here to systems undergoing phase separation, where higher-order contributions are expected to play a critical role in ensuring thermodynamic consistency and accurate meso-scopic modeling. Additional investigations will consider sys-tems under background shear and non-isothermal conditions to further validate the framework in more general flow and thermal scenarios. 
+
+> ACKNOWLEDGEMENTS
+
+H.O. sincerely acknowledges the support of Tufts Univer-sity in providing access to its High-Performance Computing (HPC) Cluster, which enabled the simulations reported in this paper.                           
+
+> ∗hiroshi.otomo@tufts.edu
+> [1] S. Succi, The Lattice Boltzmann Equation: For Complex States of Flowing Matter (Oxford University Press, 2018).
+> [2] U. D. Schiller, T. Krüger, and O. Henrich, Soft Matter 14 , 9 (2018).
+> [3] C. K. Aidun and J. R. Clausen, Annual Review of Fluid Me-chanics 42 , 439 (2010).
+> [4] T. Krüger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, and E. M. Viggen, The Lattice Boltzmann Method: Principles and Practice (Springer, Cham, Switzerland, 2017).
+> [5] H. Otomo, Journal of Statistical Physics 190 , 112 (2023).
+> [6] R. D. Groot and P. B. Warren, The Journal of Chemical Physics
+> 107 , 4423 (1997).
+> [7] S. Jamali, A. Boromand, S. Khani, J. Wagner, M. Yamanoi, and J. Maia, The Journal of Chemical Physics 142 , 164902 (2015).
+> [8] A. W. Zantop and H. Stark, The Journal of Chemical Physics
+> 155 , 134904 (2021).
+> [9] C. Denniston and M. O. Robbins, Phys. Rev. E 69 , 021505 (2004).
+> [10] Z. Tong, M. Li, and D. Li, Heat Transfer Research 53 , 33 (2022).
+> [11] A. K. Gunstensen, D. H. Rothman, S. Zaleski, and G. Zanetti, Phys. Rev. A 43 , 4320 (1991).
+> [12] X. Shan and H. Chen, Phys. Rev. E 47 , 1815 (1993).
+> [13] M. R. Swift, W. R. Osborn, and J. M. Yeomans, Phys. Rev. Lett.
+> 75 , 830 (1995).
+
+6
+
+[14] M. R. Swift, E. Orlandini, W. R. Osborn, and J. M. Yeomans, Phys. Rev. E 54 , 5041 (1996). 
+
+[15] Z. Guo, C. Zheng, and B. Shi, Phys. Rev. E 65 , 046308 (2002). 
+
+[16] A. Kupershtokh, D. Medvedev, and D. Karpov, Computers and Mathematics with Applications 58 , 965 (2009), mesoscopic Methods in Engineering and Science. 
+
+[17] M. R. Parsa and A. J. Wagner, Phys. Rev. E 96 , 013314 (2017). 
+
+[18] A. P. Thompson, H. M. Aktulga, R. Berger, D. S. Bolintineanu, W. M. Brown, P. S. Crozier, P. J. in ’t Veld, A. Kohlmeyer, S. G. Moore, T. D. Nguyen, R. Shan, M. J. Stevens, J. Tranchida, C. Trott, and S. J. Plimpton, Comp. Phys. Comm. 271 , 108171 (2022). 
+
+[19] S. Plimpton, Journal of Computational Physics 117 , 1 (1995). 
+
+[20] T. Sun and A. S. Teja, J. Phys. Chem. 100 , 17365 (1996). 
+
+[21] H. Otomo, B. M. Boghosian, and F. Dubois, Physica A: Statis-tical Mechanics and its Applications 486 , 1000 (2017). 
+
+[22] A. J. Wagner, Phys. Rev. E 74 , 056703 (2006). 
+
+[23] X. Shan, Phys. Rev. E 77 , 066702 (2008). 
+
+[24] S. Khajepor, J. Wen, and B. Chen, Phys. Rev. E 91 , 023301 (2015). 
+
+[25] M. R. Parsa, A. Pachalieva, and A. J. Wagner, International Journal of Modern Physics C 30 , 1941007 (2019). 
+
+[26] A. Pachalieva and A. J. Wagner, Phys. Rev. E 102 , 053310 (2020). 
+
+[27] M. R. Parsa and A. J. Wagner, Phys. Rev. Lett. 124 , 234501 (2020). 
+
+[28] A. Pachalieva and A. J. Wagner, Connecting lattice boltzmann methods to physical reality by coarse-graining molecular dy-namics simulations (2021), arXiv:2109.05009 [physics.comp-ph]. 
+
+[29] A. Pachalieva and A. J. Wagner, Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences 379 , 20200404 (2021). 
+
+[30] P. Yuan and L. Schaefer, Physics of Fluids 18 ,042101 (2006), https://pubs.aip.org/aip/pof/article-pdf/doi/10.1063/1.2187070/13662193/042101_1_online.pdf. 
+
+[31] See Supplemental Material at [URL] for additional simulation data, including a2 profiles, comparisons of distribution-function moments with theoretical predictions under different forcing and numerical conditions, and analytical derivations of Ψxx and the mean displacement B(x).

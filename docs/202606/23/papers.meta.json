@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-23",
+  "date": "2026-06-23",
+  "generated_at": "2026-06-23T22:08:40",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/23/2606.22048v1-molecular-dynamics-perspectives-on-nonideal-fluid-models-for-the-lattice-boltzmann-method",
+      "section": "quick",
+      "title_en": "Molecular dynamics perspectives on nonideal fluid models for the lattice Boltzmann method",
+      "authors": "Hiroshi Otomo, Alexander J. Wagner",
+      "date": "2026-06-20",
+      "pdf": "https://arxiv.org/pdf/2606.22048v1",
+      "score": "7.0",
+      "evidence": "验证了LBM的非理想流体模型，适用于多相流CFD",
+      "tldr": "非理想流体格子玻尔兹曼(LBM)模型虽广泛使用，但缺乏基于微观模拟的系统验证。本研究将限制流体的分子动力学(MD)模拟映射到介观框架，通过分析分布函数矩，识别出能一致复现微观统计和宏观力平衡的力表述。结果表明，结合伪势与自由能方法的混合力表述最为一致。该发现建立了微观粒子动力学与介观建模的直接联系，为多相流LBM模型开发提供了实用指导。",
+      "tags": "query:falling-film",
+      "abstract_en": "Despite their widespread use, mesoscopic models for non-ideal fluids have rarely been systematically validated against microscopic simulations. In this work, molecular dynamics (MD) simulations of confined fluids are mapped onto a mesoscopic framework, enabling direct comparison with lattice Boltzmann (LBM) formulations. By analyzing the moments of the distribution function, we identify a force formulation that consistently reproduces the microscopic statistics and macroscopic force balance. The results show that a hybrid formulation combining pseudo-potential and free-energy approaches provides the most consistent description. These findings establish a direct link between microscopic particle dynamics and mesoscopic modeling, offering practical guidance for the development and selection of LBM models for non-ideal and multiphase flows.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/23/2606.18417v1-enhancing-neural-network-extrapolation-in-thermo-fluid-systems-using-steady-state-solutions",
+      "section": "quick",
+      "title_en": "Enhancing neural network extrapolation in thermo-fluid systems using steady-state solutions",
+      "authors": "Sanjeeb Poudel, Teeratorn Kadeethum, Sanghyun Lee",
+      "date": "2026-06-16",
+      "pdf": "https://arxiv.org/pdf/2606.18417v1",
+      "score": "6.0",
+      "evidence": "热流体系统神经网络外推方法可迁移至多相流CFD",
+      "tldr": "传统数值模拟长时间动态计算成本高，且标准神经网络在训练区间外预测退化。本文提出稳态信息引导的神经网络架构，将解分解为稳态与瞬态校正，通过衰减剖面使校正项在长时间消失，直接嵌入收敛到稳态。在一系列热流体问题（从一维热方程到三维耦合传热）上验证，模型显著改善了外推能力。该方法为耗散系统提供了一种提升物理信息神经网络长期预测精度的新途径。",
+      "tags": "query:falling-film",
+      "abstract_en": "Time-dependent partial differential equations (PDEs) arise in many engineering systems, including thermo-fluid applications. Classical numerical simulations of such systems can become computationally expensive for long-time dynamics because they typically require sequential time integration with time steps constrained by stability, accuracy, or nonlinear solvers. Although scientific machine learning provides an alternative for approximating PDE solutions, standard neural network approximations often degrade when extrapolated beyond the training time interval.   In this work, we propose a steady-state-informed neural network representation for dissipative PDE systems whose solutions relax toward a stationary equilibrium. The proposed ansatz decomposes the solution into a steady-state component and a transient correction modulated by a time-dependent decay profile. When the decay profile vanishes at long time and the transient correction remains bounded, the representation embeds convergence to the prescribed steady state directly into the architecture, rather than enforcing it through an additional penalty term. This allows the network to learn the transient dynamics while preserving the correct asymptotic behavior.   We implement the approach within a physics-informed neural network (PINN) framework and train the resulting model using the SOAP optimizer. The method is evaluated on a sequence of problems of increasing physical and geometric complexity, ranging from the one-dimensional heat equation to incompressible Navier-Stokes flow in a lid-driven cavity, natural convection in a square cavity, and a full three-dimensional conjugate heat transfer problem. The numerical results show that the steady-state-informed architecture substantially improves temporal extrapolation beyond the training interval compared with architectures that do not explicitly enforce the asymptotic condition.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

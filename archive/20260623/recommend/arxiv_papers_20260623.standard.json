@@ -1,0 +1,91 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-23T22:06:47.278776+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.22048v1",
+      "source": "arxiv",
+      "title": "Molecular dynamics perspectives on nonideal fluid models for the lattice Boltzmann method",
+      "abstract": "Despite their widespread use, mesoscopic models for non-ideal fluids have rarely been systematically validated against microscopic simulations. In this work, molecular dynamics (MD) simulations of confined fluids are mapped onto a mesoscopic framework, enabling direct comparison with lattice Boltzmann (LBM) formulations. By analyzing the moments of the distribution function, we identify a force formulation that consistently reproduces the microscopic statistics and macroscopic force balance. The results show that a hybrid formulation combining pseudo-potential and free-energy approaches provides the most consistent description. These findings establish a direct link between microscopic particle dynamics and mesoscopic modeling, offering practical guidance for the development and selection of LBM models for non-ideal and multiphase flows.",
+      "authors": [
+        "Hiroshi Otomo",
+        "Alexander J. Wagner"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "physics.comp-ph"
+      ],
+      "published": "2026-06-20T14:02:46+00:00",
+      "link": "https://arxiv.org/pdf/2606.22048v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Validates non-ideal fluid models for LBM, relevant to multiphase CFD",
+      "llm_evidence_cn": "验证了LBM的非理想流体模型，适用于多相流CFD",
+      "llm_evidence": "验证了LBM的非理想流体模型，适用于多相流CFD",
+      "canonical_evidence": "验证了LBM的非理想流体模型，适用于多相流CFD",
+      "llm_tldr_en": "This paper validates mesoscopic models for non-ideal fluids via molecular dynamics, providing a reliable force formulation for lattice Boltzmann method simulations of multiphase flows.",
+      "llm_tldr_cn": "针对非理想流体格子玻尔兹曼方法（LBM）模型缺乏微观验证的问题，本文通过分子动力学（MD）模拟，将受限流体的统计信息映射到介观框架，系统比较了赝势和自由能等多类作用力模型。结果表明，一种结合赝势与自由能的混合公式能够最一致地复现微观统计和宏观力平衡，从而为多相流LBM模拟提供了经过微观验证的可靠建模方案，有助于提升包括降膜在内的多相流动CFD预测准确性。",
+      "llm_tldr": "针对非理想流体格子玻尔兹曼方法（LBM）模型缺乏微观验证的问题，本文通过分子动力学（MD）模拟，将受限流体的统计信息映射到介观框架，系统比较了赝势和自由能等多类作用力模型。结果表明，一种结合赝势与自由能的混合公式能够最一致地复现微观统计和宏观力平衡，从而为多相流LBM模拟提供了经过微观验证的可靠建模方案，有助于提升包括降膜在内的多相流动CFD预测准确性。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.18417v1",
+      "source": "arxiv",
+      "title": "Enhancing neural network extrapolation in thermo-fluid systems using steady-state solutions",
+      "abstract": "Time-dependent partial differential equations (PDEs) arise in many engineering systems, including thermo-fluid applications. Classical numerical simulations of such systems can become computationally expensive for long-time dynamics because they typically require sequential time integration with time steps constrained by stability, accuracy, or nonlinear solvers. Although scientific machine learning provides an alternative for approximating PDE solutions, standard neural network approximations often degrade when extrapolated beyond the training time interval.   In this work, we propose a steady-state-informed neural network representation for dissipative PDE systems whose solutions relax toward a stationary equilibrium. The proposed ansatz decomposes the solution into a steady-state component and a transient correction modulated by a time-dependent decay profile. When the decay profile vanishes at long time and the transient correction remains bounded, the representation embeds convergence to the prescribed steady state directly into the architecture, rather than enforcing it through an additional penalty term. This allows the network to learn the transient dynamics while preserving the correct asymptotic behavior.   We implement the approach within a physics-informed neural network (PINN) framework and train the resulting model using the SOAP optimizer. The method is evaluated on a sequence of problems of increasing physical and geometric complexity, ranging from the one-dimensional heat equation to incompressible Navier-Stokes flow in a lid-driven cavity, natural convection in a square cavity, and a full three-dimensional conjugate heat transfer problem. The numerical results show that the steady-state-informed architecture substantially improves temporal extrapolation beyond the training interval compared with architectures that do not explicitly enforce the asymptotic condition.",
+      "authors": [
+        "Sanjeeb Poudel",
+        "Teeratorn Kadeethum",
+        "Sanghyun Lee"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE"
+      ],
+      "published": "2026-06-16T19:12:01+00:00",
+      "link": "https://arxiv.org/pdf/2606.18417v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "neural network extrapolation for thermo-fluid systems transferable to multiphase CFD",
+      "llm_evidence_cn": "热流体系统神经网络外推方法可迁移至多相流CFD",
+      "llm_evidence": "热流体系统神经网络外推方法可迁移至多相流CFD",
+      "canonical_evidence": "热流体系统神经网络外推方法可迁移至多相流CFD",
+      "llm_tldr_en": "To improve extrapolation of thermo-fluid PDEs, this paper proposes a steady-state-informed neural network that leverages equilibrium relaxation, achieving accurate long-time predictions; applicable to accelerate multiphase heat transfer simulations.",
+      "llm_tldr_cn": "针对热流体系统数值模拟中标准神经网络时间外推能力不足的瓶颈，本文提出了一种稳态信息增强的神经网络外推方法。该方法利用耗散系统具有稳态平衡的特征，将稳态解作为先验知识引入网络表示，使网络能够学习从初始状态向稳态松弛的演化规律。数值实验表明，该方法有效缓解了训练区间外的误差累积，显著提升了长时间预测精度。这一思路可推广至多相流降膜传热等复杂热流体系统的快速代理模型，具有重要的工程应用前景。",
+      "llm_tldr": "针对热流体系统数值模拟中标准神经网络时间外推能力不足的瓶颈，本文提出了一种稳态信息增强的神经网络外推方法。该方法利用耗散系统具有稳态平衡的特征，将稳态解作为先验知识引入网络表示，使网络能够学习从初始状态向稳态松弛的演化规律。数值实验表明，该方法有效缓解了训练区间外的误差累积，显著提升了长时间预测精度。这一思路可推广至多相流降膜传热等复杂热流体系统的快速代理模型，具有重要的工程应用前景。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
