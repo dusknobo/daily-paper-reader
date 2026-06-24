@@ -6,29 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-23
-- 运行时间：2026-06-23 22:08:34 UTC
+- 最新运行日期：2026-06-24
+- 运行时间：2026-06-24 21:15:37 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：1
 - 精读区：0
-- 速读区：2
+- 速读区：1
 
 ### 今日简报（AI）
-今日速读两篇计算流体力学新作，聚焦格子玻尔兹曼方法模型修正与神经网络外推优化。  
-值得关注的是：用分子动力学视角改良非理想流体模型，以及引入稳态解来提升神经网络在热力系统中的外推可靠性。  
-建议读者优先对比这两支思路——前者重物理机理，后者重数据增强，能帮您判断自己项目的改进方向。
-- 详情：[/202606/23/README](/202606/23/README)
+今日速读一篇耦合流体流动与输运的科学机器学习进展综述，评分6.0。
+论文指出物理约束神经网络与多任务学习正成为提升地下流动模型精度与效率的关键方向。
+下一步可关注文中列出的公开基准案例，结合自身数据做低成本验证。
+- 详情：[/202606/24/README](/202606/24/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Molecular dynamics perspectives on nonideal fluid models for the lattice Boltzmann method](/202606/23/2606.22048v1-molecular-dynamics-perspectives-on-nonideal-fluid-models-for-the-lattice-boltzmann-method)  
-   标签：评分：7.0/10、query:falling-film
-   evidence：验证了LBM的非理想流体模型，适用于多相流CFD
-2. [Enhancing neural network extrapolation in thermo-fluid systems using steady-state solutions](/202606/23/2606.18417v1-enhancing-neural-network-extrapolation-in-thermo-fluid-systems-using-steady-state-solutions)  
+1. [Advances in Scientific Machine Learning for Coupled Fluid Flow and Transport](/202606/24/2606.19562v1-advances-in-scientific-machine-learning-for-coupled-fluid-flow-and-transport)  
    标签：评分：6.0/10、query:falling-film
-   evidence：热流体系统神经网络外推方法可迁移至多相流CFD
+   evidence：综述了科学机器学习在耦合流动与输运中的方法，可用于降膜换热CFD
 
 
 <div class="dpr-home-promo-card">
