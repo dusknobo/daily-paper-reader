@@ -1,0 +1,514 @@
+Title: Suppressing Spontaneous Droplet Shrinkage in Cahn-Hilliard-Stokes Microflows
+
+URL Source: https://arxiv.org/pdf/2606.24295v1
+
+Published Time: Wed, 24 Jun 2026 00:47:06 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# Suppressing Spontaneous Droplet Shrinkage in Cahn-Hilliard-Stokes Microflows 
+
+## A. M. Gurin ∗
+
+## June 24, 2026 
+
+Abstract 
+
+This paper addresses non-physical artifact, specifically spontaneous droplet shrinkage, in Cahn-Hilliard-based simulations of immiscible two-phase microflows. That artifact arise from the energy functional’s pref-erence for reduced interfacial area, leading to shifts in equilibrium phase fractions away from the physical bounds of 0 and 1. A curvature-dependent correction is proposed that shifts the double-well potential to counteract this drift. This method is validated on the following test cases: an iso-lated droplet in a cubic cavity, drainage in a synthetic porous medium, and flow through a T-shaped junction. Results demonstrate significant suppression of phase fraction overshoot/undershoot and improved droplet volume conservation. 
+
+# 1 Introduction 
+
+Efficient oil extraction relies heavily on reservoir-scale simulation software. These modeling tools enable users to evaluate economic viability and optimize the ex-traction process. However, the accuracy of such software depends on reliable estimates of the permeability of porous media. Traditionally, these values are obtained through laboratory experiments on rock core samples extracted from reservoir depths. This approach is costly, and the samples are often destroyed during testing, preventing their reuse. As a result, Digital Rock Physics (DRP) has emerged as an alternative approach, allowing engineers to simulate multi-phase flow within accurate representations of rock pore structures. DRP com-bines microtomographic imaging of subsurface rock with numerical simulations of multiphase flow. Among the available numerical methods, the phase-field approach, and in particular the Cahn–Hilliard–Stokes system, is widely used for modeling multiphase flow in porous media. Unlike other approaches, such as pore-network models or the Volume of Fluid (VOF) method, it is based on the minimization of a free-energy functional. Although this method offers significant 
+
+> ∗
+
+Lavrentyev Institute of Hydrodynamics, SB RAS, Russia, Novosibirsk. 
+
+1
+
+> arXiv:2606.24295v1 [physics.geo-ph] 23 Jun 2026
+
+advantages, it also suffers from a well-known limitation related to the formula-tion of the energy functional: in particular, the standard Cahn–Hilliard equation may fail to preserve the apparent droplet volume accurately, even though the total phase mass is conserved. Problems associated with droplet shrinkage have been known for a long time. The paper [10] shows that this problem is related to the system energy func-tional and is not merely a numerical effect. The authors show that the energy functional makes droplet compression energetically favorable. Compression of a droplet reduces its surface area and, consequently, its energy. The droplet continues to shrink until this decrease is compensated by an increase in energy caused by a change in the phase fraction inside the droplet. From these condi-tions, the authors derived the value of δϕ by which the phase fraction exceeds its physical bounds. The paper [10] proposes reducing the interfacial width and choosing the mobility so that non-physical effects are significantly reduced. An important part of the paper is the derivation of a theoretical basis that links droplet disappearance with changes in the equilibrium values of the phase frac-tion outside and inside the droplet. The study [11] similarly considers droplet shrinkage on a surface with a fixed contact angle, rather than in free space. There are more effective methods for mitigating droplet shrinkage than those proposed in earlier studies. In [4], a Lagrange multiplier method is used to constrain the phase fraction and prevent it from exceeding prescribed bounds. The examples presented in that study show an ideal distribution of the phase fraction between 0 to 1. However, the use of Lagrange multipliers significantly complicates the governing equations and makes them more difficult to solve. In [5], a logarithmic form of the double-well potential is used, which has a steeper slope near the nonphysical region. This potential greatly reduces nonphysical effects, but the logarithmic singularity also introduces difficulties in solving the equations. These two methods prevent the phase fraction from leaving the admissable interval from 0 to 1, however, as will be shown later in this paper, the phase fraction can also deviate from its desired equilibrium values while still remaining within these bounds. There are also methods for iteratively compensating for phase-fraction over-shoot. These methods require a split-method approach to solving the equa-tions. In [8], after solving the Cahn–Hilliard equations, the phase fractions that have exceeded the physical bounds are redistributed. Since there is only a single-phase droplet on a substrate, the excess phase fraction is uniformly dis-tributed across the entire interfacial boundary. In the case of multiple droplets, the method proposed in [7] can be applied. This method uses the discontinu-ous Galerkin method to solve the Cahn–Hilliard–Stokes equations, and phase-fraction overshoot is prevented by limiting the phase fluxes. In this paper, the Cahn–Hilliard–Stokes equations are formulated, and an im-plicit finite-difference numerical scheme on a staggered grid is presented. Within this model, the problem of droplet shrinkage is discussed and demonstrated us-ing synthetic test cases: a T-shaped junction and a phase droplet in a box cavity. A correction for the two-phase model that significantly suppresses non-physical effects is proposed. The correction is based on shifting the double-well poten-2tial by an amount that depends on the curvature of the interfacial boundary, obtained by analogy with [10]. The modified equations are tested on synthetic problems and on drainage through a porous medium. 
+
+# 2 Mathematical model 
+
+We consider the dynamics of a two-phase fluid system evolving within a com-plex, fully resolved micropore network. The hydrodynamics are governed by the non-stationary incompressible creeping flow approximation, where the fluid motion is propelled by a macroscopic pressure difference and opposed by viscous dissipation and capillary force. The liquid mixture consists of two distinct, in-compressible, and immiscible components. To capture the topological changes and interfacial dynamics without explicit interface tracking, the phase distri-bution is modeled using a continuous order parameter(phase volume fraction). Consequently, the computational domain is divided into bulk regions of Fluid 1 and Fluid 2, separated by a diffuse interfacial region of finite thickness. In this formulation, surface tension effects manifest as capillary forces driven by gradi-ents in phase fraction. Physically, this results in a pressure jump that acts to minimize interfacial area, pushing the interface from the convex side toward the concave side. Interaction with the solid matrix is incorporated through wetting boundary conditions, where the preferential affinity of the fluids to the pore walls is prescribed via a contact angle θ.We consider a phase-field model based on the Cahn–Hilliard equation with a double-well potential [3]. The phase distribution over the computational domain is represented by the phase field variable ϕ, which supposed to take values ϕ = 0 and ϕ = 1 in the two pure phases and varies smoothly between these values across the interfacial region. The interface has a finite thickness, controlled by the parameter ε.The model is derived from the minimization of the Ginzburg–Landau free energy functional F :
+
+F (ϕ, ∇ϕ) := 
+
+Z
+
+> Ω
+
+
+
+12 σε Ψ( ϕ) + 34 σε |∇ ϕ|2
+
+
+
+dΩ, (1) where Ψ( ϕ) = ϕ2(1 − ϕ)2. (2) Here, Ψ( ϕ) represents the bulk (or volumetric) contribution to the energy, while 
+
+|∇ ϕ|2 corresponds to the interfacial (gradient) contribution. The constant σ
+
+denotes the surface tension coefficient. The bulk energy density Ψ( ϕ) attains its minima at ϕ = 0 and ϕ = 1, corresponding to the two coexisting phases. The evolution of the phase field is governed by the Cahn–Hilliard equation: 
+
+∂ϕ ∂t − ∇ · (M ∇μ) + ∇ · (⃗uϕ ) = 0 ,
+
+3where the chemical potential μ is defined as: 
+
+μ = 12 σε Ψ′(ϕ) − 32 σε ∆ϕ, (3) with the derivative of the bulk energy potential given by: Ψ′(ϕ) = 2 ϕ(1 − ϕ)(1 − 2ϕ).
+
+Here, M denotes the mobility, μ is the chemical potential, and ⃗u represents the fluid velocity field. The term ∇ · (⃗uϕ ) accounts for advection of the phase field by the flow. The fluid motion is described by the incompressible Stokes equations: 
+
+∇ · ⃗u = 0 ,∂ρ⃗ u∂t + ∇p − ∇ ·  η  ∇⃗u + ∇⃗u T  − μ∇ϕ = 0 ,
+
+where ρ is the fluid density, p is the pressure, η is the dynamic viscosity, and the term μ∇ϕ represents the surface tension force arising from interfacial energy gradients. The density and dynamic viscosity are phase-dependent properties interpo-lated linearly according to the following expressions: 
+
+ρ(ϕ) = ρ0 (1 − ϕ) + ρ1ϕ, η(ϕ) = η0 (1 − ϕ) + η1ϕ, 
+
+where subscripts 0 and 1 denote the properties in the phase corresponding to 
+
+ϕ = 0 and ϕ = 1, respectively. Boundary conditions are imposed as follows. On solid impermeable walls, the contact angle condition is prescribed via a Neumann-type boundary condition for the phase field: 
+
+∇ϕ ·⃗n = − 4
+
+ε cos( θ12 )ϕ(1 − ϕ),
+
+where θ12 is the contact angle between phases 1 and 2, ⃗n is the outward normal to the impermeable surface. For the chemical potential μ, homogeneous Neumann boundary conditions are applied on all boundaries (walls, inlet, and outlet): 
+
+∇μ ·⃗n = 0 ,
+
+which ensures mass conservation and avoids spurious phase fluxes through bound-aries. At inflow and outflow boundaries, the phase field is typically advected with the flow. To avoid nonphysical oscillations or excessive diffusion near inlet boundary, a third-order condition is employed: 
+
+∇ϕ ·⃗n = ϕinlet − ϕh , (4) 4where h denotes a mesh cell size and ϕinlet is the prescribed inlet phase value. This condition effectively relaxes ϕ toward ϕinlet in cells adjacent to the inlet. For the Stokes system, no-slip boundary conditions ( ⃗u =⃗ 0) are imposed on impermeable walls. At inlet and outlet boundaries, the velocity is prescribed as uniform profile. The pressure is subject to a natural (homogeneous Neumann) condition, ∇p ·⃗n = 0, at all boundaries. This introduces a nullspace in the discrete pressure system (constant pressure mode). 
+
+# 3 Numerical scheme 
+
+The governing equations are discretized using the finite difference method on a uniform Cartesian grid with cubic cells of size h. To correctly couple pres-sure and velocity, we employ a staggered-grid discretization (MAC grid). Cell-centered quantities are indexed by ( i, j, k ), while the velocity components are located at the corresponding cell faces: ui+ 12 ,j,k , vi,j + 12 ,k , and wi,j,k + 12 . For brevity, we describe only the discretization of the x-momentum equation; the remaining components are treated analogously. For a cell-centered scalar field q, the standard discrete Laplacian is defined as (∆ hq)i,j,k := qi+1 ,j,k − 2qi,j,k + qi−1,j,k 
+
+h2 + qi,j +1 ,k − 2qi,j,k + qi,j −1,k 
+
+h2
+
++ qi,j,k +1 − 2qi,j,k + qi,j,k −1
+
+h2 .
+
+The discrete divergence operator at the cell center ( i, j, k ) is given by (∇h ·⃗u) i,j,k := ui+ 12 ,j,k − ui− 12 ,j,k 
+
+h + vi,j + 12 ,k − vi,j − 12 ,k 
+
+h + wi,j,k + 12 − wi,j,k − 12
+
+h .
+
+For the viscous term in the x-momentum equation, we write 
+
+Lxη,h (u, v, w ) = δxτxx + δy τxy + δz τxz ,
+
+where the stress components are discretized at the locations required by the staggered grid. Operators δx, δy and δz are a first derivatives along x, y, z axes discretized with finite differences on staggered grid. The normal stress is defined at cell centers: (τxx )i,j,k = 2 ηi,j,k 
+
+ui+ 12 ,j,k − ui− 12 ,j,k 
+
+h .
+
+The shear stresses are defined at cell edges: (τxy )i+ 12 ,j + 12 ,k = ηi+ 12 ,j + 12 ,k 
+
+ ui+ 12 ,j +1 ,k − ui+ 12 ,j,k 
+
+h + vi+1 ,j + 12 ,k − vi,j + 12 ,k 
+
+h
+
+
+
+,
+
+(τxz )i+ 12 ,j,k + 12
+
+= ηi+ 12 ,j,k + 12
+
+ ui+ 12 ,j,k +1 − ui+ 12 ,j,k 
+
+h + wi+1 ,j,k + 12 − wi,j,k + 12
+
+h
+
+
+
+.
+
+5The discrete divergence of these stresses at the u-velocity location  i + 12 , j, k 
+
+is then 
+
+ Lxη,h 
+
+   
+
+> i+12,j,k
+
+= (τxx )i+1 ,j,k − (τxx )i,j,k 
+
+h
+
++ (τxy )i+ 12 ,j + 12 ,k − (τxy )i+ 12 ,j − 12 ,k 
+
+h
+
++ (τxz )i+ 12 ,j,k + 12
+
+− (τxz )i+ 12 ,j,k − 12
+
+h .
+
+The viscosity is stored at cell centers and interpolated to edge locations. For example, 
+
+ηi+ 12 ,j + 12 ,k = 14 (ηi,j,k + ηi+1 ,j,k + ηi,j +1 ,k + ηi+1 ,j +1 ,k ) ,
+
+and 
+
+ηi+ 12 ,j,k + 12 = 14 (ηi,j,k + ηi+1 ,j,k + ηi,j,k +1 + ηi+1 ,j,k +1 ) .
+
+The operators Lyη,h and Lzη,h for the v- and w-momentum equations are defined analogously. The surface tension force term and pressure gradient are discretized at the cell faces. For the x-component, we use (μδ xϕ)i+ 12 ,j,k := μi+1 ,j,k + μi,j,k 
+
+2 · ϕi+1 ,j,k − ϕi,j,k 
+
+h ,
+
+and (δxp)i+ 12 ,j,k = pi+1 ,j,k − pi,j,k 
+
+h .
+
+For the advective term in the Cahn–Hilliard equation, a first-order upwind scheme is employed. The numerical flux at the x-face is defined as 
+
+ f xϕ
+
+ 
+
+> i+12
+
+=
+
+(ui+ 12 ,j,k ϕi,j,k if ui+ 12 ,j,k ≥ 0
+
+ui+ 12 ,j,k ϕi+1 ,j,k if ui+ 12 ,j,k < 0The fluxes in the y- and z-directions, 
+
+
+
+f yϕ
+
+
+
+and 
+
+
+
+f zϕ
+
+
+
+, are defined analogously using the velocities v and w, respectively. The discrete divergence of the flux is then (∇h ·⃗uϕ ) i,j,k := 
+
+
+
+f xϕ
+
+ 
+
+> i+12
+
+−
+
+
+
+f xϕ
+
+ 
+
+> i−12
+
+h +
+
+
+
+f yϕ
+
+ 
+
+> j+12
+
+−
+
+
+
+f yϕ
+
+ 
+
+> j−12
+
+h +
+
+
+
+f zϕ
+
+ 
+
+> k+12
+
+−
+
+
+
+f zϕ
+
+ 
+
+> k−12
+
+h .
+
+Temporal discretization is denoted by: 
+
+δtϕ := ϕn+1 − ϕn
+
+τ ,
+
+6where τ is the time step. To solve the Cahn–Hilliard equation, we use the energy-stable semi-implicit discretization described in [2]. Although originally formulated for a three-phase model, it can be adapted for the two-phase case. This scheme modifies the discretization of the bulk potential derivative Ψ ′ to ensure Ψ( ϕn+1 ) − Ψ( ϕn) = Ψ′ · (ϕn+1 − ϕn). The discrete potential derivative is given by: Ψ′(ϕn+1 , ϕ n) = (ϕn+1 1 + ϕn 
+
+> 1
+
+)(( ϕn+1 2 )2 + ( ϕn 
+
+> 2
+
+)2) − (ϕn+1 2 + ϕn 
+
+> 2
+
+)(( ϕn+1 1 )2 + ( ϕn 
+
+> 1
+
+)2)2 ,
+
+where ϕ1 = ϕ and ϕ2 = 1 − ϕ. The final fully discrete system is summarized as follows: 
+
+δtϕi,j,k − M (∆ hμ)i,j,k + ( ∇h ·⃗uϕ ) i,j,k = 0 ,μi,j,k = 12 σε Ψ′(ϕi,j,k ) − 32 σε (∆ hϕ)i,j,k ,
+
+(∇h ·⃗u) i,j,k = 0 ,δt
+
+
+
+ρu i+ 12 ,j,k 
+
+
+
++ ( δxp)i+ 12 ,j,k −  Lxη,h (u, v, w )   
+
+> i+12,j,k
+
+− (μδ xϕ)i+ 12 ,j,k = 0 .
+
+The momentum equations for the y- and z-components are discretized analo-gously. The resulting discrete system of nonlinear equations is linearized using New-ton’s method. The linear systems arising at each Newton iteration are solved by the FGMRES method with a custom multilevel preconditioner. The numer-ical scheme described above was implemented within the INMOST framework [6], which handles computational grids and supports distributed-memory par-allelization. The PETSc library [1] is used to solve the systems of equations arising from the discretization and linearization. In particular, PETSc is used to implement a multigrid preconditioner based on [9] that accounts for the spe-cific features of the coupled system. 
+
+# 4 Flow in a Porous Medium 
+
+Drainage simulations were performed in a porous-media with 66% porosity. The computational grid was generated using a random porous media generator based on sampling Gaussian noise on several coarser regular grids, followed by tricubic interpolation. The resulting pore-space grid is shown in fig. 1(a). All cells are cubes with edge length h = 1 μm . Three layers of dummy cells were added on each side along the z-axis to facilitate the imposition of velocity boundary conditions. 7Figure 1: (a) Computational grid, (b) initial distribution of the non-wetting phase. Drainage proceeds along the z-axis with a fixed inlet velocity of 1 mm/s at 
+
+z = 0 μm and a corresponding outlet condition at z = 76 μm . For the Cahn– Hilliard equation, we use the mobility M = 10 −12 and the interface width ε =4 μm . The two fluids have the following properties: densities ρ1 = 800 kg/m 3
+
+and ρ2 = 1000 kg/m 3; dynamic viscosities η1 = 0 .005 P a · s, η2 = 0 .001 P a · s;surface tension σ = 0 .008 N/m ; and contact angle θ = 0 ◦, with phase 1 being non-wetting. The initial phase distribution was prepared by solving the Cahn–Hilliard equation alone, without coupling it to the Stokes equations. A random phase field ϕ ∈ [0 , 1] was assigned to all cells and evolved until a metastable configura-tion was reached. Figure 1(b) shows the resulting non-wetting-phase distribu-tion, which preferentially occupies larger pores and accumulates near the inlet due to the third-order boundary condition eq. (4). Subsequently, drainage is simulated by injecting 100% non-wetting phase injected at the inlet. 
+
+Figure 2: Wetting-phase distribution in the porous medium: (a) ϕ distribution within the physical bounds, (b) ϕ distribution in the range from -0.06 to 0. 8Figure 3: Saturation evolution during drainage. Figure 2(a) shows the wetting-phase ϕ2 = 1 − ϕ distribution after the injec-tion of seven pore volumes. A considerable amount of wetting phase remains trapped in the pores. The curve in fig. 3 displays the non-wetting-phase sat-uration, defined as S = R 
+
+> Ω
+
+ϕ d Ω versus the injected pore volumes. Notably, at approximately 0.7 injected pore volumes, the saturation of the non-wetting-phase begins to decrease. This is a clearly nonphysical effect, since only the non-wetting phase is injected into the computational domain; therefore, its vol-ume should not decrease. The origin of this nonphysical behavior is clarified in fig. 2(b), which uses a color scale ranging from −0.06 to 0 for the wetting-phase fraction. Negative wetting-phase values, as low as −0.04, leave the domain through the outlet, while the inlet enforces ϕ = 0. Thus, the wetting phase accumulates in the domain at a rate of approximately 4% of the pore volume per injected pore volume. In typical drainage simulations, accurately predicting the amount of trapped phase is critical. Such nonphysical phase accumulation can easily change this prediction by a factor of two over three injected pore volumes. Hence, the un-corrected Cahn–Hilliard–Stokes model introduces a systematic error that leads to pronounced nonphysical effects. In the next section, we discuss the intrinsic mechanisms driving the observed behavior. 
+
+# 5 Droplet shrinkage and dissolution 
+
+To illustrate this nonphysical effects, a series of simulations was performed using the simple geometry shown in fig. 4. A cubic droplet of one phase with initial 9Figure 4: Schematic of a droplet in a cubic cavity. edge length hd is placed at the center of a cubic computational domain filled with the other phase. Initially, the interface is a sharp step between the two phases. As the Cahn–Hilliard equations evolve, the interface diffuses and the droplet assumes a spherical shape. The key parameters are the interface width 
+
+ε, the domain size L, and the initial cube edge length hd. The mobility M and surface tension σ influence only the time scale required to reach steady state. They are set to 10 −11 m5/(J · s) and 0 .05 N/m , respectively. The grid spacing is fixed at 1 μm in all simulations, and the interface width is ε = 4 μm .An example of a steady-state solution on the center plane of the domain is shown in fig. 5. A cubic droplet of phase 1 with dimensions 30 × 30 × 30 μm 
+
+was placed within a 60 × 60 × 60 μm domain. During the evolution, the droplet becomes spherical. The phase fraction reaches constant bulk values inside and outside the droplet, with a smooth transition across approximately eight grid cells at the interface. Although the figure suggests that the steady-state phase fractions are exactly 0 and 1, this is not the case. Table 1 shows the equilibrium phase fractions ϕmax , inside the droplet, and 
+
+ϕmin , outside the droplet, as functions of the domain size L and the initial droplet size hd. The equilibrium droplet diameter d is defined as the maximum extent of the region where ϕ > 0.5. The table reveals that both ϕmax and 
+
+ϕmin deviate from the ideal values of 1 and 0, with the deviation decreasing as the droplet size increases. The bulk phase fraction inside the droplet is greater than one, implying that the phase fraction of the second phase inside the droplet is negative. In case 2 the droplet fully dissolved and was uniformly smeared over the entire computational domain. In cases 7 and 14, the droplet interacted with the boundaries of the computational domain, and these results were therefore discarded. Thus, for stationary solutions with a spherical droplet inside the cubic cavity, the droplet shrinks while ϕ slightly increases both inside and outside the droplet. 10 Figure 5: Phase-fraction distribution in the computational domain at steady state. Case L, μm hd, μm d, μm ϕmax , ϕmin 
+
+1 30 18 19 1.02845, 0.035084 2 60 20 – –3 60 25 23 1.02537, 0.030189 4 60 30 33 1.01791, 0.020083 5 60 35 39 1.01552, 0.017119 6 60 40 47 1.01307, 0.014170 7 60 45 – –8 80 30 29 1.02049, 0.023419 9 80 35 37 1.01638, 0.018171 10 80 40 47 1.01338, 0.014558 11 80 45 51 1.01205, 0.012985 12 80 50 59 1.01053, 0.011236 13 80 55 65 1.00973, 0.010320 14 80 60 – –Table 1: Simulation parameters and results for a droplet in a cubic cavity. 11 6 Flow in a T-Shaped junction 
+
+Figure 6: Schematic of the T-Shaped junction geometry. Nonphysical artifacts associated with spurious phase generation are partic-ularly evident in the benchmark problem involving a T-shaped junction, shown in fig. 6. The channels forming the junction have a square cross-section with side length ht = 15 μm , the length of the main flow path is Lt = 60 μm , and the length of the dead end branch is Ht = 30 μm . The computational domain was discretized using a uniform grid of cubic cells with edge length h = 1 μm . Anon-wetting phase is injected through the main channel at a prescribed velocity 
+
+uinlet = 1 mm/s at the inlet, with the same outflow condition at the outlet. The side branch is sealed with a no-flow boundary condition, trapping the wetting phase within this dead-end pore. The fluid properties and model parameters are identical to those used in the porous-medium simulations described previously. This configuration mimics a dead-end pore in a porous medium, which typically contains an immobile trapped phase. Accurate conservation of its volume is therefore essential for physically meaningful simulations. Figure 7 shows the evolution of the wetting-phase saturation as a function of the number of pore volumes of non-wetting phase injected through the main channel, while fig. 8 displays the corresponding phase-fraction distributions at two representative time instants. The wetting-phase saturation increases by ap-proximately 30% relative to its initial value after the injection of just one pore volume of the non-wetting phase, clearly indicating spurious phase generation. In realistic displacement simulations through porous media, numerous dead-end pores are present throughout the computational domain, and approximately five global pore volumes of fluid must be injected before the system reaches a steady state. Given the significant disparity in scale, this injection protocol subjects each individual dead-end pore to hundreds of local pore volumes of flow passing 12 Figure 7: Temporal evolution of the wetting-phase saturation in the T-shaped junction. 
+
+Figure 8: Spatial distribution of the phase fraction in the T-shaped junction at two time instants. 13 through the adjacent main channel. Consequently, the artificial accumulation (or depletion) of phase mass in such regions can significantly distort the distribu-tion of the trapped phase and compromise the fidelity of the overall simulation. 
+
+# 7 Theoretical base of droplet shrinkage 
+
+The theoretical basis for the numerical artifacts associated with droplet shrink-age in the diffuse interface method was established in [10]. Figure 9 schemati-cally illustrates this shrinkage phenomenon. 
+
+Figure 9: Droplet shrinkage schematic We assume that the phase is uniformly distributed within the droplet and that the integral of the phase fraction over the entire computational domain remains constant in time. Initially, inside the droplet, the phase fraction is 
+
+ϕ = 1, and outside it is ϕ = 0. The diffuse interface, where the phase fraction transitions from 1 to 0, has a characteristic width ε. We assume the initial droplet radius r1 satisfies r1 ≫ ε.The energy of a droplet with radius r1 and ϕ = 1 is not necessarily the global minimum in the diffuse interface formulation. The total free energy functional (1) consists of bulk and gradient contributions. The bulk energy density vanishes at ϕ = 0 and ϕ = 1. However, in the diffuse interface model, the system can lower the total energy by reducing the interfacial area (shrinkage of the droplet), even if this requires the internal phase fraction to exceed unity (ϕ > 1). The equilibrium state is reached when the reduction in surface energy balances the increase in bulk energy. For sufficiently small droplets, it becomes energetically favorable to uniformly distribute the droplet phase over the entire computational domain, effectively eliminating the droplet while the total phase 14 saturation remains constant. In the limit of an infinite computational domain, no stable droplet can exist. In the following derivation, we consider only the increase in the phase fraction inside the droplet and the decrease in the droplet radius. The critical radius for droplet disappearance is derived in [10]. Due to the minimization of interfacial energy, the droplet tends to shrink to a smaller radius r2 < r 1. To satisfy global mass conservation, the phase fraction inside the droplet must increase by an amount dϕ . This deviation can be expressed as the ratio of the initial to final volumes 
+
+dϕ = r31
+
+r32
+
+− 1.
+
+Consequently, the phase fraction inside the shrunk droplet becomes ϕ = 1 + dϕ .Volume conservation requires (1 + dϕ ) 43 πr 32 = 43 πr 31 ,
+
+which yields the relationship between the radii 
+
+r2 = r1(1 + dϕ )−1/3. (5) We analyze the total free energy F = Fin + Fs, where Fin is the bulk energy inside the droplet and Fs is the interfacial energy. Using the energy functional (1) with the double-well potential Ψ( ϕ) = ϕ2(1 − ϕ)2, the bulk energy density at ϕ = 1 + dϕ is: 12 σε Ψ(1 + dϕ ) = 12 σε (1 + dϕ )2(dϕ )2.
+
+Integrating this density over the droplet volume V2 = 43 πr 32 and substituting (5) gives 
+
+Fin = 12 σε (1 + dϕ )2(dϕ )2 43 πr 32
+
+= 12 σε (1 + dϕ )2(dϕ )2 43 πr 31 (1 + dϕ )−1
+
+= 16 π σε r31 (1 + dϕ )( dϕ )2
+
+= 16 π σε r31
+
+ dϕ 2 + dϕ 3 .
+
+Retaining only the leading-order term (since dϕ 3 ≪ dϕ 2 for small deviations) yields 
+
+Fin ≈ 16 π σε r31 dϕ 2. (6) The interfacial energy for a spherical droplet is given by Fs = σ · 4πr 22 , where σ
+
+is the surface tension [3]. Substituting (5) 
+
+Fs = 4 πσr 21 (1 + dϕ )−2/3. (7) 15 The total energy F (dϕ ) = Fin + Fs is minimized at equilibrium. Differentiating (6) and (7) with respect to dϕ and setting the derivative to zero yields 32 π σε r31 dϕ − 8π
+
+3 σr 21 (1 + dϕ )−5/3 = 0 .
+
+Since we anticipate dϕ = O(ε/r 1) ≪ 1, we approximate (1 + dϕ )−5/3 ≈ 1. Solving for dϕ dϕ = 112 
+
+εr1
+
+. (8) As the difference between the initial radius r1 and the equilibrium radius r2 is of order O(ε/r 1), they differ only slightly. Therefore, in practical calculations, the observed equilibrium radius r2 is used in place of r1 on the right-hand side of eq. (8). 
+
+# 8 Correction of the double-well potential 
+
+Table 1 reveals that the phase fraction exhibits an almost uniform shift in one direction, resulting in values that exceed the desired equilibrium bulk values both inside and outside the droplet. A straightforward mitigation strategy is to shift the double-well potential in the opposite direction, thereby restoring the order parameter toward its equilibrium values of 0 and 1. This approach is illustrated in fig. 10. 
+
+Figure 10: Schematic illustration of the double-well potential shift. For a single droplet, a uniform shift is sufficient, but a more general approach is needed for systems containing multiple droplets of different sizes. This shift must be applied pointwise across the domain, requiring a spatially varying cor-rection field ϕs. Using eq. (8), dϕ can be estimated locally if the local droplet radius r2 is known. The radius is obtained from the curvature κ via r2 = 2 /κ ,where the curvature is computed from the phase field according to 
+
+κ = ∇ · 
+
+ ∇ϕ
+
+|∇ ϕ|
+
+
+
+. (9) 16 In expanded form, this expression becomes 
+
+κ =
+
+ ϕ2 
+
+> x
+
++ ϕ2 
+
+> y
+
++ ϕ2
+
+> z
+
+ (ϕxx + ϕyy + ϕzz )
+
+ ϕ2 
+
+> x
+
++ ϕ2 
+
+> y
+
++ ϕ2
+
+> z
+
+ 32
+
+(10a) 
+
+− (ϕx)2 ϕxx + ϕ2 
+
+> y
+
+ϕyy + ϕ2 
+
+> z
+
+ϕzz + 2 ϕxϕy ϕxy + 2 ϕxϕz ϕxz + 2 ϕy ϕz ϕyz 
+
+ ϕ2 
+
+> x
+
++ ϕ2 
+
+> y
+
++ ϕ2
+
+> z
+
+ 32
+
+. (10b) This expression yields the curvature in the interfacial region, which is then used to compute the local shift magnitude. To compute a field ϕs that varies smoothly over the entire domain and remains close to dϕ from eq. (8) at the interfaces, we solve a penaltized Laplace equation: ∆ϕs + ( ∇ϕ)2 
+
+ϕs − εκ 
+
+24 
+
+
+
+= 0 , (11) with zero normal gradient boundary condition ⃗n · ∇ ϕ s = 0 . (12) The term |∇ ϕ|2 is large at the interface and vanishes in the bulk phases. There-fore, it enforces ϕs ≈ εκ/ 24 = dϕ at the interface, while ϕs satisfies Laplace equation away from the interface. The resulting field ϕs is then used to shift the bulk energy density: 
+
+μ = 12 σε Ψ′(ϕ − ϕs) − 32 σε ∆ϕ. (13) The shift ϕs is not included in the implicit system matrix. Instead, it is com-puted explicitly from the phase field ϕn at the previous time step. Thus, the proposed correction is applied as follows. We use (13) in place of (3). Its discretization is straightforward because ϕs is cell-centered and is computed using variables from the previous time step: 
+
+μi,j,k = 12 σε Ψ′(ϕi,j,k − (ϕs)i,j,k ) − 32 σε (∆ hϕ)i,j,k .
+
+# 9 Numerical validation of the correction scheme 
+
+The previously described correction was implemented, and test simulations were conducted for three previously described scenarios: flow through a porous medium, a droplet in a cubic cavity, and a T-shaped junction. Table 2 presents the results obtained with the correction defined in eq. (13). The phase fraction now remains strictly within the physical bounds 0 and 1. Notably, in Case 2, where the droplet vanished in the uncorrected simulation, it now persists. For clarity, data from tables 1 and 2 are summarized in fig. 11, which shows the equilibrium value of phase 1 inside the droplet (circles) and 17 Case L, μm hd, μm d, μm ϕmax , ϕmin 
+
+1 30 18 21 0.99626, 0.00146671 2 60 20 23 0.99695, 0.00239898 3 60 25 27 0.99794, 0.00162382 4 60 30 35 0.99862, 0.00108721 5 60 35 41 0.99889, 0.00086623 6 60 40 49 0.99913, 0.00065861 7 60 45 – –8 80 30 35 0.99861, 0.00108875 9 80 35 41 0.99888, 0.00086809 10 80 40 49 0.99914, 0.00065462 11 80 45 53 0.99925, 0.00056227 12 80 50 61 0.99938, 0.00046119 13 80 55 65 0.99945, 0.00038403 14 80 60 – –Table 2: Simulation parameters and results for a droplet in a cubic cavity with the proposed correction. 
+
+Figure 11: Effect of the correction on equilibrium phase fractions. 18 phase 2 outside (crosses). With the correction, the phase fractions inside and outside the droplet are significantly closer to their physical values. In the T-shaped junction test case described in section 6, the proposed cor-rection greatly suppresses nonphysical effects. Figure 12 shows the evolution 
+
+Figure 12: Saturation of the wetting phase in a T-shaped junction. of the wetting-phase saturation as a function of the number of pore volumes of non-wetting phase injected through the junction, comparing results with and without the correction eq. (13). With the proposed correction, the saturation change is limited to 0.3% per injected pore volume, which is approximately two orders of magnitude lower than the uncorrected case. However, a gradual drift remains and at 20 pore volumes, the relative change reaches approximately 4.6%, which may still influence the residual saturation over long time scales. The porous medium flow case also demonstrates significant improvement. Figure 13 displays the effect of the correction on the non-wetting phase satura-tion. Although the potential shift is only about 5%, it profoundly affects the displacement dynamics. The curves diverge before one pore volume is injected. The uncorrected case exhibits nonphysical behavior: after the first pore volume, the non-wetting phase saturation decreases while the wetting phase increases, despite only non-wetting fluid being injected. In contrast, the corrected case shows a gradual, physical removal of the wetting phase. Figure 14 illustrates the effect of the correction on the wetting phase distribution. In Figure 14 (a), it is evident that there is significantly less wetting phase in the computational domain compared to Figure 2(a) as the artificial accumulation of it was sup-pressed. Similarly, fig. 14 (b) shows the wetting phase saturation near the outlet is much closer to zero than in the uncorrected case shown in Figure 2 (b). 19 Figure 13: Saturation evolution during drainage with the correction eq. (13) 
+
+Figure 14: Wetting phase distribution in the porous medium with the correction eq. (13): (a) ϕ distribution within physical bounds, (b) ϕ distribution in the range -0.06 to 0. 20 10 Conclusions 
+
+Building on the work of [10], a correction for the two-phase Cahn–Hilliard equa-tions was developed and implemented. This correction mitigates nonphysical effects that arise in the modeling of immiscible fluids. It requires solving an additional Laplace-type equation and computing the interface curvature using eq. (9). The effectiveness of the correction was evaluated on three test cases: a droplet in a cubic computational domain, wetting-phase displacement in a porous medium, and flow through a T-shaped junction. The results demon-strate that the correction significantly reduces nonphysical artifacts, although it does not eliminate them entirely. Nevertheless, the correction is straight-forward to implement and does not appreciably increase the complexity of the numerical solution. 
+
+# References 
+
+[1] Satish Balay et al. “Efficient Management of Parallelism in Object-Oriented Numerical Software Libraries”. In: Modern Software Tools for Scientific Computing . Boston, MA: Birkh¨ auser Boston, 1997, pp. 163–202. isbn :978-1-4612-1986-6. doi : 10.1007/978-1-4612-1986-6_8 . url : https: //doi.org/10.1007/978-1-4612-1986-6_8 .[2] Franck Boyer and Sebastian Minjeaud. “Numerical schemes for a three component Cahn-Hilliard model”. en. In: ESAIM: Mathematical Modelling and Numerical Analysis 45.4 (2011), pp. 697–738. doi : 10.1051/m2an/ 2010072 . url : https://www.numdam.org/articles/10.1051/m2an/ 2010072/ .[3] Boyer, Franck and Lapuerta, C´ eline. “Study of a three component Cahn-Hilliard flow model”. In: ESAIM: M2AN 40.4 (2006), pp. 653–687. doi :
+
+10 . 1051 / m2an : 2006028 . url : https : / / doi . org / 10 . 1051 / m2an : 2006028 .[4] Qing Cheng and Jie Shen. “A New Lagrange Multiplier Approach for Constructing Structure Preserving Schemes, II. Bound Preserving”. In: 
+
+SIAM Journal on Numerical Analysis 60.3 (2022), pp. 970–998. doi : 10. 1137/21M144877X . eprint: https://doi.org/10.1137/21M144877X . url :
+
+https://doi.org/10.1137/21M144877X .[5] M. F. P. ten Eikelder and Makrand A. Khanwale. “Ostwald ripening and breakup characteristics of the advective Cahn-Hilliard equation: The role of free energy functionals”. In: Center for Turbulence Research Proceedings of the Summer Program . 2024. [6] Igor Konshin et al. “Application of the Parallel INMOST Platform to Sub-surface Flow and Transport Modelling”. In: Parallel Processing and Ap-plied Mathematics . Cham: Springer International Publishing, 2016, pp. 277– 286. isbn : 978-3-319-32152-3. 21 [7] Chen Liu et al. “A pressure-correction and bound-preserving discretization of the phase-field method for variable density two-phase flows”. In: Journal of Computational Physics 449 (2022), p. 110769. issn : 0021-9991. doi :
+
+https://doi.org/10.1016/j.jcp.2021.110769 . url : https://www. sciencedirect.com/science/article/pii/S0021999121006641 .[8] Li Luo, Xiao-Ping Wang, and Xiao-Chuan Cai. “An efficient finite ele-ment method for simulation of droplet spreading on a topologically rough surface”. In: Journal of Computational Physics 349 (2017), pp. 233–252. 
+
+issn : 0021-9991. doi : https : / / doi . org / 10 . 1016 / j . jcp . 2017 . 08 . 010 . url : https://www.sciencedirect.com/science/article/pii/ S0021999117305818 .[9] Yvan Notay. “Algebraic Multigrid for Stokes Equations”. In: SIAM Jour-nal on Scientific Computing 39.5 (2017), S88–S111. doi : 10.1137/16M1071419 .eprint: https://doi.org/10.1137/16M1071419 . url : https://doi. org/10.1137/16M1071419 .[10] Pengtao Yue, Chunfeng Zhou, and James J. Feng. “Spontaneous shrinkage of drops and mass conservation in phase-field simulations”. In: Journal of Computational Physics 223.1 (2007), pp. 1–9. issn : 0021-9991. doi :
+
+https://doi.org/10.1016/j.jcp.2006.11.020 . url : https://www. sciencedirect.com/science/article/pii/S0021999106005857 .[11] Chunhua Zhang and Zhaoli Guo. “Spontaneous shrinkage of droplet on a wetting surface in the phase-field model”. In: Phys. Rev. E 100 (6 Dec. 2019), p. 061302. doi : 10 . 1103 / PhysRevE . 100 . 061302 . url : https : //link.aps.org/doi/10.1103/PhysRevE.100.061302 .22

@@ -6,26 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-24
-- 运行时间：2026-06-24 21:15:37 UTC
+- 最新运行日期：2026-06-25
+- 运行时间：2026-06-25 21:57:24 UTC
 - 运行状态：成功
 - 本次总论文数：1
 - 精读区：0
 - 速读区：1
 
 ### 今日简报（AI）
-今日速读一篇耦合流体流动与输运的科学机器学习进展综述，评分6.0。
-论文指出物理约束神经网络与多任务学习正成为提升地下流动模型精度与效率的关键方向。
-下一步可关注文中列出的公开基准案例，结合自身数据做低成本验证。
-- 详情：[/202606/24/README](/202606/24/README)
+今天速读了一篇关于抑制微液滴自发收缩的数值研究。  
+结论是：在 Cahn-Hilliard-Stokes 微流中，通过调控表面张力与界面厚度可有效阻止液滴消失。  
+下步可关注该机制在精密涂覆或微反应器中的应用潜力。
+- 详情：[/202606/25/README](/202606/25/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Advances in Scientific Machine Learning for Coupled Fluid Flow and Transport](/202606/24/2606.19562v1-advances-in-scientific-machine-learning-for-coupled-fluid-flow-and-transport)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：综述了科学机器学习在耦合流动与输运中的方法，可用于降膜换热CFD
+1. [Suppressing Spontaneous Droplet Shrinkage in Cahn-Hilliard-Stokes Microflows](/202606/25/2606.24295v1-suppressing-spontaneous-droplet-shrinkage-in-cahn-hilliard-stokes-microflows)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：改进Cahn-Hilliard相场法模拟两相流，修正自发液滴收缩
 
 
 <div class="dpr-home-promo-card">

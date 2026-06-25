@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-25",
+  "date": "2026-06-25",
+  "generated_at": "2026-06-25T21:57:34",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/25/2606.24295v1-suppressing-spontaneous-droplet-shrinkage-in-cahn-hilliard-stokes-microflows",
+      "section": "quick",
+      "title_en": "Suppressing Spontaneous Droplet Shrinkage in Cahn-Hilliard-Stokes Microflows",
+      "authors": "A. M. Gurin",
+      "date": "2026-06-23",
+      "pdf": "https://arxiv.org/pdf/2606.24295v1",
+      "score": "7.0",
+      "evidence": "改进Cahn-Hilliard相场法模拟两相流，修正自发液滴收缩",
+      "tldr": "Cahn-Hilliard相场方法模拟不混溶两相微流时，常遭遇液滴自发收缩的非物理问题，根源在于能量泛函追求界面最小化，使相分数偏离物理边界0和1。为此，本文提出一种基于曲率的校正策略，通过偏移双阱自由能来对抗相场的非物理漂移。在立方腔静止液滴、多孔介质内排水及T形微通道流动等算例中，该方法有效抑制了相分数的过冲与欠冲，使液滴体积得到良好保持。该校正消除了相场模拟的基础性伪影，提升了微流控预测精度。",
+      "tags": "query:falling-film",
+      "abstract_en": "This paper addresses non-physical artifact, specifically spontaneous droplet shrinkage, in Cahn-Hilliard-based simulations of immiscible two-phase microflows. That artifact arise from the energy functional's preference for reduced interfacial area, leading to shifts in equilibrium phase fractions away from the physical bounds of 0 and 1. A curvature-dependent correction is proposed that shifts the double-well potential to counteract this drift. This method is validated on the following test cases: an isolated droplet in a cubic cavity, drainage in a synthetic porous medium, and flow through a T-shaped junction. Results demonstrate significant suppression of phase fraction overshoot/undershoot and improved droplet volume conservation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
