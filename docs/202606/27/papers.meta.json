@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-27",
+  "date": "2026-06-27",
+  "generated_at": "2026-06-27T20:21:34",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/27/2606.23251v1-attention-mechanism-for-scalable-mesh-based-neural-surrogates-of-free-surface-fluids",
+      "section": "quick",
+      "title_en": "Attention mechanism for scalable mesh-based neural surrogates of free-surface fluids",
+      "authors": "Federico Lanteri, Massimiliano Cremonesi",
+      "date": "2026-06-22",
+      "pdf": "https://arxiv.org/pdf/2606.23251v1",
+      "score": "6.0",
+      "evidence": "提出基于注意力的神经网络代理，用于自由表面流模拟，可实现高效两相流CFD",
+      "tldr": "自由表面流的高保真模拟（如粒子有限元法PFEM）因连续域更新和反复求解而计算密集，非牛顿流变学进一步增加成本。提出基于自注意力机制的神经代理模型，利用注意力捕获空间依赖，保留网格离散化实现重划分与节点重分布，支持有限元算子重建派生量。在2D与3D非牛顿流体基准上，准确预测瞬态动态与最终构型，显著提高可扩展性，为工程级应用提供了精确且可扩展的代理策略。",
+      "tags": "query:falling-film",
+      "abstract_en": "High-fidelity simulations of free-surface flows using Lagrangian methods such as the Particle Finite Element Method (PFEM) are computationally demanding due to continuous domain updates and repeated solution of the governing equations. This challenge is further amplified by non-Newtonian rheologies, where material nonlinearities increase computational cost. These limitations motivate the development of efficient surrogate models to approximate PFEM dynamics at reduced cost. While data-driven deep learning approaches are promising, a key challenge is designing models that operate on arbitrary and evolving geometries. We propose a self-attention-based neural surrogate for PFEM simulations of free-surface flows. The architecture leverages attention mechanisms to model node interactions and capture complex spatial dependencies, while preserving the PFEM mesh discretization. This provides a geometric and topological framework for remeshing and node redistribution, maintaining high-quality spatial discretization during rollouts, improving long-term stability, and enabling reconstruction of derived mechanical quantities via standard finite element operators. Two attention formulations are considered: a standard self-attention mechanism and a linear variant that reduces computational cost and improves scalability. The models are evaluated on two- and three-dimensional free-surface flow benchmarks with evolving geometries, varying material parameters, and non-Newtonian fluids. Results show accurate prediction of transient dynamics and final configurations, with significantly improved scalability. The mesh-based formulation also enables direct reconstruction of quantities such as stress fields. Overall, the framework provides an accurate and scalable surrogate strategy for PFEM simulations in engineering-scale applications.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
