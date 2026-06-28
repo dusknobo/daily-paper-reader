@@ -6,26 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-27
-- 运行时间：2026-06-27 20:21:25 UTC
+- 最新运行日期：2026-06-28
+- 运行时间：2026-06-28 21:20:52 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：0
 - 精读区：0
-- 速读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读用注意力机制加速自由液面流体模拟的网格神经代理
-利用注意力提升可扩展性，让深度学习代理更高效处理复杂流体网格
-对物理仿真感兴趣可继续跟踪神经代理在计算流体力学中的落地进展
-- 详情：[/202606/27/README](/202606/27/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202606/28/README](/202606/28/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Attention mechanism for scalable mesh-based neural surrogates of free-surface fluids](/202606/27/2606.23251v1-attention-mechanism-for-scalable-mesh-based-neural-surrogates-of-free-surface-fluids)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：提出基于注意力的神经网络代理，用于自由表面流模拟，可实现高效两相流CFD
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
