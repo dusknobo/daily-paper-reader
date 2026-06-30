@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-30",
+  "date": "2026-06-30",
+  "generated_at": "2026-06-30T22:17:29",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/30/2606.28181v1-universality-of-bubble-coalescence-in-electrolytic-media",
+      "section": "deep",
+      "title_en": "Universality of Bubble Coalescence in Electrolytic Media",
+      "authors": "Afsal Chakkam Palliyalil, Gaurav Tomar, Susmita Dash",
+      "date": "2026-06-26",
+      "pdf": "https://arxiv.org/pdf/2606.28181v1",
+      "score": "9.0",
+      "evidence": "气泡聚结过程中薄液膜厚度的实验测量",
+      "tldr": "气泡聚并在矿物浮选和电化学能量转换中至关重要，但Marangoni应力对聚并时间的影响长期存在争议。通过实验研究电解介质中气泡聚并的薄膜排液过程，发现排液经历幂律减薄、指数减薄和分离压控制的三个普适阶段。不同电解质类型和浓度下，薄膜演化曲线经特征膜厚和时间重标后坍缩为单一曲线，表明电解质仅重整化时间尺度而不改变底层动力学。该发现澄清了薄膜形态对排液的主导作用，为相关过程的精确调控提供了理论基础。",
+      "tags": "query:falling-film",
+      "abstract_en": "Bubble coalescence phenomenon in electrolytic media finds applications in technologies from mineral flotation to electrochemical energy conversion. However, the underlying governing physics still remains unresolved, with longstanding disagreement over the extent to which Marangoni stresses affect the coalescence time by modulating the interfacial mobility. Here, we show that the thin film morphology governs drainage more strongly than the interfacial boundary conditions. We demonstrate experimentally that thin film drainage during bubble coalescence proceeds through three distinct regimes. An initial visco-capillary stage that exhibits a power-law thinning, followed by an exponential decrease in film thickness with time induced by rim stabilisation. The final regime is governed by disjoining pressure and is marked by an exponential relaxation of the film to the equilibrium thickness. We show that, irrespective of the electrolyte type and concentration, film evolution exhibits universal behavior by collapsing onto a single curve when rescaled with the characteristic film thickness and time scale, demonstrating that electrolyte effects act only to renormalize timescales rather than alter the underlying dynamics.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/30/2606.28021v1-multiscale-cavitation-sub-grid-modeling-via-population-balances-as-linear-stochastic-process",
+      "section": "deep",
+      "title_en": "Multiscale Cavitation Sub-Grid Modeling via Population Balances as Linear Stochastic Process",
+      "authors": "Fynn Jerome Aschmoneit",
+      "date": "2026-06-26",
+      "pdf": "https://arxiv.org/pdf/2606.28021v1",
+      "score": "8.0",
+      "evidence": "基于群体平衡的亚网格空化模型，用于两相流模拟",
+      "tldr": "多尺度空化模拟需追踪气泡尺寸分布，传统亚格子模型难以捕捉多尺度效应。本文提出将气泡群体平衡转化为半径空间上的线性随机过程，通过直方图投影得到列随机马尔可夫链，转移矩阵分离为预计算的几何部分和局部压力偏移。该方法可恢复经典均匀混合物空化闭合模型，为多尺度空化流动提供高效亚格子建模框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "A multiscale sub-grid cavitation model is developed in which the bubble size distribution evolves as a linear stochastic process in radius space. Starting from the integrated Rayleigh--Plesset equation, the population balance is recast as a hyperbolic transport equation for the number density per radius, whose method-of-characteristics solution, projected onto a discrete histogram basis, yields a column-stochastic Markov chain governing the bubble counts per size bin. The transition matrix factors into a precomputable, mesh-only geometric part and a local, pressure-dependent shift, isolating the coupling to the surrounding flow into a single dimensionless vector per cell. The framework recovers classical homogeneous-mixture cavitation closures in the limit of a single representative scale.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

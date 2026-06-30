@@ -1,0 +1,1131 @@
+Title: Universality of Bubble Coalescence in Electrolytic Media
+
+URL Source: https://arxiv.org/pdf/2606.28181v1
+
+Published Time: Mon, 29 Jun 2026 01:07:42 GMT
+
+Number of Pages: 49
+
+Markdown Content:
+# Universality of Bubble Coalescence in Electrolytic Media 
+
+Afsal Chakkam Palliyalil a, Gaurav Tomar a, ∗, Susmita Dash a, ∗
+
+> aDepartment of Mechanical Engineering, Indian Institute of Science, Bangalore, India
+
+Abstract 
+
+Bubble coalescence phenomenon in electrolytic media finds applications in technologies from mineral flotation to electrochemical energy conversion. However, the underlying governing physics still remains unresolved, with longstanding disagreement over the extent to which Marangoni stresses affect the coalescence time by modulating the interfacial mobility. Here, we show that the thin film morphology governs drainage more strongly than the interfacial boundary conditions. We demonstrate experimentally that thin film drainage during bubble coalescence proceeds through three distinct regimes. An initial visco-capillary stage that ex-hibits a power-law thinning, followed by an exponential decrease in film thickness with time induced by rim stabilisation. The final regime is governed by disjoining pressure and is marked by an exponential relaxation of the film to the equilibrium thickness. We show that, irre-spective of the electrolyte type and concentration, film evolution exhibits universal behavior by collapsing onto a single curve when rescaled with the characteristic film thickness and time scale, demonstrating that electrolyte effects act only to renormalize timescales rather than alter the underlying dynamics. 
+
+Keywords: Thin film drainage, Color Interferometry, Electrolyte solutions, Marangoni stresses, Universal scaling 
+
+Introduction 
+
+Bubble coalescence is ubiquitous in natural and industrial processes ranging from air–sea gas exchange, embolism in plant xylem, humans and marine animals to mineral flotation, foam stability, water treatment, and microfluidic operations [1, 2, 3, 4, 5]. In all of these systems, the     
+
+> ∗Corresponding author
+> Email addresses: gtom@iisc.ac.in (Gaurav Tomar), susmitadash@iisc.ac.in (Susmita Dash)
+> arXiv:2606.28181v1 [cond-mat.soft] 26 Jun 2026
+
+stability of the thin liquid film trapped between two approaching interfaces controls coalescence and therefore the rates of mass, heat, and charge transport in multiphase environments [6, 7, 8]. The drainage of the intervening liquid film is strongly influenced by the transport properties of the liquid and interface deformation. As a bubble approaches another interface, the hydro-dynamic pressure generated within the draining film can exceed the bubble Laplace pressure, producing a characteristic dimple morphology consisting of a central thick region surrounded by an annular rim where the film is thinnest [9, 10]. While pure liquids are generally incapable of sustaining stable clusters of bubbles, saline environments, exemplified by breaking ocean waves, exhibit persistent frothing and delayed bubble coalescence [11, 12]. Although surface-active organic matter contributes to foam stability through adsorption at bubble interfaces, comparable concentrations of dissolved organic matter are also found in freshwater systems that do not exhibit persistent foaming [13, 14]. These observations indicate a distinct role of dissolved electrolytes in modifying bubble coalescence dynamics. Bubble coalescence inhibition by dissolved electrolytes remains one of the long-standing un-resolved problems in interfacial science. Since the first observations of electrolyte-induced inhi-bition of coalescence nearly a century ago [15], a wide range of mechanisms have been proposed, yet no consensus has emerged regarding the physical origin of the phenomenon. Because bubble coalescence requires drainage and rupture of a thin liquid film, early interpretations adopted the framework of colloidal film stability in which electric double-layer (EDL) repulsion stabilizes the film [16]. However, increasing electrolyte concentration enhances screening of electrostatic interactions, reducing the range of EDL repulsion and decreasing the equilibrium film thick-ness. Delayed coalescence, however, is frequently observed under conditions where electrostatic interactions are strongly screened [17], suggesting that classical EDL interactions alone are insufficient to explain the sensitivity of coalescence dynamics to electrolyte composition. An alternative explanation was proposed by Marrucci [18], who argued that redistribution of ions during film drainage generates surface tension gradients that oppose liquid motion through Gibbs–Marangoni stresses. This framework established the basis for many subsequent inter-pretations of electrolyte-induced coalescence inhibition. The importance of ion-specific effects 2was later highlighted by Craig et al. [17, 19], who demonstrated that coalescence inhibition depends not only on the ionic strength but also on the specific combination of ions present in the solution. Their classification of ions into surface-depleting ( α) and surface-enhancing ( β)groups revealed empirical combining rules in which α–α and β–β electrolytes inhibit coales-cence whereas α–β and β-α combinations exhibit little or no effect. These observations pointed toward a central role of ion-specific interfacial partitioning that could not be readily reconciled within the conventional DLVO theory. Craig further noted that the Gibbs–Marangoni mech-anism contains an inherent feedback: the Marangoni stresses reduce the interfacial mobility thereby also suppressing the generation of concentration gradient required to sustain them [19]. More recently, it has been shown that ion-specific surface potentials arising from unequal inter-facial ion partitioning may provide a route toward understanding the observed α–β behaviour [20]. Collectively, these studies have progressively shifted attention away from equilibrium in-teraction forces toward ion-specific interfacial organization and dynamic transport processes [21]. Recent experimental advances have provided greater insights into the dynamics of thin-film drainage. Interferometric studies have demonstrated that coalescence time depends strongly on drainage kinetics, bubble size and approach velocity rather than solely on equilibrium in-teraction forces [22, 23]. It has been shown that pristine air-water interfaces remain highly mobile during drainage and that even trace levels of contamination can substantially modify film evolution and coalescence behaviour [24, 25]. These studies have established that bubble coalescence is governed by a strong coupling between interfacial mobility and hydrodynamic drainage. High-speed interferometric measurements subsequently revealed that films of elec-trolyte solutions initially drain in a manner nearly identical to pure water before undergoing a sudden slowdown when the thickness reaches ∼ 30 –50 nm [21, 26]. These observations moti-vated nanoscale transport-based models in which delayed coalescence is due to Gibbs-Marangoni pressure affecting the coupled bulk ion transport and interfacial surface excess. Although these models capture the overall drainage behavior in experiments, electrolyte-dependent variations in drainage kinetics also occur at film thicknesses substantially larger than the confinement scales predicted to trigger nanoscale transport effects [22, 23]. Consequently, the relationship between 3ion-specific interfacial transport, electrostatic interactions, film drainage and film morphology remains incompletely understood. Several theoretical and experimental studies suggest that electrolyte-induced stabilization arises from a complex interplay between interfacial ion transport, Gibbs–Marangoni stresses and ion-dependent modifications of interfacial electrostatics [27, 28, 29]. Surface-enhancing and surface-depleting ions modify the interfacial charge distribution in fundamentally different ways and may therefore alter both interfacial transport and electrical double-layer structure. However, existing descriptions generally treat electrostatic interactions through an average film thickness or a characteristic disjoining pressure. Whether electrolyte-dependent EDL effects act primarily through the minimum film thickness at the rim, rather than through the central film region, remains unexplored. Resolving this question is essential for connecting ion-specific interfacial physics with the hydrodynamic evolution of deformable thin films. Here, we use colour interferometry to track the spatiotemporal evolution of the liquid film entrapped between a millimetric air bubble and a flat glass substrate in monovalent (NaCl) and divalent (Na 2SO 4) electrolytes with approximately 20 nm thickness resolution. We show that increasing electrolyte concentration and ion valency systematically reduce the rim thick-ness while simultaneously slowing film drainage. Analysis of the evolving film morphology reveals three distinct drainage regimes spanning visco-capillary deformation, rim-controlled re-laxation and nanometric film stabilization. By identifying the characteristic scales governing each regime, we derive scaling laws that quantitatively describe the drainage dynamics across electrolyte type, concentration and film thickness. The resulting collapse of our measurements and previously reported experimental data onto a universal master curve provides a unified framework linking electrolyte-dependent electrostatic interactions, rim evolution and thin-film drainage dynamics. 
+
+Results and discussion 
+
+Spatio-temporal evolution of film drainage 
+
+We employ high-speed color interferometry to analyse the evolution of the thin liquid film entrapped between an approaching air bubble and a glass substrate, as illustrated in Figure 1(a) 4Figure 1. Experimental configuration and evolution of interference fringes during thin-film drainage between a rising bubble and a glass substrate. (a) Schematic of the optical inter-ferometry setup used to capture the spatio-temporal evolution of the entrapped liquid film. (b) Time-resolved color interferograms for three representative systems: deionized (DI) water (row 1), NaCl (100 mM, row 2), and Na 2SO 4 (100 mM, row 3). Each row shows successive stages of film evolution with timestamps indicating the elapsed time after the onset of the bubble approach. (see Methods for detailed experimental procedures). The interference patterns provide direct visual access to the spatio-temporal evolution of the film thickness and its dependence on electrolyte conditions. Figure 1(b) presents representative interferograms for three systems: deionized (DI) water, 100 mM NaCl, and 100 mM Na 2SO 4. Within each row, the images correspond to successive time instants of film drainage; t = 0 corresponds to the instant at which the bubble begins to approach the glass substrate from an initial separation of 601 ±5 μm. While the overall drainage dynamics are significantly slowed in the presence of electrolyte as compared to DI water for both the electrolytes, similar fringe morphologies are observed at different times, revealing a common sequence of dimple formation, rim thinning, and eventual nanometric film stabilization. During the early stage of drainage, the interference fringes appear as nearly perfect concen-tric rings, indicating an axisymmetric dimple and spatially uniform thinning of the liquid film. This behavior is consistent across DI water and all electrolyte solutions (NaCl and Na 2SO 4 at 1, 10, and 100 mM; see Supplementary Figures S3 and S4). As the film thins further, the fringe spacing becomes angularly non-uniform, and the number of visible fringes progressively 5decreases, while each fringe becomes radially broader. Simultaneously, the outermost fringe, serving as the effective optical signature of the dimple rim, undergoes pronounced evolution dur-ing drainage. While its outer boundary remains nearly stationary, its inner edge progressively shifts toward the center of the interferogram, signifying a continuous increase in the dimple shoulder width, w. For instance, for DI water, the width of the outermost fringe increases from approximately 44 μm at 3.12 s to approximately 108 μm at 111.67 s. Together, these changes reflect a flattening of the dimple profile and a reduction in curvature, consistent with the overall geometric relaxation of the draining film observed across all concentrations. The radial spreading of the thin liquid film confined between the bubble and the glass substrate continues till the z-stage stage motion is stopped at t = ∆ h/V b = 2 .15 ± 0.3 s(details in Methods section). Notably, the lateral extent of the interferogram is nearly identical 
+
+∼ 590 ± 30 μm across all the solutions. This indicates that the ultimate radial footprint of the entrapped film (see Figure 1(b) and Figures S4 and S5, at t = 200 s) is governed primarily by the imposed approach displacement ∆h and velocity, which sets the geometric extent of bubble deformation. 
+
+Ion-specific retardation of drainage kinetics 
+
+To isolate the influence of ionic strength on the dimple geometry and its drainage, we first evaluate the drainage profiles of monovalent NaCl solutions. Figure 2(a,b) shows the spatio-temporal evolution of the film thickness, h(r, t ), as a function of the radial position r, for DI water and NaCl solutions of concentration 100 mM; film evolution for 1 and 10 mM concentra-tion is provided in Supplementary Figure S6. At early times, all the solutions exhibit nearly identical drainage behavior independent of electrolyte concentration. As drainage proceeds, the profiles exhibit a progressive reduction in the minimum film thickness at the annular rim, accompanied by a gradual flattening of the central dimple. Eventually, the maximum dimple thickness approaches the rim thickness, leading to an almost spatially uniform film profile, albeit at different time instants ( tstable ) as illustrated in Figure 2(a,b). This geometric flatten-ing of the film signals the onset of stabilization; any subsequent thinning proceeds uniformly throughout the film without pronounced radial variations. The time required for the film to attain a quasi-uniform configuration increases monotonically with NaCl concentration. The 6Figure 2. Electrolyte-dependent drainage dynamics of the thin liquid film formed between a bubble ( Rb = 1 .39 mm) and a flat glass substrate. Panels (a) and (b) show the spatio-temporal evolution of the film thickness profiles, h(r, t ), for (a) deionized (DI) water and (b) NaCl (100 mM). The profiles at successive time instants (see legend) capture the progressive dimple formation and rim thinning, with markedly slower drainage and enhanced deformation at higher ionic strength. Panels (c) and (d) present the temporal evolution of key geometric metrics across DI water and NaCl solutions (1, 10, and 100 mM); (c) maximum dimple height, 
+
+hmax , and (d) minimum rim height, hmin .7stabilization time rises from approximately 198 s for DI water to approximately 473 s for the 
+
+100 mM NaCl solution (Table 1). Figures 2(c,d) show the temporal evolution of the maximum central thickness (dimple height), hmax , and the minimum rim height, hmin for DI water and different concentrations of NaCl solution. The corresponding evolution of the dimple height, hdimp (t), and rim ra-dius, rrim (t), is presented in Supplementary Figure S6. Although the z-stage motion ceases at 
+
+t = 2 .15 s, the central thickness continues to increase for an additional ∼ 0.5–0.75 s. For the baseline case of DI water, hmax reaches its maximum value ( ∼ 1600 nm) at ∼ 3–4 s, followed by thinning until approximately ∼ 200 s to reach the equilibrium film thickness (Figure 2(c)). We note that in the log-log graph, hmax decreases linearly initially till ∼ 66 .6s and deviates thereafter. The corresponding film thickness at the rim, hmin , rapidly decreases initially to about ∼ 200 nm within the initial 5 s and subsequently decreases at a significantly slower rate to reach an equilibrium film thickness of ∼ 129 nm at ∼ 200 s, where hmin ∼ hmax (Figure 2(d) and Figure S7(b)). However, increasing the NaCl concentration reveals systematic deviations from this base-line behavior. While all NaCl solutions (1, 10, and 100 mM) initially exhibit a qualitatively similar evolution of hmax , the key drainage transitions, including the termination of the initial linear thinning regime (in the log-log plot) and the eventual stabilization of the film, occur at progressively delayed times with increasing electrolyte concentration. The maximum film thickness, hmax , attains peak values of 1557 , 1155 , and 1264 nm at roughly the same time (3–4 s) for 1, 10 and 100 mM NaCl solutions, respectively. Following these peak values, hmax 
+
+decreases rapidly until approximately 47 s, 58 s, and 80 s to ∼834, 673, 675 nm for the three concentrations, respectively (Figure 2(c)), marking the end of the first drainage regime. Beyond these times, hmax exhibits a slow decay similar to DI water, although with progressively lower equilibrium thicknesses with increasing concentration as listed in Table 1. The evolution of 
+
+hmin , follows a trend similar to DI water, although with significantly lower values (see Figure 2(d)). Subsequently, the thin film equilibrates to a nearly flat film (see Figure 2(b) for 100mM NaCl solution). The final stable film thickness, hstable , reduces progressively from ∼ 54 to ∼ 27 nm as the 8Table 1. Debye length λD, stabilization time tstable , and stabilized film thickness hstable for DI water, NaCl, and Na 2SO 4 solutions at different concentrations. Electrolyte Concentration λD (nm) tstable (s) hstable (nm) DI Water – – 198 129 NaCl 1 mM 9.612 251 54 NaCl 10 mM 3.040 323 32 NaCl 100 mM 0.961 473 27 Na 2SO 4 1 mM 5.550 401 40 Na 2SO 4 10 mM 1.754 660 26 Na 2SO 4 100 mM 0.555 1680 21 electrolyte concentration increases from 1 to 100 mM. The electrostatic interactions arising from the electrical double layer (EDL) play a significant role in determining hstable [30, 31]. As electrolyte concentration increases, the Debye length, λD decreases ( λD ∝ 1/√I, where I is the ionic strength), leading to stronger screening of surface charges [32]. This reduces the repulsive disjoining pressure at the film shoulder. The consequent reduction in the annular drainage area at the rim confines the outward radial flow and effectively traps a larger volume of fluid beneath the bubble, thereby significantly retarding drainage as evident from Figure 2(c). Thus, we note that the rim region, that is, both hmin and rrim stabilizes while hmax continues to evolve before the film reaches an eventual thickness of hstable .The influence of NaCl concentration is reflected in the temporal evolution of the dimple height. At t = 100 s, the measured values are, hdimp, DI = 389 nm , h dimp, 1mM = 466 nm ,
+
+hdimp, 10mM = 503 nm and hdimp, 100mM = 593 nm . Thus, the dimple in the 100 mM NaCl solution is nearly 66% larger than in DI water, demonstrating significant retardation of film drainage in the presence of electrolytes. To elucidate the role of ion valency, analogous experiments were performed with Na 2SO 4
+
+solutions (Supplementary Figures S5 and S7). While the early-time drainage dynamics remain indistinguishable from DI water and NaCl, consistent with similar interfacial boundary con-ditions, pronounced deviations emerge at later times. In contrast to NaCl, Na 2SO 4 solutions exhibit substantially prolonged drainage, sharper and more confined rim structures, and signif-icantly delayed film stabilization, with the effect strongly amplified at higher concentrations. For instance, for 100 mM concentration, tstable increases 3.6 times for Na 2SO 4 compared to NaCl solution (see Table 1). We note that for Na 2SO 4, the shorter Debye length is significantly 9more screened due to higher SO −24 ion valency. These observations confirm that although the overall drainage time is significantly different for different salts and their concentrations, the dynamics remain qualitatively similar. Increas-ing NaCl/Na 2SO 4 concentration prolongs the persistence of the central dimple, accelerates thinning of the rim region, and modifies the lateral drainage profile. Consequently, increasing electrolyte concentration progressively alters the spatio-temporal evolution of the thin film. The delay in coalescence (slower drainage of thin intervening films) in electrolyte solutions has been attributed to the Gibbs Marangoni stress arising from non-uniform spatial distribution of ions at the interface [21, 26, 33]. The local surface tension increases compared to that of the bulk in confined liquid films of thickness h is given as [34], 
+
+∆σ = cNAkB T h 
+
+dσ dc 
+
+2
+
+, (1) where c is the bulk electrolyte concentration, kB T is the thermal energy, and dσ/dc is the variation in surface tension with concentration. Equation 1 shows that ∆σ ∝ h−1, implying that surface tension increases with decrease in film thickness. Using dσ/dc ≈ 1.787 mN m −1 M−1
+
+[35] for 100 mM NaCl, the predicted surface-tension increase at the dimple center ( h ≈ 500 nm) is negligible, ∆σ ≈ 0.0002 mN m −1, whereas at the thinned rim ( h ≈ 30 nm), the local surface tension increases by ∆σ ≈ 0.0043 mN m −1, an order-of-magnitude increase that generates significant Marangoni stresses. Because dσ/dc remains approximately constant over 1–100 mM concentration range [36], the magnitude of ∆σ increases linearly with concentration, c, leading to progressively stronger Marangoni stresses. Therefore, as the film drains, it is expected that in the limiting case, the inward Marangoni stress may render the interface immobile thus reducing the drainage rate with an increase in concentration. The above difference in surface tension developed at the bubble-liquid interface in the thin film has been the basis for the conclusions in the literature that suggest that delay in coalescence is solely driven by the Marangoni stresses. Here, we show that although Marangoni stresses may lead to an immobile interface, but it is not sufficient to explain the 1–2 orders of magnitude delay in the coalescence time observed for electrolyte solutions. We propose that the primary reason for the delayed coalescence is the geometry of the rim, specifically the thickness of the 10 film at the rim which is governed by EDL screening due to the presence of electrolytes. In order to delineate the effects of geometry from the boundary conditions imposed at the bubble-liquid interface, we estimate the drainage time for thin films of different geometries, namely, flat, linear, and double-welled, close to the one observed in experiments (see Supplementary Sec. S8) and boundary conditions. In these calculations, we keep the driving force (buoyancy or otherwise) the same for bubble-substrate interaction for all geometries with the same rrim . The temporal evolution equation for hmax (Eq. S59) is solved numerically to obtain the variation in hmax and the corresponding havg with time; both hmax and havg are scaled by the initial average film thickness. Figure S10 shows the evolution of the average film thickness indicating the drainage dynamics. For a flat film, the no-slip drainage is slower as compared to the corresponding evolution when slip boundary condition is imposed at the bubble-liquid interface. The ratio of the time taken to arrive at havg = 0 .2 for no-slip to slip boundary condition for flat film is ∼ 3.5. However, for a double-welled interface, drainage is significantly slower even under slip boundary conditions compared to the flat film case with no-slip boundary condition. The ratio of times required to reach havg = 0 .9 for double-welled and flat film under no-slip conditions is ∼ 3.2 × 10 3, suggesting that the drainage time depends much more strongly on the film geometry than on the boundary conditions. The above illustration, based on the simplified model of the role of rim geometry on the delay in drainage is further supported by experimental observations in the low bubble approach speed regime where dimple formation is absent [37, 38]. Under such conditions, the electrolyte concentration has been reported to have negligible effect on the drainage times. 
+
+Scaling Analysis and Universal Drainage Dynamics 
+
+While the experimental observations highlight the severe retardation of film drainage, it re-mains an open question whether the underlying kinematics follow a universal physical law. Fig-ure 3 presents the temporal evolution of hmax for DI water, NaCl ( 1, 10 , 100 mM ), and Na 2SO 4
+
+(1, 10 , 100 mM ). The data, irrespective of the salt type and concentration used, reveal three fundamental sequence, namely, Regime-I, Regime-II and Regime-III, in the drainage kinetics: an initial algebraic visco-capillary stage ( hmax ∼ t−1/4), a subsequent primary exponential relax-ation ( hmax ∼ exp( −t/τ 1)), and a terminal, secondary exponential decay ( hmax ∼ exp( −t/τ 2)), 11 10 0 10 1 10 2 10 3
+
+# t
+
+# 10 110 210 310 4
+
+> hmax
+
+DI Water 1 mM NaCl 10 mM NaCl 100 mM NaCl 1 mM Na 2 SO 410 mM Na 2 SO 4100 mM Na 2 SO 410 2200 400 600 800 (nm) (s) Figure 3. Mechanistic interpretation and quantitative characterization of regime-dependent thin-film drainage. Temporal evolution of the maximum film thickness, hmax , for DI water and electrolyte solutions of NaCl and Na 2SO 4 at various concentrations. The data exhibit three corresponding regimes: an early-time power-law scaling hmax ∼ t−1/4 (Regime I, solid lines), followed by a primary exponential relaxation hmax ∼ e−t/τ 1 (Regime II, dash-dot lines), and a terminal exponential decay hmax ∼ e−t/τ 2 (Regime III, dashed lines) as the film approaches equilibrium. The inset highlights the transition from the visco-capillary to the primary expo-nential regime on a log-log scale. Schematics in the inset show the representative film profiles for the three regimes along with the interferograms. 12 where τ1 and τ2 are the salt and concentration dependent characteristic relaxation times as discussed below. These successive crossovers mark critical shifts in the nature of drainage, separated by characteristic transition points as summarized in Table 2. 
+
+Table 2. Characteristic transition parameters and drainage timescales for DI water, NaCl, and Na 2SO 4 solutions at different concentrations. Here, t0 and h0 denote the transition time and thickness corresponding to the onset of Regime II following Regime I; nI is the drainage exponent in Regime I ( tnI ); τ1 and τ2 are the primary and terminal relaxation times in Regimes II and III, respectively. Parameter DI Water NaCl Na 2SO 4
+
+1 mM 10 mM 100 mM 1 mM 10 mM 100 mM 
+
+t0 (s) 40 47 58 80 60 157 275 
+
+h0 (nm) 959 834 673 675 808 680 577 
+
+nI -0.237 -0.258 -0.247 -0.241 -0.263 -0.250 -0.273 
+
+τ1 (s) 92.84 125.00 164.01 245.01 142.70 298.56 663.01 
+
+τ2 (s) 68.47 41.21 64.91 44.87 59.60 71.55 53.64 
+
+Regime I: Visco-Capillary Dimple Formation ( hmax ∼ t−1/4)
+
+In the initial stage of drainage, the film evolves under the combined action of capillary forces and viscous resistance, giving rise to a dimple profile, defined by a central bulge and rim height, that govern the drainage dynamics characterizing Regime I. In this regime, the rim width remains small, indicating that the hydraulic resistance is highly localized within a narrow rim region. Approximating the film shape by using a downward facing parabolic profile for dimple region and an upward cubic profile (retaining third order terms in the Taylor series expansion) for the rim region, we obtain the relation between hmin and hmax by performing an asymptotic matching of the two profiles and mass conservation (see Sec. S5 in the Supplemental Material): 
+
+hmin = 27 μr 3
+
+> rim
+
+4σh 3
+
+> max
+
+q(rrim ), (2) where q(rrim ) is the integrated volumetric flux at the rim. Integrated momentum balance yields: 
+
+2σRL
+
+= 12 q(rrim )μ
+
+(3 β − 2) h3
+
+> min
+
+(rrim − rc) (3) 13 Here, rc is the radial location for matching the dimple and rim profiles given by: 
+
+rrim − rc = 3hmin rrim 
+
+2hmax (t) . (4) . Using the above relation with hmin from Eq.2 and q(rrim ) ∼ − h′
+
+> max
+
+(t)rrim /4 (see Supplemen-tary Sec S5.1) gives: 
+
+1
+
+h5
+
+> max
+
+dh max 
+
+dt = −64(3 β − 2) 81 
+
+σR L
+
+r6
+
+> rim
+
+μ (5) which results in the scaling: 
+
+hmax (t) ≃ 34
+
+ μr 6
+
+> rim
+
+(3 β − 2) σR L
+
+1/4
+
+t−1/4. (6) In the above scaling for hmax , the parameter β characterizes the interfacial velocity boundary condition at the air–water interface, with β = 1 corresponding to an immobile interface and β =2 representing a shear-free interface. The characteristic exponent −1/4 arises from the coupled visco-capillary drainage of a dimpled thin film with a confined rim geometry. Accordingly, all investigated systems, including DI water, exhibit a power-law drainage behavior with an exponent nI ≈ − 1/4 (Table 2), consistent with classical visco-capillary thinning in dimpled thin films [9, 39, 40]. Regime-I continues till film thickness at the rim reaches hstable . Since, for higher concentration of salts, hstable is smaller (see Table 2), Regime-I is extended further. The experimentally observed early-stage dynamics for all the solutions are found to be consistent with a nearly shear-free interface ( β ≈ 2), indicating that the air–water interface remains largely mobile throughout Regime I. 
+
+Regime II: Visco-EDL Dimple Flattening ( hmax ∼ exp( −t/τ 1))
+
+As drainage progresses ( hmax < h 0 and t > t 0; see Table 2), the nature of the temporal evolution of the film thickness changes (see Figure 3). Once the rim thins ( ∼ hstable ; see Table 1), the repulsive EDL pressure balances the driving capillary pressure at the rim. As detailed in Section S5 of the Supplementary Information, this force balance results in a locally flat rim with a fixed equilibrium thickness ( hmin = hstable ), marking the onset of Regime II. Concurrently, the rim undergoes geometric flattening, leading to an increase in the effective 14 rim width while the outer rim radius remains unchanged (see inset for Regime-II in Figure 3). This widening of the rim region results in a transition from a highly localized flow resistance at the rim to a more spatially extended hydraulic bottleneck. Assuming hmin = hstable at the rim, the evolution equation (Eq.S17) can be written as: 
+
+2σRL
+
+∼ − 18 r2
+
+> rim
+
+h′
+
+> max
+
+(t)μ
+
+4(3 β − 2) h2
+
+> stable
+
+hmax (t). (7) resulting in a departure of the central film thickness from the power law scaling to an exponential evolution: 
+
+hmax (t) ∝ exp( −t/τ 1), (8) where the characteristic time constant, τ1, is given by, 
+
+τ1 = 9RLμr 2rim 
+
+16 σh 2stable 
+
+. (9) Thus, the exponential decrease of the film thickness in Regime II is governed by a time constant dictated by the fluid viscosity ( μ), surface tension ( σ), and the disjoining-pressure-stabilized film thickness ( hstable ). The experimentally extracted time constants, τ1, for all the investigated systems are sum-marized in Table 2. For DI water, τ1 is relatively small, τ1 ≈ 92 .8 s and increases monotonically with electrolyte concentration τ1 ≈ 245 .0 s for 100 mM NaCl. The retardation of drainage is further amplified by the ion valency reaching τ1 ≈ 663 .0 s for 100 mM Na 2SO 4. We note that τ1
+
+is dictated by the inverse-square dependence on the equilibrium thickness ( τ1 ∝ h−2stable ). Thus, even a slight decrease in hstable significantly increases τ1. As ionic strength and valency increase, enhanced EDL screening compresses the Debye length, reducing the rim film thickness to a sig-nificantly thinner hstable (see Table 2) which creates a severe hydraulic bottleneck, increasing the viscous resistance to radial flow and thereby prolonging the drainage of the film. The τ1
+
+obtained theoretically, results in an excellent agreement between the experimental observations and the theoretically predicted film evolution. 15 Regime III: EDL-driven uniform relaxation to equilibrium film thickness ( hmax ∼ exp( −t/τ 2))
+
+As the dimple in the central region of the film completely relaxes, the drainage enters Regime III, characterized by a nearly uniform, thin planar geometry ( h ≈ hstable ). At this stage, the rim region widens almost up to the central region (see regime III inset in Fig. 3). In contrast to the localized rim in Regime I and the moderately spread rim in Regime II, the flow in this regime is reflective of the drainage arising from fully developed radial flow between nearly parallel spatial confinement. At these extreme nanometric confinements, the repulsive electrical double layer (EDL) disjoining pressure extends across the entire film domain resisting drainage. The film evolution in this regime is determined by the balance between the capillary pressure (2σ/R L) that drives the drainage and the EDL disjoining pressure ( ΠEDL = Ke −h/λ ), and the viscous hydrodynamic resistance. Normal stress balance at the bubble-liquid interface, and the overall pressure drop across the film due to viscous forces, results in: 
+
+2σRL
+
+− Ke −h/λ = − 12 μR 2
+
+> c
+
+4(3 β − 2) h3
+
+dh dt , (10) where K = 64 kB T n ∞ tanh 2[( zieψ 0)/(4 kB T )] is the electrostatic interaction parameter and Rc
+
+is the fixed outer radius of the rim. As the draining film flattens toward its equilibrium thickness ( h → hstable ), the drainage kinematics asymptotically seizes, satisfying the eventual force balance 2σ/R L = Ke −hstable /λ ,giving hstable = λln (KR L/2σ). To analyze the late-stage drainage dynamics approaching this limit, we introduce a small perturbation thickness, ˜h(t), representing the deviation from the equilibrium: 
+
+h(t) = hstable + ˜h(t). (11) Assuming, ˜h ≪ hstable and ˜h ≪ λ, in this regime, we employ the approximations: e−˜h/λ ≈
+
+1 − ˜h/λ and (1 + ˜h/h stable )3 ≈ 1. Substituting the perturbation into Eq.10, yields a first-order linear ordinary differential equation (as detailed in Section S5 of the Supplementary Information): 
+
+d˜hdt = −
+
+8(3 β − 2) σh 3stable 
+
+12 μR 2 
+
+> c
+
+RLλ
+
+
+
+˜h. (12) 16 Integrating, we get an exponential relaxation towards the stable film thickness: 
+
+h(t) = hstable + ˜h0 exp 
+
+
+
+− tτ2
+
+
+
+, (13) where ˜h0 is the initial perturbation thickness at the onset of Regime III, and the terminal relaxation time, τ2, is defined as: 
+
+τ2 = 3μR 2 
+
+> c
+
+RLλ
+
+8σh 3stable 
+
+. (14) Interestingly, the time constant, τ1 and τ2 show the same dependence on λ−2. Values for 
+
+τ2 computed for all solutions are summarized in Table 2. Theoretical values of τ2 predict the experimental film drainage accurately, establishing the underlying mechanism of drainage in this regime. 
+
+Universal Scaling 
+
+Figures 4(a,b) compare the experimentally measured transition scales (t0, h 0) with the cor-responding theoretical predictions (t0,theory , h 0,theory ), (derivation shown in Section S6 of Sup-plementary Information), where, 
+
+t0,theory = τ1
+
+4 , h0,theory =
+
+r32 rrim 
+
+rhstable 
+
+RL
+
+. (15) The model predicts the transition times reasonably well across all investigated systems, in-dicating that the onset of Regime II is governed primarily by rim-controlled hydrodynamic resistance. In contrast, the transition thickness is slightly overpredicted. This discrepancy arises because the transition criterion is satisfied locally when the rim thickness reaches its equilibrium value, hmin = hstable , whereas the central dimple thickness, hmax , continues to evolve over a finite timescale before fully responding to the onset of disjoining-pressure effects. Consequently, the transition time is captured accurately by the rim-based criterion, while the corresponding transition thickness reflects a delayed geometric response of the dimple. Despite pronounced variations in the absolute timescales of entrapped-film drainage arising from changes in ionic strength and surface activity, the underlying drainage dynamics and the transitions between the three successive regimes remain self-similar. The evolution of the 17 ttt (s)  0                           
+
+> h (nm)  0
+> 10 010 110 210 310 410 010 110 210 310 4DI Water 1 mM NaCl 10 mM NaCl 100 mM NaCl 1 mM Na 2SO 410 mM Na 2SO 4100 mM Na 2SO 410 210 310 410 210 310 4
+> theory
+
+(s) t0 h theory (s) 0Figure 4. Comparison between experimentally measured and theoretically predicted transition scales, together with the universal scaling of thin-film drainage dynamics. Panels (a) and (b) compare the experimentally determined transition time ( texp ) and transition thickness ( hexp )with the corresponding theoretical predictions ( ttheory , htheory ) for DI water, NaCl, and Na 2SO 4
+
+solutions at different concentrations. The dashed line represents perfect agreement. Panel (c) shows the universal scaling collapse of the dimensionless film thickness, H = hmax /h 0, as a function of the dimensionless time, T = t/t 0, where (t0, h 0) are the experimentally determined transition scales between Regimes I and II. Despite variations in electrolyte type, concentration, and ion valency, all datasets collapse onto a single master curve exhibiting three successive drainage regimes: an initial visco-capillary regime ( H ∝ T −1/4), an intermediate exponential relaxation ( H ∝ e−t/τ 1 ), and a terminal nanoscale exponential decay ( H ∝ e−t/τ 2 ). Literature data also follow the same early-time scaling, confirming the universality of the visco-capillary drainage dynamics across diverse systems and experimental conditions. 18 dimple thickness, hmax can be collapsed onto a single master curve when scaled by characteristic transition values, t0, h 0, (see Table 2) as shown in Figure 4(c). These transition times span nearly an order of magnitude, from t0 ≈ 40 s at low electrolyte concentrations to t0 ≈ 275 s 
+
+for the 100 mM Na 2SO 4 solution, highlighting the strong influence of interfacial retardation on the drainage dynamics. The universality indicates that, despite substantial differences in electrolyte type, concen-tration, and ion valency, the three fundamental drainage sequence, an initial phase of visco-capillary thinning, followed by a primary exponential geometric relaxation, and ultimately a terminal nanoscale exponential decay, remains unchanged. Notably, the early-time dynamics in Regime I show excellent agreement with previously reported experimental data from the litera-ture, as also highlighted in Figure 4(c), confirming the robustness of the visco-capillary scaling. Additional comparisons with a broader range of literature data are provided in Supplementary Figure S9. Rather than modifying the nature of the drainage regimes themselves, the pres-ence of electrolytes primarily delays the transitions between them. Thus, electrolyte-specific properties therefore determine the characteristic transition scales (t0, h 0), while the underlying hydrodynamic pathway governing the drainage remains universal. To summarize, this study provides conclusive evidence for the existence of three distinct drainage regimes during thin-film drainage in bubble–substrate interactions. These regimes are observed consistently for DI water as well as NaCl and Na 2SO 4 electrolyte solutions over a broad range of concentrations, demonstrating that the three-stage drainage sequence is a generic feature of the process rather than a system-specific phenomenon. By combining high-resolution interferometric measurements with theoretical analysis, we identify the physical mechanisms governing each regime: visco-capillary drainage of the en-trapped liquid film, rim-flattening-induced exponential drainage, and electrostatic double-layer (EDL) mediated exponential relaxation towards a stable thin-film state. An asymptotic match-ing analysis yields the characteristic transition scales separating the different drainage stages and provides a quantitative framework for predicting the onset of the delayed-drainage regime. Most importantly, we show that when the drainage dynamics are scaled using these tran-sition scales, all datasets collapse onto a single master curve. This collapse is observed not 19 only for the experiments performed in the present study but also for drainage data reported previously in the literature. Despite substantial variations in electrolyte concentration, ionic strength, ion valency, and surface activity, the drainage dynamics and the transitions between the three successive regimes remain self-similar. These results reveal a universal hydrodynamic pathway governing thin-film drainage during bubble–substrate interactions and establish a uni-fying framework for understanding delayed coalescence phenomena across a broad class of fluid interfaces. 
+
+Methods 
+
+Experimental setup and color interferometry 
+
+Figure 1(a) shows the experimental arrangement used to study the approach and interaction of an air bubble with a flat glass substrate in an electrolyte medium. The drainage dynamics of the intervening liquid film is analyzed via color interferometry. As the bubble approaches the substrate, the intervening liquid film gradually thins. Once the film thickness becomes comparable to the coherence length of the illuminating light source, interference fringes emerge due to the optical path difference between the light reflected from the air–liquid and liquid–solid interfaces.. To capture these dynamic interference patterns, an upright microscope (Leica M205 A) fitted with a 5 × objective and a high-definition color camera (Leica MC 190 HD) is used. The images are recorded at 100 frames per second and a spatial resolution of 0.83 μm/pixel .Illumination is provided by a white-light LED source (Leica KL2500) with spectral emissivity well-matched to the camera sensitivity. Simultaneously, the macroscopic position and size of the bubble are recorded from a side view using a high-speed camera (Photron FASTCAM Mini AX200) operating at 2000 frames per second. The camera is equipped with a 6 × long-working-distance lens (Navitar) and back-lit by an LED panel (Nila Zaila), yielding a spatial resolution of 11 .23 μm/pixel 
+
+Air bubbles of radius, R = 1 .39 ± 0.1 mm are generated at the tip of a stainless-steel capillary (i.d. 1.54 mm and o.d. 1.83 mm; Nordson EFD) immersed in a cuvette (75 mm ×
+
+50 mm × 50 mm) filled with electrolyte solutions. The solutions are prepared by dissolving analytical-grade NaCl and Na 2SO 4 salts (Sigma-Aldrich) in deionized water (initial conductivity 20 128.8 μS cm −1). Bubble growth on the capillary is controlled using a syringe pump (Chemix Fusion 200) and a precision flow valve (Darwin Microfluidics, LVF-KMM-08) connected in series with the syringe pump and capillary. A glass slide (76 mm × 26 mm × 1 mm; BOROSIL Scientific, 9100P02) is placed in a recessed groove at the top of the cuvette and lightly loaded to prevent movement of the glass slide. The initial separation between the bubble apex and the glass–electrolyte interface is hini = 601 ± 5 μm. The bubble is then translated towards the glass at a constant velocity Vb = 350 ± 2 μm s −1 over a displacement ∆h = 751 ± 5 μm using a microcontroller-driven z-stage (Holmarc MVTS-75-25), after which it is allowed to evolve freely. All experiments are conducted under standard ambient temperature and pressure conditions. 
+
+Film thickness reconstruction 
+
+Quantitative film-thickness profiles are reconstructed from the recorded color interferograms using a highly calibrated color-matching procedure [41]. Briefly, experimental sRGB interfer-ence patterns are converted into the CIE 1976 CIELAB color space, which effectively decouples the illumination intensity from the true chromatic components. The local film thickness is then determined by matching these chromatic coordinates against a high-resolution calibra-tion database, which is independently generated using a reference plano–convex lens of known geometry. Because interference colors are periodic, this matching process yields a localized color-difference field containing multiple candidate profiles. The final, physically admissible interface profile is extracted by enforcing spatial smoothness and minimizing the global color deviation. This rigorous methodology yields an absolute thickness accuracy of ±18 nm and a typical measurement uncertainty of ±14 nm. A comprehensive description of the optical calibration, signal processing, and profile-selection algorithms is detailed in Section S1 of the Supplementary Information. 
+
+Data availability 
+
+The datasets generated and/or analyzed during the current study are available from the corresponding author on reasonable request. 21 Code availability 
+
+The custom MATLAB scripts utilized for image processing, color interferometry calibration, and thickness reconstruction are available from the corresponding author on reasonable request. 
+
+# Supplementary Information 
+
+S1. Color Interferometry and Film Thickness Reconstruction 
+
+Figure S1. Schematic of the reference interferometric arrangement: a plano–convex lens of known radius of curvature ( 7.85 mm) placed over a glass slide with a thin DI-water film in between. The resulting interference pattern provides a calibrated correspondence between color and film thickness. The liquid film thickness between the bubble and the substrate is measured using color interferometry following [41]. A calibration database is first constructed using a reference interferometric configuration comprising a plano–convex lens (Edmund Optics, R = 7 .85 mm), a thin film of deionized water (conductivity 128 .8 μS cm −1), and a planar glass substrate (Borosil Microslides), as illustrated in Figure S1. The observed reference interference pattern originates from the phase difference between light reflected at the lens–water and water–glass interfaces. Owing to the known geometry of 22 the lens, the film thickness varies radially as 
+
+h(r) = R − √R2 − r2, (S1) thereby providing a direct mapping between interference color and absolute film thickness. To process the experimental data, a horizontal strip (50 pixels wide) is first extracted from the interferogram and averaged across its width. This spatial averaging suppresses random sensor noise and significantly enhances the signal-to-noise ratio of the intensity profile. To ensure robustness against illumination variations, the averaged sRGB arrays are converted to the CIE 1976 (CIELAB) color space [41], where luminance ( L∗) is decoupled from the chromatic components ( a∗, b∗). The calibration database is thus constructed in terms of (a∗, b ∗) as a function of thickness. For an experimental bubble interferogram (Figure S2(a)), the film thickness is determined by computing the L2 norm (Euclidean color distance) between the measured chromatic coordinates 
+
+(a∗ 
+
+> j
+
+, b ∗ 
+
+> j
+
+) at each radial location rj and the calibrated database (a∗ 
+
+> i
+
+, b ∗ 
+
+> i
+
+):
+
+dE ij =
+
+q
+
+(a∗ 
+
+> j
+
+− a∗ 
+
+> i
+
+)2 + ( b∗ 
+
+> j
+
+− b∗ 
+
+> i
+
+)2, (S2) where i spans all discrete thickness values hi. This generates a two-dimensional color-difference map in the (r, h ) parameter space, where local dark minima correspond to candidate thickness solutions. Due to the periodic nature of optical interference, a given color may correspond to multiple discrete thicknesses, leading to several visually similar candidate profiles (Figure S2). The physically admissible solution is identified by enforcing spatial continuity and smoothness, and by selecting the continuous profile that minimizes the averaged color deviation along the profile: 
+
+⟨dE ⟩L = 1
+
+NL
+
+X
+
+> L
+
+dE ij , (S3) where NL denotes the number of pixels along a candidate profile L. The continuous profile that yields the minimum ⟨dE ⟩L is selected as the final solution (solid line in Figure S2b), ensuring 23 Figure S2. Extraction of thin-film profiles from color interferometry during bubble–glass interaction. (a) Representative color interferogram recorded during film drainage in deionized water, showing concentric interference fringes corresponding to variations in film thickness. (b) Grayscale color-difference image obtained by subtracting the interferogram from a reference pattern, highlighting fringe contrast for quantitative analysis. Superimposed curves represent candidate interface profiles, with the solid line denoting the selected profile used for thickness reconstruction. 
+
+Figure S3. Validation of the color–interferometry calibration. The differential color-distance (dE ) map from the reference lens configuration is overlaid with the reconstructed thickness profile (blue curve) and compared against the theoretical lens geometry (orange dashed line). an accurate and physically consistent reconstruction of the spatio-temporal film profile h(r, t ).The thickness resolution is governed by the sensitivity of chromatic variation with respect to film thickness within the calibrated range. The accuracy of the method is independently validated using the reference lens; as shown in Figure S3, the reconstructed profile exhibits excellent agreement with the theoretical geometry, providing an absolute thickness accuracy within ±18 nm. 24 Figure S4. Color interferograms recorded at selected time instants during film drainage for deionised water and NaCl solutions of increasing concentration. Rows correspond to different electrolyte concentrations and columns to successive times after the onset of bubble approach. The measurement uncertainty is estimated from the finite width of the dark minima in the color-difference ( dE ) maps. This bandwidth arises due to the local sensitivity of the color-to-thickness gradient; in regions where the interference colors evolve gradually with thickness, the minima appear broader. Additionally, experimental factors such as light intensity fluctuations and the pixel-averaging techniques used to reduce noise contribute to this spatial dispersion. Thickness values extracted along the centers of these minima exhibit a small spread, and re-peated measurements of these profiles yield a typical variation (uncertainty) of approximately 
+
+±14 nm. 
+
+S2. Interferograms of Thin-Film Evolution in NaCl and Na 2SO 4 Solutions 
+
+Figures S4 and S5 present representative interferograms for NaCl and Na 2SO 4 solutions at different concentrations and time instants, respectively, together with the corresponding 25 Figure S5. Color interferograms recorded at selected time instants during film drainage for deionised water and Na 2SO 4 solutions of increasing concentration. Rows correspond to different electrolyte concentrations and columns to successive times after the onset of bubble approach. 26 Figure S6. Temporal evolution of key geometric descriptors of the draining thin film for DI water and NaCl solutions at concentrations of 1, 10, and 100 mM. (a) Dimple height, hdimp ,and (b) rim radius, rrim , are shown as functions of time. results for DI water. At early times, all systems exhibit nearly concentric fringes, indicating an axisymmetric dimple and uniform drainage. As thinning proceeds, the number of fringes decreases, and the fringes broaden radially, consistent with progressive dimple flattening. With increasing Na 2SO 4 concentration, a pronounced retardation of film drainage is ob-served, as evidenced by the persistence of a greater number of interference fringes at comparable times relative to NaCl solutions. This contrast is particularly evident at 10 mM concentration when comparing NaCl (Figure S3) with Na 2SO 4 (Figure S5). In contrast to NaCl, the Na 2SO 4
+
+interferograms retain a higher degree of radial symmetry over longer times, with comparatively weaker angular non-uniformities in fringe spacing. This indicates that divalent sulfate ions retard drainage while preserving a more spatially uniform film morphology. 
+
+S3. Evolution of film characteristics for individual NaCl solutions 
+
+Figure S6 shows the temporal evolution of the dimple height, hdimp , and rim radius, rrim ,for DI water and NaCl solutions at different concentrations. For the baseline case of DI water, 
+
+rrim initially increases during the early stage of drainage, reflecting the lateral expansion of the dimple, and subsequently remains nearly constant over an intermediate time window. At later times, rrim gradually decreases as the dimple relaxes and the film approaches its stabilized configuration. In parallel, hdimp exhibits a monotonic decrease following its initial formation, closely mirroring the evolution of the central film thickness. With an increase in NaCl concentration, hmin remains significantly smaller than hmax during 27 most of the drainage process and the temporal profile of the dimple height hdimp closely follows that of hmax (Figure 2(c)). The corresponding rim radius rrim , shown in Figure S6(b), initially increases and reaches a maximum values of 359 .15 , 375 .54 , and 395 .56 μm at 3.19 , 2.92 , and 
+
+2.73 s for the 1, 10, and 100 mM solutions, respectively. This early growth reflects the radial spreading of liquid driven by the hydrodynamic pressure generated as the bubble approaches the glass substrate. Notably, the time at which rrim attains its maximum does not coincide with the instant of maximum dimple height hmax , indicating that radial spreading of the rim saturates before the vertical deformation of the dimple reaches its peak. Following this stage, 
+
+rrim remains nearly steady until the end of the first drainage regime (65.27 s, 66.25 s, and 88.44 s for 1, 10, and 100mM, respectively), beyond which it decreases as the dimple gradually flattens. 
+
+S4. Evolution of film characteristics for Na 2SO 4 solutions 
+
+To quantify the influence of ion valency on the drainage dynamics, we analyze the temporal evolution of the characteristic film parameters, hmax , hmin , hdimp , and rrim , as shown in Fig-ure S7. While the overall drainage dynamics qualitatively resemble those observed for NaCl, the magnitude of the hydrodynamic retardation and interfacial deformation is significantly amplified, revealing critical ion-specific distinctions. As illustrated in Figure S7(a), the maximum film thickness hmax for Na 2SO 4 solutions decays significantly more slowly than in DI water, with the retardation becoming progressively stronger at higher concentrations. The central thickness initially increases, reaching peak values of 
+
+1526 , 1430 , and 1449 nm at approximately 3.07 , 3.77 , and 3.94 s for the 1, 10 , and 100 mM concentrations, respectively. Following these peaks, the decay of hmax proceeds faster, with the first drainage regime persisting for 85 .10 s, 197 .04 s, and 323 .14 s for the three respective concentrations. The subsequent approach toward equilibrium is also significantly prolonged, with hmax stabilizing only after 401 s, 660 s, and 1680 s, respectively (Table 1). The evolution of the rim thickness hmin (Figure S7(b)) follows the expected trend of de-creasing equilibrium thickness with increasing ionic strength, approaching stabilized values of 
+
+40 , 26 , and 21 nm for the 1, 10 , and 100 mM Na 2SO 4 solutions, respectively. However, a more 28 Figure S7. Comparison of the temporal evolution of the characteristic geometric parameters for DI water and Na 2SO 4 solutions of varying concentrations ( 1, 10 , and 100 mM ). The subplots display the time-dependent variation of: (a) maximum film thickness of the dimple, hmax , (b) minimum film thickness at the rim, hmin , (c) dimple height, hdimp , and (d) the radius of the rim, rrim .29 revealing indicator of the drainage dynamics is the time required for hmin to reach these sta-bilized values. In NaCl solutions, stabilization occurs relatively rapidly (approximately 6.06 s, 
+
+6.41 s, and 129 s for 1, 10 , and 100 mM). In contrast, the corresponding stabilization times for Na 2SO 4 are significantly prolonged, occurring at approximately 9.05 s, 457 s, and 741 s. Because hmin remains much smaller than hmax throughout this extended drainage process, the dimple height hdimp (Figure S7(c)) closely mirrors the evolution of hmax . Consequently, the central dimple remains large and persistent, particularly at 100 mM, effectively trapping liquid beneath the interface for extended durations. A further signature of this sulfate-induced retardation appears in the lateral rim radius 
+
+rrim (Figure S7(d)). For 1, 10 , and 100 mM Na 2SO 4, rrim reaches its initial maximum at approximately 3.07 , 3.77 , and 3.82 s, attaining peak values of 354 .58 , 393 .54 , and 400 .74 μm, respectively. It then remains nearly constant throughout the prolonged first drainage regime. Beyond this stage, all concentrations, most prominently 100 mM exhibit a clear contraction of rrim as the film transitions from a broad, extended dimple to a highly confined, lenticular geometry. This high degree of spatial confinement at the rim and retardation in film drainage is a direct consequence of the specific effects of ion valency on the electrical double layer (EDL). Because Na 2SO 4 dissociates into two Na + ions and one divalent SO 2− 
+
+> 4
+
+ion, it yields a threefold higher ionic strength compared to NaCl at the same molarity. This increase in ionic strength significantly reduces the Debye length ( λD ∝ 1/√I) by approximately 30 –40% relative to NaCl (cf. Tables 1). Consequently, the repulsive disjoining pressure at the rim is screened much more effectively, allowing the local film thickness to collapse to smaller values than those observed in monovalent solutions. For instance, at t = 10 s, the rim thickness for 1 mM Na 2SO 4 is approximately 40 nm, compared to about 56 nm for 1 mM NaCl. If electrostatic screening alone governed the drainage, the shorter Debye length in the Na 2SO 4 compared to NaCl system would be expected to promote faster thinning of the film once the film reaches the nanometric regime. Instead, the markedly extended stabilization times and the pronounced contraction of the rim demonstrate that an additional retarding mechanism also influence the drainage dynamics. In the present system, this mechanism arises 30 from enhanced Marangoni stresses associated with the distinct interfacial thermodynamics of the divalent sulfate anion, SO 2− 
+
+> 4
+
+.Being a strongly hydrated kosmotrope (hydration number ≈ 12 ) [42, 43], the SO 2− 
+
+> 4
+
+ion is repelled from the air–water interface much more vigorously than the monovalent chloride ion, Cl − [44, 45]. Physically, this enhanced exclusion arises from image-charge forces that scale with the square of the ion valency [46], imposing an electrostatic penalty on the divalent sulfate ion (z = 2 ) that is approximately four times greater than that on the chloride ion. As the film thins, particularly at the rim where the area-to-volume ratio is highest, this severe negative adsorption forces a larger fraction of SO 2− 
+
+> 4
+
+ions to desorb into the adjacent finite bulk layer. This interfacial exclusion quantitatively manifests in a higher solutal surface activity, dσ/dc ,which is approximately 1.5 times larger for Na 2SO 4 (≈ 2.73 mN m −1 M−1) than for NaCl ( ≈
+
+1.79 mN m −1 M−1) [47]. Since the Marangoni stress scales as ∆σ ∝ c(dσ/dc )2, the resulting retardation is strongly amplified. For instance, for 100 mM Na 2SO 4, the theoretical surface tension increase at the thinned rim ( h ≈ 30 nm) rises to ∆σ ≈ 0.0100 mN m −1, more than double the value calculated for NaCl ( ∆σ ≈ 0.0043 mN m −1). This disparity is rooted in the significantly larger negative surface excess of the sulfate system ( Γ ≈ − 1.1 × 10 −7 mol m −2
+
+compared to −7.1 × 10 −8 mol m −2 for NaCl). Consequently, the combination of stronger ion exclusion and the quadratic sensitivity of surface tension to surface activity, dσ/dc , generates an inward Marangoni flow that opposes the outward hydrodynamic drainage (see Figure 3(a)), resulting in the pronounced retardation of drainage compared to that in NaCl solution. Overall, these geometric signatures and physical mechanisms demonstrate that the Na 2SO 4
+
+system operates in a regime of strong confinement and pronounced drainage retardation. En-hanced electrostatic screening compresses the electrical double layer, allowing the rim to collapse to significantly smaller thicknesses and thereby creating a severe nanoscale hydraulic bottleneck that dominates the drainage resistance. Although Marangoni stresses generated by ion redis-tribution further oppose interfacial flow and contribute to the retardation of drainage, their effect is secondary to the geometric confinement imposed by the thinned rim. The combined action of these mechanisms traps liquid beneath the dimple, sustaining a deep and steep-walled morphology and producing the slowest drainage rates observed in this study, most prominently 31 Figure S8. Radial film thickness profile h(r) illustrating the dimple geometry. The central region is approximated by a quadratic profile (red dotted), while the barrier-ring region is represented by a cubic profile (green dashed), showing the minimum hmin at r = rrim . The profiles are smoothly matched. The blue dash-dotted curve indicates the local curvature, and 
+
+ρb represents the radius of curvature in the barrier region. for the 100 mM Na 2SO 4 solution. 
+
+S5. Scaling Analysis 
+
+From experiments, we note that after the initial contact, drainage of the trapped thin film occurs in three distinct regimes. In the first regime (Regime-I), the thickness at the center of the film varies as hmax ∝ t−1/4. In the second regime (Regime-II), we obtain an exponential drainage (based on plots in semi-log), hmax ∝ e−t/τ and in the final regime (Regime-III), a steep slope for drainage is observed before an equilibrium uniform film is obtained. 
+
+S5.1. Scaling analysis for Regime-I 
+
+Here, we provide the complete derivation of the power-law scaling hmax (t) ∝ t−1/4 observed in Regime I in Figure 9 of the manuscript. Motivated by the scaling analysis by Bluteau et al. 
+
+[40] for a dimpled water film sandwiched between an oil droplet and a glass substrate, we derive scalings for bubble-substrate interactions. This regime is characterized by a balance between the lubrication pressure drop and capillary forces, leading to a visco-capillary drainage regime. Based on the geometric evolution of the film, we note that the film thickness variation in the dimple region (similar to that for the drop in Bluteau et al. [40]) can be approximated as 32 (see Figure S8): 
+
+hd(r) = hmax (t) 1 −
+
+ rrrim 
+
+2!
+
+(S4) where rrim is the extent of the rim region with minimum of the film thickness at r = rrim . By choosing an expansion about r = rrim , we can write the film thickness in rim region, hb(r), as: 
+
+hb(r) = hmin + (r − rrim )2
+
+2 hrr |r=rrim + hrrr |r=rrim 
+
+(r − rrim )3
+
+6 + O(( r − rrim )3) (S5) where hrr |r=rrim is the curvature of the profile at r = rrim . The two profiles, the one around the dimple and the other around the rim, are matched at r = rc such that hd(rc) = hb(rc),
+
+h′
+
+> d
+
+(rc) = h′
+
+> b
+
+(rc) and h′′ 
+
+> d
+
+(rc) = h′′  
+
+> b
+
+(rc). Hence, we obtain: 
+
+rc = rrim 
+
+
+
+1 + 3hmin 
+
+2hmax (t)
+
+
+
+(S6) 
+
+hrr |r=rrim = 2hmax (t)(4 hmax (t) − 3hmin )3hmin r2
+
+> rim
+
+≈ 8hmax (t)2
+
+3hmin r2
+
+> rim
+
+(S7) 
+
+hrrr |r=rrim = 16 hmax (t)3
+
+9h2
+
+> min
+
+r3
+
+> rim
+
+(S8) Assuming validity of the lubrication approximation, radial velocity can be written: 
+
+ur(r, z ) = 12μdp dr z(βh (r, t ) − z) (S9) where β = 2 corresponds to shear free interface (fully mobile) and β = 1 corresponds to no-slip condition at the bubble-liquid interface; the liquid-glass surface is assumed to be no-slip. Volumetric flux per unit perimeter thus can be written as: 
+
+q(r) = −dp dr 
+
+(3 β − 2) h3
+
+12 μ . (S10) Further, kinematic condition for the thin film yields: 
+
+q(r) = −
+
+R r
+
+> 0
+
+ r ∂h ∂t 
+
+ dr r . (S11) The leading order term in the lubrication pressure gradient at r = rc, obtained from eqns 33 S4, S5, S10, S11, is: 
+
+dp dr = rrim μh ′
+
+> max
+
+(t)9(3 β − 2) h3
+
+> min
+
+(S12) whereas, the pressure drop at r = rrim is given by: 
+
+dp dr = 3rrim μh ′
+
+> max
+
+(t)(3 β − 2) h3
+
+> min
+
+(S13) which is of the same form as S12 but higher by a factor of 27. Pressure gradient in the bulk of the dimple away from r = rc is ∝ 1/h 3 
+
+> max
+
+and is much smaller than 1/h 3
+
+> min
+
+. Thus, we conclude that most of the pressure drop occurs in the rim region r ∈ (rc, r rim ). Further, performing normal stress balance at the bubble-liquid interface, pressure variation due to curvature and disjoining pressure can be written as: 
+
+p(r) = Pext + 2σRL
+
+− σ
+
+
+
+hrr + hr
+
+r
+
+
+
+− ΠEDL (h) − ΠvdW (h) (S14) where ΠEDL = 64 kB T n ∞tanh 2[( zieψ 0)/(4 kB T )] e−h/λ D (valid for h >> λD) and ΠvdW =
+
+Aef f /h 3. Here, n∞ is the concentration of ions in the bulk, λD is the Debye-Hückel length scale, kB is the Boltzmann constant, T is the temperature, zi is the valency of the ions and e is the electron charge. In the expression for ΠvdW , Aef f is the effective Hamaker constant for the thin film of the electrolyte solution on a glass substrate. In the current regime (film thickness 
+
+∼ 1μm - 400nm??), the drainage is primarily driven by capillary forces. Thus, neglecting the disjoining pressure terms and comparing the gradient in pressure due to capillary forces and the viscous forces in the rim region, we get: 
+
+hmin = − 27 r4
+
+> rim
+
+μh ′
+
+> max
+
+(t)16(3 β − 2) σh max (t)3 . (S15) Further, equating the pressure difference p(0) − Pext with the net pressure drop in the film due to viscous terms, we get: 
+
+2σRL
+
++ 4σh max (t)
+
+r2
+
+> rim
+
+=
+
+Z ∞
+
+> 0
+
+12 q(r)μ
+
+(3 β − 2) h(r)3 dr. (S16) 34 As discussed earlier, the pressure drop is essentially dominated by pressure drop in the rim region, thus, we can write: 
+
+2σRL
+
++ 4σh max (t)
+
+r2
+
+> rim
+
+=
+
+Z rrim 
+
+> rc
+
+12 q(rrim )μ
+
+(3 β − 2) h3
+
+> min
+
+dr = 12 q(rrim )μ
+
+(3 β − 2) h3
+
+> min
+
+(rrim − rc) (S17) under the approximations q(rc) ≈ q(rrim ) and h(r) ∼ hmin in the rim region around r = rrim ,where the film is essentially flat. In the leading order, q(rrim ) ∼ − h′
+
+> max
+
+(t)rrim /4. Here, rc is the radial location for matching the dimple and rim profiles: 
+
+rrim − rc = 3hmin rrim 
+
+2hmax (t) . (S18) . Further, we note that the ratio of the second and first terms in LHS of the above equation is given by 2hmax (t)RL/r 2 
+
+> rim
+
+<< 1. Thus, substituting hmin from Eq. S15, we can write the Eq. S17 as: 
+
+1
+
+h5
+
+> max
+
+dh max 
+
+dt = −64(3 β − 2) 81 
+
+σR L
+
+r6
+
+> rim
+
+μ (S19) Thus, we get: 
+
+hmax (t) = 34
+
+ μr 6
+
+> rim
+
+(3 β − 2) σR L
+
+1/4
+
+t−1/4 (S20) For free-shear surface β = 2 , we get: 
+
+hmax (t) = 316 
+
+μr 6
+
+> rim
+
+σR L
+
+1/4
+
+t−1/4, (S21) whereas, for immobile surface ( β = 1 ): 
+
+hmax (t) = 34
+
+μr 6
+
+> rim
+
+σR L
+
+1/4
+
+t−1/4. (S22) We note that the t−1/4 power law does not depend on the nature of the boundary condition at the bubble-liquid interface. 35 S5.2. Scaling analysis for Regime II 
+
+In this regime, the rim settles to an equilibrium thickness given by the balance between the capillary pressure 2σ/R L and ΠEDL . Thus, we get the minimum thickness in the rim region as: 
+
+hmin = heq = −2λ ln 
+
+ 2σKR L
+
+
+
+(S23) where K = 64 kB T n ∞tanh 2[( zieψ 0)/(4 kB T )] . Substituting, hmin = heq in Eq.S17, we obtain: 
+
+2σRL
+
+∼ − 18 r2
+
+> rim
+
+h′
+
+> max
+
+(t)μ
+
+4(3 β − 2) h2
+
+> eq
+
+hmax (t) (S24) The dimple thickness obtained as: 
+
+hmax (t) ∝ e−t/τ (S25) where the relaxation time is given by: 
+
+τ = 9RLμr 2
+
+> rim
+
+4(3 β − 2) σh 2
+
+> eq
+
+. (S26) As the film relaxes towards flattening of the dimple region due to drainage, overall film thickness reduces. Finally, Regime-III is given by drainage of an essentially thin film where 
+
+hmax (t) ∼ hmin ∼ heq where in the entire film, including the dimple, disjoining pressure cannot be neglected. 
+
+S5.3. Scaling analysis for Regime-III 
+
+As the film relaxes and the dimple flattens, the drainage enters Regime-III, characterized by an essentially uniform, thin film where the disjoining pressure can no longer be neglected. In this late stage, we model the system assuming a fully mobile (zero-shear) boundary condition at the bubble-liquid interface. Assuming the lubrication approximation for a thin uniform film of thickness h draining between a solid substrate and a fully mobile bubble interface, we obtain the pressure gradient in the film as, 
+
+dp dr = 12 μr 
+
+2(3 β − 2) h3
+
+dh dt (S27) 36 Integrating this from the center ( r = 0 ) to the radial extent of the contact zone ( r = Rc), where the pressure reaches the bulk atmospheric value, we obtain the total viscous pressure drop: 
+
+∆p = − 12 μR 2
+
+> c
+
+4(3 β − 2) h3
+
+dh dt (S28) The rate of film thinning is determined by the balance between the driving capillary pressure (2σ/R L), the opposing repulsive electrical double layer (EDL) disjoining pressure ( ΠEDL =
+
+Ke −h/λ ), and this viscous hydrodynamic resistance. Equating these yields the governing force balance for Regime-III: 
+
+2σRL
+
+− Ke −h/λ = − 12 μR 2
+
+> c
+
+4(3 β − 2) h3
+
+dh dt (S29) where K = 64 kB T n ∞ tanh 2[( zieψ 0)/(4 kB T )] .
+
+Equilibrium State and Perturbation Analysis 
+
+Once the macroscopic dimple relaxes to a nearly uniform, planar geometry ( h h eq ), drainage slows considerably. The capillary pressure is perfectly balanced by the disjoining pressure: 
+
+2σRL
+
+= Ke −heq /λ =⇒ heq = λ ln 
+
+RLK
+
+2σ
+
+
+
+(S30) To analyze the late-stage drainage dynamics approaching this limit, we assume the film thickness h(t) is extremely close to the equilibrium thickness. We define a perturbation variable, 
+
+˜h(t), representing this tiny difference: 
+
+h(t) = heq + ˜h(t) (S31) Because we are in the final stages of thinning, ˜h(t) ≪ heq . Since heq is a constant, the temporal derivative is simply dh/dt = d˜h(t)/dt . Substituting h = heq + ˜h(t) back into the original force balance gives: 
+
+2σRL
+
+− Ke −(heq +˜h(t)) /λ = − 12 μR 2
+
+> c
+
+4(3 β − 2)( heq + ˜h(t)) 3
+
+dH dt (S32) 37 Or, 
+
+2σRL
+
+− Ke −heq /λ 
+
+h
+
+e−˜h(t)/λ 
+
+i
+
+= − 12 μR 2
+
+> c
+
+4(3 β − 2) h3eq 
+
+
+
+1 + ˜h(t)
+
+> heq
+
+3
+
+d˜h(t)
+
+dt (S33) Recognizing that Ke −heq /λ = 2σRL , we substitute this into the left side and factor out the capillary pressure term: 
+
+2σRL
+
+ 1 − e−H/λ  = − 12 μR 2
+
+> c
+
+4(3 β − 2) h3eq 
+
+
+
+1 + Hheq 
+
+3
+
+dH dt (S34) Because the perturbation ˜h(t) is extremely small ( ˜h(t) ≪ heq and ˜h(t) ≪ λ), we apply Taylor series approximations to linearize the equation. On the right side, ˜h(t)/h eq ≈ 0. On the left side, the exponential decay is linearized as e−˜h(t)/λ ≈ 1−˜h(t)/λ . Applying these approximations reduces the non-linear equation to: 
+
+2σRL
+
+˜h(t)
+
+λ
+
+!
+
+= − 12 μR 2
+
+> c
+
+4(3 β − 2) h3eq 
+
+d˜h(t)
+
+dt (S35) Rearranging the equation to isolate the derivative dH/dt :
+
+d˜h(t)
+
+dt = −
+
+8(3 β − 2) σh 3eq 
+
+12 μR 2 
+
+> c
+
+RLλ
+
+
+
+˜h(t) (S36) By inspecting the grouped constants, we can explicitly define the characteristic relaxation time for Regime-III: 
+
+τ2 = 12 μR 2 
+
+> c
+
+RLλ
+
+8(3 β − 2) σh 3eq 
+
+(S37) Integrating the differential equation yields ln( ˜h(t)) = −t/τ 2 +C. Taking the exponential of both sides and substituting ˜h(t)( t) = h(t) − heq gives the final mathematical proof for Regime-III exponential decay under fully mobile boundary conditions: 
+
+h(t) = heq + ˜h0(t) exp 
+
+
+
+− tτ2
+
+
+
+(S38) where ˜h0(t) is the initial perturbation from equilibrium at the onset of Regime-III. 38 ttFigure S9. Comparison of the dimensionless film thickness H = hmax /h 0 as a function of dimensionless time T = t/t 0 with previously reported experimental data from the literature. Data from the present study for DI water, NaCl, and Na 2SO 4 are shown alongside literature results spanning a wide range of systems and experimental conditions. The early-time dynam-ics collapse onto the universal visco-capillary scaling H ∝ T −1/4 (Regime I), demonstrating excellent agreement with prior studies. 
+
+S6. Universal Scaling and Comparison with Literature 
+
+Figure S9 compares the dimensionless drainage dynamics obtained in the present study with a broad range of previously reported experimental data spanning different fluids, substrates, and operating conditions. Despite substantial variations in approach velocity, fluid properties, and interfacial conditions, the early-time dynamics exhibit a remarkable collapse onto the universal visco-capillary scaling H ∝ T −1/4. This agreement indicates that the initial drainage is gov-erned by a robust balance between viscous resistance and capillary pressure associated with the dimpled film geometry, independent of electrolyte composition or interfacial physicochemistry. The consistency across disparate datasets confirms that Regime I represents a universal hy-drodynamic regime dictated primarily by geometry and bulk fluid properties. Deviations from this scaling at later times arise from electrolyte-specific effects, including Marangoni stresses and disjoining-pressure-driven confinement, which progressively alter the drainage dynamics beyond the visco-capillary limit. 39 Analytical Derivation of Transition Scales 
+
+The characteristic transition scales (t0, h 0) are analytically derived by matching the variation of hmax in both Regime-I and Regime-II. Regime I is given by, hmax (t) = C1t−1/4 (where C1 = 34 [μr 6rim /(σR L)] 1/4) and Regime II is 
+
+hmax (t) = h0,theory exp[ −(t−t0,theory )/τ 1]. By imposing the continuity of both the film thickness, (hmax ) and its rate of change, ( dh max /dt ) at t = t0,theory , we obtain, 
+
+−14C1t−5/40,theory = −h0,theory 
+
+τ1
+
+. (S39) Substituting the continuity condition ( h0,theory = C1t−1/40,theory ) into the above expression gives, 
+
+t0,theory = τ1
+
+4 . (S40) This establishes that the transition time is universally governed by, and directly proportional to, the relaxation time, τ1. Substituting t0,theory back into the visco-capillary scaling law and simplifying gives the analytical transition thickness: 
+
+h0,theory =
+
+r32rrim 
+
+rheq 
+
+RL
+
+. (S41) The transition from Regime I to Regime II is triggered by the attainment of the equilibrium thickness at the rim, hmin = heq , where disjoining-pressure effects become significant. Since the hydrodynamic resistance scales as h−3min , the drainage rate is primarily controlled by the rim thickness. Consequently, the onset of Regime II is governed by a local condition at the rim rather than the global geometry of the film. 
+
+S7. Estimation of measurement uncertainties 
+
+The uncertainties associated with the experimentally measured quantities arise from two independent sources: (i) the positioning accuracy of the microcontroller-driven z-stage used to control the bubble motion, and (ii) the optical reconstruction of the thin film thickness using color interferometry. 40 S7.1. Uncertainty in imposed displacement. 
+
+The bubble is translated toward the substrate over a displacement ∆h using a motorized 
+
+z-stage (Holmarc MVTS-75-25), whose absolute positioning accuracy is specified as ±5 μm. In addition, the determination of the bubble apex location depends on the measured bubble radius, which carries an uncertainty of approximately ±0.1 mm (±100 μm). Since these two un-certainties arise from independent measurements, the uncertainty in the imposed displacement is estimated by combining them in quadrature, 
+
+δ(∆ h) = p(δR b)2 + ( δz )2, (S42) where δR b = 100 μm and δz = 5 μm. This yields 
+
+δ(∆ h) ≈ 100 μm. (S43) Thus, the imposed displacement used in the experiments is 
+
+∆h = 751 .5 ± 100 μm. (S44) It is important to emphasize that this uncertainty reflects only the accuracy with which the macroscopic bubble position relative to the substrate is determined. It does not influ-ence the measurement of the thin film thickness itself, which is obtained independently from interferometric analysis. 
+
+S7.2. Uncertainty in bubble approach velocity. 
+
+The bubble is translated toward the substrate at a programmed constant velocity 
+
+Vb = 350 ± 2 μm s −1, (S45) where the uncertainty reflects the positioning accuracy of the stage over the imposed displace-ment. 41 Uncertainty in translation time.. The time required for the imposed translation is estimated as 
+
+t = ∆hVb
+
+. (S46) Propagation of uncertainties gives 
+
+δt t
+
+2
+
+=
+
+δ(∆ h)∆h
+
+2
+
++
+
+δV b
+
+Vb
+
+2
+
+. (S47) Substituting the experimental values yields 
+
+t = 2 .15 ± 0.29 s . (S48) 
+
+S8. Drainage dynamics for slip and no-slip conditions for different thin-film profiles 
+
+Assuming that the thin film shape remains the same during drainage, we write, h(r, t ) = 
+
+hmin +  hmax (t) − hmin 
+
+f (r), where f (r) captures the radial variation in the thin film thickness, with hmax as the film thickness at r = 0 , and hmin is the film thickness at the rim. Then, 
+
+∂h ∂t = dh max 
+
+dt f (r). For a flat film, we set: hmin = hmax = h(t) and f (r) = 1 .We note that we can modify the expression in Eq. ?? for these profiles using, 
+
+uavg (r) = − 12πrh dh max 
+
+dt 
+
+Z r
+
+> 0
+
+2πrf (r)dr (S49) and write the pressure gradient as, 
+
+∂p ∂r = 12 μ
+
+(3 β − 2) h3 · 12πrh · dh max 
+
+dt 
+
+Z r
+
+> 0
+
+(2 πr f (r)) dr (S50) Integrating Eq.S50 and imposing the boundary condition, p(Rc) = 0 , we get: 
+
+p(Rc) − p(r) = 
+
+dh max 
+
+dt 
+
+ Z Rc
+
+> r
+
+ 12 μ
+
+(3 β − 2) h3 · 12πr 
+
+Z r
+
+> 0
+
+2πr f (r) dr 
+
+
+
+dr (S51) The total lubrication force balancing the drainage driving force (forces on the bubble) is given 42 by: 
+
+F =
+
+Z Rc
+
+> 0
+
+p(r) · 2πr dr = −dh max 
+
+dt 
+
+Z Rc
+
+> 0
+
+2πr 
+
+Z Rc
+
+> r
+
+12 μ
+
+(3 β − 2) · 12πr · 1
+
+h3
+
+Z r
+
+> 0
+
+2πr f (r) dr dr 
+
+
+
+dr 
+
+(S52) which can be written in the following form: 
+
+dh max 
+
+dt 
+
+
+
+·
+
+ 24 πμ 
+
+3β − 2
+
+ Z Rc
+
+> 0
+
+Z Rc
+
+> r
+
+r 1
+
+r · 1
+
+h3
+
+Z r
+
+> 0
+
+r f (r) dr 
+
+
+
+dr dr + F = 0 (S53) The corresponding havg is given by, 
+
+havg = (1 − α)hmin + αh max (S54) where, 
+
+α =
+
+Z Rc
+
+> 0
+
+f (r) · 2πr drπR 2 
+
+> c
+
+(S55) Scaling, h with initial average film h0, radial coordinate, r, with Rc and time, t, with 
+
+τ = 24 πμR 4
+
+> c
+> F h 30
+
+, we get: 
+
+dh max 
+
+dt 
+
+Z 10
+
+r
+
+Z 1
+
+> r
+
+1
+
+rh (r, t )4
+
+Z r
+
+> 0
+
+rf (r)drdrdr + (3 β − 2) = 0 (S56) Solving, Eq. S56 numerically, we obtain the variation in hmax and the corresponding havg with time. We compare the variation in the drainage dynamics for different geometries and boundary conditions using a simplistic thin-film thickness evolution equation for hmax , assuming the profile shape remains the same, i.e., flat, f (r) = 1 , linear, 1 − r, or double belled, (1 − r2)2, during the evolution. Figure S10 shows the evolution of the average film thickness, indicating the drainage dynamics. For a flat film, the no-slip drainage is slower compared to the corresponding evolution when slip boundary condition is imposed at the bubble-liquid interface. Ratio of time taken to arrive at havg = 0 .2 for no-slip to slip boundary condition for flat film is, ∼ 2.5/0.8 = 3 .5.However, for a double-welled profile f (r) = (1 −r2)2, even for slip boundary conditions, drainage is significantly slower compared to the flat film case with no-slip boundary conditions. Further, comparing the evolution of double-welled profile with no-slip boundary condition, 43 Figure S10. Variation in drainage of films of different morphologies when drained by the same force. Time is scaled by τ , and average film thickness, havg is scaled by the initial film thickness, h0.the drainage time is several order more compared to the corresponding evolution for slip bound-ary condition (ratio of time it takes to reach havg = 0 .9 is ∼ 12 .878 /3.05 = 4 .22 ). The ratio of times to reach havg = 0 .9 with no-slip conditions for flat film to double-welled film is ∼ 12 .878 /0.004 = 3 .2 × 10 3, suggesting a significant increase in drainage time for different geometries with the same boundary conditions. 
+
+References 
+
+[1] L. Deike, X. Zhou, P. Rustogi, R. H. Stanley, B. G. Reichl, S. M. Bushinsky, L. Resplandy, A universal wind–wave–bubble formulation for air–sea gas exchange and its impact on oxy-gen fluxes, Proceedings of the National Academy of Sciences 122 (38) (2025) e2419319122. [2] C. Grossiord, T. N. Buckley, L. A. Cernusak, K. A. Novick, B. Poulter, R. T. Siegwolf, J. S. Sperry, N. G. McDowell, Plant responses to rising vapor pressure deficit, New phytologist 226 (6) (2020) 1550–1566. [3] N. Ahmed, G. Jameson, The effect of bubble size on the rate of flotation of fine particles, International Journal of Mineral Processing 14 (3) (1985) 195–215. doi:https://doi.org/10.1016/0301-7516(85)90003-1. URL https://www.sciencedirect.com/science/article/pii/0301751685900031 
+
+44 [4] D. Weaire, S. Hutzler, The Physics of Foams, Oxford University Press, 2000. doi:10.1093/oso/9780198505518.001.0001. URL https://doi.org/10.1093/oso/9780198505518.001.0001 
+
+[5] M. Jia, M. U. Farid, J. A. Kharraz, N. M. Kumar, S. S. Chopra, A. Jang, J. Chew, S. K. Khanal, G. Chen, A. K. An, Nanobubbles in water and wastewater treatment systems: Small bubbles making big difference (10 2023). doi:10.1016/j.watres.2023.120613. [6] N. Kantarci, F. Borak, K. O. Ulgen, Bubble column reactors (6 2005). doi:10.1016/j.procbio.2004.10.004. [7] M. J. Inanlu, V. Ganesan, N. V. Upot, C. Wang, Z. Suo, K. F. Rabbi, P. Kabirzadeh, A. Bakhshi, W. Fu, T. S. Thukral, V. Belosludtsev, J. Li, N. Miljkovic, Unveiling the fundamentals of flow boiling heat transfer enhancement on structured surfaces, Tech. rep. (2024). URL https://www.science.org 
+
+[8] Z. Zhang, C. Gu, K. Wang, H. Yu, J. Qiu, S. Wang, L. Wang, D. Yan, Bubbles management for enhanced catalytic water splitting performance (4 2024). doi:10.3390/catal14040254. [9] S. Hartland, J. D. Robinson, A model for an axisymmetric dimpled draining film, Journal of Colloid and Interface Science 60 (1) (1977) 72–81. [10] R. Tsekov, E. Ruckenstein, Dimple formation and its effect on the rate of drainage in thin liquid films, Colloids and Surfaces A: Physicochemical and Engineering Aspects 82 (3) (1994) 255–261. [11] G. B. Deane, M. D. Stokes, Scale dependence of bubble creation mechanisms in breaking waves, Nature 418 (6900) (2002) 839–844. [12] Y. Katsir, G. Goldstein, A. Marmur, Bubble the wave or waive the bubble: Why seawater waves foam and freshwater waves do not?, Colloids and Interface Science Communications 6 (2015) 9–12. 45 [13] K. Schilling, M. Zessner, Foam in the aquatic environment, Water research 45 (15) (2011) 4355–4366. [14] K. M. Mostofa, C.-q. Liu, M. A. Mottaleb, G. Wan, H. Ogawa, D. Vione, T. Yoshioka, F. Wu, Dissolved organic matter in natural waters, in: Photobiogeochemistry of organic matter: principles and practices in water environments, Springer, 2012, pp. 1–137. [15] R. Schnurmann, Über die vergrößerung von gasblasen in flüssigkeiten, Zeitschrift für Physikalische Chemie 142 (1) (1929) 1–24. [16] M. J. Prince, H. W. Blanch, Transition electrolyte concentrations for bubble coalescence, AIChE journal 36 (9) (1990) 1425–1429. [17] V. S. Craig, B. W. Ninham, R. M. Pashley, The effect of electrolytes on bubble coalescence in water, The Journal of Physical Chemistry 97 (39) (1993) 10192–10197. [18] G. Marrucci, L. Nicodemo, Coalescence of gas bubbles in aqueous solutions of inorganic electrolytes, Chemical Engineering Science 22 (9) (1967) 1257–1265. [19] V. S. Craig, Bubble coalescence and specific-ion effects, Current opinion in colloid & in-terface science 9 (1-2) (2004) 178–184. [20] T. T. Duignan, The surface potential explains ion specific bubble coalescence inhibition, Journal of Colloid and Interface Science 600 (2021) 338–343. [21] D. Li, R. Manica, J. Li, B. Xiang, H. Wang, Q. Liu, H. Zhang, Liquid film thinning-thickening anomaly in electrolyte solutions, Journal of Colloid and Interface Science (2025) 138487. [22] H. Christenson, R. Bowen, J. Carlton, J. Denne, Y. Lu, Electrolytes that show a transition to bubble coalescence inhibition at high concentrations, The Journal of Physical Chemistry C 112 (3) (2008) 794–796. [23] R. G. Horn, L. A. Del Castillo, S. Ohnishi, Coalescence map for bubbles in surfactant-free aqueous electrolyte solutions, Advances in colloid and interface science 168 (1-2) (2011) 85–92. 46 [24] R. Manica, I. U. Vakarelski, L. Parkinson, J. Ralston, D. Y. C. Chan, Coalescence dynamics of mobile and immobile fluid interfaces, Langmuir 34 (6) (2018) 2096–2108. doi:10.1021/acs.langmuir.7b04106. URL https://doi.org/10.1021/acs.langmuir.7b04106 
+
+[25] S. L. Carnie, L. Del Castillo, R. G. Horn, Mobile surface charge can immobilize the air/water interface, Langmuir 35 (48) (2019) 16043–16052. [26] B. Liu, R. Manica, Q. Liu, Z. Xu, E. Klaseboer, Q. Yang, Nanoscale transport during liquid film thinning inhibits bubble coalescing behavior in electrolyte solutions, Physical Review Letters 131 (10) (2023) 104003. [27] M. Firouzi, A. V. Nguyen, The gibbs-marangoni stress and nondlvo forces are equally important for modeling bubble coalescence in salt solutions, Colloids and Surfaces A: Physicochemical and Engineering Aspects 515 (2017) 62–68. [28] E. Chatzigiannakis, J. Vermant, Perspective: Interfacial stresses in thin film drainage: Subtle yet significant, Journal of Rheology 68 (4) (2024) 655–663. [29] E. Sharma, S. Borkar, P. Baumli, X. Shi, J. Y. Wu, D. Myung, G. G. Fuller, Foam stabi-lization in salt solutions: The role of capillary drainage and marangoni stresses, Journal of Colloid and Interface Science 693 (2025) 137535. [30] J. Israelachvili, Intermolecular and surface forces. academic press, london., Intermolecular and surface forces. 2nd ed. Academic Press, London. (1992). [31] R. A. Pushkarova, R. G. Horn, Surface forces measured between an air bubble and a solid surface in water, Colloids and Surfaces A: Physicochemical and Engineering Aspects 261 (1-3) (2005) 147–152. [32] B. Derjaguin, N. Churaev, Structural component of disjoining pressure, Journal of Colloid and Interface Science 49 (2) (1974) 249–255. [33] B. Liu, R. Manica, Q. Liu, E. Klaseboer, Z. Xu, G. Xie, Coalescence of bubbles with mobile interfaces in water, Physical review letters 122 (19) (2019) 194501. 47 [34] G. Marrucci, A theory of coalescence, Chemical engineering science 24 (6) (1969) 975–985. [35] L. M. Pegram, M. T. Record Jr, Partitioning of atmospherically relevant ions between bulk water and the water/vapor interface, Proceedings of the National Academy of Sciences 103 (39) (2006) 14278–14281. [36] L. M. Pegram, M. T. Record, Hofmeister salt effects on surface tension arise from parti-tioning of anions and cations between bulk water and the air- water interface, The journal of physical chemistry B 111 (19) (2007) 5411–5417. [37] U. Hofmeier, V. Yaminski, H. Christenson, Observations of solute effect on bubble forma-tion, J. Colloid and Interface Science 174 (1995) 199–210. [38] V. V. Yaminsky, S. Ohnishi, E. A. Vogler, R. G. Horn, Stability of aqueous films between bubbles. part 1. the effect of speed on bubble coalescence in purified water and simple electrolyte solutions, Langmuir 26 (11) (2010) 8061–8074. [39] S. P. Frankel, K. J. Myseis, On the “dimpling” during the approach of two interfaces1, The Journal of Physical Chemistry 66 (1) (1962) 190–191. [40] L. Bluteau, M. Bourrel, N. Passade-Boupat, L. Talini, E. Verneuil, F. Lequeux, Water film squeezed between oil and solid: drainage towards stabilization by disjoining pressure, Soft matter 13 (7) (2017) 1384–1395. [41] R. C. Van Der Veen, T. Tran, D. Lohse, C. Sun, Direct measurements of air layer pro-files under impacting droplets using high-speed color interferometry, Physical Review E—Statistical, Nonlinear, and Soft Matter Physics 85 (2) (2012) 026315. [42] V. I. Chizhik, et al., Microstructure and dynamics of electrolyte solutions containing poly-atomic ions by nmr relaxation and molecular dynamics simulation, Journal of Molecular Liquids 98 (2002) 173–182. [43] Y. Marcus, Effect of ions on the structure of water: structure making and breaking, Chem-ical reviews 109 (3) (2009) 1346–1370. 48 [44] S. Gopalakrishnan, P. Jungwirth, D. J. Tobias, H. C. Allen, Air- liquid interfaces of aque-ous solutions containing ammonium and sulfate: Spectroscopic and molecular dynamics studies, The Journal of Physical Chemistry B 109 (18) (2005) 8861–8872. [45] T. Seki, C.-C. Yu, K.-Y. Chiang, A. Greco, X. Yu, F. Matsumura, M. Bonn, Y. Nagata, Ions speciation at the water–air interface, Journal of the American Chemical Society 145 (19) (2023) 10622–10630. [46] L. Onsager, N. N. Samaras, The surface tension of debye-hückel electrolytes, The Journal of chemical physics 2 (8) (1934) 528–536. [47] P. K. Weissenborn, R. J. Pugh, Surface tension of aqueous solutions of electrolytes: rela-tionship with ion hydration, oxygen solubility, and bubble coalescence, Journal of colloid and interface science 184 (2) (1996) 550–563. 49
