@@ -6,29 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-30
-- 运行时间：2026-06-30 22:17:22 UTC
+- 最新运行日期：2026-07-01
+- 运行时间：2026-07-01 21:11:25 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：2
-- 速读区：0
+- 本次总论文数：1
+- 精读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-今日精读两篇高分论文，聚焦气泡动力学在电解液中的普适规律与多尺度空化建模。  
-电解液里气泡合并存在跨体系的标度不变性，空化亚网格也能用线性随机过程高效描述。  
-建议关注气泡行为如何影响电化学效率，可对比工业电解与微流控场景寻找优化切入点。
-- 详情：[/202606/30/README](/202606/30/README)
+今日速读了一篇关于三维纳维-斯托克斯/艾伦-卡恩系统尖界面极限的高阶收敛性研究。
+核心结论是该系统在三维情形下可实现比以往更快的界面逼近速率，为相场模型的严格理论提供了新依据。
+感兴趣可关注其数值验证思路，或追踪该高阶收敛框架在复杂流体问题中的延伸应用。
+- 详情：[/202607/01/README](/202607/01/README)
 
 ### 精读区论文标签
-1. [Universality of Bubble Coalescence in Electrolytic Media](/202606/30/2606.28181v1-universality-of-bubble-coalescence-in-electrolytic-media)  
-   标签：评分：9.0/10、query:falling-film
-   evidence：气泡聚结过程中薄液膜厚度的实验测量
-2. [Multiscale Cavitation Sub-Grid Modeling via Population Balances as Linear Stochastic Process](/202606/30/2606.28021v1-multiscale-cavitation-sub-grid-modeling-via-population-balances-as-linear-stochastic-process)  
-   标签：评分：8.0/10、query:falling-film
-   evidence：基于群体平衡的亚网格空化模型，用于两相流模拟
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Higher Order Convergence for the Sharp Interface Limit of 3D Navier--Stokes/Allen--Cahn Systems](/202607/01/2606.30532v1-higher-order-convergence-for-the-sharp-interface-limit-of-3d-navier--stokesallen--cahn-systems)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：证明两相Navier-Stokes/Allen-Cahn系统尖锐界面极限的高阶收敛
 
 
 <div class="dpr-home-promo-card">

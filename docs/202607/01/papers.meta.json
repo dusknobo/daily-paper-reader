@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-01",
+  "date": "2026-07-01",
+  "generated_at": "2026-07-01T21:11:37",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/01/2606.30532v1-higher-order-convergence-for-the-sharp-interface-limit-of-3d-navier--stokesallen--cahn-systems",
+      "section": "quick",
+      "title_en": "Higher Order Convergence for the Sharp Interface Limit of 3D Navier--Stokes/Allen--Cahn Systems",
+      "authors": "Helmut Abels, Mingwen Fei, Yadong Liu, Maximilian Moser",
+      "date": "2026-06-29",
+      "pdf": "https://arxiv.org/pdf/2606.30532v1",
+      "score": "7.0",
+      "evidence": "证明两相Navier-Stokes/Allen-Cahn系统尖锐界面极限的高阶收敛",
+      "tldr": "针对三维非恒定粘度的Navier–Stokes/Allen–Cahn系统，研究其当界面厚度趋于零时的尖锐界面极限问题。通过构造正比于界面厚度与到极限尖锐界面距离之和的自适应加权Sobolev空间，建立了线性化系统的均匀高阶能量估计。基于此获得了改进的高阶范数收敛速率，首次在三维非恒定粘度情形下证明了向两相Navier–Stokes与平均曲率流耦合系统的收敛。该加权框架为其它相场模型的尖锐界面极限提供了有力工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "We show convergence of solutions to a Navier--Stokes/Allen--Cahn system as the interfacial thickness $\\varepsilon>0$ tends to zero for well-prepared initial data as long as the limit system possesses a sufficiently smooth solution. The limit system consists of a two-phase Navier--Stokes system separated by a sharp interface in the presence of surface tension coupled to a convective mean curvature flow equation. In comparison to previous results we obtain improved convergence estimates for higher-order norms. These enable us to prove convergence in the case of three space dimensions and non-constant viscosity, which was unknown before. The convergence results relies crucially on uniform higher-order estimates for the associated linearized Navier--Stokes/Allen--Cahn system in suitably weighted $L^2$-Sobolev spaces. Here a novel problem-adapted weight proportional to the sum of $\\varepsilon$ and the distance to the sharp interface of the limit, which gives improved and sharp estimates, is an important new ingredient. This approach can be potentially adapted to other sharp interface limits as well.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

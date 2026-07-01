@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-01T21:09:21.289934+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.30532v1",
+      "source": "arxiv",
+      "title": "Higher Order Convergence for the Sharp Interface Limit of 3D Navier--Stokes/Allen--Cahn Systems",
+      "abstract": "We show convergence of solutions to a Navier--Stokes/Allen--Cahn system as the interfacial thickness $\\varepsilon>0$ tends to zero for well-prepared initial data as long as the limit system possesses a sufficiently smooth solution. The limit system consists of a two-phase Navier--Stokes system separated by a sharp interface in the presence of surface tension coupled to a convective mean curvature flow equation. In comparison to previous results we obtain improved convergence estimates for higher-order norms. These enable us to prove convergence in the case of three space dimensions and non-constant viscosity, which was unknown before. The convergence results relies crucially on uniform higher-order estimates for the associated linearized Navier--Stokes/Allen--Cahn system in suitably weighted $L^2$-Sobolev spaces. Here a novel problem-adapted weight proportional to the sum of $\\varepsilon$ and the distance to the sharp interface of the limit, which gives improved and sharp estimates, is an important new ingredient. This approach can be potentially adapted to other sharp interface limits as well.",
+      "authors": [
+        "Helmut Abels",
+        "Mingwen Fei",
+        "Yadong Liu",
+        "Maximilian Moser"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP",
+        "physics.flu-dyn"
+      ],
+      "published": "2026-06-29T16:35:13+00:00",
+      "link": "https://arxiv.org/pdf/2606.30532v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Proves higher-order convergence of sharp interface limit for two-phase Navier-Stokes/Allen-Cahn system",
+      "llm_evidence_cn": "证明两相Navier-Stokes/Allen-Cahn系统尖锐界面极限的高阶收敛",
+      "llm_evidence": "证明两相Navier-Stokes/Allen-Cahn系统尖锐界面极限的高阶收敛",
+      "canonical_evidence": "证明两相Navier-Stokes/Allen-Cahn系统尖锐界面极限的高阶收敛",
+      "llm_tldr_en": "Establishes improved convergence rates for the sharp interface limit of Navier-Stokes/Allen-Cahn models, extending to 3D and non-constant viscosity, crucial for accurate multiphase flow simulations.",
+      "llm_tldr_cn": "针对Navier-Stokes/Allen-Cahn两相流模型，证明当界面厚度趋于零时解的高阶收敛性，并首次将结果推广至三维和非恒定粘度情形。通过建立均匀高阶估计，改善了先前收敛阶数，为相场法在复杂两相流模拟中的可靠性提供了严格理论基础。",
+      "llm_tldr": "针对Navier-Stokes/Allen-Cahn两相流模型，证明当界面厚度趋于零时解的高阶收敛性，并首次将结果推广至三维和非恒定粘度情形。通过建立均匀高阶估计，改善了先前收敛阶数，为相场法在复杂两相流模拟中的可靠性提供了严格理论基础。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
