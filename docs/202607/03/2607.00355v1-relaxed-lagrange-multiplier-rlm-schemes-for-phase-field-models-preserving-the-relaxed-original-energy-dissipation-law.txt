@@ -1,0 +1,1615 @@
+Title: Relaxed Lagrange Multiplier (RLM) Schemes for Phase Field Models Preserving the Relaxed Original Energy Dissipation Law
+
+URL Source: https://arxiv.org/pdf/2607.00355v1
+
+Published Time: Thu, 02 Jul 2026 00:24:06 GMT
+
+Number of Pages: 37
+
+Markdown Content:
+# Relaxed Lagrange Multiplier (RLM) Schemes for Phase Field Models Preserving the Relaxed Original Energy Dissipation Law 
+
+Xiaobo Jing ∗ Jia Zhao †
+
+Abstract 
+
+Phase-field models are typically derived from variational principles for a free-energy func-tional and are widely used to simulate complex multiphase phenomena in science and engineer-ing. A central goal in designing numerical schemes for these models is to preserve the underlying energy-dissipation law. In this paper, we propose a class of relaxed Lagrange multiplier (RLM) schemes for phase field models. In contrast to popular scalar auxiliary variable (SAV) and invari-ant energy quadratization (IEQ) methods, which dissipate a modified energy involving auxiliary variables, the RLM schemes dissipate a relaxed version of the original energy and closely track the original energy dissipation rate. Compared with the classical Lagrange multiplier (LM) approach, the RLM schemes ensure that the resulting discrete system is uniquely solvable over a broad range of time steps. The key idea is to augment the LM formulation with a relaxation term, yielding a scalar quadratic equation for the multiplier with an explicit closed-form solu-tion. The resulting schemes are linear and efficient because each time step requires solving only two linear systems with constant coefficients, at a cost comparable to that of SAV schemes. We construct both first-order and second-order variants and prove their energy stability. Numeri-cal experiments verify the expected convergence rates and demonstrate that the RLM schemes accurately capture interface dynamics. 
+
+Key words: Allen–Cahn Equation, Cahn–Hilliard Equation, Relaxed Lagrange Multiplier, Energy Stable, Phase Field 
+
+# 1 Introduction 
+
+Phase-field methods are widely used to model multiphase problems across many areas of science and engineering. In materials science, they are used to simulate microstructural evolution processes such as solidification, grain growth, and phase transformations [1,3,29,43]. In fluid dynamics, they are used to model multiphase flows, including droplet dynamics and bubble formation [2, 32, 34]. Some other examples include fracture mechanics, biological systems, and pattern formation [5]. Phase-field models are usually derived from variational principles for a free-energy functional that governs the system dynamics via an energy-dissipation law [18,35]. The core idea of phase-field methods is to introduce a diffuse interface variable whose thickness is controlled by an artificial parameter ε. Instead of explicitly tracking sharp interfaces, we solve PDEs for the phase variable over the entire domain, and the interface is recovered from level sets of the phase variable. Although this formulation is conceptually simple, it presents significant numerical challenges. The small 
+
+> ∗
+
+School of Mathematics, Southeast University, Nanjing 210096, Jiangsu Province, P.R. China. Email: 
+
+xiaobo@seu.edu.cn 
+
+> †
+
+Department of Mathematics, University of Alabama, Tuscaloosa, AL 35487, USA. Email: jia.zhao@ua.edu 
+
+(corresponding author) 
+
+1
+
+> arXiv:2607.00355v1 [math.NA] 1 Jul 2026
+
+parameter ε yields stiff systems that require sufficiently fine spatial and temporal resolution, and the nonlinear potential terms should be carefully treated to ensure stability [40]. Moreover, numerical methods should preserve the underlying energy dissipation principle. Schemes that preserve this property are called energy-stable, and those that maintain stability regardless of the time step are termed unconditionally energy-stable. Several classes of energy-stable numerical schemes have been developed for phase-field models. The convex splitting method [16, 17, 37] separates the free energy into convex and concave compo-nents, treating them implicitly and explicitly, respectively. Stabilization techniques add artificial damping terms to enable explicit treatment of nonlinear terms, yielding linear schemes [31, 41, 45]. Exponential time differencing (ETD) methods provide another class of numerical schemes for phase-field models. These methods treat the linear stiff terms exactly using matrix exponentials while handling the nonlinear terms explicitly or semi-implicitly, enabling large time steps without sacri-ficing accuracy [36, 51]. Recent advances have established maximum bound principles and energy stability for ETD schemes applied to Allen–Cahn and epitaxial growth models [7, 13, 14, 28]. How-ever, existing approaches in the literature still have limitations. Some of them are linear but require restrictive time-step constraints, while others require the solution of nonlinear systems at each time step, which can be computationally expensive [23, 44]. The Invariant Energy Quadratization (IEQ) method [20, 46, 47, 53, 54] and the Scalar Auxiliary Variable (SAV) method [38] have recently been developed by introducing an auxiliary variable that transforms the original PDEs into an equivalent system with a quadratic energy structure. This reformulation enables the construction of unconditionally energy-stable linear schemes. These methods have been widely adopted due to their simplicity and broad applicability [21, 30, 48]. However, the energy dissipation laws in the SAV and IEQ methods are formulated in terms of auxiliary variables rather than the original phase variables. As truncation errors accumulate in the auxiliary variables during time stepping, the discrete auxiliary variables deviate from their continuous definitions. Consequently, while these schemes satisfy a modified energy dissipation law, they do not guarantee dissipation of the original free energy. This discrepancy has been partially addressed by the relaxed SAV (RSAV) method [25] and the relaxed IEQ approach [52], both of which use projection techniques to restore consistency. An alternative approach is the Lagrange multiplier (LM) method [8], which introduces a scalar multiplier to enforce the original energy dissipation law directly. This method achieves dissipation of the original energy without requiring the potential to be bounded from below [15]. However, the Lagrange multiplier approach requires solving a nonlinear algebraic equation for the multiplier at each time step, which may have multiple solutions, complicating the analysis [9]. Several variants have been proposed to address this solvability issue [22,24]. The dynamically regularized Lagrange multiplier (DRLM) method introduces regularization parameters to improve solvability and has been applied to incompressible Navier–Stokes, Cahn–Hilliard–Navier–Stokes, and magnetohydro-dynamic equations [11, 12, 42]. Meanwhile, the supplementary variable method (SVM) [19] provides a general framework for structure-preserving schemes, with the Lagrange multiplier method as a special case. However, SVM still faces solvability challenges. The existence and uniqueness of solutions are not guaranteed, and the solution typically requires solving a nonlinear algebraic equation subject to time-step constraints. By combining the SAV and Lagrange multiplier methods, a weighted SAV method was introduced to address the shortcomings of both [24]. This approach is applicable to any time-step size, provided the weight coefficients are sufficiently large, thereby yielding a discrete energy that is closer to the original energy. More broadly, several recent works improve the solvability and energy fidelity of auxiliary-variable and Lagrange multiplier schemes through various relaxation techniques, including a relaxed 2Lagrange multiplier approach for gradient flows [33], linear relaxation schemes for Allen–Cahn-type and Cahn–Hilliard-type models [26], a class of unconditionally energy-stable relaxation schemes for gradient flows [49], and multi-step SAV approaches that recover the original dissipation law [6]. We emphasize, however, that the term “relaxation” carries different meanings across these works, which differ from its meaning in the present method. In the relaxed SAV/IEQ and relaxed Lagrange multiplier methods [25,33,52], relaxation refers to a correction step applied to the auxiliary variable or multiplier after the main solve to restore consistency with the original energy. In the linear relaxation schemes [26, 49], it refers to introducing an auxiliary relaxation variable governed by its own relaxation dynamics. In the DRLM method [12], regularization parameters are introduced to stabilize the multiplier equation. In summary, energy-stable schemes have progressed from conditionally energy-stable schemes (e.g., the stabilization method) to unconditionally energy-stable schemes (e.g., convex splitting), from schemes that dissipate a modified energy (e.g., the IEQ and SAV methods) to schemes that dissipate the original energy (e.g., the LM method). As the dissipated energy approaches the original energy, however, the resulting algebraic system tends to be harder to solve, often requir-ing smaller time steps and reducing computational efficiency. In the design of numerical schemes, maintaining mathematical elegance, preserving the physical properties of the PDE, and improving computational efficiency are not mutually exclusive. In schemes that conserve a modified energy, both the energy and the governing equations are reformulated; whereas in schemes that conserve the original energy, the governing equations are also moderately adjusted. From the standpoint of PDE well-posedness and numerical solutions, the stability of the algorithm is precisely a re-flection of PDE well-posedness at the discrete level. Once the governing equations are modified during algorithm design, the well-posedness of the PDE must be reassessed. From a modeling per-spective, any PDE arises from the desire to maintain mathematical elegance and physical fidelity, and thus, the modeling error may be substantial. If an appropriate modification to the PDE can unify these three objectives—mathematical elegance, physical structure-preserving, and computa-tional efficiency—then such a modification is permissible. Therefore, we argue that, assuming no round-off error, modeling error and algorithmic error must be considered together. In fact, the nu-merical schemes cited in the paper have all taken modeling error into account, either deliberately or imperceptibly. In this paper, we propose a class of energy-stable linear schemes for phase-field equations, the Relaxed Lagrange Multiplier (RLM) scheme. The RLM method applies to a general class of phase-field equations, including Allen–Cahn-type and Cahn–Hilliard-type equations as special cases. We make several contributions. First, we introduce a relaxation mechanism that augments the Lagrange multiplier formulation with a relaxation term parameterized by α ≥ 0. This yields a quadratic algebraic equation for the scaling factor qn+1 , which admits a closed-form solution. Compared with the LM scheme, the RLM scheme is solvable for a broad range of time step sizes once α is chosen sufficiently large. Moreover, for sufficiently large α, the quadratic equation admits exactly one positive root, so the update of the scaling factor is uniquely determined. Second, the RLM scheme dissipates a relaxed original energy ˜E = E + α(q2 − 1), where E is the original free energy. For suitable α, we have q ≈ 1, so the relaxation term α(q2 − 1) is close to zero and ˜E closely tracks E. This differs from SAV/IEQ methods whose modified energies can deviate significantly from E. In particular, the formulation tracks the original energy dissipation rate when q ≈ 1, adding only a controllable relaxation penalty. Third, the scheme is linear and requires solving only two linear systems per time step, with a computational cost comparable to that of SAV methods. We develop both first-order and second-order variants. These properties make the RLM schemes attractive for long-time simulations of phase-field models while faithfully preserving the energy dissipation law. Table 1 summarizes the key differences between SAV, IEQ, RSAV, LM, WSAV, 3SVM, and the proposed RLM methods. Table 1: Comparison of energy-stable schemes for phase-field equations. Method Energy Preserved Cost per Step Solvability Requirement on F
+
+SAV [39] Modified 2 linear solves Guaranteed Bounded below IEQ [47] Modified 1 linear solve Guaranteed Bounded below RSAV [25] Modified 2 linear solves Guaranteed Bounded below LM [8] Original Nonlinear solve May fail None WSAV [24] Modified 2 linear solves Guaranteed Bounded below SVM [19] Original Nonlinear solve May fail None RLM (this work) Relaxed original 2 linear solves Guaranteed None The remainder of this paper is organized as follows. In Section 2, we review the SAV and Lagrange multiplier methods for context. In Section 3, we present the general RLM framework for phase-field models. In Section 4, we apply the RLM scheme to the Allen–Cahn, Cahn–Hilliard, and conserved Allen-Cahn equations with the double-well potential for binary flow, the Flory– Huggins potential for polymer solutions, and the Lennard–Jones-type potential for liquid thin films, and present numerical experiments demonstrating the convergence rates and comparing the RLM schemes with the SAV method. Finally, we conclude in Section 5. 
+
+# 2 Background and Preliminaries 
+
+2.1 General phase-field model framework 
+
+We begin by establishing notation for general phase-field models. Let Ω ⊂ Rd be a bounded domain. For f, g ∈ L2(Ω), we define the standard inner product and norm as (f, g ) = 
+
+Z
+
+> Ω
+
+f (x)g(x) d x, ∥f ∥ = p(f, f ).
+
+Given a linear, self-adjoint, non-negative operator A, we denote the induced inner product and semi-norm by (f, g )A = ( Af, g ), ∥f ∥A = p(f, f )A.
+
+The self-adjointness of A ensures ( f, g )A = ( g, f )A, so ( ·, ·)A is a symmetric nonnegative bilinear form with associated semi-norm ∥ · ∥ A. We use this notation with A taken to be the operators L,
+
+L0, and M introduced below. We consider a general free energy functional of the form 
+
+E(ϕ) = 12 ∥ϕ∥2 
+
+> L
+
++
+
+Z
+
+> Ω
+
+F (ϕ) d x, (2.1) where L is a linear self-adjoint elliptic operator (e.g., L = −ε2∆) and F (ϕ) is a nonlinear potential function. We denote f (ϕ) := F ′(ϕ) as the derivative of the potential. The phase-field evolution equation associated with the free energy (2.1) is 
+
+
+
+∂tϕ = −M μ, μ := δE δϕ = Lϕ + f (ϕ), (2.2) 4where μ is the chemical potential and M ≥ 0 is the mobility operator. Two canonical choices of the mobility operator M recover the Allen–Cahn (AC) type and Cahn–Hilliard (CH) type dynamics. For the AC type, we take M = M I with M > 0 a constant and I the identity operator, which yields 
+
+∂tϕ = −M (Lϕ + f (ϕ)) , (2.3) For the CH type, we take M = −M ∆ with mobility constant M > 0, which can be equivalently written as 
+
+∂tϕ = M ∆( Lϕ + f (ϕ)) . (2.4) Moreover, under homogeneous Neumann or periodic boundary conditions for μ, the CH-type system conserves mass, ddt 
+
+Z
+
+> Ω
+
+ϕ dx = 0 . (2.5) This follows from integrating (2.4) over Ω and applying the divergence theorem with the boundary condition. A key property of the phase-field equation (2.2) associated with the energy (2.1) is the energy dissipation law 
+
+ddt E(ϕ) = 
+
+ δE δϕ , ∂ tϕ
+
+
+
+= −(μ, Mμ) = −∥ μ∥2 
+
+> M
+
+≤ 0. (2.6) In other words, the free energy decreases monotonically over time, a fundamental thermodynamic principle that numerical schemes should preserve in phase-field models. The identity in Eq. (2.6) relies on the self-adjointness of L and M in L2(Ω) under the cho-sen boundary conditions. For simplicity, we assume homogeneous Neumann boundary conditions throughout this paper, though the approach extends naturally to other boundary conditions. We assume that L and M are linear, self-adjoint, and non-negative with respect to the L2 inner prod-uct, with boundary conditions chosen so that all integration-by-parts identities used in the energy estimates are valid. In particular, for L = −ε2∆ we impose the homogeneous Neumann condition 
+
+n · ∇ ϕ = 0 on ∂Ω, and for the CH-type mobility M = −M ∆ we additionally impose n · ∇ μ = 0 on 
+
+∂Ω. Periodic boundary conditions work equally well. 
+
+Notation for time discretization. To make the later explanation clearer and more consistent, we introduce some notation for numerical discretization. Consider the time interval [0 , T ] and discretize it into equally spaced points 0 = t0 < t 1 < · · · < t N = T with step size ∆ t = T /N , so that tn = n∆t. The numerical solution for a function ϕ(x, t ) at time tn is denoted by ϕn(x). When there is no ambiguity, we write simply ϕn to represent ϕn(x). We use the following extrapolation notation. For functions ϕ(x, t ) and q(t), we have 
+
+ϕn+ 12 = 12 (ϕn + ϕn+1 ), ϕn+ 12 = 32 ϕn − 12 ϕn−1, ϕ n+1 = 2 ϕn − ϕn−1, (2.7) 
+
+qn+ 12 = 12 (qn + qn+1 ). (2.8) Whenever an extrapolation involves values at earlier time levels (e.g., ϕn−1), we assume the required starting values are available and set q0 = 1, consistent with q(0) = 1. 52.2 Review of the SAV method 
+
+We briefly review the classical SAV method [38,39]. The key is to introduce auxiliary variables and reformulate the original problem in (2.2) into an equivalent PDE with a quadratic energy structure. For the classical SAV method, we introduce the scalar auxiliary variable 
+
+q(t) = H(ϕ(x, t )) := 
+
+sZ
+
+> Ω
+
+
+
+F (ϕ) − 12 γ0ϕ2 + Csav 
+
+
+
+dx, (2.9) where γ0 is a regularization parameter [4] and Csav > 0 is chosen so that q(t) is well-defined, i.e., so that the quantity under the square root remains strictly positive for all relevant states ϕ. Otherwise, 
+
+h(ϕ) below becomes singular. Denote 
+
+L0 = L + γ0I, h(ϕ) := δH δϕ = F ′(ϕ) − γ0ϕ
+
+2H(ϕ) .
+
+Then Eq. (2.2) is reformulated into an equivalent system 
+
+
+
+∂tϕ = −M μ, μ = L0ϕ + 2 h(ϕ)q(t),dq (t)
+
+dt =
+
+Z
+
+> Ω
+
+h(ϕ)∂tϕ dx,
+
+(2.10) with a consistent initial condition for the auxiliary variable q(0) = H(ϕ(x, 0)). Here h(ϕ) = 
+
+δH/δϕ is the variational derivative of the functional H[ϕ] = 
+
+qR
+
+> Ω
+
+(F (ϕ) − 12 γ0ϕ2 + Csav ) d x, and the evolution of q in (2.10) follows from the chain rule dq dt = dH dt = R 
+
+> Ω
+> δH δϕ
+
+∂tϕ dx. If we define the reformulated free energy as ˆE(ϕ, q ) = 12 ∥ϕ∥2 
+
+> L0
+
++ q2 − Csav |Ω|, (2.11) then the energy dissipation law for Eq. (2.10) is 
+
+ddt ˆE(ϕ, q ) = −∥L 0ϕ + 2 h(ϕ)q(t)∥2 
+
+> M
+
+≤ 0. (2.12) Here |Ω| denotes the measure of Ω. In particular, ˆE(ϕ, q ) = E(ϕ) when q = H(ϕ). At the continuous level, q(t) = H(ϕ). The reformulated phase-field model in Eq. (2.10) is equivalent to the original phase-field model in Eq. (2.2), and the modified energy law in Eq. (2.12) is equivalent to the original energy law in Eq. (2.6) when q(t) = H(ϕ). Thus, numerical schemes designed for Eq. (2.10) are well-suited for solving Eq. (2.2). If we apply the backward difference formula (BDF) to the time derivative with a semi-implicit time discretization, we obtain the first-order SAV-BDF scheme as follows. 
+
+Scheme 1 (SAV-BDF1 Scheme) .
+
+
+
+ϕn+1 − ϕn
+
+∆t = −M μn+1 ,μn+1 = L0ϕn+1 + 2 h(ϕn)qn+1 ,qn+1 − qn =
+
+Z
+
+> Ω
+
+h(ϕn)( ϕn+1 − ϕn) d x.
+
+(2.13) 6Meanwhile, if we apply the Crank–Nicolson temporal discretization, we obtain the second-order SAV-CN scheme as follows. 
+
+Scheme 2 (SAV-CN Scheme) .
+
+
+
+ϕn+1 − ϕn
+
+∆t = −M μn+ 12 ,μn+ 12 = L0ϕn+ 12 + 2 h(ϕn+ 12 )qn+ 12 ,qn+1 − qn =
+
+Z
+
+> Ω
+
+h(ϕn+ 12 )( ϕn+1 − ϕn) d x.
+
+(2.14) Scheme 1 and Scheme 2 are both unconditionally energy-stable in the sense that ˆE(ϕn+1 , q n+1 )−
+
+ˆE(ϕn, q n) ≤ 0. 
+
+2.3 Review of the Lagrange Multiplier Method 
+
+We briefly revisit the Lagrange multiplier (LM) framework for phase field models [8]. For the general phase-field equation in Eq. (2.2), the LM method introduces a scalar multiplier q(t) to enforce dissipation of the original energy. The reformulated system reads 
+
+
+
+∂tϕ = −M μ, μ = Lϕ + q(t)f (ϕ), f (ϕ) = F ′(ϕ),ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x = q(t)
+
+Z
+
+> Ω
+
+f (ϕ) ∂tϕ dx,
+
+(2.15) with the consistent initial condition q(0) = 1. Taking the L2 inner product of the first relation in (2.15) with μ and using the last identity yields 
+
+dE dt = −∥ μ∥2 
+
+> M
+
+= −∥L ϕ + q(t)f (ϕ)∥2 
+
+> M
+
+≤ 0,
+
+so the original energy decays monotonically without assuming that F is bounded from below [8]. We note that the branch q(t) ≡ 1 recovers the original gradient flow (2.2). Indeed, combining the scalar constraint in (2.15) with the chain rule ddt 
+
+R 
+
+> Ω
+
+F (ϕ) d x = R 
+
+> Ω
+
+f (ϕ) ∂tϕ dx shows that it reduces to ( q(t) − 1) R 
+
+> Ω
+
+f (ϕ) ∂tϕ dx = 0, so q(t) ≡ 1 except at states where R 
+
+> Ω
+
+f (ϕ) ∂tϕ dx = 0, at which the constraint does not uniquely determine q(t). Compared to the SAV approach, the LM method dissipates the original energy and does not rely on a modified energy. However, solvability issues arise as discussed below. Using the same notation, we can obtain the LM-BDF1 and LM-CN schemes as follows. 
+
+Scheme 3 (LM-BDF1 Scheme) .
+
+ϕn+1 − ϕn
+
+∆t = −M μn+1 , (2.16) 
+
+μn+1 = L ϕn+1 + qn+1 f  ϕn, (2.17) 
+
+ F (ϕn+1 ) − F (ϕn), 1 = qn+1  f  ϕn, ϕ n+1 − ϕn . (2.18) 7Scheme 4 (LM-CN Scheme) .
+
+ϕn+1 − ϕn
+
+∆t = −M μn+ 12 , (2.19) 
+
+μn+ 12 = L ϕn+ 12 + qn+ 12 f  ϕn+ 12 , (2.20) 
+
+ F (ϕn+1 ) − F (ϕn), 1 = qn+ 12
+
+
+
+f  ϕn+ 12 , ϕ n+1 − ϕn
+
+
+
+. (2.21) Scheme 3 and Scheme 4 are energy-stable in the sense that 
+
+E(ϕn+1 ) − E(ϕn) ≤ 0. (2.22) However, the existence and uniqueness of solutions are not guaranteed, and solvability may depend on the time step size ∆ t [9]. In practice, one time step of the LM–CN scheme proceeds as follows. Denote 
+
+ϕn+1 = ϕn+1 1 + qn+1 ϕn+1 2 . (2.23) 1. Define the linear operator 
+
+G := 1∆t I + 12 M L . (2.24) We assume throughout that G is invertible. This holds for the canonical AC and CH choices under the stated boundary conditions, since ML ≥ 0 in both cases (for AC, ML = −M ε 2∆ ≥
+
+0, and for CH, ML = M ε 2∆2 ≥ 0), so that G ≥ 1∆t I > 0. Given ϕn, compute ϕn+1 1 and ϕn+1 2
+
+by solving the two linear problems with the operator G in (2.24), 
+
+G ϕn+1 1 = ϕn
+
+∆t − 12 M L ϕn − 12 M qnf  ϕn+ 12 , G ϕn+1 2 = − 12 M f  ϕn+ 12 ,
+
+2. Get qn+1 by solving the scalar nonlinear equation 
+
+
+
+F (ϕn+1 1 + qn+1 ϕn+1 2 ) − F (ϕn), 1
+
+
+
+= qn+ 12
+
+
+
+f  ϕn+ 12 , ϕ n+1 1 + qn+1 ϕn+1 2 − ϕn
+
+. (2.25) Here qn+ 12 = 12 (qn + qn+1 ), so Eq. (2.25) is a scalar equation for the single unknown qn+1 .This can be solved, for example, by Newton’s method with initial guess qn+1 = 1. 3. Recover the new solution ϕn+1 from the affine representation in Eq. (2.23), and proceed to the next time step. 
+
+Remark 2.1. Eq. (2.25) is a scalar nonlinear algebraic equation for qn+1 . In the proposed RLM scheme, this relation is relaxed and, with a suitable quadratic approximation of F n+1 , reduces to a quadratic equation for the scaling factor that admits a closed-form solution. The SAV and LM methods each have advantages and limitations. A significant advantage of the LM method is that it dissipates the original energy E without requiring F to be bounded from below. On the other hand, at each time step, we must solve a nonlinear scalar equation for q, which may admit multiple solutions, making the stability and error analysis more involved. 83 Relaxed Lagrange Multiplier (RLM) Methods 
+
+We now present our proposed Relaxed Lagrange Multiplier (RLM) schemes, which combine the ad-vantages of both approaches while avoiding their drawbacks. The key idea is to augment the LM for-mulation with a relaxation term involving a parameter α ≥ 0. This relaxation serves two purposes. First, combined with a suitable quadratic approximation of F n+1 , it yields a quadratic equation for the multiplier that admits a closed-form solution, with the relaxation term α[( qn+1 )2 − (qn)2]ensuring solvability and root-separation. Second, it provides additional flexibility in controlling the deviation of q(t) from 1. Unlike SAV methods, the RLM schemes preserve the energy dissipation law in the original variables. Unlike the standard LM method, they avoid solving a nonlinear equa-tion and ensure that the algebraic system is uniquely solvable with a suitable relaxation parameter 
+
+α.
+
+3.1 RLM Reformulation 
+
+For the general phase-field equation (2.2), we reformulate it as 
+
+∂tϕ = −M μ, (3.1) 
+
+μ = Lϕ + q(t) f (ϕ), f (ϕ) = F ′(ϕ), (3.2) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t) f (ϕ)∂tϕ dx, (3.3) where α ≥ 0 is a relaxation parameter and q(t) is a scaling factor with the consistent initial condition q(0) = 1. Taking the L2 inner product of (3.1) with μ, expanding μ via (3.2), and using (3.3) together with the time-independence and self-adjointness of L and M, we obtain the relaxed energy dissipation law 
+
+ddt 
+
+h
+
+E(ϕ) + α q(t)2 − 1i
+
+= −∥L ϕ + q(t)f (ϕ)∥2 
+
+> M
+
+≤ 0. (3.4) We refer to ˜E(ϕ, q ) := E(ϕ) + α(q2 − 1) as the relaxed (original) energy. With the consistent initial condition q(0) = 1, it satisfies ˜E(ϕ(0) , q (0)) = E(ϕ(0)). Moreover, the reformulation is consistent with the original model (2.2). If ϕ solves (2.2), then the pair ( ϕ, q ≡ 1) satisfies (3.1)– (3.3), since for q ≡ 1 Eq. (3.3) reduces to the chain rule ddt 
+
+R 
+
+> Ω
+
+F (ϕ) d x = R 
+
+> Ω
+
+f (ϕ) ∂tϕ dx. In this case ˜E(ϕ, q ≡ 1) = E(ϕ) exactly, so (3.4) reduces to the original energy dissipation law (2.6). 
+
+Remark 3.1. For α > 0, combining (3.3) with the chain rule ddt 
+
+R 
+
+> Ω
+
+F (ϕ) d x = R 
+
+> Ω
+
+f (ϕ) ∂tϕ dx yields the explicit scalar ODE ˙q(t) = 
+
+ q(t) − 1 R  
+
+> Ω
+
+f (ϕ) ∂tϕ dx
+
+2α q (t) . (3.5) When q(0) = 1, it admits q ≡ 1 as a solution branch. This is the well-posedness improvement that the relaxation provides over the bare LM constraint. For the Allen–Cahn (AC) type, applying the RLM reformulation to the original AC-type equa-tion (2.3) with M = M I (where M > 0 is a constant and I is the identity operator), we obtain 
+
+∂tϕ = −M μ, (3.6) 
+
+μ = Lϕ + q(t) f (ϕ), f (ϕ) = F ′(ϕ), (3.7) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t) f (ϕ)∂tϕ dx. (3.8) 9For the Cahn–Hilliard (CH) type, applying the RLM reformulation to the original CH-type equation (2.4) with M = −M ∆ (where M > 0 is the mobility constant), we obtain 
+
+∂tϕ = M ∆μ, (3.9) 
+
+μ = Lϕ + q(t) f (ϕ), f (ϕ) = F ′(ϕ), (3.10) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t) f (ϕ)∂tϕ dx. (3.11) As with the original CH-type system, the RLM reformulation preserves mass conservation (2.5) under homogeneous Neumann boundary conditions ( n · ∇ μ = 0 on ∂Ω), 
+
+ddt 
+
+Z
+
+> Ω
+
+ϕ dx = 0 . (3.12) This follows from integrating (3.9) over Ω and applying the divergence theorem with the boundary condition, just as in the original CH-type case. The introduction of the scaling factor q(t) does not affect mass conservation, as it appears only in the chemical potential μ and not in the evolution equation for ϕ.
+
+Remark 3.2. If α = 0, such a strategy reduces to the Lagrange multiplier method [8] and one of the special cases of the supplementary variable method [19]. 
+
+Remark 3.3. For simplicity, and to avoid obscuring the effects of the stabilization technique, we choose the regularization parameter γ0 = 0 [4] in the RLM scheme. A non-zero treatment, as in the SAV approach in Eq. (2.9), can be carried out similarly. Positive γ0 increases the numerical stability by introducing a stabilization term as in [41]. 
+
+3.2 RLM Numerical Schemes 
+
+Discretizing Eqs. (3.1)–(3.3) using BDF1 or CN semi-implicit schemes yields the first-order RLM-BDF1 scheme and the second-order RLM-CN scheme as follows. 
+
+Scheme 5 (RLM-BDF1 Scheme) .
+
+ϕn+1 − ϕn
+
+∆t = −M μn+1 , (3.13) 
+
+μn+1 = Lϕn+1 + qn+1 f (ϕn), (3.14) 
+
+Z
+
+> Ω
+
+F n+1 − F n
+
+∆t dx + α (qn+1 )2 − (qn)2
+
+∆t = qn+1 
+
+Z
+
+> Ω
+
+f (ϕn) ϕn+1 − ϕn
+
+∆t dx, (3.15) 
+
+where F n+1 and F n are approximations of F (ϕ) at the times tn+1 and tn, respectively. 
+
+Scheme 6 (RLM-CN Scheme) .
+
+ϕn+1 − ϕn
+
+∆t = −M μn+ 12 , (3.16) 
+
+μn+ 12 = Lϕn+ 12 + qn+ 12 f (ϕn+ 12 ), (3.17) 
+
+Z
+
+> Ω
+
+F n+1 − F n
+
+∆t dx + α (qn+1 )2 − (qn)2
+
+∆t = qn+ 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 ) ϕn+1 − ϕn
+
+∆t dx, (3.18) 
+
+where F n+1 and F n are approximations of F (ϕ) at the times tn+1 and tn, respectively. 
+
+10 Remark 3.4. For instance, F n+1 = F (ϕn+1 ) and F n = F (ϕn). Special treatments of F n+1 and 
+
+F n will be discussed in Sections 3.3 and 3.4. 
+
+Theorem 3.1. Assume that at each time step the discrete system admits a solution (ϕn+1 , q n+1 )
+
+(see the solvability results in Section 3.3). Schemes 5 and 6 are energy-stable in the sense that 
+
+˜E(ϕn+1 , q n+1 ) − ˜E(ϕn, q n) ≤ 0, (3.19) 
+
+where ˜E(ϕn, q n) = 12 ∥ϕn∥2 
+
+> L
+
++ R 
+
+> Ω
+
+F n dx + α(qn)2 − 1.Proof. We first prove the result for Scheme 6 and then indicate the modification for Scheme 5. Taking the L2 inner products of (3.16) and (3.17) with μn+ 12 and ϕn+1 −ϕn 
+
+> ∆t
+
+, respectively, we obtain 
+
+ϕn+ 12 , ϕn+1 − ϕn
+
+∆t
+
+
+
+> L
+
++
+
+
+
+qn+ 12 f (ϕn+ 12 ), ϕn+1 − ϕn
+
+∆t
+
+
+
+= −∥ μn+ 12 ∥2
+
+> M
+
+. (3.20) Using the symmetry of ( ·, ·)L and ϕn+ 12 = 12 (ϕn+1 + ϕn), 
+
+
+
+ϕn+ 12 , ϕn+1 − ϕn
+
+∆t
+
+
+
+> L
+
+= 12∆ t
+
+h
+
+∥ϕn+1 ∥2 
+
+> L
+
+− ∥ ϕn∥2
+
+> L
+
+i
+
+.
+
+Substituting this identity and (3.18) into (3.20), multiplying by ∆ t, and rearranging yields ˜E(ϕn+1 , q n+1 ) − ˜E(ϕn, q n) = −∆t ∥μn+ 12 ∥2 
+
+> M
+
+≤ 0,
+
+where the inequality holds since ∥ · ∥ 2 
+
+> M
+
+≥ 0 by the non-negativity of M.For Scheme 5, we take the L2 inner products of (3.13) and (3.14) with μn+1 and ϕn+1 −ϕn 
+
+> ∆t
+
+,respectively, and use the identity 
+
+ ϕn+1 , ϕ n+1 − ϕn 
+
+> L
+
+= 12
+
+h
+
+∥ϕn+1 ∥2 
+
+> L
+
+− ∥ ϕn∥2 
+
+> L
+
++ ∥ϕn+1 − ϕn∥2
+
+> L
+
+i
+
+.
+
+Substituting (3.15) and multiplying by ∆ t yields ˜E(ϕn+1 , q n+1 ) − ˜E(ϕn, q n) = −∆t ∥μn+1 ∥2 
+
+> M
+
+− 12 ∥ϕn+1 − ϕn∥2 
+
+> L
+
+≤ 0,
+
+which carries an additional non-negative dissipation term 12 ∥ϕn+1 − ϕn∥2 
+
+> L
+
+from the non-negativity of L.We emphasize that Theorem 3.1 holds for any choice of the approximations F n+1 and F n,provided the scalar relation (3.15) or (3.18) is enforced exactly with the increment ϕn+1 − ϕn. This is the case for the RLM-Q variant introduced in the next subsection. 
+
+Remark 3.5 (Relaxed Energy vs. Original Energy) . The relaxed energy ˜E(ϕn, q n) = 12 ∥ϕn∥2 
+
+> L
+
++
+
+Z
+
+> Ω
+
+F n dx + α(qn)2 − 1
+
+differs from the original energy 
+
+E(ϕn) = 12 ∥ϕn∥2 
+
+> L
+
++
+
+Z
+
+> Ω
+
+F (ϕn) d x
+
+11 by the exact decomposition ˜E(ϕn, q n) − E(ϕn) = 
+
+Z
+
+> Ω
+
+ F n − F (ϕn) dx + α(qn)2 − 1.
+
+For a consistent discretization, the first term satisfies 
+
+Z
+
+> Ω
+
+(F n − F (ϕn)) d x = O(∆ tk),
+
+where k is the order of the surrogate approximation of F . The relaxation term α(( qn)2 − 1) is observed numerically to be of the same order, O(∆ tk), so that 
+
+| ˜E(ϕn, q n) − E(ϕn)| ≲ O(∆ tk).
+
+A rigorous bound on |qn − 1| in terms of α and ∆ t, which would make this estimate precise, is left for future work. Both RLM-BDF1 and RLM-CN satisfy the mass/volume conservation law with the phase vari-able ϕ, which usually represents the mass fraction or volume fraction. Here, we present only the proof for RLM-CN, since the proofs are analogous. 
+
+Theorem 3.2 (Mass/Volume Conservation) . The RLM-CN scheme (Scheme 6) for the Cahn– Hilliard equation preserves mass/volume, i.e., 
+
+Z
+
+> Ω
+
+ϕn+1 dx =
+
+Z
+
+> Ω
+
+ϕn dx
+
+for all n ≥ 0, under homogeneous Neumann boundary conditions n · ∇ μ = 0 on ∂Ω (or periodic boundary conditions). Proof. Integrating equation (3.16) over the domain Ω, we obtain 
+
+Z
+
+> Ω
+
+ϕn+1 − ϕn
+
+∆t dx = M
+
+Z
+
+> Ω
+
+∆μn+ 12 dx.
+
+Applying the divergence theorem to the right-hand side (with μn+ 12 taken sufficiently regular for the divergence theorem to apply, consistent with the standing boundary-condition assumptions) yields Z
+
+> Ω
+
+∆μn+ 12 dx =
+
+Z
+
+> Ω
+
+∇ · (∇μn+ 12 ) d x =
+
+Z
+
+> ∂Ω
+
+n · ∇ μn+ 12 dS. 
+
+Under homogeneous Neumann boundary conditions, n·∇ μn+ 12 = 0 on ∂Ω, so the boundary integral vanishes. Under periodic boundary conditions, the contributions from opposite faces of ∂Ω cancel, so the boundary integral likewise vanishes. Then, we have 
+
+Z
+
+> Ω
+
+∆μn+ 12 dx = 0 .
+
+Substituting back and multiplying by ∆ t gives 
+
+Z
+
+> Ω
+
+ϕn+1 dx −
+
+Z
+
+> Ω
+
+ϕn dx = 0 ,
+
+which establishes the conservation property. 12 The procedures to solve Scheme 5 and Scheme 6 are similar. Taking Scheme 6 as an example, we express ϕn+1 as an affine function of qn+1 ,
+
+ϕn+1 = ϕn+1 1 + qn+1 ϕn+1 2 ,
+
+by solving the following system of equations. 
+
+• Step 1: Solve ϕn+1 1 and ϕn+1 2 . Denote the operator 
+
+G := 1∆t I + 12 M L .
+
+Then, solve ϕn+1 1 and ϕn+1 2 from the following linear system, 
+
+Gϕn+1 1 = 1∆t ϕn − 12 ML ϕn − 12 Mqnf (ϕn+ 12 ); (3.21) 
+
+Gϕn+1 2 = − 12 Mf (ϕn+ 12 ). (3.22) 
+
+• Step 2: Solve qn+1 . Using the discrete energy equation (3.18), we solve qn+1 from the following algebraic equation, 
+
+Z
+
+> Ω
+
+F n+1 − F n
+
+∆t dx + α (qn+1 )2 − (qn)2
+
+∆t = qn+ 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 ) ϕn+1 − ϕn
+
+∆t dx. (3.23) With a suitable approximation of F n+1 .
+
+• Step 3: Update ϕn+1 = ϕn+1 1 + qn+1 ϕn+1 2 .
+
+Remark 3.6. Eq. (3.23) is an algebraic equation for qn+1 . For instance, if we approximate F n+1 
+
+and F n by F n+1 = F (ϕn+1 ) and F n = F (ϕn), then Eq. (3.23) can be rewritten as 
+
+Z
+
+> Ω
+
+
+
+F (ϕn+1 1 + qn+1 ϕn+1 2 ) − F (ϕn)
+
+
+
+dx + α
+
+h
+
+(qn+1 )2 − (qn)2i
+
+= qn+ 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 ) ϕn+1 1 + qn+1 ϕn+1 2 − ϕn dx. (3.24) Once ϕn+1 1 and ϕn+1 2 are obtained from Eq. (3.21) and Eq. (3.22), respectively, we can determine 
+
+qn+1 by solving the algebraic Eq. (3.23). Unfortunately, due to the nonlinearity of F (ϕ), the existence and uniqueness of a solution for qn+1 in Eq. (3.23) are not guaranteed, as in the LM and SVM approaches [8, 19]. We can expect the solvability to depend on the time step size ∆ t.
+
+3.3 RLM Schemes with Quadratization 
+
+The solvability issue identified above motivates the development of RLM schemes that guarantee the existence of a closed-form solution for qn+1 . The key idea is to approximate F n+1 in such a way that Eq. (3.23) becomes a quadratic equation in qn+1 , which admits an explicit solution via the quadratic formula. In our first approach, we approximate F n+1 by a quadratic function of ϕn+1 in a semi-implicit manner. We refer to this approach as relaxed Lagrange multiplier with quadratization (RLM-Q). This approach is practical for a broad class of potentials. For instance, we can introduce a stabilization constant S > 0 such that 
+
+F n+1 = S(ϕn+1 )2 + F (ϕn+1 ) − S(ϕn+1 )2. (3.25) 13 Therefore, Eq. (3.23) is a quadratic equation for qn+1 .In particular, we can refine this approximation by properly exploring F (ϕ). For instance, when 
+
+F (ϕ) = 14 (ϕ2 − 1) 2, we can approximate F n+1 and F n by 
+
+F n+1 = 14 (ϕn+1 ϕn+1 − 1) 2, F n = 14 (ϕnϕn − 1) 2. (3.26) After multiplying through by ∆ t to clear the common 1 /∆t factor, Eq. (3.23) is simplified as 
+
+Z
+
+> Ω
+
+ 14 (ϕn+1 ϕn+1 − 1) 2 − 14 (ϕnϕn − 1) 2
+
+dx + α
+
+h
+
+(qn+1 )2 − (qn)2i
+
+= qn+ 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 ) ϕn+1 − ϕn dx. (3.27) This expression is quadratic in ϕn+1 and, through the affine representation ϕn+1 = ϕn+1 1 +qn+1 ϕn+1 2 ,in the unknown qn+1 . For Eq. (3.26), we can write 
+
+Z
+
+> Ω
+
+F n+1 dx = A0(qn+1 )2 + B0qn+1 + C0.
+
+with the coefficients calculated as 
+
+A0 =
+
+Z
+
+> Ω
+
+14 (ϕn+1 ϕn+1 2 )2 dx, B0 =
+
+Z
+
+> Ω
+
+12 (ϕn+1 ϕn+1 1 − 1) ϕn+1 ϕn+1 2 dx,C0 =
+
+Z
+
+> Ω
+
+14 (ϕn+1 ϕn+1 1 − 1) 2 dx.
+
+Therefore, Eq. (3.27) is a quadratic equation for qn+1 . We can write it as 
+
+A1(qn+1 )2 + B1qn+1 + C1 = 0 , (3.28) where the coefficients for the quadratic equations are derived as 
+
+A1 = ˜A0 + α, ˜A0 = A0 − 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 )ϕn+1 2 dx
+
+B1 = ˜B0, ˜B0 = B0 − 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 )( ϕn+1 1 − ϕn) d x − 12 qn
+
+Z
+
+> Ω
+
+f (ϕn+ 12 )ϕn+1 2 dx,C1 = ˜C0 − α(qn)2, ˜C0 = C0 −
+
+Z
+
+> Ω
+
+F n dx − 12 qn
+
+Z
+
+> Ω
+
+f (ϕn+ 12 )( ϕn+1 1 − ϕn) d x.
+
+Here R 
+
+> Ω
+
+F n dx denotes the same quadratized surrogate as in (3.26), namely R 
+
+> Ω
+
+F n dx = R 
+
+> Ω14
+
+(ϕnϕn −
+
+1) 2 dx. The following lemma formalizes this solvability result. 
+
+Lemma 3.1 (Solvability of RLM-Q Quadratic Equation) . Assume qn > 0 (consistent with the root-selection criterion qn+1 ≈ qn ≈ 1). Then Eq. (3.28) has at least one real solution in the following cases: 1. If ( ˜A0(qn)2 + ˜C0)2 < (qn)2 ˜B20 , then the equation is solvable for any α ≥ 0.2. If ( ˜A0(qn)2 + ˜C0)2 ≥ (qn)2 ˜B20 , then the equation is solvable when 
+
+α ≥ α∗ := max 
+
+0,
+
+˜C0 − ˜A0(qn)2 +
+
+q
+
+( ˜A0(qn)2 + ˜C0)2 − (qn)2 ˜B20
+
+2( qn)2
+
+ .
+
+14 Proof. Assume qn > 0. If A1 = ˜A0 + α = 0, Eq. (3.28) degenerates to a linear equation, which is solvable whenever B1̸ = 0 (and if A1 = B1 = 0, a solution exists only when C1 = 0, in which case every qn+1 is a solution). We henceforth assume A1̸ = 0 (this is guaranteed, e.g., when α > − ˜A0,cf. Corollary 3.1). The discriminant of equation (3.28) is ∆1 = B21 − 4A1C1
+
+= ˜B20 − 4( ˜A0 + α)( ˜C0 − α(qn)2)= ˜B20 − 4 ˜A0 ˜C0 + 4 α ˜A0(qn)2 − 4α ˜C0 + 4 α2(qn)2
+
+= 4( qn)2α2 + 4   ˜A0(qn)2 − ˜C0
+
+α +   ˜B20 − 4 ˜A0 ˜C0
+
+.
+
+This is a quadratic polynomial in α with leading coefficient 4( qn)2 > 0. Therefore, ∆ 1 → +∞ as 
+
+α → ∞ .For the discriminant ∆ 1 ≥ 0, we require the quadratic in α to be non-negative. The discriminant of this quadratic in α is 
+
+Dα = 16 ( ˜A0(qn)2 + ˜C0)2 − (qn)2 ˜B20
+
+.
+
+If Dα < 0, i.e., ( ˜A0(qn)2 + ˜C0)2 < (qn)2 ˜B20 , then the quadratic in α has no real roots. Since its leading coefficient is positive and it has no real roots, the quadratic in α is strictly positive, so ∆1 > 0 for all α ≥ 0, and the equation (3.28) is solvable for any α ≥ 0. If Dα ≥ 0, i.e., ( ˜A0(qn)2 + ˜C0)2 ≥ (qn)2 ˜B20 , then the quadratic in α has two real roots. Since the leading coefficient is positive, ∆ 1 ≥ 0 when α lies outside the interval between these roots. The larger root gives the threshold α∗,
+
+α∗ = max 
+
+0,
+
+˜C0 − ˜A0(qn)2 +
+
+q
+
+( ˜A0(qn)2 + ˜C0)2 − (qn)2 ˜B20
+
+2( qn)2
+
+ .
+
+We note that ∆ 1 ≥ 0 also holds for α at or below the smaller root. We state only the large-α
+
+branch, which is the regime of practical interest. When two real roots exist for qn+1 , we select the root closest to qn to ensure continuity of the scaling factor. The solvability conditions in Lemma 3.1 guarantee the existence of a real root. The following corollary shows that the quadratic admits exactly one positive root. For sufficiently large α, the two roots approach ±qn, so the closest-to-qn selection rule returns this positive root, and the update of the scaling factor is uniquely determined. 
+
+Corollary 3.1 (Unique Positive Root for RLM-Q) . Assume qn > 0. If α > max 
+
+n
+
+− ˜A0, ˜C0
+
+> (qn)2
+
+o
+
+,
+
+then A1 > 0 and C1 < 0 in (3.28) . Consequently, the discriminant satisfies ∆1 = B21 − 4A1C1 > 0,and the two real roots of (3.28) have opposite signs. Hence Eq. (3.28) admits exactly one positive root. For sufficiently large α, the two roots approach ±qn, so the closest-to-qn selection rule returns this positive root, and qn+1 is uniquely determined. Proof. The condition α > − ˜A0 gives A1 = ˜A0 + α > 0, and α > ˜C0/(qn)2 gives C1 = ˜C0 − α(qn)2 <
+
+0. Then ∆ 1 = B21 − 4A1C1 ≥ − 4A1C1 > 0, so (3.28) has two distinct real roots. The product of the roots equals C1/A 1 < 0, so the roots have opposite signs, and exactly one of them is positive. 
+
+Remark 3.7. In particular, when α is sufficiently large ( α ≫ | ˜A0|, | ˜B0|, | ˜C0| ), the terms involving 
+
+α dominate the coefficients in (3.28). In this limit, (3.28) reduces to α[( qn+1 )2 − (qn)2] = 0, and the discriminant satisfies ∆ 1 = B21 − 4A1C1 = 4 α2(qn)2 > 0, which means that Eq. (3.28) is always solvable. Combined with Theorem 3.1, the RLM-Q-CN scheme is unconditionally energy-stable provided α is sufficiently large and | ˜A0|, | ˜B0|, and | ˜C0| are bounded. 15 Remark 3.8 (Root Selection Criterion) . When the quadratic equation for qn+1 admits two real roots, we select the root closest to qn. This choice is justified by three considerations. At the continuous level, q(t) evolves continuously with q(0) = 1, so the discrete approximation qn+1 
+
+should remain close to qn for small time steps. The criterion also ensures temporal stability and prevents spurious jumps in the scaling factor. Finally, for sufficiently large α, the two roots approach 
+
+±qn, and selecting the root closest to qn naturally yields the positive root that maintains qn+1 ≈
+
+1. In particular, under the conditions of Corollary 3.1, exactly one of the two roots is positive. For sufficiently large α, the two roots approach ±qn, so the closest-to-qn selection criterion picks precisely this positive root. 
+
+3.4 RLM with Prediction-Correction (RLM-PC) 
+
+In our second approach, we approximate F n+1 using the predicted solution (obtained by setting 
+
+q = 1). This leads to a more easily solvable quadratic equation for qn+1 than the RLM-Q method. We refer to this approach as RLM-PC (relaxed Lagrange multiplier with prediction-correction). In particular, for a general bulk potential F (ϕ), we can update 
+
+F n+1 = F (ϕn+1 ,∗), F n = F (ϕn, ∗), ϕn+1 ,∗ := ϕn+1 1 + ϕn+1 2 , ϕn, ∗ := ϕn 
+
+> 1
+
++ ϕn 
+
+> 2
+
+, (3.29) in Eq. (3.23). Here ϕn+1 ,∗ is the predicted state corresponding to setting qn+1 = 1. The surrogate 
+
+F n = F (ϕn, ∗) uses the predicted state ϕn, ∗ = ϕn 
+
+> 1
+
++ ϕn 
+
+> 2
+
+(corresponding to q = 1), formed from the affine fields of the previous step, which differs from F (ϕn) unless qn = 1. Since qn ≈ 1, the two agree to high order. To obtain a quadratic equation with explicit coefficients, we further approximate the inner-product term in (3.23) using the predicted increment ϕn+1 ,∗ − ϕn. Thus, Eq. (3.23) is simplified as 
+
+Z
+
+> Ω
+
+
+
+F (ϕn+1 ,∗) − F (ϕn, ∗)
+
+
+
+dx + α
+
+h
+
+(qn+1 )2 − (qn)2i
+
+= qn+ 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 ) ϕn+1 ,∗ − ϕn dx. (3.30) Then we need to solve another (but simpler) quadratic equation, which is 
+
+A2(qn+1 )2 + B2qn+1 + C2 = 0 , (3.31) where the coefficients are 
+
+A2 = α, B2 = − 12
+
+Z
+
+> Ω
+
+f (ϕn+ 12 )( ϕn+1 ,∗ − ϕn) d x, C2 =
+
+Z
+
+> Ω
+
+ F n+1 − F n dx + qnB2 − α(qn)2,
+
+with F n+1 and F n defined by Eq. (3.29). 
+
+Remark 3.9 (Comparison of RLM-Q and RLM-PC) . The key difference between RLM-Q and RLM-PC lies in how F n+1 (and the related inner-product term in (3.23)) is approximated. In the RLM-Q approach, we replace F n+1 by a semi-implicit surrogate that is quadratic in ϕn+1 , with the remaining factor frozen at the extrapolation ϕn+1 . This yields a quadratic equation for qn+1 with coefficients that depend on the extrapolated values. In the RLM-PC approach, we first form the predicted state ϕn+1 ,∗ = ϕn+1 1 + ϕn+1 2 (corresponding to qn+1 = 1), evaluate F n+1 = F (ϕn+1 ,∗), and approximate the inner-product term using the predicted increment ϕn+1 ,∗ − ϕn. This leads to the simpler quadratic equation (3.31). In this sense, RLM-PC can be viewed as a predictor–correction for qn+1 , predicting with qn+1 = 1 and then correcting by solving for qn+1 .16 4 Numerical Results 
+
+In this section, we apply the RLM framework to several classical phase-field models with homo-geneous Neumann boundary conditions to illustrate the accuracy and efficiency of the proposed schemes. For spatial discretization, we use the discrete cosine transform method, which is second-order accurate and naturally enforces homogeneous Neumann boundary conditions. 
+
+4.1 AC-type Equation with Double-Well Potential 
+
+The free energy of the system with the double-well potential is given as 
+
+E(ϕ) = 
+
+Z
+
+> Ω
+
+ ε2
+
+2 |∇ ϕ|2 + F (ϕ)
+
+
+
+dx, F (ϕ) = 14 (ϕ2 − 1) 2. (4.1) where ϕ is the phase-field variable and ε is the interfacial thickness parameter. Note that f (ϕ) = 
+
+F ′(ϕ) = ϕ(ϕ2 − 1). Based on the RLM reformulation in Section 3, the Allen–Cahn-type equation with the double-well potential is given by 
+
+∂tϕ = −M μ, (4.2) 
+
+μ = −ε2∆ϕ + q(t)ϕ(ϕ2 − 1) , (4.3) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t)ϕ(ϕ2 − 1) ∂tϕ dx, (4.4) where M > 0 is the mobility constant and q(0) = 1. For the RLM-Q scheme, we set F n+1 = 14 (ϕn+1 ϕn+1 − 1) 2. We assess temporal convergence, energy accuracy, and computational efficiency. In the first example, we verify the convergence rates of the proposed RLM-Q and RLM-PC schemes for the Allen–Cahn equation. We set the domain as Ω = [0 , 1] 2 and use the initial condition 
+
+ϕ0(x, y ) = cos(2 πx ) cos(2 πy ).
+
+We take the interface thickness ε = 10 −2, α = 1 × 10 −2, and the mobility coefficient M = 1. For the temporal convergence test, we compute the Cauchy difference ϕk−ϕk−1 for k = 1 , 2, . . . , 7in the L2 norm at final time Tfinal = 0 .1 with ∆ t = 0 .1/2k−1 and spatial step size h = 1 /256. We compute the convergence order by order = log 2 
+
+> L2(k−1)
+> L2(k)
+
+, where L2(k) := ∥ϕk − ϕk−1∥2 with the discrete norm ∥v∥2 = ( h2 P 
+
+> i,j
+
+v2 
+
+> ij
+
+)1/2. The same definition applies to the Cahn–Hilliard convergence test in Section 4.2. We perform convergence tests for the RLM-Q-BDF1, RLM-Q-CN, and RLM-PC-CN schemes. The results are summarized in Table 2. From Table 2, we observe that the RLM-Q-BDF1 scheme achieves first-order temporal accuracy, as expected for a first-order BDF scheme. Moreover, both the RLM-Q-CN and RLM-PC-CN schemes achieve approximately second-order temporal accuracy, consistent with Crank–Nicolson-type schemes. 17 Table 2: Temporal convergence test for the Allen–Cahn equation with the double-well potential: Cauchy-difference L2 errors and observed convergence orders ( ε = 10 −2, α = 10 −2, M = 1, h =1/256, Tfinal = 0 .1). 
+
+(a) RLM-Q-BDF1 scheme 
+
+Coarse ∆ t Fine ∆ t L2 error Order 0.1 0.1/2 1.04 × 10 −2 –0.1/2 0.1/22 5.23 × 10 −3 0.985 0.1/22 0.1/23 2.63 × 10 −3 0.992 0.1/23 0.1/24 1.32 × 10 −3 0.996 0.1/24 0.1/25 6.60 × 10 −4 0.998 0.1/25 0.1/26 3.30 × 10 −4 0.999 
+
+(b) RLM-Q-CN scheme 
+
+Coarse ∆ t Fine ∆ t L2 error Order 0.1 0.1/2 1.10 × 10 −3 –0.1/2 0.1/22 2.91 × 10 −4 1.92 0.1/22 0.1/23 7.48 × 10 −5 1.96 0.1/23 0.1/24 1.90 × 10 −5 1.98 0.1/24 0.1/25 4.78 × 10 −6 1.99 0.1/25 0.1/26 1.20 × 10 −6 1.99 
+
+(c) RLM-PC-CN scheme 
+
+Coarse ∆ t Fine ∆ t L2 error Order 0.1 0.1/2 6.99 × 10 −4 –0.1/2 0.1/22 1.80 × 10 −4 1.96 0.1/22 0.1/23 4.57 × 10 −5 1.98 0.1/23 0.1/24 1.15 × 10 −5 1.99 0.1/24 0.1/25 2.89 × 10 −6 1.99 0.1/25 0.1/26 7.23 × 10 −7 2.00 Next, we present dynamic simulations of the Allen–Cahn equation using the proposed RLM-CN schemes and compare them with the SAV-CN scheme. We set the computational domain as Ω = [0 , 1] 2, the interface thickness ε = 10 −2, the time step size ∆ t = 10 −3, the mobility coefficient 
+
+M = 1, the constant Csav = 1 × 10 3 in the SAV scheme, and the spatial step size h = 1 /128. The initial condition is given by 
+
+ϕ0(x, y ) = tanh 
+
+ 0.2 − rδ0
+
+
+
+, r = p(x − 0.5) 2 + ( y − 0.5) 2, δ0 = 0 .01 . (4.5) We apply the SAV-CN, RLM-Q-CN, and RLM-PC-CN schemes and compare snapshots of the phase variable at T = 24 , 120 , 192 , 240. Figure 1 summarizes the results. The three schemes produce visually indistinguishable snapshots at these times. 18 Method T = 24 T = 120 T = 192 T = 240 
+
+> SAV
+> RLM-Q
+> RLM-PC
+
+Figure 1: Snapshots of the phase variable ϕ for the Allen–Cahn equation at T = 24 , 120 , 192 , 240. Each row corresponds to a different scheme: SAV-CN (top), RLM-Q-CN with α = 10 −2 (middle), and RLM-PC-CN with α = 10 −2 (bottom). Each column shows results at the same time point. We conduct quantitative comparisons between these schemes, with the results summarized in Figure 2. In Figure 2(a), we observe that the relaxed original energies of RLM-Q-CN and RLM-PC-CN (denoted ERLM in the numerical results) with α = 10 −2 are almost identical to those of SAV-CN ( denoted ESAV , which is the benchmark). The time evolutions of q for four cases are shown in Figure 2(b). We find that decreasing α increases the deviation of q from 1. The results indicate that q is very close to 1 with α = 10 −2, while a smaller α may induce a larger deviation of q from 1 for both RLM schemes. When α = 10 −4, the quadratic equation for RLM-Q-CN does not have a real solution, while RLM-PC-CN remains solvable, indicating that RLM-PC-CN is more robust. To quantify the differences among RLM, SAV, and original energies, we define two classes of energy differences. The first class, ˜E − ESAV , compares the relaxed original energies ( ˜E) with the benchmark energy ( ESAV ). The second class, ˜E − E = α(q2 − 1), compares the relaxed original energy ˜E (as defined in Section 3) with the original energy E. Figure 2(c) indicates that the relaxed original energies ˜E are closer to the benchmark energy with a larger α. Meanwhile, a larger α also promotes the accuracy of the original energy α(q2 − 1) in Figure 2(d). This is because a larger α
+
+improves the stability of q. For example, q is very close to 1 when α = 10 −2 in Figure 2(b). 19 (a) Comparison of the energies (b) Scaling factor q 
+
+> (c) First class of energy differences (d) Second class of energy differences
+
+Figure 2: Time evolution of the energy, scaling factor q, and energy differences for the Allen–Cahn equation. (a) Energies of SAV-CN, RLM-Q-CN (all with α = 10 −2). (b) Scaling factor q for RLM-Q ( α = 10 −2, 5 × 10 −4) and RLM-PC ( α = 10 −2, 1 × 10 −4). (c) First class of energy differences ˜E − ESAV . (d) Second class of energy differences α(q2 − 1). To further investigate the robustness of the RLM methods, we next examine their accuracy with sufficiently large values of α. The relaxed original energy ( ˜E) evolutions of the RLM-Q-CN and RLM-PC-CN schemes with α = 10 −2 and α = 10 3 are shown in panels (a) and (b) of Figure 3. For both RLM-Q-CN and RLM-PC-CN, the energy dissipation rates with α = 10 −2 and α = 10 3
+
+are identical. Figure 3(c) and (d) show that RLM-PC-CN is more robust than RLM-Q-CN with 
+
+α = 10 −2 and α = 10 3.20 (a) RLM-Q (b) RLM-PC        
+
+> (c) Scaling factor q(α= 10 −2)(d) Scaling factor q(α= 10 3)
+
+Figure 3: Time evolution of the relaxed original energy ˜E and scaling factor q for the Allen–Cahn equation with α = 10 −2 and 10 3. (a) RLM-Q: the energy curves for α = 10 −2 coincide with those of α = 10 3. (b) RLM-PC: the energy curves for α = 10 −2 are also the same as those of α = 10 3.(c) and (d) show the time evolutions of q for the two RLM methods with α = 10 −2 and α = 10 3.
+
+4.2 CH-type Equation with Double-Well Potential 
+
+Having validated the RLM schemes for the Allen–Cahn equation, we now apply the same framework to the Cahn–Hilliard equation with the same double-well potential to demonstrate the performance of RLM for mass-conserving gradient flows. The free energy is the same double-well potential as in (4.1). Based on the RLM reformulation in Section 3, the Cahn–Hilliard-type equation with this potential is given by 
+
+∂tϕ = M ∆μ, (4.6) 
+
+μ = −ε2∆ϕ + q(t)ϕ(ϕ2 − 1) , (4.7) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t)ϕ(ϕ2 − 1) ∂tϕ dx, (4.8) where M > 0 is the mobility constant and q(0) = 1. Using the same RLM-Q approximation as in Section 4.1, we set F n+1 = 14 (ϕn+1 ϕn+1 − 1) 2. We assess temporal convergence, energy accuracy, and computational efficiency. 
+
+ϕ0(x, y ) = cos(2 πx ) cos(2 πy ).
+
+21 We take the interface thickness ε = 10 −2, α = 1 × 10 −2, and the mobility coefficient M = 5 × 10 −4.For the temporal convergence test, we compute the Cauchy difference ϕk−ϕk−1 for k = 1 , 2, . . . , 7in the L2 norm at final time Tfinal = 0 .1 with ∆ t = 0 .1/2k−1 and spatial step size h = 1 /256. We compute the convergence order by order = log 2 
+
+> L2(k−1)
+> L2(k)
+
+. We perform convergence tests for the RLM-Q-BDF1, RLM-Q-CN, and RLM-PC-CN schemes. The results are summarized in Table 3. From Table 3, we observe that the RLM-Q-BDF1 scheme achieves first-order temporal accuracy, while both the RLM-Q-CN and RLM-PC-CN schemes achieve approximately second-order temporal accuracy. Table 3: Temporal convergence test for the Cahn–Hilliard equation with the double-well potential: Cauchy-difference L2 errors and observed convergence orders ( ε = 10 −2, α = 10 −2, M = 5 × 10 −4,
+
+h = 1 /256, Tfinal = 0 .1). 
+
+(a) RLM-Q-BDF1 scheme 
+
+Coarse ∆ t Fine ∆ t L2 error Order 0.1 0.1/2 1.42 × 10 −3 –0.1/2 0.1/22 7.15 × 10 −4 0.9981 0.1/22 0.1/23 3.58 × 10 −4 0.9990 0.1/23 0.1/24 1.79 × 10 −4 0.9995 0.1/24 0.1/25 8.95 × 10 −5 0.9998 0.1/25 0.1/26 4.47 × 10 −5 0.9999 
+
+(b) RLM-Q-CN scheme 
+
+Coarse ∆ t Fine ∆ t L2 error Order 0.1 0.1/2 9.70 × 10 −5 –0.1/2 0.1/22 2.52 × 10 −5 1.95 0.1/22 0.1/23 6.39 × 10 −6 1.98 0.1/23 0.1/24 1.60 × 10 −6 2.00 0.1/24 0.1/25 3.98 × 10 −7 2.01 0.1/25 0.1/26 9.80 × 10 −8 2.02 
+
+(c) RLM-PC-CN scheme 
+
+Coarse ∆ t Fine ∆ t L2 error Order 0.1 0.1/2 5.95 × 10 −5 –0.1/2 0.1/22 1.56 × 10 −5 1.93 0.1/22 0.1/23 3.99 × 10 −6 1.97 0.1/23 0.1/24 1.01 × 10 −6 1.98 0.1/24 0.1/25 2.53 × 10 −7 1.99 0.1/25 0.1/26 6.35 × 10 −8 2.00 Next, we present dynamic simulations for the Cahn–Hilliard equation. We set the computational domain as Ω = [0 , 1] 2, the interface thickness ε = 10 −2, the time step size ∆ t = 10 −2, the mobility coefficient M = 10 −6, and the spatial step size h = 1 /128. The initial condition is given by 
+
+ϕ0(x, y ) = 1 − 12
+
+h
+
+1 − tanh 
+
+ 0.2 − r1
+
+δ0
+
+ ih 
+
+1 − tanh 
+
+ 0.2 − r2
+
+δ0
+
+ i
+
+(4.9) where r1 = p(x − 0.3) 2 + ( y − 0.5) 2, r2 = p(x − 0.7) 2 + ( y − 0.5) 2, and δ0 = 0 .01. Using the same initial and boundary conditions, time step, and spatial step sizes, we observe no discernible difference in the dynamics of the phase variable among the SAV-CN, RLM-Q-CN, and RLM-PC-CN schemes (see Figure 4). 22 Method T = 500 T = 5000 T = 25000 T = 50000 
+
+> SAV
+> RLM-Q
+> RLM-PC
+
+Figure 4: Snapshots of the phase variable ϕ for the Cahn–Hilliard equation at T =500 , 5000 , 25000 , 50000. Each row corresponds to a different scheme: SAV-CN (top), RLM-Q-CN with α = 10 −2 (middle), and RLM-PC-CN with α = 10 −2 (bottom). Each column shows results at the same time point. To further analyze the behavior of the schemes for the Cahn–Hilliard equation, we focus on the evolution of energy and related quantities. The results are summarized in Figure 5. In Figure 5(a), we observe that the relaxed original energies ERLM of RLM-Q-CN and RLM-PC-CN with α = 10 −2
+
+are identical to that of SAV-CN. We compare the q values between the two RLM schemes in Figure 5(b). When α = 10 −2, q is very close to 1, while decreasing α causes q to oscillate. In Figure 5(c) and (d), we compare two classes of energy differences. The first checks the effects of α
+
+on the accuracy of ˜E, and the second checks the effects on the accuracy of the original energy E.When α = 10 −2, the performance of RLM-PC-CN is much better than that of RLM-Q-CN in (c) and (d). 23 (a) Energy (b) Scaling factor q 
+
+> (c) First class of energy differences (d) Second class of energy differences
+
+Figure 5: Time evolution of the energy, scaling factor q, and energy differences for the Cahn–Hilliard equation. (a) Energies of SAV-CN, RLM-Q-CN ( α = 10 −2, 5 ×10 −4), and RLM-PC-CN ( α = 10 −2,2 × 10 −4). (b) Scaling factor q. (c) First class of energy differences ˜E − ESAV . (d) Second class of energy differences α(q2 − 1). All simulations used ∆ t = 1 × 10 −2.Next, we examine the accuracy of RLM-Q-CN and RLM-PC-CN with sufficiently large α values, as shown in Figure 6(a) and (b), with the final time Tfinal = 5 × 10 4. For α = 10 −2 and α = 10 3,the energy dissipation rates are close. This occurs because when α = 10 −2 or α = 10 3, q is very close to 1 in Figure 6(c) and (d), thus the relaxation term α(q2 − 1) remains approximately zero, thereby preserving the energy dissipation rate of the original energy. With the same α, q of RLM-PC is much closer to 1 in the two cases. These results match the Allen–Cahn case. For both the Allen–Cahn and Cahn–Hilliard equations, RLM-PC keeps q closer to 1 than RLM-Q at the same 
+
+α. We also find that a larger α introduces a smaller error in q.24 (a) RLM-Q (b) RLM-PC        
+
+> (c) Scaling factor q(α= 10 −2)(d) Scaling factor q(α= 10 3)
+
+Figure 6: Time evolution of the original energy ˜E − α(q2 − 1) and scaling factor q for the Cahn– Hilliard equation with α = 10 −2 and 10 3. (a) RLM-Q: the energy curves for α = 10 −2 coincide with those of α = 10 3. (b) RLM-PC: the energy curves for α = 10 −2 are also the same as those of 
+
+α = 10 3. (c) and (d) show the time evolutions of q for the two RLM methods with α = 10 −2 and 
+
+α = 10 3.Given the high performance of the RLM schemes at large α, we next use both RLM schemes with 
+
+α = 1 × 10 3 to simulate the long-time behavior of two merging droplets. The initial conditions and parameters are the same as above. We adopt ∆ t = 0 .1 to investigate the long-time behavior until the system reaches a steady state with Tf inal = 3 ×10 6. Figure 7(a) shows that the energy curves of the RLM-Q and RLM-PC schemes coincide, indicating that both share the same accuracy. We then define the total volume V (t) = R 
+
+> Ω
+
+ϕ(x, t ) dx. In Figure 7(b) and (c), we evaluate the performance of the two RLM schemes with respect to the scaling factor q and the conservation of total volume. The results demonstrate that RLM-PC-CN outperforms RLM-Q-CN. 25 (a) Original energy (b) Scaling factor q (c) Total volume 
+
+Figure 7: Long-time simulations of the Cahn–Hilliard equation with the double-well potential using the RLM-Q-CN and RLM-PC-CN schemes ( α = 10 3): time evolution of the original energy in (a), scaling factor q in (b), and total volume V (t) = R 
+
+> Ω
+
+ϕ(x, t ) d x in (c). The snapshots of the phase variable with ∆ t = 0 .1 at T = 1 .5 × 10 5, 1.5 × 10 6, 3 × 10 6 sim-ulated by RLM-Q-CN and RLM-PC-CN are shown in Figure 8. The two schemes yield visually indistinguishable patterns.  
+
+> Method
+
+T = 1 .5 × 10 5 T = 1 .5 × 10 6 T = 3 × 10 6
+
+> RLM-Q
+> RLM-PC
+
+Figure 8: Snapshots of the phase variable ϕ for the Cahn–Hilliard equation at T = 1 .5 × 10 5, 1.5 ×
+
+10 6, 3×10 6. Each row corresponds to a different scheme: RLM-Q-CN with α = 10 3, ∆t = 0 .1 (top), and RLM-PC-CN with α = 10 3, ∆t = 0 .1 (bottom). Each column shows results at the same time point. The preceding examples with the double-well potential serve as benchmark cases. We now demonstrate the applicability of RLM to more challenging potentials, starting with the Flory– Huggins potential that contains logarithmic terms. 
+
+4.3 CH-type Equation with Flory–Huggins Potential 
+
+In this example, we consider the polymer solution system with the bulk free energy given by a Flory–Huggins potential 
+
+E(ϕ) = 
+
+Z
+
+> Ω
+
+ ε2
+
+2 |∇ ϕ|2 + F (ϕ)
+
+
+
+dx, F (ϕ) = ϕ ln ϕ + (1 − ϕ) ln(1 − ϕ) + χcϕ(1 − ϕ), (4.10) 26 where ϕ is the volume fraction of the polymer segments, ε is the interfacial thickness parameter, and χc is a parameter describing the affinity between the polymer and the solvent. In this case, 
+
+f (ϕ) = F ′(ϕ) = ln ϕ − ln(1 − ϕ) + χc(1 − 2ϕ).
+
+Based on the RLM reformulation in Section 3, the Cahn–Hilliard-type equation with the Flory– Huggins potential is given by 
+
+∂tϕ = M ∆μ, (4.11) 
+
+μ = −ε2∆ϕ + q(t) [ln ϕ − ln(1 − ϕ) + χc(1 − 2ϕ)] , (4.12) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t) [ln ϕ − ln(1 − ϕ) + χc(1 − 2ϕ)] ∂tϕ dx, (4.13) where M > 0 is the mobility constant and q(0) = 1. Homogeneous Neumann boundary conditions are assumed. Although physically ϕ ∈ [0 , 1], the Cahn–Hilliard equation with constant mobility operator M ∆does not enforce such a bound. To overcome this shortcoming, F is modified as follows [10] ˜F (ϕ) = 
+
+
+
+ϕ ln ϕ + (1 −ϕ)2 
+
+> 2σ
+
++ (1 − ϕ) ln σ − σ 
+
+> 2
+
++ χcϕ(1 − ϕ), if ϕ ≥ 1 − σ, ϕ ln σ + ϕ2 
+
+> 2σ
+
++ (1 − ϕ) ln(1 − ϕ) − σ 
+
+> 2
+
++ χcϕ(1 − ϕ), if ϕ ≤ σ, F, others .
+
+When using the RLM-Q approach, we introduce the stabilization technique as (3.25), namely ˜F n+1 = ( ϕn+1 )2 + ˜F (ϕn+1 ) − (ϕn+1 )2,
+
+i.e., we take S = 1 in (3.25). When applying the SAV approach, we introduce the scalar auxiliary variable as 
+
+qR 
+
+> Ω
+
+˜F dx + Csav , where Csav is a constant to ensure R 
+
+> Ω
+
+˜F dx + Csav ≥ 0. In this case, we set the computational domain as Ω = [0 , 1] 2, the interface thickness ε = 10 −2,the regularization parameter σ = 0 .01, χc = 3, the mobility coefficient M = 10 −5, and the spatial step size h = 1 /128. The initial condition is set as 
+
+ϕ0(x, y ) = 0 .3 + 0 .01 ζ, 
+
+where ζ is a random variable uniformly distributed on [ −1, 1]. Convergence tests are omitted for brevity, as the temporal accuracy is consistent with the results in Sections 4.1 and 4.2. Next, we examine the accuracy of RLM for free energy systems with logarithmic terms using ∆t = 10 −2 and final time Tf inal = 2 × 10 4. Figure 9(a) and (b) show the time evolution of the original energy ERLM − α(q2 − 1) for various α using the RLM-Q-CN and RLM-PC-CN schemes. The energy curves for α = 10 −2 and 10 3 coincide. Figure 9(c) shows that q approaches 1 with different α, and RLM-PC-CN performs better than RLM-Q-CN in both α = 10 −2 and α = 10 3
+
+cases. RLM-PC-CN is also computationally more efficient than RLM-Q-CN. 27 (a) RLM-Q (b) RLM-PC (c) Scaling factor 
+
+Figure 9: Time evolution of the original energies ERLM − α(q2 − 1) in (a) and (b), and scaling factor 
+
+q for the Cahn–Hilliard equation with the Flory–Huggins potential, computed by the RLM-Q-CN and RLM-PC-CN schemes with α = 10 −2 and 10 3.Next, we compare snapshots of the phase variable at T = 0, 400, 10000, and 20000 obtained by the SAV-CN and RLM-PC-CN schemes. For ∆ t = 10 −2, the two methods yield visually indistin-guishable patterns in Figure 10.  
+
+> Method
+
+T = 0 T = 400 T = 10000 T = 20000 
+
+> SAV
+> RLM-PC
+
+Figure 10: Snapshots of the phase variable ϕ for polymer solution at T = 0 , 400 , 10000 , 20000. Each row corresponds to a different scheme: SAV-CN (top) and RLM-PC-CN with α = 10 3 (bottom). Each column shows results at the same time point. Since the constant Csav in the SAV-CN scheme often affects numerical accuracy, we compare two values, Csav = 10 2 and Csav = 10 8, to assess their effects on the energy at different time step sizes. We first choose the results of SAV-CN with Csav = 10 2, ∆ t = 10 −2 and RLM-CN with ∆t = 10 −2, α = 10 3 as the benchmarks, since the energy curves are identical in Figure 11(a). When increasing Csav to 10 8 and setting ∆ t = 5 × 10 −2, the energy curve of SAV-CN deviates from the benchmarks in Figure 11(a). Meanwhile, the RLM energy curve (simulated by RLM-Q-CN and RLM-PC-CN schemes) with ∆ t = 5 × 10 −2 is identical to the benchmark. This demonstrates that the RLM approach is more robust than SAV. To check the volume-preserving property for both SAV-CN and RLM-CN, the time evolution of total volume with different parameter values is summarized in Figure 11(b). 28 (a) Energy (b) Volume drift V (t) − V (0) 
+
+Figure 11: Time evolution of the energy ( ESAV or ERLM −α(q2 −1)) and the volume drift V (t)−V (0) for the Cahn–Hilliard equation with the Flory–Huggins potential, where V (t) = R 
+
+> Ω
+
+ϕ(x, t ) d x.(a) Energies of SAV-CN with Csav = 10 2 (∆ t = 10 −2 and 5 × 10 −2), SAV-CN with Csav = 10 8
+
+(∆ t = 5 × 10 −2), and RLM with α = 10 3 (∆ t = 10 −2 and 5 × 10 −2). (b) Volume drift for the SAV and RLM schemes. 
+
+4.4 CH-type Equation with Lennard–Jones-type Potential 
+
+Finally, we consider a system whose bulk free energy is singular at ϕ = 0, which poses a unique challenge for the SAV method. In particular, we consider the liquid thin film coarsening system with the bulk free energy given by a Lennard–Jones-type potential 
+
+E(ϕ) = 
+
+Z
+
+> Ω
+
+ ε2
+
+2 |∇ ϕ|2 + F (ϕ)
+
+
+
+dx, F (ϕ) = 13ϕ8 − 43ϕ2 , (4.14) where ϕ represents the film thickness and ε is the interfacial parameter. The bulk free energy F (ϕ)is singular at ϕ = 0, with F (ϕ) → +∞ as ϕ → 0+ [50]. In this case, f (ϕ) = F ′(ϕ) = 83ϕ9 (ϕ6 − 1). Based on the RLM reformulation in Section 3, the Cahn–Hilliard-type equation with the mo-bility operator M ∆ and the Lennard–Jones-type potential is reformulated as follows. 
+
+∂tϕ = M ∆μ, (4.15) 
+
+μ = −ε2∆ϕ + q(t) 83ϕ9 (ϕ6 − 1) , (4.16) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t) 83ϕ9 (ϕ6 − 1) ∂tϕ dx, (4.17) where M > 0 is the mobility constant and q(0) = 1. For the RLM-Q approach, we use the stabilization technique from (3.25), setting F n+1 = ( ϕn+1 )2 + F (ϕn+1 ) − (ϕn+1 )2, i.e., taking S = 1. Since F (ϕ) and f (ϕ) = F ′(ϕ) blow up as ϕ → 0, the SAV auxiliary variable and its associated square-root functional become ill-behaved near ϕ = 0, so the SAV method is inapplicable. Here, we assess the accuracy of the RLM schemes for this singular free energy system. In the first case, we set the computational domain as Ω = [0 , 1] 2, the interface thickness parameter ε = 10 −2, the time step size ∆ t = 10 −2, the mobility coefficient M = 10 −5, and the spatial step size h = 1 /128. The initial condition is given by 
+
+ϕ0(x, y ) = 2 + 0 .01 ζ, (4.18) 29 where ζ is a random variable uniformly distributed on [ −1, 1]. Convergence tests and computational efficiency comparisons are omitted for brevity. The energy and scaling factor evolutions are shown in Figure 12.   
+
+> (a) RLM-Q (b) RLM-PC
+> (c) Scaling factor (d) Total volume
+
+Figure 12: Time evolution of the energy, scaling factor q, and total volume for the liquid thin-film model with the Lennard–Jones-type potential, computed by the RLM-Q-CN and RLM-PC-CN schemes with α = 10 −4 and 10 4, where the total volume at t is given by V (t) = R 
+
+> Ω
+
+ϕ(x, t ) d x.In Figure 12(a) and (b), we show the time evolution of the original energy with various α using the RLM-Q-CN and RLM-PC-CN schemes. The two schemes yield coincident energy curves for 
+
+α ∈ { 10 −4, 10 4}. In Figure 12(c), we observe that q approaches 1 with a sufficiently large α, and RLM-PC-CN performs better than RLM-Q-CN. RLM-PC-CN is also computationally more efficient than RLM-Q-CN. We also find that a larger α introduces a smaller error in q. In Figure 12(d), we find that the total thickness (which can be viewed as the total volume) is conserved in four cases. Then, we compare snapshots of the phase variable from the simulations above. Figure 13 shows snapshots obtained by RLM-PC-CN with α = 10 4 at T = 0 , 200 , 5000 , 10000 to illustrate the coarsening dynamics. Across the tested α values and RLM variants, the snapshots are visually indistinguishable. 30 T = 0 T = 200 T = 5000 T = 10000 
+
+Figure 13: Snapshots of the phase variable ϕ for the liquid thin film model at T = 0 , 200 , 5000 , 10000, computed by the RLM-PC-CN scheme with α = 10 4.
+
+4.5 Conserved Allen–Cahn Equation with Double-well Potential in 3D 
+
+Finally, we consider a three-dimensional binary system with a double-well potential. The governing equation is the conserved Allen–Cahn equation [27] 
+
+∂tϕ = −M (μ + ˜L), (4.19) 
+
+μ = −ε2∆ϕ + ϕ(ϕ2 − 1) , (4.20) with the energy 
+
+E(ϕ) = 
+
+Z
+
+> Ω
+
+ ε2
+
+2 |∇ ϕ|2 + F (ϕ)
+
+
+
+dx + ˜L
+
+Z 
+
+> Ω
+
+ϕ dx − V0
+
+
+
+, F (ϕ) = 14 (ϕ2 − 1) 2, (4.21) where ϕ is the volume fraction, ε is the interfacial parameter, ˜L is a spatially constant Lagrange multiplier enforcing volume conservation, and V0 = R 
+
+> Ω
+
+ϕ(x, 0) d x is the initial total volume. The Lagrange multiplier is derived as ˜L = −   
+
+> R
+> Ωϕ(ϕ2−1)d x
+> R
+> Ω1d x
+
+. Here R 
+
+> Ω
+
+1 d x = |Ω| denotes the volume of Ω. Based on the RLM reformulation strategy in Section 3, the conserved Allen–Cahn equation is reformulated as follows. 
+
+∂tϕ = −M ˜μ, (4.22) ˜μ = −ε2∆ϕ + q(t)
+
+
+
+ϕ(ϕ2 − 1) −
+
+R 
+
+> Ω
+
+ϕ(ϕ2 − 1)d x
+
+R 
+
+> Ω
+
+1d x
+
+
+
+, (4.23) 
+
+ddt 
+
+Z
+
+> Ω
+
+F (ϕ) d x + α d q(t)2
+
+dt =
+
+Z
+
+> Ω
+
+q(t)
+
+
+
+ϕ(ϕ2 − 1) −
+
+R 
+
+> Ω
+
+ϕ(ϕ2 − 1)d x
+
+R 
+
+> Ω
+
+1d x
+
+
+
+∂tϕ dx. (4.24) In the first example, we set the computational domain as Ω = [0 , 1] 3, the interface thickness parameter ε = 10 −2, the mobility coefficient M = 1, the spatial step size h = 1 /128, the relaxation parameter α = 10 3, and the final time Tf inal = 100. The initial condition is given by 
+
+ϕ0(x, y, z ) = 1 − 12
+
+h
+
+1 − tanh 
+
+ 0.2 − r1
+
+δ0
+
+ ih 
+
+1 − tanh 
+
+ 0.1 − r2
+
+δ0
+
+ i
+
+(4.25) where r1 = p(x − 0.3) 2 + ( y − 0.5) 2 + ( z − 0.5) 2, r2 = p(x − 0.7) 2 + ( y − 0.5) 2 + ( z − 0.5) 2, and 
+
+δ0 = 0 .01. Convergence tests are omitted for brevity. This three-dimensional, nonlocal example serves as a numerical demonstration of the RLM framework: the discrete RLM-Q and RLM-PC updates are formed exactly as in Section 3, now with the volume-projected chemical potential. The energy, volume, and scaling factor evolutions are shown in Figure 14. 31 (a) Original energy (b) ERLM − E  
+
+> (c) Scaling factor q(d) Total volume
+
+Figure 14: Time evolution of the energy, scaling factor q, and total volume for the conserved Allen– Cahn equation in 3D with ∆ t = 10 −2 and 10 −3. The curves for RLM-PC with different time step sizes coincide. (a) Original energy. (b) Second class of energy differences. (c) and (d) show the time evolutions of q and the total volume for the two RLM methods, where the total volume at t
+
+is given by V (t) = R 
+
+> Ω
+
+ϕ(x, t )dx.In Figure 14(a) and (b), we show the time evolution of the original energy ERLM − α(q2 − 1) and the difference of ERLM − E with various time step sizes by using the RLM-Q-CN and RLM-PC-CN schemes. The results show that RLM-PC-CN performs much better than RLM-Q-CN. In Figure 14(c), we observe that q approaches 1 for α = 1 × 10 3, and RLM-PC-CN performs better than RLM-Q-CN with the same time step size. In Figure 14(d), the total volume is conserved in all tests. We also find that a smaller ∆ t introduces a smaller error in both q and V (t). Next, we compare snapshots of the phase variable from the simulations above. Figure 15 shows snapshots obtained by RLM-PC-CN with α = 10 3 at T = 0 , 25 , 40 , 100 to illustrate the coarsening dynamics. For all tested RLM variants, the snapshots appear visually identical. 32 T = 0 T = 25 T = 40 T = 100 
+
+Figure 15: Snapshots of the phase variable ϕ for the conserved Allen–Cahn equation in 3D at 
+
+T = 0 , 25 , 40 , 100, computed by the RLM-PC-CN scheme with α = 10 3.
+
+# 5 Conclusion 
+
+In this paper, we proposed a class of relaxed Lagrange multiplier (RLM) schemes for phase-field models that dissipate a relaxed original energy ˜E = E + α(q2 − 1) while tracking the original energy dissipation rate when q ≈ 1, and remain linear and efficient. The central idea is to augment the classical Lagrange multiplier formulation with a relaxation term controlled by α ≥ 0, thereby converting the nonlinear scalar multiplier equation into a quadratic equation that admits a closed-form solution. We select the physically relevant root by continuity (i.e., the one closer to qn). We developed two practical variants. The RLM-Q approach uses a semi-implicit quadratization of the potential to obtain a quadratic equation for qn+1 , while the RLM-PC approach evaluates the potential at a predicted solution (obtained by setting q = 1) and leads to an even simpler quadratic equation. The resulting schemes require only two linear solves with constant coefficients per time step, comparable to SAV-type methods, while tracking an energy much closer to the original free energy than the SAV or IEQ modified energies. We also established unconditional energy stability and mass conservation for both first- and second-order RLM-Q variants. We provided explicit conditions on α under which the quadratic equation for the scaling factor is solvable and admits a unique positive root. The RLM-PC variant uses a predicted increment in the scalar equation. Numerical experiments confirm the expected temporal convergence orders and show that the RLM schemes accurately capture interface dynamics for polynomial, logarithmic (Flory–Huggins), and singular (Lennard–Jones-type) potentials in 2D or 3D. In future work, we plan to explore several directions. The first is higher-order time discretiza-tions with rigorous stability and solvability analysis. The second is extensions to more complex phase-field models, such as phase-field crystal and multicomponent systems, as well as to coupled multiphysics problems. We also plan to develop adaptive, problem-dependent strategies for choos-ing α to balance accuracy and energy stability. Finally, we aim to derive rigorous error estimates, including quantitative bounds for |qn − 1| in terms of α and ∆ t.
+
+# Acknowledgments 
+
+Xiaobo Jing’s work is supported by the National Natural Science Foundation of China (No. 12147165) and the Jiangsu Provincial Scientific Research Center of Applied Mathematics (No. BK20233002). Additional support was provided by the Basic Research Program of Jiangsu (No. BK20252120) and the Start-up Research Fund of Southeast University (No. RF1028623369). Jia Zhao acknowledges support from the National Science Foundation under grant NSF-DMS-2513764. 33 References 
+
+[1] S. M. Allen. Ground state structures in ordered binary alloys with second neighbor interactions. 
+
+Acta Metallurgica , 20(3):423–433, 1972. [2] D. M. Anderson, G. B. McFadden, and A. A. Wheeler. Diffuse-interface methods in fluid mechanics. Annual Review of Fluid Mechanics , 30(1):139–165, 1998. [3] J. W. Cahn and J. E. Hilliard. Free energy of a nonuniform system. I. Interfacial free energy. 
+
+Journal of Chemical Physics , 28(2):258–267, 1958. [4] L. Chen, J. Zhao, and X. Yang. Regularized linear schemes for the molecular beam epitaxy model with slope selection. Applied Numerical Mathematics , 128:138–156, 2018. [5] L. Q. Chen and J. Shen. Applications of semi-implicit Fourier-spectral method to phase field equations. Computer Physics Communications , 108:147–158, 1998. [6] Y. Chen, Z. Liu, and X. Meng. Partially and fully implicit multi-step SAV approaches with original dissipation law for gradient flows. Communications in Nonlinear Science and Numer-ical Simulation , 140:108379, 2025. [7] K. Cheng, Z. Qiao, and C. Wang. A third order exponential time differencing numerical scheme for no-slope-selection epitaxial thin film model with energy stability. Journal of Scientific Computing , 81(1):154–185, 2019. [8] Q. Cheng, C. Liu, and J. Shen. A new Lagrange multiplier approach for gradient flows. 
+
+Computer Methods in Applied Mechanics and Engineering , 367:113070, 2020. [9] Q. Cheng, J. Shen, and C. Wang. Unique solvability and error analysis of a scheme using the Lagrange multiplier approach for gradient flows. SIAM Journal on Numerical Analysis ,63(2):772–799, 2025. [10] Maria Inˆ es Martins Copetti and Charles M Elliott. Numerical analysis of the Cahn-Hilliard equation with a logarithmic free energy. Numerische Mathematik , 63(1):39–65, 1992. [11] C. K. Doan, T. T. P. Hoang, L. Ju, and R. Lan. Dynamically regularized Lagrange multiplier method for the Cahn–Hilliard–Navier–Stokes system. International Journal for Numerical Methods in Engineering , 126(13):e70074, 2025. [12] C. K. Doan, L. Ju, and R. Lan. Dynamically regularized Lagrange multiplier schemes with energy dissipation for the incompressible Navier–Stokes equations. Journal of Computational Physics , 521:113550, 2025. [13] Q. Du, L. Ju, X. Li, and Z. Qiao. Maximum principle preserving exponential time differenc-ing schemes for the nonlocal Allen–Cahn equation. SIAM Journal on Numerical Analysis ,57(2):875–898, 2019. [14] Q. Du, L. Ju, X. Li, and Z. Qiao. Maximum bound principles for a class of semilinear parabolic equations and exponential time-differencing schemes. SIAM Review , 63(2):317–359, 2021. [15] H. Egger. Structure preserving approximation of dissipative evolution problems. Numerische Mathematik , 143:85–106, 2019. 34 [16] C. M. Elliott and A. M. Stuart. The global dynamics of discrete semilinear parabolic equations. 
+
+SIAM Journal on Numerical Analysis , 30(6):1622–1663, 1993. [17] D. J. Eyre. Unconditionally gradient stable time marching the Cahn–Hilliard equation. MRS Online Proceedings Library , 529:39–46, 1998. [18] D. Furihata and T. Matsuo. Discrete Variational Derivative Method: A Structure-Preserving Numerical Method for Partial Differential Equations . CRC Press, 2011. [19] Y. Gong, Q. Hong, and Q. Wang. Supplementary variable method for thermodynamically consistent partial differential equations. Computer Methods in Applied Mechanics and Engi-neering , 381:113909, 2021. [20] Y. Gong and J. Zhao. Energy-stable Runge–Kutta schemes for gradient flow models using the energy quadratization approach. Applied Mathematics Letters , 94:224–231, 2019. [21] F. Guill´ en-Gonz´ alez and G. Tierra. Second order schemes and time-step adaptivity for Allen– Cahn and Cahn–Hilliard models. Computers and Mathematics with Applications , 68(8):821– 846, 2014. [22] D. Hou, Y. Ning, and C. Zhang. An efficient and robust Lagrange multiplier approach with a penalty term for phase-field models. Journal of Computational Physics , 488:112236, 2023. [23] Z. Hu, S. M. Wise, C. Wang, and J. S. Lowengrub. Stable and efficient finite-difference nonlinear-multigrid schemes for the phase field crystal equation. Journal of Computational Physics , 228(15):5323–5339, 2009. [24] Q.-A. Huang, W. Jiang, J. Z. Yang, and C. Yuan. A weighted scalar auxiliary variable method for solving gradient flows: Bridging the nonlinear energy-based and Lagrange multiplier ap-proaches. Journal of Scientific Computing , 106(1):16, 2025. [25] M. Jiang, Z. Zhang, and J. Zhao. Improving the accuracy and consistency of the scalar auxiliary variable (SAV) method with relaxation. Journal of Computational Physics , 456:110954, 2022. [26] M. Jiang and J. Zhao. Linear relaxation schemes for the Allen–Cahn-type and Cahn–Hilliard-type phase field models. Applied Mathematics Letters , 137:108477, 2023. [27] Xiaobo Jing, Jun Li, Xueping Zhao, and Qi Wang. Second order linear energy stable schemes for Allen-Cahn equations with nonlocal constraints. Journal of Scientific Computing ,80(1):500–537, 2019. [28] L. Ju, X. Li, Z. Qiao, and H. Zhang. Energy stability and error estimates of exponential time differencing schemes for the epitaxial growth model without slope selection. Mathematics of Computation , 87(312):1859–1885, 2018. [29] A. Karma and W. Rappel. Quantitative phase-field modeling of dendritic growth in two and three dimensions. Physical Review E , 57:4323–4349, 1998. [30] D. Li and Z. Qiao. On second order semi-implicit Fourier spectral methods for 2D Cahn– Hilliard equations. Journal of Scientific Computing , 70(1):301–341, 2017. [31] D. Li, Z. Qiao, and T. Tang. Characterizing the stabilization size for semi-implicit Fourier-spectral method to phase field equations. SIAM Journal on Numerical Analysis , 54(3):1653– 1681, 2016. 35 [32] C. Liu and J. Shen. A phase field model for the mixture of two incompressible fluids and its approximation by a Fourier-spectral method. Physica D: Nonlinear Phenomena , 179(3– 4):211–228, 2003. [33] Z. Liu and X. Li. A novel Lagrange multiplier approach with relaxation for gradient flows. 
+
+CSIAM Transactions on Applied Mathematics , 5(1):110–141, 2024. [34] J. Lowengrub and L. Truskinovsky. Quasi-incompressible Cahn–Hilliard fluids and topologi-cal transitions. Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences , 454(1978):2617–2654, 1998. [35] R. I. McLachlan, G. R. W. Quispel, and N. Robidoux. Geometric integration using discrete gradients. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences , 357(1754):1021–1045, 1999. [36] Z. Qiao, Z. Zhang, and T. Tang. An adaptive time-stepping strategy for the molecular beam epitaxy models. SIAM Journal on Scientific Computing , 33(3):1395–1414, 2011. [37] J. Shen, C. Wang, X. Wang, and S. M. Wise. Second-order convex splitting schemes for gradient flows with Ehrlich–Schwoebel type energy: Application to thin film epitaxy. SIAM Journal on Numerical Analysis , 50(1):105–125, 2012. [38] J. Shen, J. Xu, and J. Yang. The scalar auxiliary variable (SAV) approach for gradient flows. 
+
+Journal of Computational Physics , 353:407–416, 2018. [39] J. Shen, J. Xu, and J. Yang. A new class of efficient and robust energy stable schemes for gradient flows. SIAM Review , 61(3):474–506, 2019. [40] J. Shen and X. Yang. Numerical approximations of Allen–Cahn and Cahn–Hilliard equations. 
+
+Discrete and Continuous Dynamical Systems , 28(4):1669–1691, 2010. [41] L. Wang and H. Yu. On efficient second order stabilized semi-implicit schemes for the Cahn– Hilliard phase-field equation. Journal of Scientific Computing , 77(2):1185–1209, 2018. [42] S. Wang, W. Wang, and J. Li. An efficient dynamically regularized Lagrange multiplier method for the incompressible MHD equations. Communications in Nonlinear Science and Numerical Simulation , page 109235, 2025. [43] S. L. Wang, R. F. Sekerka, A. A. Wheeler, B. T. Murray, S. R. Coriell, R. J. Braun, and G. B. McFadden. Thermodynamically-consistent phase-field models for solidification. Physica D: Nonlinear Phenomena , 69:189–200, 1993. [44] S. M. Wise, C. Wang, and J. S. Lowengrub. An energy-stable and convergent finite-difference scheme for the phase field crystal equation. SIAM Journal on Numerical Analysis , 47(3):2269– 2288, 2009. [45] C. Xu and T. Tang. Stability analysis of large time-stepping methods for epitaxial growth models. SIAM Journal on Numerical Analysis , 44(4):1759–1779, 2006. [46] X. Yang. Linear, first and second-order, unconditionally energy stable numerical schemes for the phase field model of homopolymer blends. Journal of Computational Physics , 327:294–316, 2016. 36 [47] X. Yang, J. Zhao, and Q. Wang. Numerical approximations for the molecular beam epitaxial growth model based on the invariant energy quadratization method. Journal of Computational Physics , 333:104–127, 2017. [48] X. Yang, J. Zhao, Q. Wang, and J. Shen. Numerical approximations for a three-components Cahn–Hilliard phase-field model based on the invariant energy quadratization method. Math-ematical Models and Methods in Applied Sciences , 27(11):1993–2030, 2017. [49] G. Zhang, J. Li, and Q.-A. Huang. A class of unconditionally energy stable relaxation schemes for gradient flows. Mathematics and Computers in Simulation , 218:235–247, 2024. [50] Juan Zhang, Cheng Wang, Steven M Wise, and Zhengru Zhang. Structure-preserving, energy stable numerical schemes for a liquid thin film coarsening model. SIAM Journal on Scientific Computing , 43(2):A1248–A1272, 2021. [51] Z. Zhang and Z. Qiao. An adaptive time-stepping strategy for the Cahn–Hilliard equation. 
+
+Communications in Computational Physics , 11(4):1261–1278, 2012. [52] J. Zhao. A revisit of the energy quadratization method with a relaxation technique. Applied Mathematics Letters , 120:107331, 2021. [53] J. Zhao, Q. Wang, and X. Yang. Numerical approximations for a phase field dendritic crystal growth model based on the invariant energy quadratization approach. International Journal for Numerical Methods in Engineering , 110(3):279–300, 2017. [54] J. Zhao, X. Yang, Y. Gong, X. Zhao, J. Li, X. Yang, and Q. Wang. A general strategy for numerical approximations of thermodynamically consistent nonequilibrium models–part I: Thermodynamical systems. International Journal of Numerical Analysis and Modeling ,15(6):884–918, 2018. 37

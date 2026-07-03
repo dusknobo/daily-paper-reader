@@ -1,0 +1,5481 @@
+Title: Pressure-robust ALE space-time DG method for the Stokes equations on moving domains
+
+URL Source: https://arxiv.org/pdf/2606.28914v1
+
+Published Time: Tue, 30 Jun 2026 00:43:31 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+# Pressure-robust ALE space–time DG method for the Stokes equations on moving domains 
+
+## L. Beir˜ ao da Veiga ∗† S. G´ omez ∗† K. B. Haile ∗
+
+Abstract 
+
+We propose and analyze a space–time discontinuous Galerkin method for the incompressible Stokes equations on moving domains within the arbitrary Lagrangian–Eulerian setting. We use a contravariant Piola map in the definition of the discrete velocity space to preserve the pointwise divergence-free property on the discrete level. We show that the method is inf–sup stable, with no constraints on the spatial mesh or the time partition. We also establish a priori error estimates in the energy norm for arbitrary degrees of approximation in space and time. For piecewise-constant and piecewise-linear approximations in time, we show that the method is also robust at low viscosity regimes, and provide numerical evidence suggesting that this property extends to high-order cases as well. We present several numerical experiments to validate our theoretical findings. 
+
+Keywords. Space–time method, discontinuous Galerkin, arbitrary Lagrangian–Eulerian, incompressible Stokes equations, pressure-robust approximation 
+
+2020 Mathematics Subject Classification. 65M12, 65M15, 65M60, 35Q35 
+
+# 1 Introduction 
+
+This work concerns the design and analysis of a space–time discontinuous Galerkin method for the incom-pressible Stokes equations on moving domains, which preserves the exact divergence-free property for the velocity. 
+
+The ALE setting for moving domains. Let T > 0 be a prescribed final time. For d ∈ { 2, 3}, we consider a moving domain as an indexed family {Ω( t)}t∈[0 ,T ], where Ω( t) ⊂ Rd is an open bounded domain, for each t ∈ [0 , T ]. We assume (only for simplicity, see Remarks 3.3 and 3.4 for natural generalizations) that the initial domain Ω 0 := Ω(0) is an open polytope that also serves as our reference domain .Following the ALE approach, we assume that the boundary deformation is determined by a velocity w,which can be extended with standard techniques to also dictate the bulk deformation. For each t ∈ [0 , T ], such an extension induces a bijective map At : Ω 0 → Ω( t). Moreover, the family of maps {A t}t∈[0 ,T ] can be used to define the space–time function A(y, t ) := At(y), which satisfies 
+
+w(x, t ) = ∂tA(y, t ) ∀y ∈ Ω0, with x = At(y). (1.1) In what follows, we will consistently use x for the physical spatial coordinate in Ω( t) and y for the coordinate in the reference domain Ω 0. This convention is also used to stress the variable of differentiation for differential operators. The space–time domain is defined as 
+
+QT := (x, t ) ∈ Rd × R+ : t ∈ (0 , T ) and x = At(y), for some y ∈ Ω0 ,
+
+or, equivalently, QT is the image of the tensor-product domain Ω 0 × (0 , T ) under the extended space–time mapping ( y, t ) 7 → (A(y, t ), t ). 
+
+> ∗
+
+Department of Mathematics and Applications, University of Milano-Bicocca, Via Cozzi 55, 20125 Milan, Italy (lourenco.beirao@unimib.it, sergio.gomezmacias@unimib.it, k.haile@campus.unimib.it) 
+
+> †
+
+IMATI-CNR “E. Magenes”, Via Ferrata 5, 27100 Pavia, Italy 
+
+1
+
+> arXiv:2606.28914v1 [math.NA] 27 Jun 2026
+
+Model problem. Given a constant viscosity ν > 0, a source term f : QT → Rd, and an initial datum u0 :Ω0 → Rd, we consider the following time-dependent Stokes equations: find the velocity u : QT → Rd and the (minus) pressure p : QT → R such that 
+
+∂tu − ν∆xu − ∇ xp = f in QT , (1.2a) div xu = 0 in QT , (1.2b) 
+
+u = 0 on ∂Ω( t) × { t}, t ∈ [0 , T ], (1.2c) 
+
+u(·, 0) = u0(·) in Ω 0. (1.2d) In the ALE framework, model (1.2) can be rewritten using the material derivative , which corresponds to the time derivative along the characteristic lines of the ALE map A. For a sufficiently smooth function φ,it is defined, via the chain rule, as 
+
+Dtφ(x, t ) := ddt φ(At(y), t ) = ∂tφ(x, t ) + ∇xφ(x, t )w(x, t ) , x = At(y),
+
+where ∇x denotes the spatial gradient operator acting componentwise. The resulting reformulation of (1.2) reads: find the velocity u : QT → Rd and the (minus) pressure p : QT → R such that 
+
+Dtu − (∇xu)w − ν∆xu − ∇ xp = f in QT , (1.3a) div xu = 0 in QT , (1.3b) 
+
+u = 0 on ∂Ω( t) × { t}, t ∈ [0 , T ], (1.3c) 
+
+u(·, 0) = u0(·) in Ω 0. (1.3d) The specific condition (1.2c) is included only for simplicity; the method and analysis in the present con-tribution can be easily extended to different boundary conditions. 
+
+Previous works. Several approaches have been proposed in the literature for the numerical approxima-tion of PDEs on moving domains within the ALE framework. Below, we briefly describe some of the main ideas employed in the design of high-order space–time methods. 
+
+i) A first approach consist of approximating the domain at each time level with a standard mesh, and subsequently constructing space–time elements using linear interpolation of A in time for internal elements and high-order interpolation for curved elements on the boundary. The discrete spaces are then defined through isoparametric mappings from a reference element; see, e.g., [28, 29, 33]. 
+
+ii) An alternative approach is to directly decompose the space–time domain with ( d + 1)-dimensional simplices or polytopes and treat the time variable as an additional spatial dimension; see [21, 22] for hybridizable discontinuous Galerkin methods, and the review [16] on finite volume and discontinuous Galerkin (DG) schemes. 
+
+iii) One can also formulate the problem in the reference coordinates, and then apply standard discretiza-tions for tensor-product space–time domains; see [26]. 
+
+iv) The high-order DG-in-time approach of [9, 10] extends the ideas of [14, 15] to high-order approx-imations in time. This approach has also been applied in [1, 2] to nonlinear convection–diffusion equations. In this framework, the discrete space at each time level is obtained by transporting the reference basis functions through the ALE map A. In particular, the spaces considered in [9, 10] are piecewise polynomials in time along the trajectories induced by A, and can be combined with a conforming finite element space defined on the reference mesh. We refer to [27, §1] for a recent comprehensive overview of stability results and a priori error estimates for finite element methods in the ALE setting. 
+
+A specific challenge. A major challenge in the fully discrete (i.e., discrete in both space and time) approximation of incompressible fluid problems in moving domains is ensuring the solenoidal constraint and pressure-robustness. Indeed, this property is intimately related to employing a discrete velocity/pressure pair that satisfies a De Rham diagram (see, e.g., [23, §4.3 and 4.4]). When considering a high-order method with exact (or high-order) geometric approximation, achieving pressure-robustness essentially requires using a Piola map to define the velocity space in the physical domain. For general geometries, this is often required also for standard finite elements, as many inf–sup stable pairs degenerate under non-affine mappings unless a Piola transform is used to define the velocity space. On the other hand, incorporating a 2Piola map introduces a very strong tangling of space and time, posing additional difficulties in the analysis of the method. For instance, unlike what happens for a standard push-forward, the presence of the Piola map implies that the material derivative of a “polynomial in time” discrete velocity is not a function of the same kind with one degree lower. This prevents the use of many standard arguments used in the literature for the analysis of DG time discretizations; cf. [17]. 
+
+Present contribution. We propose a space–time DG method for the time-dependent Stokes equations on moving domains. The proposed method is closely related to approach iv) , but (in addition to address-ing also the space discretization) employs the controvariant Piola map associated with A to transport the discrete spaces. Combined with the use of H(div)-conforming velocity spaces [3,6,18,19,31] and a compat-ible pressure discretization in the reference domain, this construction preserves the divergence structure under the ALE mapping and allows the divergence-free constraint to be satisfied exactly (up to quadrature errors) at all times. Furthermore, in this approach, the geometry of the domain is approximated exactly (see Remarks 3.4 and 3.3). The main advancements in this work are: 
+
+• We derive stability bounds and establish a priori error estimates for arbitrary degrees of approxima-tion in both space and time. Moreover, we do not require smallness conditions on the time steps, nor do we require (global or local) quasi-uniformity of the spatial and temporal partitions. 
+
+• The method is pressure-robust, meaning that modifications of the data which only affect pressure at the continuous level will maintain such a property also for the discrete solution. As a consequence, velocity errors are not influenced by pressure errors, which renders the velocity approximation free from pressure-induced pollution. 
+
+• For the low-order cases (with approximations in time of degree ℓ = 0 or ℓ = 1), we show that the method is robust with respect to small values of the viscosity parameter. Preliminary numerical experiments suggest that this property holds also for high-order approximations in time. In addition to the theoretical derivations, we present numerical tests in (2 + 1) dimensions which support our theoretical findings. These include verifying the expected convergence orders in both space and time, assessing the pressure-robustness, and showing uniformly bounded error for small values of the viscosity parameter ν.
+
+Structure of the article. The remainder of this work is organized as follows. Section 2 introduces some basic notation and provides a set of preliminary results for the mappings involved. We then present the space–time method in Section 3. The stability and convergence analyses are developed in Sections 4 and 5, respectively. In Section 6, we establish an improved result valid for the low-order cases in time. Finally, the numerical experiments are presented in Section 7. 
+
+# 2 Notation and maps 
+
+We use standard notation for Lp and Sobolev spaces, as well as for Bochner spaces of functions defined in the tensor-product domain Ω 0 × (0 , T ). Moreover, we will introduce some suitable spaces for functions defined in the space–time domain QT .For a bounded domain D ⊂ Rd (d ∈ { 1, 2, 3}) with Lipschitz boundary ∂D, m ∈ N, and p ∈ [1 , ∞], we denote by W m,p (D) the corresponding Sobolev space on D equipped with the standard seminorm |·| W m,p (D)
+
+and norm ∥ · ∥ W m,p (D). For m = 0, we obtain the Lebesgue space Lp(D) := W 0,p (D), and, in particular, 
+
+L2(D) is the space of Lebesgue square-integrable functions with inner product ( ·, ·)D and norm ∥ · ∥ L2(D).For p = 2, we have the Hilbert space Hm(D) := W m, 2(D), with H10 (D) denoting the subspace of functions in H1(D) with zero trace on ∂D. We use boldface to denote spaces of d-vector-valued functions, as well as their elements. Moreover, we denote by H(div; D) the subspace of functions in L2(D) with divergence in L2(D). Given a time interval ( a, b ), p ∈ [1 , ∞], m ∈ N, and a separable Banach space ( Z, ∥ · ∥ Z ), the corre-sponding Bochner spaces are given by 
+
+Lp(a, b ; Z) := 
+
+n
+
+v : ( a, b ) → Z : v measurable and ∥v∥Lp(a,b ;Z) < ∞
+
+o
+
+,W m,p (a, b ; Z) := 
+
+n
+
+v ∈ Lp(a, b ; Z) : ∂(i) 
+
+> t
+
+v ∈ Lp(a, b ; Z), for i = 1 , . . . , m 
+
+o
+
+,
+
+3where 
+
+∥v∥Lp(a,b ;Z) := 
+
+ Z ba
+
+∥v(t)∥pZ dt
+
+1/p 
+
+if p ∈ [1 , ∞),
+
+ess sup t∈(a,b ) ∥v(t)∥Z if p = ∞.
+
+For functions defined in QT , let {Y (t)}t∈[0 ,T ] denote a family of Sobolev spaces, where Y (t) is a space of functions defined in Ω( t) for t ∈ [0 , T ] (e.g., Y (t) = L2(Ω( t)) or Y (t) = H10 (Ω( t))). We define 
+
+Lp(Y ; QT ) := 
+
+n
+
+v : v(t) ∈ Y (t) for a.e. t ∈ [0 , T ] and 
+
+ Z T
+
+> 0
+
+∥v(·, t )∥pY (Ω( t)) dt
+
+1/p 
+
+< ∞
+
+o
+
+, p ∈ [1 , ∞),L∞(Y ; QT ) := 
+
+n
+
+v : v(t) ∈ Y (t) for a.e. t ∈ [0 , T ] and ess sup t∈(0 ,T ) ∥v(·, t )∥Y (Ω( t)) < ∞
+
+o
+
+,W m,p (Y ; QT ) := 
+
+n
+
+v ∈ Lp(Y ; QT ) : ∂(i) 
+
+> t
+
+v ∈ Lp(Y ; QT ), i = 0 , . . . , m 
+
+o
+
+, p ∈ [1 , ∞], m ∈ N,
+
+with the obvious corresponding norms. We will conveniently use the notation Hm(Y ; QT ) := W m, 2(Y ; QT ). The derivations of the present work hold under the following assumption on the map At.
+
+Assumption 2.1 (Regularity of At). Recalling that A is the space–time function induced by the family of maps {A t}t∈[0 ,T ], we assume (i) A ∈ W 1,∞(0 , T ; W 2,∞(Ω 0)) ;(ii) there exists a positive constant cA such that, for all t ∈ [0 , T ],
+
+∥A t(y1) − A t(y2)∥∞ ≥ cA∥y1 − y2∥∞ ∀y1, y 2 ∈ Ω0,
+
+where ∥ · ∥ ∞ denotes the ℓ∞ norm of d-vectors. 
+
+Remark 2.1 (Consequences of Assumption 2.1) . Assumption 2.1 implies several fundamental properties: 
+
+• Assumption 2.1(i) and the continuous embedding W 1,∞(0 , T ; W 2,∞(Ω 0)) ,→ C0,1([0 , T ]; C1,1(Ω 0)) 
+
+guarantees that, for each t ∈ [0 , T ], both At and its spatial Jacobian matrix ∇yAt are Lipschitz con-tinuous on Ω0, with uniform Lipschitz constant for all t ∈ [0 , T ]. Furthermore, w ∈ L∞(W 1,∞, Q T ).
+
+• The uniform strong injectivity condition in Assumption 2.1(ii) ensures that the inverse mapping A−1 
+
+> t
+
+:Ω( t) → Ω0 exists for all t ∈ [0 , T ] and is Lipschitz continuous, with uniform Lipschitz constant c−1 
+
+> A
+
+.
+
+• The combination of the previous two points implies that there exists a positive constant μ⋆ such that det ∇yAt(y) ≥ μ⋆ > 0 for all (y, t ) ∈ Ω0 × [0 , T ].
+
+• Since Ω0 × [0 , T ] is a compact set, the regularity of A implies that there exists a fixed, open, bounded domain Ω ⊂ Rd such that Ω( t) ⊂ Ω for all t ∈ [0 , T ].For further details, we refer to the discussion in [10, §2.1]. 
+
+## 2.1 The Piola transform 
+
+To relate the Sobolev spaces in the reference domain Ω 0 to those in Ω( t), while preserving divergence-free functions, we define the following (contravariant) Piola transform (see [30, Def. 2.7]). 
+
+Definition 2.2 (Piola transform) . For each t ∈ [0 , T ], let Jt(y) := ∇yAt(y) be the spatial Jacobian of the ALE mapping. The fixed-time Piola transformation ϕt : L2(Ω 0) → L2(Ω( t)) is defined for any reference vector field bφ ∈ L2(Ω 0) as 
+
+(ϕt bφ)( x) := 1det Jt(y) Jt(y) bφ(y) , with x = At(y).
+
+The inverse fixed-time Piola transformation ϕ−1 
+
+> t
+
+: L2(Ω( t)) → L2(Ω 0) maps a vector field φ ∈ L2(Ω( t)) 
+
+back to the reference domain as: 
+
+(ϕ−1 
+
+> t
+
+φ)( y) := det Jt(y)J−1 
+
+> t
+
+(y) φ(x), with x = At(y).
+
+Pointwise extension in time defines the global space–time Piola operator ϕ : H1(0 , T ; L2(Ω 0)) → H1(L2; QT )
+
+such that (ϕbφ)( x, t ) := [ ϕt(bφ(·, t ))]( x). Accordingly, the global inverse space–time Piola operator ϕ−1 :
+
+H1(L2; QT ) → H1(0 , T ; L2(Ω 0)) is defined as (ϕ−1φ)( y, t ) := [ ϕ−1 
+
+> t
+
+(φ(·, t ))]( y). Such definitions can be generalized in a natural way to functions that are only piecewise H1 in time. 
+
+4The key result related to this Piola transform is given in the next Lemma; see [30, Ex. 4.6] and [12, Lemma 2.8]). 
+
+Lemma 2.3 (Divergence preservation) . For each t ∈ [0 , T ] and all bv ∈ H(div y; Ω 0), the following identity holds: 
+
+div x(ϕt bv)( x) = 1det Jt(y) div y bv(y) for a.e. x = At(y) ∈ Ω( t).
+
+In addition, the following identity will be used in the convergence analysis. 
+
+Lemma 2.4 (Time derivative of the Piola transform) . For all bv ∈ H1(0 , T ; L2(Ω 0)) , the space–time Piola transform ϕbv satisfies the following identity: 
+
+Dt(ϕbv) = ϕ(∂t bv) + ( ∇xw − div xwId)ϕbv in L2(L2; QT ),
+
+where Id is the d × d identity matrix. Proof. Using the definition of the Piola transform ϕt, the fact that the material derivative Dt is the partial derivative with respect to t for fixed y, and the Leibniz rule, for x = At(y), we can write [Dt(ϕbv)]( x, t ) = ∂t
+
+ 1det Jt(y) Jt(y)bv(y, t )
+
+
+
+= ∂t
+
+ 1det Jt(y)
+
+
+
+Jt(y)bv(y, t ) + 1det Jt(y) ∂t(Jt(y)) bv(y, t ) + 1det Jt(y) Jt(y)∂t bv(y, t ). (2.1) Elementary calculus operations, identity (1.1), and the chain rule give 
+
+∂t(Jt(y)) = ∂t(∇yAt(y)) = ∇y(∂tx) = ∇yw = ( ∇xw)Jt(y). (2.2) Moreover, using the Jacobi formula (see [25, Thm. 8.1 in Ch. 8, Part III]), identity (2.2), and the commutativity of the matrix product under the trace operator, we obtain 
+
+∂t(det Jt(y)) = det Jt(y) tr( Jt(y)−1∂tJt(y)) = det Jt(y) tr( Jt(y)−1∇xwJt(y)) = det Jt(y)div xw,
+
+which implies 
+
+∂t
+
+ 1det Jt(y)
+
+
+
+= − 1(det Jt(y)) 2 ∂t(det Jt(y)) = − 1det Jt(y) div xw. (2.3) Inserting identities (2.2) and (2.3) into (2.1), we get [Dt(ϕbv)]( x, t ) = −div xw(x, t )
+
+ 1det Jt(y) Jt(y)bv(y, t )
+
+
+
++ ∇xw(x, t )
+
+ 1det Jt(y) Jt(y)bv(y, t )
+
+
+
++ 1det Jt(y) Jt(y)∂t bv(y, t )= [ ϕ(∂t bv)]( x, t ) − div xw(x, t )( ϕbv)( x, t ) + ∇xw(x, t )( ϕbv)( x, t ) for a.e. ( x, t ) ∈ QT ,which yields the desired global identity in L2(L2; QT ). We end this section with the following key notation remark. 
+
+Remark 2.5 (Hat and tilde notation) . Any scalar-valued function φ ∈ L1(QT ) can be uniquely associated with its ALE pull-back map eφ ∈ L1(Ω 0 × [0 , T ]) via direct composition as eφ(y, t ) := φ(x, t ) for a.e. x =
+
+At(y). Moreover, the ALE push-forward map of a reference function eφ is given by φ(x, t ) := eφ(y, t )
+
+for a.e. x = At(y). This tilde notation can be extended naturally to vector-valued functions. The Piola map provides an alternative way to relate vector-valued functions defined in the reference domain Ω0 to those defined in Ω( t). Throughout the remainder of this work, we adopt a systematic notation to distinguish these types of push-forwards and pull-backs. 
+
+• If a function is originally defined in QT , its tilded (resp. hatted) counterpart denotes its ALE (resp. Piola) pull-back. Analogously, if a tilded (resp. hatted) function is first introduced in the reference domain, the plain symbol without tilde (resp. hat) represents its ALE (resp. Piola) push-forward defined in QT .
+
+• For scalar-valued functions, we systematically employ the tilde eφ notation. For vector-valued func-tions, both notations can be used depending on the context. The tilde eφ notation denotes the standard pull-back via direct composition, and it preserves pointwise values but not normal fluxes and diver-gence. Conversely, the hat function bφ preserves divergence mappings (see Lemma 2.3), which is fundamental for the construction of our discrete velocity spaces. 
+
+53 Description of the method 
+
+We first describe the mesh notation (Section 3.1); we then present the discrete spaces for the velocity and the pressure (Sections 3.2 and 3.3), and finally introduce the proposed space–time method (Section 3.4). 
+
+## 3.1 Mesh notation 
+
+Let { bTh}h> 0 be a family of shape-regular, conforming simplicial partitions of the initial domain Ω 0, where the parameter h stands for the maximum meshsize of bTh. The set of facets of bTh is denoted by bFh = bFI 
+
+> h
+
+∪ bF∂h ,where bFI 
+
+> h
+
+and bF∂h are the sets of internal and boundary facets, respectively. For each F ∈ bFh, we set hF := diam( F ), and denote by nF one of the two unit normal vectors to F , which is fixed once and for all, with the convention that nF points outward Ω 0 if F ∈ bF∂h . In addition, for t ∈ [0 , T ], we denote by Ft := At(F ) the moving facets, and by nFt the corresponding unit normal to Ft (which does not coincide with At(nF ) in general). Analogously, for each K ∈ bTh and t ∈ [0 , T ], we define the moving elements 
+
+Kt := At(K), which form the spatial mesh Th(t) of the domain Ω( t). Associated with this partition, we introduce the following broken Sobolev space: 
+
+H1(Th(t)) := q ∈ L2(Ω( t)) : q|Kt ∈ H1(Kt) ∀K ∈ bTh .
+
+For t ∈ [0 , T ], we consider the following average and jump operators: for any facet Ft := At(F ), with F
+
+shared by two elements K+ and K− in bTh and nF pointing from K+ to K−, we define 
+
+{{q}}Ft := 12
+
+ q|K+
+
+> t
+
++ q|K−
+
+> t
+
+ and JqKFt := q|K+
+
+> t
+
+− q|K−
+
+> t
+
+∀q ∈ H1(Th(t)) .
+
+Analogously, for any boundary facet F ∈ bF∂h , we set 
+
+{{q}}Ft := q|Ft and JqKFt := q|Ft .
+
+All definitions here above for scalar fields can be seamlessly extended to vector-valued fields. We consider a partition Tτ of the time interval (0 , T ), determined by the nodes 0 =: t0 < t 1 < . . . < t N := T. 
+
+For n = 1 , . . . , N , we define the time interval In := ( tn−1, t n), the time step τn := tn − tn−1, and the time-slab 
+
+Qn := (x, t ) ∈ Rd × R+ : t ∈ In, and x = At(y), for some y ∈ Ω0 .
+
+Similarly, for all K ∈ bTh, we define Kn := {(x, t ) ∈ Rd × R+ : t ∈ In, and x = At(y), for some y ∈ K}.Furthermore, we define the time-jump J·Kn at tn for functions v with ev ∈ H1(In; L2(Ω 0)) as follows: 
+
+JvKn(x) := v(x, t + 
+
+> n
+
+) − v(x, t − 
+
+> n
+
+) ∀x = Atn (y) ∈ Ω( tn), (3.1) where 
+
+v(x, t + 
+
+> n
+
+) := lim 
+
+> ε→0+
+
+ev(y, t n + ε) and v(x, t − 
+
+> n
+
+) := lim 
+
+> ε→0+
+
+ev(y, t n − ε).
+
+## 3.2 Discrete spaces 
+
+Given a degree of approximation k ∈ N with k ≥ 1, we denote by bVkh the Brezzi–Douglas–Marini (BDM) space of degree k defined on bTh (see [8, §2.3]), with the additional condition of having vanishing normal component on ∂Ω0. We also denote by fMk−1 
+
+> h
+
+the space of piecewise polynomials of degree k − 1 with zero mean on Ω 0.Given also a degree of approximation in time ℓ ∈ N, for n = 1 , . . . , N , we denote by Pℓ(In) the space of polynomials of degree at most ℓ defined on In, and by {ψ(n) 
+
+> j
+
+}ℓj=0 a generic basis for Pℓ(In), where specific choices will be made when convenient. Furthermore, we define the following discrete spaces on each time-slab Qn:
+
+V(n) 
+
+> hτ
+
+:= 
+
+
+
+vhτ : Qn → Rd : vhτ (x, t ) = 
+
+> ℓ
+
+X
+
+> j=0
+
+(ϕt bαh,j )( x)ψ(n) 
+
+> j
+
+(t), with bαh,j ∈ bVkh, for j = 0 , . . . , ℓ 
+
+
+
+,
+
+(3.2a) 6M(n) 
+
+> hτ
+
+:= 
+
+n
+
+qhτ : Qn → R : qhτ (x, t ) = 
+
+> ℓ
+
+X
+
+> j=0
+
+( eβh,j ◦ A −1 
+
+> t
+
+)( x)ψ(n) 
+
+> j
+
+(t), with eβh,j ∈ fMk−1 
+
+> h
+
+, for j = 0 , . . . , ℓ 
+
+o
+
+.
+
+(3.2b) We can then define the global discrete spaces as 
+
+Vhτ := 
+
+n
+
+vhτ : QT → Rd : vhτ |Qn ∈ V(n) 
+
+> hτ
+
+, for n = 1 , . . . , N 
+
+o
+
+, (3.3a) 
+
+Mhτ := qhτ : QT → R : qhτ |Qn ∈ M (n) 
+
+> hτ
+
+, for n = 1 , . . . , N . (3.3b) 
+
+Remark 3.1 (The discrete space Vhτ and its material derivative) . The discrete space Vhτ can be equiv-alently defined as Vhτ := ϕ( bVkh ⊗ Pℓ(Tτ )) , i.e., any element vhτ ∈ Vhτ is the image under the space–time Piola transform ϕ of a function in the tensor-product space bVkh ⊗ Pℓ(Tτ ). In contrast to the spaces intro-duced in [10, §3.1], due to the presence of the (contravariant) Piola transform, the functions in Vhτ are not polynomials in time of degree ℓ along the trajectories defined by At. In particular, using the superscript [ℓ]
+
+to highlight the polynomial degree in time, the material derivative DtV[ℓ]
+
+> hτ
+
+̸ ⊂ V[ℓ−1]  
+
+> hτ
+
+, unless A = Id . This fact introduces significant challenges in the stability and convergence analyses in the subsequent sections. 
+
+Due to Lemma 2.3 and the hat notation introduced in Remark 2.5, for all vhτ ∈ Vhτ and n = 1 , . . . , N ,it holds div xvhτ (x, t ) = 1det Jt(y) div y bvhτ (y, t ) ∀(x, t ) ∈ Q n, with x = At(y). (3.4) 
+
+## 3.3 Discrete kernel space 
+
+For n = 1 , 2, . . . , N , we also define the discrete velocity kernel space 
+
+Z(n) 
+
+> hτ
+
+:= 
+
+
+
+vhτ ∈ V(n) 
+
+> hτ
+
+: (div xvhτ , q hτ )Qn = 0 ∀qhτ ∈ M (n)
+
+> hτ
+
+
+
+.
+
+The global space Zhτ is then defined naturally, as in (3.3a) and (3.3b). 
+
+Lemma 3.2 (Compatibility of the discrete spaces) . The discrete velocity kernel space is equivalent to 
+
+Z(n) 
+
+> hτ
+
+=
+
+
+
+vhτ ∈ V(n) 
+
+> hτ
+
+: div xvhτ = 0 in Qn
+
+
+
+.
+
+Proof. Let n ∈ { 1, . . . , N } and v(n) 
+
+> hτ
+
+∈ V(n) 
+
+> hτ
+
+. Recalling the hat and tilde notation introduced in Remark 2.5, and then applying identity (3.4) and a change of variables of the ensuing integral, for all q(n) 
+
+> hτ
+
+∈ M (n) 
+
+> hτ
+
+, we have 
+
+Z
+
+> In
+
+ div xv(n) 
+
+> hτ
+
+, q (n)
+
+> hτ
+
+ 
+
+> Ω( t)
+
+dt =
+
+Z
+
+> In
+
+Z
+
+> Ω( t)
+
+ 1det Jt
+
+(div y bvhτ )
+
+ A−1 
+
+> t
+
+(x), t eqhτ 
+
+ A−1 
+
+> t
+
+(x), t  dx dt
+
+=
+
+Z
+
+> In
+
+Z
+
+> Ω0
+
+div y bvhτ (y, t )eqhτ (y, t ) d y dt. (3.5) Assume now that v(n) 
+
+> hτ
+
+∈ Z(n) 
+
+> hτ
+
+satisfies R
+
+> In
+
+ div xvhτ , q (n)
+
+> hτ
+
+ 
+
+> Ω( t)
+
+dt = 0 for all q(n) 
+
+> hτ
+
+∈ M (n) 
+
+> hτ
+
+. By the well-known property of BDM elements in Lemma 5.3: div y( bVkh ⊗ Pℓ(In)) = fMk−1 
+
+> h
+
+⊗ Pℓ(In). Therefore, we can find eqhτ ∈ fMk−1 
+
+> h
+
+⊗ Pℓ(In) such that eqhτ (y, t ) = div y bvhτ (y, t ). Choosing the corresponding qhτ ∈ M hτ in identity (3.5) gives 
+
+∥div y bvhτ ∥2 
+
+> L2(In;L2(Ω 0))
+
+= 0 ,
+
+which implies that div y bvhτ = 0 in Ω 0 × In and, together with identity (3.4), gives div xvhτ = 0 in Qn.
+
+Remark 3.3 (Exact geometric representation) . The proposed method represents exactly the geometry of the moving domain, which is allowed to be curved and may require high-order quadratures. The same construction can be adapted to an isoparametric approach, i.e., approximating the map At by a piecewise polynomial. 
+
+7Remark 3.4 (Initial domain Ω 0). We can obtain a simplicial partition bTh of Ω0 because Ω0 was assumed to be a polytopal domain. This simplification is introduced only for ease of exposition. A more general assumption could be that Ω0 is a Lipschitz domain described as the image of a map G : eΩ → Ω0, for a polytopal parametric domain eΩ, the map G being piecewise regular with piecewise-regular inverse. In such a case, given a simplicial mesh on the parametric domain eΩ, the discrete spaces bVkh and fMk−1 
+
+> h
+
+defined in Ω0 would be simply replaced by their ( G-based) Piola-mapped counterparts, in the spirit of [7]. 
+
+## 3.4 Space–time DG method 
+
+We define the following forms: 
+
+ah,τ (uhτ , vhτ ) := 
+
+> N
+
+X
+
+> n=1
+
+a(n) 
+
+> h,τ
+
+(uhτ , vhτ ) := 
+
+> N
+
+X
+
+> n=1
+
+Z tn
+
+> tn−1
+
+ath(uhτ , vhτ ) d t
+
+:= 
+
+> N
+
+X
+
+> n=1
+
+Z tn
+
+> tn−1
+
+ X 
+
+> bK∈bTh
+
+(∇xuhτ , ∇xvhτ )Kt − X  
+
+> F∈bFh
+
+({{∇xuhτ }}Ft nFt , Jvhτ KFt )Ft
+
+− X  
+
+> F∈bFh
+
+(Juhτ KFt , {{∇xvhτ }}Ft nFt )Ft + X  
+
+> F∈bFh
+
+(σh −1 
+
+> F
+
+Juhτ KFt , Jvhτ KFt )Ft
+
+
+
+dt, 
+
+(3.6) 
+
+ch,τ (w; uhτ , vhτ ) := 
+
+> N
+
+X
+
+> n=1
+
+c(n) 
+
+> h,τ
+
+(w; uhτ , vhτ ) := 
+
+> N
+
+X
+
+> n=1
+
+Z tn
+
+> tn−1
+
+cth(w; uhτ , vhτ ) d t
+
+:= 
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ X 
+
+> K∈bTh
+
+ (∇xuhτ )w, vhτ 
+
+ 
+
+> Kt
+
+− X  
+
+> F∈bFI
+> h
+
+ (w · nFt )Juhτ KFt , {{vhτ }}Ft
+
+
+
+> Ft
+
+
+
+dt, (3.7) where the stability parameter σ > 0 will be chosen “large enough”, as usual. Furthermore, for all t ∈ [0 , T ], we define (v, w )Ωh(t) := X 
+
+> K∈bTh
+
+(v, w )Kt ∀v, w : Ω( t) → R , piecewise regular ,
+
+with the obvious analog for d-vector-valued functions. The proposed space–time DG formulation of (1.3) reads: find ( uhτ , p hτ ) ∈ Vhτ × M hτ such that 
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+(Dtuhτ , vhτ )Ωh(t) dt + 
+
+> N−1
+
+X
+
+> n=1
+
+ Juhτ Kn,vhτ (·, t + 
+
+> n
+
+) 
+
+> Ω( tn)
+
++ ( uhτ (·, 0) , vhτ (·, 0)) Ω0 − ch,τ (w; uhτ , vhτ )+νa h,τ (uhτ , vhτ ) + ( phτ , div xvhτ )QT = ( f , vhτ )QT + ( u0, vhτ (·, 0)) Ω0 ∀vhτ ∈ Vhτ , (3.8a) (div xuhτ , q hτ )QT = 0 ∀qhτ ∈ M hτ . (3.8b) By Lemma 3.2, it is simple to check that the discrete problem (3.8) can be written equivalently as: find uhτ ∈ Zhτ such that 
+
+Bh,τ (uhτ , zhτ ) := 
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+(Dtuhτ , zhτ )Ωh(t) dt + 
+
+> N−1
+
+X
+
+> n=1
+
+ Juhτ Kn, zhτ (·, t + 
+
+> n
+
+) 
+
+> Ω( tn)
+
++ ( uhτ (·, 0) , zhτ (·, 0)) Ω0
+
+− ch,τ (w; uhτ , zhτ ) + νa h,τ (uhτ , zhτ ) = ( f , zhτ )QT + ( u0, zhτ (·, 0)) Ω0 ∀zhτ ∈ Zhτ .
+
+(3.9) 
+
+# 4 Stability analysis 
+
+This section is devoted to establishing the well-posedness of the space–time method (3.8). Henceforth, we will use a ≲ b to denote the existence of a positive constant C independent of the mesh size h, the time steps τn, and the viscosity coefficient ν such that a ≤ Cb . In particular, we trace explicitly the dependence of all constants on ν. We will also use a ≃ b to indicate that a ≲ b and b ≲ a.8For all t ∈ [0 , T ] and all piecewise-regular (with respect to the mapped mesh) functions on Ω( t), we define 
+
+∥vh∥21,h,t := X 
+
+> bK∈bTh
+
+∥∇ xvh∥2 
+
+> L2(Kt)
+
++ X  
+
+> F∈bFh
+
+h−1 
+
+> F
+
+∥JvhKFt ∥2
+
+> L2(Ft)
+
+.
+
+In the next lemma, we collect several bounds related to the Piola transformation ϕt; the proof and the specific constants involved are provided in Appendix A. 
+
+Lemma 4.1. Let Assumption 2.1 on the map A hold. Let bv ∈ H2( bTh) and eq ∈ L2(Ω 0). For any K ∈ bTh,any F ∈ bFh, and any t ∈ [0 , T ], the following inequalities hold: 
+
+∥bv∥2 
+
+> L2(∂K )
+
+≃ ∥ ϕt bv∥2
+
+> L2(∂K t)
+
+, (4.1a) 
+
+∥∇x(ϕt bv)∥2 
+
+> L2(∂K t)
+
+≲ h−1 
+
+> K
+
+∥bv∥2 
+
+> L2(K)
+
++ ( hK + h−1 
+
+> K
+
+)∥∇y bv∥2 
+
+> L2(K)
+
++ hK ∥∇2 
+
+> y
+
+bv∥2
+
+> L2(K)
+
+, (4.1b) 
+
+∥∇x(ϕt bv)∥2 
+
+> L2(Kt)
+
+≲ ∥bv∥2 
+
+> L2(K)
+
++ ∥∇y bv∥2
+
+> L2(K)
+
+, (4.1c) 
+
+∥∇y bv∥2 
+
+> L2(K)
+
+≲ ∥ϕt bv∥2 
+
+> L2(Kt)
+
++ ∥∇x(ϕt bv)∥2
+
+> L2(Kt)
+
+, (4.1d) 
+
+∥JbvKF ∥2  
+
+> L2(F)
+
+≃ ∥ Jϕt bvKFt ∥2
+
+> L2(Ft)
+
+, (4.1e) 
+
+∥bv∥2 
+
+> L2(Ω 0)
+
+≃ ∥ ϕt bv∥2
+
+> L2(Ω( t))
+
+, (4.1f) 
+
+∥eq ◦ A −1 
+
+> t
+
+∥2 
+
+> L2(Ω( t))
+
+≃ ∥ eq∥2
+
+> L2(Ω 0)
+
+. (4.1g) 
+
+Moreover, if bv ∈ bVkh, then the following discrete trace estimates hold: 
+
+∥ϕt bv∥2 
+
+> L2(∂K t)
+
+≲ h−1 
+
+> K
+
+∥ϕt bv∥2
+
+> L2(Kt)
+
+, (4.2a) 
+
+∥∇x(ϕt bv)∥2 
+
+> L2(∂K t)
+
+≲ h−1 
+
+> K
+
+∥∇x(ϕt bv)∥2
+
+> L2(Kt)
+
+. (4.2b) 
+
+All the hidden constants above depend only on d, k, the mesh regularity parameter of bTh, and the regularity of the map At.
+
+The next lemmas provide the ingredients to prove the well-posedness of the space–time method (3.8) in Theorem 4.7 below. 
+
+Lemma 4.2 (Discrete Poincar´ e inequality) . Let Assumption 2.1 on the map A hold. For any t ∈ [0 , T ]
+
+and any mesh bTh in the family, the following bound holds: 
+
+∥v∥L2(Ω( t)) ≲ ∥v∥1,h,t ∀v ∈ H1(Th(t)) ,
+
+with the involved constant independent of h and t.Proof. Let v ∈ H1(Th(t)). Recalling Assumption 2.1 and Remark 2.1, a mapping argument easily gives 
+
+∥v∥L2(Ω( t)) ≲ ∥v ◦ A t∥L2(Ω 0) .
+
+Moreover, it can be immediately verified that v ◦ A t ∈ H1( bTh). Therefore, we first apply the Poincar´ e– Friedrich inequality on bTh from [11], and subsequently use again a mapping argument (treating jump and gradient terms separately) to obtain 
+
+∥v ◦ A t∥L2(Ω 0) ≲ ∥v ◦ A t∥1,h, 0 ≲ ∥v∥1,h,t .
+
+The proof is concluded combining the two bounds above. 
+
+Lemma 4.3 (Coercivity of ah,τ ). Under Assumption 2.1 on the map A, for σ sufficiently large, there exists a positive constant Ca such that, for n = 1 , . . . , N , it holds 
+
+a(n) 
+
+> h,τ
+
+(vhτ , vhτ ) ≥ Ca
+
+Z
+
+> In
+
+∥vhτ ∥21,h,t dt ∀vhτ ∈ Vhτ . (4.3) 
+
+Proof. The result follows from standard DG arguments and the trace inequality (4.2b). 9The previous lemma allows us to prove the following discrete inf–sup condition. To simplify the proof, we set {ψ(n) 
+
+> j
+
+}ℓj=0 as the Legendre basis on the interval In, which satisfies the following orthogonality property: Z
+
+> In
+
+ψ(n) 
+
+> i
+
+ψ(n) 
+
+> j
+
+dt = δij 
+
+τn
+
+2i + 1 , (4.4) where δij is the standard Kronecker delta function. 
+
+Proposition 4.4 (Inf–sup condition) . There exists Cβ > 0 independent of h and τ such that, for n =1, 2, . . . , N , it holds 
+
+sup  
+
+> v(n)
+> hτ ∈V(n)
+> hτ
+
+Z
+
+> In
+
+ div xv(n) 
+
+> hτ
+
+(·, t ), q (n) 
+
+> hτ
+
+(·, t ) 
+
+> Ω( t)
+
+dt
+
+Z
+
+> In
+
+∥v(n) 
+
+> hτ
+
+(·, t )∥21,h,t dt
+
+≥ Cβ
+
+Z 
+
+> In
+
+∥q(n) 
+
+> hτ
+
+(·, t )∥2 
+
+> L2(Ω( t))
+
+dt
+
+1/2
+
+∀qhτ ∈ M hτ .
+
+Proof. Let n ∈ { 1, 2, . . . , N }, and q(n) 
+
+> hτ
+
+∈ M (n) 
+
+> hτ
+
+, with eq(n) 
+
+> hτ
+
+(y, t ) = Pℓj=0 eβh,j (y)ψ(n) 
+
+> j
+
+(t); see (3.2b). By the inf–sup stability of standard BDM elements endowed with DG-norms (see [24, Thm. 2.2]), for each 
+
+eβh,j ∈ fMk−1 
+
+> h
+
+, we can find bαh,j ∈ bVkh such that div y bαh,j = eβh,j and 
+
+∥ bαh,j ∥1,h, 0 ≲ ∥ eβh,j ∥L2(Ω 0) . (4.5) We now take such { bαh,j }ℓj=0 and consider the choice v(n) 
+
+> hτ
+
+(x, t ) := Pℓi=0 (ϕt bαh,i )( x)ψ(n) 
+
+> i
+
+(t). It is evident that div y bv(n) 
+
+> hτ
+
+= eq(n) 
+
+> hτ
+
+in Ω 0 × In. Therefore, recalling (3.5), and using bound (4.1g) from Lemma 4.1, we obtain Z
+
+> In
+
+ div xv(n) 
+
+> hτ
+
+, q (n)
+
+> hτ
+
+ 
+
+> Ω( t)
+
+dt = ∥eq(n) 
+
+> hτ
+
+∥2 
+
+> L2(In;L2(Ω 0))
+
+≳
+
+Z
+
+> In
+
+∥q(n) 
+
+> hτ
+
+(·, t )∥2 
+
+> L2(Ω( t))
+
+dt. (4.6) Furthermore, by the triangle inequality, we have 
+
+Z
+
+> In
+
+∥v(n) 
+
+> hτ
+
+(·, t )∥21,h,t dt =
+
+Z
+
+> In
+
+∥
+
+> ℓ
+
+X
+
+> j=0
+
+(ϕt bαh,j )( x)ψ(n) 
+
+> j
+
+(t)∥21,h,t dt ≤
+
+> ℓ
+
+X
+
+> j=0
+
+Z
+
+> In
+
+∥(ϕt bαh,j )∥21,h,t |ψ(n) 
+
+> j
+
+(t)|2 dt . (4.7) We preliminarily note that, due to the orthogonality property (4.4), it holds 
+
+∥eq(n) 
+
+> hτ
+
+∥2 
+
+> L2(In;L2(Ω 0))
+
+=
+
+> ℓ
+
+X
+
+> j=0
+
+τn
+
+2j + 1 ∥ bβh,j ∥2
+
+> L2(Ω 0)
+
+. (4.8) Starting from (4.7), we apply bounds (4.1d) and (4.1e), followed by the Poincar´ e–Friedrich inequality on bTh
+
+from [11], and finally use estimate (4.5) and the orthogonality property (4.4) to obtain 
+
+Z
+
+> In
+
+∥v(n) 
+
+> hτ
+
+(·, t )∥21,h,t dt ≲
+
+> ℓ
+
+X
+
+> j=0
+
+ ∥ bαh,j ∥21,h, 0 + ∥ bαh,j ∥2
+
+> L2(Ω 0)
+
+ Z
+
+> In
+
+|ψ(n) 
+
+> j
+
+|2 dt
+
+≲
+
+> ℓ
+
+X
+
+> j=0
+
+∥ bαh,j ∥21,h, 0
+
+Z
+
+> In
+
+|ψ(n) 
+
+> j
+
+|2 dt ≲
+
+> ℓ
+
+X
+
+> j=0
+
+τn
+
+2j + 1 ∥ eβh,j ∥2
+
+> L2(Ω 0)
+
+.
+
+The above bound, combined with identity (4.8) and bound (4.1g), gives 
+
+Z
+
+> In
+
+∥v(n) 
+
+> hτ
+
+(·, t )∥21,h,t dt ≲ ∥eq(n) 
+
+> hτ
+
+∥2 
+
+> L2(In;L2(Ω 0))
+
+≲
+
+Z
+
+> In
+
+∥q(n) 
+
+> hτ
+
+(·, t )∥2 
+
+> L2(Ω( t))
+
+dt. (4.9) The result now follows by standard theory for the inf–sup condition, combining (4.6) and (4.9). The stability analysis also relies on the following local Reynolds identities, which we write on generic mapped simplices; see [10, Lemma 2.2]. 
+
+Lemma 4.5 (Reynolds identities for regular functions) . For all K ∈ bTh, n ∈ { 1, . . . , N }, and t ∈ In, it holds 
+
+ddt
+
+Z
+
+> Kt
+
+φ · v dx =
+
+Z
+
+> Kt
+
+v · (Dtφ + φ(div xw)) d x +
+
+Z
+
+> Kt
+
+φ · Dtv dx ∀v, φ ∈ H1(Kn). (4.10) 10 As a consequence, for n = 1 , . . . , N , the following identity holds for all v ∈ H1(Kn): 12 ∥v(·, t − 
+
+> n
+
+)∥2  
+
+> L2(Ktn )
+
+− 12 ∥v(·, t +
+
+> n−1
+
+)∥2  
+
+> L2(Ktn−1)
+
+=
+
+Z
+
+> In
+
+Z
+
+> Kt
+
+h
+
+Dtv · v + 12 (div xw)|v|2i
+
+dx dt . 
+
+The previous result yields the following crucial lemma, valid for discrete functions. 
+
+Lemma 4.6 (Discrete Reynolds identities) . Let vhτ , φhτ ∈ Vhτ . For all n ∈ { 1, . . . , N } and t ∈ In, it holds 
+
+ddt
+
+Z
+
+> Ω( t)
+
+φhτ · vhτ dx =
+
+Z
+
+> Ωh(t)
+
+ φhτ · Dtvhτ + vhτ · Dtφhτ 
+
+ dx − cth(w; φhτ , vhτ ) − cth(w; vhτ , φhτ ),
+
+(4.11a) 
+
+and, for each n = 1 , 2, . . . , N ,
+
+12 ∥vhτ (·, t − 
+
+> n
+
+)∥2 
+
+> L2(Ω( tn))
+
+− 12 ∥vhτ (·, t +
+
+> n−1
+
+)∥2 
+
+> L2(Ω( tn−1))
+
+=
+
+Z
+
+> In
+
+Z
+
+> Ωh(t)
+
+Dtvhτ · vhτ dx dt − c(n) 
+
+> h,τ
+
+(w; vhτ , vhτ ).
+
+(4.11b) 
+
+Proof. For each n ∈ { 1, . . . , N } and t ∈ In, integration by parts and standard DG arguments yield 
+
+Z
+
+> Ω( t)
+
+(div xw)φhτ · vhτ dx = −cth(w; φhτ , vhτ ) − cth(w; vhτ , φhτ ) . (4.12) Writing the integral in Ω( t) as a sum over all elements K ∈ bTh, then applying (4.10) elementwise, and finally using (4.12), we obtain ddt
+
+Z
+
+> Ω( t)
+
+φhτ · vhτ dx =
+
+Z
+
+> Ωh(t)
+
+ φhτ · Dtvhτ + vhτ · Dtφhτ 
+
+ dx − cth(w; φhτ , vhτ ) − cth(w; vhτ , φhτ ).
+
+The second identity (4.11b) is an immediate consequence of (4.11a) with φhτ = vhτ , as integration in time over In leads to 12 ∥vhτ (·, t − 
+
+> n
+
+)∥2 
+
+> L2(Ω( tn))
+
+− 12 ∥vhτ (·, t +
+
+> n−1
+
+)∥2 
+
+> L2(Ω( tn−1))
+
+= 12
+
+Z
+
+> In
+
+h ddt
+
+Z
+
+> Ω( t)
+
+|vhτ |2 dx
+
+i
+
+dt
+
+=
+
+Z
+
+> In
+
+h Z
+
+> Ωh(t)
+
+Dtvhτ · vhτ dx − cth(w; vhτ , vhτ )
+
+i
+
+dt . 
+
+We are now in a position to prove the main result in this section. The following result shows the existence and uniqueness of a solution to problem (3.8) and its stability at the time nodes {tn}Nn=0 .
+
+Theorem 4.7 (Well-posedness) . Under the assumptions of Lemma 4.3, there exists a unique solution (uhτ , p hτ ) ∈
+
+Vhτ × M hτ to problem (3.8) . Furthermore, such a solution satisfies the following nodal stability bound for m ∈ { 1, 2, . . . , N }:
+
+12 ∥uhτ (·, t −
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
++ 12
+
+> m−1
+
+X
+
+> n=1
+
+∥Juhτ Kn∥2 
+
+> L2(Ω( tn))
+
++ 14 ∥uhτ (·, 0) ∥2 
+
+> L2(Ω 0)
+
++ 12
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ν∥uhτ (·, t )∥21,h,t dt
+
+≲ 1
+
+ν
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥f (·, t )∥2 
+
+> L2(Ω( t))
+
+dt + ∥u0∥2
+
+> L2(Ω 0)
+
+. (4.13) 
+
+Proof. The discrete linear problem (3.8) can be solved sequentially for n = 1 , 2, . . . , N . For each n, the problem has the classical mixed form: find ( u(n) 
+
+> hτ
+
+, p (n) 
+
+> hτ
+
+) ∈ V(n) 
+
+> hτ
+
+× M (n) 
+
+> hτ
+
+such that 
+
+
+
+A(n) 
+
+> h
+
+(u(n) 
+
+> hτ
+
+, vhτ ) + B(n) 
+
+> h
+
+(vhτ , p (n) 
+
+> hτ
+
+) = ( f , vhτ )Qn +  u(n−1)  
+
+> hτ
+
+(·, t −
+
+> n−1
+
+), vhτ (·, t +
+
+> n−1
+
+) 
+
+> Ωn−1
+
+∀vhτ ∈ V(n) 
+
+> hτ
+
+,
+
+B(n) 
+
+> h
+
+(u(n) 
+
+> hτ
+
+, q hτ ) = 0 ∀qhτ ∈ M (n) 
+
+> hτ
+
+,
+
+11 with the obvious right-hand side modification for n = 1, and where 
+
+A(n) 
+
+> h
+
+(uhτ , vhτ ) := 
+
+Z
+
+> In
+
+(Dtuhτ , vhτ )Ωh(t) dt +  uhτ (·, t +
+
+> n−1
+
+), vhτ (·, t +
+
+> n−1
+
+)
+
+> Ω( tn−1)
+
+− c(n) 
+
+> h,τ
+
+(w; uhτ , vhτ ) + νa (n) 
+
+> h,τ
+
+(uhτ , vhτ ) ,
+
+B(n) 
+
+> h
+
+(uhτ , q hτ ) :=( qhτ , div xuhτ )Qn .
+
+Using the discrete Reynolds identity (4.11b) and the coercivity in (4.3) of the bilinear form ah,τ (·, ·), we obtain 
+
+A(n) 
+
+> h
+
+(u(n) 
+
+> hτ
+
+, u(n) 
+
+> hτ
+
+) = 12 ∥u(n) 
+
+> hτ
+
+(·, t − 
+
+> n
+
+)∥2 
+
+> L2(Ω( tn))
+
+− 12 ∥u(n) 
+
+> hτ
+
+(·, t +
+
+> n−1
+
+)∥2
+
+> L2(Ω( tn−1))
+
++  u(n−1)  
+
+> hτ
+
+(·, t +
+
+> n−1
+
+), u(n−1)  
+
+> hτ
+
+(·, t +
+
+> n−1
+
+) 
+
+> Ωn−1
+
++ ν
+
+Z
+
+> In
+
+ah,τ 
+
+ u(n) 
+
+> hτ
+
+, u(n)
+
+> hτ
+
+ dt
+
+≥ 12 ∥u(n) 
+
+> hτ
+
+(·, t − 
+
+> n
+
+)∥2 
+
+> L2(Ω( tn))
+
++ 12 ∥u(n) 
+
+> hτ
+
+(·, t +
+
+> n−1
+
+)∥2 
+
+> L2(Ω( tn))
+
++ νC a
+
+Z
+
+> In
+
+|u(n) 
+
+> hτ
+
+|21,h dt, 
+
+so that the bilinear form A(n) 
+
+> h
+
+is coercive on V(n) 
+
+> hτ
+
+. Moreover, the inf–sup stability of the spaces V(n) 
+
+> hτ
+
+×M (n)
+
+> hτ
+
+with respect to the form B(n) 
+
+> h
+
+has been shown in Proposition 4.4. As a consequence of theset two properties, standard theory of mixed methods [8, §4.2] yields existence and uniqueness of a solution. Let uhτ ∈ Vhτ be the solution to (3.9), and let m ∈ { 1, . . . , N } be fixed. We define vhτ ∈ Vhτ as 
+
+vhτ |Qj := 
+
+(
+
+uhτ if j ∈ { 1, . . . , m },
+
+0 otherwise .
+
+Taking this vhτ as a test function in (3.9), we get 
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+(Dtuhτ , uhτ )Ωh(t) dt +
+
+> m−1
+
+X
+
+> n=1
+
+ Juhτ Kn, uhτ (·, t + 
+
+> n
+
+) 
+
+> Ω( tn)
+
++ ∥uhτ (·, 0) ∥2
+
+> L2(Ω 0)
+
+−
+
+> m
+
+X
+
+> n=1
+
+c(n) 
+
+> h,τ
+
+(w; uhτ , uhτ ) + ν
+
+> m
+
+X
+
+> n=1
+
+a(n) 
+
+> h,τ
+
+(uhτ , uhτ ) = 
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+(f , uhτ )Ωh(t) dt + ( u0, uhτ (·, 0)) Ω0 .
+
+(4.14) We denote by LHS and RHS the left- and right-hand sides of the above equation, respectively. For the first and fourth terms in LHS, using the discrete Reynolds identity (4.11b) and recalling the definition of 
+
+ch,τ (·; ·, ·), we obtain 
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+(Dtuhτ , uhτ )Ωh(t) dt − ch,τ (w; uhτ , uhτ )= 12
+
+> m
+
+X
+
+> n=1
+
+ ∥uhτ (·, t − 
+
+> n
+
+)∥2 
+
+> L2(Ω( tn))
+
+− ∥ uhτ (·, t +
+
+> n−1
+
+)∥2
+
+> L2(Ω( tn−1))
+
+.
+
+(4.15) For the second term in LHS, recalling the definition in (3.1) of the time-jump operator J·Kn, and using the relation ( a − b) · a = 12 (|a|2 + |a − b|2 − | b|2) with a = uhτ (·, t + 
+
+> n
+
+) and b = uhτ (·, t − 
+
+> n
+
+), we have 
+
+> m−1
+
+X
+
+> n=1
+
+ Juhτ Kn, uhτ (·, t + 
+
+> n
+
+) 
+
+> Ω( tn)
+
+=
+
+> m−1
+
+X
+
+> n=1
+
+12
+
+h
+
+∥uhτ (·, t + 
+
+> n
+
+)∥2 
+
+> L2(Ω( tn))
+
++ ∥Juhτ Kn∥2 
+
+> L2(Ω( tn))
+
+− ∥ uhτ (·, t − 
+
+> n
+
+)∥2
+
+> L2(Ω( tn))
+
+i
+
+.
+
+(4.16) As for the last term in LHS, we use the coercivity in (4.3) of ah,τ (·, ·) to obtain 
+
+νa h,τ (uhτ , uhτ ) ≥
+
+> m
+
+X
+
+> n=1
+
+νC a
+
+Z
+
+> In
+
+∥uhτ (·, t )∥21,h,t dt. (4.17) Combining (4.15), (4.16), and (4.17) with identity (4.14) yields LHS ≥ 12
+
+
+
+∥uhτ (·, t −
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
++
+
+> m−1
+
+X
+
+> n=1
+
+∥Juhτ Kn∥2 
+
+> L2(Ω( tn))
+
++ ∥uhτ (·, 0) ∥2
+
+> L2(Ω 0)
+
+
+
++
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+νC a∥uhτ (·, t )∥21,h,t dt. 
+
+(4.18) 12 Applying the Cauchy–Schwarz and the Young inequalities to the RHS of (4.14), along with Lemma 4.2, we obtain RHS ≤ 12εν 
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥f (·, t )∥2 
+
+> L2(Ω( t))
+
+dt + ε νC PF 
+
+2
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥uhτ (·, t )∥21,h,t dt
+
++ ∥u0∥2 
+
+> L2(Ω 0)
+
++ 14 ∥uhτ (·, 0) ∥2
+
+> L2(Ω 0)
+
+,
+
+(4.19) where we denoted by CPF the constant in Lemma 4.2. From (4.18) and (4.19), straightforward algebraic manipulations and choosing ε = Ca/C PF > 0 easily give 12 ∥uhτ (·, t −
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
++ 12
+
+> m−1
+
+X
+
+> n=1
+
+∥Juhτ Kn∥2 
+
+> L2(Ω( tn))
+
++ 14 ∥uhτ (·, 0) ∥2 
+
+> L2(Ω 0)
+
++ 12
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ν∥uhτ (·, t )∥21,h,t dt
+
+≤ C
+
+ 1
+
+ν
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥f (·, t )∥2 
+
+> L2(Ω( t))
+
+dt + ∥u0∥2
+
+> L2(Ω 0)
+
+
+
+, (4.20) with C := max {CPF /(2 Ca), 1}/ min {1, C a}.
+
+Remark 4.8 (Pressure-robust stability bound) . Thanks to the property in Lemma 3.2, which implies that the discrete kernel space Zhτ is contained in the continuous one, the forcing f on the right-hand side of bound (4.13) could be substituted by its Helmholtz–Hodge projection, underlining the pressure-robustness of the scheme. We refer to [23] for more details and an extended discussion on the relevance of such a property. 
+
+# 5 Convergence analysis 
+
+We now focus on the derivation of a priori estimates for the error in the energy norm. 
+
+## 5.1 Space–time projection 
+
+We recall the definition and properties of some auxiliary operators. We start with the Thom´ ee projection in time Pτ (see [32, eq. (12.9) in Ch. 12]), which is a classical tool in the analysis of DG time discretizations. 
+
+Definition 5.1 (The Thom´ ee projection Pτ ). For ℓ ∈ N and a Hilbert space H with inner product (·, ·)H,the projection operator Pτ : H1(0 , T ; H) → H ⊗ Pℓ(Tτ ) is defined for any v ∈ H1(0 , T ; H) as follows: for n = 1 , . . . , N ,
+
+Pτ v(t− 
+
+> n
+
+) = v(tn),
+
+Z
+
+> In
+
+(Pτ v, w ℓ−1)H dt =
+
+Z
+
+> In
+
+(v, w ℓ−1)H dt ∀wℓ−1 ∈ H ⊗ Pℓ−1(Tτ ).
+
+The stability of Pτ in the L∞(0 , T ; H) norm yields the following approximation estimates (see [13, 
+
+§69.3.2] and [5, Lemma 4.2]). 
+
+Lemma 5.2 (Estimates for Pτ ). Let r ∈ [1 , ∞], and H a Hilbert space with inner product (·, ·)H. Then, for n = 1 , . . . , N , the following estimate holds: 
+
+∥P τ v − v∥Lr (In;H) ≲ τ sn∥∂(s) 
+
+> t
+
+v∥Lr (In;H) ∀v ∈ W s,r (In; H), 1 ≤ s ≤ ℓ + 1 .
+
+Moreover, we denote by bIBDM  
+
+> h
+
+: H1(Ω 0) → bVkh the standard BDM interpolant (see [8, §2.5.2]) in the reference domain Ω 0, which, with a slight abuse of notation, we assume to act on the spatial variable in the space–time setting. Denoting by Π M 
+
+> h
+
+: L1(Ω 0) → fMk−1 
+
+> h
+
+, the standard L2(Ω 0)-orthogonal projection, we recall the well-known commutativity property of bIBDM  
+
+> h
+
+(see, e.g., [8, §2.5.6]). 
+
+Lemma 5.3 (Commutativity of bIBDM  
+
+> h
+
+). The following identity holds: 
+
+div y bIBDM  
+
+> h
+
+bv = Π M 
+
+> h
+
+div y bv ∀bv ∈ H1(Ω 0).
+
+The next lemma concerns the approximation properties of the interpolant bIBDM  
+
+> h
+
+(see, e.g., [8, Prop. 2.5.1]). 13 Lemma 5.4 (Estimates for bIBDM  
+
+> h
+
+). For all K ∈ bTh, 1 ≤ m ≤ k + 1 , and v ∈ Hm(K), it holds: 
+
+∥bIBDM  
+
+> h
+
+v − v∥L2(K) + hK ∥∇y(bIBDM  
+
+> h
+
+v − v)∥L2(K) ≲ hmK |v|Hm(K).
+
+Finally, we define the space–time projection Π hτ in the discrete space Vhτ .
+
+Definition 5.5 (Space–time interpolation operator Π hτ ). For any function v ∈ H1(H1; QT ), we define its space–time interpolation Πhτ v ∈ Vhτ as Πhτ v = ϕ (Pτ ◦ bIBDM  
+
+> h
+
+)bv.
+
+Due to Lemma 2.3 and the commutativity property in Lemma 5.3, for all v ∈ H1(H1; QT ) and for a.e. (x, t ) = ( At(y), t ) ∈ QT , it holds div xΠhτ v(x, t ) = 1det Jt(y)
+
+h
+
+div y
+
+ (Pτ ◦ bIBDM  
+
+> h
+
+)bvi
+
+(y, t ) = 1det Jt(y)
+
+h
+
+Pτ
+
+ ΠM 
+
+> h
+
+(div y bv)i
+
+(y, t ).
+
+Using again Lemma 2.3, if div xv = 0, then div y bv = 0 and Π hτ v ∈ Zhτ .We conclude with an inverse estimate for functions in Vhτ .
+
+Lemma 5.6 (Inverse estimate) . For all vhτ ∈ Vhτ and n ∈ { 1, . . . , N }, it holds 
+
+∥Dtvhτ ∥L2(L2;Qn) ≲ (τ −1 
+
+> n
+
++ 1) ∥vhτ ∥L2(L2;Qn).
+
+Proof. Let vhτ ∈ Vhτ . Using the triangle inequality and the identity in Lemma 2.4, we have 
+
+∥Dtvhτ ∥L2(L2;Qn) ≤ ∥ ϕ(∂t bvhτ )∥L2(L2;Qn) + ∥∇ xw − div xwId∥L∞(QT )∥ϕbvhτ ∥L2(L2;Qn).
+
+Using (4.1f), the regularity of w, and the polynomial inverse estimate for functions in bVkh ⊗ Pℓ(In), we get 
+
+∥Dtvhτ ∥L2(L2;Qn) ≲ τ −1 
+
+> n
+
+∥bvhτ ∥L2(In;L2(Ω 0)) + ∥vhτ ∥L2(L2;Qn) ≲ (τ −1 
+
+> n
+
++ 1) ∥vhτ ∥L2(L2;Qn),
+
+where, in the last step, we have used again (4.1f). 
+
+## 5.2 A priori error estimates 
+
+We introduce the tensor-valued field Θ : Ω × [0 , T ] → Rd×d, defined as Θ( y, t ) := (det Jt(y)) −1Jt(y)⊤ Jt(y) ∀(y, t ) ∈ Ω0 × [0 , T ], (5.2) which is clearly symmetric and, due to Assumption 2.1 on the regularity of the ALE map A, also uniformly strictly positive definite. Let u be the continuous weak solution to (1.3), which we assume to satisfy bu ∈ H1(0 , T ; H1(Ω 0)) and 
+
+bu ∈ L2(0 , T ; Hs(Ω 0)) with s > 3/2. Furthermore, let uhτ ∈ Zhτ be the solution to the discrete space–time formulation (3.9). We define the following error functions: 
+
+eu := u − uhτ = ( u − Πhτ u) + (Π hτ u − uhτ ) =: eΠ 
+
+> u
+
++ Π hτ eu.
+
+Due to the consistency of (3.9), the following error equation holds: 
+
+Bh,τ (Π hτ eu, zhτ ) = −B h,τ (eΠ 
+
+> u
+
+, zhτ ) ∀zhτ ∈ Zhτ . (5.3) 
+
+Simplified error equation. We now use the properties of the space–time projection Π hτ to simplify the error equation (5.3). Using the discrete Reynolds identity in (4.11a) and the identity 
+
+Ju · vKn = JuKn · v(t+ 
+
+> n
+
+) + u(t− 
+
+> n
+
+) · JvKn, for n = 1 , . . . , N − 1,
+
+we obtain 
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+(Dt(Π hτ u − u), zhτ )Ωh(t) dt + 
+
+> N−1
+
+X
+
+> n=1
+
+ JΠhτ u − uKn, zhτ (·, t + 
+
+> n
+
+) 
+
+> Ω( tn)
+
++  (Π hτ u − u)( ·, 0) , zhτ (·, 0) 
+
+> Ω0
+
+=  (Π hτ u − u)( ·, T ), zhτ (·, T )  
+
+> Ω( T)
+
+− 
+
+> N−1
+
+X
+
+> n=1
+
+Z
+
+> Ω( tn)
+
+
+
+J(Π hτ u − u) · zhτ Kn − JΠhτ u − uKn · zhτ (·, t + 
+
+> n
+
+)
+
+
+
+dx
+
+14 −
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ Πhτ u − u, D tzhτ 
+
+ 
+
+> Ωh(t)
+
+dt + ch,τ (w; Π hτ u − u, zhτ ) + ch,τ (w; zhτ , Πhτ u − u)= − (Π hτ u − u)( ·, T ), zhτ (·, T )  
+
+> Ω( T)
+
+− 
+
+> N−1
+
+X
+
+> n=1
+
+ (Π hτ u − u)( ·, t − 
+
+> n
+
+), Jzhτ Kn
+
+
+
+> Ω( tn)
+
+−
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ Πhτ u − u, D tzhτ 
+
+ 
+
+> Ωh(t)
+
+dt + ch,τ (w; Π hτ u − u, zhτ ) + ch,τ (w; zhτ , Πhτ u − u).
+
+Then, using the interpolation property of Pτ and adding and subtracting suitable terms, the right-hand side of (5.3) can be simplified as follows: 
+
+−B h,τ (eΠ 
+
+> u
+
+, zhτ ) = − ϕ(bIBDM  
+
+> h
+
+bu − bu)( ·, T ), zhτ (·, T )  
+
+> Ω( T)
+
+− 
+
+> N−1
+
+X
+
+> n=1
+
+ ϕ(bIBDM  
+
+> h
+
+bu − bu)( ·, t − 
+
+> n
+
+), Jzhτ Kn
+
+
+
+> Ω( tn)
+
+−
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ ϕ bIBDM  
+
+> h
+
+bu − bu), D tzhτ 
+
+ 
+
+> Ωh(t)
+
+dt
+
+−
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ ϕ (Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu), D tzhτ 
+
+ 
+
+> Ωh(t)
+
+dt
+
+− νa h,τ (Π hτ u − u, zhτ ) + ch,τ (w; zhτ , Πhτ u − u). (5.4) Finally, we can use the continuity in time of u and the discrete Reynolds identity in (4.11a) to simplify the first three terms on the right-hand side of (5.4). The error equation (5.3) reduces to 
+
+Bh,τ (Π hτ eu, zhτ ) = 
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ Dtϕ(bIBDM  
+
+> h
+
+bu − bu), zhτ 
+
+ 
+
+> Ωh(t)
+
+dt + ( bIBDM  
+
+> h
+
+u0 − u0, zhτ (·, 0)) Ω0
+
+−
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ ϕ (Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu), D tzhτ 
+
+ 
+
+> Ωh(t)
+
+dt
+
+− ch,τ 
+
+ w; ϕ(bIBDM  
+
+> h
+
+bu − bu), zhτ 
+
+ + ch,τ 
+
+ w; zhτ , ϕ (( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu)
+
+− νa h,τ (Π hτ u − u, zhτ )=: M1(zhτ ) + M2(zhτ ) + M3(zhτ ) + M4(zhτ ) + M5(zhτ ) + M6(zhτ ).
+
+(5.5) 
+
+Error estimates. We are now in a position to prove the main result in this section. 
+
+Theorem 5.7 (Error estimate for the discrete error) . Let u be the continuous weak solution to (1.3) ,which we assume to satisfy bu ∈ Hℓ+1 (0 , T ; H2(Ω 0)) ∩ H1(0 , T ; Hk+1 (Ω 0)) . Let also uhτ ∈ Zhτ be the solution to the discrete formulation (3.9) . For m ∈ { 1, . . . , N }, the discrete error Πhτ eu satisfies 
+
+∥Πhτ eu(·, t −
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
++
+
+> m−1
+
+X
+
+> n=1
+
+∥JΠhτ euKn∥2
+
+> L2(Ω( tn))
+
++ ∥Πhτ eu(·, 0) ∥2 
+
+> L2(Ω 0)
+
++ ν
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥Πhτ eu(·, t )∥21,h,t dt ≲ Eτ (bu) + Eh(bu, u0),
+
+where the temporal and spatial approximation bounds are given by 
+
+Eτ (bu) := τ 2( ℓ+1) h
+
+(ν + ν−1)∥∂(ℓ+1)  
+
+> t
+
+bu∥2  
+
+> L2(0 ,T ;L2(Ω 0))
+
++ ( ν + ν−1h2)|∂(ℓ+1)  
+
+> t
+
+bu|2 
+
+> L2(0 ,T ;H1(Ω 0))
+
++ ν|∂(ℓ+1)  
+
+> t
+
+bu|2 
+
+> L2(0 ,T ;H2(Ω 0))
+
+i
+
+,
+
+Eh(bu, u0) := h2kh
+
+h2ν−1|∂t bu|2  
+
+> L2(0 ,T ;Hk+1 (Ω 0))
+
++  ν + ν−1(1 + h2)|bu|2 
+
+> L2(0 ,T ;Hk+1 (Ω 0))
+
++ h2|u0|2 
+
+> Hk+1 (Ω 0)
+
++ νT |bu|2 
+
+> L∞(0 ,T ;Hk+1 (Ω 0))
+
+i
+
+.
+
+Proof. Without loss of generality, we prove the result for m = N . We now estimate each term Mi(zhτ ), 
+
+i = 1 , . . . , 6, appearing in (5.5) separately. 15 Estimate of M1. Using the identity in Lemma 2.4, together with the Cauchy–Schwarz inequality and (4.1f), we get 
+
+M1(zhτ ) ≤
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+
+
+∥ϕt(bIBDM  
+
+> h
+
+∂t bu − ∂t bu)∥L2(Ω h(t)) 
+
++ ∥∇ xw − div xwId∥L∞(Ω( t)) ∥ϕt(bIBDM  
+
+> h
+
+bu − bu)∥L2(Ω h(t)) 
+
+
+
+∥zhτ ∥L2(Ω h(t)) dt
+
+≲
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ ∥bIBDM  
+
+> h
+
+∂t bu − ∂t bu∥L2(Ω 0) + ∥bIBDM  
+
+> h
+
+bu − bu∥L2(Ω 0)
+
+∥zhτ ∥L2(Ω h(t)) dt
+
+≲ hk+1 
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ |∂t bu|Hk+1 (Ω 0) + |bu|Hk+1 (Ω 0)
+
+∥zhτ ∥L2(Ω h(t)) dt, 
+
+where, in the last inequality, we have applied the approximation properties of bIBDM  
+
+> h
+
+from Lemma 5.4. Multiplying and dividing by ν1/2, and finally applying the Poincar´ e–Friedrich inequality from Lemma 4.2, yields 
+
+M1(zhτ ) ≲ ν−1/2hk+1  |∂t bu|L2(0 ,T ;Hk+1 (Ω 0)) + |bu|L2(0 ,T ;Hk+1 (Ω 0)) 
+
+
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+.
+
+Estimate of M2. An immediate application of the Cauchy–Schwarz inequality and the approximation properties in Lemma 5.4 of bIBDM  
+
+> h
+
+gives 
+
+M2(zhτ ) ≲ hk+1 |u0|Hk+1 (Ω 0)∥zhτ (·, 0) ∥L2(Ω 0).
+
+Estimate of M3. We first split the term M3 using Lemma 2.4 as follows: 
+
+M3(zhτ ) = −
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+
+
+ϕ (Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu, ϕ (∂tbzhτ ) + ( ∇xw − div xwId)zhτ 
+
+
+
+> Ωh(t)
+
+dt
+
+=: M (a)3 (zhτ ) + M (b)3 (zhτ ). (5.6) As for the first term on the right-hand side, we first make a change of variable, and then use the definition in (5.2) of Θ and the orthogonality properties of Pτ to obtain 
+
+M (a)3 (zhτ ) = −
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+Z
+
+> Ω0
+
+
+
+(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu
+
+
+
+· Θ ∂tbzhτ dy dt
+
+= −
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+Z
+
+> Ω0
+
+
+
+(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu
+
+
+
+· (Θ − Πt
+
+> 0
+
+Θ) ∂tbzhτ dy dt, 
+
+where Π t 
+
+> 0
+
+denotes the L2(0 , T )-orthogonal projection into the space of constant functions in time. This identity, combined with the H¨ older inequality, the approximation properties in Lemma 5.2 of Pτ , a standard polynomial inverse estimate, and bound (4.1f), gives 
+
+M (a)3 (zhτ ) ≲ ∥Θ − Πt
+
+> 0
+
+Θ∥L∞(In;L∞(Ω 0)) 
+
+> N
+
+X
+
+> n=1
+
+∥(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu∥L2(In;L2(Ω 0)) ∥∂tbzhτ ∥L2(In;L2(Ω 0)) 
+
+≲ τn∥Θ∥W 1,∞(In;L∞(Ω 0)) 
+
+> N
+
+X
+
+> n=1
+
+∥(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu∥L2(In;L2(Ω 0)) τ −1 
+
+> n
+
+∥bzhτ ∥L2(In;L2(Ω 0)) 
+
+≲
+
+> N
+
+X
+
+> n=1
+
+∥(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu∥L2(In;L2(Ω 0)) ∥bzhτ ∥L2(In;L2(Ω 0)) 
+
+≲ τ ℓ+1 
+
+> N
+
+X
+
+> n=1
+
+∥∂(ℓ+1)  
+
+> t
+
+bIBDM  
+
+> h
+
+bu∥L2(In;L2(Ω 0)) ∥zhτ ∥L2(Qn). (5.7) 16 The term M (b)3 can be estimated similarly using the Cauchy–Schwarz inequality, the regularity of w,bound (4.1f), and the the approximation properties of Pτ in Lemma 5.2 as follows: 
+
+M (b)3 (zhτ ) ≲
+
+> N
+
+X
+
+> n=1
+
+∥ϕ
+
+
+
+(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu
+
+
+
+∥L2(Qn)∥zhτ ∥L2(Qn)
+
+≲ τ ℓ+1 
+
+> N
+
+X
+
+> n=1
+
+∥∂(ℓ+1)  
+
+> t
+
+bIBDM  
+
+> h
+
+bu∥L2(In;L2(Ω 0)) ∥zhτ ∥L2(Qn).
+
+(5.8) Combining estimates (5.7) and (5.8) with (5.6), and using the triangle inequality, the approximation properties of bIBDM  
+
+> h
+
+in Lemma 5.4 with m = 1, and the Poincar´ e–Friedrich inequality from Lemma 4.2, implies 
+
+M3(zhτ ) ≲ ν−1/2τ ℓ+1 
+
+∥∂(ℓ+1)  
+
+> t
+
+bu∥L2(0 ,T ;L2(Ω 0)) + h|∂(ℓ+1)  
+
+> t
+
+bu|L2(0 ,T ;H1(Ω 0)) 
+
+ 
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+.
+
+Estimate of M4. Recalling the definition in (3.7) of the form ch,τ (·; ·, ·), we can split the term M4 as 
+
+M4(zhτ ) = −
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ (∇xϕ(bIBDM  
+
+> h
+
+bu − bu)) w, zhτ 
+
+
+
+> Ωh(t)
+
+− X  
+
+> F∈bFI
+> h
+
+ (w · nFt )Jϕ(bIBDM  
+
+> h
+
+bu − bu)KFt , {{zhτ }}Ft
+
+
+
+> Ft
+
+
+
+dt. 
+
+(5.9) Using the H¨ older inequality, bound (4.1c), the approximation properties of bIBDM  
+
+> h
+
+in Lemma 5.4, and the regularity of w, for all t ∈ [0 , T ], we obtain 
+
+ (∇xϕt(bIBDM  
+
+> h
+
+bu − bu)) w, zhτ 
+
+
+
+> Ωh(t)
+
+≤ ∥ w∥L∞(QT )∥∇xϕt(bIBDM  
+
+> h
+
+bu − bu)∥L2(Ω h(t)) ∥zhτ ∥L2(Ω( t)) 
+
+≲ ∥w∥L∞(QT )
+
+ ∥bIBDM  
+
+> h
+
+bu − bu∥L2(Ω 0) + ∥∇y(bIBDM  
+
+> h
+
+bu − bu)∥L2(Ω h(0)) 
+
+∥zhτ ∥L2(Ω( t)) 
+
+≲ hk|bu|Hk+1 (Ω 0)∥zhτ ∥L2(Ω( t)) .
+
+(5.10) Similarly, now using bounds (4.1a) and (4.2a), Lemma 5.4, and a standard continuous trace inequality, for all t ∈ [0 , T ], we get 
+
+X  
+
+> F∈bFI
+> h
+
+ (w · nFt )Jϕt(bIBDM  
+
+> h
+
+bu − bu)KFt , {{zhτ }}Ft
+
+
+
+> Ft
+
+≲ ∥w∥L∞(QT )
+
+X 
+
+> K∈bTh
+
+∥ϕt(bIBDM  
+
+> h
+
+bu − bu)∥L2(∂K t)∥zhτ ∥L2(∂K t)
+
+≲ X 
+
+> K∈bTh
+
+h−1/2 
+
+> K
+
+∥bIBDM  
+
+> h
+
+bu − bu∥L2(∂K )∥zhτ ∥L2(Kt)
+
+≲ hk|bu|Hk+1 (Ω 0)∥zhτ ∥L2(Ω( t)) .
+
+(5.11) Combining (5.10) and (5.11) with (5.9), and applying Lemma 4.2, we can estimate M4 as follows: 
+
+M4(zhτ ) ≲ ν−1/2hk|bu|L2(0 ,T ;Hk+1 (Ω 0)) 
+
+
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+.
+
+Estimate of M5. As for the term M5, we use the definition in (3.7) of the form ch,τ (·; ·, ·) to get 
+
+M5(zhτ ) = 
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ (∇xzhτ )w, ϕ (( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu)
+
+> Ωh(t)
+
+− X  
+
+> F∈bFI
+> h
+
+ (w · nFt )Jzhτ KFt , {{ϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu)}}Ft
+
+
+
+> Ft
+
+
+
+dt. 
+
+(5.12) 17 Using the H¨ older inequality, bound (4.1f), and the approximation properties in Lemmas 5.2 and 5.4 of Pτ
+
+and bIBDM 
+
+h , respectively, for n ∈ { 1, . . . , N }, we obtain 
+
+Z
+
+In
+
+
+
+(∇xzhτ )w, ϕ  (Pτ ◦ bIBDM 
+
+h )bu − bIBDM 
+
+h bu
+
+Ωh(t)
+
+dt
+
+≤ ∥ w∥L∞(QT )ν1/2∥∇xzhτ ∥L2(In;L2(Ω h(t))) ν−1/2∥ϕ(( Pτ ◦ bIBDM 
+
+h )bu − bIBDM 
+
+h bu)∥L2(In;L2(Ω( t))) 
+
+≲ ν1/2∥∇xzhτ ∥L2(In;L2(Ω h(t))) ν−1/2∥(Pτ ◦ bIBDM 
+
+h )bu − bIBDM 
+
+h bu∥L2(In;L2(Ω 0)) 
+
+≲ ν−1/2τ ℓ+1 
+
+n ∥bIBDM 
+
+h ∂(ℓ+1) 
+
+t bu∥L2(In;L2(Ω 0)) ν1/2∥∇xzhτ ∥L2(In;L2(Ω h(t))) 
+
+≲ ν−1/2τ ℓ+1 
+
+n
+
+ ∥∂(ℓ+1) 
+
+t bu∥L2(In;L2(Ω 0)) + h|∂(ℓ+1) 
+
+t bu|L2(In;H1(Ω 0)) 
+
+ν1/2
+
+Z
+
+In
+
+∥z(n)
+
+hτ ∥21,h,t dt. 
+
+(5.13) In a similar way, now using bound (4.1a), the shape-regularity of bTh, and Lemma 5.4, the following estimate holds: 
+
+Z
+
+In
+
+X
+
+F ∈ bFI
+
+> h
+
+ (w · nFt )Jzhτ KFt , {{ϕ(( Pτ ◦ bIBDM 
+
+h )bu − bIBDM 
+
+h bu)}}Ft
+
+
+
+Ft dt
+
+≲ ∥w∥L∞(QT )
+
+Z
+
+In
+
+X
+
+F ∈ bFI
+
+> h
+
+ν1/2h−1/2
+
+F ∥Jzhτ KFt ∥L2(Ft)ν−1/2h1/2
+
+F ∥{ {ϕ(( Pτ ◦ bIBDM 
+
+h )bu − bIBDM 
+
+h bu)}}Ft ∥L2(Ft) dt
+
+≲
+
+
+
+ν
+
+Z
+
+In
+
+X
+
+F ∈ bFI
+
+> h
+
+h−1
+
+F ∥Jzhτ KFt ∥2
+
+L2(Ft) dt
+
+1/2
+
+ν−1
+
+Z
+
+In
+
+X
+
+K∈ bTh
+
+hK ∥ϕ(( Pτ ◦ bIBDM 
+
+h )bu − bIBDM 
+
+h bu)∥2
+
+L2(∂K t) dt
+
+1/2
+
+≲
+
+
+
+ν
+
+Z
+
+In
+
+X
+
+F ∈ bFI
+
+> h
+
+h−1
+
+F ∥Jzhτ KFt ∥2
+
+L2(Ft) dt
+
+1/2
+
+ν−1
+
+Z
+
+In
+
+X
+
+K∈ bTh
+
+hK ∥(Pτ ◦ bIBDM 
+
+h )bu − bIBDM 
+
+h bu)∥2
+
+L2(∂K ) dt
+
+1/2
+
+≲ ν−1/2τ ℓ+1 
+
+n
+
+ ∥∂(ℓ+1) 
+
+t bu∥L2(In;L2(Ω 0)) + h|∂(ℓ+1) 
+
+t bu|L2(In;H1(Ω 0)) 
+
+ν1/2
+
+Z
+
+In
+
+∥z(n)
+
+hτ ∥21,h,t dt. 
+
+(5.14) Combining estimates (5.13) and (5.14) with identity (5.12) yields 
+
+M5(zhτ ) ≲ ν−1/2τ ℓ+1  ∥∂(ℓ+1) 
+
+t bu∥L2(0 ,T ;L2(Ω 0)) + h|∂(ℓ+1) 
+
+t bu|L2(0 ,T ;H1(Ω 0)) 
+
+
+
+ν
+
+Z T
+
+0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+.
+
+Estimate of M6. Using the definition in (3.6) of the bilinear form ah,τ (·, ·), we have 
+
+M6(zhτ ) = −ν
+
+NX
+
+n=1 
+
+Z
+
+In
+
+ X
+
+K∈ bTh
+
+ ∇xϕ(( Pτ ◦ bIBDM 
+
+h )bu − bu), ∇xzhτ 
+
+
+
+Kt
+
+− X
+
+F ∈ bFh
+
+ {{∇xϕ(( Pτ ◦ bIBDM 
+
+h )bu − bu)}}Ft nFt , Jzhτ KFt
+
+
+
+Ft
+
+− X
+
+F ∈ bFh
+
+ Jϕ(( Pτ ◦ bIBDM 
+
+h )bu − bu)KFt , {{∇xzhτ }}Ft nFt
+
+
+
+Ft
+
++ X
+
+F ∈ bFh
+
+ σh −1
+
+F Jϕ(( Pτ ◦ bIBDM 
+
+h )bu − bu)KFt , Jzhτ KFt
+
+
+
+Ft
+
+
+
+dt
+
+=: M (a)6 (zhτ ) + M (b)6 (zhτ ) + M (c)6 (zhτ ) + M (d)6 (zhτ ).
+
+(5.15) 18 The Cauchy–Schwarz inequality, bound (4.1c), and the approximation properties in Lemmas 5.2 and 5.4 of Pτ and bIBDM  
+
+> h
+
+, respectively, give 
+
+M (a)6 (zhτ ) ≲ ν1/2
+
+> N
+
+X
+
+> n=1
+
+ ∥(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bu∥L2(In;L2(Ω 0)) + ∥∇y(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bu)∥L2(In;L2(Ω h(0))) 
+
+
+
+× ν1/2∥∇xzhτ ∥L2(In;L2(Ω h(t))) 
+
+≲ ν1/2
+
+> N
+
+X
+
+> n=1
+
+
+
+τ ℓ+1 
+
+> n
+
+ ∥∂(ℓ+1)  
+
+> t
+
+bu∥L2(In;L2(Ω 0)) + |∂(ℓ+1)  
+
+> t
+
+bu|L2(In;H1(Ω 0)) 
+
+ + hk|bu|L2(In;Hk+1 (Ω 0)) 
+
+
+
+× ν1/2
+
+Z
+
+> In
+
+∥z(n) 
+
+> hτ
+
+∥21,h,t dt
+
+≲ ν1/2
+
+τ ℓ+1  ∥∂(ℓ+1)  
+
+> t
+
+bu∥L2(0 ,T ;L2(Ω 0)) + |∂(ℓ+1)  
+
+> t
+
+bu|L2(0 ,T ;H1(Ω 0)) 
+
+ + hk|bu|L2(0 ,T ;Hk+1 (Ω 0)) 
+
+
+
+×
+
+
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+.
+
+As for the term M (b)6 , the use of the Cauchy–Schwarz inequality, the shape-regularity of bTh, and bound (4.1b) leads to 
+
+M (b)6 (zhτ ) ≲ ν
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ X 
+
+> K∈bTh
+
+hK ∥∇xϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bu)∥2
+
+> L2(∂K t)
+
+1/2 X  
+
+> F∈bFh
+
+h−1 
+
+> F
+
+∥Jzhτ KFt ∥2
+
+> L2(Ft)
+
+1/2
+
+dt
+
+≲ ν
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ X 
+
+> K∈bTh
+
+
+
+∥(Pτ ◦ bIBDM  
+
+> h
+
+)bu − bu∥2 
+
+> L2(K)
+
++ ( h2 
+
+> K
+
++ 1) ∥∇y(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bu)∥2
+
+> L2(K)
+
++ h2 
+
+> K
+
+∥∇2
+
+> y
+
+(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bu)∥2
+
+> L2(K)
+
+1/2 X  
+
+> F∈bFh
+
+h−1 
+
+> F
+
+∥Jzhτ K∥2
+
+> L2(Ft)
+
+1/2
+
+dt, 
+
+which, together with the approximation properties in Lemmas 5.2 and 5.4 of Pτ and bIBDM  
+
+> h
+
+, respectively, gives 
+
+M (b)6 (zhτ ) ≲ ν1/2
+
+τ ℓ+1  ∥∂(ℓ+1)  
+
+> t
+
+bu∥L2(0 ,T ;L2(Ω 0)) + |∂(ℓ+1)  
+
+> t
+
+bu|L2(0 ,T ;H1(Ω 0)) + |∂(ℓ+1)  
+
+> t
+
+bu|L2(0 ,T ;H2(Ω 0)) 
+
+
+
++ hk|bu|L2(0 ,T ;Hk+1 (Ω 0)) 
+
+ 
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+For the term M (c)6 , we first observe that ϕ(Pτ bu) and u = ϕ(bu) are continuous across the facets Ft.Therefore, we use the Cauchy–Schwarz inequality, the L∞(0 , T ) stability of Pτ (see [5, Lemma 4.1]), bounds (4.1a) and (4.2b), and the approximation properties of bIBDM  
+
+> h
+
+combined with a standard trace inequality on each element K ∈ bTh to obtain 
+
+M (c)6 (zhτ ) ≲ ν
+
+> N
+
+X
+
+> n=1
+
+X 
+
+> K∈bTh
+
+h−1/2 
+
+> K
+
+∥ϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − P τ bu)∥L2(In;L2(∂K t)) h1/2 
+
+> K
+
+∥∇xzhτ ∥L2(In;L2(∂K t)) 
+
+≲ ν
+
+> N
+
+X
+
+> n=1
+
+τ 1/2
+
+> n
+
+X 
+
+> K∈bTh
+
+h−1/2 
+
+> K
+
+∥bIBDM  
+
+> h
+
+bu − bu∥L∞(In;L2(∂K )) ∥∇xzhτ ∥L2(In;L2(Kt)) 
+
+≲ √νT h k|bu|L∞(0 ,T ;Hk+1 (Ω 0)) 
+
+
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+,
+
+where, in the last step, we have used again the Cauchy–Schwarz inequality. The term M (d)6 can be estimated similarly as follows: 
+
+M (d)6 (zhτ ) ≲ ν
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ X 
+
+> K∈bTh
+
+h−1 
+
+> K
+
+∥ϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − P τ bu)∥2
+
+> L2(∂K t)
+
+1/2 X  
+
+> F∈bFh
+
+h−1 
+
+> F
+
+∥Jzhτ KFt ∥2
+
+> L2(Ft)
+
+1/2
+
+dt
+
+19 ≲ √νT h k|bu|L∞(0 ,T ;Hk+1 (Ω 0)) 
+
+
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+.
+
+Combining the estimates for M (a)6 –M (d)6 with (5.15) leads to 
+
+M6(zhτ ) ≲
+
+h
+
+ν1/2
+
+τ ℓ+1  ∥∂(ℓ+1)  
+
+> t
+
+bu∥L2(0 ,T ;L2(Ω 0)) + |∂(ℓ+1)  
+
+> t
+
+bu|L2(0 ,T ;H1(Ω 0)) + |∂(ℓ+1)  
+
+> t
+
+bu|L2(0 ,T ;H2(Ω 0)) 
+
+
+
++ hk|bu|L2(0 ,T ;Hk+1 (Ω 0)) 
+
+
+
++ √νT h k|bu|L∞(0 ,T ;Hk+1 (Ω 0)) 
+
+i
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt
+
+1/2
+
+.
+
+Now plugging the estimates for M1–M6 into (5.5), after basic algebraic manipulations, we get 
+
+Bh,τ (Π hτ eu, zhτ ) ≲
+
+"
+
+h2k
+
+h2ν−1|∂t bu|2  
+
+> L2(0 ,T ;Hk+1 (Ω 0))
+
++ ( ν + (1 + h2)ν−1)|bu|2 
+
+> L2(0 ,T ;Hk+1 (Ω 0))
+
++ h2|u0|2 
+
+> Hk+1 (Ω 0)
+
++ νT |bu|2 
+
+> L∞(0 ,T ;Hk+1 (Ω 0))
+
+
+
++ τ 2( ℓ+1) 
+
+(ν−1 + ν)∥∂(ℓ+1)  
+
+> t
+
+bu∥2  
+
+> L2(0 ,T ;L2(Ω 0))
+
++ ( ν−1h2 + ν)|∂(ℓ+1)  
+
+> t
+
+bu|2 
+
+> L2(0 ,T ;H1(Ω 0))
+
++ ν|∂(ℓ+1)  
+
+> t
+
+bu|2 
+
+> L2(0 ,T ;H2(Ω 0))
+
+#1/2"
+
+ν
+
+Z T
+
+> 0
+
+∥zhτ ∥21,h,t dt + ∥zhτ (·, 0) ∥2
+
+> L2(Ω 0)
+
+#1/2
+
+.
+
+(5.16) On the other hand, applying the same argument that leads to (4.18), we get 
+
+Bh,τ (Π hτ eu, Πhτ eu) ≳ ∥Πhτ eu(·, T )∥2  
+
+> L2(Ω( T))
+
++ 
+
+> N−1
+
+X
+
+> n=1
+
+∥JΠhτ euKn∥2 
+
+> L2(Ω( tn))
+
++ ∥Πhτ eu(·, 0) ∥2
+
+> L2(Ω 0)
+
++
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ν∥Πhτ eu∥21,h,t dt. 
+
+(5.17) Substituting zhτ = Π hτ eu in (5.16), combining the resulting bound with (5.17) and applying the Young inequality to absorb the terms involving Π hτ eu on the right-hand side yields, after basic algebraic manip-ulations, the desired result. The following corollary follows easily combining Theorem 5.7 with the triangle inequality and approx-imation estimates for the operator Π hτ .
+
+Corollary 5.8 (Error estimate) . Under the same assumptions of Theorem 5.7, for m ∈ { 1, 2, .., N }, it holds 
+
+∥u(·, t −
+
+> m
+
+) − uhτ (·, t −
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
++ ν
+
+> m
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥u(·, t ) − uhτ ∥21,h,t dt ≲ (1 + ν + ν−1) ( h2k + τ 2( ℓ+1) ) .
+
+Remark 5.9 (Pressure-robustness) . The pressure-robustness of the scheme is reflected by the fact that the pressure solution does not enter the velocity error estimates in Theorem 5.7 and Corollary 5.8. 
+
+# 6 The low-order cases 
+
+In the present section, we investigate more specifically the low-order (in time) cases ℓ = 0 and ℓ = 1, showing, in particular, stability and error estimates that are robust in the viscosity parameter ν.
+
+Proposition 6.1 (Stability for the low-order cases) . Let the polynomial degree in time ℓ ∈ { 0, 1}. Then the following improved stability estimate also holds: 
+
+∥uhτ ∥2  
+
+> L∞(L2;QT)
+
++
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+ν∥uhτ (·, t )∥21,h,t ≲ ∥f (·, t )∥2  
+
+> L1(L2;QT)
+
++ ∥u0∥2 
+
+> L2(Ω 0)
+
+,
+
+where the hidden constant is independent of ν.
+
+20 Proof. Since the case ℓ = 0 is simpler, we focus on the case ℓ = 1. We start by a simple but crucial calculation (similar arguments in simpler settings with fixed domains can be found in [4, 20]). On a time interval In, n = 1 , 2, . . . , N , choose {ψ(n) 
+
+> j
+
+}1 
+
+> j=0
+
+as the Lagrange basis associated with the nodes tn−1 and tn.We thus have, by definition, 
+
+uhτ (x, t ) = 
+
+> 1
+
+X
+
+> j=0
+
+(ϕ bαh,j )( x)ψ(n) 
+
+> j
+
+(t), with 
+
+uhτ (x, t +
+
+> n−1
+
+) = ( ϕtn−1 bαh, 0)( x) , uhτ (x, t − 
+
+> n
+
+) = ( ϕtn bαh, 1)( x) .
+
+From to the last two identities above and (4.1f), we deduce 
+
+∥uhτ (·, t +
+
+> n−1
+
+)∥L2(Ω( tn−1)) ≃ ∥ bαh, 0∥L2(Ω 0) , ∥uhτ (·, t − 
+
+> n
+
+)∥L2(Ω( tn)) ≃ ∥ bαh, 1∥L2(Ω 0) .
+
+Combining the above equations with the regularity of the mapping A, it follows 
+
+∥uhτ (·, t )∥L2(Ω( t)) ≤
+
+> 1
+
+X
+
+> j=0
+
+∥ϕ bαh,j ∥L2(Ω( t)) ≲
+
+> 1
+
+X
+
+> j=0
+
+∥ bαh,j ∥L2(Ω 0)
+
+≲ ∥uhτ (·, t +
+
+> n−1
+
+)∥L2(Ω( tn−1)) + ∥uhτ (·, t − 
+
+> n
+
+)∥L2(Ω( tn)) for all t ∈ In ,
+
+(6.1) so that the L∞(L2; Qn) norm of uhτ is controlled by the values of its L2(Ω( t)) norm at the two extrema of In. The remaining part of the argument takes the steps from the proof of Theorem 4.7. By the H¨ older inequality, the right-hand side in (4.14) can be bounded, for any m ∈ { 1, 2, . . . , N } and all ε > 0, by RHS ≤ 12ε ∥f ∥2  
+
+> L1(L2;QT)
+
++ ε
+
+2 ∥uhτ ∥2  
+
+> L∞(L2;QT)
+
++ ∥u0∥2 
+
+> L2(Ω 0)
+
++ 14 ∥uhτ (·, 0) ∥2
+
+> L2(Ω 0)
+
+. (6.2) As a consequence, we can observe that the maximum over all m ∈ { 1, 2, . . . , N } of the LHS in (4.20) is controlled by the above bound on RHS. Using (4.18) and the triangle inequality, we obtain 12 ∥uhτ (·, t +
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
+≤ ∥ uhτ (·, t −
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
++ ∥Juhτ Km∥2 
+
+> L2(Ω( tm))
+
+,
+
+which, together with the observation above, easily leads to the bound 12 max  
+
+> m=0 ,...,N
+
+Ξm ≤ 12ε ∥f ∥2  
+
+> L1(L2;QT)
+
++ ε
+
+2 ∥uhτ ∥2  
+
+> L∞(L2;QT)
+
++ ∥u0∥2 
+
+> L2(Ω 0)
+
++ 14 ∥uhτ (·, 0) ∥2 
+
+> L2(Ω 0)
+
+,
+
+with 
+
+Ξm := 
+
+
+
+∥uhτ (·, 0) ∥2 
+
+> L2(Ω 0)
+
+if m = 0 ,
+
+max ∥uhτ (·, t −
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
+, 12 ∥uhτ (·, t +
+
+> m
+
+)∥2 
+
+> L2(Ω( tm))
+
+if m = 1 , 2, . . . , N − 1 ,
+
+∥uhτ (·, t − 
+
+> N
+
+)∥2  
+
+> L2(Ω( tN))
+
+if m = N . 
+
+Applying (6.1) and simple manipulations, for all ε > 0, we obtain 
+
+∥uhτ ∥2  
+
+> L∞(L2;QT)
+
+≤ C
+
+ 12ε ∥f ∥2  
+
+> L1(L2;QT)
+
++ ε
+
+2 ∥uhτ ∥2  
+
+> L∞(L2;QT)
+
++ ∥u0∥2
+
+> L2(Ω 0)
+
+
+
+,
+
+where the constant C is independent of ν. The bound on ∥uhτ ∥2  
+
+> L∞(L2;QT)
+
+now follows taking ε sufficiently small. In order to recover the analogous inequality also on the term PNn=1 
+
+R 
+
+> In
+
+ν∥uhτ ∥21,h,t dt, we pursue the following steps: (1) start from (4.14) and (4.18) with m = N ; (2) bound the right-hand side first applying (6.2) with ε = 1 and afterwards using the bound on ∥uhτ ∥2 
+
+> L∞(L2;QT)
+
+.We now state (in brief format) also the corresponding convergence result. 
+
+Proposition 6.2 (Discrete error estimate for the low-order cases) . Let the polynomial degree in time 
+
+ℓ ∈ { 0, 1}. Then, assuming bu sufficiently smooth, the following improved bound for the discrete error also holds: 
+
+∥Πhτ eu∥2  
+
+> L∞(L2;QT)
+
++ ν
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥Πhτ eu(·, t )∥21,h,t dt ≲ (1 + ν) ( hk + τ ℓ+1 )R(bu),
+
+where the hidden constant is independent of ν, and R(bu) gathers the regularity terms of the exact solution. 
+
+21 Proof. We omit the full proof, as it is essentially a combination of the arguments in Theorem 5.7 and Proposition 6.1. In particular, by the same steps in the proof of Proposition 6.1, we now have control on ∥Πhτ eu∥2 
+
+> L∞(L2;QT)
+
+, which allows us to handle the terms M1, M3, and M4 without using the diffusion term on the left-hand side. Therefore, we limit ourselves to show briefly an alternative bound for the term 
+
+M5. By the antisymmetric property of ch,τ (·; ·, ·), we can write 
+
+M5(zhτ ) = −ch,τ (w; ϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu), zhτ )= −
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+h ∇xϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu)w, zhτ 
+
+
+
+> Ωh(t)
+
++ X  
+
+> F∈bFI
+> h
+
+ (w · nFt )Jϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu)KFt , {{zhτ }}Ft
+
+
+
+> Ft
+
+i
+
+dt
+
+=: M (a)5 (zhτ ) + M (b)5 (zhτ ),
+
+with zhτ = Π hτ eu.We bound the first term by the H¨ older inequality and the boundedness of w in L∞(QT ), as follows: 
+
+M (a)5 (zhτ ) ≲
+
+ Z T
+
+> 0
+
+∥∇xϕ (Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu∥L2(Ω h(t)) dt
+
+
+
+∥zhτ ∥L∞(L2;QT ) .
+
+We then apply (4.1c) and, as usual, Lemmas 5.4 and 5.2 (similarly to the last steps in (5.13)) to obtain 
+
+M (a)5 (zhτ ) ≲
+
+ Z T
+
+> 0
+
+
+
+∥(Id − P τ )∇y bIBDM  
+
+> h
+
+bu∥L2(Ω h(0)) + ∥(Id − P τ )bIBDM  
+
+> h
+
+bu∥L2(Ω 0)
+
+
+
+dt
+
+
+
+∥zhτ ∥L∞(L2;QT )
+
+≲ τ ℓ+1 ∥∂(ℓ+1)  
+
+> t
+
+bu∥L1(0 ,T ;H1(Ω 0)) ∥zhτ ∥L∞(L2;QT ) .
+
+Applying (4.2a) to zhτ , the H¨ older inequality, standard manipulations, and (4.1e) yield 
+
+M (b)5 (zhτ ) ≲
+
+ Z T
+
+> 0
+
+X  
+
+> F∈bFI
+> h
+
+h−1/2 
+
+> F
+
+∥Jϕ(( Pτ ◦ bIBDM  
+
+> h
+
+)bu − bIBDM  
+
+> h
+
+bu)K∥L2(Ft) dt
+
+
+
+∥zhτ ∥L∞(L2;QT )
+
+≲
+
+ Z T
+
+> 0
+
+X  
+
+> F∈bFI
+> h
+
+h−1/2 
+
+> F
+
+∥J(Pτ − I ) ◦ bIBDM  
+
+> h
+
+buK∥L2(F )
+
+
+
+∥zhτ ∥L∞(L2;QT ) .
+
+First writing J(Pτ − Id) ◦ bIBDM  
+
+> h
+
+buK = ( Pτ − Id) JbIBDM  
+
+> h
+
+buK, then by the continuity in L∞(0 , T ) of the Pτ
+
+operator, finally recalling that the jumps of bu vanish, we obtain 
+
+M (b)5 (zhτ ) ≲
+
+ Z T
+
+> 0
+
+X  
+
+> F∈bFI
+> h
+
+h−1/2 
+
+> F
+
+∥Jbu − bIBDM  
+
+> h
+
+buK∥L2(F ) dt
+
+
+
+∥zhτ ∥L∞(L2;QT )
+
+≲ hk|bu|L1(0 ,T ;Hk+1 (Ω 0)) ∥zhτ ∥L∞(L2;QT ),
+
+where, in the last step, we used trace estimates and Lemma 5.4. 
+
+Remark 6.3 (ν-robustness for high-order approximations) . Extending the above stronger results also to the case ℓ ≥ 2 would require introducing suitable test functions, analogous to the case of fixed domains (see [5, 17]). Additionally, one would need to cope with the specific difficulty of the very strong space– time tangling in the present setting induced by the Piola map. Furthermore, this may also require the combination with suitable discrete integration in time, to be incorporated in the definition of the scheme. Such investigations are beyond the scope of the present work and will be the objective of future studies. 
+
+# 7 Numerical tests 
+
+In this section, we numerically validate the theoretical findings presented in the previous sections. Specifi-cally, we assess the performance of the proposed method through a quantitative convergence and robustness analysis in Sections 7.1, 7.2, and 7.3, while a qualitative analysis is carried out in Section 7.4. For the quantitative tests, we consider the reference domain Ω 0 = (0 , 1) 2, whereas for the qualitative test, the initial domain is defined as the unit disk Ω 0 := {y ∈ R2 : |y| < 1}. In all the numerical 22 Figure 1: Space–time evolution of the domain Ω 0. Left panel: unit square with ALE map AS. Right panel: unit disk with ALE map AD (cf. (7.1)). 
+
+experiments, we set the time interval to (0 , T ) with T = 1, the interior-penalty stabilization parameter to σ = 10, and the spatial polynomial degree to k = 1. Moreover, we employ uniform time partitions. The ALE maps considered in the quantitative and qualitative tests are defined as 
+
+AS(y, t ) := ( y1(1 + ty 2), y 2) and AD(y, t ) := 
+
+
+
+(1 + 2 t)y1, 11 + 2 t y2
+
+
+
+, (7.1) respectively (see Figure 1 for a graphical representation). We consider the following error measures: velERR T := ∥u(·, T ) − uhτ (·, T )∥L2(Ω( T )) , preERR T := ∥p(·, T ) − phτ (·, T )∥L2(Ω( T )) 
+
+velERR h,τ := 
+
+h
+
+∥u(·, T ) − uhτ (·, T )∥2  
+
+> L2(Ω( T))
+
++ ν
+
+> N
+
+X
+
+> n=1
+
+Z
+
+> In
+
+∥u(·, t ) − uhτ (·, t )∥21,h,t dt
+
+i1/2
+
+.
+
+## 7.1 Test 1: convergence rates 
+
+In this section, we assess the convergence rates predicted by Corollary 5.8. Specifically, in Section 7.1.1, we verify the spatial convergence rates by prescribing suitable manufactured solutions ( u, p ) such that the temporal error is negligible. Conversely, in Section 7.1.2, we verify the temporal convergence rates by ensuring a negligible spatial error. Finally, in Section 7.1.3, we perform a comprehensive space–time convergence test. In all these tests, we set the viscosity parameter ν = 1. 
+
+7.1.1 Convergence in space 
+
+We prescribe the exact solution ( u, p ) to problem (1.3) as 
+
+u(x, t ) = cos( x2) + t
+
+ x1 
+
+> 1+ tx 2
+
+sin( x1 
+
+> 1+ tx 2
+
+) + cos( x1 
+
+> 1+ tx 2
+
+)
+
+
+
+sin( x1 
+
+> 1+ tx 2
+
+)
+
+!
+
+and p(x, t ) = t cos( πx 1) cos( πx 2).
+
+The forcing term f and the Dirichlet boundary conditions are derived accordingly. Note that, when mapped to the reference configuration, the velocity bu is a polynomial of degree 1 with respect to time. Conversely, due to the nonlinear transformation of the coordinates inside the arguments of the trigonometric functions, the mapped pressure ep is not a polynomial in time. Nevertheless, thanks to the pressure-robustess property of the proposed formulation, which will be analyzed in detail in Section 7.3 below, the temporal discretization error stemming from the pressure component does not pollute the veloc-ity error. Consequently, by setting the degree of approximation in time to ℓ = 1, the temporal component of the velocity error is negligible compared to the spatial error. We fix the time step to τ = 0 .0625 and consider a sequence of spatial meshes for Ω 0 with mesh sizes h ≈ 0.149582 , 0.0793161 , 0.0325956 , 0.01227. As shown in Figure 2, the error velERR h,τ decays at the expected rate of O(h). 
+
+7.1.2 Convergence in time 
+
+We now prescribe the exact solution ( u, p ) to problem (1.3) as 
+
+u(x, t ) = sin(2 πt )
+
+tx 2 + t2
+
+t
+
+
+
+and p(x, t ) = 0 .
+
+23 The forcing term f and the Dirichlet boundary conditions are obtained accordingly. In this case, the corresponding bu is a polynomial of degree 1 with respect to the spatial variables. Consequently, since the spatial polynomial degree is fixed to k = 1, the spatial components are rep-resented exactly by our method, making the spatial error negligible compared to the temporal one. We fix the mesh size to h = 0 .149582 and consider a sequence of systematically halved time steps 
+
+τ ∈ { 0.5, 0.25 , 0.125 , 0.0625 , 0.03125 , 0.015625 } over the time interval (0 , 1). As shown in Figure 2, the error velERR h,τ evaluated for different values of the time-DG degree ℓ ∈ { 0, 1, 2} decays at the expected rate of O(τ ℓ+1 ). 10 −2 10 −1
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+h 
+
+> k= 1
+> O(h)
+
+10 −2 10 −1 10 0
+
+10 −4
+
+10 −2
+
+10 0
+
+τ        
+
+> ℓ= 0
+> O(τ)
+> ℓ= 1
+> O(τ2)
+> ℓ= 2
+> O(τ3)
+> Figure 2: Test 1: Convergence plots for the velocity error velERR h,τ in space (left panel) and time (right panel).
+
+7.1.3 Space–time convergence 
+
+In this test, we prescribe the smooth exact solution ( u, p ) to problem (1.3) as 
+
+u(x, t ) = π cos( πt )
+
+ sin( πx 1) cos( πx 2)
+
+− cos( πx 1) sin( πx 2)
+
+
+
+and p(x, t ) = cos( πt ) cos( πx 1) cos( πx 2),
+
+with the corresponding forcing term f and Dirichlet boundary conditions. In this test, we verify the simultaneous space–time convergence rates by matching the discretization parameters to equilibrate the spatial and temporal errors. Specifically, we evaluate the error velERR h,τ 
+
+by coupling the mesh size and time step according to τ ≃ h 1 
+
+> ℓ+1
+
+, whereas for the final-time errors velERR T
+
+and preERR T , we impose the relation τ ≃ h 2 
+
+> ℓ+1
+
+. The tests are performed on the sequence of meshes with sizes h ≈ 0.149582 , 0.0793161 , 0.0325956 , 0.01227. As shown in Figure 3, the error velERR h,τ decays at the expected rate of O(h). The velocity error at the final time step, velERR T , exhibits an O(h2) reduction. Regarding the pressure error preERR T ,although the present theoretical analysis does not explicitly cover its convergence bounds, we empirically observe a decay rate of O(h). 10 −2 10 −1
+
+10 −2
+
+10 −1
+
+h   
+
+> ℓ= 0
+> ℓ= 1
+> ℓ= 2
+> O(h)
+
+10 −2 10 −1
+
+10 −4
+
+10 −2
+
+10 0
+
+h                                
+
+> ℓ= 0, u
+> ℓ= 1, u
+> ℓ= 2, u
+> O(h2)
+> ℓ= 0, p
+> ℓ= 1, p
+> ℓ= 2, p
+> O(h)
+> Figure 3: Test 1: Space–time convergence analysis under simultaneous mesh refinement and time-step reduction for different values of the time-DG degree ℓ∈ { 0,1,2}.Error velERR h,τ with τ≃h1
+> ℓ+1 (left panel) and errors (velERR T,preERR T)with τ≃h2
+> ℓ+1 (right panel).
+
+24 7.2 Test 2: viscosity-robustness 
+
+In this section, we investigate the robustness of the proposed method with respect to the fluid viscosity ν.For this analysis, we adopt the same smooth exact solution ( u, p ) used in the space–time convergence test of Section 7.1.3. We fix the spatial mesh size to h = 0 .149582 and evaluate the method’s behavior for 
+
+ν ∈ { 1, 10 −1, 10 −2, . . . , 10 −10 }. The numerical results, reported in Figure 4, show that the error velERR h,τ 
+
+has an initial small increase and then stabilizes, remaining essentially constant for smaller values of ν for all tested time-DG degrees ℓ ∈ { 0, 1, 2, 3}. Notice that, while our current theoretical framework guarantees 
+
+ν-robustness strictly for the lowest-order cases ℓ ∈ { 0, 1}, the numerical evidence strongly indicates that this desirable property extends to higher-order temporal approximations (with ℓ ≥ 2) as well (see also Remark 6.3). 10 −10 10 −9 10 −8 10 −7 10 −6 10 −5 10 −4 10 −3 10 −2 10 −1 10 0           
+
+> 10 −1
+> 10 0
+> 10 1
+> ν
+> ℓ= 0
+> ℓ= 1
+> ℓ= 2
+> ℓ= 3
+> Figure 4: Test 2: ν-robustness of the error velERR h,τ for different values of the time-DG degree ℓ∈ { 0,1,2}.
+
+## 7.3 Test 3: pressure-robustness 
+
+This section is devoted to verifying the pressure-robustness of the proposed numerical scheme by evaluating whether the velocity error depends on the pressure field and its discrete approximation. To this end, we prescribe the exact velocity field as 
+
+u(x, t ) = x2 + tx 21
+
+> (1+ tx 2)3
+> x1
+> (1+ tx 2)2
+
+!
+
+.
+
+By construction, the mapped velocity field satisfies bu ∈ bVkh ⊗ P0([0 , 1]), therefore the proposed method should theoretically reproduce the exact velocity up to machine precision. Conversely, the exact pressure field is chosen as in the space–time convergence test (cf. Section 7.1.3), which cannot be represented exactly by the discrete pressure space, thereby generating a nontrivial pressure error. The results of this pressure-robustness test are presented in Table 1. As expected, for both ℓ = 0 and 
+
+ℓ = 1, the velocity error velERR h,τ is machine zero for all considered mesh sizes h, while the pressure error preERR T is large. This contrast empirically confirms that the velocity error is entirely decoupled from the pressure approximation, in accordance with the pressure-robustness of the proposed formulation. 
+
+ℓ = 0 ℓ = 1 
+
+h velERR h,τ preERR T velERR h,τ preERR T
+
+0.1496 4.07 · 10 −11 1.24 · 10 −1 4.20 · 10 −11 1.10 · 10 −1
+
+0.0793 4.05 · 10 −13 6.76 · 10 −2 3.48 · 10 −13 5.89 · 10 −2
+
+0.0326 1.51 · 10 −12 3.11 · 10 −2 7.43 · 10 −12 2.77 · 10 −2    
+
+> Table 1: Test 3: pressure-robustness test for temporal degrees ℓ∈ { 0,1}. The velocity error is zero up to machine precision, confirming that the velocity approximation is entirely unaffected by the pressure discretization error.
+
+25 7.4 Test 4: an ovalization benchmark 
+
+In this final numerical test, we investigate a more physically challenging problem where the fluid motion is entirely driven by the deformation of the domain. We consider an initial circular domain Ω 0 = {y ∈ R2 :
+
+|y| < 1} at t = 0, which is progressively squeezed into an ellipse through the area-preserving ALE map 
+
+AD (cf. (7.1)). We solve the ALE-Stokes problem (1.3) with zero external forcing ( f = 0) and a kinematic viscosity 
+
+ν = 1. The system is driven exclusively by the nonhomogeneous Dirichlet boundary conditions assigned on the moving boundary ∂Ω( t), where we enforce the fluid velocity to match the domain velocity u = w.This test serves as a benchmark to verify whether the proposed formulation can accurately simulate fluid dynamics purely induced by the squeezing and stretching of the domain boundaries. The spatial domain is discretized using a triangular mesh with h ≈ 0.1463 (approximating the initial circular boundary with 64 points). For the temporal discretization, we set the final time to T = 1, the time step to τ = 1 /6, and the time-DG degree to ℓ = 1. Figure 5 shows the discrete pressure phτ and the velocity field uhτ at three different time steps: 
+
+t ∈ { 0, 0.5, 1}. As expected from the physical setup, the pressure distribution directly reflects the domain’s deformation. We have negative pressure zones at the lateral boundaries where the mesh stretches outward, creating a suction effect. Conversely, we have positive pressure regions at the top and bottom boundaries where the domain is actively squeezed inward. The velocity vectors clearly follow the kinematic deformation of the mesh: the fluid flows inward along the vertical axis and is expelled outward along the horizontal axis. Furthermore, to quantitatively assess the exact mass conservation of the proposed scheme under con-tinuous domain deformation, we monitor the divergence of the discrete velocity. As reported in Table 2, the L2 norm of the divergence remains at the level of machine precision at all observed times, confirming that the divergence-free constraint div xuhτ = 0 is strictly satisfied. Time t ∥div xuhτ ∥L2(Ω( t)) 
+
+0.0 2.47 · 10 −14 
+
+0.5 1.22 · 10 −14 
+
+1.0 2.45 · 10 −14    
+
+> Table 2: Test 4: L2norm of the discrete velocity divergence evaluated at different times.
+
+# Acknowledgements 
+
+All authors were partially supported by the European Union (ERC Synergy, NEMESIS, project number 101115663). Views and opinions expressed are however those of the authors only and do not necessarily reflect those of the EU or the ERC Executive Agency. All authors are also member of the INdAM-GNCS group. 
+
+# References 
+
+[1] M. Bal´ azsov´ a and M. Feistauer. On the stability of the ALE space-time discontinuous Galerkin method for nonlinear convection-diffusion problems in time-dependent domains. Appl. Math. , 60(5):501–526, 2015. [2] M. Bal´ azsov´ a, M. Feistauer, and M. Vlas´ ak. Stability of the ale space-time discontinuous Galerkin method for nonlinear convection-diffusion problems in time-dependent domains. ESAIM Math. Model. Numer. Anal. , 52(6):2327–2356, 2018. [3] G. Barrenechea, E. Burman, and J. Guzm´ an. Well-posedness and H(div)-conforming finite element approximation of a linearised model for inviscid incompressible flow. Math. Models Methods Appl. Sci. , 30(5):847–865, 2020. [4] L. Beir˜ ao da Veiga, F. Dassi, and G. Vacca. Pressure robust SUPG-stabilized finite elements for the unsteady Navier-Stokes equation. IMA J. Numer. Anal. , 44(2):710–750, 2024. 26 (a) t = 0               
+
+> (b) t= 0 .5(c) t= 1
+> Figure 5: Test 4: discrete velocity uhτ and discrete pressure phτ for different times t∈ { 0,0.5,1}.
+
+[5] L. Beir˜ ao da Veiga, S. G´ omez, and F. Dassi. Fully and semi-implicit robust space–time DG methods for the incompressible Navier–Stokes equations. Math. Models Methods Appl. Sci. , 35(12):2561–2609, 2025. [6] L. Beir˜ ao da Veiga, D. A. Di Pietro, and K. B. Haile. A Reynolds-semi-robust H(div)-conforming method for unsteady incompressible non-Newtonian flows. arXiv:2505.08708, 2025. To appear IMA J. Numer. Anal. [7] F. Bertrand and G. Starke. Parametric Raviart-Thomas elements for mixed methods on domains with curved surfaces. SIAM J. Numer. Anal. , 54(6):3648–3667, 2016. [8] D. Boffi, F. Brezzi, and M. Fortin. Mixed finite element methods and applications , volume 44 of 
+
+Springer Series in Computational Mathematics . Springer, Heidelberg, 2013. [9] A. Bonito, I. Kyza, and R. H. Nochetto. Time-discrete higher order ALE formulations: a priori error analysis. Numer. Math. , 125(2):225–257, 2013. [10] A. Bonito, I. Kyza, and R. H. Nochetto. Time-discrete higher-order ALE formulations: stability. 
+
+SIAM J. Numer. Anal. , 51(1):577–604, 2013. [11] S. C. Brenner. Poincar´ e-Friedrichs inequalities for piecewise H1 functions. SIAM J. Numer. Anal. ,41(1):306–324, 2003. [12] A. Djurdjevac, C. Gr¨ aser, and P. J. Herbert. An evolving space framework for Oseen equations on a moving domain. ESAIM Math. Model. Numer. Anal. , 57(5):3113–3138, 2023. [13] A. Ern and J.-L. Guermond. Finite elements III. First-order and time-dependent PDEs , volume 74 of Texts Appl. Math. Cham: Springer, 2021. [14] L. Formaggia and F. Nobile. A stability analysis for the arbitrary Lagrangian Eulerian formulation with finite elements. East-West J. Numer. Math. , 7(2):105–131, 1999. [15] L. Formaggia and F. Nobile. Stability analysis of second-order time accurate schemes for ALE-FEM. 
+
+Comput. Methods Appl. Mech. Engrg. , 193(39-41):4097–4116, 2004. 27 [16] E. Gaburro. A unified framework for the solution of hyperbolic PDE systems using high order direct arbitrary-Lagrangian-Eulerian schemes on moving unstructured meshes with topology change. Arch. Comput. Methods Eng. , 28(3):1249–1321, 2021. [17] S. G´ omez. Galerkin-type time discretizations for parabolic and hyperbolic problems: stability and apriori error analysis. arXiv:2601.19828, 2026. [18] J. Guzm´ an, C.-W. Shu, and F. A. Sequeira. H(div) conforming and DG methods for incompressible Euler’s equations. IMA J. Numer. Anal. , 37(4):1733–1771, 2017. [19] Y. Han and Y. Hou. Robust error analysis of H(div)-conforming DG method for the time-dependent incompressible Navier-Stokes equations. J. Comput. Appl. Math. , 390:Paper No. 113365, 13, 2021. [20] P. Hansbo and A. Szepessy. A velocity-pressure streamline diffusion finite element method for the incompressible Navier-Stokes equations. Comput. Methods Appl. Mech. Engrg. , 84(2):175–192, 1990. [21] T. L. Horv´ ath and S. Rhebergen. A locally conservative and energy-stable finite-element method for the Navier-Stokes problem on time-dependent domains. Internat. J. Numer. Methods Fluids ,89(12):519–532, 2019. [22] T. L. Horv´ ath and S. Rhebergen. An exactly mass conserving space-time embedded-hybridized dis-continuous Galerkin method for the Navier-Stokes equations on moving domains. J. Comput. Phys. ,417:109577, 17, 2020. [23] V. John, A. Linke, C. Merdon, M. Neilan, and L. G. Rebholz. On the divergence constraint in mixed finite element methods for incompressible flows. SIAM Rev. , 59(3):492–544, 2017. [24] P. L. Lederer and J. Sch¨ oberl. Polynomial robust stability analysis for H(div)-conforming finite elements for the Stokes equations. IMA J. Numer. Anal. , 38(4):1832–1860, 2018. [25] J. R. Magnus and H. Neudecker. Matrix differential calculus with applications in statistics and econo-metrics . Wiley Ser. Probab. Stat. Hoboken, NJ: John Wiley & Sons, 3rd updated edition, 2019. [26] P.-O. Persson, J. Bonet, and J. Peraire. Discontinuous Galerkin solution of the Navier-Stokes equations on deformable domains. Comput. Methods Appl. Mech. Eng. , 198(17-20):1585–1595, 2009. [27] Q. Rao, J. Wang, and Y. Xie. Optimal convergence of arbitrary Lagrangian-Eulerian finite element methods for the Stokes equations in an evolving domain. IMA J. Numer. Anal. , 45(6):3616–3642, 2025. [28] S. Rhebergen and B. Cockburn. A space-time hybridizable discontinuous Galerkin method for incom-pressible flows on deforming domains. J. Comput. Phys. , 231(11):4185–4204, 2012. [29] S. Rhebergen and B. Cockburn. Space-time hybridizable discontinuous Galerkin method for the advection-diffusion equation on moving and deforming meshes. In The Courant-Friedrichs-Lewy (CFL) condition , pages 45–63. Birkh¨ auser/Springer, New York, 2013. [30] M. E. Rognes, R. C. Kirby, and A. Logg. Efficient assembly of H(div) and H(curl) conforming finite elements. SIAM J. Sci. Comput. , 31(6):4130–4151, 2009/10. [31] P. W. Schroeder and G. Lube. Divergence-free H(div)-FEM for time-dependent incompressible flows with applications to high Reynolds number vortex dynamics. J. Sci. Comput. , 75(2):830–858, 2018. [32] V. Thom´ ee. Galerkin finite element methods for parabolic problems. Berlin: Springer, 2nd revised and expanded ed. edition, 2006. [33] J. J. W. van der Vegt and H. van der Ven. Space-time discontinuous Galerkin finite element method with dynamic grid motion for inviscid compressible flows. I. General formulation. J. Comput. Phys. ,182(2):546–585, 2002. 28 A Appendix: Proof of Lemma 4.1 
+
+In this section, we detail the hidden constants in Lemma 4.1. We show the proof only for the third bound, which requires careful handling of the Piola map ϕt, as the remaining ones can be shown with analogous arguments. We first define the following constants: 
+
+J⋆ := ess sup (y,t )∈Ω0×[0 ,T ] | det ∇yAt(y)|, J⋆ := ess inf (y,t )∈Ω0×[0 ,T ] | det ∇yAt(y)|,Jsup := ess sup (y,t )∈Ω0×[0 ,T ] ∥∇yAt(y)∥∞, ˜Jsup := ess sup (y,t )∈Ω0×[0 ,T ] ∥∇2
+
+> y
+
+At(y)∥∞.
+
+Lemma A.1. Let Assumption 2.1 on the map A hold. Let bv ∈ H2( bTh) and eq ∈ L2(Ω 0). For any K ∈ bTh,any F ∈ bFh, and any t ∈ [0 , T ], the following inequalities hold: 
+
+d− 32
+
+C2
+
+> A
+
+J⋆ ∥bv∥2 
+
+> L2(∂K )
+
+≤ ∥ ϕt bv∥2 
+
+> L2(∂K t)
+
+≤ d 32
+
+J2sup 
+
+J⋆
+
+∥bv∥2
+
+> L2(∂K )
+
+, (A.1a) 
+
+∥∇x(ϕt bv)∥2 
+
+> L2(∂K t)
+
+≤ d 12 Jsup C1Cc.t.
+
+
+
+h−1 
+
+> K
+
+∥bv∥2 
+
+> L2(K)
+
++ ( hK + h−1 
+
+> K
+
+)∥∇y bv∥2 
+
+> L2(K)
+
++ hK ∥∇2 
+
+> y
+
+bv∥2
+
+> L2(K)
+
+
+
+,
+
+(A.1b) 
+
+∥∇x(ϕt bv)∥2 
+
+> L2(Kt)
+
+≤ C1
+
+
+
+∥bv∥2 
+
+> L2(K)
+
++ ∥∇y bv∥2
+
+> L2(K)
+
+
+
+, (A.1c) 
+
+∥∇y bv∥2 
+
+> L2(K)
+
+≤ C2
+
+
+
+∥ϕt bv∥2 
+
+> L2(Kt)
+
++ ∥∇x(ϕt bv)∥2
+
+> L2(Kt)
+
+
+
+, (A.1d) 
+
+d− 32
+
+c2
+
+> A
+
+J⋆Jsup 
+
+∥JbvKF ∥2  
+
+> L2(F)
+
+≤ ∥ Jϕt bvKFt ∥2 
+
+> L2(Ft)
+
+≤ d 32
+
+J2sup 
+
+cAJ⋆
+
+∥JbvKF ∥2 
+
+> L2(F)
+
+, (A.1e) 
+
+d−1 c2
+
+> A
+
+J⋆ ∥bv∥2 
+
+> L2(Ω 0)
+
+≤ ∥ ϕt bv∥2 
+
+> L2(Ω( t))
+
+≤ d J2sup 
+
+J⋆
+
+∥bv∥2
+
+> L2(Ω 0)
+
+, (A.1f) 1
+
+J⋆ ∥eq ◦ A −1 
+
+> t
+
+∥2 
+
+> L2(Ω( t))
+
+≤ ∥ eq∥2 
+
+> L2(Ω 0)
+
+≤ 1
+
+J⋆
+
+∥eq ◦ A −1 
+
+> t
+
+∥2
+
+> L2(Ω( t))
+
+, (A.1g) 
+
+where 
+
+C1 := 3 d2 1
+
+c2
+
+> A
+
+J−1 
+
+> ⋆
+
+max 
+
+ ˜J2sup 
+
+ d3 (d!) 2J−2 
+
+> ⋆
+
+J2d 
+
+> sup
+
++ 1  , J 2sup 
+
+
+
+C2 := 3 d2 max 
+
+ ˜J2sup 
+
+ d2(d!) 2J−1 
+
+> ⋆
+
+J2d 
+
+> sup
+
++ J⋆c−4
+
+> A
+
+ , J 2sup J⋆c−2
+
+> A
+
+
+
+.
+
+Moreover, if bv ∈ bVkh, then the following discrete trace estimates hold: 
+
+∥ϕt bv∥2 
+
+> L2(∂K t)
+
+≤ d J⋆Cd.t.
+
+c2
+
+> A
+
+h−1 
+
+> K
+
+∥ϕt bv∥2
+
+> L2(Kt)
+
+,
+
+∥∇x(ϕt bv)∥2 
+
+> L2(∂K t)
+
+≤ d 12
+
+Cd.t.
+
+cA
+
+h−1 
+
+> K
+
+∥∇x(ϕt bv)∥2
+
+> L2(Kt)
+
+,
+
+where Cc.t. and Cd.t. denote the continuous and discrete trace inequality constants, respectively. Proof of bound (A.1c) . We start by noticing that, from the definition of the Piola map ϕt and applying the chain rule, we have 
+
+∇x(ϕt bvh)( x) = 
+
+h
+
+(( M1 + M2) ◦ A −1 
+
+> t
+
+)∇x(A−1 
+
+> t
+
+)
+
+i
+
+(x),
+
+with 
+
+M1 := ∇y((det ∇yAt)−1) ⊗ [∇yAt bvh] and M2 := (det ∇yAt)−1(∇2
+
+> y
+
+At ⋆ bvh + ∇yAt∇y bvh).
+
+Above, ∇y((det ∇yAt)−1)⊗[∇yAt bvh] denotes the tensor product between the vectors ∇y((det ∇yAt)−1)and ∇yAt bvh, while ∇2
+
+> y
+
+At ⋆bvh denotes the tensor contraction along the third index between the third-order tensor ∇2
+
+> y
+
+At and the vector bvh. A change of variable leads to 
+
+∥∇x(ϕt bvh)∥2 
+
+> L2(Kt)
+
+=
+
+Z
+
+> K
+
+∥[( M1 + M2)( y)][ ∇x(A−1 
+
+> t
+
+)( At(y))] ∥2 |det ∇yAt(y)| dy
+
+29 Applying the triangle and the Cauchy–Schwarz inequalities, along with the fact that (recalling Assump-tion 2.1(ii)) 
+
+∥∇x(A−1 
+
+> t
+
+)( At(y)) ∥ = ∥[∇yAt(y)] −1∥ ≤ d1/2∥[∇yAt(y)] −1∥∞ ≤ d1/2
+
+cA
+
+,
+
+we obtain 
+
+∥∇x(ϕt bvh)∥2 
+
+> L2(Kt)
+
+≤ 3d 1
+
+c2
+
+> A
+
+Z
+
+> K
+
+(Tt, 1 + Tt, 2)( y) d y, (A.3) with Tt, 1(y) := ∥M1(y)∥2 |det ∇yAt(y)| and Tt, 2(y) := ∥M2(y)∥2 |det ∇yAt(y)|.The second term Tt, 2(y) is easily bounded using the constants introduced at the beginning of the section 
+
+Tt, 2(y) ≤ dJ −1 
+
+> ⋆
+
+˜J2sup 
+
+ |bvh(y)|2 + ∥∇y bvh(y)∥2 , (A.4) where the constant d comes from the equivalence between the Euclidean and the ℓ∞ norm. For the first term Tt, 1(y), using the tensor product property, basic derivation rules, and the Cauchy– Schwarz inequality, we write 
+
+Tt, 1(y) ≤ | det ∇yAt(y)|−3 ∥∇yAt(y)∥2|∇y(det ∇yAt(y)) |2|bvh(y)|2
+
+≤ d2J−3 
+
+> ⋆
+
+J2sup |∇y(det ∇yAt(y)) |2 
+
+> ℓ∞
+
+|bvh(y)|2.
+
+Observing that, for any j ∈ { 1, . . . , d },
+
+|∂j (det ∇yAt(y)) | = X
+
+> σ∈S d
+
+sign( σ)∂j
+
+> d
+
+Y
+
+> i=1
+
+∂σ(i)(( At(y)) i)
+
+!
+
+= X
+
+> σ∈S d
+
+sign( σ)
+
+
+
+> d
+
+X
+
+> i=1
+
+∂j ∂σ(i)(( At(y)) i) Y
+
+> ℓ̸=i
+
+∂σ(ℓ)(( At(y)) ℓ)
+
+
+
+≤ X
+
+> σ∈S d
+
+
+
+> d
+
+X
+
+> i=1
+
+[∇2
+
+> y
+
+At(y)] i,σ (i),j 
+
+Y
+
+> ℓ̸=i
+
+[∇yAt(y)] ℓ,σ (ℓ)
+
+
+
+≤ d d ! Jd−1sup ˜Jsup ,
+
+we conclude that 
+
+Tt, 1(y) ≤ d4 (d!) 2J−3 
+
+> ⋆
+
+J2d 
+
+> sup
+
+˜J2sup |bvh(y)|2. (A.5) Plugging (A.4) and (A.5) into (A.3) yields the desired result. 30

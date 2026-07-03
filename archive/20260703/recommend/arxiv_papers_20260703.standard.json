@@ -1,0 +1,164 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-03T20:39:20.937605+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.28914v1",
+      "source": "arxiv",
+      "title": "Pressure-robust ALE space-time DG method for the Stokes equations on moving domains",
+      "abstract": "We propose and analyze a space-time discontinuous Galerkin method for the incompressible Stokes equations on moving domains within the arbitrary Lagrangian-Eulerian setting. We use a contravariant Piola map in the definition of the discrete velocity space to preserve the pointwise divergence-free property on the discrete level. We show that the method is inf-sup stable, with no constraints on the spatial mesh or the time partition. We also establish a priori error estimates in the energy norm for arbitrary degrees of approximation in space and time. For piecewise-constant and piecewise-linear approximations in time, we show that the method is also robust at low viscosity regimes, and provide numerical evidence suggesting that this property extends to high-order cases as well. We present several numerical experiments to validate our theoretical findings.",
+      "authors": [
+        "L. Beirão da Veiga",
+        "S. Gómez",
+        "K. B. Haile"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-06-27T13:43:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.28914v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "ALE space-time DG method for Stokes on moving domains, enabling multiphase CFD with deforming interfaces",
+      "llm_evidence_cn": "可应用于变形界面的多相流CFD的移动域ALE时空DG方法",
+      "llm_evidence": "可应用于变形界面的多相流CFD的移动域ALE时空DG方法",
+      "canonical_evidence": "可应用于变形界面的多相流CFD的移动域ALE时空DG方法",
+      "llm_tldr_en": "Proposes a pressure-robust space-time DG method for Stokes equations on moving domains, preserving divergence-free property via Piola map, with proven stability and low-viscosity robustness, offering a numerical tool for multiphase flow simulations.",
+      "llm_tldr_cn": "针对移动域上不可压缩Stokes方程，本文提出了一种压力稳健的ALE时空间断Galerkin方法，通过逆变Piola映射保证离散无散度条件，证明了inf-sup稳定性和能量范数先验误差估计，并在低粘度下表现出鲁棒性。该方法为包含移动界面的多相流直接数值模拟提供了高精度的数值格式基础，可进一步拓展至降膜蒸发等场景。",
+      "llm_tldr": "针对移动域上不可压缩Stokes方程，本文提出了一种压力稳健的ALE时空间断Galerkin方法，通过逆变Piola映射保证离散无散度条件，证明了inf-sup稳定性和能量范数先验误差估计，并在低粘度下表现出鲁棒性。该方法为包含移动界面的多相流直接数值模拟提供了高精度的数值格式基础，可进一步拓展至降膜蒸发等场景。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.00355v1",
+      "source": "arxiv",
+      "title": "Relaxed Lagrange Multiplier (RLM) Schemes for Phase Field Models Preserving the Relaxed Original Energy Dissipation Law",
+      "abstract": "Phase-field models are typically derived from variational principles for a free-energy functional and are widely used to simulate complex multiphase phenomena in science and engineering. A central goal in designing numerical schemes for these models is to preserve the underlying energy-dissipation law. In this paper, we propose a class of relaxed Lagrange multiplier (RLM) schemes for phase field models. In contrast to popular scalar auxiliary variable (SAV) and invariant energy quadratization (IEQ) methods, which dissipate a modified energy involving auxiliary variables, the RLM schemes dissipate a relaxed version of the original energy and closely track the original energy dissipation rate. Compared with the classical Lagrange multiplier (LM) approach, the RLM schemes ensure that the resulting discrete system is uniquely solvable over a broad range of time steps. The key idea is to augment the LM formulation with a relaxation term, yielding a scalar quadratic equation for the multiplier with an explicit closed-form solution. The resulting schemes are linear and efficient because each time step requires solving only two linear systems with constant coefficients, at a cost comparable to that of SAV schemes. We construct both first-order and second-order variants and prove their energy stability. Numerical experiments verify the expected convergence rates and demonstrate that the RLM schemes accurately capture interface dynamics.",
+      "authors": [
+        "Xiaobo Jing",
+        "Jia Zhao"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-01T02:50:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.00355v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "numerical schemes for phase field models preserving energy dissipation, directly applicable to multiphase flow simulation",
+      "llm_evidence_cn": "保持能量耗散的相场模型数值格式，适用于多相流模拟",
+      "llm_evidence": "保持能量耗散的相场模型数值格式，适用于多相流模拟",
+      "canonical_evidence": "保持能量耗散的相场模型数值格式，适用于多相流模拟",
+      "llm_tldr_en": "Proposes relaxed Lagrange multiplier (RLM) schemes for phase field models that dissipate a relaxed original energy, offering an alternative to SAV/IEQ methods with closer tracking of original energy dissipation.",
+      "llm_tldr_cn": "相场模型广泛用于多相流模拟，其数值格式需保持能量耗散律。本文提出一类松弛拉格朗日乘子格式，与流行的SAV和IEQ方法不同，它耗散的是原始能量的松弛版本，能更紧密地跟踪原始能量耗散率。该格式为相场模型提供了新的数值工具，可应用于包括降膜流动在内的多相流模拟，提高计算精度与稳定性。",
+      "llm_tldr": "相场模型广泛用于多相流模拟，其数值格式需保持能量耗散律。本文提出一类松弛拉格朗日乘子格式，与流行的SAV和IEQ方法不同，它耗散的是原始能量的松弛版本，能更紧密地跟踪原始能量耗散率。该格式为相场模型提供了新的数值工具，可应用于包括降膜流动在内的多相流模拟，提高计算精度与稳定性。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.01020v1",
+      "source": "arxiv",
+      "title": "The PICNN-Assisted Physics-Preserving Scheme for Thermodynamically Consistent Two-Phase Flow in Porous Media",
+      "abstract": "In this paper, we develop a physics-informed convolutional neural network (PICNN) assisted physics-preserving method for a thermodynamically consistent model of incompressible and immiscible two-phase flow in porous media. Following the physics-preserving prediction-correction scheme of Li et al. \\cite{li2025class}, the prediction step is performed by a PICNN trained with finite-volume residuals, where the interfacial fluxes are evaluated by the two-point flux approximation (TPFA) using two-point difference quotients of neighboring cell-centered unknowns to approximate interfacial normal gradients. The PICNN output is further corrected by a post-processing procedure to obtain energy-stable, mass-conservative, and bounds-preserving solutions. Numerical results show that the finite-volume residuals trained PICNN can replace the traditional prediction solver within the physics-preserving framework. Compared with conventional physics-informed neural networks (PINNs), the PICNN better captures local spatial interactions between each control volume and its neighboring cells, while the finite-volume residuals accommodate discontinuous permeability fields and interfacial flux continuity.",
+      "authors": [
+        "Yuanshuo Kong",
+        "Xue Wang",
+        "Yujing Yan"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "math.NA"
+      ],
+      "published": "2026-07-01T14:53:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.01020v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "PICNN-assisted two-phase flow simulation preserving thermodynamic consistency",
+      "llm_evidence_cn": "物理信息CNN辅助的热力学一致两相流模拟",
+      "llm_evidence": "物理信息CNN辅助的热力学一致两相流模拟",
+      "canonical_evidence": "物理信息CNN辅助的热力学一致两相流模拟",
+      "llm_tldr_en": "Proposes a physics-informed convolutional neural network to simulate immiscible two-phase flow in porous media, ensuring thermodynamic consistency, mass conservation, and energy stability.",
+      "llm_tldr_cn": "针对多孔介质中不可混溶两相流的热力学一致性问题，提出物理信息卷积神经网络辅助的物理保持方法；通过预测-校正方案结合有限体积残差训练，实现能量稳定、质量守恒和边界保持的模拟，为多相流数值模拟提供了新途径。",
+      "llm_tldr": "针对多孔介质中不可混溶两相流的热力学一致性问题，提出物理信息卷积神经网络辅助的物理保持方法；通过预测-校正方案结合有限体积残差训练，实现能量稳定、质量守恒和边界保持的模拟，为多相流数值模拟提供了新途径。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.01575v1",
+      "source": "arxiv",
+      "title": "A second-order diffusive-interface immersed boundary method for incompressible flow with phase change and moving interfaces",
+      "abstract": "Accurately resolving interfacial gradients is critical for simulating two-phase flows, particularly those involving phase transitions or active matter. The traditional diffuse-interface immersed boundary methods (IBMs) are highly efficient for such problems, but they typically suffer from a reduction to first-order accuracy near the phase-changing boundaries. We clarify that the main reason is the local derivative discontinuities. Here, we propose a smooth extension strategy to restore formal second-order spatial accuracy. By extrapolating the scalar field across the interface, the method structurally ensures derivative continuity. To preserve the divergence-free condition in incompressible fluid solvers, this smooth extension is applied exclusively to the scalar transport equations. The velocity field retains the standard diffuse-interface treatment. The proposed framework is systematically validated against classical phase-change benchmarks, specifically one-dimensional evaporation and boiling problems. Additionally, the method is applied to the spontaneous autophoretic motion of isotropic particles. The numerical results confirm the capability of our method in resolving the complex multi-physics boundary couplings.",
+      "authors": [
+        "Wenyuan Chen",
+        "Yantao Yang"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-07-02T01:11:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.01575v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "proposes a second-order diffuse-interface IBM for two-phase flows with phase change",
+      "llm_evidence_cn": "提出用于相变两相流的二阶扩散界面浸入边界法",
+      "llm_evidence": "提出用于相变两相流的二阶扩散界面浸入边界法",
+      "canonical_evidence": "提出用于相变两相流的二阶扩散界面浸入边界法",
+      "llm_tldr_en": "This paper addresses the accuracy loss in diffuse-interface immersed boundary methods for two-phase flows with phase change. It proposes a smooth extension strategy to restore second-order spatial accuracy by extrapolating the scalar field across the interface, ensuring derivative continuity and divergence-free condition. The method improves simulation fidelity for phase-change and moving-interface flows, relevant to multiphase CFD.",
+      "llm_tldr_cn": "针对含相变和运动界面的不可压缩两相流模拟，该论文解决了传统扩散界面浸入边界法在相变边界处精度降为一阶的问题。作者提出一种光滑外推策略，将标量场跨界面外推以保证导数连续性，从而恢复形式上的空间二阶精度，并保持无散条件。该方法通过结构性地消除局部导数不连续，提升了复杂两相流相变问题的计算精度与鲁棒性，对于传热与相变过程的多相流CFD模拟具有重要参考价值。",
+      "llm_tldr": "针对含相变和运动界面的不可压缩两相流模拟，该论文解决了传统扩散界面浸入边界法在相变边界处精度降为一阶的问题。作者提出一种光滑外推策略，将标量场跨界面外推以保证导数连续性，从而恢复形式上的空间二阶精度，并保持无散条件。该方法通过结构性地消除局部导数不连续，提升了复杂两相流相变问题的计算精度与鲁棒性，对于传热与相变过程的多相流CFD模拟具有重要参考价值。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

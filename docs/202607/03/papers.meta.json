@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-03",
+  "date": "2026-07-03",
+  "generated_at": "2026-07-03T20:43:34",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/03/2606.28914v1-pressure-robust-ale-space-time-dg-method-for-the-stokes-equations-on-moving-domains",
+      "section": "quick",
+      "title_en": "Pressure-robust ALE space-time DG method for the Stokes equations on moving domains",
+      "authors": "L. Beirão da Veiga, S. Gómez, K. B. Haile",
+      "date": "2026-06-27",
+      "pdf": "https://arxiv.org/pdf/2606.28914v1",
+      "score": "6.0",
+      "evidence": "可应用于变形界面的多相流CFD的移动域ALE时空DG方法",
+      "tldr": "针对移动区域上的不可压缩Stokes方程，提出了一种压力鲁棒的ALE时空间断伽辽金方法。通过逆变Piola映射构造离散速度空间，严格保持逐点无散度性质。理论证明方法无条件inf-sup稳定，并建立了任意时空逼近阶数的能量范数误差估计。数值实验显示该方法在低粘度区具有鲁棒性，且可扩展至高阶情形，为移动边界流动问题提供了高精度、稳定的数值工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "We propose and analyze a space-time discontinuous Galerkin method for the incompressible Stokes equations on moving domains within the arbitrary Lagrangian-Eulerian setting. We use a contravariant Piola map in the definition of the discrete velocity space to preserve the pointwise divergence-free property on the discrete level. We show that the method is inf-sup stable, with no constraints on the spatial mesh or the time partition. We also establish a priori error estimates in the energy norm for arbitrary degrees of approximation in space and time. For piecewise-constant and piecewise-linear approximations in time, we show that the method is also robust at low viscosity regimes, and provide numerical evidence suggesting that this property extends to high-order cases as well. We present several numerical experiments to validate our theoretical findings.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/03/2607.00355v1-relaxed-lagrange-multiplier-rlm-schemes-for-phase-field-models-preserving-the-relaxed-original-energy-dissipation-law",
+      "section": "quick",
+      "title_en": "Relaxed Lagrange Multiplier (RLM) Schemes for Phase Field Models Preserving the Relaxed Original Energy Dissipation Law",
+      "authors": "Xiaobo Jing, Jia Zhao",
+      "date": "2026-07-01",
+      "pdf": "https://arxiv.org/pdf/2607.00355v1",
+      "score": "6.0",
+      "evidence": "保持能量耗散的相场模型数值格式，适用于多相流模拟",
+      "tldr": "相场模型广泛用于模拟多相现象，其数值方案需保持能量耗散律。现有SAV/IEQ方法耗散修改能量，经典LM方法时间步受限。为此，提出松弛拉格朗日乘子(RLM)方案，引入松弛项将LM转化为标量二次方程并显式求解，耗散原始能量松弛版本。方案线性高效，每步仅解两个常数系数线性系统，且对大时间步唯一可解。构造了一阶和二阶格式，证明能量稳定，数值实验验证了收敛精度和界面动力学准确捕获。",
+      "tags": "query:falling-film",
+      "abstract_en": "Phase-field models are typically derived from variational principles for a free-energy functional and are widely used to simulate complex multiphase phenomena in science and engineering. A central goal in designing numerical schemes for these models is to preserve the underlying energy-dissipation law. In this paper, we propose a class of relaxed Lagrange multiplier (RLM) schemes for phase field models. In contrast to popular scalar auxiliary variable (SAV) and invariant energy quadratization (IEQ) methods, which dissipate a modified energy involving auxiliary variables, the RLM schemes dissipate a relaxed version of the original energy and closely track the original energy dissipation rate. Compared with the classical Lagrange multiplier (LM) approach, the RLM schemes ensure that the resulting discrete system is uniquely solvable over a broad range of time steps. The key idea is to augment the LM formulation with a relaxation term, yielding a scalar quadratic equation for the multiplier with an explicit closed-form solution. The resulting schemes are linear and efficient because each time step requires solving only two linear systems with constant coefficients, at a cost comparable to that of SAV schemes. We construct both first-order and second-order variants and prove their energy stability. Numerical experiments verify the expected convergence rates and demonstrate that the RLM schemes accurately capture interface dynamics.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/03/2607.01020v1-the-picnn-assisted-physics-preserving-scheme-for-thermodynamically-consistent-two-phase-flow-in-porous-media",
+      "section": "quick",
+      "title_en": "The PICNN-Assisted Physics-Preserving Scheme for Thermodynamically Consistent Two-Phase Flow in Porous Media",
+      "authors": "Yuanshuo Kong, Xue Wang, Yujing Yan",
+      "date": "2026-07-01",
+      "pdf": "https://arxiv.org/pdf/2607.01020v1",
+      "score": "6.0",
+      "evidence": "物理信息CNN辅助的热力学一致两相流模拟",
+      "tldr": "在多孔介质不可压缩非混相两相流模拟中，保持热力学一致性（能量稳定、质量守恒和有界性）是数值方法的挑战。针对Li等人提出的物理保持预测-校正框架，本文发展了物理信息卷积神经网络（PICNN）辅助方案，用有限体积残差训练PICNN作为预测步，界面通量采用两点通量近似。数值实验表明，PICNN可有效替代传统预测求解器，后处理保证解的有界和能量稳定。与传统PINN相比，PICNN通过有限体积残差更好地捕捉局部空间交互，能处理非连续渗透率场和通量连续性。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this paper, we develop a physics-informed convolutional neural network (PICNN) assisted physics-preserving method for a thermodynamically consistent model of incompressible and immiscible two-phase flow in porous media. Following the physics-preserving prediction-correction scheme of Li et al. \\cite{li2025class}, the prediction step is performed by a PICNN trained with finite-volume residuals, where the interfacial fluxes are evaluated by the two-point flux approximation (TPFA) using two-point difference quotients of neighboring cell-centered unknowns to approximate interfacial normal gradients. The PICNN output is further corrected by a post-processing procedure to obtain energy-stable, mass-conservative, and bounds-preserving solutions. Numerical results show that the finite-volume residuals trained PICNN can replace the traditional prediction solver within the physics-preserving framework. Compared with conventional physics-informed neural networks (PINNs), the PICNN better captures local spatial interactions between each control volume and its neighboring cells, while the finite-volume residuals accommodate discontinuous permeability fields and interfacial flux continuity.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/03/2607.01575v1-a-second-order-diffusive-interface-immersed-boundary-method-for-incompressible-flow-with-phase-change-and-moving-interfaces",
+      "section": "quick",
+      "title_en": "A second-order diffusive-interface immersed boundary method for incompressible flow with phase change and moving interfaces",
+      "authors": "Wenyuan Chen, Yantao Yang",
+      "date": "2026-07-02",
+      "pdf": "https://arxiv.org/pdf/2607.01575v1",
+      "score": "6.0",
+      "evidence": "提出用于相变两相流的二阶扩散界面浸入边界法",
+      "tldr": "传统扩散界面浸没边界法在模拟相变两相流时，因相变边界附近导数不连续导致空间精度降为一阶，限制界面梯度解析。本文提出光滑扩展策略，通过将标量场外推测界面另一侧强制导数连续，恢复形式二阶精度。该方法仅作用于标量输运方程，速度场保留标准扩散界面处理以维持无散条件。经一维蒸发、沸腾基准及自泳运动验证，成功解析复杂多物理边界耦合，为相变与移动界面问题提供高精度计算框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "Accurately resolving interfacial gradients is critical for simulating two-phase flows, particularly those involving phase transitions or active matter. The traditional diffuse-interface immersed boundary methods (IBMs) are highly efficient for such problems, but they typically suffer from a reduction to first-order accuracy near the phase-changing boundaries. We clarify that the main reason is the local derivative discontinuities. Here, we propose a smooth extension strategy to restore formal second-order spatial accuracy. By extrapolating the scalar field across the interface, the method structurally ensures derivative continuity. To preserve the divergence-free condition in incompressible fluid solvers, this smooth extension is applied exclusively to the scalar transport equations. The velocity field retains the standard diffuse-interface treatment. The proposed framework is systematically validated against classical phase-change benchmarks, specifically one-dimensional evaporation and boiling problems. Additionally, the method is applied to the spontaneous autophoretic motion of isotropic particles. The numerical results confirm the capability of our method in resolving the complex multi-physics boundary couplings.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
