@@ -1,0 +1,1997 @@
+Title: Lock-exchange flow regimes under low air Froude number bubble curtains
+
+URL Source: https://arxiv.org/pdf/2607.00960v1
+
+Published Time: Thu, 02 Jul 2026 01:25:49 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+> July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR
+
+To appear in the Journal of Hydraulic Research 
+
+Vol. 00, No. 00, Month 20XX, 1–26 
+
+Research paper 1
+
+# Lock-exchange flow regimes under low air Froude number bubble curtains 2
+
+Shravan K.R. Raaghav, Fluid Dynamics Laboratory and J.M. Burgers Centre, Department of Applied 3
+
+Physics, Eindhoven University of Technology, PO Box 513, 5600 MB, Eindhoven, The Netherlands 4
+
+Email: s.r.kaveripuram.ramasamy@tue.nl 5
+
+Herman J.H. Clercx, Fluid Dynamics Laboratory and J.M. Burgers Centre, Department of Applied 6
+
+Physics, Eindhoven University of Technology, PO Box 513, 5600 MB, Eindhoven, The Netherlands 7
+
+Email: h.j.h.clercx@tue.nl 8
+
+Matias Duran-Matute, Fluid Dynamics Laboratory and J.M. Burgers Centre, Department of Applied 9
+
+Physics, Eindhoven University of Technology, PO Box 513, 5600 MB, Eindhoven, The Netherlands 10 
+
+Email: m.duran.matute@tue.nl (author for correspondence) 11 
+
+Regimes under low Froude air bubble curtains 12   
+
+> v2.1 released September 2025
+> arXiv:2607.00960v1 [physics.flu-dyn] 1 Jul 2026 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR
+
+Lock-exchange flow regimes under low air Froude number bubble curtains 13 
+
+> ABSTRACT 14
+> The flow and density field characteristics around a bubble curtain in a laboratory scale lock-exchange setup are 15
+> investigated using two-phase large-eddy simulations. We study the detailed hydrodynamics and show that there are 16
+> three qualitatively distinct (sub)regimes within the previously classified breakthrough regime. The occurrence of 17
+> these regimes depends not only on air Froude number that characterises the relative strength of the bubble curtain 18
+> and the gravity current, but also on an additional non-dimensional parameter: the density ratio between the salt and 19
+> fresh water. The dependence on this additional parameter is also observed in how effective bubble curtains are in 20
+> blocking the transport of salt to the fresh part of the lock. Hence, it has important implications for the optimisation 21
+> of bubble curtains in ship locks. 22
+
+Keywords: Bubble curtains; Lock-exchange flow; Salt intrusion; Ship locks; Euler-Euler two-fluid modelling; 23 
+
+Large eddy simulations 24 
+
+1 Introduction 25 
+
+Bubble plumes are multiphase buoyant plumes that have long been of relevance for a wide range of 26 
+
+engineering applications (Boufadel et al., 2020; Brevik and Kristiansen, 2002; Dissanayake et al., 27 
+
+2018). They are commonly used in bubble columns and air-lift reactors due to their ability to 28 
+
+enhance mixing and mass transfer (Chisti and Moo-Young, 1987; Kantarci et al., 2005). When in-29 
+
+dividual bubble plumes are placed on a line they form a bubble curtain or screen, which can enhance 30 
+
+mixing or act as a barrier between two fluids with different properties. As a result, bubble curtains 31 
+
+have gained a lot of interest as a solution to various environmental flow problems. For example, they 32 
+
+can be used for underwater noise mitigation (W¨ ursig et al., 2000), lake destratification/aeration 33 
+
+(Li and Liu, 2025; Murai et al., 2025; Schladow, 1993; Wen and Torrest, 1987), barriers trapping 34 
+
+oil and sediments (Covarrubias-Contreras et al., 2025; Cutroneo et al., 2014; Dugu´ e et al., 2015; 35 
+
+Liu et al., 2025; McClimans et al., 2013; Wang et al., 2024), controlling ichthyoplankton dispersion 36 
+
+(Prasad et al., 2026), and preventing intrusion of sea water in ship locks (Abraham et al., 1973; 37 
+
+Bacot et al., 2022; Keetels et al., 2011; Oldeman et al., 2020; O’Mahoney et al., 2024). The latter 38 
+
+is the focus of this paper. 39 
+
+When the gate of the ship lock that separates the dense seawater and the fresh river water is 40 
+
+opened for the ships to pass through, due to the barotropic pressure gradient, a lock-exchange flow 41 
+
+occurs. In this flow, the dense salt water flows beneath the fresh water as a gravity or density 42 
+
+current (Benjamin, 1968; Shin et al., 2004), causing the intrusion of salt water into the rivers. 43 
+
+With increasing sea level and severity of droughts, the problem of salt intrusion demands more 44 
+
+measures to mitigate salinisation of fresh water reserves (Lee et al., 2024; Li et al., 2025). Bubble 45 
+
+curtains are a promising choice for mitigation because the vertical momentum of the bubbly flow 46 
+
+can effectively impede this infiltration of saltwater. In fact, bubble curtains are already installed 47 
+
+and working in several ship locks in the Netherlands and more are being planned. However, several 48 
+
+questions remain about the fluid dynamics of bubble curtains to optimize their use. 49 
+
+The earliest known studies on the topic are the seminal works of Abraham and Van der Burgh 50 
+
+(1962) and Abraham et al. (1973) who laid down the fundamental theory and concepts behind 51 
+
+the hydrodynamics and performance of bubble curtains in lock-exchange configurations by means 52 
+
+of theoretical modelling and field measurements. They showed that the amount of saltwater that 53 
+
+infiltrates the bubble curtain depends mainly on the air Froude number (Fr air ), which describes 54 
+
+the relative strength of the bubble curtain to the gravity current. 55 
+
+Interest in this topic has seen a resurgence over the past 15 years. With advances in optical mea-56 
+
+surement techniques and computational fluid dynamics (CFD), various studies have contributed 57 
+
+2July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR  
+
+> Figure 1 Sketch of the initial lock-exchange configuration (a), with saltwater coloured in dark blue and freshwater coloured with light blue. The two regimes classified by Bacot et al. (2022) are shown in b) the breakthrough regime and c) the curtain-driven regime. The horizontal arrows depict the flow of (secondary) gravity currents and the curved arrows depict the recirculation cells formed in the curtain-driven regime.
+
+to an improved fundamental understanding of the hydrodynamics of bubble curtains in a lock-58 
+
+exchange flow. Keetels et al. (2011) combined field-scale experiments, laboratory experiments and 59 
+
+numerical simulations to investigate the performance of bubble curtains and in combination with 60 
+
+water jets and rigged sills. Van der Ven et al. (2018) conducted particle image velocimetry (PIV) 61 
+
+measurements and dye measurements, which were later used for the validation of numerical sim-62 
+
+ulations by Oldeman et al. (2020). They performed Euler-Lagrange large-eddy simulations and 63 
+
+were the first to capture an optimal Fr air value (Fr air ≈ 0.9) for maximum effectiveness, where the 64 
+
+effectiveness quantifies the amount of salt water that is blocked when a bubble curtain is present 65 
+
+compared to the case where it is not. This optimal value was later experimentally confirmed by 66 
+
+Bacot et al. (2022), who drew an analogy to air curtains and proposed two regimes based on the 67 
+
+optimal Fr air value (Figure 1 shows sketches of the two regimes). For Fr air ≲ 0.9, the breakthrough 68 
+
+regime is observed in which the curtain does not possess enough inertia to stop the gravity current. 69 
+
+As a result, the gravity current breaks through the curtain (see Figure 1b). For Fr air ≳ 0.9, the 70 
+
+curtain-driven regime is observed, where the curtain entrains fluid on both sides, forming recir-71 
+
+culation cells, from which diluted secondary gravity currents emerge (see Figure 1c). In addition, 72 
+
+Bacot et al. (2022) developed a semi-analytical model in the curtain-driven regime using steady-73 
+
+state mass conservation to compute the effectiveness. Raaghav et al. (2025) showed, by means 74 
+
+of numerical simulations and an unsteady semi-analytical model, that the time elapsed after the 75 
+
+opening of the lock gate is also an important parameter to determine the effectiveness of a bubble 76 
+
+curtain in the curtain-driven regime. O’Mahoney et al. (2024) investigated the effect of the bubble 77 
+
+size on flow characteristics and effectiveness. They reported that larger bubbles are more effective 78 
+
+in keeping the salt and fresh halves separate and observed that the optimal value of Fr air increased 79 
+
+for larger bubbles. They attributed this dependence to the influence of bubble size on entrainment 80 
+
+by the bubble curtain. 81 
+
+Most recent studies have focused on obtaining an overview of the dependence of the effectiveness 82 
+
+3July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR yxz
+
+Salt water Fresh water Bubble curtain         
+
+> Figure 2 Schematic of a laboratory scale lock with a bubble curtain placed at the centre. The annotations L,W, and Hd
+> depict the length, width and height of the tank, respectively. The mean free-surface level is located at y=H.
+
+of bubble curtains as a function of Fr air over a wide range of values (see e.g. Bacot et al., 2022; 83 
+
+Keetels et al., 2011; Oldeman et al., 2020) or have focused on a detailed understanding of the 84 
+
+curtain-driven regime (see e.g. Bacot et al., 2022; Raaghav et al., 2025). However, for practical 85 
+
+purposes, operating the bubble curtain close to the optimum but in the breakthrough regime is 86 
+
+preferable to operating it in the curtain-driven regime because less energy is needed to achieve 87 
+
+similar effectiveness. Hence, this paper focuses on the breakthrough regime. It provides, by means 88 
+
+of Euler-Euler large eddy simulations, a detailed characterisation of the flow and density fields as 89 
+
+a function of the governing parameters. This characterisation reveals that there are, in fact, three 90 
+
+qualitatively distinct sub-regimes, and that the transition between them depends not only on Fr air 91 
+
+but also on an additional non-dimensional parameter: the density ratio between the salt and fresh 92 
+
+water. The dependence on this additional parameter is also observed in the effectiveness of the 93 
+
+bubble curtain, and hence it has important implications for the optimisation of bubble curtains in 94 
+
+ship locks. 95 
+
+The remainder of this paper is organised as follows. In Section 2, we describe the problem, includ-96 
+
+ing the relevant non-dimensional parameters. This is followed by the description of the numerical 97 
+
+methodology in Section 3. Section 4 presents qualitative descriptions of the sub-regimes, and a 98 
+
+quantitative characterisation is presented in Section 5. A discussion of the relevance and impli-99 
+
+cations of the results for practical applications is given in Section 6. Finally, the conclusions are 100 
+
+summarised in Section 7. 101 
+
+2 Problem setup and definition of the parameters 102 
+
+We represent the lock (shown in Figure 2) in an idealised rectangular tank of size L × Hd × W in 103 
+
+the x, y, and z directions, respectively (with y the vertical direction). The origin of the reference 104 
+
+frame is located at the centre of the tank in the horizontal and at the bottom of the tank in the 105 
+
+vertical. The lock gate, located at x = 0, separates two halves of the tank such that each half has a 106 
+
+length L/ 2 filled with water of different density up to a depth H. Throughout the paper constant 107 
+
+values of L = 6 m, Hd = 0 .2 m, H = 0 .15 m and W = 0 .2 m were used. A porous sparger is 108 
+
+located on the tank floor ( y = 0) at the location of the lock gate ( x = 0) and spans the tank in 109 
+
+the z-direction (i.e. along the width). In the x-direction, it has a width ds = 0 .02 m, which means 110 
+
+that it is located at −ds/2 ≤ x ≤ ds/2 and −W/ 2 ≤ z ≤ W/ 2. The sparger delivers an air volume 111 
+
+flow rate per unit width qair to form the line bubble plume. The bubbles are assumed to have a 112 
+
+uniform bubble diameter db = 2 mm. 113 
+
+4July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+Performing a dimensional analysis for the problem yields the following dimensionless parameters, 114 
+
+˜L = LH , ˜W = WH , Fr air = (g q air )1/3
+
+√g′H , σ − 1 = g′
+
+g , Re g =
+
+√g′HH ν , (1) where g is the gravitational acceleration, ν is the kinematic viscosity of water, and g′ = g(ρs−ρf )/ρ f115 
+
+is the reduced gravity with ρs and ρf the density of salt and fresh water, respectively. Furthermore, 116 
+
+combining Fr air and σ − 1 results in an additional relevant parameter: 117 
+
+ˆqair = Fr 3air (σ − 1) 3/2 = qair /(HpgH ). (2) This parameter has been shown to govern the entrainment by bubble plumes in water with homo-118 
+
+geneous density (Fanneløp et al., 1991). The entrainment increases with it up to ˆ qair ≈ 1.6 × 10 −3119 
+
+and remains approximately constant for larger values. 120 
+
+We further introduce the effectiveness as a measure of the amount of salt water that can be 121 
+
+blocked by the curtain compared to a case without it. It is defined as 122 
+
+E(t) = 1 − Vbc (t)
+
+Vo(t) , (3) where Vbc (t) and Vo(t) are the total volume of salt water that has infiltrated the fresh side of 123 
+
+the lock when the bubble curtain is present and absent, respectively, and t is the elapsed time 124 
+
+after opening of the lock gate. Hence, E measures the amount of saltwater that is blocked by the 125 
+
+curtain, with E = 1 a perfect barrier. Instead of effectiveness, Keetels et al. (2011) and Oldeman 126 
+
+et al. (2020) used the salt transmission factor ST F = Vbc /V o = 1 − E, but both quantities give 127 
+
+the same information. 128 
+
+The volume Vbc is obtained from mass conservation 129 
+
+Vbc (t) = VF
+
+¯ρF(t) − ρf
+
+ρs − ρf
+
+, (4) with VF = L W H/ 2 the volume on the freshwater side of the lock and ¯ ρF(t) the average density on 130 
+
+that same side (Bacot et al., 2022). For the infiltrated volume in the absence of a bubble curtain, 131 
+
+we consider a constant flux so that 132 
+
+Vo(t) = CD
+
+3 W H pg′Ht, (5) where C D ≈ 0.51 is the discharge coefficient that is obtained by fitting the flow rate obtained in 133 
+
+simulations without a bubble curtain (see Raaghav et al., 2025). 134 
+
+In general, effectiveness is a function of time, and Raaghav et al. (2025) showed that this de-135 
+
+pendence is very important in the curtain-driven regime, but that it becomes less important when 136 
+
+approaching the breakthrough regime. In other words, Vbc /V o becomes a constant at earlier times. 137 
+
+Hence, in this paper, we focus, similarly to Bacot et al. (2022), only on the effectiveness at a final 138 
+
+time t = tend . Here, tend is the end time of the simulation or when the gravity current reaches the 139 
+
+end wall of the tank. These end times are typically about three times longer than those consid-140 
+
+ered by Bacot et al. (2022) because the tank in the simulations is three times longer. Hence, at 141 
+
+t = tend , E has reached a constant value to a good approximation. To simplify the notation, we 142 
+
+define Eend = E(t = tend ). 143 
+
+5July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+Determining the effectiveness Eend of bubble curtains as a function of the parameters of the 144 
+
+problem is a crucial question for their operation. Most previous studies extensively investigated 145 
+
+the dependence of the effectiveness on Fr air while keeping other parameters constant or ignoring 146 
+
+their effects. For example, Oldeman et al. (2020), Bacot et al. (2022) and O’Mahoney et al. (2024) 147 
+
+kept σ −1 = 0 .020, a typical value of the density difference between sea water and fresh water, while 148 
+
+Bacot et al. (2022) also considered cases with σ − 1 > 0.020 even up to σ − 1 ≈ 0.187 that extend 149 
+
+beyond the limits where the Boussinesq approximation is valid. However, the density difference 150 
+
+between the water in the lock chamber and the harbours can be much smaller ( σ − 1 ≲ 0.010), 151 
+
+since the lock chamber mostly contains brackish water (Bakker et al., 2026; Weiler et al., 2026). 152 
+
+Then, it can be seen from the definition of ˆ qair in Equation (2) that, for Fr air ≲ 1 and σ −1 ≈ 0.010, 153 
+
+the value of ˆ qair ≤ 1 × 10 −3. Previous studies show that the entrainment depends on ˆ qair (Fanneløp 154 
+
+et al., 1991; Kobus, 1968). From the work of Fanneløp et al. (1991), it can be inferred that, around 155 
+
+the value of ˆ qair ≈ 1.6 × 10 −3, the entrainment by the plume become constant. In this study, we 156 
+
+will show that this has important implications for the effectiveness of bubble curtains. 157 
+
+To study the dependence of Eend on the non-dimensional parameters of the problem, we varied 158 
+
+some of the parameters as follows. The values of H, L, and W result in ˜L = 40 and ˜W = 1 .33, 159 
+
+and are kept constant for all simulations. We consider three values for σ − 1 (0.008, 0.020 and 160 
+
+0.028), and we vary Fr air between 0.3 and 1.1. This implies 2 .7 × 10 −5 ≤ ˆqair ≤ 3.7 × 10 −3. Finally, 161 
+
+Re g ≳ 14500, implying that all gravity currents are fully turbulent, as in ship locks. Hence, the 162 
+
+dependence of the results on Re g is expected to be minimal. To vary the values of Fr air and σ −1, we 163 
+
+changed the salt water density ρs, while keeping the fresh water density ρf = 999 kg/m 3 constant. 164 
+
+This value of ρf is the reference density that corresponds to an ambient temperature of 288.5 K. 165 
+
+3 Numerical methodology 166 
+
+We perform Euler-Euler large-eddy simulations of a bubble curtain in a lock-exchange configura-167 
+
+tion using the approach followed by Raaghav et al. (2025). In the Euler-Euler two-fluid modelling 168 
+
+framework, the air and water phases are assumed to be interpenetrating continua, and the mo-169 
+
+mentum exchange between the phases is modelled using a closure force term in the momentum 170 
+
+equations (Drew, 1983; Ishii and Hibiki, 2010). We solve the governing phase-averaged continuity 171 
+
+equation and Navier-Stokes equations for incompressible Newtonian fluids under the Boussinesq 172 
+
+approximation: 173 
+
+∂α q
+
+∂t + ∇ · (αqv q) = 0 , (6) 
+
+> 174
+
+∂(αqvq)
+
+∂t + ∇ · (αqv qv q) = − αq
+
+ρ0,q 
+
+∇p + ρq
+
+ρ0,q 
+
+αqg + ∇ ·
+
+
+
+αqνe,q 
+
+
+
+∇v q + ( ∇v q)T − 23 (∇ · v q)I
+
+ 
+
++ F q.
+
+(7) Here, the subscript q denotes the phase [ g for gas (air) or l for liquid (water)], αq represents the 175 
+
+volume fraction for each phase, v q = ( vq,x , v q,y , v q,z ) the velocity, ρq the density, ρ0,q a reference 176 
+
+density, p the shared pressure between the air and water phase, g = (0 , −g, 0) the gravitational 177 
+
+acceleration, νe,q the effective kinematic viscosity (i.e. the sum of the molecular viscosity νq and 178 
+
+the eddy viscosity νt,q ), I the identity matrix, and F q the inter-phase momentum transfer. In this 179 
+
+study, F q includes the drag, lift, virtual, and mass closure forces. For the drag and lift force, we 180 
+
+use the closure of Schiller (1933) and Tomiyama et al. (2002), respectively. A constant coefficient 181 
+
+equal to 0.5 was used for the virtual mass force. Since we are mainly interested in the liquid phase 182 
+
+6July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+and to simplify the notation, we obviate the subindex l for this phase so that νl = ν, ρl = ρ,183 
+
+αl = α, v l = v , and so on. 184 185 
+
+Buoyancy effects caused by salinity gradients are only considered within the liquid phase because 186 
+
+the diffusivity of salt in the gas phase is orders of magnitude lower than in the liquid phase. We solve 187 
+
+the phase-intensive formulation of the scalar transport equation to model the salinity transport in 188 
+
+the liquid phase: 189 
+
+∂(αs )
+
+∂t + ∇ · (αv s) − ∇ · [Deff ∇(αs )] = 0 , (8) where αs = αs is the conserved volume fraction of salt water with 0 ≤ s ≤ 1, Deff = D + Dt is the 190 
+
+effective diffusivity with D the molecular diffusivity and Dt the turbulent or eddy diffusivity. The 191 
+
+turbulent diffusivity Dt is related to the eddy viscosity such that 192 
+
+Dt = νt/Sc t, (9) with Sc t the turbulent Schmidt number. A constant value Sc t = 0 .7 was used following, for example, 193 
+
+Spalding (1971) and Oldeman et al. (2020). For a round turbulent free jet Spalding (1971) showed 194 
+
+that this value yielded very good agreement between experiments and simulations in predicting 195 
+
+the concentration fluctuation profiles. Furthermore, Oldeman et al. (2020) also observed very good 196 
+
+agreement with the experiments for the current flow configuration. This justifies our choice in the 197 
+
+present study. 198 
+
+The Boussinesq approximation was used in Equation (7) for the liquid phase to include the effects 199 
+
+of density difference resulting from changes in salinity (Boussinesq, 1903). Hence, the variations in 200 
+
+density are only incorporated in the gravitational term in Equation (7). The approximation is only 201 
+
+valid for flows with small density variations (Nieuwstadt et al., 2016), which is a fair assumption 202 
+
+in this study, since ∆ ρ/ρ f ≤ 0.04. 203 
+
+The density of the liquid is then calculated as 204 
+
+ρ = ρf + αs(ρs − ρf ) = αsρs + (1 − αs)ρf , (10) where the density of fresh water is taken as the reference density ( ρ0 = ρf ) such that the 205 
+
+perturbation density is ρ′ = ρ − ρf = αs(ρs − ρf ). Variations in the kinematic viscosity of water 206 
+
+due to differences in salt concentration are neglected. 207 208 
+
+The values of physical constants used in the simulations are given in Table 1. The values of 209 
+
+kinematic viscosity of water ν, surface tension γ and salt diffusivity D were estimated for an 210 
+
+ambient temperature of 288.5 K, as for the density of fresh water ρf . The air in the bubbles and 211 
+
+on top of the water surface has a density ρg and a kinematic viscosity νg estimated at the same 212 
+
+ambient temperature. 213 
+
+The governing equations (6), (7), and (8) are discretized and solved numerically with the finite-214 
+
+volume method using OpenFOAM (Chen et al., 2014; Jasak et al., 2007; Weller et al., 1998), where 215 
+
+a customized version of the Euler-Euler solver module is used. Details regarding the discretization, 216 
+
+flow initialisation and boundary conditions along with validation is given in Raaghav et al. (2025). 217 
+
+The only difference from the configuration of Raaghav et al. (2025) is that here, for the tempo-218 
+
+ral discretization, we use implicit Euler time integration instead of the Crank-Nicholson scheme. 219 
+
+We made this change because we noticed that the simulations are more susceptible to numerical 220 
+
+7July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+Physical Quantity Value Units 
+
+ν 1.123 × 10 −6 (m 2 s−1)
+
+νg 1.464 × 10 −5 (m 2 s−1)
+
+ρg 1.223 (kg m −3)
+
+γ 0.0734 (N m −1)
+
+D 1.096 × 10 −9 (m 2 s−1)
+
+g 9.81 (m s −2) 
+
+> Table 1 Values of the physical constants at temperature of 288.5 K.
+
+artifacts for low Fr air values. 221 
+
+4 Regimes at low Fr air values - Qualitative description 222 
+
+A first detailed observation of the density and velocity fields reveals that the breakthrough regime 223 
+
+is actually composed of qualitatively different sub-regimes. In this section, we present these sub-224 
+
+regimes based on a qualitative description of the width-averaged density fields and the typical flow 225 
+
+patterns close to the bubble curtain as shown in (Figures 3 and 4). 226 
+
+For the analysis of the numerical results, it is convenient to use width-average quantities, with 227 
+
+the width-average operator is defined as 228 
+
+⟨· · · ⟩ = 1
+
+W
+
+Z W/ 2
+
+> −W/ 2
+
+· · · dz. (11) Furthermore, when studying the statistically steady state in the near-field of the plume, it is 229 
+
+convenient to additionally average in time to remove temporal fluctuations. The width- and time-230 
+
+averaging operator is defined as 231 
+
+⟨⟨· · · ⟩⟩ = 1(tend − t0)W
+
+Z tend 
+
+> t0
+
+Z W/ 2
+
+> −W/ 2
+
+· · · dzdt. (12) In all cases, we use t0 = 25 s, which was found to be sufficient for the flow and salt concentration 232 
+
+fields to reach a steady state in the near-field of the plume. 233 
+
+4.1 Total breakthrough regime 234 
+
+In the total breakthrough regime, from the density field associated with this regime (shown in 235 
+
+Figures 3a and b for Fr air = 0.34), we observe that the density current resembles that which would 236 
+
+have been formed in the absence of the bubble curtain in a classical lock-exchange flow. In other 237 
+
+words, due to the very low inertia of the bubble curtain, the density current infiltrates the curtain 238 
+
+almost unaffected by it. Hence, the density close to the bottom is that of the salt water and the 239 
+
+density close to the surface is that of fresh water. 240 
+
+A closer inspection of the density fields and the streamlines near the bubble curtain ( −2.5 ≲241 
+
+x/H ≲ 2.5) in Figure 4 reveals a recirculation cell around mid-depth at x ≈ 0. This cell extends 242 
+
+in the positive x-direction, and for the two cases with Fr air = 0 .34 shown in Figure 4, it extends 243 
+
+8July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR -15 -10 -5 0 5 10 15 
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.34 ; < ! 1 = 0.008 (a) 
+
+-15 -10 -5 0 5 10 15 
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.34 ; < ! 1 = 0.028 (b) 
+
+-15 -10 -5 0 5 10 15 
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.66 ; < ! 1 = 0.008 (c) 
+
+-15 -10 -5 0 5 10 15 
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.66 ; < ! 1 = 0.028 (d) 
+
+-15 -10 -5 0 5 10 15 
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.92 ; < ! 1 = 0.008 (e) 
+
+-15 -10 -5 0 5 10 15 
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.92 ; < ! 1 = 0.028 (f) 
+
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+h,si                          
+
+> Figure 3 Width-averaged density contours represented by the volume fraction of salt water ⟨αs⟩for six simulations with different values of Fr air and σat t=tend . The top row shows two cases of the total breakthrough regime, the middle row shows two cases of the diluted breakthrough regime, and the lower row shows two cases of the curtain-driven onset regime. The grey shaded contour depicts the location of the bubble curtain using the region with 0 .5>⟨αg⟩>5×10 −4and the horizontal solid grey line at y/H ≈1 marks the location of the free surface.
+
+vertically in the range 0 .4 ≲ y/H ≲ 0.6. The bubble curtain entrains and lifts some dense salt 244 
+
+water that subsequently moves in the positive x direction carried by the exchange flow. The lifting 245 
+
+of some dense fluid is reminiscent of the peeling observed in previous studies on bubble plumes in a 246 
+
+stratified quiescent fluid (Socolofsky and Adams, 2003, 2005; Yang et al., 2016). Due to the higher 247 
+
+density, these fluid parcels that are lifted sink while moving in the positive x-direction, causing the 248 
+
+formation of the recirculation cell. This recirculation cell induces a weak mixing of salt and fresh 249 
+
+water in the saltwater side. 250 
+
+4.2 Diluted breakthrough regime 251 
+
+From the two simulations for Fr air = 0 .64 shown in Figure 3c and d, we observe that the dense 252 
+
+fluid entrained by the curtain reaches the free surface. Consequently, the gravity current (exchange 253 
+
+9July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR -2 -1 0 1 2
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.34 ; < ! 1 = 0.008 (a) 
+
+-2 -1 0 1 2
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.34 ; < ! 1 = 0.028 (b) 
+
+-2 -1 0 1 2
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.66 ; < ! 1 = 0.008 (c) 
+
+-2 -1 0 1 2
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.66 ; < ! 1 = 0.028 (d) 
+
+-2 -1 0 1 2
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.92 ; < ! 1 = 0.008 (e) 
+
+-2 -1 0 1 2
+
+x=H 
+
+0.2 0.4 0.6 0.8 11.2 
+
+> y=H
+
+Fr air = 0.92 ; < ! 1 = 0.028 (f)           
+
+> 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+
+hh ,sii        
+
+> Figure 4 Width- and time-averaged density represented by the salt water volume fraction field ⟨⟨ αs⟩⟩ (colours) and streamlines (grey lines) obtained from the width- and time-averaged velocity field. The simulations are the same as in Figure 3, but the extent of the x-axis is much smaller. The horizontal solid grey line at y/H ≈1 marks the location of the free surface.
+
+flow) travelling just below the surface in the positive x-direction is no longer composed of pure 254 
+
+fresh water. Similarly, the salt content in the density current travelling over the bottom in the 255 
+
+negative x direction is lower than that of the salt water. Hence, we name this regime the diluted 256 
+
+breakthrough regime. 257 
+
+The streamlines in Figure 4 show that the recirculation cell for x > 0 has grown and extends 258 
+
+over (almost) the entire water column, while still no recirculation cell is observed for x < 0. At the 259 
+
+free surface, the recirculation cell produces surface currents limited to the right side, contrary to 260 
+
+the case of a classical bubble curtain in a quiescent fluid, where surface currents are observed on 261 
+
+both sides. The lack of a surface current for x < 0 is due to the strength of the exchange flow near 262 
+
+the surface in the positive x-direction. 263 
+
+Quite remarkably, in this regime, some differences are observed between the case with σ − 1 = 264 
+
+0.008 and that with σ − 1 = 0 .028. On the one hand, the case with σ − 1 = 0 .008 shows less 265 
+
+dilution and, on the other hand, the recirculation cell is slightly smaller. The differences between 266 
+
+simulations with different values of σ will be discussed in more detail in the following. 267 
+
+10 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+4.3 Curtain-driven onset regime 268 
+
+As Fr air increases further, we observe further dilution in the gravity currents due to the increased 269 
+
+mixing around the bubble curtain (see Figures 3e and f). Furthermore, the streamlines displayed 270 
+
+in Figures 4e and f show, in addition to a recirculation cell for x > 0, also a small recirculation 271 
+
+cell and surface currents for x < 0. The simulation for σ − 1 = 0 .008 shows a smaller recirculation 272 
+
+cell than that for σ − 1 = 0 .028. In the curtain-driven regime, the recirculation cells on both sides 273 
+
+of the bubble curtain are approximately equal in strength and size (Bacot et al., 2022; Raaghav 274 
+
+et al., 2025). However, in this onset regime, even if the curtain has enough inertia to form surface 275 
+
+currents and recirculation cells on both sides of the bubble curtain, they are strongly asymmetric. 276 
+
+Hence, we denote this regime as the curtain-driven onset regime. 277 
+
+The asymmetry between both sides is due to the fluid parcels in the surface current for x < 0278 
+
+sinking more quickly than those for x > 0. In fact, the end of the recirculation cell for x > 0 is not 279 
+
+observed within the spatial range plotted in Figure 4. Interestingly, Abraham et al. (1973) sketched 280 
+
+a similar flow with a small recirculation cell for x < 0 based on surface flow observations. However, 281 
+
+the recirculation cell for x > 0 was not considered, probably because its signature on the surface 282 
+
+is not as clear. 283 
+
+The gradual appearance and growth of the recirculation cell for x < 0 with Fr air shows that there 284 
+
+is not a sharp transition between the breakthrough and the curtain-driven regime at Fr air ≈ 0.9 (as 285 
+
+proposed by Bacot et al., 2022). Instead, we observe a smooth transition through the curtain-driven 286 
+
+onset regime. 287 
+
+5 Quantitative description 288 
+
+In the previous section, we qualitatively introduced three sub-regimes: total breakthrough , diluted 289 
+
+breakthrough , and curtain-driven onset . In what follows, we provide a quantitative characterisation 290 
+
+to more precisely capture the transitions between these sub-regimes and delineate their respective 291 
+
+limits. 292 
+
+5.1 Approach 293 
+
+We aim to quantitatively describe how key characteristics of the flow and density fields change as a 294 
+
+function of Fr air and σ − 1. We focus on the entrainment by the bubble curtain, the dilution by the 295 
+
+bubble curtain, and the emergence and growth of the recirculation cells. To quantify these changes, 296 
+
+we define a small rectangular control volume around the bubble curtain. However, one difficulty 297 
+
+is that the bubble curtain changes in size and shape depending on the control parameters. Hence, 298 
+
+we must define the control volume as a function of the volume occupied by the bubble curtain in 299 
+
+each simulation. Since there is little spanwise variation, we will consider width-averaged quantities, 300 
+
+so that we need to define the extent of the volume in the x and y directions. The vertical limits, 301 
+
+owing to pragmatic reasons, are 1.5 grid cells above the bottom at y− = 0 .05 H and below the free 302 
+
+surface at y+ = 0 .95 H.303 
+
+To define the extent of the control volume in the x-direction, we first determine the extent of the 304 
+
+bubble curtain in this direction by fitting a Gaussian curve to the air volume fraction averaged in 305 
+
+11 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+width and time ⟨⟨ αg⟩⟩ at every height y as a function of x such that 306 
+
+⟨⟨ αg⟩⟩ fit = A(y) exp 
+
+(
+
+−
+
+ x − B(y)
+
+C(y)
+
+2)
+
+, (13) with A(y), B(y) and C(y) the fitting constants. From this fit, we define the width of the curtain as 307 
+
+w(y) = 2 √2C(y), which is equivalent to four times the standard deviation of the fitted Gaussian 308 
+
+profile. In other words, it represents the region that encompasses 95% of the air volume at a 309 
+
+given height y. Using the width of the bubble curtain, the limits of the bubble curtain are x =310 
+
+B(y) + w(y)/2 on the right side and x = B(y) − w(y)/2 on the left side. The horizontal limits of 311 
+
+the control volume for our analysis are the leftmost and rightmost points of the boundaries of the 312 
+
+curtain: 313 
+
+x− = min[ B(y) − √2C(y)] (14) and 314 
+
+x+ = max[ B(y) + √2C(y)] , (15) respectively. 315 
+
+Although the choices we have made to define the control volume are somewhat arbitrary, we 316 
+
+note three important characteristics that it must satisfy: 1) it must be large enough to include the 317 
+
+entire plume, 2) its boundaries must be close enough to the plume so that structures such as the 318 
+
+signatures of the recirculation cells are observed, and 3) it must adjust depending on the size of 319 
+
+the curtain parameters σ − 1 and Fr air .320 
+
+The limits of the curtain and the control volume for two examples are shown in Figure 5. As 321 
+
+can be seen, the limits of the curtain (solid lines) coincide well with what would be expected from 322 
+
+visual inspection of the width-averaged air volume fraction. The boundaries of the control volume 323 
+
+are shown with the box with white dashed lines in Figure 5. For the two examples, we chose 324 
+
+one simulation in the total breakthrough regime and one in the curtain-driven onset regime (the 325 
+
+same simulations as shown in Figures 3b, 3f, 4b and 4f). We highlight two observations that stress 326 
+
+the importance of adjusting the size of the control volume for each simulation. First, the bubble 327 
+
+curtain in the total breakthrough regime is curved due to the strength of the gravity current. For 328 
+
+this reason, the limit x− is not given by the bubble curtain limit close to the free surface. Second, 329 
+
+we observe that the width of the curtain for the simulation in the curtain-driven onset regime grows 330 
+
+faster with height. 331 
+
+Due to the gravity current and the recirculation cells, it is difficult to obtain the structure of the 332 
+
+bubble curtain from the vertical velocity. In other words, it is difficult to obtain the momentum 333 
+
+plume. However, it has previously been observed for the homogeneous case that the spread of 334 
+
+momentum is proportional to the spread of air in the curtain. Hence, it is possible to estimate, 335 
+
+following Ditmars and Cederwall (1974), the entrainment coefficient of the bubble curtain β from 336 
+
+the width of the bubble curtain w(y), such that 337 
+
+(y − yv)β = 1
+
+λ
+
+r π
+
+32 w(y), (16) where λ is the constant that represents the ratio of the lateral spread of air (bubbles) to momentum 338 
+
+and yv is the height of the virtual origin of the curtain. The value λ = 0 .85 proposed by Fanneløp 339 
+
+12 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR Fr air = 0.34, < ! 1 = 0.028 
+
+-1 -0.5 0 0.5 1
+
+x=H 
+
+00.2 0.4 0.6 0.8 1    
+
+> y=H
+> Fr air = 0.92, <!1 = 0.028
+
+-1 -0.5 0 0.5 1
+
+x=H 
+
+00.2 0.4 0.6 0.8 1
+
+> y=H
+
+0.05 0.1 0.15 0.2 
+
+> hh ,sii
+
+(a) (b)            
+
+> Figure 5 Two examples of the definition of the limits of the bubble curtain and the control volume used for the analysis. The colour denotes the width- and time-averaged air volume fraction ⟨⟨ αg⟩⟩ . The solid white curves denote the limit of the bubble curtain, and the white dashed lines denote the limits x=x−and x=x+of the control volume for analysis given by Equations (14) and (15), respectively.
+
+et al. (1991) gives good qualitative results (a quantitative estimate of the error is difficult due to 340 
+
+the gravity current and the recirculation cells). Notice, that β is a constant if w(y) grows linearly 341 
+
+with y. To verify that this is a good approximation and obtain the value of β, we make a linear 342 
+
+fit of w as a function of y of the form w(y) = ay + b with a and b the fitting parameters. Hence, 343 
+
+β = ( a/λ )pπ/ 32 and yv = −b/a .344 
+
+Now that the control volume is defined, we study the dilution and the flow around the bubble 345 
+
+curtain by extracting, at both x = x− and x = x+, vertical profiles for the width and time averages 346 
+
+of the velocity in the x-direction, vx(y), and the density profile, ρ(y). For simplicity and to compare 347 
+
+the simulations with different values of σ − 1, we define the normalised width- and time-averaged 348 
+
+density 349 
+
+ˆρ = ⟨⟨ ρ⟩⟩ − ρf
+
+∆ρ , (17) so that ˆ ρ = 0 for fully fresh water and ˆ ρ = 1 for fully salt water. 350 
+
+In the following section, we present results on the entrainment coefficient, the dilution by the 351 
+
+bubble curtain, and the shape of the width- and time-averaged profiles of the horizontal velocity 352 
+
+at x = x− and x = x+ as a function of the control parameters. In this way, we identify the sub-353 
+
+regimes and their limits. Finally, we discuss how the effectiveness varies as a function of the control 354 
+
+parameters and across the sub-regimes. 355 
+
+5.2 Sub-regime characteristics and limits 356 
+
+Entrainment coefficient 357 
+
+We first discuss the dependence of the entrainment coefficient β on the control parameters, since 358 
+
+it impacts both the dilution and the flow around the bubble curtain. As mentioned in Section 359 
+
+2, Fanneløp et al. (1991) found that the entrainment by the bubble curtain (a line plume) in a 360 
+
+homogeneous fluid depends on ˆ qair . Figure 6 presents the values of β as a function of ˆ qair for 361 
+
+13 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 0 2 4 6
+
+^qair #10 !3
+
+00.05 0.1 0.15 0.2 0.25 
+
+> -
+
+< ! 1 = 0 :008 
+
+< ! 1 = 0 :020 
+
+< ! 1 = 0 :028    
+
+> Figure 6 Entrainment coefficient βas a function of ˆ qair for all simulations. The error bars denote 95% confidence interval
+
+all simulations. The error bars denote the 95% confidence interval. Due to the small errors, we 362 
+
+conclude that considering that w(y) varies linearly with y is a good approximation, which means 363 
+
+that β can be considered a constant for each simulation. However, it is important to note that β364 
+
+also depends on the bubble diameter db (Fraga and Stoesser, 2016; O’Mahoney et al., 2024). Since 365 
+
+db is constant throughout this study, the values of β reported in Figure 6 may change for other 366 
+
+bubble sizes and should therefore be generalised with caution. 367 
+
+Furthermore, to good approximation, the results for different values of σ collapse into a single 368 
+
+curve, implying that the ˆ qair is the only parameter determining the entrainment by the bubble 369 
+
+curtain. As expected from earlier results on round plumes (e.g Ditmars and Cederwall, 1974), β370 
+
+increases with ˆ qair , tending to a constant value for large enough values of ˆ qair . Although many 371 
+
+previous studies computed β for different values of ˆ qair (Beelen and Krug, 2024; Ditmars and 372 
+
+Cederwall, 1974; Fanneløp et al., 1991; Lee and Park, 2026), they all have been restricted to 373 
+
+relatively small values of ˆ qair . The largest values of ˆ qair were reached in the studies of Ditmars and 374 
+
+Cederwall (1974) and Fanneløp et al. (1991): ˆ qair ≈ 1.12 ×10 −3 and 1 .55 ×10 −3, respectively. These 375 
+
+values are still not large enough to reach the plateau region which emerges in Figure 6. Hence, 376 
+
+the present study is the first that considers such high values of ˆ qair for line plumes, allowing us to 377 
+
+estimate a critical value of ˆ qair beyond which the entrainment coefficient is constant. 378 
+
+Our results indicate that β tends to a constant value for ˆ qair ≳ 2 × 10 −3. This transition seems to 379 
+
+agree with the general trends observed by Ditmars and Cederwall (1974) and Fanneløp et al. (1991) 380 
+
+results, even if a definitive value is difficult to determine due to the gradual change in β and the 381 
+
+scatter in the data. For ˆ qair > 2 × 10 −3, β = 0 .163 ± 0.04, which is close to the results of Ditmars 382 
+
+and Cederwall (1974) who proposed the possibility of an asymptotic value of approximately 0.16. 383 
+
+For σ − 1 = 0 .020 and 0.028, ˆ qair < 2 × 10 −3 for some simulations, while for σ − 1 = 0 .008, this 384 
+
+is the case for all simulations. As a result, for Fr air ≈ 1, the entrainment coefficient of the bubble 385 
+
+curtain for σ − 1 = 0 .008 (ˆ qair ≈ 0.7 × 10 −3) is up to two times smaller than for σ − 1 = 0 .020 386 
+
+(ˆ qair ≈ 2.8 × 10 −3) and 0.028 (ˆ qair ≈ 4.7 × 10 −3). 387 
+
+14 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 0 0.2 0.4 0.6 0.8 1
+
+^;
+
+00.2 0.4 0.6 0.8 1
+
+> y=H
+
+Fr air = 0.34, < ! 1 = 0.028 
+
+0 0.2 0.4 0.6 0.8 1
+
+^;
+
+00.2 0.4 0.6 0.8 1
+
+> y=H
+
+Fr air = 0.92, < ! 1 = 0.028 
+
+x!
+
+x+
+
+(a) (b)                 
+
+> Figure 7 Normalized density profiles at x=x−(dashed line) and x=x+(solid line) for the same two simulations shown in Figure 5. The height ypat x=x+is marked with an asterisk. The vertical dotted line represents the value of ˆ ρ= 0 .5.
+
+Dilution by the bubble curtain 388 
+
+As discussed in section 4, the total breakthrough regime is characterised by ˆ ρ = 1 close to the 389 
+
+bottom and ˆ ρ = 0 close to the free surface on both sides of the bubble curtain (as seen in Figure 390 
+
+7a). In the diluted breakthrough and curtain-driven onset regimes, the density at the bottom and 391 
+
+close to the surface changes (with |ˆρ| < 1) due to the mixing induced by the bubble curtain and the 392 
+
+recirculation cells that emerge, resulting also in more uniform density profiles (as seen in Figure 7b 393 
+
+for the curtain-driven onset regime). To distinguish the role of varying σ −1 and Fr air in the density 394 
+
+distribution around the curtain, it is useful to characterise the changes in the density distribution 395 
+
+using the density at the corners of the control volume, i.e., at ( x−, y −), ( x−, y +), ( x+, y −), ( x+, y +). 396 
+
+In addition, to characterise the ability of the bubble curtain to entrain the dense fluid upward, we 397 
+
+compute the height yp at which the water has an intermediate density ˆ ρ = 0 .5 at x = x+. For the 398 
+
+example in the total breakthrough regime (shown in Figure 7a), mixing by the small recirculation 399 
+
+cell on the saltwater side is reflected by a weaker density gradient around mid-height and an increase 400 
+
+in yp to yp ≈ 0.65 (compared to yp ≈ 0.5 when the bubble curtain is absent, as also observed for 401 
+
+x = x−). The height yp can be seen as a similar concept to the peel height (Socolofsky and Adams, 402 
+
+2003, 2005; Yang et al., 2016). However, the peel height of a plume in a stably stratified fluid is 403 
+
+traditionally defined as the height at which the dye or tracer concentration is 5% of the maximum 404 
+
+concentration. In other words, it is the maximum height reached by the entrained fluid, reaching 405 
+
+a neutral buoyancy level. 406 
+
+We now focus on the lower corners of the control volume: ( x−, y −) and ( x+, y −). Figure 8 shows 407 
+
+the normalised width- and time-averaged density ˆ ρ in these corners. In the lower left corner ( x−, y −)408 
+
+(see Figure 8a), the density decreases from ˆ ρ = 1 to ˆ ρ = 0 .4 with the decrease starting at Fr air ≈ 0.6409 
+
+for σ − 1 = 0 .020 and 0.028, and at Fr air ≈ 0.7 for σ − 1 = 0 .008. The start of this decrease marks 410 
+
+the start of the diluted breakthrough regime, since it signifies that the gravity current emerging 411 
+
+from the plume region is diluted. The fact that ˆ ρ reaches a constant value for Fr air ≳ 0.9 means 412 
+
+that there is a maximum in the dilution. 413 
+
+Although the density and transition in the lower left corner ( x−, y −) depend on σ − 1, in the 414 
+
+lower right corner ( x+, y −) (see Figure 8b), the density is independent of σ − 1. In other words, 415 
+
+the normalised density of the salt water that reaches the bubble curtain close to the bottom on 416 
+
+15 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+00.2 0.4 0.6 0.8 1
+
+> ^;(x!; y !)
+
+< ! 1 = 0 :008 
+
+< ! 1 = 0 :020 
+
+< ! 1 = 0 :028 
+
+0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+00.2 0.4 0.6 0.8 1
+
+> ^;(x+; y !)
+
+(a) (b)   
+
+> Figure 8 Normalized density at the lower corners of the control volume as a function of Fr air for all simulations on a) the freshwater side ( x−, y −) and b) the saltwater side ( x+, y −).
+
+0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+00.2 0.4 0.6 0.8 1
+
+> ^;(x!; y +)
+
+< ! 1 = 0 :008 
+
+< ! 1 = 0 :020 
+
+< ! 1 = 0 :028 
+
+0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+00.2 0.4 0.6 0.8 1
+
+> ^;(x+; y +)
+
+(a) (b)   
+
+> Figure 9 Normalized density at the upper corners of the control volume as a function of Fr air for all simulations on a) the freshwater side ( x−, y +) and b) the saltwater side ( x+, y +).
+
+the saltwater side is independent of σ − 1. However, this parameter is relevant for how this salt 417 
+
+water is redistributed by the bubble curtain, unless σ − 1 is large enough ( σ − 1 ≳ 0.020). This is a 418 
+
+first indication that the difference in entrainment for simulations with the same value of Fr air but 419 
+
+different values of σ − 1 and ˆ qair affects the mixing and distribution of salt water by the bubble 420 
+
+curtain. 421 
+
+The transition from the diluted breakthrough regime to the curtain-driven onset regime is marked 422 
+
+by the formation of the recirculation cell on the freshwater side, so we focus now on the density in 423 
+
+the two upper corners of the control volume (see Figure 9). Here, the normalised density increases 424 
+
+from ˆ ρ ≈ 0 to ˆ ρ ≈ 0.7. In the upper right corner ( x+, y +), where a recirculation cell is always 425 
+
+present, this increase occurs at similar values of Fr air (Fr air ≈ 0.7 for σ − 1 = 0 .008, and Fr air ≈ 0.6426 
+
+for σ − 1 = 0 .020 and 0.028) as the decrease in density in the lower left corner (see Figure 8a). 427 
+
+However, the increase in the upper left corner occurs for slightly larger values of Fr air (Fr air ≈ 0.8428 
+
+16 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+0.08 0.09 0.1 0.11 0.12 0.13 0.14 0.15 
+
+> yp=H
+
+< ! 1 = 0 :008 
+
+< ! 1 = 0 :020 
+
+< ! 1 = 0 :028    
+
+> Figure 10 Peel height ypas a function of Fr air for all simulations.
+
+for σ − 1 = 0 .008, and Fr air ≈ 0.7 for σ − 1 = 0 .020 and 0.028); see Figure 9a. 429 
+
+The start of the density increase on the upper left corner signals the formation of the recirculation 430 
+
+cell on the fresh water side, and hence the transition to the curtain-driven onset regime. The 431 
+
+formation of this recirculation cell is also observed in the value of yp (the height reached by water 432 
+
+with ˆ ρ = 0 .5 at x = x−) as shown in Figure 10. In general, yp/H increases almost linearly with 433 
+
+Fr air until suddenly (at Fr air ≈ 0.8 for σ − 1 = 0 .008, and Fr air ≈ 0.7 for σ − 1 = 0 .020 and 0.028), 434 
+
+its value increases to yp/H = 1. Again, we see a difference between the results for σ − 1 ≥ 0.020 435 
+
+and σ − 1 = 0 .008, where the increase of yp is slower for σ − 1 = 0 .008, again pointing to the effect 436 
+
+of the reduced entrainment by the bubble curtain for simulations with this value of σ − 1. 437 
+
+In summary, the density at the four corners of the control volume and the height yp suggest 438 
+
+that the flow transitions from the total breakthrough regime to the diluted breakthrough regime 439 
+
+at Fr air ≈ 0.6 for σ − 1 ≳ 0.020 and at Fr air ≈ 0.7 for σ − 1 = 0 .008. Furthermore, the transition 440 
+
+between the diluted breakthrough regime and the curtain-driven onset regime occurs at Fr air ≈ 0.7441 
+
+for σ − 1 ≳ 0.020 and at Fr air ≈ 0.8 for σ − 1 = 0 .008. These limits point to a very small region of 442 
+
+the parameter space for the diluted breakthrough regime. Furthermore, although the normalised 443 
+
+density at the corners of the control volume is approximately constant within the total breakthrough 444 
+
+and curtain-driven onset regimes, other important flow characteristics vary within these regimes. 445 
+
+We have already seen how yp/H increases linearly within the total breakthrough regime. In the 446 
+
+following section, we will study how the velocity varies within these regimes. 447 
+
+Velocity profiles 448 
+
+For the velocity, we expect from the qualitative descriptions of the regimes in section 4 a change 449 
+
+from an almost undisturbed lock exchange flow in the total breakthrough regime to a flow with 450 
+
+recirculation cells on both sides of the curtain in the curtain-driven onset regime. This change can 451 
+
+be seen in the velocity profiles at x = x+ and x = x− in the total breakthrough and the curtain-452 
+
+driven onset regimes in Figure 11. For the profiles in the total breakthrough regime (see Figure 453 
+
+11a), the flow close to the bottom remains in the negative x-direction and close to the surface 454 
+
+in the positive x-direction, which is the characteristic flow structure of the exchange flow. In the 455 
+
+curtain-driven onset regime (shown in Figure 11b), the flow directions are reversed for the profile 456 
+
+at x = x−.457 
+
+17 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR -0.2 -0.1 0 0.1 0.2 
+
+hh vxii 
+
+00.2 0.4 0.6 0.8 1
+
+> y=H
+
+Fr air = 0.34, < ! 1 = 0.028 
+
+-0.2 -0.1 0 0.1 0.2 
+
+hh vxii 
+
+00.2 0.4 0.6 0.8 1
+
+> y=H
+
+Fr air = 0.92, < ! 1 = 0.028 
+
+x!
+
+x+
+
+(a) (b)                
+
+> Figure 11 Profiles of the width- and time-averaged velocity component ⟨⟨ vx⟩⟩ at x=x−(dashed line) and x=x+(solid line) for the same two simulations shown in Figure 5. The vertical dotted line represents ⟨⟨ vx⟩⟩ = 0 and the uppermost location where ⟨⟨ vx⟩⟩ = 0 for each profile is marked with an asterisk.
+
+Furthermore, the height at which the velocity changes sign (denoted as y0 and marked with 458 
+
+asterisks in Figure 11) increases from y0 ≈ 0.5, as in a lock exchange flow (see e.g. Shin et al., 459 
+
+2004), to y0 ≈ 0.75 in the curtain-driven onset regime like for a bubble curtain in a homogeneous 460 
+
+fluid (Bulson, 1961). Hence, to characterise the changes in the velocity profile, we focus on the 461 
+
+variation of y0 as a function of Fr air as shown in Figure 12. 462 
+
+The height at which the velocity changes sign for both x = x− and x = x+ as a function of 463 
+
+Fr air is shown in (Figures 12a and b), respectively. We observe that, indeed, y0(x = x−) ≈ 0.5464 
+
+for Fr air ≲ 0.5. For higher values of Fr air , first, y0(x = x−) gradually increases, and then there 465 
+
+is a sharp increase to a value close to unity. This jump is associated with the emergence of the 466 
+
+recirculation cell on the freshwater side in the upper part of the water column. The values of Fr air 467 
+
+at which we observe the changes in y0 coincide with the transition values observed in the density 468 
+
+as discussed previously with the simulations with σ − 1 ≥ 0.020 showing similar results, while the 469 
+
+transitions for σ − 1 = 0 .008 occur at slightly higher Fr air values. Within the curtain-driven onset 470 
+
+regime, the recirculation cell grows with Fr air as can be seen from decreasing values of y0(x = x−)471 
+
+for Fr air ≳ 0.7 for σ − 1 ≥ 0.0020 and for Fr air ≳ 0.8 for σ − 1 = 0 .008. 472 
+
+On the saltwater side, y0(x = x+) increases almost linearly from y0(x = x+) ≈ 0.5 for Fr air ≈ 0.3473 
+
+to y0(x = x+) ≈ 0.7 for Fr air ≈ 1; see Figure 12b. On this side, the direction of the exchange 474 
+
+flow close to the surface is the same as for the surface current driven by the curtain. Hence, the 475 
+
+flow induced by the plume and the gravity current strengthen each other. This complementarity 476 
+
+results in a gradual increase in size of the recirculation cell and in the value of y0 instead of a sharp 477 
+
+increase like in the freshwater side (see Figure 12a). Furthermore, we note that no difference is 478 
+
+observed in y0(x = x+) for different values of σ − 1, suggesting a compensation mechanism for the 479 
+
+lower entrainment. 480 
+
+Effectiveness 481 
+
+The previous results imply that the flow and the density distribution around the bubble curtain 482 
+
+depend on both Fr air and σ − 1 (or ˆ qair ), and that it is not possible to find one single governing 483 
+
+parameter. Now, the key question for the applications of bubble curtain in ship locks is if and how 484 
+
+18 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+0.5 0.6 0.7 0.8 0.9 1
+
+> y0(x = x!)=H
+
+< ! 1 = 0 :008 
+
+< ! 1 = 0 :020 
+
+< ! 1 = 0 :028 
+
+0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+0.5 0.6 0.7 0.8 0.9 1
+
+> y0(x = x+)=H
+
+(a) (b)            
+
+> Figure 12 Height y0at which the width- and time-averaged velocity ⟨⟨ vx⟩⟩ changes sign for each side of the control volume on a) freshwater side ( x=x−) and b) saltwater side ( x=x+). The dashed lines are a visual guide marking the sharp increase in y0when the recirculation cell emerges on the freshwater side.
+
+the effectiveness is also affected by the changes in the different governing parameters. 485 
+
+Figure 13 shows the effectiveness as a function of Fr air for all simulations. First, for Fr air ≲ 0.5, the 486 
+
+effectiveness seems to vary little with Fr air . Later, for 0 .5 ≲ Fr air ≲ 0.8, the effectiveness increases 487 
+
+(almost linearly) until the maximum effectiveness E ≈ 0.8 is reached. In this range of Fr air values, 488 
+
+the results of the simulations with σ − 1 = 0 .020 and 0.028 show minor differences, while the 489 
+
+simulations with σ − 1 = 0 .008 have a markedly lower effectiveness than those for σ − 1 ≳ 0.020. 490 
+
+Furthermore, the maximum value E ≈ 0.8 is reached at Fr air ≈ 0.8 for σ − 1 = 0 .020 and 0.028, 491 
+
+while it is reached at Fr air ≈ 1 for σ − 1 = 0 .008. The fact that changes in the trend of E occur at 492 
+
+higher values of Fr air for σ − 1 = 0 .008 compared to σ − 1 ≥ 0.020 is consistent with changes in the 493 
+
+density and velocity profiles in the limits of the control volume as discussed previously. In general, 494 
+
+we observe that for Fr air ≳ 0.8, the effectiveness depends only on Fr air for large values of σ − 1495 
+
+and the effectiveness values collapse onto a single curve, while for lower values (e.g. σ − 1 = 0 .008), 496 
+
+the effectiveness is lower. This can be attributed to a lower entrainment by the bubble curtain as 497 
+
+discussed earlier and shown in Figure 6. 498 
+
+6 Discussion 499 
+
+For practical applications, it is desired to operate bubble curtains close to the optimum or at 500 
+
+slightly lower Fr air values to require less energy without a major loss in effectiveness. Hence, it is 501 
+
+important to understand how the effectiveness and its optimal value depend on the parameters of 502 
+
+the problem. From the early work of Abraham and Van der Burgh (1962) to the studies of Oldeman 503 
+
+et al. (2020), Bacot et al. (2022), and O’Mahoney et al. (2024), the effectiveness of bubble curtains 504 
+
+for reducing salt intrusion has been considered exclusively as a function of Fr air . However, our 505 
+
+results show that the effectiveness is also a function of an additional parameter (either σ − 1 or 506 
+
+ˆqair ). This is of importance for small values of Fr air (i.e. in the breakthrough regime) because, in 507 
+
+this range, low values of σ translate into low values of ˆ qair , implying that the entrainment coefficient 508 
+
+of the bubble curtain is not constant but highly dependent on ˆ qair .509 
+
+19 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 0.2 0.4 0.6 0.8 1 1.2 
+
+Fr air 
+
+00.2 0.4 0.6 0.8 1
+
+> Eend
+
+< ! 1 = 0 :008 
+
+< ! 1 = 0 :020 
+
+< ! 1 = 0 :028  
+
+> Figure 13 Effectiveness as a function of Fr air for all simulations.
+
+The value σ − 1 = 0 .020 is typical for the density difference between sea water and fresh water, 510 
+
+and similar values have been used in recent experimental and numerical studies (Bacot et al., 2022; 511 
+
+Oldeman et al., 2020; O’Mahoney et al., 2024; Raaghav et al., 2025). However, in ship locks, σ − 1512 
+
+tends to be a factor of two smaller ( σ − 1 ≈ 0.010) (Bakker et al., 2026; Weiler et al., 2026). Our 513 
+
+results show that, for such low values of σ − 1, the effectiveness in the breakthrough regime can be 514 
+
+up to 20% smaller and that the maximum effectiveness occurs for higher values of Fr air compared 515 
+
+to situations where σ −1 ≳ 0.020. These results suggest that bubble curtains in locks further inland 516 
+
+where σ − 1 might have much lower values would be less effective and optimum effectiveness would 517 
+
+occur at higher Fr air values. 518 
+
+In general, the dependence of the entrainment coefficient on ˆ qair in the curtain-driven regime is of 519 
+
+secondary importance. Raaghav et al. (2025) completely neglected this dependence by considering 520 
+
+only simulations with ˆ qair > 4 × 10 −3. Even for the case with σ − 1 = 0 .010, the entrainment 521 
+
+coefficient becomes constant (i.e. ˆ qair > 2 × 10 −3) for Fr air ≈ 1.25, barely into the range of Fr air 522 
+
+values considered by Raaghav et al. (2025). However, it is important to consider this dependence 523 
+
+when interested in optimal effectiveness (Fr air ≈ 1) or if the value of σ − 1 is even smaller. 524 
+
+Furthermore, our results show that the flow in the breakthrough regime displays important qual-525 
+
+itative differences for different values of the control parameters. We describe three qualitatively 526 
+
+different regimes dependent on two control parameters: Fr air and either σ − 1 or ˆ qair . Transitions 527 
+
+between different regimes occurred at different Fr air values because the entrainment by the bubble 528 
+
+plume depends on ˆ qair . Previous work proposing theoretical estimates for the effectiveness as a 529 
+
+function of Fr air (see e.g. Abraham et al., 1973; Bacot et al., 2022) has not considered the depen-530 
+
+dence of the entrainment coefficient on ˆ qair . For example, Bacot et al. (2022) used the constant 531 
+
+value proposed by Paillat and Kaminski (2014). Abraham et al. (1973) used a range of values for 532 
+
+the entrainment coefficient but considered it independent of Fr air . In addition, to build the theo-533 
+
+retical model, Abraham et al. (1973) used the flow characteristics based on the results of Bulson 534 
+
+(1961) in the case of homogeneous water. However, our results show that the flow structure in the 535 
+
+breakthrough regime (e.g., the size of the recirculation cells and the height of the surface currents) 536 
+
+varies with the parameters of the problem. Hence, we expect that the detailed new knowledge 537 
+
+provided by our simulations can be used to develop new analytical models for the effectiveness of 538 
+
+bubble curtains in the breakthrough regime. 539 
+
+20 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+7 Conclusions 540 
+
+We performed large-eddy simulations of a bubble curtain in a lock-exchange configuration for 541 
+
+Fr air ≲ 1. This range covers the breakthrough regime, extending into the onset of the curtain-542 
+
+driven regime. We report new insights into the flow characteristics and show that what has been 543 
+
+deemed the “breakthrough regime” by Bacot et al. (2022) is composed of qualitatively different 544 
+
+sub-regimes. We refer to these as the total breakthrough , the diluted breakthrough , and the curtain-545 
+
+driven onset regimes (in order of increasing Fr air values). 546 
+
+In the total breakthrough regime, the exchange flow is nearly unaffected by the presence of the 547 
+
+bubble curtain. In the diluted breakthrough regime, the bubble curtain entrains the salt water 548 
+
+from the bottom, and a large recirculation cell is formed on the saltwater side of the bubble screen. 549 
+
+Hence, salt and fresh water are mixed, and the gravity current emanating from the bubble curtain 550 
+
+on the freshwater side of it has an intermediate density. Finally, in the curtain-driven onset regime, 551 
+
+an additional recirculation cell appears on the freshwater side of the curtain, and salt water is 552 
+
+entrained by the curtain all the way to the surface. 553 
+
+Importantly, the transitions between these regimes do not depend only on Fr air , but also on 554 
+
+an additional non-dimensional parameter: either σ − 1 or ˆ qair (only two of the three parameters 555 
+
+are independent). In the present work, we thoroughly examined the entrainment characteristics 556 
+
+of the curtain and its dependence on ˆ qair . To our knowledge, this is the first study showing the 557 
+
+asymptotic behaviour of the entrainment coefficient for line bubble plumes as a function of ˆ qair and 558 
+
+allowing to estimate the critical value of ˆ qair ≈ 2 × 10 −3 beyond which the entrainment coefficient 559 
+
+becomes a constant. Because the entrainment coefficient depends on ˆ qair , when ˆ qair ≲ 2 × 10 −3 the 560 
+
+effectiveness of bubble curtains is controlled by both Fr air and ˆ qair . This has consequences for their 561 
+
+application to mitigate saltwater intrusion. 562 
+
+Acknowledgements 563 
+
+The authors thank both Dr. Rob Uittenbogaard and Dr. Tom O’Mahoney for the greatly insightful 564 
+
+and stimulating discussions on various aspects of the topic of mitigating saltwater intrusion in locks 565 
+
+using bubble curtains. 566 
+
+Funding 567 
+
+The authors thank the Dutch Research Council (NWO) for financial support through the NWO / 568 
+
+TTW Perspectief Program ‘SaltiSolutions’ P18-32, in particular Project 2 ‘Data and CFD for so-569 
+
+lutions’ (2022/TTW/01344701). The simulations were run on the Dutch National Supercomputing 570 
+
+Facility SURF through an NWO Domain Science grant (2024.006). 571 
+
+Notation 572 
+
+A = fitting constant of the Gaussian curve representing the amplitude (–) 573 
+
+B = fitting constant of the Gaussian curve representing the location of the peak (m) 574 
+
+21 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+C = fitting constant (width parameter) of the Gaussian curve (m) 575 
+
+db = bubble diameter (m) 576 
+
+ds = sparger width (m) 577 
+
+D = molecular diffusivity (m 2 s−1)578 
+
+Dt = turbulent diffusivity (m 2 s−1)579 
+
+Def f = effective diffusivity (m 2 s−1)580 
+
+CD = discharge coefficient (–) 581 
+
+E = Effectiveness of the bubble curtain (–) 582 
+
+Fr air = Froude number of the bubble curtain (–) 583 
+
+Fq = total interphase force on phase q (m 4 s−2)584 
+
+g = gravitational acceleration (m s −1)585 
+
+g′ = reduced gravity (m s −1)586 
+
+Hd = height of the tank/lock (m) 587 
+
+H = height of water column in the lock (m) 588 
+
+I = identity matrix (–) 589 
+
+L = length of the lock (-) 590 
+
+˜L = dimensionless length of the lock (m) 591 
+
+p = shared pressure between air and water phase (Pa) 592 
+
+qair = air flow rate per unit width (m 2 s−1)593 
+
+ˆqair = dimensionless air flow rate per unit width (–) 594 
+
+Re g = Reynolds number of the gravity current (–) 595 
+
+s = volume fraction of salt water per unit of water phase (–) 596 
+
+Sc = molecular Schmidt number (–) 597 
+
+Sc t = turbulent Schmidt number (–) 598 
+
+ST F = Salt transmission factor (–) 599 
+
+t = elapsed time after opening of the lock gate (s) 600 
+
+tend time when the gravity current reaches the end wall of the lock (s) 601 
+
+vq = velocity of phase q (m s −1)602 
+
+Vbc = total volume of salt water infiltrated the fresh side of the lock when the bubble curtain is 603 
+
+present (m 2)604 
+
+Vo = total volume of salt water infiltrated the fresh side of the lock when the bubble curtain is 605 
+
+absent (m 2)606 
+
+22 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+VF = volume on the freshwater side of the lock (m 3)607 
+
+w = width of the bubble curtain (m) 608 
+
+W = width of the lock (m) 609 
+
+˜W = dimensionless width of the lock (–) 610 
+
+x− = leftmost point of the curtain boundary (m) 611 
+
+x+ = rightmost points of the curtain boundary (m) 612 
+
+y− = location of first grid point above the bottom wall (m) 613 
+
+y+ = location of first grid point below the free surface (m) 614 
+
+yp = peel height equivalent (m) 615 
+
+yv = height of the virtual origin of the curtain (m) 616 
+
+α = αl = volume fraction of water (-) 617 
+
+αg = volume fraction of air (-) 618 
+
+αs = conserved volume fraction of salt water (-) 619 
+
+β = entrainment coefficient (–) 620 
+
+λ = ratio of the lateral spread of air to momentum (–) 621 
+
+ν = νl = kinematic viscosity of water (m 2 s−1)622 
+
+νg = volume fraction of air (m 2 s−1)623 
+
+ρ = liquid density (kg m −3)624 
+
+ˆρ = normalised width- and time-averaged density (–) 625 
+
+ρg = air density (kg m −3)626 
+
+ρf = freshwater density (kg m −3)627 
+
+ρs = saltwater density (kg m −3)628 
+
+¯ρF = average density on freshwater side of the lock (kg m −3)629 
+
+ρ′ = perturbation density (kg m −3)630 
+
+ρ0 = reference density of water (kg m −3)631 
+
+σ = density ratio between the salt and fresh water (–) 632 
+
+References 633 
+
+Abraham, G. and Van der Burgh, P. (1962). Reduction of salt water intrusion through locks by 634 
+
+pneumatic barriers . Rijkswaterstaat & Delft Hydraulics Laboratory, Delft. 635 
+
+Abraham, G., Van der Burgh, P., and De Vos, P. (1973). Pneumatic barriers to reduce salt intrusion 636 
+
+through locks. Technical report, Rijkswaterstaat & Delft Hydraulics Laboratory, Delft. 637 
+
+Bacot, A., Frank, D., and Linden, P. F. (2022). Bubble curtains used as barriers across horizontal 638 
+
+23 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+density stratifications. Journal of Fluid Mechanics , 941:A1. 639 
+
+Bakker, F. P., de Ruiter, J. W. E., Van der Hout, A. J., and Van Koningsveld, M. (2026). Accu-640 
+
+rately forecasting saltwater intrusion through navigation locks requires nautical traffic simulation 641 
+
+modelling. Ocean Engineering , 355:124918. 642 
+
+Beelen, S. and Krug, D. (2024). Planar bubble plumes from an array of nozzles: Measurements 643 
+
+and modelling. International Journal of Multiphase Flow , 174:104752. 644 
+
+Benjamin, T. B. (1968). Gravity currents and related phenomena. Journal of Fluid Mechanics ,645 
+
+31(2):209–248. 646 
+
+Boufadel, M. C., Socolofsky, S., Katz, J., Yang, D., Daskiran, C., and Dewar, W. (2020). A review 647 
+
+on multiphase underwater jets and plumes: Droplets, hydrodynamics, and chemistry. Reviews of 648 
+
+Geophysics , 58(3):e2020RG000703. 649 
+
+Boussinesq, J. (1903). Th´ eorie analytique de la chaleur: mise en harmonie avec la thermodynamique 650 
+
+et avec la th´ eorie m´ ecanique de la lumi` ere . Gauthier-Villars, Paris. 651 
+
+Brevik, I. and Kristiansen, Ø. (2002). The flow in and around air-bubble plumes. International 652 
+
+journal of multiphase flow , 28(4):617–634. 653 
+
+Bulson, P. S. (1961). Currents produced by an air curtain in deep water. Dock Harbour Authority ,654 
+
+42:15–22. 655 
+
+Chen, G., Xiong, Q., Morris, P. J., Paterson, E. G., Sergeev, A., and Wang, Y. (2014). Openfoam for 656 
+
+computational fluid dynamics. Notices Of The American Mathematical Society , 61(4):354–363. 657 
+
+Chisti, M. Y. and Moo-Young, M. (1987). Airlift reactors: characteristics, applications and design 658 
+
+considerations. Chemical Engineering Communications , 60(1-6):195–242. 659 
+
+Covarrubias-Contreras, B. R., Torres-Freyermuth, A., Tinoco, R. O., and Figueroa-Espinoza, B. 660 
+
+(2025). Interaction between a bubble curtain with waves and currents: implications on sediment 661 
+
+dispersal. Environmental Fluid Mechanics , 25(2):14. 662 
+
+Cutroneo, L., van der Goot, F., Roels, A., Castellano, M., Radermacher, M., Tucci, S., Povero, 663 
+
+P., Canepa, G., and Capello, M. (2014). A check on the efficiency of an air-bubble screen using 664 
+
+acoustic measurements and an artificial tracer. Journal of Soils and Sediments , 14:1626–1637. 665 
+
+Dissanayake, A. L., Gros, J., and Socolofsky, S. A. (2018). Integral models for bubble, droplet, 666 
+
+and multiphase plume dynamics in stratification and crossflow. Environmental Fluid Mechanics ,667 
+
+18(5):1167–1202. 668 
+
+Ditmars, J. D. and Cederwall, K. (1974). Analysis of air-bubble plumes. Coastal Engineering ,669 
+
+pages 2209–2226. 670 
+
+Drew, D. A. (1983). Mathematical modeling of two-phase flow. Annual Review of Fluid Mechanics ,671 
+
+15(1):261–291. 672 
+
+Dugu´ e, V., Blanckaert, K., Chen, Q., and Schleiss, A. J. (2015). Influencing flow patterns and bed 673 
+
+morphology in open channels and rivers by means of an air-bubble screen. Journal of Hydraulic 674 
+
+Engineering , 141(2):04014070. 675 
+
+Fanneløp, T. K., Hirschberg, S., and K¨ uffer, J. (1991). Surface current and recirculating cells 676 
+
+generated by bubble curtains and jets. Journal of Fluid Mechanics , 229:629–657. 677 
+
+Fraga, B. and Stoesser, T. (2016). Influence of bubble size, diffuser width, and flow rate on the 678 
+
+integral behavior of bubble plumes. Journal of Geophysical Research: Oceans , 121(6):3887–3904. 679 
+
+Ishii, M. and Hibiki, T. (2010). Thermo-fluid dynamics of two-phase flow . Springer Science & 680 
+
+Business Media, New York. 681 
+
+Jasak, H., Jemcov, A., and Tukovic, Z. (2007). Openfoam: A c++ library for complex physics 682 
+
+simulations. In International workshop on coupled methods in numerical dynamics , volume 1000, 683 
+
+pages 1–20. 684 
+
+Kantarci, N., Borak, F., and Ulgen, K. O. (2005). Bubble column reactors. Process Biochemistry ,685 
+
+40(7):2263–2283. 686 
+
+Keetels, G., Uittenbogaard, R., Cornelisse, J., Villars, N., and van Pagee, H. (2011). Field study 687 
+
+and supporting analysis of air curtains and other measures to reduce salinity transport through 688 
+
+shipping locks. Irrigation and Drainage , 60:42–50. 689 
+
+24 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+Kobus, H. E. (1968). Analysis of the flow induced by air-bubble systems. Coastal Engineering 690 
+
+1968 , pages 1016–1031. 691 
+
+Lee, D. and Park, H. (2026). Comparative morphological analysis between bubble curtains and 692 
+
+bubble plumes. International Journal of Multiphase Flow , page 105734. 693 
+
+Lee, J., Biemond, B., de Swart, H., and Dijkstra, H. A. (2024). Increasing risks of extreme salt 694 
+
+intrusion events across european estuaries in a warming climate. Communications Earth & 695 
+
+Environment , 5(1):60. 696 
+
+Li, M., Najjar, R. G., Kaushal, S., Mejia, A., Chant, R. J., Ralston, D. K., Burchard, H., Had-697 
+
+jimichael, A., Lassiter, A., and Wang, X. (2025). The emerging global threat of salt contamina-698 
+
+tion of water supplies in tidal rivers. Environmental Science & Technology Letters , page available 699 
+
+online 10.1021/acs.estlett.5c00505. 700 
+
+Li, Y. and Liu, D. (2025). A numerical study on temperature destratification induced by bubble 701 
+
+plumes in idealized reservoirs. Environmental Fluid Mechanics , 25(5):41. 702 
+
+Liu, H., Sun, H., Jiao, B., Lin, H., and Wang, G. (2025). Research on the oil retention effect of 703 
+
+pneumatic oil barriers under current and wave action. PLoS One , 20(5):e0322390. 704 
+
+McClimans, T., Leifer, I., Gjøsund, S. H., Grimaldo, E., Daling, P., and Leirvik, F. (2013). Pneu-705 
+
+matic oil barriers: The promise of area bubble plumes. Proceedings of the Institution of Mechan-706 
+
+ical Engineers, Part M: Journal of Engineering for the Maritime Environment , 227(1):22–38. 707 
+
+Murai, Y., Tasaka, Y., Noto, D., and Ulloa, H. (2025). Density destratification by a single bubble 708 
+
+plume in long horizontal fluid layers and in a dam lake. Environmental Fluid Mechanics , 25(1):4. 709 
+
+Nieuwstadt, F. T. M., Westerweel, J., and Boersma, B. (2016). Introduction to Theory and Appli-710 
+
+cations of Turbulent Flows . Springer, Cham. 711 
+
+Oldeman, A. M., Kamath, S., Masterov, M. V., O’Mahoney, T. S. D., van Heijst, G. J. F., Kuipers, 712 
+
+J. A. M., and Buist, K. A. (2020). Numerical study of bubble screens for mitigating salt intrusion 713 
+
+in sea locks. International Journal of Multiphase Flow , 129:103321. 714 
+
+O’Mahoney, T. S. D., Oldenziel, G., and Van Der Ven, P. (2024). The effect of bubble size 715 
+
+on lock-exchange density currents through bubble screens. Journal of Hydraulic Engineering ,716 
+
+150(3):04024006. 717 
+
+Paillat, S. and Kaminski, E. (2014). Entrainment in plane turbulent pure plumes. Journal of Fluid 718 
+
+Mechanics , 755:R2. 719 
+
+Prasad, V., Doyle, H. F., Suski, C. D., Jackson, P. R., George, A. E., Fischer, J. R., Stahlschmidt, 720 
+
+B. H., Herndon, A. M., and Tinoco, R. O. (2026). Controlling invasive carp ichthyoplankton dis-721 
+
+persion using a streamwise-oriented bubble screen: A proof-of-concept validation in a laboratory 722 
+
+flume. Journal of Great Lakes Research , page 102784. 723 
+
+Raaghav, S. K. R., Driessen, R. J. A., O’Mahoney, T. S. D., Uittenbogaard, R. E., Clercx, H. 724 
+
+J. H., and Duran-Matute, M. (2025). Bubble curtains in a lock-exchange flow: the importance 725 
+
+of transient dynamics in the curtain-driven regime. arXiv preprint arXiv:2511.23421 .726 
+
+Schiller, L. (1933). A drag coefficient correlation. Zeit. Ver. Deutsch. Ing. , 77:318–320. 727 
+
+Schladow, S. G. (1993). Lake destratification by bubble-plume systems: Design methodology. 728 
+
+Journal of Hydraulic Engineering , 119(3):350–368. 729 
+
+Shin, J. O., Dalziel, S. B., and Linden, P. F. (2004). Gravity currents produced by lock exchange. 730 
+
+Journal of Fluid Mechanics , 521:1–34. 731 
+
+Socolofsky, S. A. and Adams, E. E. (2003). Liquid volume fluxes in stratified multiphase plumes. 732 
+
+Journal of Hydraulic Engineering , 129(11):905–914. 733 
+
+Socolofsky, S. A. and Adams, E. E. (2005). Role of slip velocity in the behavior of stratified 734 
+
+multiphase plumes. Journal of Hydraulic Engineering , 131(4):273–282. 735 
+
+Spalding, D. B. (1971). Concentration fluctuations in a round turbulent free jet. Chemical Engi-736 
+
+neering Science , 26(1):95–107. 737 
+
+Tomiyama, A., Tamai, H., Zun, I., and Hosokawa, S. (2002). Transverse migration of single bubbles 738 
+
+in simple shear flows. Chemical Engineering Science , 57(11):1849–1858. 739 
+
+Van der Ven, P. P. D., O’Mahoney, T. S. D., and Weiler, O. M. (2018). Methods to assess bubble 740 
+
+25 July 2, 2026 Journal of Hydraulic Research Paper-2-Shravan-JHR 
+
+screens applied to mitigate salt intrusion through locks. In PIANC-World Congress Panama 741 
+
+City. Panama City , pages 1–7. 742 
+
+Wang, Y., Wu, J., Shui, B., Yang, J., and Wei, W. (2024). Particle dynamic behaviors in bubble 743 
+
+curtain barriers blocking the diffusion of sediment. European Journal of Mechanics-B/Fluids ,744 
+
+106:214–226. 745 
+
+Weiler, O., Vreeken, T., Maijvis, S., Zuiderwijk, N., and O’Mahoney, T. (2026). Quantification of 746 
+
+salt intrusion caused by navigation locks and their operation for policy analysis, water manage-747 
+
+ment or salt dispersion modelling. Journal of Coastal and Hydraulic Structures , 6. 748 
+
+Weller, H. G., Tabor, G., Jasak, H., and Fureby, C. (1998). A tensorial approach to computational 749 
+
+continuum mechanics using object-oriented techniques. Computers in physics , 12(6):620–631. 750 
+
+Wen, J. and Torrest, R. S. (1987). Aeration-induced circulation from line sources. i: Channel flows. 751 
+
+Journal of Environmental Engineering , 113(1):82–98. 752 
+
+W¨ ursig, B., Greene Jr, C. R., and Jefferson, T. A. (2000). Development of an air bubble curtain 753 
+
+to reduce underwater noise of percussive piling. Marine Environment Research , 49(1):79–93. 754 
+
+Yang, D., Chen, B., Socolofsky, s. A., Chamecki, M., and Meneveau, C. (2016). Large-eddy sim-755 
+
+ulation and parameterization of buoyant plume dynamics in stratified flow. Journal of Fluid 756 
+
+Mechanics , 794:798–833. 757 
+
+26
