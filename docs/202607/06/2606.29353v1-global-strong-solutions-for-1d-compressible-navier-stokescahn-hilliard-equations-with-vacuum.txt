@@ -1,0 +1,4655 @@
+Title: Global strong solutions for 1D compressible Navier-Stokes/Cahn-Hilliard equations with vacuum
+
+URL Source: https://arxiv.org/pdf/2606.29353v1
+
+Published Time: Tue, 30 Jun 2026 01:10:00 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NAVIER-STOKES/CAHN-HILLIARD EQUATIONS WITH VACUUM 
+
+SHIJIN DING, YINGHUA LI, YUANXIANG YAN*, AND HAORAN ZHENG 
+
+Abstract. In this paper, we study the initial-boundary value problem of the 1D compress-ible Navier–Stokes/Cahn–Hilliard system with vacuum. We establish the global existence and uniqueness of strong solutions to this initial-boundary value problem. No any initial compatibility conditions are required via time weighted techniques, which leads to a loss of regularity near the initial time. Therefore, the uniqueness of solutions obtained in this paper is even more challenging. To address this issue, we establish refined growth estimates and singular-in-time weighted energy estimates that induce a Gronwall-type structure, which ul-timately allows us to close the uniqueness proof in Eulerian coordinates without passing to Lagrangian coordinates. 
+
+1. Introduction 
+
+In this paper, we investigate the compressible Navier–Stokes/Cahn–Hilliard (NSCH) system, which describes a diffusive interface model for the two-phase flow of viscous fluids. The model considered here was first deduced by Lowengrub and Truskinovsky [35]. It has been modified and studied by Abels and Feireisl [2] in the following form 
+
+
+
+∂tρ + div( ρu) = 0 ,ρ∂ tu + ρu · ∇ u − div S + ∇p = − div 
+
+
+
+∇ϕ ⊗ ∇ ϕ − 12 |∇ ϕ|2I
+
+
+
+,ρ∂ tϕ + ρu · ∇ ϕ = ∆ μ, ρμ = −∆ϕ + ρ ∂f ∂ϕ .
+
+(1.1) Here, ρ, u, ϕ, and μ denote the total density, the mean velocity of the fluid mixture, the phase-field variable, and the chemical potential, respectively. The viscous stress tensor S satisfies 
+
+S = λ(ϕ)
+
+
+
+∇u + ∇⊤u − 23 div uI
+
+
+
++ η(ϕ) div uI.
+
+The functions λ(ϕ) > 0 and η(ϕ) ≥ 0 are the shear and bulk viscosities, respectively. The free energy density f takes the form 
+
+f (ρ, ϕ ) = ργ−1
+
+γ − 1 + Φ( ϕ), Φ( ϕ) = 14 (ϕ2 − 1) 2,
+
+and is related to the pressure through the isentropic equation of state p = ρ2 ∂f ∂ρ = ργ . Here Φ( ϕ) is also known as Landau potential [34]. 
+
+Date : June 30, 2026. 
+
+> ∗
+
+Corresponding author. 
+
+Keywords : Compressible Navier–Stokes; Cahn–Hilliard system; initial vacuum; strong solutions. 
+
+AMS Subject Classification : 35A01, 35A02, 35Q35, 76N10.  
+
+> 1
+> arXiv:2606.29353v1 [math.AP] 28 Jun 2026 2SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG
+
+In the special case of single phase fluid, i.e., ϕ = 1 or ϕ = −1. The system (1.1) reduces to Navier–Stokes equations. Let us recall about the results about Navier–Stokes equations with initial density vacuum. In the presence of vacuum, i.e., when the initial density vanishes on some region, there has been a number of works on the compressible Navier–Stokes equations since Lions [33] established the global existence of weak solutions for the isentropic case with the pressure law p = aρ γ where 
+
+a > 0 and the adiabatic exponent satisfies γ ≥ 95 . This result was subsequently extended by Feireisl, Novotn´ y, and Petzeltov´ a [19] to the range γ ≥ 32 , and further by Jiang and Zhang [27, 28] to the case γ > 1 under the additional assumptions of spherical symmetry or axisymmetry. For more recent developments, we refer to Bresch and Jabin [5], where more general stress tensors and pressure laws are allowed. In the context of the full compressible Navier–Stokes equations (including energy equation), Feireisl [17] proved global existence of weak solutions under certain structural assumptions on the viscous and heat-conductive coefficients as well as the equations of state. Nevertheless, the uniqueness of such weak solutions remains an open problem. For the uniqueness in the case involving vacuum, Salvi and Straˇ skraba [44] first proved the local existence and uniqueness of strong solutions to the isentropic compressible Navier–Stokes equations with suitably regular initial data and the following compatibility condition 
+
+−μ∆u0 − (μ + λ)∇div u0 − ∇ p(ρ0) = √ρ0g, (1.2) for some g ∈ L2. Since the work [44], the compatibility condition and its necessary modifications are widely used, as the standard assumptions, in many paper concerning the studies of the existence and uniqueness of strong solutions with initial vacuum allowed, see [8, 9, 10]. Later, Huang, Li and Xin [24] established a global-in-time existence result under a small initial energy assumption, see [20, 23, 25, 38, 46] for some further developments in this direction. Different from the multi-dimensional case, in the one-dimensional case, the global well posedness of strong solutions can be established for arbitrary large initial data, see [26, 31, 32]. In contrast to the well-developed theory for Navier–Stokes equations, available results for compressible NSCH systems are rather limited. A first compressible diffuse–interface model was proposed by Lowengrub and Truskinovsky [35]; see also [15] for recent extensions to N-phase mixtures. A simplified variant was later introduced by Abels and Feireisl [2], which corresponds precisely to system (1.1) considered in the present work. More recently, Elbar and Poulain [16] established the global-in-time existence of weak solutions to (1.1) with an additional friction term under the condition γ > 6, which was subsequently relaxed to γ > 32 by Basari´ c and Giorgini [4] for a Flory–Huggins (Boltzmann–Gibbs) type free energy. On the other hand, Kotschote and Zacher [29] proved the local-in-time existence and uniqueness of strong solutions to the model proposed in [35]. Further developments include the existence of global weak solutions with dynamic boundary conditions [6], the low Mach number limit [3, 40], the analysis of stationary problems in [36, 37]. Ding and Li [12] established global classical solution in the one-dimensional case without vacuum. For isentropic 1D compressible Navier-Stokes/Allen-Cahn (NSAC) system, Ding, Li and Luo [13] obtained global classical solution without vacuum. Later, this result was extended by Chen and Guo [7] to the vacuum case, under the following compatibility conditions 
+
+μu 0xx − p(ρ0)x − 12 (ϕ20x)x = ρ0g1, (1.3) 
+
+μ0 = ρ0g2, (1.4) for ( g1, g 2xx ) ∈ H1 × L2. Moreover, under the assumption of compatibility conditions simi-lar to (1.3) and (1.4), Chen and Zhu [11] further extended this result to the case where the viscosity is given μ(ρ) = 1 + ρα with 2 ≤ α ≤ γ. Meanwhile, Su [45] established the global existence and uniqueness of strong and classical solutions to 1D compressible NSAC system with GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 3
+
+density-dependent viscosity and obtained the large time behavior of the velocity. In the three-dimensional setting, Li, Zheng, and Zhou [41] established the local existence and uniqueness of strong solutions in the presence of vacuum, under the following compatibility condition on the initial phase-field variable: ∆ϕ0 = ρ0h, in Ω , (1.5) 
+
+∂nϕ0 = 0 , on ∂Ω, (1.6) for some h ∈ L2(Ω). It is worth pointing out that the compatibility condition (1.2) or its natural amendments play a crucial role in the well-posedness theories. Consequently, they have been accepted as standard assumptions for establishing the well-posedness of the compressible Navier–Stokes equations and related models in the presence of vacuum. One should note that these conditions impose restrictive constraints on the initial data, both in the vacuum region and in a neighborhood of the vacuum–nonvacuum interface. Indeed, by the compatibility condition (1.2), the initial velocity u0 is destined to obey 
+
+−μ∆u0 − (μ + λ)∇div u0 = 0 ,
+
+in the vacuum region, which however seem not physically relevant. Based on the above analysis, an alternative well-posedness theory that avoids any initial compatibility conditions such as (1.2) is both mathematically and physically importance. The first contribution in this direction was made by Li [30] for the inhomogeneous incompressible Navier–Stokes equations, where local well-posedness was successfully established without im-posing any compatibility conditions on the initial data. Further progress aimed at reducing the regularity requirements on the initial density can be found in Danchin and Mucha [14]. Sub-sequently, an analogous local well-posedness theory free of initial compatibility conditions was independently developed for the isentropic compressible Navier–Stokes equations by Gong et al. [21] and Huang [22]. For the full compressible Navier–Stokes equations, the local well-posedness theory was achieved by Lai, Xu and Zhang [42], where they removed the compatibility condition of u0 but still required compatibility condition of θ0. Later, Li and Zheng [43] extended this result to the case without any compatibility conditions on the initial data. For the inhomo-geneous incompressible NSAC system, the global existence of unique strong solutions to the 3D Cauchy problem and the initial boundary value problem is established by Li, Xie and Yan [39]. Here, the initial vacuum is allowed and no compatibility conditions are required for the initial data. However, for the compressible NSCH equations, to the best of our knowledge, the desired well-posedness theory without any compatibility conditions on the initial data has not been established. The aim of this paper is to establish the desired global well-posedness theory for 1D com-pressible NSCH system without any extra compatibility conditions beyond the essential smooth-ness conditions on the initial data. In one spatial dimension, the viscous stress reduces to 
+
+S = νeff (ϕ)ux, where νeff (ϕ) = 43 λ(ϕ) + η(ϕ) > 0. For simplicity, we assume νeff (ϕ) ≡ 1. Then the compressible NSCH system (1.1) in one dimension reduces to the following form 
+
+
+
+ρt + ( ρu )x = 0 ,ρu t + ρuu x + ( ργ )x = uxx − 12 (ϕ2
+
+> x
+
+)x,ρϕ t + ρuϕ x = μxx ,ρμ = −ϕxx + ρ(ϕ3 − ϕ),
+
+(1.7) for ( x, t ) ∈ (0 , 1) × (0 , T ). 4 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+The system (1.7) is supplemented with the boundary conditions (u, ϕ x, μ x) x=0 ,1 = (0 , 0, 0) , (1.8) and the initial conditions (ρ, ρu, ρϕ ) t=0 = ( ρ0, ρ 0u0, ρ 0ϕ0). (1.9) We emphasize that the initial density ρ0 ≥ 0 is allowed to vanish on an open subset of I; in other words, the presence of an initial vacuum is permitted. Before stating our main results, we first introduce some necessary notations used throughout this paper and state the definition of solutions to be established. For 1 ≤ p ≤ ∞ , we denote 
+
+
+
+I = (0 , 1) , Q T = I × [0 , T ] for T > 0,Lp = Lp(I), W k,p = W k,p (I), H k = W k, 2,
+
+∥(f1, f 2, · · · , f N )∥X = NP
+
+> i=1
+
+∥fi∥X .
+
+Without loss of generality, we assume throughout this paper that 
+
+Z
+
+> I
+
+ρ0(x)d x = 1 .
+
+The strong solutions to be established in this paper are defined as follows. 
+
+Definition 1.1. Given positive time T ∈ (0 , ∞). Assume that the initial data satisfy 
+
+0 ≤ ρ0 ∈ H1, u0 ∈ H10 , ϕ0 ∈ H1,
+
+and that ρ0 is not identically zero. A triple (ρ, u, ϕ ) is called a strong solution to the problem 
+
+(1.7) –(1.9) in I × (0 , T ), if it has the regularities 
+
+0 ≤ ρ ∈ L∞(0 , T ; H1), ρt ∈ L∞(0 , T ; L2),ρu ∈ C([0 , T ]; L2), u ∈ L∞(0 , T ; H10 ) ∩ L2(0 , T ; H2),
+
+√ρu t ∈ L2(0 , T ; L2), tu ∈ L∞(0 , T ; H2) ∩ L2(0 , T ; H3),
+
+√tu t ∈ L∞(0 , T ; H1), ϕ ∈ L∞(0 , T ; H1) ∩ L2(0 , T ; H2),ρϕ ∈ C([0 , T ]; L2), √tϕ xx ∈ L∞(0 , T ; H1),
+
+√tϕ t ∈ L∞(0 , T ; H1), tϕ xxt ∈ L2(0 , T ; L2),
+
+√tμ ∈ L∞(0 , T ; H1), μ ∈ L2(0 , T ; H1),tμ xx ∈ L∞(0 , T ; L2), tμ t ∈ L2(0 , T ; H1).
+
+satisfies equations (1.7) a.e. in I × (0 , T ), and fulfills the initial condition (1.9) .
+
+Remark 1.1. Thanks to ρu, ρϕ ∈ C([0 , T ]; L2), the initial values of ρu and ρϕ are well-defined. 
+
+The main result of this paper can be summarized as follows. 
+
+Theorem 1.1. Assume that the initial data satisfy 
+
+0 ≤ ρ0 ∈ H1, u0 ∈ H10 , ϕ0 ∈ H1,
+
+and that ρ0 is not identically zero. Then for any T > 0, there exists a unique global strong solution (ρ, u, ϕ ) to the problem (1.7) –(1.9) in I × (0 , T ).
+
+Remark 1.2. A notable feature of the present work is that no initial compatibility conditions are imposed on the data. By means of singular-in-time weighted energy estimates, we establish the global existence and uniqueness of strong solutions with vacuum. This approach is partly inspired by the time-weighted energy method in [43] .GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 5
+
+Remark 1.3. These assumptions on the initial value ϕ0 are weaker than those in [7, 11, 45] .In fact, ϕ0 ∈ H10 ∩ H2 was required in [7, 11, 45] , where the phase field variable ϕ is subject to Dirichlet boundary condition. In Theorem 1.1, we replace it with the Neumann boundary condition, which is more physically meaningful. 
+
+A fundamental difficulty remains largely open in the analysis of compressible NSCH systems, namely the presence of vacuum. From a mathematical point of view, vacuum regions cause degeneracy in the momentum equation, leading to a loss of coercivity and preventing the direct application of classical energy methods. Moreover, the strong coupling between the hydro-dynamic variables and the phase-field equation introduces additional nonlinear effects, which significantly complicate the derivation of higher-order a priori estimates. These challenges are particularly severe when seeking strong solutions that allow initial vacuum, even in one spatial dimension. Let us state the key ideas in our arguments. It is noted that in the previous literature [7, 11], the compressible Navier-Stokes/Allen-Cahn system with initial density vacuum was considered, where the phase field variable ϕ is subject to Dirichlet boundary condition. Such a boundary condition is adopted in order to overcome technical difficulties by applying the Poincar´ e inequality. Nevertheless, the Neumann boundary condition for ϕ is more physically meaningful. To address the challenges posed by the Neumann boundary condition, we establish the following inequality 
+
+∥∂it ϕ∥L∞ ≤ C∥√ρ∂ it ϕ∥L2 + C∥∂x∂it ϕ∥L2 , i = 0 , 1.
+
+Due to the difficulties caused by the low regularities and lack of compatibility conditions on the initial data, leading to weaker regularities of the solutions, the uniqueness of solutions obtained in the current paper is even more challenging. Our strategies of proving the uniqueness are illustrated as follows. Let ( ρ1, u 1, ϕ 1) and ( ρ2, u 2, ϕ 2) be two solutions with the same initial data and denote by ( ρ, u, ϕ ) their subtraction. Then, we have singular-in-time weighted energy estimates of the form 
+
+A(t) + 
+
+Z t
+
+> 0
+
+ ∥ρ∥2
+
+> L2
+
+t2 + ∥ux∥2 
+
+> L2
+
++ ∥μx∥2
+
+> L2
+
+
+
+(s)d s ≤ C
+
+Z t
+
+> 0
+
+B(s)A(s)d s, (1.10) where B(s) ∈ L1(0 , t ) and 
+
+A(t) := ∥ρ∥2
+
+> L2
+
+t + ∥√ρ1u∥2 
+
+> L2
+
++ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
+.
+
+Note that (1.10) meets the Gronwall type structure. It remains to guarantee that the quantity with singular weights A(t) tends to zero when approaching the initial time. Thus, one needs to show that the initial values of √ρ1u and √ρ1ϕ are identically zero. However, it is a subtle issue to verify this in the Euler coordinates, as the initial condition is ( ρ1u1, ρ 1ϕ1) t=0 = ( ρ2u2, ρ 2ϕ2) t=0 .Because of the technical challenges noted above, Li-Zheng [43] established the uniqueness ini-tially in Lagrangian coordinates and later convert it back to Eulerian coordinates. Comparing with [43], we establish the uniqueness in Eulerian coordinates rather than in Lagrangian coor-dinates. Besides, we need to additionally show that the higher-order term lim  
+
+> t→0
+
+∥ϕx∥2 
+
+> L2
+
+(t) = 0 . (1.11) Firstly, we can find that the continuity ϕx ∈ C([0 , T ]; L2) is not available, since the low reg-ularities of solutions, lack of compatibility conditions on the initial data, and the initial data 
+
+ρϕ t=0 = ρ0ϕ0. To establish (1.11), we consider the growth estimate of ∥ϕx∥2 
+
+> L2
+
+(t) and have the following observation 
+
+∥ϕx∥2 
+
+> L2
+
+(t) ≤ ∥ √ρ1ϕ∥L2 (t)∥√ρ1μ∥L2 (t) + O(t 12 ), (1.12) 6 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+Consequently, we proceed to establish the growth estimate ∥√ρ1ϕ∥L2 (t) ≤ Ct 12 . Moreover, we further show that 
+
+t 14 ∥√ρ1μ∥L2 (t) ≤ t 14 ∥μx∥L2 (t) + O(t 14 ) ≤ C. (1.13) From the above, we finally arrive at 
+
+∥ϕx∥2 
+
+> L2
+
+(t) ≤ Ct 14 , (1.14) which directly implies (1.11). For more details, see section 3 (Step 2. Growth estimate). The remainder of this paper is organized as follows. Section 2 is devoted to the derivation of a priori estimates. On this basis, the existence and uniqueness of Theorem 1.1 are established in Section 3. Throughout this paper, we use C, which may vary from place to place, to denote a generic constant that may depend on T but not on the lower bound of the density, unless we clearly specify. 2. A priori estimates 
+
+In this section, we derive a priori estimates for smooth solutions ( ρ, u, ϕ ) to system (1.7)–(1.9) on a finite time interval (0 , T ). The main goal is to obtain uniform bounds for the basic energy quantities and higher-order derivatives of the solution in the presence of vacuum. The estimates are obtained without imposing any initial compatibility conditions and rely on suitable time-weighted energy inequalities to handle the degeneracy induced by vanishing density. All the a priori bounds established in this section are summarized in Proposition 2.1, which serves as the foundation for the proof of global existence and uniqueness of strong solutions in Section 3. We begin by collecting several fundamental a priori estimates for smooth solutions ( ρ, u, ϕ )to system (1.7)–(1.9) on a finite time interval (0 , T ). These estimates are mostly available in the existing literature and are recalled here for completeness, as they constitute the analytical foundation of our subsequent arguments. 
+
+Lemma 2.1. (cf. Lemma 3.1 in [12]) Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+E(t) + 
+
+Z t
+
+> 0
+
+ ∥ux∥2 
+
+> L2
+
++ ∥μx∥2
+
+> L2
+
+ ds = E(0) , (2.1) 
+
+where 
+
+E(t) := 
+
+Z
+
+> I
+
+ ρu 2
+
+2 + ργ
+
+γ − 1 + ρ(ϕ2 − 1) 2
+
+4 + ϕ2
+
+> x
+
+2
+
+
+
+(x, t )d x. 
+
+Lemma 2.2. (cf. Lemma 3.2 in [12]) Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+sup 
+
+> 0≤t≤T
+
+Z
+
+> I
+
+ρϕ 2dx +
+
+Z T
+
+> 0
+
+Z
+
+> I
+
+
+
+ϕ2ϕ2 
+
+> x
+
++ 1
+
+ρ ϕ2
+
+> xx
+
+
+
+dxdt ≤ C(T ). (2.2) 
+
+Remark 2.1. Observing that ∥ϕ∥L∞(QT ) can not be controlled by ∥ϕx∥L∞(0 ,T ;L2), since ϕ sat-isfies Neumann boundary value condition. Consequently, an additional estimate is required to bound the concentration difference ϕ.
+
+Lemma 2.3. (cf. Lemma 2.2 in [7] or Lemma 3.4 in [12]) Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+∥ϕ∥L∞(QT ) ≤ C(T ). (2.3) GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 7
+
+Lemma 2.4. (cf. Lemma 2.3 in [7]) Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+∥ρ∥L∞(QT ) ≤ C(T ). (2.4) Based on the above results, we establish the following lemma, which is instrumental in the proof of the a priori estimates. 
+
+Lemma 2.5. Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+Z T
+
+> 0
+
+ ∥μ∥2 
+
+> L2
+
++ ∥ρ−1ϕxx ∥2 
+
+> L2
+
++ ∥ϕxx ∥2
+
+> L2
+
+ dt ≤ C(T ). (2.5) 
+
+Proof. Integrating (1.7) 4 over I and using the boundary value condition (1.8) yields 
+
+Z
+
+> I
+
+ρμ dx =
+
+Z
+
+> I
+
+ρ(ϕ3 − ϕ)d x ≤  ∥ϕ∥3 
+
+> L∞
+
++ ∥ϕ∥L∞
+
+ Z
+
+> I
+
+ρdx ≤ C. 
+
+Due to the above inequality, one has 
+
+|μ(x, t )| = μ(x, t )
+
+Z
+
+> I
+
+ρ(y, t )d y
+
+≤
+
+Z
+
+> I
+
+ρ(y, t ) ( μ(x, t ) − μ(y, t )) d y +
+
+Z
+
+> I
+
+ρ(y, t )μ(y, t )d y
+
+≤
+
+Z
+
+> I
+
+ρ(y, t )
+
+Z xy
+
+μξ (ξ, t )d ξ dy + C
+
+≤
+
+Z
+
+> I
+
+ρ(y, t )
+
+Z
+
+> I
+
+|μx|dxdy + C
+
+=
+
+Z
+
+> I
+
+|μx|dx + C ≤ ∥ μx∥L2 + C, (2.6) which together with (2.1) implies that 
+
+Z T
+
+> 0
+
+∥μ∥2 
+
+> L2
+
+dt ≤ C
+
+Z T
+
+> 0
+
+∥μ∥2 
+
+> L∞
+
+dt ≤ C
+
+Z T
+
+> 0
+
+ ∥μx∥2 
+
+> L2
+
++ 1  dt ≤ C. (2.7) It follows from (1.7) 4, (2.3) and (2.7) that 
+
+Z T
+
+> 0
+
+ρ−1ϕxx  
+
+> 2
+> L2
+
+dt ≤ C
+
+Z T
+
+> 0
+
+∥μ∥2 
+
+> L2
+
+dt + C
+
+Z T
+
+> 0
+
+∥ϕ3 − ϕ∥2 
+
+> L2
+
+dt ≤ C. (2.8) Combining with (2.7), (2.8) and (2.4) leads to Lemma 2.5. □
+
+Lemma 2.6. Let (ρ, u, ϕ ) be smooth solutions to (1.7) –(1.9) . Then 
+
+∥ϕt∥L∞ ≤ C∥√ρ ϕ t∥L2 + C∥ϕxt ∥L2 . (2.9) 
+
+Proof. The proof can be carried out in the same way as for (2.6) and is therefore omitted. □
+
+Lemma 2.7. Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+sup 
+
+> 0≤t≤T
+
+
+
+t ρ− 12 ϕxx 
+
+> 2
+> L2
+
+
+
++
+
+Z T
+
+> 0
+
+t∥√ρϕ t∥2 
+
+> L2
+
+dt ≤ C(T ). (2.10) 
+
+Proof. By integration by parts and (1.7) 4, we find 
+
+Z
+
+> I
+
+μxx ϕtdx =
+
+Z
+
+> I
+
+μϕ xxt dx =
+
+Z
+
+> I
+
+
+
+− 1
+
+ρ ϕxx + ( ϕ3 − ϕ)
+
+
+
+ϕxxt dx. (2.11) 8 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+Testing (1.7) 3 by ϕt, integrating over I and using (2.11), we have 12ddt
+
+Z
+
+> I
+
+1
+
+ρ ϕ2
+
+> xx
+
+dx +
+
+Z
+
+> I
+
+ρϕ 2 
+
+> t
+
+dx = ddt
+
+Z
+
+> I
+
+(ϕ3 − ϕ)ϕxx dx −
+
+Z
+
+> I
+
+(3 ϕ2 − 1) ϕtϕxx dx
+
++ 12
+
+Z
+
+> I
+
+ 1
+
+ρ
+
+
+
+> t
+
+ϕ2
+
+> xx
+
+dx −
+
+Z
+
+> I
+
+ρuϕ xϕtdx
+
+=: ddt
+
+Z
+
+> I
+
+(ϕ3 − ϕ)ϕxx dx +
+
+> 3
+
+X
+
+> i=1
+
+Ai. (2.12) We next estimate each term Ai as follows. Direct calculation shows that 
+
+A1 ≤ C(∥ϕ∥2 
+
+> L∞
+
++ 1) ∥√ρϕ t∥L2 ρ− 12 ϕxx L2 ≤ 14 ∥√ρϕ t∥2 
+
+> L2
+
++ C ρ− 12 ϕxx  
+
+> 2
+> L2
+
+,A3 ≤ C∥u∥L∞ ∥ϕx∥L2 ∥√ρϕ t∥L2 ≤ C∥ux∥L2 ∥√ρϕ t∥L2 ≤ 14 ∥√ρϕ t∥2 
+
+> L2
+
++ C∥ux∥2 
+
+> L2
+
+.
+
+As for A2, it follows from (1.7) 1 and (1.7) 4 that 
+
+A2 = 12
+
+Z
+
+> I
+
+1
+
+ρ2 (ρu )xϕ2
+
+> xx
+
+dx = − 12
+
+Z
+
+> I
+
+ 1
+
+ρ2
+
+
+
+> x
+
+ρuϕ 2
+
+> xx
+
+dx −
+
+Z
+
+> I
+
+1
+
+ρ ϕxxx uϕ xx dx
+
+=
+
+Z
+
+> I
+
+ρx
+
+ρ2 uϕ 2
+
+> xx
+
+dx +
+
+Z
+
+> I
+
+
+
+μx − (3 ϕ2 − 1) ϕx +
+
+ 1
+
+ρ
+
+
+
+> x
+
+ϕxx 
+
+
+
+uϕ xx dx
+
+=
+
+Z
+
+> I
+
+μx − (3 ϕ2 − 1) ϕx
+
+ uϕ xx dx
+
+≤ C∥u∥L∞ ρ− 12 ϕxx L2
+
+ ∥μx∥L2 + ∥3ϕ2 − 1∥L∞ ∥ϕx∥L2
+
+
+
+≤ C∥ux∥L2 ρ− 12 ϕxx L2
+
+(∥μx∥L2 + 1) 
+
+≤ C  ∥μx∥2 
+
+> L2
+
++ 1  + C∥ux∥2 
+
+> L2
+
+ρ− 12 ϕxx  
+
+> 2
+> L2
+
+.
+
+Substituting A1–A3 into (2.12) and multiplying (2.12) by t, we get ddt
+
+
+
+t ρ− 12 ϕxx 
+
+> 2
+> L2
+
+
+
++ t∥√ρϕ t∥2
+
+> L2
+
+≤ ddt
+
+
+
+t
+
+Z
+
+> I
+
+(ϕ3 − ϕ)ϕxx dx
+
+
+
++ ρ− 12 ϕxx  
+
+> 2
+> L2
+
+−
+
+Z
+
+> I
+
+(ϕ3 − ϕ)ϕxx dx
+
++ Ct  ∥μx∥2 
+
+> L2
+
++ ∥ux∥2 
+
+> L2
+
++ 1  + C(∥ux∥2 
+
+> L2
+
++ 1) 
+
+
+
+t ρ− 12 ϕxx 
+
+> 2
+> L2
+
+
+
+≤ ddt
+
+
+
+t
+
+Z
+
+> I
+
+(ϕ3 − ϕ)ϕxx dx
+
+
+
++ C(∥ux∥2 
+
+> L2
+
++ 1) 
+
+
+
+t ρ− 12 ϕxx 
+
+> 2
+> L2
+
+
+
++ C(T )
+
+
+
+∥μx∥2 
+
+> L2
+
++ ∥ux∥2 
+
+> L2
+
++ ρ−1ϕxx  
+
+> 2
+> L2
+
++ ∥ϕxx ∥2 
+
+> L2
+
++ 1 
+
+
+
+. (2.13) Integrating (2.13) over [0 , t ], using (2.1) and (2.5), we obtain 
+
+t ρ− 12 ϕxx 
+
+> 2
+> L2
+
++
+
+Z t
+
+> 0
+
+t∥√ρϕ t∥2 
+
+> L2
+
+ds
+
+≤t
+
+Z
+
+> I
+
+[( ϕ3 − ϕ)ϕxx ]( x, t )d x + C
+
+Z t
+
+> 0
+
+ ∥ux∥2 
+
+> L2
+
++ 1  
+
+s ρ− 12 ϕxx 
+
+> 2
+> L2
+
+
+
+ds + C
+
+≤ 12
+
+
+
+t ρ− 12 ϕxx 
+
+> 2
+> L2
+
+
+
++ C
+
+Z t
+
+> 0
+
+ ∥ux∥2 
+
+> L2
+
++ 1  
+
+s ρ− 12 ϕxx 
+
+> 2
+> L2
+
+
+
+ds + C, GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 9
+
+which, together with (2.1) and Gronwall’s inequality, implies Lemma 2.7. □
+
+Lemma 2.8. Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+sup 
+
+> 0≤t≤T
+
+∥ux∥2 
+
+> L2
+
++
+
+Z T
+
+> 0
+
+∥√ρu t∥2 
+
+> L2
+
+dt ≤ C(T ). (2.14) 
+
+Proof. Testing (1.7) 2 by ut and integrating over I by parts, one has 12ddt ∥ux∥2 
+
+> L2
+
++ ∥√ρu t∥2 
+
+> L2
+
+= ddt
+
+Z
+
+> I
+
+ργ uxdx −
+
+Z
+
+> I
+
+(ργ )tuxdx −
+
+Z
+
+> I
+
+ρuu xutdx −
+
+Z
+
+> I
+
+ϕxϕxx utdx
+
+=: ddt
+
+Z
+
+> I
+
+ργ uxdx +
+
+> 3
+
+X
+
+> i=1
+
+Bi (2.15) We next estimate each term Bi as follows. Firstly, using (1.7) 1, (2.1), (2.4) and integration by parts formula, one infers that 
+
+B1 =
+
+Z
+
+> I
+
+γρ γ−1(ρu )xuxdx =
+
+Z
+
+> I
+
+γρ γ u2
+
+> x
+
+dx +
+
+Z
+
+> I
+
+(ργ )xuu xdx
+
+= ( γ − 1) 
+
+Z
+
+> I
+
+ργ u2
+
+> x
+
+dx −
+
+Z
+
+> I
+
+ργ uu xx dx
+
+= ( γ − 1) 
+
+Z
+
+> I
+
+ργ u2
+
+> x
+
+dx −
+
+Z
+
+> I
+
+ργ u [ρu t + ρuu x + ϕxϕxx ] d x + 12
+
+Z
+
+> I
+
+ρ2γ uxdx
+
+≤ C∥ux∥2 
+
+> L2
+
++ C∥u∥L∞ (∥√ρu t∥L2 + ∥u∥L2 ∥ux∥L2 + ∥ϕx∥L2 ∥ϕxx ∥L2 ) + C∥ux∥L2
+
+≤ 16 ∥√ρu t∥2 
+
+> L2
+
++ C∥ux∥2 
+
+> L2
+
++ C  ∥ϕxx ∥2 
+
+> L2
+
++ 1  .
+
+Next, direct calculation shows that 
+
+B2 ≤ C∥u∥L∞ ∥ux∥L2 ∥√ρu t∥L2 ≤ 16 ∥√ρu t∥2 
+
+> L2
+
++ C∥ux∥4 
+
+> L2
+
+.
+
+Finally, it follows from (1.7) 4, (2.1) and (2.3) that 
+
+B3 =
+
+Z
+
+> I
+
+ ρμ − ρ(ϕ3 − ϕ) ϕxutdx
+
+≤ C  ∥μ∥L∞ + ∥ϕ3∥L∞ + ∥ϕ∥L∞
+
+ ∥ϕx∥L2 ∥√ρu t∥L2
+
+≤ C (∥μ∥H1 + 1) ∥√ρu t∥L2 ≤ 16 ∥√ρu t∥2 
+
+> L2
+
++ C∥μ∥2 
+
+> H1
+
++ C. 
+
+Substituting B1–B3 into (2.15), integrating it over [0 , t ] and using (2.1), (2.4) and (2.5), we arrive at 
+
+∥ux(t)∥2 
+
+> L2
+
++
+
+Z t
+
+> 0
+
+∥√ρu t∥2 
+
+> L2
+
+ds
+
+≤ ∥ ux(0) ∥2 
+
+> L2
+
+−
+
+Z
+
+> I
+
+(ργ ux)( x, 0)d x +
+
+Z
+
+> I
+
+ργ ux(x, t )d x
+
++ C
+
+Z t
+
+> 0
+
+∥ux∥2 
+
+> L2
+
+∥ux∥2 
+
+> L2
+
+ds + C
+
+≤ C(∥u0∥2 
+
+> H1
+
++ ∥ρ0∥γH1 + 1) + 12 ∥ux(t)∥2 
+
+> L2
+
++ C
+
+Z t
+
+> 0
+
+∥ux∥2 
+
+> L2
+
+∥ux∥2 
+
+> L2
+
+ds + C, 
+
+which, together with (2.1) and Gronwall’s inequality, completes the proof of Lemma 2.8. □10 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+Lemma 2.9. Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+sup 
+
+> 0≤t≤T
+
+ ∥ρx∥2 
+
+> L2
+
++ ∥ρt∥2
+
+> L2
+
+ +
+
+Z T
+
+> 0
+
+∥uxx ∥L2 dt ≤ C(T ). (2.16) 
+
+Proof. Differentiating (1.7) 1 with respect to x, testing the resultant equation by ρx, and then integrating over I by parts, we have 12ddt ∥ρx∥2 
+
+> L2
+
+= − 32
+
+Z
+
+> I
+
+ρ2
+
+> x
+
+uxdx −
+
+Z
+
+> I
+
+ρρ x [ρu t + ρuu x + ( ργ )x + ϕxϕxx ] d x
+
+≤ C∥ux∥L∞ ∥ρx∥2 
+
+> L2
+
++ C∥ρx∥L2 (∥√ρu t∥L2 + ∥u∥L∞ ∥ux∥L2 )+ C∥ρx∥L2 (∥ρx∥L2 + ∥ϕx∥L∞ ∥ϕxx ∥L2 )
+
+≤ C  ∥ux∥L∞ + ∥ϕxx ∥2 
+
+> L2
+
++ 1  ∥ρx∥2 
+
+> L2
+
++ C  ∥√ρu t∥2 
+
+> L2
+
++ ∥ϕxx ∥2 
+
+> L2
+
++ 1  . (2.17) To proceed, we note that 
+
+∥ux∥L∞ ≤ ∥ (ux − ργ )∥L∞ + ∥ργ ∥L∞
+
+≤ C∥(ux − ργ )∥L1 + C∥(ux − ργ )x∥L1 + C
+
+≤ C∥ρu t + ρuu x + ϕxϕxx ∥L1 + C
+
+≤ C (∥√ρu t∥L2 + ∥u∥L2 ∥ux∥L2 + ∥ϕx∥L2 ∥ϕxx ∥L2 + 1) 
+
+≤ C (∥√ρu t∥L2 + ∥ϕxx ∥L2 + 1) , (2.18) where we have used (2.1), (2.4), (2.14) and Sobolev inequality. Substituting (2.18) into (2.17), using (2.5), (2.14) and Gronwall’s inequality, one deduces sup 
+
+> 0≤t≤T
+
+∥ρx∥2 
+
+> L2
+
+≤ C. 
+
+This together with (1.7) 1, (2.4) and (2.14) shows sup 
+
+> 0≤t≤T
+
+∥ρt∥2 
+
+> L2
+
+≤ C. 
+
+It follows from (1.7) 2 that 
+
+Z T
+
+> 0
+
+∥uxx ∥L2 dt ≤ C
+
+Z T
+
+> 0
+
+(∥√ρu t∥L2 + ∥u∥L∞ ∥ux∥L2 + ∥ρx∥L2 + ∥ϕx∥L∞ ∥ϕxx ∥L2 ) d t (2.19) 
+
+≤ C
+
+Z T
+
+> 0
+
+ 1 + ∥√ρu t∥2 
+
+> L2
+
++ ∥ux∥2 
+
+> L2
+
++ ∥ρx∥2 
+
+> L2
+
++ ∥ϕxx ∥2
+
+> L2
+
+ dt ≤ C. (2.20) Thus, we complete the proof of Lemma 2.9. □
+
+Lemma 2.10. Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+sup 
+
+> 0≤t≤T
+
+ t∥μ∥2 
+
+> H1
+
++ t∥ϕxxx ∥2
+
+> L2
+
+ +
+
+Z T
+
+> 0
+
+
+
+t∥ϕt∥2 
+
+> H1
+
++ t 12 ∥√ρϕ t∥2
+
+> L2
+
+
+
+dt ≤ C(T ). (2.21) 
+
+Proof. Testing (1.7) 3 by −μt, using (1.7) 4 and integrating over I by parts, one has 12ddt ∥μx∥2 
+
+> L2
+
++ ∥ϕxt ∥2 
+
+> L2
+
+=
+
+Z
+
+> I
+
+ρϕ t
+
+ 1
+
+ρ
+
+
+
+> t
+
+ϕxx dx −
+
+Z
+
+> I
+
+(3 ϕ2 − 1) ρϕ 2 
+
+> t
+
+dx
+
++
+
+Z
+
+> I
+
+ρuϕ x
+
+ 1
+
+ρ ϕxx 
+
+
+
+> t
+
+dx −
+
+Z
+
+> I
+
+(3 ϕ2 − 1) ρuϕ xϕtdx
+
+=: 
+
+> 4
+
+X
+
+> i=1
+
+Gi. (2.22) GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 11 
+
+We now estimate each term on the right hand side of (2.22) as follows. Firstly, it follows from (2.16) and (2.9) that 
+
+G1 = −
+
+Z
+
+> I
+
+1
+
+ρ ρtϕtϕxx dx ≤ ∥ ϕt∥L∞ ∥ρ−1ϕxx ∥L2 ∥ρt∥L2
+
+≤ C∥ϕt∥H1 ∥ρ−1ϕxx ∥L2 ≤ C (∥√ρϕ t∥L2 + ∥ϕxt ∥L2 ) ∥ρ−1ϕxx ∥L2
+
+≤ 14 ∥ϕxt ∥2 
+
+> L2
+
++ C∥√ρϕ t∥2 
+
+> L2
+
++ C∥ρ−1ϕxx ∥2 
+
+> L2
+
+.
+
+Then, noting −(3 ϕ2 − 1) ≤ 1 and ρϕ 2 
+
+> t
+
+≥ 0, we have 
+
+G2 =
+
+Z
+
+> I
+
+−(3 ϕ2 − 1) ρϕ 2 
+
+> t
+
+dx ≤
+
+Z
+
+> I
+
+ρϕ 2 
+
+> t
+
+dx = ∥√ρϕ t∥2 
+
+> L2
+
+.
+
+Next, using integration by parts formula and (2.14), one has 
+
+G3 = −
+
+Z
+
+> I
+
+1
+
+ρ ρtuϕ xϕxx dx +
+
+Z
+
+> I
+
+uϕ xϕxxt dx
+
+= −
+
+Z
+
+> I
+
+1
+
+ρ ρtuϕ xϕxx dx −
+
+Z
+
+> I
+
+uxϕxϕxt dx −
+
+Z
+
+> I
+
+uϕ xx ϕxt dx
+
+≤ ∥ u∥L∞ ∥ϕx∥L∞ ∥ρ−1ϕxx ∥L2 ∥ρt∥L2 + ∥ux∥L2 ∥ϕx∥L∞ ∥ϕxt ∥L2
+
++ ∥u∥L∞ ∥ϕxx ∥L2 ∥ϕxt ∥L2
+
+≤ C∥ux∥L2 ∥ϕxx ∥L2 ∥ρ−1ϕxx ∥L2 + C∥ux∥L2 ∥ϕxx ∥L2 ∥ϕxt ∥L2
+
+≤ 14 ∥ϕxt ∥2 
+
+> L2
+
++ C∥ϕxx ∥2 
+
+> L2
+
++ C∥ρ−1ϕxx ∥2 
+
+> L2
+
+.
+
+Finally, due to (2.1), (2.14) and −(3 ϕ2 − 1) ≤ 1, there holds 
+
+G4 ≤
+
+Z
+
+> I
+
+ρuϕ xϕtdx ≤ C∥u∥L∞ ∥√ρϕ t∥L2 ∥ϕx∥L2
+
+≤ C∥ux∥L2 ∥√ρϕ t∥L2 ≤ C∥√ρϕ t∥2 
+
+> L2
+
++ C. 
+
+Substituting G1–G4 into (2.22), and then multiplying the result by t, yields ddt
+
+ t∥μx∥2
+
+> L2
+
+ + t∥ϕxt ∥2 
+
+> L2
+
+≤ ∥ μx∥2 
+
+> L2
+
++ Ct ∥√ρϕ t∥2 
+
+> L2
+
++ C(T )  ∥ϕxx ∥2 
+
+> L2
+
++ ∥ρ−1ϕxx ∥2 
+
+> L2
+
++ 1  .
+
+Integrating the above inequality over [0 , t ] and then using (2.5) and (2.10), we have sup 
+
+> 0≤t≤T
+
+ t∥μx∥2
+
+> L2
+
+ +
+
+Z T
+
+> 0
+
+t∥ϕxt ∥2 
+
+> L2
+
+dt ≤ C. (2.23) Thus, we obtain from (1.7) 3 that 
+
+Z T
+
+> 0
+
+t 12 ∥√ρϕ t∥2 
+
+> L2
+
+dt
+
+= −
+
+Z T
+
+> 0
+
+t 12
+
+Z
+
+> Ω
+
+ρuϕ xϕtdxdt −
+
+Z T
+
+> 0
+
+t 12
+
+Z
+
+> Ω
+
+μxϕxt dxdt
+
+≤ 12
+
+Z T
+
+> 0
+
+t 12 ∥√ρϕ t∥2 
+
+> L2
+
+dt + C
+
+Z T
+
+> 0
+
+t 12 ∥u∥2 
+
+> L∞
+
+∥ϕx∥2 
+
+> L2
+
+dt +
+
+Z T
+
+> 0
+
+∥μx∥2 
+
+> L2
+
+dt +
+
+Z T
+
+> 0
+
+t∥ϕxt ∥2 
+
+> L2
+
+dt
+
+≤ 12
+
+Z T
+
+> 0
+
+t 12 ∥√ρϕ t∥2 
+
+> L2
+
+dt + C(T ). (2.24) It follows from (1.7) 4, (2.1), (2.3), (2.4), (2.6), (2.16) and (2.23) that 
+
+√t∥ϕxxx ∥L2 ≤ √t∥ρx∥L2 ∥μ∥L∞ + √t∥ρ∥L∞ ∥μx∥L2 + C(T )∥ϕx∥L2 + C(T )∥ρx∥L2 ≤ C(T ).12 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+This, together with (2.6), (2.9), (2.23) and (2.24), completes the proof of Lemma 2.10. □
+
+Lemma 2.11. Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+sup 
+
+> 0≤t≤T
+
+ t2∥√ρϕ t∥2 
+
+> L2
+
++ t2∥ϕt∥2 
+
+> H1
+
++ t2∥μxx ∥2
+
+> L2
+
+ +
+
+Z T
+
+> 0
+
+t2  ∥μt∥2 
+
+> H1
+
++ ∥ϕxxt ∥2
+
+> L2
+
+ dt ≤ C(T ). (2.25) 
+
+Proof. The proof will be completed by several steps. 
+
+Step 1. Estimate for ∥√ρϕ t∥L2 .
+
+Differentiating (1.7) 3 with respect to t yields 
+
+ρϕ tt + ρtϕt + ρtuϕ x + ρu tϕx + ρuϕ xt = μxxt . (2.26) Testing (2.26) by ϕt, then integrating over I by parts, using (1.7) 1, we have 12ddt ∥√ρϕ t∥2 
+
+> L2
+
+= −2
+
+Z
+
+> I
+
+ρuϕ tϕxt dx +
+
+Z
+
+> I
+
+ρu xuϕ xϕtdx +
+
+Z
+
+> I
+
+ρxu2ϕxϕtdx
+
+−
+
+Z
+
+> I
+
+ρu tϕxϕtdx −
+
+Z
+
+> I
+
+μxt ϕxt dx
+
+≤ C∥u∥L∞ ∥√ρϕ t∥L2 ∥ϕxt ∥L2 + ∥u∥L∞ ∥ux∥L2 ∥√ρϕ t∥L2 ∥ϕx∥L∞
+
++ ∥ρx∥L2 ∥u∥2 
+
+> L∞
+
+∥ϕt∥L∞ ∥ϕx∥L2 + ∥μxt ∥L2 ∥ϕxt ∥L2
+
++ ∥√ρu t∥L2 ∥√ρϕ t∥L2 ∥ϕx∥L∞
+
+≤ 112 ∥μxt ∥2 
+
+> L2
+
++ C∥ϕxx ∥2
+
+> L2
+
+ ∥√ρϕ t∥2 
+
+> L2
+
++ ∥ϕxt ∥2
+
+> L2
+
+ + C∥√ρu t∥2 
+
+> L2
+
++ C, 
+
+which implies that 12ddt
+
+ t2∥√ρϕ t∥2
+
+> L2
+
+ ≤ 112 t2∥μxt ∥2 
+
+> L2
+
++ 2 t∥√ρϕ t∥2 
+
+> L2
+
++ C(T )∥√ρu t∥2 
+
+> L2
+
++ C(T )+ C∥ϕxx ∥2
+
+> L2
+
+ t2∥√ρϕ t∥2 
+
+> L2
+
++ t2∥ϕxt ∥2
+
+> L2
+
+ . (2.27) 
+
+Step 2. Estimate for ∥ϕxt ∥L2 .
+
+Differentiating (1.7) 4 with respect to t yields 
+
+ρμ t + ρtμ = −ϕxxt + ρt(ϕ3 − ϕ) + ρ(3 ϕ2 − 1) ϕt. (2.28) Testing (2.26) by μt, then integrating over I by parts, using (2.28), we get 12ddt ∥ϕxt ∥2 
+
+> L2
+
++ ∥μxt ∥2
+
+> L2
+
+= −
+
+Z
+
+> I
+
+ρtϕtμtdx −
+
+Z
+
+> I
+
+ρtuϕ xμtdx −
+
+Z
+
+> I
+
+ρu tϕxμtdx −
+
+Z
+
+> I
+
+ρuϕ xt μtdx
+
++
+
+Z
+
+> I
+
+ϕtt ρt[μ − (ϕ3 − ϕ)]d x −
+
+Z
+
+> I
+
+ϕtt ρ(3 ϕ2 − 1) ϕtdx
+
+=: 
+
+> 6
+
+X
+
+> i=1
+
+Hi. (2.29) We are going to estimate each term on the right hand side of (2.29) as follows. For i = 1 , · · · , 4, direct calculation shows that 
+
+H1 ≤ ∥ ρt∥L2 ∥ϕt∥L2 ∥μt∥L∞ ≤ ε∥μt∥2 
+
+> L∞
+
++ C  ∥√ρϕ t∥2 
+
+> L2
+
++ ∥ϕxt ∥2
+
+> L2
+
+ ,H2 ≤ ∥ ρt∥L2 ∥u∥L∞ ∥ϕx∥L2 ∥μt∥L∞ ≤ ε∥μt∥2 
+
+> L∞
+
++ C, H3 ≤ C∥√ρu t∥L2 ∥ϕx∥L2 ∥μt∥L∞ ≤ ε∥μt∥2 
+
+> L∞
+
++ C∥√ρu t∥2 
+
+> L2
+
+,GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 13 
+
+H4 ≤ C∥u∥L2 ∥ϕxt ∥L2 ∥μt∥L∞ ≤ ε∥μt∥2 
+
+> L∞
+
++ C∥ϕxt ∥2 
+
+> L2
+
+,
+
+where ε is sufficiently small and will be specified later. It follows from (1.7) 1 and integration by parts formula that 
+
+H5 = −
+
+Z
+
+> I
+
+ϕtt (ρu )x[μ − (ϕ3 − ϕ)]d x
+
+=
+
+Z
+
+> I
+
+ϕxtt ρu [μ − (ϕ3 − ϕ)]d x +
+
+Z
+
+> I
+
+ϕtt ρu [μx − (3 ϕ2 − 1) ϕx]d x
+
+= ddt
+
+Z
+
+> I
+
+ϕxt ρu [μ − (ϕ3 − ϕ)]d x −
+
+Z
+
+> I
+
+ϕxt ρtu[μ − (ϕ3 − ϕ)]d x
+
+−
+
+Z
+
+> I
+
+ϕxt ρu t[μ − (ϕ3 − ϕ)]d x −
+
+Z
+
+> I
+
+ϕxt ρu [μt − (3 ϕ2 − 1) ϕt]d x
+
++ ddt
+
+Z
+
+> I
+
+ϕtρu [μx − (3 ϕ2 − 1) ϕx]d x −
+
+Z
+
+> I
+
+ϕtρtu[μx − (3 ϕ2 − 1) ϕx]d x
+
+−
+
+Z
+
+> I
+
+ϕtρu t[μx − (3 ϕ2 − 1) ϕx]d x −
+
+Z
+
+> I
+
+ϕtρu [μxt − (3 ϕ2 − 1) ϕxt − 6ϕϕ tϕx]d x
+
+≤ ddt
+
+Z
+
+> I
+
+ϕxt ρu [μ − (ϕ3 − ϕ)]d x + ddt
+
+Z
+
+> I
+
+ϕtρu [μx − (3 ϕ2 − 1) ϕx]d x
+
++ C∥ϕxt ∥L2 (∥ρt∥L2 ∥u∥L∞ + ∥√ρu t∥L2 )  ∥μ∥L∞ + ∥ϕ3 − ϕ∥L∞
+
+
+
++ C∥ϕxt ∥L2 ∥u∥L2
+
+ ∥μt∥L∞ + ∥3ϕ2 − 1∥L∞ ∥ϕt∥L∞
+
+
+
++ C∥ϕt∥L∞ (∥ρt∥L2 ∥u∥L∞ + ∥√ρu t∥L2 )  ∥μx∥L2 + ∥3ϕ2 − 1∥L∞ ∥ϕx∥L2
+
+
+
++ C∥ϕt∥L∞ ∥u∥L2
+
+ ∥μxt ∥L2 + ∥3ϕ2 − 1∥L∞ ∥ϕxt ∥L2 + ∥ϕ∥L∞ ∥ϕx∥L2 ∥ϕt∥L∞
+
+
+
+≤ ddt
+
+Z
+
+> I
+
+ϕxt ρu [μ − (ϕ3 − ϕ)]d x + ddt
+
+Z
+
+> I
+
+ϕtρu [μx − (3 ϕ2 − 1) ϕx]d x + C∥μ∥2
+
+> H1
+
++ 16 ∥μxt ∥2 
+
+> L2
+
++ ε∥μt∥2 
+
+> L∞
+
++ C(1 + ∥√ρu t∥2 
+
+> L2
+
+)  ∥√ρϕ t∥2 
+
+> L2
+
++ ∥ϕxt ∥2
+
+> L2
+
+ + C. 
+
+Similarly, one has 
+
+H6 = − 12ddt
+
+Z
+
+> I
+
+ϕ2 
+
+> t
+
+ρ(3 ϕ2 − 1)d x − 12
+
+Z
+
+> I
+
+ϕ2 
+
+> t
+
+ρt(3 ϕ2 − 1)d x − 3
+
+Z
+
+> I
+
+ϕ3 
+
+> t
+
+ρϕ dx
+
+≤ − 12ddt
+
+Z
+
+> I
+
+ϕ2 
+
+> t
+
+ρ(3 ϕ2 − 1)d x + C∥ϕt∥2 
+
+> L∞
+
+∥ρt∥L2 ∥3ϕ2 − 1∥L2
+
++ C∥√ρϕ t∥2 
+
+> L2
+
+∥ϕt∥L∞ ∥ϕ∥L∞
+
+≤ − 12ddt
+
+Z
+
+> I
+
+ϕ2 
+
+> t
+
+ρ(3 ϕ2 − 1)d x + C  ∥√ρϕ t∥2 
+
+> L2
+
++ ∥ϕxt ∥2
+
+> L2
+
+
+
++ Ct ∥√ρϕ t∥4 
+
+> L2
+
++ Ct
+
+ ∥√ρϕ t∥2 
+
+> L2
+
++ ∥ϕxt ∥2
+
+> L2
+
+ .
+
+Substituting H1–H6 into (2.29), we arrive at 12ddt ∥ϕxt ∥2 
+
+> L2
+
++ ∥μxt ∥2
+
+> L2
+
+≤ ddt A(t) + 5 ε∥μt∥2 
+
+> L∞
+
++ 16 ∥μxt ∥2 
+
+> L2
+
++ C∥√ρu t∥2 
+
+> L2
+
++ Ct
+
+ ∥√ρϕ t∥2 
+
+> L2
+
++ ∥ϕxt ∥2
+
+> L2
+
+
+
++ C  1 + ∥√ρu t∥2 
+
+> L2
+
++ t∥√ρϕ t∥2
+
+> L2
+
+   ∥√ρϕ t∥2 
+
+> L2
+
++ ∥ϕxt ∥2
+
+> L2
+
+ + C∥μ∥2 
+
+> H1
+
++ C, (2.30) 14 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+where 
+
+A(t) := 
+
+Z
+
+> I
+
+ϕxt ρu [μ − (ϕ3 − ϕ)]d x
+
++
+
+Z
+
+> I
+
+ϕtρu [μx − (3 ϕ2 − 1) ϕx]d x − 12
+
+Z
+
+> I
+
+ϕ2 
+
+> t
+
+ρ(3 ϕ2 − 1)d x. (2.31) 
+
+Step 3. Estimate for ∥μt∥L∞ .
+
+In order to use Gronwall’s inequality for (2.30), we need to estimate ∥μt∥L∞ . Note that 
+
+Z
+
+> I
+
+ρμ tdx = −
+
+Z
+
+> I
+
+ρtμdx +
+
+Z
+
+> I
+
+ρt(ϕ3 − ϕ)d x +
+
+Z
+
+> I
+
+ρ(3 ϕ2 − 1) ϕtdx
+
+≤ ∥ ρt∥L2 ∥μ∥L2 + ∥ρt∥L2 ∥ϕ3 − ϕ∥L2 + C∥3ϕ2 − 1∥L2 ∥√ρϕ t∥L2
+
+≤ C∥√ρϕ t∥L2 + C∥μ∥L2 + C. 
+
+Thus, similar to (2.6), we have 
+
+∥μt∥L∞ ≤ ∥ μxt ∥L2 +
+
+Z
+
+> I
+
+ρμ tdx ≤ ∥ μxt ∥L2 + C∥√ρϕ t∥L2 + C∥μ∥L2 + C. (2.32) Putting (2.32) into (2.30), and then multiplying the result by t2, we obtain 12ddt
+
+ t2∥ϕxt ∥2
+
+> L2
+
+ + t2∥μxt ∥2
+
+> L2
+
+≤ ddt
+
+ t2A(t) − 2tA(t) + 5 εt 2∥μxt ∥2 
+
+> L2
+
++ 16 t2∥μxt ∥2
+
+> L2
+
++ C(T )  1 + ∥√ρu t∥2 
+
+> L2
+
++ ∥μ∥2 
+
+> H1
+
++ t∥√ρϕ t∥2 
+
+> L2
+
++ t∥ϕxt ∥2
+
+> L2
+
+
+
++ C  1 + ∥√ρu t∥2 
+
+> L2
+
++ t∥√ρϕ t∥2
+
+> L2
+
+   t2∥√ρϕ t∥2 
+
+> L2
+
++ t2∥ϕxt ∥2
+
+> L2
+
+ . (2.33) 
+
+Step 4. Closure of the estimates. 
+
+Multiplying (2.27) by 2, adding the result to (2.33), substituting (2.32) into (2.30), choosing 
+
+ε sufficiently small such that 5 ε < 1/6, we have 
+
+t2∥√ρϕ t∥2 
+
+> L2
+
++ 12 t2∥ϕxt ∥2 
+
+> L2
+
++ 12
+
+Z t
+
+> 0
+
+s2∥μxt ∥2 
+
+> L2
+
+ds
+
+≤t2A(t) − 2
+
+Z t
+
+> 0
+
+sA(s)d s + C(T )+ C
+
+Z t
+
+> 0
+
+ 1 + ∥ϕxx ∥2 
+
+> L2
+
++ ∥√ρu t∥2 
+
+> L2
+
++ s∥√ρϕ t∥2
+
+> L2
+
+   s2∥√ρϕ t∥2 
+
+> L2
+
++ s2∥ϕxt ∥2
+
+> L2
+
+ (s)d s. (2.34) Note that −(3 ϕ2 − 1) ≤ 1. Hence, using (2.1), (2.3), (2.14) and (2.21), one has 
+
+A(t) ≤ 12 ∥√ρϕ t∥2 
+
+> L2
+
++
+
+Z
+
+> I
+
+ϕxt ρu [μ − (ϕ3 − ϕ)]d x +
+
+Z
+
+> I
+
+ϕtρu [μx − (3 ϕ2 − 1) ϕx]d x
+
+≤ 34 ∥√ρϕ t∥2 
+
+> L2
+
++ 14 ∥ϕxt ∥2 
+
+> L2
+
++ C∥u∥2
+
+> L∞
+
+ ∥μ∥2 
+
+> H1
+
++ ∥ϕ3 − ϕ∥2 
+
+> L2
+
++ ∥3ϕ2 − 1∥2 
+
+> L∞
+
+∥ϕx∥2
+
+> L2
+
+
+
+≤ 34 ∥√ρϕ t∥2 
+
+> L2
+
++ 14 ∥ϕxt ∥2 
+
+> L2
+
++ C∥μ∥2 
+
+> H1
+
++ C. (2.35) Substituting (2.35) into (2.34), using Gronwall’s inequality and (2.32), then utilizing (2.9), as well as using (1.7) 3,4, we complete the proof of Lemma 2.11. □
+
+Lemma 2.12. Let (ρ, u, ϕ ) be the smooth solutions to (1.7) –(1.9) , then it holds that 
+
+sup 
+
+> 0≤t≤T
+
+ t∥√ρu t∥2 
+
+> L2
+
++ t∥uxx ∥2
+
+> L2
+
+ +
+
+Z T
+
+> 0
+
+(t∥ut∥2 
+
+> H1
+
++ t2∥uxxx ∥2 
+
+> L2
+
+)d t ≤ C(T ). (2.36) GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 15 
+
+Proof. Differentiating (1.7) 2 with respect to t and testing the result by ut, then integrating over I by parts, we have 12ddt ∥√ρu t∥2 
+
+> L2
+
++ ∥uxt ∥2
+
+> L2
+
+= − 2
+
+Z
+
+> I
+
+ρuu tuxt dx −
+
+Z
+
+> I
+
+ρuu 2
+
+> x
+
+utdx −
+
+Z
+
+> I
+
+ρu 2uxx utdx −
+
+Z
+
+> I
+
+ρu 2uxuxt dx
+
+−
+
+Z
+
+> I
+
+ρu xu2 
+
+> t
+
+dx − γ
+
+Z
+
+> I
+
+ργ uxuxt dx − γ
+
+Z
+
+> I
+
+ργ−1ρxuu xt dx +
+
+Z
+
+> I
+
+ϕxϕxt uxt dx
+
+≤C∥u∥L∞ ∥√ρu t∥L2 ∥uxt ∥L2 + C∥u∥L∞ ∥ux∥2 
+
+> L4
+
+∥√ρu t∥L2
+
++ C∥u∥2 
+
+> L∞
+
+(∥uxx ∥L2 ∥√ρu t∥L2 + ∥ux∥L2 ∥uxt ∥L2 ) + C∥ux∥L∞ ∥√ρu t∥2
+
+> L2
+
++ C∥ux∥L2 ∥uxt ∥L2 + C∥u∥L∞ ∥ρx∥L2 ∥uxt ∥L2 +
+
+Z
+
+> I
+
+ϕxϕxt uxt dx
+
+≤ 14 ∥uxt ∥2 
+
+> L2
+
++ C  ∥√ρu t∥2 
+
+> L2
+
++ 1  ∥√ρu t∥2 
+
+> L2
+
++ C∥uxx ∥2 
+
+> L2
+
++ C +
+
+Z
+
+> I
+
+ϕxϕxt uxt dx. (2.37) It follows from (1.7) 2 that 
+
+∥uxx ∥2 
+
+> L2
+
+≤ C∥√ρu t∥2 
+
+> L2
+
++ C∥ϕxx ∥2 
+
+> H1
+
++ C. (2.38) We are going to estimate the last term on the right hand side of (2.37). Using integration by parts formula yields 
+
+Z
+
+> I
+
+ϕxϕxt uxt dx = −
+
+Z
+
+> I
+
+ϕxx ϕxt utdx −
+
+Z
+
+> I
+
+ϕxϕxxt utdx =: J1 + J2. (2.39) For J1, it follows from (1.7) 4 that 
+
+J1 =
+
+Z
+
+> I
+
+ μ − (ϕ3 − ϕ) ϕxt ρu tdx
+
+≤ C  ∥μ∥L∞ + ∥ϕ3 − ϕ∥L∞
+
+ ∥ϕxt ∥L2 ∥√ρu t∥L2
+
+≤ C  ∥μ∥2 
+
+> H1
+
++ 1  ∥√ρu t∥2 
+
+> L2
+
++ C∥ϕxt ∥2 
+
+> L2
+
+. (2.40) For J2, it also follows from (1.7) 4 that 
+
+J2 =
+
+Z
+
+> I
+
+ ρtμ + ρμ t − ρt(ϕ3 − ϕ) − ρ(3 ϕ2 − 1) ϕt
+
+ ϕxutdx
+
+≤ ∥ ρt∥L2 ∥ϕx∥L2 ∥ut∥L∞
+
+ ∥μ∥L∞ + ∥ϕ3 − ϕ∥L∞
+
+
+
++ C∥√ρu t∥L2 ∥ϕx∥L2
+
+ ∥μt∥L∞ + ∥3ϕ2 − 1∥L∞ ∥ϕt∥L∞
+
+
+
+≤ C∥uxt ∥L2 (∥μ∥H1 + 1) + C∥√ρu t∥L2 (∥μxt ∥L2 + ∥√ρϕ t∥L2 + C + ∥ϕt∥H1 )
+
+≤ 14 ∥uxt ∥2 
+
+> L2
+
++ C  ∥μ∥2 
+
+> H1
+
++ 1  + Ct −1∥√ρu t∥2
+
+> L2
+
++ Ct  ∥μxt ∥2 
+
+> L2
+
++ ∥√ρϕ t∥2 
+
+> L2
+
++ C + ∥ϕt∥2
+
+> H1
+
+ . (2.41) Combining (2.38)-(2.41) with (2.37), then multiplying the result by t and using (2.21), one obtains 12ddt
+
+ t∥√ρu t∥2
+
+> L2
+
+ + t∥uxt ∥2
+
+> L2
+
+≤ C∥√ρu t∥2 
+
+> L2
+
++ C  ∥√ρu t∥2 
+
+> L2
+
++ ∥μ∥2 
+
+> H1
+
++ 1  t∥√ρu t∥2
+
+> L2
+
++ Ct ∥μ∥2 
+
+> H1
+
++ Ct ∥ϕxx ∥2 
+
+> H1
+
++ Ct ∥ϕt∥2 
+
+> H1
+
++ Ct ∥√ρϕ t∥2 
+
+> L2
+
++ Ct 2∥μxt ∥2 
+
+> L2
+
++ C(T ). (2.42) Thanks to (2.1), (2.5), (2.10), (2.14), (2.21) and (2.25), using Gronwall’s inequality to (2.42), and then using Poincar´ e’s inequality, (2.38) and (1.7) 2, we complete the proof of Lemma 2.12. □16 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+Finally, as a consequence of Lemmas 2.1–2.12, we obtain the following a priori estimates .
+
+Proposition 2.1. Assume that (ρ, u, ϕ ) are smooth solutions to (1.7) –(1.9) , then there exists a generic constant C depending on the initial data and T , such that 
+
+sup 
+
+> 0≤t≤T
+
+ ∥(ρ, ϕ )∥2 
+
+> H1
+
++ ∥(√ρu, ρ t, u x)∥2
+
+> L2
+
+
+
++
+
+Z T
+
+> 0
+
+ ∥μ∥2 
+
+> H1
+
++ ∥(uxx , ϕ xx , √ρu t)∥2
+
+> L2
+
+ dt ≤ C, (2.43) 
+
+and 
+
+sup 
+
+> 0≤t≤T
+
+
+
+∥(√tϕ xx , √tϕ xxx , √t√ρu t, √tu xx , t √ρϕ t, tμ xx )∥2 
+
+> L2
+
++ ∥(√tμ, tϕ t)∥2
+
+> H1
+
+
+
++
+
+Z T
+
+> 0
+
+
+
+∥(√tϕ t, tμ t, tϕ xt , √tu t)∥2 
+
+> H1
+
++ ∥(t 14 √ρϕ t, tu xxx )∥2
+
+> L2
+
+
+
+dt ≤ C. (2.44) 3. Existence And Uniqueness 
+
+In this section, we will prove Theorem 1.1. In order to prove Theorem 1.1, we start with the following global well-posedness for the case of positive initial densities, which can be proved in the same way as in [12, Theorem 1]. 
+
+Proposition 3.1. Let ρ0 ∈ C3,α (I) satisfies 0 < ρ ≤ ρ0 ≤ ¯ρ for some constants α ∈ (0 , 1) , ρ 
+
+and ¯ρ, u0 ∈ C3,α (I) with u0(0) = u0(1) = 0 and ϕ0 ∈ C4,α (I). Then the problem (1.7) –(1.9) 
+
+admits a unique classical solution (ρ, u, ϕ ) satisfying that, for any T > 0, there exists a constant 
+
+C = C(ρ, ¯ρ, T ) > 0 such that 
+
+(ρxxx , ρ xxt ) ∈ C α   
+
+> 2,α
+> 4
+
+(QT ), 0 < C −1 ≤ ρ ≤ C on Q T ,ux ∈ C2+ α   
+
+> 2,1+ α
+> 4
+
+(QT ), ϕ ∈ C4+ α   
+
+> 2,1+ α
+> 4
+
+(QT ).
+
+Based on the a priori estimates derived in the Section 2, which is independent of the lower bound of ρ0, we can extend the global well-posedness obtained in Proposition 3.1 to the case where the initial density is allowed to vacuum. We are now ready to give the proof of Theorem 1.1. 
+
+Proof of Theorem 1.1. (i) Existence. The proof of existence will be completed by several steps. 
+
+Step 1. Construction of the initial data. Recall the initial data satisfy 0 ≤ ρ0 ∈ H1(I), u0 ∈ H10 (I), ϕ0 ∈ H1(I).
+
+Choose nonnegative smooth functions rn ∈ C∞( ¯I) such that rn → ρ0 in H1(I), and then set 
+
+ρ0n = rn + n−1
+
+R 
+
+> I
+
+(rn + n−1) d x .
+
+By the standard density argument, there exist sequences 
+
+ρ0n ∈ C∞( ¯I), u0n ∈ C∞ 
+
+> c
+
+(I), ϕ0n ∈ C∞( ¯I),
+
+such that 
+
+ρ0n > 0,
+
+Z
+
+> I
+
+ρ0n dx = 1 ,
+
+and 
+
+ρ0n → ρ0, u0n → u0, ϕ0n → ϕ0 in H1(I).
+
+In addition, there exists a constant C > 0, such that 
+
+∥ρ0n∥C3,α + ∥u0n∥C3,α + ∥ϕ0n∥C4,α ≤ C. GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 17 
+
+Step 2. Approximate solutions and convergence. 
+
+By Proposition 3.1, for each n ∈ N, there exists a unique global classical solution ( ρn, u n, ϕ n)to problem (1.7)–(1.9) corresponding to the initial data ( ρ0n, u 0n, ϕ 0n). From Proposition 2.1, there are two positive constants T and C independent of n, such that the solution ( ρn, u n, ϕ n)satisfying the following a priori estimates sup 
+
+> 0≤t≤T
+
+ ∥(ρn, ϕ n)∥2 
+
+> H1
+
++ ∥(√ρnun, ρ nt , u nx )∥2
+
+> L2
+
+
+
++
+
+Z T
+
+> 0
+
+ ∥μn∥2 
+
+> H1
+
++ ∥(unxx , ϕ nxx , √ρnunt )∥2
+
+> L2
+
+ dt ≤ C, (3.1) and sup 
+
+> 0≤t≤T
+
+
+
+∥(√tϕ nxx , √tϕ nxxx , √t√ρnunt , t √ρnϕnt , tϕ nxt , tμ nxx )∥2 
+
+> L2
+
++ ∥√tμ n∥2
+
+> H1
+
+
+
++
+
+Z T
+
+> 0
+
+
+
+∥(√tϕ nt , tμ nt , tϕ xt , √tu nt )∥2 
+
+> H1
+
++ ∥(t 14 √ρnϕnt , tu nxxx )∥2
+
+> L2
+
+
+
+dt ≤ C. (3.2) Thus, by the Banach-Alaoglu theorem and using the Cantor’s diagonal arguments, there is a subsequence, still denoted by ( ρn, u n, ϕ n, μ n), such that, as n → ∞ , we have for any δ ∈ (0 , T )
+
+ρn
+
+> ∗
+
+⇀ ρ in L∞(0 , T ; H1), ρnt 
+
+> ∗
+
+⇀ ρ t in L∞(0 , T ; L2), (3.3) 
+
+un
+
+> ∗
+
+⇀ u in L∞(0 , T ; H10 ), unt ⇀ u t in L2(δ, T ; H2), (3.4) 
+
+ϕn
+
+> ∗
+
+⇀ ϕ in L∞(0 , T ; H1), ϕnt ⇀ ϕ t in L2(δ, T ; H1), (3.5) 
+
+un ⇀ u in L2(0 , T ; H2), ϕn ⇀ ϕ in L2(0 , T ; H2), (3.6) 
+
+μn ⇀ μ in L2(0 , T ; H1), tμ tn ⇀ tμ t in L2(0 , T ; H1), (3.7) and ( ρ, u, ϕ ) satisfying 
+
+ρ ∈ L∞(0 , T ; H1), ρt ∈ L∞(0 , T ; L2), (3.8) 
+
+u ∈ L∞(0 , T ; H10 ) ∩ L2(0 , T ; H2), √ρu t ∈ L2(0 , T ; L2), (3.9) 
+
+tu ∈ L∞(0 , T ; H2) ∩ L2(0 , T ; H3), √tu t ∈ L∞(0 , T ; H1), (3.10) 
+
+ϕ ∈ L∞(0 , T ; H1) ∩ L2(0 , T ; H2), √tϕ xx ∈ L∞(0 , T ; H1), (3.11) 
+
+√tϕ t ∈ L∞(0 , T ; H1), tϕ xxt ∈ L2(0 , T ; L2) (3.12) 
+
+√tμ ∈ L∞(0 , T ; H1), μ ∈ L2(0 , T ; H1), (3.13) 
+
+tμ xx ∈ L∞(0 , T ; L2), tμ t ∈ L2(0 , T ; H1). (3.14) In addition, since H1(I) ,→,→ C( ¯I) and H2(I) ,→,→ H1(I) ,→,→ L2(I), it follows from Aubin-Lions lemma and (3.3)–(3.7) that 
+
+ρn → ρ, in C([0 , T ]; C), (3.15) 
+
+un → u, in C([ δ, T ]; L2) ∩ L2(δ, T ; H10 ), (3.16) 
+
+ϕn → ϕ, in C([ δ, T ]; L2) ∩ L2(δ, T ; H1). (3.17) Due to the convergence (3.3)–(3.7) and (3.15)–(3.17), we have the convergence of the nonlinear terms as follows (ρnun, √ρnun, ρ nϕn, √ρnϕn) → (ρu, √ρu, ρϕ, √ρϕ ), in C([ δ, T ]; L2), (3.18) (ρnunt , √ρnunt , ρ nϕnt , √ρnϕnt ) ⇀ (ρu t, √ρu t, ρϕ t, √ρϕ t), in L2(δ, T ; L2), (3.19) (ρnununx , ρ nunϕnx ) → (ρuu x, ρuϕ x), in L1(( δ, T ) × I), (3.20) 18 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+ϕnx ϕnxx ⇀ ϕ xϕxx , in L1(( δ, T ) × I), (3.21) 
+
+ρnunx → ρu x, in L2(( δ, T ) × I), (3.22) 
+
+ρnx un → ρxu, in C([ δ, T ]; L1), (3.23) for any δ ∈ (0 , T ). 
+
+Step 3. The existence. 
+
+With the convergence (3.3)–(3.7) and (3.15)–(3.23) at hand, we take the limit as n → ∞ 
+
+to the equations of ( ρn, u n, ϕ n) to show that ( ρ, u, ϕ ) satisfies equations (1.7) in the sense of distribution. Thanks to the regularities (3.8)–(3.14), one can further show that ( ρ, u, ϕ ) satisfies (1.7), a.e. in I × (0 , T ). The initial condition ρ|t=0 = ρ0 is guaranteed by (3.15) by recalling that ρn|t=0 = η1/n ∗ ρ0 + 1 
+
+> n
+
+.It remains to prove ( ρu, ρϕ )|t=0 = ( ρ0u0, ρ 0ϕ0). Note that ρu ∈ C((0 , T ]; L2) and ρϕ ∈
+
+C((0 , T ]; L2), we only need to show that 
+
+ρu → ρ0u0, in L2, as t → 0, (3.24) 
+
+ρϕ → ρ0ϕ0, in L2, as t → 0. (3.25) Using (3.1) and Holder inequality yields 
+
+Z T
+
+> 0
+
+∥(ρnun)t∥2 
+
+> L2
+
+dt ≤ 2
+
+Z T
+
+> 0
+
+ ∥ρnt un∥2 
+
+> L2
+
++ ∥ρnunt ∥2
+
+> L2
+
+ dt
+
+≤ C
+
+Z T
+
+> 0
+
+ ∥ρnt ∥2 
+
+> L2
+
+∥un∥2 
+
+> L∞
+
++ ∥√ρnunt ∥2
+
+> L2
+
+ dt ≤ C, (3.26) for sufficiently large n. Consequently, it follows from the Newton-Leibnitz formula, the Minkowski inequality that 
+
+∥ρu (·, t ) − ρ0u0∥L2 ≤∥ ρu − ρnun∥L2 (t) + ∥ρnun(·, t ) − ρ0nu0n∥L2
+
++ ∥ρ0nu0n − ρ0nu0∥L2 + ∥ρ0nu0 − ρ0u0∥L2
+
+≤∥ ρu − ρnun∥L2 (t) + 
+
+Z t
+
+> 0
+
+∥(ρnun)t∥L2 ds
+
++ ∥ρ0n∥L∞ ∥u0n − u0∥L2 + Cn ∥u0∥L2
+
+≤∥ ρu − ρnun∥L2 (t) + C√t + C∥u0n − u0∥L2 + Cn ∥u0∥L2 , (3.27) for sufficiently large n. Recalling (3.18) and the convergence u0n → u0 in H1 as n → ∞ , we may pass to the limit in (3.27) to conclude that 
+
+∥ρu (·, t ) − ρ0u0∥L2 ≤ C√t, 
+
+which proves (3.24). Using (3.2) and Holder inequality yields 
+
+Z T
+
+> 0
+
+t 12 ∥(ρnϕn)t∥2 
+
+> L2
+
+dt ≤ 2
+
+Z T
+
+> 0
+
+t 12
+
+ ∥ρnt ϕn∥2 
+
+> L2
+
++ ∥ρnϕnt ∥2
+
+> L2
+
+ dt
+
+≤ C
+
+Z T
+
+> 0
+
+t 12
+
+ ∥ρnt ∥2 
+
+> L2
+
+∥ϕn∥2 
+
+> L∞
+
++ ∥√ρnϕnt ∥2
+
+> L2
+
+ dt ≤ C, (3.28) for large n. Similar to (3.27), we have 
+
+∥ρϕ (·, t ) − ρ0ϕ0∥L2 ≤∥ ρϕ − ρnϕn∥L2 (t) + ∥ρ0n∥L∞ ∥ϕ0n − ϕ0∥L2 + Cn ∥ϕ0∥L2GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 19 
+
++
+
+Z t
+
+> 0
+
+s− 12 ds
+
+ 12 Z t
+
+> 0
+
+
+
+s 14 ∥(ρnϕn)t∥L2
+
+2
+
+ds
+
+ 12
+
+≤∥ ρϕ − ρnϕn∥L2 (t) + Ct 14 + C∥ϕ0n − ϕ0∥L2 + Cn ∥ϕ0∥L2 , (3.29) for large n. Noting (3.18) and ϕ0n → ϕ0 in L2 as n → ∞ , we obtain by taking n → ∞ that 
+
+∥ρϕ (·, t ) − ρ0ϕ0∥L2 ≤ Ct 14 , which indicates (3.25). (ii) Uniqueness. Let ( ρi, u i, ϕ i)( i = 1 , 2) be two solutions to the problem (1.7) obtained above. Denote ρ = ρ1 − ρ2, u = u1 − u2, ϕ = ϕ1 − ϕ2 and μ = μ1 − μ2. Then ( ρ, u, ϕ ) satisfies the following equations 
+
+
+
+ρt + ( ρu 1)x + ( ρ2u)x = 0 ,ρ1ut − uxx = −ρu 2t − ρ1u1ux − ρ1uu 2x − ρu 2u2x
+
+−(ργ 
+
+> 1
+
+− ργ 
+
+> 2
+
+)x − ϕ1xϕxx − ϕxϕ2xx ,ρ1ϕt + ρ1u1ϕx = μxx − ρϕ 2t − ρu 2ϕ2x − ρ1uϕ 2x,ρ1μ = −ϕxx + ρ1(ϕ21 + ϕ1ϕ2 + ϕ22 − 1) ϕ + ρ(ϕ32 − ϕ2) − ρμ 2,
+
+(3.30) subject to the boundary value condition (u, ϕ x, μ x) x=0 ,1
+
+= (0 , 0, 0) . (3.31) It follows from the Holder and Poincare inequalities that 
+
+∥√ρ1u∥2 
+
+> L2
+
+(t) = 
+
+Z
+
+> I
+
+ρ1|u|2(x, t )d x ≤ ∥ ρ1u∥L2 (t)∥u∥L2 (t)
+
+≤ C ∥ρ1u1 − ρ2u2∥L2 (t) + ∥(ρ1 − ρ2)u2∥L2 (t)
+
+≤ C ∥ρ1u1 − ρ2u2∥L2 (t) + ∥ρ1 − ρ2∥L2 (t)∥∇ u2∥L2 (t)
+
+≤ C ∥ρ1u1 − ρ2u2∥L2 (t) + ∥ρ1 − ρ2∥L2 (t), (3.32) for every t > 0. Note that ρ1(x, 0) = ρ2(x, 0) and ( ρ1u1)( x, 0) = ( ρ2u2)( x, 0). Therefore, let 
+
+t → 0, we deduce from (3.32) that lim  
+
+> t→0
+
+∥√ρ1u∥2 
+
+> L2
+
+(t) = 0 . (3.33) Similar to (3.32), due to ∇ϕ2 ∈ L∞(0 , T ; L2), we also have lim  
+
+> t→0
+
+∥√ρ1ϕ∥2 
+
+> L2
+
+(t) = 0 . (3.34) 
+
+Step 1. Energy inequalities of ρ and u.
+
+Testing (3.30) 1 by ρ and integrating over I by parts, one has 12ddt ∥ρ∥2 
+
+> L2
+
+=
+
+Z
+
+> I
+
+ρu 1ρxdx −
+
+Z
+
+> I
+
+(ρ2xu + ρ2ux) ρdx
+
+= − 12
+
+Z
+
+> I
+
+ρ2u1xdx −
+
+Z
+
+> I
+
+(ρ2xu + ρ2ux) ρdx
+
+≤ 12 ∥u1x∥L∞ ∥ρ∥2 
+
+> L2
+
++ ∥u∥L∞ ∥ρ2x∥L2 ∥ρ∥L2 + ∥ρ2∥L∞ ∥ux∥L2 ∥ρ∥L2
+
+≤ C (∥u1x∥H1 + 1) ∥ρ∥2 
+
+> L2
+
++ C∥ux∥2 
+
+> L2
+
+. (3.35) Testing (3.30) 2 by u and integrating over I by parts, one deduces 12ddt ∥√ρ1u∥2 
+
+> L2
+
++ ∥ux∥2
+
+> L2
+
+= −
+
+Z
+
+> I
+
+ρuu 2tdx −
+
+Z
+
+> I
+
+ρuu 2u2xdx −
+
+Z
+
+> I
+
+ρ1u2u2xdx +
+
+Z
+
+> I
+
+(ργ 
+
+> 1
+
+− ργ 
+
+> 2
+
+) uxdx20 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
++
+
+Z
+
+> I
+
+ϕ1xϕxuxdx +
+
+Z
+
+> I
+
+ϕ1xx ϕxudx −
+
+Z
+
+> I
+
+ϕ2xx ϕxudx
+
+≤∥ u∥L∞ ∥ρ∥L2 ∥u2t∥L2 + ∥u∥L∞ ∥u2∥L∞ ∥ρ∥L2 ∥u2x∥L2
+
++ C∥u2x∥L2 ∥√ρ1u∥L2 ∥u∥L∞ + C∥ρ∥L2 ∥ux∥L2
+
++ ∥ϕ1x∥L∞ ∥ux∥L2 ∥ϕx∥L2 + ∥u∥L∞ ∥ϕx∥L2 (∥ϕ1xx ∥L2 + ∥ϕ2xx ∥L2 )
+
+≤ 12 ∥ux∥2 
+
+> L2
+
++ C  ∥u2t∥2 
+
+> L2
+
++ 1  ∥ρ∥2 
+
+> L2
+
++ C∥√ρ1u∥2
+
+> L2
+
++ C  ∥ϕ1xx ∥2 
+
+> L2
+
++ ∥ϕ2xx ∥2
+
+> L2
+
+ ∥ϕx∥2 
+
+> L2
+
+. (3.36) 
+
+Step 2. Growth estimates. 
+
+We proceed to consider the growth estimates of ρ, √ρ1ϕ and ϕx. Testing (3.30) 1 with ρ, one obtains that ddt ∥ρ∥2 
+
+> L2
+
+≤ C∥u1x∥H1 ∥ρ∥2 
+
+> L2
+
++ C∥ux∥L2 ∥ρ2x∥L2 ∥ρ∥L2 + C∥ux∥L2 ∥ρ∥L2 ,
+
+which implies (if ∥ρ∥L2̸ = 0) ddt ∥ρ∥L2 ≤ C∥u1x∥H1 ∥ρ∥L2 + C∥ux∥L2 ∥ρ2x∥L2 + C∥ux∥L2 . (3.37) Thanks to ux, ρ 2x ∈ L∞(0 , T ; L2) and u1x ∈ L2(0 , T ; H1), applying the Gronwall’s inequality to (3.37), we conclude that 
+
+∥ρ∥L2 ≤ Ce C R t  
+
+> 0∥u1x∥H1ds
+
+Z t
+
+> 0
+
+(∥ux∥L2 ∥ρ2x∥L2 + ∥ux∥L2 ) d s ≤ Ct. (3.38) We now consider the growth estimates of √ρ1ϕ. Testing (3.30) 3 with ϕ, noting ρ1t =
+
+−(ρ1u1)x, ρ1t ∈ L∞(0 , T ; L2) and ( ϕi, u i, ϕ, u ) ∈ L∞(0 , T ; H1), i = 1 , 2, we have 12ddt ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥√ρ1μ∥2
+
+> L2
+
+= −
+
+Z
+
+> I
+
+ρϕ 2tϕdx −
+
+Z
+
+> I
+
+ρu 2ϕ2xϕdx −
+
+Z
+
+> I
+
+ρ1uϕ 2xϕdx
+
++
+
+Z
+
+> I
+
+ρ1(ϕ21 + ϕ1ϕ2 + ϕ22 − 1) ϕμ dx −
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] μdx
+
+≤ C∥ρ∥L2 ∥ϕ2t∥L2 ∥ϕ∥H1 + C∥ρ∥L2 ∥u2x∥L2 ∥ϕ2x∥L2 ∥ϕ∥H1 + C∥ux∥L2 ∥ϕ2x∥L2 ∥√ρ1ϕ∥L2
+
++ C∥√ρ1μ∥L2 ∥ϕ21 + ϕ1ϕ2 + ϕ22 − 1∥L∞ ∥√ρ1ϕ∥L2
+
++ ∥ρ∥L2 ∥μ∥L2 (∥μ2∥L∞ + ∥ϕ32 − ϕ2∥L∞ )
+
+≤ 12 ∥√ρ1μ∥2 
+
+> L2
+
++ C∥ρ∥L2 (∥ϕ2t∥L2 + 1) + C∥ρ∥L2 ∥μ∥L2 (∥μ2∥H1 + 1) + C. (3.39) Due to ( tϕ 2t, √tμ 2) ∈ L∞(0 , T ; L2) and (3.38), integrating (3.39) over (0 , t ), we deduce from (3.34) that 
+
+∥√ρ1ϕ∥2 
+
+> L2
+
+(t) + 
+
+Z t
+
+> 0
+
+∥√ρ1μ∥2 
+
+> L2
+
+ds
+
+≤ C
+
+Z t
+
+> 0
+
+∥ρ∥L2 (∥ϕ2t∥L2 + 1)d s +
+
+Z t
+
+> 0
+
+∥ρ∥L2 ∥μ∥L2 (∥μ2∥H1 + 1)d s + t
+
+
+
+≤ C
+
+Z t
+
+> 0
+
+s(∥ϕ2t∥L2 + 1)d s + C
+
+Z t
+
+> 0
+
+s∥μ∥L2 (∥μ2∥H1 + 1)d s + Ct ≤ Ct. (3.40) GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 21 
+
+Finally, we consider the growth estimates of ϕx. Testing (3.30) 4 by μ, integrating the result over I by parts, and using ϕ1, ϕ 2 ∈ L∞(0 , T ; H1), (3.38) and (3.40), one has 
+
+∥√ρ1μ∥2 
+
+> L2
+
+=
+
+Z
+
+> I
+
+μxϕxdx +
+
+Z
+
+> I
+
+ρ1(ϕ21 + ϕ1ϕ2 + ϕ22 − 1) ϕμ dx −
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] μdx
+
+≤ 12 ∥√ρ1μ∥2 
+
+> L2
+
++ ∥ϕx∥L2 ∥μx∥L2 + ∥ϕ21 + ϕ1ϕ2 + ϕ22 − 1∥2 
+
+> L∞
+
+∥√ρ1ϕ∥2
+
+> L2
+
++ ∥ρ∥L2 ∥μ∥L2 (∥μ2∥H1 + 1) 
+
+≤ 12 ∥√ρ1μ∥2 
+
+> L2
+
++ C∥μx∥L2 + Ct + Ct ∥μ∥L2 (∥μ2∥H1 + 1) 
+
+≤ 12 ∥√ρ1μ∥2 
+
+> L2
+
++ C∥μx∥L2 + C, (3.41) which implies 
+
+∥√ρ1μ∥2 
+
+> L2
+
+≤ C∥μx∥L2 + C. (3.42) Testing (3.30) 4 by ϕ , integrating the result over I by parts, and using (3.40) and (3.42), one gets 
+
+∥ϕx∥2 
+
+> L2
+
+(t) = 
+
+Z
+
+> I
+
+ρ1μϕ dx −
+
+Z
+
+> I
+
+ρ1(ϕ21 + ϕ1ϕ2 + ϕ22 − 1) ϕ2dx +
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx
+
+≤ ∥ √ρ1ϕ∥L2 ∥√ρ1μ∥L2 + C∥√ρ1ϕ∥2 
+
+> L2
+
++ C∥ρ∥L2 ∥ϕ∥H1 (∥μ2∥L2 + 1) 
+
+≤ Ct 12
+
+
+
+∥μx∥ 12 
+
+> L2
+
++ 1 
+
+
+
++ Ct + Ct (∥μ2∥L2 + 1) 
+
+≤ Ct 14
+
+ t∥μx∥2
+
+> L2
+
+ 14 + Ct 12
+
+ t∥μx∥2
+
+> L2
+
+ 12 + Ct 12 ≤ Ct 14 . (3.43) 
+
+Step 3. Energy inequalities of ϕ.
+
+Testing (3.30) 3 and (3.30) 4 by −μ and ϕt respectively and integrating the result over I by parts, summing up the obtained results, noting 12ddt ∥√ρ1ϕ∥2 
+
+> L2
+
+= 12
+
+Z
+
+> I
+
+ρ1tϕ2dx +
+
+Z
+
+> I
+
+ρ1ϕϕ tdx, 
+
+we have 12ddt
+
+ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+ + ∥μx∥2
+
+> L2
+
+= 12
+
+Z
+
+> I
+
+ρ1tϕ2dx −
+
+Z
+
+> I
+
+(ϕ21 + ϕ1ϕ2 + ϕ22)ϕρ 1ϕtdx −
+
+Z
+
+> I
+
+ρ1u1ϕxμdx −
+
+Z
+
+> I
+
+ρ1uϕ 2xμdx
+
+−
+
+Z
+
+> I
+
+ρϕ 2tμdx −
+
+Z
+
+> I
+
+ρu 2ϕ2xμdx + 2 
+
+Z
+
+> I
+
+ρ1ϕϕ tdx +
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕtdx
+
+=: 
+
+> 8
+
+X
+
+> i=1
+
+Ki. (3.44) We now estimate each term on the right hand side of (3.44) as follows. For K1, we have 
+
+K1 ≤ C∥ρ1t∥L2 ∥ϕ∥2 
+
+> L∞
+
+≤ C  ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+ .
+
+Using (3.30) 3 and integration by parts, one has 
+
+K2 + K7 = −
+
+Z
+
+> I
+
+(ϕ21 + ϕ1ϕ2 + ϕ22 − 2) ϕ (−ρ1u1ϕx + μxx − ρϕ 2t − ρu 2ϕ2x − ρ1uϕ 2x) d x
+
+=
+
+Z
+
+> I
+
+(ϕ21 + ϕ1ϕ2 + ϕ22 − 2) ϕ (ρ1u1ϕx + ρϕ 2t + ρu 2ϕ2x + ρ1uϕ 2x) d x22 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
++
+
+Z
+
+> I
+
+∂x(ϕ21 + ϕ1ϕ2 + ϕ22)ϕμ xdx +
+
+Z
+
+> I
+
+(ϕ21 + ϕ1ϕ2 + ϕ22 − 2) ϕxμxdx
+
+≤ C∥ϕ21 + ϕ1ϕ2 + ϕ22 − 2∥L∞ (∥√ρ1ϕ∥L2 ∥ϕx∥L2 ∥u1∥L∞ + ∥ϕ∥L∞ ∥ρ∥L2 ∥ϕ2t∥L2 )+ C∥ϕ21 + ϕ1ϕ2 + ϕ22 − 2∥L∞ ∥ϕ∥L∞ ∥ρ∥L2 ∥u2∥L∞ ∥ϕ2x∥L2
+
++ C∥ϕ21 + ϕ1ϕ2 + ϕ22 − 2∥L∞ ∥√ρ1ϕ∥L2 ∥√ρ1u∥L2 ∥ϕ2x∥L∞
+
++ ∥∂x(ϕ21 + ϕ1ϕ2 + ϕ22)∥L2 ∥ϕ∥L∞ ∥μx∥L2
+
++ ∥ϕ21 + ϕ1ϕ2 + ϕ22 − 2∥L∞ ∥ϕx∥L2 ∥μx∥L2
+
+≤ C∥√ρ1ϕ∥L2 ∥ϕx∥L2 + C(∥√ρ1ϕ∥L2 + ∥ϕx∥L2 )( t−1∥ρ∥L2 )( t∥ϕ2t∥L2 )+ C(∥√ρ1ϕ∥L2 + ∥ϕx∥L2 )∥ρ∥L2 + C∥√ρ1ϕ∥L2 ∥√ρ1u∥L2
+
++ C(∥√ρ1ϕ∥L2 + ∥ϕx∥L2 )∥μx∥L2 + C∥ϕx∥L2 ∥μx∥L2
+
+≤ 12 ∥μx∥2 
+
+> L2
+
++ C ∥ρ∥2
+
+> L2
+
+t + C  1 + t∥ϕ2t∥2
+
+> L2
+
+   ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++ ∥√ρ1u∥2
+
+> L2
+
+ .
+
+For Ki(i = 3 , · · · , 6), direct calculation shows that 
+
+K3 ≤ C∥√ρ1μ∥L2 ∥u1∥L∞ ∥ϕx∥L2 ≤ ε2∥√ρ1μ∥2 
+
+> L2
+
++ C∥ϕx∥2 
+
+> L2
+
+,K4 ≤ ∥ √ρ1μ∥L2 ∥√ρ1u∥L2 ∥ϕ2x∥L∞ ≤ ε2∥√ρ1μ∥2 
+
+> L2
+
++ C∥ϕ2x∥2 
+
+> H1
+
+∥√ρ1u∥2 
+
+> L2
+
+,K5 ≤ C∥ρ∥L2 ∥μ∥L∞ ∥ϕ2t∥L2 ≤ ε2
+
+ ∥√ρ1μ∥2 
+
+> L2
+
++ ∥μx∥2
+
+> L2
+
+ + C(t∥ϕ2t∥2 
+
+> L2
+
+) ∥ρ∥2
+
+> L2
+
+t ,K6 ≤ C∥ρ∥L2 ∥μ∥L∞ ∥u2∥L∞ ∥ϕ2x∥L2 ≤ ε2
+
+ ∥√ρ1μ∥2 
+
+> L2
+
++ ∥μx∥2
+
+> L2
+
+ + C∥ρ∥2 
+
+> L2
+
+.
+
+Using (3.30) 1 and integration by parts, we obtain 
+
+K8 =
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕtdx
+
+= ddt
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx −
+
+Z
+
+> I
+
+ρ[μ2t − (3 ϕ22 − 1) ϕ2t]ϕdx
+
+−
+
+Z
+
+> I
+
+ρt[μ2 − (ϕ32 − ϕ2)] ϕdx
+
+= ddt
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx −
+
+Z
+
+> I
+
+ρ[μ2t − (3 ϕ22 − 1) ϕ2t]ϕdx
+
++
+
+Z
+
+> I
+
+[( ρu 1)x + ( ρ2u)x][ μ2 − (ϕ32 − ϕ2)] ϕdx
+
+= ddt
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx −
+
+Z
+
+> I
+
+ρ[μ2t − (3 ϕ22 − 1) ϕ2t]ϕdx
+
+−
+
+Z
+
+> I
+
+[( ρu 1) + ( ρ2u)][ μ2 − (ϕ32 − ϕ2)] ϕxdx
+
+−
+
+Z
+
+> I
+
+[( ρu 1) + ( ρ2u)][ μ2x − (3 ϕ22 − 1) ϕ2x]ϕdx
+
+≤ ddt
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx + ∥ρ∥L2 ∥ϕ∥L∞
+
+ ∥μ2t∥L2 + ∥3ϕ22 − 1∥L∞ ∥ϕ2t∥L2
+
+
+
++ ∥ϕx∥L2 (∥ρ∥L2 ∥u1∥L∞ + ∥ρ2∥L∞ ∥u∥L2 )  ∥μ2∥L∞ + ∥ϕ32 − ϕ2∥L∞
+
+
+
++ ∥ϕ∥L∞ (∥ρ∥L2 ∥u1∥L∞ + ∥ρ2∥L∞ ∥u∥L2 )  ∥μ2x∥L2 + ∥3ϕ22 − 1∥L∞ ∥ϕ2x∥L2
+
+GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 23 
+
+≤ ddt
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx + C ∥ρ∥L2
+
+t (∥√ρ1ϕ∥L2 + ∥ϕx∥L2 ) ( t∥μ2t∥L2 + t∥ϕ2t∥L2 )+ C (∥√ρ1ϕ∥L2 + ∥ϕx∥L2 ) ( ∥ρ∥L2 + ∥ux∥L2 ) ( ∥μ2∥H1 + 1) 
+
+≤ ddt
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx + 12
+
+∥ρ∥2
+
+> L2
+
+t2 + 14 ∥ux∥2
+
+> L2
+
++ C  ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++ ∥ρ∥2
+
+> L2
+
+   t2∥μ2t∥2 
+
+> L2
+
++ t2∥ϕ2t∥2 
+
+> L2
+
++ ∥μ2∥2 
+
+> H1
+
++ 1  .
+
+Substituting K1–K8 into (3.44), we arrive at ddt
+
+ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+ + ∥μx∥2
+
+> L2
+
+≤2 ddt
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx + 12
+
+∥ρ∥2
+
+> L2
+
+t2 + 14 ∥ux∥2 
+
+> L2
+
++ Cε 2
+
+ ∥√ρ1μ∥2 
+
+> L2
+
++ ∥μx∥2
+
+> L2
+
+
+
++ CB(t)
+
+ ∥ρ∥2
+
+> L2
+
+t + ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++ ∥√ρ1u∥2
+
+> L2
+
+
+
+, (3.45) where 
+
+B(t) := 1 + ∥μ2∥2 
+
+> H1
+
++ ∥ϕ2x∥2 
+
+> H1
+
++ t2∥ϕ2t∥2 
+
+> L2
+
++ t2∥μ2t∥2 
+
+> L2
+
+.
+
+We next estimate ∥√ρ1μ∥L2 . Testing (3.30) 4 by μ, integrating over I by parts, one gets 
+
+∥√ρ1μ∥2 
+
+> L2
+
+=
+
+Z
+
+> I
+
+ϕxμxdx +
+
+Z
+
+> I
+
+ρ1μ(ϕ21 + ϕ1ϕ2 + ϕ22 − 1) ϕdx
+
++
+
+Z
+
+> I
+
+ρ[( ϕ32 − ϕ2) − μ2]μdx
+
+≤ 14 ∥√ρ1μ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++ ∥μx∥2 
+
+> L2
+
++ C∥√ρ1ϕ∥2
+
+> L2
+
++ C 1
+
+√t ∥ρ∥L2
+
+√t (1 + ∥μ2∥L2 ) ∥μ∥L∞
+
+≤ 14 ∥√ρ1μ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++ ∥μx∥2 
+
+> L2
+
++ C∥√ρ1ϕ∥2
+
+> L2
+
++ C 1
+
+√t ∥ρ∥L2 (∥√ρ1μ∥L2 + ∥μx∥L2 )
+
+≤ 12 ∥√ρ1μ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++ C∥μx∥2 
+
+> L2
+
++ C∥√ρ1ϕ∥2 
+
+> L2
+
++ C ∥ρ∥2
+
+> L2
+
+t . (3.46) Inserting (3.46) into (3.45), integrating over (0 , t ), choosing ε2 sufficiently small such that Cε 2 <
+
+1/2, and using (3.34) and (3.43), there holds 
+
+∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++
+
+Z t
+
+> 0
+
+∥μx∥2 
+
+> L2
+
+ds
+
+≤C3
+
+∥ρ∥2
+
+> L2
+
+t + 12
+
+Z t
+
+> 0
+
+∥ρ∥2
+
+> L2
+
+s2 ds + 14
+
+Z t
+
+> 0
+
+∥ux∥2 
+
+> L2
+
+ds
+
++ C
+
+Z t
+
+> 0
+
+B(s)
+
+ ∥ρ∥2
+
+> L2
+
+s + ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++ ∥√ρ1u∥2
+
+> L2
+
+
+
+ds, (3.47) where we have used 2
+
+Z
+
+> I
+
+ρ[μ2 − (ϕ32 − ϕ2)] ϕdx
+
+≤2∥ρ∥L2 ∥ϕ∥L∞ (∥μ2∥L2 + ∥ϕ32 − ϕ2∥L2 )24 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+≤C ∥ρ∥L2
+
+√t (∥√ρ1ϕ∥L2 + ∥ϕx∥L2 ) √t∥μ2∥L2 + C∥ρ∥L2 (∥√ρ1ϕ∥L2 + ∥ϕx∥L2 )
+
+≤ 12
+
+ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+ + C3
+
+∥ρ∥2
+
+> L2
+
+t .
+
+Step 4. Singular t-weighted energy inequalities and uniqueness. 
+
+Similar to (3.35), one has 12ddt ∥ρ∥2 
+
+> L2
+
+≤ 12 ∥u1x∥L∞ ∥ρ∥2 
+
+> L2
+
++ ∥u∥L∞ ∥ρ2x∥L2 ∥ρ∥L2 + ∥ρ2∥L∞ ∥ux∥L2 ∥ρ∥L2
+
+≤ C∥u1x∥H1 ∥ρ∥2 
+
+> L2
+
++ Ct ∥ux∥2 
+
+> L2
+
++ 12
+
+∥ρ∥2
+
+> L2
+
+t . (3.48) Multiplying (3.48) by t−1 yields ddt
+
+ ∥ρ∥2
+
+> L2
+
+t
+
+
+
++ ∥ρ∥2
+
+> L2
+
+t2 ≤ C (∥u1x∥H1 + 1) ∥ρ∥2
+
+> L2
+
+t + C1∥ux∥2 
+
+> L2
+
+. (3.49) Multiplying (3.36) by 2( C1 + 1), and adding the resultant with (3.49), one obtains ddt
+
+ ∥ρ∥2
+
+> L2
+
+t + ( C1 + 1) ∥√ρ1u∥2
+
+> L2
+
+
+
++ ∥ρ∥2
+
+> L2
+
+t2 + ∥ux∥2
+
+> L2
+
+≤C  ∥u1x∥H1 + t∥u2t∥2 
+
+> L2
+
++ ∥ϕ1x∥2 
+
+> H1
+
++ ∥ϕ2xx ∥2 
+
+> L2
+
++ 1   ∥ρ∥2
+
+> L2
+
+t + ∥√ρ1u∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+
+
+. (3.50) Multiplying (3.50) by C3 + 1, integrating it over (0 , t ), adding the resultant with (3.47), we finally arrive at 
+
+∥ρ∥2
+
+> L2
+
+t + ∥√ρ1u∥2 
+
+> L2
+
++ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2 
+
+> L2
+
++
+
+Z t
+
+> 0
+
+ ∥ρ∥2
+
+> L2
+
+s2 + ∥ux∥2 
+
+> L2
+
++ ∥μx∥2
+
+> L2
+
+
+
+ds
+
+≤C
+
+Z t
+
+> 0
+
+F(s)
+
+ ∥ρ∥2
+
+> L2
+
+s + ∥√ρ1u∥2 
+
+> L2
+
++ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+
+
+ds, (3.51) where 
+
+F(s) := 1 + ∥μ2∥2 
+
+> H1
+
++ ∥ϕ2x∥2 
+
+> H1
+
++ t2∥ϕ2t∥2 
+
+> L2
+
++ t2∥μ2t∥2 
+
+> L2
+
++ ∥u1x∥H1 + t∥u2t∥2 
+
+> L2
+
++ ∥ϕ1x∥2 
+
+> H1
+
+,
+
+and F(s) ∈ L1(0 , t ). By using (3.38), (3.33), (3.34) and (3.43), we conclude that lim 
+
+> t→0
+
+ ∥ρ∥2
+
+> L2
+
+t + ∥√ρ1u∥2 
+
+> L2
+
++ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+
+
+(t) = 0 .
+
+Thus, one deduces from Gronwall’s inequality that 
+
+ ∥ρ∥2
+
+> L2
+
+t + ∥√ρ1u∥2 
+
+> L2
+
++ ∥√ρ1ϕ∥2 
+
+> L2
+
++ ∥ϕx∥2
+
+> L2
+
+
+
+(t) + 
+
+Z t
+
+> 0
+
+ ∥ρ∥2
+
+> L2
+
+s2 + ∥ux∥2 
+
+> L2
+
++ ∥μx∥2
+
+> L2
+
+
+
+ds = 0 .
+
+which implies ρ = u = ϕ = 0. As a consequence, the uniqueness of solutions is proved. □
+
+Acknowledgment. Ding’s work is supported by the Key Project of the National Nat-ural Science Foundation of China (No.12131010), the National Natural Science Foundation of China (No.12271032) and Guangdong Basic and Applied Basic Research Foundation (No. 2026A1515010778). Li’s work is supported by the National Natural Science Foundation of China (No.12371205) and the Natural Science Foundation of Guangdong Province (No.2025A151501202 6, 2025A1515040001). Yan’s work is supported by the National Natural Science Foundation of China (No.12526617). GLOBAL STRONG SOLUTIONS FOR 1D COMPRESSIBLE NSCH EQUATIONS WITH VACUUM 25 
+
+References 
+
+[1] D.M. Anderson, G.B. McFadden, A.A. Wheeler, Diffuse-interface methods in fluid mechanics, Annu. Rev. Fluid Mech. , vol. 30, Annual Reviews, Palo Alto, CA, 1998, pp. 139–165. [2] H. Abels, E. Feireisl, On a diffuse interface model for a two-phase flow of compressible viscous fluids, Indiana Univ. Math. J. , 57 (2008), 659–698. [3] H. Abels, Y. Liu and ˇS. Neˇ casov´ a, Low Mach number limit of a diffuse interface model for two-phase flows of compressible viscous fluids, GAMM-Mitteilungen. , 47 (2024), e202470008. [4] D. Basari´ c, A. Giorgini, Global weak solutions to a compressible Navier–Stokes/Cahn–Hilliard system with singular entropy of mixing, arXiv preprint , arXiv:2506.07835, 2025. [5] D. Bresch, P. E. Jabin, Global existence of weak solutions for compressible Navier–Stokes equations: ther-modynamically unstable pressure and anisotropic viscous stress tensor, Ann. Math. (2) 188 (2018), no. 2, 577–684. [6] L. Cherfils, E. Feireisl, M. Mich´ alek, A. Miranville, M. Petcu and D. Praˇ z´ ak, The compressible Navier-StokesCahn-Hilliard equations with dynamic boundary conditions, Math. Models Methods Appl. Sci. , 29 
+
+(2019), 2557–2584. [7] M. Chen, X. Guo, Global large solutions for a coupled compressible Navier-Stokes/Allen-Cahn system with initial vacuum, Nonlinear Anal. Real World Appl. , 37 (2017), 350–373. [8] H. Choe, and H. Kim, Strong solutions of the Navier–Stokes equations for isentropic compressible fluids, J. Differential Equations , 190 (2003), no. 2, 504–523. [9] Y. Cho, H. J. Choe, and H. Kim, Unique solvability of the initial boundary value problems for compressible viscous fluids, J. Math. Pures Appl. , 83 (2004), no. 2, 243–275. [10] Y. Cho and H. Kim, Existence results for viscous polytropic fluids with vacuum, J. Differential Equations ,
+
+228 (2006), no. 2, 377–411. [11] S. Chen, C. Zhu, Blow-up criterion and the global existence of strong/classical solutions to Navier–Stokes/Allen–Cahn system, Z. Angew. Math. Phys. , 72 (2021), no. 1, Paper No. 14, 24 pp. [12] S. Ding, Y. Li, Global solutions of a diffuse interface model for the two-phase flow of compressible viscous fluids in 1D, Commun. Math. Sci. , 18 (2020), no. 4, 1055–1086. [13] S. Ding, Y. Li, W. Luo, Global solutions for a coupled compressible Navier-Stokes/Allen-Cahn system in 1D, J. Math. Fluid Mech. , 15 (2013), no. 2, 335–360. [14] R. Danchin, P. B. Mucha, The incompressible Navier–Stokes equations in vacuum, Comm. Pure Appl. Math. 
+
+72 (2019), no. 7, 1351–1385. [15] M.F.P. ten Eikelder, E.H. van Brummelen and D. Schillinger, Compressible N-phase fluid mixture models, 
+
+arXiv preprint , arXiv:2503.24225, 2025. [16] C. Elbar and A. Poulain, Analysis and numerical simulation of a generalized compressible Cahn–Hilliard–Navier–Stokes model with friction effects, ESAIM: M2AN , 58 (2024), 1989–2034. [17] E. Feireisl, On the motion of a viscous, compressible, and heat conducting fluid, Indiana Univ. Math. J. ,
+
+53 (2004), no. 6, 1705–1738. [18] M. Fei, X. Fei, D. Han and Y. Liu, Local-in-time existence of strong solutions to a quasi-incompressible Cahn–Hilliard–Navier–Stokes system, arXiv preprint , arXiv:2411.09455, 2024. [19] E. Feireisl, A. Novotn´ y, H. Petzeltov´ a, On the existence of globally defined weak solutions to the Navier-Stokes equations, J. Math. Fluid Mech. , 3 (2001), no. 6, 358–392. [20] W. Craig, X. Huang, Y. Wang, Global wellposedness for the 3D inhomogeneous incompressible Navier–Stokes equations, J.Math. Fluid Mech. 15 (2013), 747–758. [21] H. Gong, J. Li, X. Liu, X. Zhang, Local well-posedness of isentropic compressible Navier–Stokes equations with vacuum, Commun. Math. Sci. , 18 (2020), no. 7, 1891–1909. [22] X. Huang, On local strong and classical solutions to the three-dimensional barotropic compressible Navier–Stokes equations with vacuum, Sci. China Math. , 64 (2021), no. 8, 1771–1788. [23] X. Huang, J. Li, Global classical and weak solutions to the three-dimensional full compressible Navier–Stokes system with vacuum and large oscillations, Arch. Ration. Mech. Anal. , 227 (2018), no. 3, 995–1059. [24] X. Huang, J. Li, and Z. Xin, Global well-posedness of classical solutions with large oscillations and vacuum to the three-dimensional isentropic compressible Navier-Stokes equations, Comm. Pure Appl. Math. , 65 
+
+(2012), 549–585. [25] X. Huang, Y. Wang, Global strong solution of 3D inhomogeneous Navier–Stokes equations with density-dependent viscosity, J.Differential Equations , 259 (2015), 1606–1627. [26] Q. Jiu, M. Li, and Y. Ye, Global classical solution of the Cauchy problem to 1D compressible Navier-Stokes equations with large initial data, J. Differential Equations , 257 (2014), 311–350. [27] S. Jiang, P. Zhang, On spherically symmetric solutions of the compressible isentropic Navier-Stokes equa-tions, Comm. Math. Phys. , 215 (2001), no. 3, 559–581. 26 SHIJIN DING, YINGHUA LI, YUANXIANG YAN, AND HAORAN ZHENG 
+
+[28] S. Jiang, P. Zhang, Axisymmetric solutions of the 3D Navier-Stokes equations for compressible isentropic fluids, J. Math. Pures Appl. , 82 (2003), no. 8, 949–973. [29] M. Kotschote, R. Zacher, Strong solutions in the dynamical theory of compressible fluid mixtures, Math. Models Methods Appl. Sci. 25 (2015), 1217–1256. [30] J. Li, Local existence and uniqueness of strong solutions to the Navier–Stokes equations with nonnegative density, J.Differential Equations , 263 (2017), no. 10, 6512–6536. [31] J. Li, Global well-posedness of the one-dimensional compressible Navier–Stokes equations with constant heat conductivity and nonnegative density, SIAM J. Math. Anal. , 51 (2019), no. 5, 3666–3693. [32] J. Li, Global well-posedness of non-heat conductive compressible Navier–Stokes equations in 1D, Nonlin-earity 33 (2020), no. 5, 2181–2210. [33] P. L. Lions, Mathematical topics in fluid mechanics. Vol. 2, Oxford Lecture Ser. Math. Appl., 10, The Clarendon Press, Oxford University Press, New York, 1998, xiv+348 pp. [34] L. D. Landau and E. M. Lifshitz, Course of theoretical physics , Elsevier, 2013. [35] J. Lowengrub, L. Truskinovsky, Quasi–incompressible Cahn–Hilliard fluids and topological transitions, Proc. Royal Soc. London A: Math. Phys. Eng. Sci. , 454 (1998), 2617–2654. [36] Z. Liang, D. Wang, Stationary Cahn–Hilliard–Navier–Stokes equations for the diffuse interface model of compressible flows, Math. Models Methods Appl. Sci. , 30 (2020), 2445–2486. [37] Z. Liang, D. Wang, Weak solutions to the stationary Cahn–Hilliard/Navier–Stokes equations for compressible fluids, J. Nonlinear Sci. , 32 (2022), 1–25. [38] J. Li, Z. Xin, Global well-posedness and large time asymptotic behavior of classical solutions to the com-pressible Navier–Stokes equations with vacuum, Ann. PDE , 5 (2019), no. 1, 37 pp. [39] Y. Li, M. Xie, Y. Yan, Exponential stability of a diffuse interface model of incompressible two-phase flow with phase variable dependent viscosity and vacuum, J. Differential Equations , 414 (2025), 842–889. [40] Y. Li, M. Xie, Incompressible limit of strong solutions to the diffuse interface model for two-phase flows, 
+
+arXiv preprint , arXiv: 2503.00857v1, 2025. [41] Y. Li, H. Zheng, J. Zhou, Well-posedness and blow-up criterion for strong solutions of the compressible Navier-Stokes/Allen-Cahn system with vacuum, arXiv preprint , arXiv: 2605.24568, 2026. [42] S. Lai, H. Xu, J. Zhang, Well-posedness and exponential decay for the Navier–Stokes equations of viscous compressible heat-conductive fluids with vacuum, Math. Models Methods Appl. Sci. , 32 (2022), no. 9, 1725– 1784. [43] J. Li and Y. Zheng, Local existence and uniqueness of heat-conductive compressible Navier-Stokes equations in the presence of vacuum without initial compatibility conditions, J. Math. Fluid Mech. , 25 (2023), no. 1, 14. [44] R. Salvi, I. Straˇ skraba, Global existence for viscous compressible fluids and their behavior as t → ∞ , J. Fac. Sci. Univ. Tokyo Sect. IA, Math. , 40 (1993), 17–51. [45] M. Su, On global classical solutions to one-dimensional compressible Navier-Stokes/Allen-Cahn system with density-dependent viscosity and vacuum. Bound. Value Probl. , 2021, Paper No. 92, 21 pp. [46] J. Zhang, Global well-posedness for the incompressible Navier–Stokes equations with density-dependent viscosity coefficient, J.Differential Equations , 259 (2015), 1722–1742. (S. Ding) School of Mathematical Sciences, South China Normal University, Guangzhou, 510631, China 
+
+Email address : dingsj@scnu.edu.cn 
+
+(Y. Li) School of Mathematical Sciences, South China Normal University, Guangzhou, 510631, China 
+
+Email address : yinghua@scnu.edu.cn 
+
+(Y. Yan) School of Mathematics and Systems Science, Guangdong Polytechnic Normal University, Guangzhou, 510655, China 
+
+Email address : yuanxiangyan@m.scnu.edu.cn 
+
+(H. Zheng) School of Mathematical Sciences, South China Normal University, Guangzhou, 510631, China 
+
+Email address : hrzheng@scnu.edu.cn
