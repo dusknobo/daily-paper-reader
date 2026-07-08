@@ -1,0 +1,691 @@
+Title: Stabilising Evaporating Soap Films with Salt
+
+URL Source: https://arxiv.org/pdf/2607.06363v1
+
+Published Time: Wed, 08 Jul 2026 01:26:31 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+1
+
+# Stabilising Evaporating Soap Films with Salt 
+
+Victor Ziapkoff 1, Fran¸ cois Boulogne 1, Anniina Salonen 2, and Emmanuelle Rio 1
+
+> 1
+
+Universit´ e Paris-Saclay, CNRS, Laboratoire de Physique des Solides, 91405, Orsay, France. 
+
+> 2
+
+Soft Matter Sciences and Engineering, ESPCI Paris, PSL University, CNRS, Sorbonne Universit´ e, 75005 Paris, France (Received xx; revised xx; accepted xx) 
+
+We investigate the effect of a high concentration (32.5 g.L −1) of sodium chloride (NaCl) on TTAB (tetradecyltrimethylammonium bromide) vertical soap films also called foam films, pulled out of a bath under controlled humidity conditions. We observe that the film lifetime increases with relative humidity, both in the presence and absence of salt. At any given humidity, the presence of NaCl systematically enhances film stability. Our film thickness measurements show that the thinning dynamics with or without salt are nearly identical down to 100 nm. Down to that thickness, the effect of evaporation can be rationalised by a constant evaporation rate, which becomes non-negligible compared to the drainage rate at film thicknesses below 400 nm. The main effect of salt is the stabilisation of a Newton black film at a thickness of approximately 5 nm, whereas in the absence of salt, the film ruptures upon reaching a critical thickness of about 10 nm. 
+
+Key words: Soap Film, Foam Film, Film lifetime, Thickness measurement, Evapo-ration rate 
+
+1. Introduction 
+
+Surface bubbles generated during coastal wave breaking eventually rupture. This leads to the generation of aerosols and microdroplets (Deike 2022), which play a key role in ocean-atmosphere coupling. The size of these ejecta is controlled, among other parameters, by the thickness of the fragile liquid film surrounding the bubble at the time of rupture. The latter depends on the thinning dynamics and on the lifetime of the film. A description of the dynamics of liquid films is therefore crucial to understand surface bubble stability. Film thinning dynamics is driven by the coupled effects of drainage and evap-oration, set by environmental conditions like atmospheric humidity (Champougny et al. 2018; Aur´ egan & Deike 2024; Poulain et al. 2018) and presence of convection (Aur´ egan & Deike 2024). One commonly studied experimental configuration is vertical liquid films. Cham-pougny et al. (2018) showed that, in this configuration, drainage dominates during arXiv:2607.06363v1 [physics.flu-dyn] 7 Jul 2026 2the early stages of film thinning, when the film remains relatively thick. As the film becomes thinner (on the order of one micrometer), evaporation becomes increasingly important in the dynamics. Eventually, the film ruptures. Additionally, natural convection and thermal effects (Boulogne et al. 2022) must be taken into account, which complicates the derivation of comprehensive models. Drainage is caused by the generation of thin patches in the vicinity of the meniscus, which rise by buoyancy (Seiwert et al. 2017; Miguet et al. 2021). Recently, Monier et al. (2024) proposed a description of the self-similar thickness profile of the thin films evolving under such a mechanism. However, neither drainage nor evaporation rate are described quantitatively in the literature. Another factor of complexity is the remarkable biological richness of the marine surface (Helm 2021). Additionally, the ionic composition of seawater is complex and variable as described by Dittmar’s law (Copin-Mont´ egut 2002). This makes it difficult to isolate the specific influence of a single component on the behaviour of bubbles and films. The effect of salts — and more generally of electrolytes — on adsorp-tion/desorption of surfactant, water/air interfaces, and thin film structure has been extensively investigated in the scientific literature. Regarding water/air interfaces, Onsager & Samaras (1934) demonstrated theoretically that increasing salt concentration leads to a rise in surface tension. The effect has been later refined by Jones and Ray (Jones & Ray 1935, 1937), who observed little deviations at very low electrolyte concentrations. This so-called Jones-Ray effect remains the subject of active debate (Okur et al. 2017). Another well-documented effect is the importance of electrolytes on the surfactant critical micelle concentration (CMC), which can be much smaller in presence of salt (Roy et al. 2019; Qazi et al. 2020). The Krafft temperature, below which the salt precipitates, and the surfactant adsorption/desorption process are also modified in presence of electrolytes (Chang & Franses 1992; Roy et al. 2014, 2019). Early experimental work by Reinold & R¨ ucker (1881, 1893) revealed a decrease in the thickness of soap films as salt concentration increased. This phenomenon has been theoretically rationalised by the models proposed by Helmholtz (1879); Gouy (1910); Chapman (1913); Stern (1924) and Debye & H¨ uckel (1923), who introduced the concept of electrostatic screening and elucidated how ionic strength modulates the spatial distribution of charges in aqueous solutions. As a result, the addition of salt induces variation in electrostatic pressure. This impacts the well-known DLVO theory (Derjaguin & Landau 1941; Verwey & Overbeek 1948; Scheludko & Exerowa 1959, 1960) that rationalises the balance between van der Waals attraction and electrostatic repulsion in the interaction between two interfaces. Within the DLVO framework, two equilibrium states are distinguished for thin foam films: the Common Black Film (CBF), stabilised by electrostatic interactions, and the Newton Black Film (NBF), stabilised by steric repulsion (IUPAC 1971). The first ones have a thickness of few tens of nanometers, whereas the second ones have a thickness of about 5 nm (Schulze-Schlarmann et al. 2006). The presence of salt decreases the repulsion between the interfaces, destabilising the CBF and densifies the surfactant monolayers, stabilising the NBF. Exerowa et al. (1981) introduced the concept of a critical electrolyte concentration Cel ,cr , a threshold that governs the transition between the two stable configurations, passing from CBF to NBF. More recently, the influence of electrolytes on the thinning of vertical foam films, which we will also call soap films in the following, has been reported on non-ionic surfactant systems. Aur´ egan & Deike (2024) demonstrated that the presence of salts 3does not modify drainage in any humidity conditions. Even at salt concentrations up to twice that of seawater, the only effect of salt addition on the drainage of thin films is through viscosity, and the thickness h follows the scaling predicted by Monier et al. (2024). However, the stability of liquid films is inherently a dynamic problem. Such films are continuously formed not only at the moment of bubble generation but also within foams during structural rearrangements when two bubbles come into contact, and a new film is created. We thus propose to explore the stability of thin liquid films in a dynamic configuration. Saulnier et al. (2014) developed a set-up that continuously generates vertical films, which allows to explore film formation under controlled conditions. With this configuration, the soap film generated by pulling a frame out of a bath has an initial thickness of a few micrometers fixed by the Frankel law (Mysels et al. 1959; Mysels & Cox 1962; Van Nierop et al. 2008). It thins over time as a result of capillary and gravity-driven drainage and evaporation and eventually ruptures. In this article, we investigate the effect of a high concentration of salt, comparable to seawater, on film evaporation, drainage, and rupture during film generation. We present the experimental set-up for characterising vertical films in Section 2 and the results obtained on film lifetime in Section 3. We rationalise the enhanced film stability in the presence of salt through measurements of their thickness. We demonstrate in Section 4 that salt enables the formation of a stable NBF i.e. aconstant thickness. The results are discussed in Section 5. 
+
+2. Experimental set-up 
+
+To characterise the thinning and rupture of vertical foam films during their genera-tion, we use a setup developed by Saulnier et al. (2014). Fig. 1 ( a) shows a scheme of the setup. The procedure to generate soap films consists in dipping a 3D-printed rectangular frame of surface area 10 cm × 1.7 cm in a circular reservoir of 2.8 cm diameter and 9.7 cm depth. It contains an aqueous solution of tetradecyltrimethylammonium bromide (TTAB - Sigma Aldrich) at the CMC, C = 1.18 g .L−1. We perform experiments with or without addition of sodium chloride (NaCl, Sigma Aldrich) at a concentration 
+
+C◦ 
+
+> s
+
+= 32.5 g .L−1. Note that at this salt concentration the CMC decreases to 0.03 g.L −1, as expected (see Appendix 7). However, we choose to keep the same concentration of TTAB even if the CMC is now lower. To ensure sample purity, we recrystallise the TTAB (Stubenrauch & Khristov 2005) and roast the salt overnight at 700 ◦C. A sub-frame, consisting of two vertical and one horizontal fishing wires, made with nylon fibre of diameter 150 μm, is glued at 2 mm from the main frame. The latter is connected to a force sensor (HBM, 5g) that detects film rupture. The initial position of the manually adjustable translation plate is set so that the horizontal nylon fiber is nearly in contact with the bulk, which sets the zero vertical position. To make the film, the translation plate moves downward at a constant velocity V = 1 mm.s −1 thanks to a motorised linear stage (Newport UTS150CC) coupled to a motion controller (Newport SMC100CC). We set the time origin t = 0 of film generation to coincide with the start of the translation plate’s movement. The maximum range of the translation plate is 81 mm, which limits our study to film lifetimes of 81 s. Above this time, the film length remains constant. Fig. 1 ( b) shows a photograph of a film during its generation. As in Champougny et al. (2018), the film generation setup described above is 4(a)
+
+## 1 cm 
+
+# (b)   
+
+> Figure 1: (a) Set-up scheme of a film generated by translating the reservoir downwards at constant velocity. The force sensor detects the film rupture, and the optical fiber measures the spectrum of the light reflected by the thin film close to the top. The figure exhibits two typical examples of spectra with wavelengths
+> λ∈[400, 800] nm. ( b) Photograph of a foam film pulled out of a bath.
+
+enclosed in a box of dimensions 32 × 32 × 62 cm 3 in which humidity is regulated using a home-made controller described in Boulogne (2019). A PID controller based on an Arduino Uno and a humidity sensor (Honeywell, HIH-4000-003) positioned near the top of the film allows the injection of appropriate proportions of dry and moist gas to achieve the target humidity in the box. Dry gas is produced by circulating nitrogen directly in the box. Moist air is obtained by bubbling air through water. We perform experiments at four different relative humidities Rh ∈ [40 , 60 , 80 , 100] %. To achieve measurements at saturation i.e. at Rh = 100 %, we saturate the atmosphere before starting regulation by sprinkling the edges of the box with water. The whole setup yields a typical uncertainty of ± 0.5 % on the relative humidity Rh. The temperature within the box is maintained at the room temperature, T = 20 ± 1◦C. A horizontal optical fiber (IDIL, France) is placed at the very top of the film, where the film ruptures, at the focal plane of the lens with a 400 μm spot size. The reflected light is collected by six optical fibers (IDIL, France) surrounding the central one and its spectrum is measured by a spectrometer (NanoCalc 2000 VIS/NIR, Ocean Optics) in the wavelength range [400, 800] nm with a time resolution of 50 ms. This enables an acquisition throughout the full thinning process, i.e. from film generation to rupture. Fig. 1 ( a) represents two spectra in the range [400, 800] nm at two different times t.It is clear from these examples that the signal-to-noise ratio is poor in the range [400, 450] nm. The range of wavelengths λ studied is thus restricted to [450, 800] nm. The film thickness h is then calculated from the spectra acquired manually and treated with the Python library optifik relying on microinterferometry and presented in detail in Ziapkoff et al. (2026). This method allows thickness measurements down to 5 with an associated uncertainty σ = ± 1 nm. Film thickness measurements from interferometry require a precise determina-tion of the refractive index. Refractometer measurements (Abbemat MW, Anton 5                                             
+
+> C◦
+> s[g.L −1]AB[nm 2]01.324 3102 10 1.326 3136 20 1.327 3173 30 1.329 3201 40 1.331 3234 50 1.332 3270 Table 1: Coefficients Aand Bof ad hoc Cauchy law, n(λ, C ◦
+> s) = A+B/λ 2,determined at T= 20 ◦C for aqueous TTAB solutions at C= 1 .18 g.L −1with six different salt concentrations C◦
+> s∈[0 ,10 ,20 ,30 ,40 ,50] g.L −1. The refractometer measurements are done for wavelengths
+> λ= [481 .3,513 .1,589 .3,656 .2] nm
+
+Paar) have been performed on aqueous TTAB solutions at C = 1 .18 g .L−1 for wavelengths λ = [481 .3, 513 .1, 589 .3, 656 .2] nm and temperature T = 20 ◦ C, at six salt concentrations C◦ 
+
+> s
+
+∈ [0 , 10 , 20 , 30 , 40 , 50] g .L−1. This allowed us to determine 
+
+ad hoc Cauchy laws for our systems, n(λ, C s) = A + B/λ 2 describing the index of refraction n(λ). The coefficients A and B for each condition are listed in Table 1. The coefficients A = 1 .329 and B = 3209 nm 2 for n(λ, C ◦ 
+
+> s
+
+= 32 .5 g.L−1) are determined by interpolating the data in Table 1. For clarity, in the following, the index of refraction without salt will be denoted as n(λ, 0), and with salt as n(λ, C ◦ 
+
+> s
+
+). As soon as film rupture is detected by the force sensor, its lifetime τf is recorded, and a new one is generated. This allows to accumulate statistics and to obtain histograms of film lifetimes τf with several hundreds of datapoints N . Note that, as explained in the introduction, this setup is meant to measure foam film thinning and rupture during generation. The choice of pulling velocity and frame length ensures that most films rupture during their generation. 
+
+3. Film lifetime 
+
+We create N > 400 films at four different relative humidities with and without sodium chloride in the bath. Fig. 2 ( a, b ) presents the raw data of the lifetimes 
+
+τf measured for each humidity level - displayed in blue, green, yellow, and red for 
+
+Rh = 40 % , 60 % , 80 % , and 100 %, respectively, with ( a) and without ( b) NaCl. For 
+
+N < 100, a transient regime is visible, likely due to the initial adsorption dynamics of the surfactant at both the bath and film interfaces. In the following, those data are not considered in the analysis. Fig. 2 ( c) displays violin plots for all experimental conditions, using the same colour code. The NaCl labels at the bottom of the violin plots indicate the datasets corresponding to the saline solutions. The shaded regions in all plots represent domains where the translation stage has reached its maximum range, and the film is no longer under generation. From Fig. 2, we observe that increasing ambient humidity leads to longer film lifetimes τf , regardless of the presence of salt - an intuitive effect already reported by (Champougny et al. 2018; Aur´ egan & Deike 2024; Poulain et al. 2018). This trend is particularly pronounced in the salt-free system, where a clear jump in lifetime is observed between Rh = 100 % and lower humidity levels. In contrast, the NaCl-containing systems show a more gradual and regular increase in film lifetime with humidity. The presence of NaCl not only increases the mean film lifetime but 60 200 400 600 025 50 75 100    
+
+> τf [s]
+> (a)
+> 0200 400 600
+
+i
+
+> 025 50 75 100
+> τf [s]
+> (b)
+
+40 60 80 100 
+
+Rh [%] 
+
+050 100              
+
+> τf [s]
+> NaCl NaCl NaCl NaCl
+> (c)
+> Figure 2: Lifetime τfof TTAB films for relative humidities
+> Rh∈[40 ,60 ,80 ,100] % represented in blue, green, yellow, red, respectively, for baths with ( a) and without ( b) the addition of 32.5 g .L−1NaCl. ( c) Violin plots of the film lifetime distributions, using the same colour code. The label ’NaCl’ indicates experiments performed with salt. The shaded region corresponds to lifetimes where the translation stage has stopped before bursting.
+
+also results in more dispersed distributions, as indicated by the longer violin plots (Fig. 2 ( c)). 
+
+4. Film thickness 
+
+In this section, we first address the impact of the relative humidity of air on film thinning, and subsequently quantify the effect of salt addition. 4.1. Impact of the relative humidity of air 
+
+To rationalise the increase in film stability induced by the presence of salt, we make 10 films at the four relative humidities studied and measure their thicknesses. We observe that all thinning curves collapse, proving good reproducibility. This motivates the use of only the longest film from each experimental condition for detailed analysis. Fig. 3 ( a) shows the evolution of the film thickness corresponding to the most stable films measured at each relative humidity studied in the salt-free system. We observe that, aside from a slight horizontal shift of the curve at Rh = 40 % (blue) likely due to an offset in the zero reference of the translation stage, all curves closely follow the same dynamics down to a thickness of 400 nm. As shown in the inset of Fig. 3 ( a) (log-lin scale), the curves start to deviate significantly from one another below 400 nm. We observe that, at such small thicknesses, a higher relative humidity leads to a slower thinning rate of the film. As a consequence, at a given generation time t, films formed at higher humidity are systematically thicker. This observation is in good agreement with the previous work by Champougny et al. (2018). The authors considered that drainage and evaporation are decorre-lated. Under saturated vapor, where thinning is governed exclusively by drainage, Champougny et al. (2018) observed that the drainage rate decreases over time. Under non-saturated conditions ( Rh < 100 %), evaporation also contributes to thinning, but its effect becomes significant only for film thicknesses under h = 400 nm. This does not necessarily mean that evaporation dominates over drainage in this regime, 7but that we need to consider both. Eventually, the films rupture as soon as their thickness reaches 10 nm, indicating that no stable CBF or NBF form under these conditions. Fig. 3 ( b) shows four thinning curves corresponding to the most stable films at each tested relative humidity, for the system with added salt. As in the salt-free case, all four curves collapse onto a common curve down to 400 nm. Below this thickness, the curves begin to differ significantly. Thus, the drainage-dominated regime above 400 nm is followed by a regime below where evaporation plays an important role. The inset in Fig. 3 ( b) (log-lin scale) highlights the [0 , 400] nm range, where we observe local thickness variations. These are likely due to the emergence of localised thick patches - an effect previously reported by Aur´ egan & Deike (2024). In Fig. 3 ( b), we also observe the presence of a thickness plateau at all the studied humidities. The corresponding thickness on this plateau is constant at approximately 5 nm independent on the relative humidity. The higher the humidity, the longer the plateau. We identify this plateau as corresponding to the formation of a stable Newton Black Film (NBF). Indeed, in the literature, it is demonstrated that such films, stabilised by a steric repulsion between the surfactant heads at the interfaces, have a thickness between 5 and 10 nm (Schulze-Schlarmann et al. 2006). The thickness at the plateau hp = 5 nm is measured by microinterferometry using a single-layer model with two reflecting interfaces, analogous to a Fabry-Perot cavity (Ziapkoff et al. 2026). This model does not account for the surfactant layer. However, at such thicknesses, the contribution of the surfactant layer cannot be neglected. We can use multilayer models instead to refine the description of the film layer (Mysels et al. 1959). The three-layer model introduced by Duyvis (1962) considers an aqueous core of thickness h† including an ammonium TTAB head sandwiched between tetradecane tails of thickness h1 and yields a total layer thickness htot .According to this model, the calculation of htot and h† are given by 
+
+htot = 2 h1 + h†; h† = hp − 2h1
+
+n21 − 1
+
+n22 − 1 , (4.1) where n1 = 1 .4290 is the refractive index of pure tetradecane (Lide 1993) and n2 the refractive index of the aqueous core, assumed here as n2 = 1
+
+> m
+
+Pmi=1 n(λi, C ◦ 
+
+> s
+
+) with 
+
+m = 1106 the number of discrete wavelength values in the experimental spectrum where λ ∈ [450 , 800] nm. The linear tetradecane chains oriented perpendicular to the interface yield a thickness h1 of 1.7 nm (Simister et al. 1992). Using these values, the actual thickness of the core at any given relative humidity Rh is h† ≈ 0.52 nm, consistent with neutron scattering measurements reported by Simister et al. (1992). Note that we have neglected the variation of the refractive index with the salt concentration. We estimate an increase of n2 of about 3 % at saturation (from Li et al. (2015)), in which experiments are performed on salty water, in the absence of surfactant). Taking this into account would lead to h† = 1 .13 nm. Note that this error, which increases over time, will also impact the values of h in Figure 3 (b) by at most 3 %. 4.2. Impact of salt 
+
+From the thinning curves presented in Fig. 3, a direct comparison can be made for the liquid composition at fixed relative humidity Rh. Fig. 4 shows the thinning dynamics with and without salt at Rh = 40 %, 60 %, 80 %, and 100 % in subfigures 8
+
+[h] 10 20 30 40                
+
+> t[s]
+> 01000 2000 3000 4000
+> h [nm]
+> (a)010 20 30 40 50 60 70
+> t[s]
+> 01000 2000 3000 4000
+> h [nm]
+> (b)10 20 30 40 10 1
+> 10 2
+> 10 3
+> 020 40 60 10 1
+> 10 2
+> 10 3
+
+Figure 3: Time evolution of film thickness for the most stable TTAB film at each relative humidity tested ( Rh = 40 % , 60 % , 80 % , 100 % ; blue, green, yellow, red), ( a) without ( ▲) salt and ( b) with ( □) 32.5 g .L−1 NaCl. Insets show the data in log-lin scale. 
+
+[h] 5 10 15 20 25 
+
+t [s] 01000 2000 3000 
+
+> h [nm]
+
+20 40 60 
+
+t [s] 01000 2000 3000 
+
+> h [nm]
+
+20 40 60 
+
+t [s] 02000 4000 
+
+> h [nm]
+
+20 40 60 
+
+t [s] 02000 
+
+> h [nm]
+
+10 20 10 1
+
+10 2
+
+10 3
+
+25 50 10 1
+
+10 2
+
+10 3
+
+25 50 10 1
+
+10 2
+
+10 3
+
+25 50 75 10 1
+
+10 2
+
+10 3
+
+(a) (b)(c) (d)
+
+Rh = 40 % Rh = 60 % 
+
+Rh = 80 % Rh = 100 % 
+
+Figure 4: Thinning curves of films with ( □) and without ( ▲) 32.5 g .L−1 NaCl for the four fixed relative humidities: ( a) Rh = 40 % , ( b) Rh = 60 % ,(c) Rh = 80 % , and ( d) Rh = 100 % . The ▲ markers for films without salt are outlined in black for clarity. Insets show the data in log-lin scale. 
+
+(a), ( b), ( c), and ( d), respectively. Each figure includes an inset representing the data in log-lin scale. In Fig. 4, for each tested humidity, the thinning curves with or without salt follow the same dynamics down to 100 nm in agreement with results reported previously by Aur´ egan & Deike (2024). In contrast, when h < 100 nm, the presence of salt tends to slow down thinning and to stabilise the NBF. 9
+
+5. Interpretation 
+
+In this section, we first address the stochastic nature of film lifetimes. We then provide a detailed discussion of the thinning dynamics, followed by a quantification of the contribution of evaporation to film rupture. 5.1. Film rupture stochasticity 
+
+The stochastic nature of film rupture has been explored in different contexts, includ-ing public studies of horizontal film lifetimes sealed in bamboo cylinders by Tobin et al. (2011), experimental studies on two-dimensional foams by Forel et al. (2019), droplet coalescence simulations by Perumanath et al. (2019), and more recently, thin-film pressure balance (TFPB) measurements by Chatzigiannakis & Vermant (2020). However, the dynamics of vertical film rupture remains underexplored. Given the data shown in Sec. 3, we quantify the degree of stochasticity in vertical film rupture by following the approach of Shaw (1984). Specifically, we represent the difference of lifetime of consecutive films through return maps, plotting the interval 
+
+Ti+1 = τ i+2  
+
+> f
+
+− τ i+1  
+
+> f
+
+(5.1) between the lifetimes of films i + 2 and i + 1 as a function of the interval Ti
+
+between the lifetimes of films i + 1 and i. If rupture events, considered here as independent, are strongly correlated, characteristic patterns should emerge in these maps. Conversely, if rupture events are independent, the resulting cloud of points should be homogeneously distributed and centered, reflecting stochastic dynamics. Figures 5 ( a) and 5 ( b) display return maps for films with or without salt at four different relative humidities, Rh ∈ [40 , 60 , 80 , 100] %, using the same colour code as in Fig. 2. To quantify any privileged angular directions from the cloud data points, we construct a new variable zi(θ) defined as 
+
+zi(θ) = 
+
+
+
+Ti − ˜T
+
+
+
+cos θ +
+
+
+
+Ti+1 − ˜T
+
+
+
+sin θ, (5.2) with i ∈ [0 , N − 1] and θ ∈ [0 , 2π] and where the mean value is defined as ˜T = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+Ti. (5.3) Figures 5 ( c) and 5 ( d) then present the variance 
+
+⟨z(θ)2⟩ = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+zi(θ)2, (5.4) plotted in polar coordinates as a function of θ. For clarity, angles are expressed in degrees in these polar representations. The results in Fig. 5 ( c, d ) indicate that, for both systems and at all relative hu-midities, the variance is consistently more pronounced along the 315 ◦–135 ◦ direction, with the amplitude of the variance lobes increasing with humidity. This trend reflects a negative correlation between rupture events. When Ti is larger than average, Ti+1 
+
+tends to be smaller, and vice versa . In other words, long films are statistically more likely to be followed by shorter ones. Salt addition does not significantly alter this behavior. This robust feature suggests that film rupture is neither purely stochastic nor fully deterministic, but rather exhibits intermediate dynamics. 10 
+
+[h] −50 0 50      
+
+> Ti[s]
+> −50 050
+> Ti+1  [s]
+> −50 050
+> Ti[s]
+> −50 050
+> Ti+1  [s]
+> (a)(b)0°
+> 45 °
+> 90 °
+> 135 °
+> 180 °
+> 225 °
+> 270 °
+> 315 °
+> 25
+> 50
+> 75
+> 100
+> (c)0°
+> 45 °
+> 90 °
+> 135 °
+> 180 °
+> 225 °
+> 270 °
+> 315 °
+> 200
+> 400
+> 600
+> (d)
+
+Figure 5: (a) Experimental return maps for films without salt at four relative humidities Rh ∈ [40 , 60 , 80 , 100] % . ( b) Experimental return maps for films with 32.5 g .L−1 sodium chloride addition under identical humidity conditions. Polar representation of the variance ⟨zi(θ)2⟩ as a function of the angle θ for films (c) without salt and (d) with salt addition, at relative humidities 
+
+Rh ∈ [40 , 60 , 80 , 100] % . All figures use the same colour code than in Fig. 2. 
+
+5.2. Film evaporation without salt 
+
+In this section, we provide a quantitative description of the film thinning dynamics over the entire film lifetime, under all humidity conditions, to rationalise the results reported in Sec. 3. We consider here only salt-free films. As shown in Fig. 3 ( a), small offsets are present in experimental data, which we attribute to slight differences in the initial positioning of the translation stage. We correct this artifact by shifting each data set in time, as explained in the following. We observe that the early stages of film thinning are mostly governed by drainage and not depend on humidity. This leads us to take the experimental data obtained in a saturated environment, displayed as red triangles, as a reference. We minimise the least-squares error between the t(h) curves and the reference curve, restricted to the interval h ∈ [1000 , 3000] nm, in the early stage of the film dynamics and with a sufficient number of data points to determine the optimal temporal shifts t0.The corresponding temporal corrections are smaller than one second. The resulting shifted datasets are shown in Fig. 6, using triangular symbols and the same colour code as in the previous sections. To determine theoretically the evolution of the thickness in time h(t), we use the approach by Pasquet et al. (2024) and by Champougny et al. (2018). In the following, we make the hypothesis that the film thickness is uniform. The slope of each curve in Fig. 6 writes, dh dt Rh, T
+
+= − 2je − jd, (5.5) where T is the film temperature, assumed to be equal to the room temperature, je is the water evaporation rate from the film, the factor 2 comes from the presence of two interfaces, and jd is the drainage rate inside the film, supposed independent of the atmospheric humidity. Both contributions are defined as positive. By definition, in the saturated experimental data, the evaporation rate je = 0 and dh dt Rh=100 % , T =
+
+−jd.To extract the drainage curves jd(h), we first smooth the experimental data obtained in a saturated atmosphere with a third order Savitzky–Golay filter (Savitzky & Golay 1964) with a window size of 11 points and derive the temporal data h(t). The 11 
+
+> [h]
+
+0 10 20 30 40    
+
+> t−t0[s]
+
+02000 4000 
+
+> h [nm]
+
+0 10 20 30 40 10 1
+
+10 2
+
+10 3                              
+
+> Figure 6: Time shifted evolution of film thickness for the TTAB film showed in Fig. 3 (a)at relative humidity Rh= 40 % ,60 % ,80 % ,100 % without salt. The respective time shifts t0at Rh= 40 % ,60 % ,80 % are 0.764 s, 0.047 s, and 0.166 s. The black line represents the computation of Eq. 5.5 at saturation, whereas dashed lines represent the computation at relative humidity
+> Rh= 40 % ,60 % ,80 % . The fitting values of the prefactor aare
+> {0.74 ,0.67 ,0.55 }and the evaporation rate jeis [21 ,13 ,5] nm.s −1, for the three different humidities. Insets show the models and experimental data in log-lin scale.
+
+derivation, noted jd(t), is smoothed with the same procedure, and an interpolation gives us the drainage rate jd(h). We numerically solve Eq. 5.5 with the function odeint 
+
+from the scipy.integrate package and the result is displayed in Fig. 6 as a black line. We restrain our computation to h > 5 nm because we do not take into account disjoining pressure, important at these length-scales. As expected, the numerical solution accurately follows the experimental data. To perform this analysis for data at any relative humidity Rh, following Eq. 5.5, we need to determine the evaporation rate je(h) for any thickness. We use the framework established by Schmidt & Beckmann (1930), Dollet & Boulogne (2017), Boulogne & Dollet (2018), and Pasquet et al. (2024) to obtain an expression for 
+
+je(h). In particular, Boulogne & Dollet (2018) demonstrated that natural convection evaporation significantly affects vertical aqueous films of a few centimeters or more, a criterion that we meet (Sec. 3). This observation is also supported by the direct calculation of the Grashof number, Gr = gν2
+
+ρ∞ − ρs
+
+ρ∞
+
+L3, (5.6) where g = 9 .81 m.s −2 is the gravitational acceleration, ν = 1 .5 × 10 −5 m2.s −1 the kinematic viscosity of water vapor in air, ρs and ρ∞ = ρsRh, the air densities at saturation and far from the evaporating surface, respectively, and L the characteristic vertical length scale of the evaporating film, which we take equal to 20 mm for the calculation. Gr quantifies the relative importance of buoyancy-driven flow. Large Gr values indicate that natural convection dominates the evaporative transport. Following Jones (1978) and Boulogne & Dollet (2018), we compute ρs and ρ∞ at any relative humidity. Across all experimental conditions, we consistently find Gr ≫ 1(typically Gr > 200), confirming that buoyancy-driven convection is the dominant mechanism. 12                  
+
+> Rh[%] 40 60 80 100
+> a0.74 0.67 0.55 –
+> a′10.7 0.7 0.7 Table 2: Summary of the fitted values of parameters a(Eq. 5.7) and a′(Eq. 5.10).
+
+Accordingly, the evaporative rate of a film can be approximated as 
+
+je = a ˆc0D (csat − c∞)
+
+ρw
+
+Gr 1/4
+
+L , (5.7) where ˆ c0 = 0 .478 is a prefactor arising from a numerical solution (Boulogne & Dollet 2018), D = 2 .44 × 10 −5 m2.s −1 is the diffusion coefficient of water vapor in air, 
+
+csat and c∞ = csat Rh are the mass concentrations of saturated vapor and ambient water vapor, respectively and ρw = 1000 kg.m −3 is the water density. At T = 20 ◦C, 
+
+csat ≈ 17 g.m −3 for water. The prefactor a will be used as a fit parameter. We solve Eq. 5.5 Pasquet et al. (2024) using the explicit expression of je (Boulogne & Dollet 2018) given by Eq. 5.7. We start all computations at t = t0 and h =3.2 μm, which is the first thickness detected in the reference data. We numeri-cally solve Eq. 5.5 with the function odeint from the scipy.integrate package. The result is displayed in Fig. 6 as dashed black lines for relative humidities Rh ∈
+
+[40 , 60 , 80] % and captures the experimental thinning dynamics. Indeed, the values of 
+
+je ∈ [21 , 13 , 5] nm .s−1 are comparable with the values je ∈ [16 , 8, 3.5] nm .s−1 reported by Champougny et al. (2018). The fitting parameter a accounts for deviations from the idealised model, such as convection, thermal exchange, complex geometry (including the presence of the bath), the variation of L and Gr in time, and the presence of concentration and temperature gradients. Notably, a (see Table 2) remains of order 1, indicating that our expression of je captures the dominant physical mechanisms. 5.3. Film evaporation with salt 
+
+To rationalise the results presented in Fig. 3 ( b), we follow the same approach as in Subsec. 5.2. As observed in Fig. 4, salt has no significant effect on drainage. We also previously argued that drainage also does not depend on humidity. Consequently, to mitigate potential offset on experimental data, we shift by t0 all datasets in time with respect to the same reference – the red triangle displayed in Fig. 6 – using the same least-squares error minimisation than in Subsec. 5.2. The corresponding temporal corrections for all humidity conditions tested are smaller than one second. Fig. 7 ( a) shows the shifted datasets using square symbols and the same colour as in the previous sections. The inset is the log-lin representation. The difficulty in applying the model developed in Subsec. 5.2 arises because, as the film thins by evaporation, the salt concentration Cs increases and, in turn, affects the evaporation described in Eq. 5.7. This coupled effect results from the dependence of the parameters csat (Cs) and Gr( Cs) on the salt concentration. Additionally, it is well established in the literature (O’Brien 1948; Kou 1999; Generous et al. 2020; L´ opez-Borrell et al. 2024) that the presence of salt affects the humidity fixed point. For instance, at Cs = 32 .5 g .L−1, the liquid-vapor equilibrium is reached at Rh = 98 %, 13 
+
+[h] 0 10 20 30 40 50 60 70         
+
+> t−t0[s]
+> 01000 2000 3000
+> h [nm]
+> 010 20
+> t−t0[s]
+> 0100 200 300 400
+> Cs [g .L−1]
+
+×× × ×    
+
+> 020 40 60 10 1
+> 10 2
+> 10 3
+> (a)(b)
+
+Figure 7: ( a) Time shifted evolution of the film thicknesses for TTAB films with salt shown in Fig. 3 (b). The dashed lines represent the computation of h(t) at the four relative humidities with the function odeint for Eq. 5.5 and Eq. 5.8. The respective time shifts t0 are 0.672 s, 0.669 s, 0.105 s and 0.672 s and the values of the prefactor a′ are {1, 0.7, 0.7, 0.7}. Insets show the models and experimental data in log-lin scale. (b) Numerical solutions of the salt concentration from Eq. 5.5 and Eq. 5.8 for salt concentration Cs with relative humidity Rh = 40 % , 60 % , 80 % , 100 % . Coloured crosses correspond to t⋆ such as h⋆(t⋆) = 100 nm, where the corresponding salt concentrations are Cs(t⋆).The black straight line represents the saturation of salt in water. 
+
+while at saturation ( Cs = 360 g .L−1 at T = 20 ◦ C), the equilibrium humidity drops to Rh ≈ 78 %. A full modeling of the film dynamics requires an explicit description of the temporal evolution of the salt concentration over time. Applying a mass balance between a time t and a time t + d t over an infinitesimal film element of length d z both in the absence of evaporation and with evaporation leads us to the equation for the evolution of the salt concentration Cs in the film, dC s
+
+dt Rh, T
+
+= 2 je
+
+Cs
+
+h . (5.8) Using the ideal gas law for water vapor in air, we express the saturated vapor mass concentration as 
+
+csat (Cs) = csat 
+
+Psat (Cs)
+
+Psat (0) , (5.9) where Psat (Cs) is the saturated vapor pressure at salt concentration Cs, and Psat (0) = 2340 Pa the saturated vapor pressure of pure water. To obtain Psat (Cs) at any given 
+
+Cs, we interpolate the data of L´ opez-Borrell et al. (2024). As shown by Eq. 5.6, L is the only variable of the Grashoff number, and we take it equal to 20 mm as in Sec. 5.2. The resulting new expression for je is 
+
+je = a′ˆc0
+
+Dcsat 
+
+ Psat (Cs) 
+
+> Psat (0)
+
+− R h
+
+
+
+ρw
+
+Gr 1/4
+
+L , (5.10) with D and ρw the same values as in Eq. 5.7 and a′ the new fit parameter. As in the previous section, we numerically solve Eq. 5.5 and Eq. 5.8 down to h > 5 nm, with the same expression of jd but with the expression of je given by Eq. 5.10 using the function odeint from the scipy.integrate package. The results for h(t) are displayed as dashed black lines for the different relative humidities in Fig. 7 ( a) and the values of the fitting parameter a′ are given in Table 2. 14 This new model accurately captures the experimental data for most of its duration, down to h = 100 nm in all humidity conditions. Note that the thinning curves with or without salt are very similar, which means that the effect of salt on evaporation is negligible down to such thicknesses. Nevertheless, it allows us to estimate the salt concentration over time. The variation Cs(t) for each humidity condition is displayed in Fig. 7 ( b) as coloured lines for the different relative humidities. The black horizontal line represents the saturation of salt in water. We identify the time t⋆ at which the thickness reaches h⋆ = 100 nm. The corresponding salt concentrations for relative humidities Rh ∈ [40 , 60 , 80 , 100] % are Cs(t⋆) ∈ { 150 , 73 , 58 , 31 } g.L−1. These points are displayed as coloured crosses in Fig. 7 ( b). Since the model is no longer valid below these thicknesses, we cannot predict what happens in these concentrated thin films. Below a thickness of 100 nm, the model predicts a more rapid thinning than observed in the experiments. At such high salt concentrations, Aur´ egan & Deike (2024) observed instabilities in the film thickness. The thinning slowdown noticed in experimental data below h⋆ = 100 nm could be attributed to those instabilities, or to a complex coupling between drainage and evaporation. Our conclusion is that neither the drainage nor the evaporation rates are measur-ably affected by the addition of salt, despite the strong increase in salt concentration. The impact of salt only appears at smaller thicknesses and is threefold: (i) the thinning rate is smaller than predicted by the model, (ii) some thickening regions are observed, (iii) the NBF is more stable. Among these three effects, the one that controls the film rupture seems to be the stabilisation of the NBF, which we quantify in the following. From our model, we extract the salt concentration over time and we show that it cannot explain the evolution of the thinning curves. 5.4. Film rupture 
+
+As illustrated in Fig. 8 ( a), in addition to the film lifetime τf determined in Fig. 2, two characteristic times can be extracted from each thinning curve: the thinning lifetime τt, and the plateau lifetime τp. τt is determined by plotting the thickness 1/h against t as shown in the inset of Fig. 8 ( a) in log-lin scale. In this example, 
+
+τt = 22 .5 s corresponds to the jump in 1 /h . If the identification of this time is not as obvious as in this example, we take the intersection between a horizontal line at the mean plateau 1 /h p and an affine regression, 1 /h = pt + q with p and q constants, fitted to the data in the range h ∈ [50 , 200] nm. The plateau lifetime τp is defined as the difference τf − τt.By extracting these two characteristic times for each set of 10 films, together with the film lifetime τf (Fig. 2), we plot in Fig. 8 ( b) the mean film lifetime ⟨τf ⟩
+
+as a function of the mean thinning time ⟨τt⟩. The circle’s colour code is the same as in Fig. 2 for relative humidity. The blue and red crosses present salt-free and salt containing systems, respectively. The ⟨τf ⟩ = ⟨τt⟩ line is included in black. The collapse of all blue points onto this line indicates that film rupture occurs immediately after thinning ceases, implying that no stable plateau forms without salt. On the other hand, the red crosses are above the ⟨τf ⟩ = ⟨τt⟩ line, suggesting that film rupture occurs during the plateau phase in salted systems. Previous TFPB studies (Exerowa et al. 1981) have shown that a Newton Black Film can be stabilised above a critical salt concentration Cel ,cr . For films made with TTAB, Schulze-Schlarmann et al. (2006) reported a critical sodium chloride concentration Cel ,cr = 23 .4 g .L−1 that is lower than our initial salt concentration of 15 
+
+[h] 10 20 30 40 50 60  
+
+> t[s] 0500 1000 1500 2000 2500
+> h [nm]
+
+## τf
+
+## τt τp
+
+(a)   
+
+> 20 40 60
+> t[s] 10 0
+> 10 1
+> 10 2
+> 1/h  [μm−1]
+
+τt    
+
+> 20 30 40 50
+> 〈τt〉[s]10 20 30 40 50 60 70
+> 〈τf 〉 [s]
+
+(b)   
+
+> 〈τf〉=〈τt〉
+> TTAB TTAB + NaCl
+
+Figure 8: (a) Illustration of the three characteristic times, the film lifetime τf ,the thinning lifetime τt and the plateau lifetime τp for a thinning curve obtained with C◦ 
+
+> s
+
+= 32.5 g .L−1 NaCl at a relative humidity of Rh = 80 % . The inset shows the determination of τt from the plot of 1/h versus t (log-lin scale). ( b)Mean film lifetime, ⟨τf ⟩, as a function of the mean thinning time, ⟨τt⟩, for all relative humidity conditions tested using the same colour code as previous sections, either with ( +) or without ( +) 32.5 g .L−1 NaCl. The solid black line corresponds to ⟨τf ⟩ = ⟨τt⟩.
+
+[h] 10 20 30 40 50 60 
+
+t [s] 
+
+01000 2000 3000 4000 
+
+> h [nm]
+
+20 40 60 10 1
+
+10 2
+
+10 3 0 g .L−1
+
+> 3.25 g .L−1
+> 32 .5 g .L−1
+> 65 g .L−1
+> 97 .5 g .L−1
+
+Figure 9: Thinning curves of films in Fig 4 (c) with the addition of the thinning curve at Rh = 80 % with initial concentration 
+
+C◦ 
+
+> s
+
+∈ [3 .25 , 65 , 97 .5] g.L−1represented using a blue-scale gradient indicating concentration . Insets show the data in log-lin scale. 
+
+C◦ 
+
+> s
+
+= 32 .5 g .L−1. The plateau is thus probably stabilised by the same process. A surprising feature is that no common black film is stabilised in the absence of salt. This is unexpected as, in the absence of salt, the screening is much smaller and an electrostatic repulsion between the interfaces should appear (Bergeron 1997). The absence of CBF stabilisation could be attributed to the dynamics of the process. However, further investigation would be necessary to clarify the mechanism. For example, systematic measurements in a Thin Film Pressure Balance, controlling the pressure jump applied on the thin film could give insights on the transition between CBF and NBF. 16 
+
+> [h]
+
+## 40 60 80 100 
+
+Rh [%] 
+
+## 45678     
+
+> 〈hp〉 ±  σ [nm]
+> 0 g .L−1
+> 3.25 g .L−1
+> 32 .5 g .L−1
+> 65 g .L−1
+> 97 .5 g .L−1
+> Figure 10: Mean film thickness ⟨hp⟩averaged over the plateau once local thickening is no longer observed in the thinning curves in Fig. 4 and Fig. 9.
+> σ= 1 nm is the uncertainty estimated on each measurement. The blue-scale gradient indicates the salt concentration.
+
+We performed complementary measurements at Rh = 80 % with different initial concentrations C◦ 
+
+> s
+
+. Fig. 9 shows the results of Fig. 4 ( c) together with initial concentration C◦ 
+
+> s
+
+∈ [3 .25 , 65 , 97 .5] g .L−1 represented using a blue-scale gradient indicating concentration. We note that for C◦ 
+
+> s
+
+∈ [65 , 97 .5] g .L−1, most films attain the 81 mm limit of the translation stage. Thus, in Fig. 9 the thinning curves do not correspond to the longer film as in Sec. 4, but rather to the longest film attained within this limit. The observed thickness, about 5 nm corresponds to the typical thickness of NBF as observed in the TFPB Exerowa et al. (1981). Except without added salt, an NBF forms at all concentrations, even below Cel ,cr . This could be attributed to the increase of salt concentration over time, leading to a concentration higher than 
+
+Cel ,cr on the plateau. In Fig. 10, the thickness on the plateau ⟨hp⟩ measured in each experiment is plotted as a function of atmospheric humidity. ⟨hp⟩ is obtained by averaging the thickness on the plateau, at the later times, once local thickening is no longer observed. The uncertainty σ is determined the error bar measured on each measure, before averaging. We note that the thickness plateau is constant in all experiments at approximately 5 ±1 nm. 
+
+6. Conclusion 
+
+In this article, we investigate the influence of a high salt concentration on evaporation, drainage, and rupture of vertical soap films, pulled out of a bath containing a solution of TTAB. We illustrate the previously reported increase in film lifetime with humidity, both with and without salt. We also show that, at any humidity, the addition of salt leads to longer film lifetimes and a more dispersed distribution. We discuss the stochastic nature of film rupture using the approach of Shaw (1984), plotting return maps of lifetime differences. Surprisingly, an intermediate negative correlation was observed across all humidity conditions, regardless of whether salt was added or not. Long films tend to be followed by shorter ones and vice versa. The thinning curves have the same dynamics down to about 400 nm for all 17 humidities, in the presence or in the absence of salt. Below 400 nm, films are thicker at higher humidity. This is interpreted as a transition from a drainage-dominated regime to a regime in which evaporation cannot be neglected. Comparison of curves with and without salt at each relative humidity reveals that salt does not influence the thinning dynamics down to 100 nm. The evaporation rate in this regime is quantified experimentally and compared with a model of vertical film evaporation, which accounts for the data, providing the introduction of a fitting parameter. It demonstrates that, down to 100 nm, the effect of salt on evaporation is negligible. Below this threshold, thinning is slowed down in the presence of salt and local thickening can appear. These unexplained observations suggest that confinement effects may become relevant. For films without salt, neither Common Black Films (CBF) nor Newton Black Films (NBF) are stable. All films rupture when their thickness reaches 5-10 nm. By contrast, in the presence of salt, a thickness plateau at 5 nm is observed at all relative humidities, indicating the systematic stabilisation of an NBF. Relative humidity is found to positively influence the plateau lifetime. Complementary measurements at different salt concentrations confirm the existence of the plateau, and its stability increases with salt concentration. 
+
+Acknowledgments 
+
+Funding by the National Research Agency (ANR - 22-CE06-0029) is acknowledged. We are grateful to Luc Deike, Giuseppe Foffi, and Luis G´ omez-Nava for fruitful discussions. We also thank Laura Wallon for the measurements of the refractive indices. We acknowledge the use of LLM to improve the style of certain figures and the fluidity of certain sentences. 
+
+Declaration of interests. 
+
+The authors report no conflicts of interest. 
+
+Authors Contribution 
+
+The study was conceived and designed by ER, AS, and VZ. Experimental execution and subsequent data analysis were carried out by VZ. The modeling was discussed and derived by ER, AS, FB and VZ. The initial manuscript was drafted by VZ, and all authors (VZ, ER, AS, FB) contributed critically to its revision and approved the final version. 
+
+7. Surface tension of TTAB solutions with and without NaCl 
+
+Figure 11 reports a surface tension measurement campaign investigating the effect of adding 32.5 g.L −1 of NaCl to TTAB solutions. Blue crosses ( ×) and red crosses ( ×)represent the results obtained without and with NaCl, respectively. The measure-ments were performed at T = 20 ◦C using a pendant drop TECLIS @TRACKER ™
+
+tensiometer. From Fig. 11, we observe a significant decrease in the critical micelle concentration, from 1.18 g.L −1 to 0 .03 g.L −1.18 
+
+[h] 10 −3 10 −2 10 −1 10 0 10 1 
+
+> CTTAB [g .L−1]
+
+40 50 60 70 
+
+> γ [mN .m−1]
+> With NaCl Without NaCl
+
+Figure 11: Surface tension as a function of TTAB concentration with ( ×) and without ( ×) the addition of 32 .5 g.L −1 of NaCl. 
+
+REFERENCES Aur´ egan, T & Deike, L 2024 Drainage and lifetime of thin liquid films: The role of salinity and convective evaporation. arXiv .
+
+Bergeron, V 1997 Disjoining pressures and film stability of alkyltrimethylammonium bromide foam films. Langmuir 13 (13), 3474–3482. 
+
+Boulogne, F. 2019 Cheap and versatile humidity regulator for environmentally controlled experiments. The European Physical Journal E 42 (4), 51. 
+
+Boulogne, F. & Dollet, B. 2018 Convective evaporation of vertical films. Soft Matter 14 (9), 1665–1671. 
+
+Boulogne, F., Restagno, F. & Rio, E. 2022 Measurement of the temperature decrease in evaporating soap films. Physical Review Letters 129 (26), 268001. 
+
+Champougny, L., Henaff, R., Restagno, F., Boulogne, F. & Rio, E. 2018 Influence of evaporation on soap film rupture. Langmuir 34 (10), 3221–3227. 
+
+Chang, C. H. & Franses, E. I. 1992 Modified langmuir–hinshelwood kinetics for dynamic adsorption of surfactants at the air/water interface. Colloids and Surfaces 69 (2–3), 189– 201. 
+
+Chapman, D. L. 1913 LI. A contribution to the theory of electrocapillarity . The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science 25 (148), 475– 481. 
+
+Chatzigiannakis, E. & Vermant, J. 2020 Breakup of thin liquid films: From stochastic to deterministic. Physical Review Letters 125 (15), 158001. 
+
+Copin-Mont´ egut, G. 2002 Le sel de la mer . 
+
+Debye, Peter & H¨ uckel, Erich 1923 Zur theorie der elektrolyte. i. gefrierpunktserniedrigung und verwandte erscheinungen. Physikalische Zeitschrift 24 , 185–206. 
+
+Deike, L. 2022 Mass transfer at the ocean–atmosphere interface: The role of wave breaking, droplets, and bubbles. Annual Review of Fluid Mechanics 54 , 191–224. 
+
+Derjaguin, B.V. & Landau, L.D. 1941 Theory of the stability of strongly charged lyophobic sols and of the adhesion of strongly charged particles in solutions of electrolytes. Acta Physicochimica URSS 14 , 633. 
+
+Dollet, B. & Boulogne, F. 2017 Natural convection above circular disks of evaporating liquids. Physical Review Fluids 2 (5), 053501. 
+
+Duyvis, E. M. 1962 Phd thesis, University of Utrecht. 
+
+Exerowa, D., Nikolov, A. & Zacharieva, M. 1981 Common black and newton film formation. Journal of Colloid and Interface Science 81 (2), 419–429. 
+
+Forel, E., Dollet, B., Langevin, D. & Rio, E. 2019 Coalescence in two-dimensional foams: A purely statistical process. Physical Review Letters 122 (8), 088002. 
+
+Generous, M. M., Qasem, N. A. A., Qureshi, B. A. & Zubair, S. M. 2020 A comprehensive review of saline water correlations and data-part i: Thermodynamic properties. Arabian Journal for Science and Engineering 45 (11), 8817–8876. 19 
+
+Gouy, L. G. 1910 Sur la constitution de la charge ´ electrique ` a la surface d’un ´ electrolyte. 
+
+Journal de Physique Th´ eorique et Appliqu´ ee 9 (1), 457–468. 
+
+Helm, Rachel R. 2021 The mysterious ecosystem at the ocean’s surface. PLoS Biology 19 (4), e3001046. 
+
+Helmholtz, H. Von 1879 Studien ¨ uber electrische Grenzschichten. Annalen der Physik 243 (7), 337–382. 
+
+IUPAC 1971 Definitions, terminology, and symbols in colloid and surface chemistry. Chemistry International – Newsmagazine for IUPAC 25 (1). 
+
+Jones, F. E. 1978 The air density equation and the transfer of the mass unit. Journal of Research of the National Bureau of Standards 83 (5), 419–428. 
+
+Jones, G. & Ray, W. A. 1935 The surface tension of solutions. Journal of the American Chemical Society 57 (5), 957–958. 
+
+Jones, G. & Ray, W. A. 1937 The surface tension of solutions of electrolytes as a function of the concentration. i. a differential method for measuring relative surface tension. Journal of the American Chemical Society 59 (1), 187–198. 
+
+Kou, Y. 1999 Vapor pressure and water activity measurements of saturated salt solutions made with d2o at 20 °c. Food Chemistry 66 (2), 253–255. 
+
+Li, X., Liu, L., Zhao, J. & Tan, J. 2015 Optical properties of sodium chloride solution within the spectral range from 300 to 2500 nm at room temperature. Appl. Spectrosc. 69 (5), 635–640. 
+
+Lide, D. , ed. 1993 Handbook of Chemistry and Physics, 73rd edn. Cleveland, OH: CRC Press Inc. 
+
+L´ opez-Borrell, A., Lora-Garc´ ıa, J., Cardona, S. C., L´ opez-P´ erez, M.-F. & Fombuena, V. 2024 Vapor pressure and evaporation studies of saline solutions on natural and synthetic fabrics for industrial water treatment. Polymers 16 (16), 2335. 
+
+Miguet, J., Pasquet, M., Rouyer, F., Fang, Y. & Rio, E. 2021 Marginal regeneration-induced drainage of surface bubbles. arXiv preprint arXiv:2109.07966 .
+
+Monier, A., Gauci, F.-X., Claudet, C., Celestini, F., Brouzet, C. & Raufaste, C. 2024 Self-similar and universal dynamics in drainage of mobile soap films. arXiv Preprint. 
+
+Mysels, K. J. & Cox, M. C. 1962 An experimental test of frankel’s law of film thickness. 
+
+Journal of Colloid Science 17 (2), 136–145. 
+
+Mysels, K. J., Shinoda, K. & Frankel, S. 1959 Soap Films, Studies of Their Thinning and a Bibliography. Pergamon Press. 
+
+O’Brien, F. E. M. 1948 The control of humidity by saturated salt solutions. J. Sci. Instrum. 
+
+25 (3), 73–76. 
+
+Okur, Hamza I., Chen, Yujie, Wilkins, David M. & Roke, Sylvie 2017 The jones-ray effect reinterpreted: Surface tension minima of low ionic strength electrolyte solutions are caused by electric field induced water-water correlations. Chemical Physics Letters 684 ,433–442. 
+
+Onsager, L. & Samaras, N. N. T. 1934 The surface tension of debye-h¨ uckel electrolytes. The Journal of Chemical Physics 2 (8), 528–536. 
+
+Pasquet, M., Boulogne, F., Restagno, F. & Rio, E. 2024 Lifetime of vertical giant soap films: Role of the relative humidity and film dimensions. Soft Matter 20 (10), 2374–2380. 
+
+Perumanath, S., Borg, M. K., Chubynsky, M. V., Sprittles, J. E. & Reese, J. M. 2019 Droplet coalescence is initiated by thermal motion. Physical Review Letters 122 (10), 104501. 
+
+Poulain, S, Villermaux, E & Bourouiba, L 2018 Ageing and burst of surface bubbles. 
+
+Journal of fluid mechanics 851 , 636–671. 
+
+Qazi, Muhammad J., Schlegel, Sandra J., Backus, Ellen H. G., Bonn, Mischa, Bonn, Daniel & Shahidzadeh, Noushine 2020 Dynamic surface tension of surfactants in the presence of high salt concentrations. Langmuir 36 (27), 7956–7964. 
+
+Reinold, A.W. & R¨ ucker, A.W. 1881 On the Electrical Resistance of Thin Liquid Films, with a revision of Newton’s a Table of Colours. Philosophical Transactions of the Royal Society of London 172 , 447–490. 
+
+Reinold, A.W. & R¨ ucker, A.W. 1893 On the thickness and electrical resistance of thin liquid films. Philosophical Transactions of the Royal Society A 184 , 505. 
+
+Roy, J. C., Das, S. & Islam, Md. N. 2019 Influence of kosmotropes and chaotropes on the 20 
+
+krafft temperature and critical micelle concentration of tetradecyltrimethylammonium bromide in aqueous solution. J. Solution Chem. 48 (5), 758–773. 
+
+Roy, J. C., Islam, Md. N. & Aktaruzzaman, G. 2014 The effect of nacl on the krafft temperature and related behavior of cetyltrimethylammonium bromide in aqueous solution. Journal of Surfactants and Detergents 17 (2), 231–242. 
+
+Saulnier, L., Champougny, L., Bastien, G., Restagno, F., Langevin, D. & Rio, E. 2014 A study of generation and rupture of soap films. Soft Matter 10 (16), 2899. 
+
+Savitzky, Abraham & Golay, M. J. E. 1964 Smoothing and differentiation of data by simplified least squares procedures. Analytical Chemistry 36 (8), 1627–1639. 
+
+Scheludko, A. & Exerowa, D. 1959 ¨Uber den elektrostatischen druck in schaumfilmen aus w¨ asserigen elektrolytl¨ osungen. Kolloid-Zeitschrift 165 , 148–151. 
+
+Scheludko, A. & Exerowa, D. 1960 ¨Uber den elektrostatischen und van der waalsschen zus¨ atzlichen druck in w¨ asserigen schaumfilmen. Kolloid-Zeitschrift 168 , 24–32. 
+
+Schmidt, E. & Beckmann, W. 1930 Das temperatur- und geschwindigkeitsfeld vor einer w¨ arme abgebenden senkrechten platte bei nat¨ urlicher konvektion. Technische Mechanik und Thermodynamik 1 (11), 391–406. 
+
+Schulze-Schlarmann, J., Buchavzov, N. & Stubenrauch, C. 2006 A disjoining pressure study of foam films stabilized by tetradecyl trimethyl ammonium bromide C14TAB. Soft Matter 2 (7), 584. 
+
+Seiwert, J., Kervil, R., Nou, S. & Cantat, I. 2017 Velocity field in a vertical foam film. 
+
+Physical Review Letters 118 (4), 048001. 
+
+Shaw, R. 1984 The Dripping Faucet as a Model Chaotic System. Santa Cruz, CA: Aerial Press. 
+
+Simister, E. A., Lee, E. M., Thomas, R. K. & Penfold, J. 1992 Structure of atetradecyltrimethylammonium bromide layer at the air/water interface determined by neutron reflection. Journal of Physical Chemistry 96 (3), 1373–1382. 
+
+Stern, O. 1924 Zur theorie der electrolytischen doppelschicht. Zeitschrift f¨ ur Elektrochemie und Angewandte Physikalische Chemie 30 (21-22), 508–516. 
+
+Stubenrauch, C. & Khristov, K. 2005 Foams and foam films stabilized by CnTAB: Influence of the chain length and of impurities. Journal of Colloid and Interface Science 286 (2), 710–718. 
+
+Tobin, S. T., Meagher, A. J., Bulfin, B., M¨ obius, M. & Hutzler, S. 2011 A public study of the lifetime distribution of soap films. American Journal of Physics 79 (8), 819–824. 
+
+Van Nierop, E. A, Scheid, B. & Stone, H. A 2008 On the thickness of soap films: an alternative to frankel’s law. Journal of fluid mechanics 602 , 119–127. 
+
+Verwey, E.J.W. & Overbeek, J.Th.G. 1948 Theory of the Stability of Lyophobic Colloids. Leiden: Elsevier. 
+
+Ziapkoff, V., Boulogne, F., Salonen, A. & Rio, E. 2026 White light interferometry analysis for measuring thin film thickness down to a few nanometers. European Physical Journal E 49 (4).

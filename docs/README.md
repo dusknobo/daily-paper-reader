@@ -6,26 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-07
-- 运行时间：2026-07-07 22:00:42 UTC
+- 最新运行日期：2026-07-08
+- 运行时间：2026-07-08 21:13:04 UTC
 - 运行状态：成功
 - 本次总论文数：1
-- 精读区：0
-- 速读区：1
+- 精读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读了一篇利用物理信息神经网络（PINN）实现跨钝体形状的可泛化湍流闭合模型。  
-该研究指出，通过求解器无关的 PINN 训练，能让湍流模型在不同钝体外形间迁移，提升通用性。  
-对流体力学感兴趣的话，可以留意这种不绑定具体几何形状的智能建模方法，或许能简化日后仿真。
-- 详情：[/202607/07/README](/202607/07/README)
+今日精选解读了一篇关于向肥皂膜加盐防止其蒸发破裂的物理研究。
+核心发现：微量盐分能让肥皂膜在蒸发时自发增厚而更稳定，揭示了表面张力波驱动补液的新机制。
+不妨亲自动手，在肥皂水里加一撮盐吹泡泡，感受日常现象背后的奇妙物理。
+- 详情：[/202607/08/README](/202607/08/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Stabilising Evaporating Soap Films with Salt](/202607/08/2607.06363v1-stabilising-evaporating-soap-films-with-salt)  
+   标签：评分：8.0/10、query:falling-film
+   evidence：垂直皂膜厚度测量、蒸发及盐稳定化
 
 ### 速读区论文标签
-1. [Generalizable turbulence closures across bluff-body shapes by PINN-based solver-agnostic training](/202607/07/2607.04491v1-generalizable-turbulence-closures-across-bluff-body-shapes-by-pinn-based-solver-agnostic-training)  
-   标签：评分：7.0/10、query:falling-film
-   evidence：基于PINN的湍流闭合模型训练用于CFD
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
