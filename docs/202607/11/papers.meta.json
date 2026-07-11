@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-11",
+  "date": "2026-07-11",
+  "generated_at": "2026-07-11T21:24:54",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/11/2607.03455v1-development-and-application-of-a-multiphase-lagrangian-structure-function-model-in-anisotropic-turbulence",
+      "section": "deep",
+      "title_en": "Development and application of a multiphase Lagrangian structure function model in anisotropic turbulence",
+      "authors": "Andrew P. Grace, David Richter",
+      "date": "2026-07-03",
+      "pdf": "https://arxiv.org/pdf/2607.03455v1",
+      "score": "8.0",
+      "evidence": "多相拉格朗日模型用于颗粒湍流",
+      "tldr": "惯性粒子对湍流运动的能量响应是理解多相流动力学和开发降阶模型的关键，但现有研究主要关注各向同性湍流，忽略了壁面等引起的流动各向异性。本文针对壁面约束湍流中的沉降惯性粒子，利用耦合欧拉-拉格朗日直接数值模拟，探究尺度能量学对湍流强度、粒子惯性和沉降的复杂依赖关系，并推导了精确的尺度能量守恒律。研究发现，流动各向异性能传递给粒子相，且粒子惯性和沉降可保持大尺度各向异性直至小尺度范围。该工作为各向异性非局部效应建模和连续介质模型提供了深入理解和理论依据。",
+      "tags": "query:falling-film",
+      "abstract_en": "The energetic response of inertial particles to turbulent flow motions is important for both a fundamental understanding of the multi-phase dynamics at play, and for applications such as reduced-order models of particle dispersion processes, and their two-way coupled effects onto the flow phase. Numerous studies focus on the energetics of ensembles of particles in homogeneous isotropic turbulence, where the influence of flow anisotropy (such as that provided by boundary conditions, or other external forcing) is not considered a priori. In this work, we investigate the role of flow anisotropy on the Eulerian scale-wise particle phase energetics in a turbulent wall bounded flow for settling inertial Lagrangian particles. By using coupled Eulerian-Lagrangian direct numerical simulations at moderate Reynolds number, we aim to unravel the complex dependency of the scale-wise particle energetics on the turbulence intensity, particle inertia, and particle settling. In particular, we focus on how the developing anisotropy of the underlying turbulent flow (derived from the presence of the wall) is donated to the particle phase, and how particle inertia and settling preserve this large scale anisotropy into the formally isotropic scale range of the flow. We derive an exact (but unclosed) conservation law for the particle phase energetics at arbitrary scale, and use an asymptotic argument to help elucidate our DNS data. We discuss the relative changes to the quasi-streamwise and vertical components of the fluctuating particle field, and finish by discussing the implications of anisotropic non-local effects for more general flows, and the implications for continuum models of inertial settling Lagrangian particles.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/11/2607.07025v1-numerical-solutions-of-an-accurate-diffuse-interface-model-of-the-incompressible-resistive-mhd-free-surface-flow",
+      "section": "quick",
+      "title_en": "Numerical solutions of an accurate diffuse interface model of the incompressible resistive MHD free surface flow",
+      "authors": "Maojun Li, Jiancheng Wang, Zeyu Xia, Liwei Xu",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07025v1",
+      "score": "6.0",
+      "evidence": "提出了一种用于不可压缩MHD自由表面流动的扩散界面方法，可用于多相流模拟",
+      "tldr": "针对不可压缩电阻MHD自由表面流，传统尖锐界面法复杂且欠稳，限制三维应用。本文从热力学一致性出发推导扩散界面模型，证明其收敛到尖锐界面，无需捕捉；设计全解耦线性有限元格式，离散保磁场无散，简化求解。数值模拟气泡运动在磁场下的阻尼效应，与无感应MHD和ALE模型定量对比，结果一致，验证准确性。该工作为MHD自由表面流提供高效、稳健的无界面追踪框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this paper, we derive a new model to simulate the incompressible resistive magnetohydrodynamic (MHD) free surface flow. A thermodynamically consistent diffuse interface method is adopted to characterize the moving interface in the modeling process. The formal convergence of the proposed MHD free surface flow model to the sharp interface model is established via a matched asymptotic argument, and the model can be solved without the need for sophisticated free surface capturing schemes. We design a fully decoupled linear finite element scheme that preserves the divergence-free constraint of the magnetic field at a discrete level. The reliability and robustness of the proposed model and algorithm are validated through numerical investigations of the magnetic damping effect on bubble dynamics. In particular, we provide a quantitative numerical comparison of the present results with those obtained from an inductionless MHD model and a sharp interface arbitrary Lagrangian--Eulerian model.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

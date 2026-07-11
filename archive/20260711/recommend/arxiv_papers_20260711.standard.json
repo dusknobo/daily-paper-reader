@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-11T21:20:10.893159+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.03455v1",
+      "source": "arxiv",
+      "title": "Development and application of a multiphase Lagrangian structure function model in anisotropic turbulence",
+      "abstract": "The energetic response of inertial particles to turbulent flow motions is important for both a fundamental understanding of the multi-phase dynamics at play, and for applications such as reduced-order models of particle dispersion processes, and their two-way coupled effects onto the flow phase. Numerous studies focus on the energetics of ensembles of particles in homogeneous isotropic turbulence, where the influence of flow anisotropy (such as that provided by boundary conditions, or other external forcing) is not considered a priori. In this work, we investigate the role of flow anisotropy on the Eulerian scale-wise particle phase energetics in a turbulent wall bounded flow for settling inertial Lagrangian particles. By using coupled Eulerian-Lagrangian direct numerical simulations at moderate Reynolds number, we aim to unravel the complex dependency of the scale-wise particle energetics on the turbulence intensity, particle inertia, and particle settling. In particular, we focus on how the developing anisotropy of the underlying turbulent flow (derived from the presence of the wall) is donated to the particle phase, and how particle inertia and settling preserve this large scale anisotropy into the formally isotropic scale range of the flow. We derive an exact (but unclosed) conservation law for the particle phase energetics at arbitrary scale, and use an asymptotic argument to help elucidate our DNS data. We discuss the relative changes to the quasi-streamwise and vertical components of the fluctuating particle field, and finish by discussing the implications of anisotropic non-local effects for more general flows, and the implications for continuum models of inertial settling Lagrangian particles.",
+      "authors": [
+        "Andrew P. Grace",
+        "David Richter"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "math-ph"
+      ],
+      "published": "2026-07-03T16:14:05+00:00",
+      "link": "https://arxiv.org/pdf/2607.03455v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multiphase Lagrangian model for particle-laden turbulent flows",
+      "llm_evidence_cn": "多相拉格朗日模型用于颗粒湍流",
+      "llm_evidence": "多相拉格朗日模型用于颗粒湍流",
+      "canonical_evidence": "多相拉格朗日模型用于颗粒湍流",
+      "llm_tldr_en": "Develops a multiphase Lagrangian structure function model to analyze particle energetics in anisotropic wall-bounded turbulence, extending homogeneous isotropic studies.",
+      "llm_tldr_cn": "本文针对各向异性壁面湍流中惯性颗粒的能量响应，开发了一种多相拉格朗日结构函数模型，将分析从各向同性湍流推广至壁面边界层流动，为粒子弥散过程的降阶模型和双向耦合效应提供更准确的理论基础。",
+      "llm_tldr": "本文针对各向异性壁面湍流中惯性颗粒的能量响应，开发了一种多相拉格朗日结构函数模型，将分析从各向同性湍流推广至壁面边界层流动，为粒子弥散过程的降阶模型和双向耦合效应提供更准确的理论基础。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.07025v1",
+      "source": "arxiv",
+      "title": "Numerical solutions of an accurate diffuse interface model of the incompressible resistive MHD free surface flow",
+      "abstract": "In this paper, we derive a new model to simulate the incompressible resistive magnetohydrodynamic (MHD) free surface flow. A thermodynamically consistent diffuse interface method is adopted to characterize the moving interface in the modeling process. The formal convergence of the proposed MHD free surface flow model to the sharp interface model is established via a matched asymptotic argument, and the model can be solved without the need for sophisticated free surface capturing schemes. We design a fully decoupled linear finite element scheme that preserves the divergence-free constraint of the magnetic field at a discrete level. The reliability and robustness of the proposed model and algorithm are validated through numerical investigations of the magnetic damping effect on bubble dynamics. In particular, we provide a quantitative numerical comparison of the present results with those obtained from an inductionless MHD model and a sharp interface arbitrary Lagrangian--Eulerian model.",
+      "authors": [
+        "Maojun Li",
+        "Jiancheng Wang",
+        "Zeyu Xia",
+        "Liwei Xu"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-08T05:48:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.07025v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "presents a diffuse interface method for incompressible MHD free surface flow, relevant to multiphase flow simulation",
+      "llm_evidence_cn": "提出了一种用于不可压缩MHD自由表面流动的扩散界面方法，可用于多相流模拟",
+      "llm_evidence": "提出了一种用于不可压缩MHD自由表面流动的扩散界面方法，可用于多相流模拟",
+      "canonical_evidence": "提出了一种用于不可压缩MHD自由表面流动的扩散界面方法，可用于多相流模拟",
+      "llm_tldr_en": "This paper develops a thermodynamically consistent diffuse interface model for incompressible resistive MHD free surface flows and a decoupled linear finite element scheme, providing accurate interface capturing without complex free surface tracking methods.",
+      "llm_tldr_cn": "针对磁流体自由表面流动中界面捕捉困难的问题，本文提出了一种热力学一致的扩散界面模型，将移动界面隐式处理，避免了传统尖锐界面方法中复杂的追踪算法。通过匹配渐近分析证明了模型向尖锐界面解的收敛性，并设计了保磁场散度约束的全解耦线性有限元格式。数值验证表明该方法可靠且稳健，为多相流模拟提供了一种无需显式界面重构的高效数值框架。",
+      "llm_tldr": "针对磁流体自由表面流动中界面捕捉困难的问题，本文提出了一种热力学一致的扩散界面模型，将移动界面隐式处理，避免了传统尖锐界面方法中复杂的追踪算法。通过匹配渐近分析证明了模型向尖锐界面解的收敛性，并设计了保磁场散度约束的全解耦线性有限元格式。数值验证表明该方法可靠且稳健，为多相流模拟提供了一种无需显式界面重构的高效数值框架。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

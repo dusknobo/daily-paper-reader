@@ -1,0 +1,2431 @@
+Title: Numerical solutions of an accurate diffuse interface model of the incompressible resistive MHD free surface flow
+
+URL Source: https://arxiv.org/pdf/2607.07025v1
+
+Published Time: Thu, 09 Jul 2026 00:37:28 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# Numerical solutions of an accurate diffuse interface model of the incompressible resistive MHD free surface flow 
+
+Maojun Li, Jiancheng Wang, Zeyu Xia ∗, Liwei Xu 
+
+> School of Mathematical Sciences, University of Electronic Science and Technology of China, Sichuan, 611731, P.R. China
+
+Abstract 
+
+In this paper, we derive a new model to simulate the incompressible resistive magnetohydrodynamic (MHD) free surface flow. A thermodynamically consistent diffuse interface method is adopted to characterize the moving interface in the modeling process. The formal convergence of the proposed MHD free surface flow model to the sharp interface model is established via a matched asymptotic argument, and the model can be solved without the need for sophisticated free surface capturing schemes. We design a fully decoupled linear finite element scheme that preserves the divergence-free constraint of the magnetic field at a discrete level. The reliability and robustness of the proposed model and algorithm are validated through numerical investigations of the magnetic damping effect on bubble dynamics. In particular, we provide a quantitative numerical comparison of the present results with those obtained from an inductionless MHD model and a sharp interface arbitrary Lagrangian–Eulerian model. 
+
+Keywords: magnetohydrodynamics, free surface flow, finite element method, asymptotic convergence 
+
+2020 MSC: 76W05, 65M60, 76T10 
+
+1. Introduction 
+
+When a magnetic field is applied to an electrically conducting and non-magnetic fluid (e.g., liquid metals, plasmas, and strong electrolytes), the induced magnetohydrodynamic (MHD) effect can significantly change the fluid dynamics via the Lorentz force, resulting in fundamentally distinct flow behaviors. Given the ubiquitous presence of such a scenario in industrial processes, numerous studies have been carried out to investigate the underlying flow mechanism [7] and develop structure-preserving numerical schemes [16, 17, 19, 23]. Although MHD flows exhibit extremely complex dynamics in engineering applications, the frequent occurrence of free surfaces further complicates the fluid dynamics. Representative examples include magnetic stirring and damping in the continuous casting and refining of metals [7, 11], MHD instabilities of free surfaces in Hall–Héroult aluminum reduction cells [9, 15], liquid metal batteries [15, 30], and plasma-facing components of tokamaks [21, 24]. In this work, we consider incompressible resistive MHD free surface flows in a fixed and bounded domain 
+
+Ω ⊂ R3, which contains two immiscible fluids occupying two time-dependent open subdomains Ω±(t), re-spectively. From a macroscopic perspective, the free surface is a manifold of codimension one [12], and the two subdomains Ω±(t) are separated by a sharp interface Γ( t) = Ω +(t) ∩ Ω−(t) that should not be in contact with the boundary ∂Ω. Consequently, the flow dynamics can be governed by the following resistive MHD equations in each subdomain Ω±(t) with the jump conditions on the interface Γ( t),
+
+ρ±(∂tu + u · ∇ u) = ∇ · (2η±D(u) − pI) + J × B + ρ±g in Ω±(t), (1a) 
+
+∇ · u = 0 in Ω±(t), (1b) 
+
+∂tB + ∇ × E = 0 in Ω±(t), (1c) 
+
+∇ × B = μ0J in Ω±(t), (1d) 
+
+J = σ±(E + u × B) in Ω±(t), (1e) 
+
+∇ · B = 0 , ∇ · J = 0 in Ω±(t), (1f)        
+
+> ∗Corresponding author
+> Email addresses: limj@uestc.edu.cn (Maojun Li), 202311110403@std.uestc.edu.cn (Jiancheng Wang),
+> zeyuxia@uestc.edu.cn (Zeyu Xia), xul@uestc.edu.cn (Liwei Xu) arXiv:2607.07025v1 [math.NA] 8 Jul 2026
+
+[[2 ηD(u) − pI]] nΓ = −λκ nΓ on Γ( t), (1g) 
+
+[[ u]] = 0 on Γ( t), (1h) 
+
+[[ B]] = 0 on Γ( t), (1i) 
+
+nΓ × [[ E]] = 0 on Γ( t), (1j) 
+
+[[ J]] · nΓ = 0 on Γ( t), (1k) 
+
+VΓ = u · nΓ on Γ( t). (1l) In the above system, the unknowns are the fluid velocity u, the pressure p, the magnetic field B, the electric field E, and the current density J. In addition, D(u) = 12
+
+(∇u + ( ∇u)⊤) and I stand for the deformation tensor and identity tensor, respectively. g = (0 , 0, −g)⊤ represents the gravitational acceleration with g
+
+being a positive constant. The material properties ρ±, η±, and σ± are the positive constant densities, dynamic viscosities, and electrical conductivities of the two fluids, respectively. Moreover, we denote by 
+
+μ0 the permeability of free space, λ the surface tension coefficient, κ the mean curvature, nΓ the unit normal on Γ( t) pointing to Ω+(t), and VΓ the normal velocity of Γ( t). For brevity, we use the notation 
+
+χ = χ+XΩ+(t) + χ−XΩ−(t) throughout this work, where χ denotes any physical quantity or parameter in system (1), and XΩ±(t) are the characteristic functions corresponding to Ω±(t). Generally, [[ χ]] = χ+ − χ−
+
+denotes the jump of quantity χ across Γ( t) from Ω+(t) to Ω−(t). Equations (1a)-(1f) are the resistive MHD equations modeling the mutual interaction between the electromagnetic fields and the fluid flows; see [7] for a physical justification. Meanwhile, equations (1g)-(1k) are the jump conditions at the interface Γ( t), derived from equations (1a)-(1f). Equation (1l) models the movement of Γ( t), corresponding to the immiscibility assumption. Under homogeneous boundary conditions, the sharp interface model (1) satisfies the following stability estimate, 
+
+ddt
+
+( ∫
+
+> Ω
+
+12 ρ|u|2dx +
+
+∫
+
+> Ω
+
+12 μ−10 |B|2dx +
+
+∫
+
+> Γ( t)
+
+λds +
+
+∫
+
+> Ω
+
+ρgx 3dx
+
+)
+
+= −
+
+∫
+
+> Ω
+
+2η|D(u)|2dx −
+
+∫
+
+> Ω
+
+σ−1|J|2dx ≤ 0,
+
+where x3 is the third component of x = ( x1, x 2, x 3).Numerical solution of system (1) is challenging primarily due to the presence of the moving interface Γ( t)
+
+and the associated jump conditions. To characterize the evolving interfaces in MHD free surface problems, substantial numerical methodologies have been developed in the past decades. Morley et al. [24] employed the level set technique to model the free surface of fusion liquid walls in tokamaks, where the interface was represented by a signed distance function, and the material properties were obtained through an approximate Heaviside function. In addition, the re-initialization method and the continuum surface force (CSF) model were exploited to conduct stable numerical simulations, and interested readers are referred to [12] for more details on these methods. Similar techniques were also utilized by Munger and Vincent [25], where a finite volume level set approach was developed to simulate the MHD instability in aluminum reduction cells while neglecting the surface tension force. Flueck et al. [8] utilized the level set method as an indicator and constructed an interface-fitted mesh using the zero level set of the solution, to simulate the instability of the interface in aluminum reduction cells. Cappanera et al. [5] adopted a conservative level set method, which utilized an approximate Heaviside function rather than the signed distance function, to investigate the metal pad roll instability in stably stratified liquid layers; see also [15]. Furthermore, Zhang and Ni [37] applied the volume of fluid method, representing the interface by volume fractions, to explore the bubble dynamics in metallurgical processes. In their approach, the material properties and surface tension force were treated smoothly, and an adaptive mesh refinement technique combined with a consistent and conservative scheme for the Lorentz force was developed to accurately resolve the fluid dynamics. They also designed an algorithm to address the phase transition problem using cut cell and ghost cell techniques in [38]. In addition to implicit interface capturing approaches such as the level set and volume of fluid methods, explicit interface tracking and moving mesh techniques have also been extensively developed in the simulation of MHD problems. Gerbeau et al. [9] employed an arbitrary Lagrangian–Eulerian (ALE) approach for a two-fluid MHD problem to simulate MHD instability of aluminum reduction cells; see also Baňas and Prohl [4] for a convergent bound-preserving scheme for this system. Samulyak et al. [28] utilized a front tracking technique to capture the interface in a compressible inviscid MHD model. Pan et al. [26] exploited the immersed boundary method to accurately solve the inductionless MHD equations with a moving boundary. While these approaches are widely used, they typically require specialized numerical techniques to ensure high interface resolution or numerical stability. In addition to the aforementioned approaches, the diffuse interface method [3] emerges as another effective 2tool to characterize the free surface between binary immiscible fluids. In this methodology, the sharp interface 
+
+Γ( t) is represented by a significantly thin transition layer where the fluid properties vary smoothly, and the singular surface tension effects can be modeled by either the CSF model or the smooth Korteweg stress tensor. Hence, a stable simulation can be readily conducted without the additional numerical effort that is usually required by the aforementioned methods [12]. Regarding the diffuse interface method for solving the MHD free surface flow, [36] proposed a scheme to simulate the resistive MHD problem with matched densities, and established the existence of weak solutions. Subsequently, many studies have been devoted to the convergence analysis of numerical schemes for this model; see, e.g., [31, 35]. In addition, [6] proposed a diffuse interface method for an inductionless MHD problem with matched densities. We point out that the two-phase MHD model employed in the above works is a direct coupling of MHD equations with a phase model, and its relationship with the classical sharp interface formulation has not been quantified. In this paper, we employ a thermodynamically consistent diffuse interface method [1] to numerically solve the MHD free surface flow. Although the sharp interface Γ( t) is replaced by a thin transition layer, we demonstrate that system (1) is formally recovered as the thickness of the transition layer tends to zero, by utilizing the method of matched asymptotic expansions [1, 34]. Then, we develop a fully decoupled linear finite element scheme that involves only Poisson-type equations and time-independent saddle point systems. Accordingly, algebraic multigrid and additive Schwarz methods can be exploited as preconditioners for the resulting linear systems, in turn facilitating large-scale computations. Furthermore, we apply a potential method [18] to solve the pre-Maxwell equations (1c)-(1f), ensuring an exactly solenoidal discrete magnetic field. Finally, we present numerical examples of two- and three-dimensional single rising bubble benchmarks, together with a quantitative comparison of our results with those obtained from an inductionless MHD model and a sharp interface ALE model. The results demonstrate the capability and robustness of the proposed method in capturing complex MHD effects in free surface flows. The remainder of this paper is organized as follows. In Section 2, we present the numerical framework and demonstrate its convergence to the sharp interface model. The discrete scheme is also detailed. In Section 3, several numerical results on the magnetic damping effect are presented, including the effect of the interface thickness and the comparison among different models. Conclusions and future research directions are discussed in Section 4. 
+
+2. Numerical framework 
+
+2.1. Governing equations 
+
+With the sharp interface Γ( t) replaced by a thin transition layer Γϵ(t) where the two fluids are mixed, model (1) is approximated by the following diffuse interface system (the derivation of these equations is outlined in Appendix A.1): 
+
+∂tϕ + ∇ · (ϕu) = ∇ · (mϵ(ϕ)∇μ), (2a) 
+
+μ = −̂ λϵ ∆ϕ +̂ λϵ −1(ϕ3 − ϕ), (2b) 
+
+ρ(ϕ)∂tu + (ρ(ϕ)u − ρdmϵ(ϕ)∇μ) · ∇ u = ∇ · (2η(ϕ)D(u) − pI) + μ∇ϕ + J × B + ρ(ϕ)g, (2c) 
+
+∇ · u = 0 , (2d) 
+
+∂tB + ∇ × E = 0, (2e) 
+
+∇ × B = μ0J, (2f) 
+
+J = σ(ϕ)( E + u × B), (2g) 
+
+∇ · B = 0 , ∇ · J = 0 . (2h) In the above equations, ϕ is the order parameter that labels the two fluids such that 
+
+ϕ(x, t ) = 
+
+{
+
+1, x ∈ Ω+(t),
+
+−1, x ∈ Ω−(t), and |ϕ(x, t )| < 1 in Γϵ(t),μ is the chemical potential serving as an auxiliary variable, ϵ is the thickness of Γϵ(t), mϵ(ϕ) > 0 represents the mobility which plays the role of diffusivity for Γϵ(t), and ̂ λ = 32√2 λ stands for the scaled surface tension coefficient. Moreover, the density ρ, the dynamic viscosity η, and the electrical conductivity σ in the mixture are all linearly dependent on ϕ as illustrated below for ρ,
+
+ρ(ϕ) = ρ+ − ρ−
+
+2 ϕ + ρ+ + ρ−
+
+2 .
+
+3We define ρd = ∂ρ ∂ϕ = ρ+−ρ− 
+
+> 2
+
+and the extra mass flux term ρdmϵ∇μ accounts for thermodynamic consistency. 
+
+μ∇ϕ is a simplified Korteweg stress modeling the surface tension force. Equations (2a)-(2b) represent the widely recognized Cahn–Hilliard equation which describes the process of phase separation. To close the system, we impose some appropriate initial and boundary conditions. The initial data are specified as 
+
+u(0) = u0, B(0) = B0, and ϕ(0) = ϕ0,
+
+with ∇ · u0 = 0 and ∇ · B0 = 0 . For simplicity, we apply the following homogeneous boundary conditions 
+
+u = 0, n × E = 0, ∇ϕ · n = 0 , and ∇μ · n = 0 
+
+on ∂Ω, where n is the unit outward normal to Ω. Boundary conditions adapted to the physical setting of benchmarks will be specified in the numerical experiments. 
+
+Remark 1. System (2) satisfies the following energy balance law, whose detailed derivation is provided in Appendix A.2: 
+
+ddt
+
+( ∫
+
+> Ω
+
+12 ρ|u|2dx +
+
+∫
+
+> Ω
+
+12 μ−10 |B|2dx +
+
+∫
+
+> Ω
+
+f (ϕ, ∇ϕ)d x
+
+)
+
+= −
+
+∫
+
+> Ω
+
+mϵ|∇ μ|2dx −
+
+∫
+
+> Ω
+
+2η|D(u)|2dx −
+
+∫
+
+> Ω
+
+σ−1|J|2dx +
+
+∫
+
+> Ω
+
+ρg · udx,
+
+where f (ϕ, ∇ϕ) = ̂ λϵ  
+
+> 2
+
+|∇ ϕ|2 +̂ λϵ −1 
+
+> 4
+
+(ϕ2 −1) 2. Because of the diffusive mass flux inherent in the volume-averaged formulation (a numerical demonstration of the influence of this flux can be found in [13]), the gravitational contribution cannot in general be absorbed entirely into a standard gravitational potential energy term. In simulations, gravity always plays an important role, and the energy of system (2) is no longer dissipative, unlike that of model (1) . In contrast, interested readers are referred to [20] for another thermodynamically consistent diffuse interface method leading to a much more complex quasi-incompressible system that preserves a conservative gravitational force. 
+
+Since the thickness of the transition layer Γϵ(t) is determined by parameter ϵ, physically correct behavior is expected in simulations for sufficiently small ϵ. In this paper, we take a constant mobility with an established scaling law mϵ = O(ϵ2) [22, 32, 34], and hence we are able to establish the formal convergence of system (2) to model (1) as ϵ → 0.
+
+Theorem 1. Assuming mϵ = O(ϵ2), the formal asymptotic limit of system (2) for ϵ → 0 is model (1) .2.2. Formal derivation of the sharp interface limit 
+
+We exploit the method of formally matched asymptotic expansions to identify the sharp interface limit. This argument depends on two critical assumptions: (i) under vanishing interface thickness the domain can be decomposed into two distinct subdomains separated by an interface, each containing only one fluid; and (ii) the solutions admit separate asymptotic expansions in terms of the interface thickness in the bulk and near the interface, which must be matched in the overlapping region. 
+
+2.2.1. Preliminaries 
+
+Letting (ϕϵ, μ ϵ, uϵ, p ϵ, Bϵ, Eϵ, Jϵ) be a solution to equations (2), we assume that it converges formally to a limit (ϕ, μ, u, p, B, E, J) as ϵ → 0, and further, 
+
+Ω+(t) = {x ∈ Ω : ϕϵ(x) > 0} and Ω−(t) = {x ∈ Ω : ϕϵ(x) < 0}.
+
+Then, the corresponding interface separating Ω±(t) is denoted by 
+
+Γ( t) = {x ∈ Ω : ϕϵ(x) = 0 }.
+
+Here, we reuse for simplicity the notations Ω±(t) and Γ( t).In outer regions far from Γ( t), we assume the following outer expansions with respect to the interface thickness ϵ of ϕϵ, uϵ, pϵ, Bϵ, Eϵ, Jϵ; for example, for ϕϵ,
+
+ϕϵ = ϕ± 
+
+> 0
+
++ ϵϕ ± 
+
+> 1
+
++ ϵ2ϕ± 
+
+> 2
+
++ · · · .
+
+4As an auxiliary variable, we have evidently for μϵ,
+
+μϵ = ϵ−1μ± 
+
+> 0
+
++ μ± 
+
+> 1
+
++ ϵμ ± 
+
+> 2
+
++ · · · 
+
+with μ± 
+
+> 0
+
+=̂ λ((ϕ± 
+
+> 0
+
+)3 − ϕ±
+
+> 0
+
+). In the transition layer near Γ( t), we introduce a new stretched coordinate to scale the variables. Let d(x) be the signed distance function to Γ( t) such that d(x) > 0 if x ∈ Ω+(t). Then we have nΓ = ∇d and VΓ = −∂td. Defining the scaled distance z = dϵ , the following change of variables holds [1]: 
+
+∂tχ = −ϵ−1VΓ∂z χ + O(1) , (3a) 
+
+∇χ = ϵ−1∂z χnΓ + ∇Γχ + O(ϵ), (3b) 
+
+∇ · χ = ϵ−1∂z χ · nΓ + ∇Γ · χ + O(ϵ), (3c) 
+
+∆χ = ϵ−2∂zz χ − ϵ−1κ∂ z χ + O(1) , (3d) where χ and χ represent the generic scalar- and vector-valued variables, respectively. Then in this region we have the inner expansion in terms of the interface thickness ϵ for ϕϵ, uϵ, pϵ, Bϵ, Eϵ, Jϵ in the form (also exemplarily for ϕϵ)
+
+ϕϵ = ϕi 
+
+> 0
+
++ ϵϕ i 
+
+> 1
+
++ ϵ2ϕi 
+
+> 2
+
++ · · · ,
+
+with μϵ = ϵ−1μi 
+
+> 0
+
++ μi 
+
+> 1
+
++ ϵμ i 
+
+> 2
+
++ · · · , where 
+
+μi 
+
+> 0
+
+=̂ λ( − ∂zz ϕi 
+
+> 0
+
++ ( ϕi
+
+> 0
+
+)3 − ϕi
+
+> 0
+
+) and μi 
+
+> 1
+
+=̂ λ( − ∂zz ϕi 
+
+> 1
+
++ κ∂ z ϕi 
+
+> 0
+
++ (3( ϕi
+
+> 0
+
+)2 − 1) ϕi
+
+> 1
+
+).
+
+In the overlapping region, the outer and inner expansions must satisfy the matching conditions [1] 
+
+lim  
+
+> z→±∞
+
+χi 
+
+> 0
+
+= χ± 
+
+> 0
+
+, (4a) 
+
+lim  
+
+> z→±∞
+
+∂z χi 
+
+> 0
+
+= 0 , (4b) 
+
+lim  
+
+> z→±∞
+
+∂z χi 
+
+> 1
+
+= ∇χ± 
+
+> 0
+
+· nΓ. (4c) Next, we will establish that the limit solution (ϕ, μ, u, p, B, E, J) exactly satisfies equations (1) by fol-lowing the procedure in [1, 34]. 
+
+2.2.2. Bulk equations 
+
+Expansion of (2c) at order O(ϵ−1): Recalling the assumption mϵ := mϵ 2, we naturally obtain that the leading order of the flux mϵ∇μ is O(ϵ). Hence, we arrive at 
+
+μ± 
+
+> 0
+
+∇ϕ± 
+
+> 0
+
+= 0 ,
+
+which is equivalent to 
+
+∇
+
+((ϕ± 
+
+> 0
+
+)2 − 1)2
+
+4 = 0.
+
+This implies that ϕ± 
+
+> 0
+
+= c± where c± are two constants such that c+ > 0 and c− < 0.
+
+Expansion of (2c) -(2h) at order O(1) : Using the fact that mϵ∇μ is of order O(ϵ), we conclude 
+
+ρ±
+
+> 0
+
+(∂tu± 
+
+> 0
+
++ u± 
+
+> 0
+
+· ∇ u±
+
+> 0
+
+) = ∇ · (2η± 
+
+> 0
+
+D(u± 
+
+> 0
+
+) − p± 
+
+> 0
+
+I) + μ± 
+
+> 0
+
+∇ϕ± 
+
+> 1
+
++ J± 
+
+> 0
+
+× B± 
+
+> 0
+
++ ρ± 
+
+> 0
+
+g,
+
+∇ · u± 
+
+> 0
+
+= 0 ,∂tB± 
+
+> 0
+
++ ∇ × E± 
+
+> 0
+
+= 0 ,
+
+∇ × B± 
+
+> 0
+
+= μ0J± 
+
+> 0
+
+,
+
+J± 
+
+> 0
+
+= σ±
+
+> 0
+
+(E± 
+
+> 0
+
++ u± 
+
+> 0
+
+× B±
+
+> 0
+
+),
+
+∇ · B± 
+
+> 0
+
+= 0 , ∇ · J± 
+
+> 0
+
+= 0 ,
+
+where we abbreviate χ± 
+
+> 0
+
+= (χ+−χ−)ϕ± 
+
+> 0
+> 2
+
++ χ++χ− 
+
+> 2
+
+for χ ∈ { ρ, η, σ }.52.2.3. Jump conditions 
+
+Expansion of (2d) at order O(ϵ−1): Invoking change of variables (3), we get 
+
+∂z ui 
+
+> 0
+
+· nΓ = 0 , (5) which implies that ui 
+
+> 0
+
+· nΓ is independent of z.
+
+Expansion of (2a) at order O(ϵ−1): With a similar procedure, we obtain 
+
+−VΓ∂z ϕi 
+
+> 0
+
++ ∂z
+
+(ϕi
+
+> 0
+
+ui
+
+> 0
+
+) · nΓ = m∂ zz μi
+
+> 0
+
+.
+
+Integrating this equation with respect to z from −∞ to ∞ yields 
+
+(−VΓ + ui 
+
+> 0
+
+· nΓ)
+
+∫ ∞−∞ 
+
+∂z ϕi
+
+> 0
+
+dz = m
+
+∫ ∞−∞ 
+
+∂zz μi
+
+> 0
+
+dz. 
+
+Then matching conditions (4a)-(4b) require 
+
+( − VΓ + ui 
+
+> 0
+
+· nΓ
+
+)( ϕ+0 − ϕ−
+
+> 0
+
+) = 0 ,
+
+in turn giving 
+
+VΓ = ui 
+
+> 0
+
+· nΓ.
+
+Additionally, we have 
+
+∂zz μi 
+
+> 0
+
+= 0 ,
+
+or equivalently, μi 
+
+> 0
+
+linearly dependent on z. Matching condition (4a) then requires μi 
+
+> 0
+
+to be a constant. 
+
+Expansion of (2c) at order O(ϵ−2): Defining D(A) = 12
+
+(A + A⊤), we obtain after the change of variables (3), 
+
+∇ · (2ηD(u)) = ϵ−2∂z
+
+(2ηD(∂z u ⊗ nΓ)nΓ
+
+) + ϵ−1∂z
+
+(2ηD(∇Γu)nΓ
+
+) + ϵ−1∇Γ · (2ηD(∂z u ⊗ nΓ
+
+) + O(1) .
+
+Noting that mϵ∇μ is of order O(ϵ) in the inner region since μi 
+
+> 0
+
+is independent of z, we conclude 
+
+∂z
+
+(ηi
+
+> 0
+
+∂z ui
+
+> 0
+
+) + μi
+
+> 0
+
+∂z ϕi
+
+> 0
+
+nΓ = 0 ,
+
+where ηi 
+
+> 0
+
+= (η+−η−)ϕi 
+
+> 0
+> 2
+
++ η++η− 
+
+> 2
+
+and we have used 
+
+(nΓ ⊗ ∂z ui
+
+> 0
+
+)nΓ = (∂z ui 
+
+> 0
+
+· nΓ
+
+)nΓ = 0.
+
+By integrating this equation with respect to z, we can obtain 
+
+ηi
+
+> 0
+
+∂z ui
+
+> 0
+
+∣∣∞−∞ + μi
+
+> 0
+
+ϕi
+
+> 0
+
+∣∣∞−∞ nΓ = 0.
+
+Taking the inner product with nΓ and using equation (5) together with matching condition (4a), we obtain 
+
+μi
+
+> 0
+
+(ϕ+0 − ϕ−
+
+> 0
+
+) = 0 ,
+
+in turn indicating μi 
+
+> 0
+
+= 0 , or equivalently 
+
+−∂zz ϕi 
+
+> 0
+
++ (ϕi
+
+> 0
+
+)3 − ϕi 
+
+> 0
+
+= 0 .
+
+The solvability of this equation [34] leads to 
+
+ϕ± 
+
+> 0
+
+= lim  
+
+> z→±∞
+
+ϕi 
+
+> 0
+
+= ±1 and ϕi 
+
+> 0
+
+= tanh z
+
+√2 .
+
+Then we have a second-order ordinary differential equation 
+
+∂z
+
+(ηi
+
+> 0
+
+∂z ui
+
+> 0
+
+) = 0,
+
+which, by matching conditions (4a)-(4b) and the positivity of η, implies that ui 
+
+> 0
+
+is independent of z. Hence, we obtain 
+
+[[ u± 
+
+> 0
+
+]] = 0.
+
+6Expansion of (2c) at order O(ϵ−1): The combination of matching conditions (4a) and (4c) yields 
+
+lim 
+
+> z→±∞
+
+(∂z ui 
+
+> 1
+
+⊗ nΓ + ∇Γui
+
+> 0
+
+) = ∇u± 
+
+> 0
+
+. (6) Noting that ui 
+
+> 0
+
+and μi 
+
+> 0
+
+are independent of z, we can derive 
+
+∂z
+
+(2ηi
+
+> 0
+
+D(∂z ui 
+
+> 1
+
+⊗ nΓ)nΓ
+
+) + ∂z
+
+(2ηi
+
+> 0
+
+D(∇Γui
+
+> 0
+
+)nΓ
+
+) − ∂z pi
+
+> 0
+
+nΓ + μi
+
+> 1
+
+∂z ϕi
+
+> 0
+
+nΓ = 0.
+
+Then integrating with respect to z and using matching conditions (4a) and (6) yields 
+
+[[2 ηD(u± 
+
+> 0
+
+) − p± 
+
+> 0
+
+I]] nΓ = −
+
+∫ ∞−∞ 
+
+μi
+
+> 1
+
+∂z ϕi
+
+> 0
+
+nΓdz. 
+
+For the right-hand side of this equation, integration by parts with matching conditions (4a)-(4b) leads to 
+
+∫ ∞−∞ 
+
+μi
+
+> 1
+
+∂z ϕi
+
+> 0
+
+dz =̂ λ
+
+∫ ∞−∞ 
+
+( − ∂zz ϕi 
+
+> 1
+
++ κ∂ z ϕi 
+
+> 0
+
++ (3( ϕi
+
+> 0
+
+)2 − 1) ϕi
+
+> 1
+
+)∂z ϕi
+
+> 0
+
+dz, 
+
+=̂ λκ 
+
+∫ ∞−∞ 
+
+(∂z ϕi
+
+> 0
+
+)2dz +̂ λ
+
+∫ ∞−∞ 
+
+( − ∂zz ϕi 
+
+> 1
+
++ (3( ϕi
+
+> 0
+
+)2 − 1) ϕi
+
+> 1
+
+)∂z ϕi
+
+> 0
+
+dz
+
+= 2√2̂λκ 
+
+3 +̂ λ
+
+∫ ∞−∞ 
+
+(∂zz ϕi 
+
+> 0
+
+− (ϕi
+
+> 0
+
+)3 + ϕi
+
+> 0
+
+)∂z ϕi
+
+> 1
+
+dz
+
+= λκ, 
+
+where ∫ ∞−∞ 
+
+(∂z ϕi
+
+> 0
+
+)2dz = 12
+
+∫ ∞−∞ 
+
+sech 4 z
+
+√2 dz = 2√23 .
+
+Then we conclude 
+
+[[2 ηD(u± 
+
+> 0
+
+) − p± 
+
+> 0
+
+I]] nΓ = −λκ nΓ.
+
+Expansion of (2e) -(2f) and (2h) at order O(ϵ−1): A direct change of variables (3) gives 
+
+−VΓ∂z Bi 
+
+> 0
+
++ nΓ × ∂z Ei 
+
+> 0
+
+= 0,
+
+nΓ × ∂z Bi 
+
+> 0
+
+= 0,∂z Bi 
+
+> 0
+
+· nΓ = 0 ,∂z Ji 
+
+> 0
+
+· nΓ = 0 .
+
+Integrating with respect to z with matching condition (4a), we obtain 
+
+[[ B± 
+
+> 0
+
+]] = 0, (7a) 
+
+nΓ × [[ E± 
+
+> 0
+
+]] = 0, (7b) 
+
+[[ J± 
+
+> 0
+
+]] · nΓ = 0 . (7c) 
+
+2.2.4. Summary of the sharp interface limit 
+
+We summarize the main results as follows. For the region far from Γ( t), we have ϕ± 
+
+> 0
+
+= ±1 and μ± 
+
+> 0
+
+= 0 .Then, we obtain the following resistive MHD equations: 
+
+ρ±
+
+(∂tu± 
+
+> 0
+
++ u± 
+
+> 0
+
+· ∇ u±
+
+> 0
+
+) = ∇ · (2η± 
+
+> 0
+
+D(u± 
+
+> 0
+
+) − p± 
+
+> 0
+
+I) + J± 
+
+> 0
+
+× B± 
+
+> 0
+
++ ρ±g,
+
+∇ · u± 
+
+> 0
+
+= 0 ,∂tB± 
+
+> 0
+
++ ∇ × E± 
+
+> 0
+
+= 0,
+
+∇ × B± 
+
+> 0
+
+= μ0J± 
+
+> 0
+
+,
+
+J± 
+
+> 0
+
+= σ±
+
+(E± 
+
+> 0
+
++ u± 
+
+> 0
+
+× B±
+
+> 0
+
+),
+
+∇ · B± 
+
+> 0
+
+= 0 , ∇ · J± 
+
+> 0
+
+= 0 ,
+
+and the jump conditions: 
+
+[[2 ηD(u± 
+
+> 0
+
+) − p± 
+
+> 0
+
+I]] nΓ = −λκ nΓ,
+
+7[[ u± 
+
+> 0
+
+]] = 0,
+
+[[ B± 
+
+> 0
+
+]] = 0,
+
+nΓ × [[ E± 
+
+> 0
+
+]] = 0,
+
+[[ J± 
+
+> 0
+
+]] · nΓ = 0 ,VΓ = ui 
+
+> 0
+
+· nΓ.
+
+We can deduce that the limit system is exactly model (1). 
+
+2.3. Discrete scheme 
+
+The incompressible resistive MHD equations involve several fundamental constraints, including the in-compressibility of the fluid velocity u and the divergence-free conditions on the magnetic field B and the current density J. Some structure-preserving techniques for the incompressible resistive MHD equations, addressing these constraints at the discrete level, can be found in [16, 17, 23]. In the present work, with the objective of developing a fully decoupled linear scheme for the proposed model, we restrict our attention to the discrete preservation of the divergence-free constraint on the magnetic field B, which is particularly important for MHD simulations. To this end, we introduce the vector potential A under the Weyl gauge, so that B = ∇ × A and E = −∂tA, and obtain [18] 
+
+∂tA − u × ∇ × A + μ−10 σ−1(ϕ)∇ × ∇ × A = 0 ,
+
+B = ∇ × A,
+
+The boundary condition n×A = 0 is imposed consistently with n×E = 0 under the Weyl gauge. Meanwhile, consistent with the initial magnetic field B0, the initial vector potential is specified as A(0) = A0, where 
+
+A0 satisfies ∇ × A0 = B0. Using Ampère’s law, we then rewrite the Lorentz force in terms of the Maxwell stress tensor [7]: 
+
+J × B = μ−10 ∇ · 
+
+(
+
+B ⊗ B − 12 |B|2I
+
+)
+
+.
+
+Therefore, the current density J does not need to be treated as an additional unknown in the resulting formulation. For simplicity, we absorb the magnetic pressure contribution into the pressure variable by redefining p ← p + 12 μ−10 |B|2. Consequently, only the term μ−10 ∇ · (B ⊗ B) arising from the Maxwell stress tensor appears explicitly in the momentum equation. Now let Lr , ur , Br , ρr , ηr , σr denote the characteristic quantities of length, velocity, magnetic field, density, dynamic viscosity, and electrical conductivity, respectively. We introduce the following scalings 
+
+x ← x
+
+Lr
+
+, t ← tu r
+
+Lr
+
+, u ← u
+
+ur
+
+, ρ ← ρρr
+
+, η ← ηηr
+
+,p ← pρr u2
+
+> r
+
+, μ ← μϵ ̂
+
+λ , B ← B
+
+Br
+
+, A ← A
+
+Lr Br
+
+, σ ← σσr
+
+.
+
+Certainly, the dimensionless system is given by 
+
+∂tϕ + ∇ · (ϕu) = 1Pe ∆μ, μ = −Cn 2∆ϕ + ϕ3 − ϕ, ρ∂ tu +
+
+(
+
+ρu − ρd
+
+1Pe ∇μ
+
+)
+
+· ∇ u = ∇ · 
+
+(
+
+2Re ηD(u) − pI
+
+)
+
++ 1WeCn μ∇ϕ + NRm ∇ · (B ⊗ B) − 1Fr ρe3,
+
+∇ · u = 0 ,∂tA − u × ∇ × A = − 1Rm σ−1∇ × ∇ × A,
+
+B = ∇ × A,
+
+where e3 = (0 , 0, 1) ⊤. Here, the dimensionless numbers include the Cahn number Cn = ϵL r , Péclet number 
+
+Pe = ϵL r ur̂
+
+> λm ϵ
+
+, Reynolds number Re = Lr ρr ur 
+
+> ηr
+
+, Weber number We = Lr ρr u2 
+
+> r̂
+> λ
+
+, Stuart number N = Lr σr B2  
+
+> r
+> ρrur
+
+,Froude number Fr = u2 
+
+> r
+> gL r
+
+, and magnetic Reynolds number Rm = Lr ur μ0σr .8Let L2(Ω) be the Lebesgue space of square integrable functions equipped with inner product (·, ·), and let H1(Ω) , H(div; Ω) , and H(curl; Ω) be subspaces of L2(Ω) and L2(Ω) 3 with square integrable gradients, divergences, and curls, respectively. We define their subspaces L20(Ω) , H10 (Ω) , H0(div; Ω) , H0(curl; Ω) with vanishing mean values on Ω, vanishing traces, normal traces, and tangential traces on ∂Ω, respectively. Then, let Qh ⊂ H1(Ω) , Xh ⊂ H10 (Ω) 3, and Mh ⊂ L20(Ω) ∩ H1(Ω) be the H1-conforming finite element spaces, Nh ⊂ H(div; Ω) be the H(div) -conforming finite element space, and Ch ⊂ H0(curl; Ω) be the 
+
+H(curl) -conforming finite element space. It is assumed that ∇ × Ch ⊂ Nh. We use a uniform partition of the time interval with a time step size τ . Then we define 
+
+δτ χn+1 = γ0χn+1 −̂ χτ ,
+
+where χ is a generic variable, and ̂
+
+χ =
+
+{
+
+χn, k = 1 ,
+
+2χn − 12 χn−1, k = 2 , ; γ0 =
+
+{
+
+1, k = 1 , 
+
+> 32
+
+, k = 2 .
+
+We also recall the extrapolation formulas 
+
+˜χn+1 =
+
+{
+
+χn, k = 1 ,
+
+2χn − χn−1, k = 2 .
+
+With these notations, the discrete finite element scheme is given as follows: 
+
+Step 1: Find (ϕn+1  
+
+> h
+
+, μ n+1 
+
+> h
+
+) ∈ Qh × Qh, such that for all (ψh, ω h) ∈ Qh × Qh,
+
+(δτ ϕn+1  
+
+> h
+
+, ω h
+
+) + 1Pe 
+
+(∇μn+1  
+
+> h
+
+, ∇ωh
+
+) =( ˜ϕn+1  
+
+> h
+
+˜un+1  
+
+> h
+
+, ∇ωh
+
+),
+
+(μn+1  
+
+> h
+
+, ψ h
+
+) − Cn 2(∇ϕn+1  
+
+> h
+
+, ∇ψh
+
+) − (ϕn+1  
+
+> h
+
+, ψ h
+
+) =(( ˜ϕn+1  
+
+> h
+
+)3 − 2 ˜ϕn+1  
+
+> h
+
+, ψ h
+
+).
+
+Then we evaluate ρn+1  
+
+> h
+
+, ηn+1  
+
+> h
+
+, and σn+1  
+
+> h
+
+by (exemplarily for ρn+1  
+
+> h
+
+)
+
+ρn+1  
+
+> h
+
+= ρ+ − ρ−
+
+2ρr
+
+C (ϕn+1 
+
+> h
+
+) + ρ+ + ρ−
+
+2ρr
+
+,
+
+where we define 
+
+C (ϕn+1 
+
+> h
+
+) =
+
+{
+
+ϕn+1  
+
+> h
+
+, if ∣∣ϕn+1 
+
+> h
+
+∣∣ ≤ 1,
+
+sign( ϕn+1  
+
+> h
+
+), otherwise .
+
+Step 2: Find un+1  
+
+> h
+
+∈ Xh, such that for all vh ∈ Xh,
+
+(ρn+1  
+
+> h
+
+δτ un+1  
+
+> h
+
+, vh
+
+) + 2Re 
+
+(ηn+1  
+
+> h
+
+D(un+1  
+
+> h
+
+), D(vh)) = −((ρn+1  
+
+> h
+
+˜un+1  
+
+> h
+
+− ρd 1Pe ∇μn+1  
+
+> h
+
+) · ∇ ˜un+1  
+
+> h
+
+, vh
+
+)
+
++ (˜pn+1  
+
+> h
+
+, ∇ · vh
+
+) + 1WeCn 
+
+(μn+1  
+
+> h
+
+∇ϕn+1  
+
+> h
+
+, vh
+
+) − NRm 
+
+( ˜Bn+1  
+
+> h
+
+⊗ ˜Bn+1  
+
+> h
+
+, D(vh)) − 1Fr 
+
+(ρn+1  
+
+> h
+
+e3, vh
+
+).
+
+Step 3: Find pn+1  
+
+> h
+
+∈ Mh, such that for all qh ∈ Mh,
+
+(∇(pn+1  
+
+> h
+
+− pnh ), ∇qh
+
+) = − γ0ϑτ
+
+(∇ · un+1  
+
+> h
+
+, q h
+
+),
+
+with ϑ = min( ρ+,ρ −) 
+
+> ρr
+
+.
+
+Step 4: Find An+1  
+
+> h
+
+∈ Ch, such that for all Zh ∈ Ch,
+
+(σn+1  
+
+> h
+
+δτ An+1  
+
+> h
+
+, Zh
+
+) + 1Rm 
+
+(∇ × An+1  
+
+> h
+
+, ∇ × Zh
+
+) = (σn+1  
+
+> h
+
+un+1  
+
+> h
+
+× ∇ × ˜An+1  
+
+> h
+
+, Zh
+
+).
+
+Step 5: Find Bn+1  
+
+> h
+
+∈ Nh, such that for all Dh ∈ Nh,
+
+(Bn+1  
+
+> h
+
+, Dh
+
+) = (∇ × An+1  
+
+> h
+
+, Dh
+
+).
+
+9Remark 2. In the above scheme, we have exploited a linearization technique in [29] and the pressure penalty method developed by Guermond and Salgado [14]. While this scheme offers a straightforward implementation and exactly preserves the divergence-free constraint on the magnetic field B, it neither satisfies the fluid incompressibility constraint nor admits a discrete stability estimate. Designing an algorithm that preserves these properties simultaneously remains a significant challenge and hence is beyond the scope of this work. 
+
+Remark 3. By its physical interpretation, the order parameter ϕ should take values in [−1, 1] . However, the present formulation cannot theoretically guarantee this bound [10]. In computations, the cut-off value 
+
+C (ϕn+1  
+
+> h
+
+) defined above is used when evaluating material properties ρn+1  
+
+> h
+
+, ηn+1  
+
+> h
+
+, and σn+1  
+
+> h
+
+. This treatment guarantees that these material properties remain within their physically admissible ranges. It is especially important for simulations with large parameter ratios, and is a common strategy in simulations [29, 32]. 
+
+Remark 4. In computations, we fix the Froude number Fr = 1 , which gives ur = √gL r . The Reynolds number and the Weber number now become the Archimedes number Ar = ρ+
+
+√gL 3 
+
+> r
+> η+
+
+= Re and the Eötvös number Eo = L2  
+
+> rρ+gλ
+
+= 2√23 We , where we have chosen χr = χ+ with χ = {ρ, η, σ }. We also employ the Hartmann number Ha = Lr Br
+
+√ σ+ 
+
+> η+
+
+= √NRe and the magnetic Prandtl number Pm = η+μ0σ+ 
+
+> ρ+
+
+= Rm Re in place of the Stuart number N and the magnetic Reynolds number Rm . With the scaling law 1Pe = 3Cn [22], the system is fully characterized by eight dimensionless quantities: ρ+ 
+
+> ρ−
+
+, η+ 
+
+> η−
+
+, σ+ 
+
+> σ−
+
+, Cn , Ar , Eo , Ha , Pm .
+
+3. Numerical examples 
+
+In this section, we present numerical examples demonstrating the magnetic damping effect on bubble dynamics. In metallurgical processes, gas bubbles (e.g., argon and nitrogen) are frequently injected into liquid metals to stir and homogenize the melt or to prevent nozzle clogging. Meanwhile, magnetic fields provide a non-intrusive means of bubble control [11, 37, 38]. Here, we consider a single lighter bubble with an initial diameter Lr = 0 .5 rising in a vertical column of heavier liquid. The computational domain is 
+
+(0 , 2Lr ) × (0 , 4Lr ) in two dimensions, and (0 , 2Lr )2 × (0 , 4Lr ) in three dimensions, with no-slip and insulating boundary conditions on all walls. The initial center of the bubble is positioned at (Lr , L r ) and (Lr , L r , L r )
+
+in two and three dimensions, respectively. The initial order parameter profile is prescribed as 
+
+ϕ0 = tanh d(x)
+
+√2Cn ,
+
+where d(x) denotes the signed distance function to the bubble interface, chosen to be positive outside the bubble. The fluid is initially at rest, i.e., u0 = 0. In all simulations, the initial magnetic field B0 is prescribed as the imposed magnetic field, and the corresponding initial vector potential A0 is chosen as specified earlier. In three-dimensional examples, uniform magnetic fields are applied in both the vertical and horizontal directions that orient antiparallel and perpendicular to gravity, respectively. The two-dimensional simulations are restricted to a vertical field antiparallel to the direction of gravity. The magnetic Prandtl number is prescribed as either Pm = 10 −2 or Pm = 10 , corresponding to the low and high magnetic Reynolds number regimes. The relevant physical parameters are ρ+ 
+
+> ρ−
+
+= 10 3, η+ 
+
+> η−
+
+= 10 2, σ+ 
+
+> σ−
+
+= 10 4, Ar = 35 , Eo = 125 .For a quantitative comparison, we use the centroid and rise velocity defined by 
+
+∫ 
+
+> ϕ< 0
+
+xddx
+
+∫ 
+
+> ϕ< 0
+
+dx and 
+
+∫ 
+
+> ϕ< 0
+
+uddx
+
+∫ 
+
+> ϕ< 0
+
+dx ,
+
+where d = 2 , 3 and ud is the dth component of u = ( u1, u 2, u 3).Our numerical implementation relies on the deal.II finite element library [2]. We apply the lowest-order elements for all finite element spaces, specifically using a tensor-product continuous Lagrange element Q1
+
+for ϕh, μh, uh, and ph, the Raviart–Thomas element RT 0 for Bh, and the Nédélec element N0 for Ah.The resulting linear systems are solved using the flexible generalized minimal residual (FGMRES) algorithm, preconditioned by either additive Schwarz methods or algebraic multigrid methods. For brevity, the details of preconditioning are omitted as they are not the primary focus of this study. Additionally, we use an absolute iteration tolerance of εiter = 10 −10 in all examples. All numerical results reported below are rescaled to the physical dimensional scale for presentation, and, unless otherwise specified, all simulations are performed up to the physical final time t = 3 .10 3.1. Convergence test 
+
+In this subsection, we investigate the effect of interface thicknesses on numerical results to examine the asymptotic behavior of our diffuse interface model. Five two-dimensional experiments are performed with 
+
+Cn = 0 .04 , 0.02 , 0.01 , 0.005 , and 0.0025 . To adequately resolve the interfacial dynamics, we employ a fixed locally refined mesh for each Cahn number. Specifically, a uniform background mesh with mesh size h is first generated, followed by one level of local refinement in the subdomain (0 .15 , 0.85) × (0 .2, 1.5) . As the Cahn number decreases, both the mesh resolution and the time step size τ are refined accordingly, as summarized in Table 1. The remaining dimensionless parameters are fixed at Pm = 10 −2 and Ha = 15 .
+
+Table 1: Spatial and temporal resolutions in the convergence test. 
+
+Cn τ h cells 0.04 2 × 10 −3 2−5 4,820 0.02 1 × 10 −3 2−6 19,148 0.01 5 × 10 −4 2−7 77,588 0.005 2.5 × 10 −4 2−8 310,892 0.0025 1.25 × 10 −4 2−9 1,239,572 Figure 1 shows the final bubble shapes for different Cahn numbers, together with the time evolution of the corresponding benchmark quantities. It is evident that the numerical results converge to a limiting solution as the Cahn number decreases. For a more quantitative assessment, Table 2 summarizes the relative differences and estimated convergence orders of the final centroid and rise velocity, using the result obtained with Cn = 0 .0025 as the reference solution. The results indicate an approximately second-order convergence for both benchmark quantities. In particular, no pronounced difference in either the bubble shape or the benchmark quantities is observed between the cases Cn = 0 .005 and Cn = 0 .0025 .0 0.2 0.4 0.6 0.8 1
+
+> 0.7 0.9 1.1 1.3 1.5 1.7
+
+(a) Final bubble shapes 0 1 2 3       
+
+> Time
+> 0.5 0.7 0.9 1.1 1.3
+> Centroid
+> 0123
+> Time
+> 00.1 0.2 0.3 0.4
+> Rise velocity
+> 2.8 2.9 3
+> 11.05 1.1
+> 2.8 2.9 3
+> 0.22 0.24 0.26
+
+(b) Time evolution of centroid and rise velocity Figure 1: Effect of the Cahn number on the computed bubble dynamics. 
+
+In the subsequent two-dimensional simulations, we employ Cn = 0 .005 together with a background mesh size h = 2 −7 and a locally refined region (0 .15 , 0.85) × (0 .2, 1.5) to reduce the computational cost. For the 11 Table 2: Final benchmark quantities and estimated convergence order. 
+
+Cn Centroid Rise velocity value error order value error order 0.04 1.0387 3.52 × 10 −2 0.2323 9.50 × 10 −2
+
+0.02 1.0684 7.56 × 10 −3 2.22 0.2492 2.92 × 10 −2 1.70 0.01 1.0750 1.45 × 10 −3 2.38 0.2546 8.03 × 10 −3 1.86 0.005 1.0764 1.99 × 10 −4 2.87 0.2563 1.69 × 10 −3 2.25 0.0025 1.0766 0.2567 three-dimensional simulations, we use Cn = 0 .01 together with a background mesh size h = 2 −6 and a locally refined region (0 .15 , 0.85) 2 × (0 .2, 1.8) , which gives 1,906,592 cells. The time step size is fixed at τ = 1 × 10 −3
+
+in all subsequent simulations. 
+
+3.2. Comparison with inductionless MHD and sharp interface ALE computations 
+
+In most laboratory experiments and industrial processes, the magnetic Reynolds number Rm is typically low [7], and the inductionless MHD model is therefore widely used as an efficient formulation for the simulation of resistive MHD free surface flows [15, 24, 26, 37, 38]. It is therefore of interest to examine whether, in the low Rm regime, the present resistive MHD model produces results consistent with those of the inductionless MHD model. In the computation, the evolving interface and fluid unknowns are computed by the same diffuse interface formulation developed in this work. Meanwhile, for the electromagnetic fields, we follow the procedure in [37]. Specifically, the electric potential is obtained from the electric potential Poisson equation, and the current density is subsequently projected into the H(div) -conforming finite element space using Ohm’s law and charge-conservation constraint, thereby preserving a divergence-free current density at the discrete level. On the other hand, although the preceding subsection demonstrates numerically that the diffuse interface solutions approach a stable limiting behavior as the Cahn number decreases, a numerical verification is still necessary to validate whether this limiting behavior is consistent with the corresponding sharp interface dynamics. Such a reference solution is obtained using an ALE approach, in which the moving sharp interface is explicitly represented by a body-fitted mesh. The evolving interface and fluid unknowns are computed using the Barrett–Garcke–Nürnberg type scheme employed in [33], whereas the electromagnetic fields are discretized using the potential formulation developed in the present work. In this comparison, the relevant dimensionless parameters are Pm = 10 −2 and Ha = 15 . Figure 2 depicts the final bubble shape and the associated benchmark quantities. Close agreement is observed between the present resistive MHD computation and the inductionless MHD computation, as well as between the diffuse interface computation and the sharp interface ALE computation. The former comparison verifies the consistency of the present electromagnetic formulation with the inductionless approximation in the low 
+
+Rm regime, whereas the latter validates the diffuse interface approximation against the corresponding sharp interface dynamics. These results indicate the accuracy and robustness of our method in simulating MHD interfacial phenomena. 
+
+3.3. Results in low magnetic Reynolds number regime 
+
+This subsection presents numerical results for Pm = 10 −2. We first perform two-dimensional simulations with different magnetic strengths. A comparison of the final order parameter profile under different Hartmann numbers is presented in Figure 3. Notably, the bubble undergoes elongation along the vertical direction, giving a more pronounced elliptical profile as the magnetic field intensifies. Meanwhile, the swirling vortices become more regular, with streamlines aligning parallel to the magnetic field lines. For a detailed quantitative assessment, Figure 4 illustrates the time evolution of the centroid and rise velocity. Remarkably, the rise velocity depends non-monotonically on the magnetic field strength, and a moderate field is found to enhance the rise velocity, leading to a higher centroid position. We now turn our attention to three-dimensional simulations. Figure 5 shows cross sections of final order parameter profiles and streamlines at Ha = 30 , while the corresponding benchmark quantities are depicted in Figure 6. Under a vertical magnetic field, the observed flow dynamics mirror those in the two-dimensional examples. This can be attributed to the fact that only the velocity components perpendicular to the magnetic 12 0 0.2 0.4 0.6 0.8 1
+
+0.6 0.8 11.2 1.4 1.6 (a) Final bubble shapes 0 1 2 3
+
+Time    
+
+> 0.5 0.7 0.9 1.1 1.3
+> Centroid
+> 0123
+
+Time     
+
+> 00.1 0.2 0.3 0.4
+> Rise velocity
+> 2.8 2.9 3
+> 11.05 1.1
+> 2.8 2.9 3
+> 0.24 0.26 0.28
+
+(b) Time evolution of centroid and rise velocity Figure 2: Bubble dynamics obtained from the present, inductionless MHD, and ALE computations. In the legends, present, IMHD, and ALE denote these three results, respectively. 
+
+(a) Ha = 5 (b) Ha = 15 (c) Ha = 25 
+
+Figure 3: Final order parameter profiles and streamlines in two-dimensional tests at Pm = 10 −2.0 1 2 3
+
+Time    
+
+> 0.5 0.7 0.9 1.1 1.3
+> Centroid
+> 0123
+
+Time    
+
+> 00.1 0.2 0.3 0.4
+> Rise velocity
+> 0123
+
+Time 
+
+> 00.2 0.4 0.6 0.8 1
+> Divergence
+> 10 -7
+
+Figure 4: Centroid, rise velocity, and divergence of the magnetic field in two-dimensional tests at Pm = 10 −2.
+
+13 field (i.e., the horizontal components) contribute to the induced current. The resulting Lorentz force primarily acts to suppress horizontal motion, leading to an axisymmetric deformation of the bubble. In contrast, a horizontal magnetic field induces a pronounced anisotropic flow structure. In this case, the induced current is generated by velocity components normal to the field direction, resulting in a spatially non-uniform Lorentz force distribution. As a consequence, vortical structures perpendicular to the magnetic field are strongly damped, and the flow becomes highly directional; detailed three-dimensional bubble shapes are shown in Figure 7. In particular, the streamlines in the plane normal to the magnetic field tend to align opposite to gravity. Furthermore, both the centroid and rise velocity exhibit a monotonic decrease with increasing magnetic intensity. These numerical observations are in qualitative agreement with previous findings reported in [37].               
+
+> (a) Vertical magnetic fields (b) Horizontal magnetic field Figure 5: Final order parameter profiles and streamlines for three-dimensional tests at Ha = 30 and Pm = 10 −2. Left and right panels show cross sections parallel and perpendicular to the horizontal magnetic field direction, respectively. 0123
+> Time
+> 0.5 0.8 1.1 1.4 1.7
+> Centroid
+> 0123
+> Time
+> 00.2 0.4 0.6
+> Rise velocity
+> 0123
+> Time
+> 02468
+> Divergence
+> 10 -9
+> Figure 6: Centroid, rise velocity, and divergence of the magnetic field in three-dimensional tests at Pm = 10 −2. In the legends, “V” and “H” denote vertical and horizontal applied magnetic fields, respectively.
+
+In addition, the divergence of Bh is maintained at O(10 −8) in two dimensions and O(10 −9) in three dimensions, illustrating the robust conservation property of our algorithm in the low Rm regime; notice that we adopt a tolerance of εiter = 10 −10 for FGMRES iterations. 
+
+3.4. Results in high magnetic Reynolds number regime 
+
+This subsection presents numerical results for Pm = 10 . Given that a vertical magnetic field induces an axisymmetric fluid motion, we restrict our investigation to two-dimensional simulations for this field. Figure 8 illustrates the final order parameter profiles under various magnetic strengths, with streamlines and magnetic field lines superimposed. Although the vortices become more regular as the magnetic field strength increases, the magnetic damping effect is less pronounced. Meanwhile, the non-monotonic dependence of the rise velocity on the magnetic-field strength is weaker, so that an intense field is required to inhibit the bubble motion, as detailed in Figure 9. Moreover, the magnetic flux freezing effect becomes increasingly significant, causing the magnetic field lines to become nearly frozen into the flow both within and surrounding the bubble. This induces the formation of a protrusion at the bubble’s base that remains absent in the low-Rm regime. Consequently, secondary vortices are generated beneath the bubble. Next, we focus on the dynamics under a horizontal magnetic field. Figure 10 presents the magnetic field lines and streamlines at Ha = 30 . The strong coupling between the magnetic field and the fluid flow leads 14 (a) Vertical magnetic fields 
+
+(b) Horizontal magnetic fields Figure 7: Final three-dimensional bubble shapes for Pm = 10 −2 with Ha = 0 , 10 , 20 , and 30 . In the legends, Bext denotes the direction of the external imposed magnetic field. 
+
+(a) Ha = 25 (b) Ha = 30 (c) Ha = 35 
+
+Figure 8: Final order parameter profiles in two-dimensional tests at Pm = 10 , with streamlines in black and magnetic field lines in red. 0 1 2 3      
+
+> Time
+> 0.5 0.7 0.9 1.1 1.3
+> Centroid
+> 0123
+> Time
+> 00.1 0.2 0.3 0.4
+> Rise velocity
+> 0123
+> Time
+> 00.2 0.4 0.6 0.8 1
+> Divergence
+> 10 -7
+
+Figure 9: Centroid, rise velocity, and divergence of the magnetic field in two-dimensional tests at Pm = 10 .
+
+15 to highly perturbed magnetic field lines. While the protrusion at the bubble’s base remains observable, the damping effect does not yield a distinctly anisotropic bubble shape as observed in the low Rm regime; see also Figure 11 for a quantitative measurement. Furthermore, the flow field becomes increasingly complex, with secondary vortices also emerging beneath the bubble in the parallel plane.               
+
+> (a) Magnetic field lines (b) Streamlines Figure 10: Three-dimensional magnetic field lines and streamlines for a horizontal magnetic field at Ha = 30 and Pm = 10 . Left and right panels show cross sections parallel and perpendicular to the horizontal magnetic field direction, respectively. 0123
+> Time
+> 0.5 0.8 1.1 1.4 1.7
+> Centroid
+> 0123
+> Time
+> 00.2 0.4 0.6
+> Rise velocity
+> 0123
+> Time
+> 02468
+> Divergence
+> 10 -9
+> Figure 11: Centroid, rise velocity, and divergence of the magnetic field in a three-dimensional test with a horizontal magnetic field at Pm = 10 .
+
+Also, the divergence of Bh is maintained at O(10 −8) in two dimensions and O(10 −9) in three dimensions, demonstrating the robust conservation property of our algorithm in high Rm regime. 
+
+4. Concluding remarks 
+
+In this paper, we propose a diffuse interface model to simulate the incompressible resistive MHD free surface flows. The formal convergence of the diffuse interface system to the sharp interface model is established by the method of matched asymptotic expansions. For the purpose of obtaining numerical solutions, we develop a fully decoupled linear finite element algorithm that preserves the divergence-free constraint on the magnetic field. The magnetic damping effects are investigated through rising bubble dynamics. Numerical tests demonstrate the accuracy and efficiency of our approach. Although the proposed model and developed algorithm are capable of effectively capturing such MHD phenomena as the magnetic damping effect in free surface flows, our investigation on this topic remains relatively limited. We identify several directions for future research. First, it is essential to take the ther-mocapillary effect into account, in view of practical industrial applications [7, 37, 38]. Another direction for future investigation lies in the investigation of other MHD phenomena using the developed method, such as metal pad rolling in stably stratified liquid layers [9, 15, 30]. Finally, it is highly desirable to develop structure-preserving numerical algorithms that preserve fundamental physical properties for the MHD free surface flow problems. 
+
+Acknowledgments 
+
+The authors would like to thank Prof. Wenyu Lei at UESTC for the fruitful discussions on numerical im-plementations using deal.II . The research is supported in part by the National Natural Science Foundation 16 of China (Nos. 12271082, 12471371, 12431015, 62231016), the Foundation for Innovative Research Groups of the Natural Science Foundation of Sichuan Province (No. 2025NSFTD0004), and the Fundamental Research Funds for the Central Universities (No. ZYGX2025XJ029). 
+
+Appendix A. Details of the numerical model 
+
+Appendix A.1. Derivation of the diffuse interface model 
+
+We present here the derivation of system (2) by means of Onsager’s variational principle and the laws of thermodynamics. First, we assume partial mixing of the two fluids in a narrow interfacial zone Γϵ(t) of thickness ϵ under the volume incompressibility assumption. We need to define the unknowns in Γϵ(t) and develop the corresponding governing equations. Hence, let W (t) ⊂ Ω be an arbitrary control volume, and let 
+
+M and ρ denote its mass and density, respectively. Then, denoting the masses and densities of the two fluids in W (t) by M± and ϱ±, it holds that 
+
+ϱ± = M±
+
+|W (t)| ∈ [0 , ρ ±] and ρ = M
+
+|W (t)| = M+ + M−
+
+|W (t)| = ϱ+ + ϱ−.
+
+In turn, the volume incompressibility assumption leads to 
+
+1 =  
+
+> M+
+> ρ+
+
++ M−
+
+> ρ−
+
+|W (t)| = ϱ+
+
+ρ+
+
++ ϱ−
+
+ρ−
+
+.
+
+We define the order parameter for the mixture as 
+
+ϕ(x, t ) = ϱ+
+
+ρ+
+
+− ϱ−
+
+ρ−
+
+=
+
+{
+
+1, x ∈ Ω+(t),
+
+−1, x ∈ Ω−(t),
+
+which indicates that 
+
+ρ = ρ+ − ρ−
+
+2 ϕ + ρ+ + ρ−
+
+2 .
+
+Apparently, |ϕ(x, t )| < 1 in Γϵ(t). Supposing that the fluids move with different velocities u±, the continuity equations read 
+
+∂tϱ± + ∇ · (ϱ±u±) = 0 .
+
+Then, we introduce the volume-averaged velocity and relative mass flux as 
+
+u = ϱ+
+
+ρ+
+
+u+ + ϱ−
+
+ρ−
+
+u− and j± = ϱ±(u± − u).
+
+As a consequence, we obtain 
+
+∇ · u = ∇ · 
+
+( ϱ+
+
+ρ+
+
+u+ + ϱ−
+
+ρ−
+
+u−
+
+)
+
+= −∂t
+
+( ϱ+
+
+ρ+
+
++ ϱ−
+
+ρ−
+
+)
+
+= 0 ,
+
+and 
+
+∂tϕ = −∇ · 
+
+( ϱ+
+
+ρ+
+
+u + j+
+
+ρ+
+
+− ϱ−
+
+ρ−
+
+u − j−
+
+ρ−
+
+)
+
+= −∇ · (ϕu + jϕ),
+
+where jϕ = j+ 
+
+> ρ+
+
+− j− 
+
+> ρ−
+
+. Correspondingly, the incompressibility constraint is retained and this implies that mass diffusion is permitted in this method. Also, this gives a non-conservative gravitational force. Hence, the momentum ρu should be transported by ρu + ρdjϕ, giving 
+
+ρ∂ tu + ( ρu + ρdjϕ) · ∇ u = ∇ · S − ∇ p + F ,
+
+where S is a symmetric second-order tensor, p is the pressure serving as a Lagrange multiplier for the incom-pressibility constraint, and F is a force density. The definition of the electromagnetic fields is independent of the control volume, so we directly invoke the pre-Maxwell equations: 
+
+∂tB + ∇ × E = 0,
+
+∇ × B = μ0J,
+
+J = σ(ϕ)( E + u × B),
+
+∇ · B = 0 , ∇ · J = 0 ,
+
+17 where the definition of electrical conductivity σ(ϕ) will be specified later. Following [1, 27], we employ Onsager’s variational principle to determine jϕ, S, and F . By introducing the Rayleighian functional 
+
+R = dE
+
+dt + P,
+
+where E and P are the free energy and dissipation functional, Onsager’s variational principle states that the kinetic equation is obtained by minimizing R [27]. Then, we define 
+
+E =
+
+∫
+
+> Ω
+
+( 12 ρ|u|2 + 12 μ−10 |B|2 + f (ϕ, ∇ϕ)
+
+)
+
+dx,
+
+where f (ϕ, ∇ϕ) is a Helmholtz free energy density. Hence, it holds that 
+
+dE
+
+dt =
+
+∫
+
+> Ω
+
+( − S : D(u) + F · u − σ−1(ϕ)|J|2 − J × B · u − μu · ∇ ϕ + jϕ · ∇ μ)dx,
+
+where μ = ∂f ∂ϕ − ∇ · ( ∂f ∂∇ϕ
+
+) denotes the chemical potential, and here we assume ∂f ∂∇ϕ · n = 0 , n × E = 0, and 
+
+u = 0 on ∂Ω. Since the first law of thermodynamics reads 
+
+dE
+
+dt = −T dS
+
+dt + dW
+
+dt ,
+
+where T , S, and W represent the temperature, entropy, and mechanical work, we are able to identify 
+
+dW
+
+dt =
+
+∫
+
+> Ω
+
+(F · u − J × B · u − μu · ∇ ϕ)d x.
+
+Incorporating gravitational forces, we can write 
+
+dW
+
+dt =
+
+∫
+
+> Ω
+
+ρg · udx,
+
+which gives 
+
+F = μ∇ϕ + J × B + ρg.
+
+To further specify S and jϕ, we introduce the dissipation functional 
+
+P =
+
+∫
+
+> Ω
+
+( |S|2
+
+4η(ϕ) + |jϕ|2
+
+2mϵ(ϕ) + |J|2
+
+2σ(ϕ)
+
+)
+
+dx,
+
+which accounts for the viscous dissipation, the diffusive dissipation, and the ohmic dissipation, respectively. Hence, we obtain a Rayleighian functional 
+
+R =
+
+∫
+
+> Ω
+
+(
+
+− S : D(u) + ρg · u + jϕ · ∇ μ + |S|2
+
+4η(ϕ) + |jϕ|2
+
+2mϵ(ϕ) − |J|2
+
+2σ(ϕ)
+
+)
+
+dx.
+
+In accordance with Onsager’s variational principle, we find by minimizing R with respect to S and jϕ,
+
+S = 2 ηD(u) and jϕ = −mϵ∇μ. 
+
+In this work, we consider the Helmholtz free energy density in the Ginzburg–Landau form 
+
+f (ϕ, ∇ϕ) = ̂ λϵ 
+
+2 |∇ ϕ|2 +̂ λϵ −1
+
+4
+
+(ϕ2 − 1)2 .
+
+Moreover, we assume that the material properties vary linearly in the mixture, i.e., 
+
+η = η+ − η−
+
+2 ϕ + η+ + η−
+
+2 and σ = σ+ − σ−
+
+2 ϕ + σ+ + σ−
+
+2 ,
+
+and hence the model is compatible with the resistive MHD equations in the single fluid regime. This finally leads to system (2). 18 Appendix A.2. Energy balance law for the diffuse interface model 
+
+We present here the derivation of the energy law for system (2). In the following derivation, all boundary contributions vanish owing to the prescribed boundary conditions. Since ∂ρ ∂ϕ = ρd, the Cahn–Hilliard equation implies 
+
+∂tρ + ∇ · (ρu) = ρd∇ · (mϵ∇μ).
+
+Accordingly, the momentum equation can be written equivalently in the energy compatible form 
+
+ρ∂ tu + (ρu − ρdmϵ∇μ) · ∇ u + 12 (∂tρ + ∇ · (ρu) − ρd∇ · (mϵ∇μ)) u = ∇ · (2ηD(u) − pI) + μ∇ϕ + J × B + ρg.
+
+Using integration by parts, we have 
+
+∫
+
+> Ω
+
+(ρu − ρdmϵ∇μ) · ∇ u · udx = −
+
+∫
+
+> Ω
+
+12 (∇ · (ρu) − ρd∇ · (mϵ∇μ)) |u|2dx.
+
+Taking the L2 inner product of the momentum equation with u therefore yields 
+
+ddt
+
+∫
+
+> Ω
+
+12 ρ|u|2dx =
+
+∫
+
+> Ω
+
+( 12 ∂tρ|u|2 + ρ∂ tu · u
+
+)
+
+dx
+
+=
+
+∫
+
+> Ω
+
+(∇ · (2ηD(u) − pI) + μ∇ϕ + J × B + ρg) · udx
+
+= −
+
+∫
+
+> Ω
+
+2η|D(u)|2dx +
+
+∫
+
+> Ω
+
+(μ∇ϕ + J × B + ρg) · udx.
+
+Next, using the definition of the chemical potential and the Cahn–Hilliard equation, the time derivative of the Helmholtz free energy satisfies 
+
+ddt
+
+∫
+
+> Ω
+
+(̂ 
+
+λϵ 
+
+2 |∇ ϕ|2 +̂ λϵ −1
+
+4 (ϕ2 − 1) 2
+
+)
+
+dx =
+
+∫
+
+> Ω
+
+(̂ 
+
+λϵ ∇ϕ · ∇ ∂tϕ +̂ λϵ −1(ϕ3 − ϕ)∂tϕ
+
+)
+
+dx
+
+=
+
+∫
+
+> Ω
+
+(
+
+−̂ λϵ ∆ϕ +̂ λϵ −1(ϕ3 − ϕ)
+
+)
+
+∂tϕdx
+
+=
+
+∫
+
+> Ω
+
+μ∂ tϕdx
+
+= −
+
+∫
+
+> Ω
+
+mϵ|∇ μ|2dx −
+
+∫
+
+> Ω
+
+μu · ∇ ϕdx.
+
+Finally, using Faraday’s law, Ampère’s law, and Ohm’s law, we obtain 
+
+ddt
+
+∫
+
+> Ω
+
+12 μ−10 |B|2dx =
+
+∫
+
+> Ω
+
+μ−10 B · ∂tBdx
+
+= −
+
+∫
+
+> Ω
+
+μ−10 B · ∇ × Edx
+
+= −
+
+∫
+
+> Ω
+
+μ−10 ∇ × B · Edx
+
+= −
+
+∫
+
+> Ω
+
+σ−1|J|2dx +
+
+∫
+
+> Ω
+
+J · u × Bdx.
+
+Summing the above three identities, we obtain the desired result. 
+
+References 
+
+[1] H. Abels, H. Garcke, and G. Grün. Thermodynamically consistent, frame indifferent diffuse interface models for incompressible two-phase flows with different densities. Math. Models Methods Appl. Sci. , 22(3):1150013, 40, 2012. [2] P. C. Africa, D. Arndt, W. Bangerth, B. Blais, M. Fehling, R. Gassmöller, T. Heister, L. Heltai, S. Kin-newig, M. Kronbichler, M. Maier, P. Munch, M. Schreter-Fleischhacker, J. P. Thiele, B. Turcksin, D. Wells, and V. Yushutin. The deal.II library, version 9.6. J. Numer. Math. , 32(4):369–380, 2024. 
+
+19 [3] D. M. Anderson, G. B. McFadden, and A. A. Wheeler. Diffuse-interface methods in fluid mechanics. Annu. Rev. Fluid Mech. , 30:139–165, 1998. [4] L. Baňas and A. Prohl. Convergent finite element discretization of the multi-fluid nonstationary incompressible magnetohydrodynamics equations. Math. Comp. , 79(272):1957–1999, 2010. [5] L. Cappanera, J.-L. Guermond, W. Herreman, and C. Nore. Momentum-based approximation of incompressible multiphase fluid flows. Internat. J. Numer. Methods Fluids , 86(8):541–563, 2018. [6] R. Chen and H. Zhang. Second-order energy stable schemes for the new model of the Cahn–Hilliard-MHD equations. Adv. Comput. Math. , 46(6):Paper No. 79, 28, 2020. [7] P. A. Davidson. Introduction to magnetohydrodynamics . Cambridge Texts in Applied Mathematics. Cambridge University Press, Cambridge, second edition, 2017. [8] M. Flueck, A. Janka, C. Laurent, M. Picasso, J. Rappaz, and G. Steiner. Some mathematical and numerical aspects in aluminum production. J. Sci. Comput. , 43(3):313–325, 2010. [9] J.-F. Gerbeau, T. Lelièvre, and C. Le Bris. Simulations of MHD flows with moving interfaces. J. Comput. Phys. ,184(1):163–191, 2003. [10] A. Giorgini, A. Miranville, and R. Temam. Uniqueness and regularity for the Navier–Stokes–Cahn–Hilliard system. SIAM J. Math. Anal. , 51(3):2535–2574, 2019. [11] H.-Y. Gou, M.-J. Ni, and Z.-H. Yao. Experimental study of a single bubble’s motion in a liquid metal under a horizontal magnetic field. J. Fluid Mech. , 988:A21, 2024. [12] S. Gross and A. Reusken. Numerical methods for two-phase incompressible flows , volume 40 of Springer Series in Computational Mathematics . Springer-Verlag, Berlin, 2011. [13] G. Grün and F. Klingbeil. Two-phase flow with mass density contrast: stable schemes for a thermodynamic consistent and frame-indifferent diffuse-interface model. J. Comput. Phys. , 257:708–725, 2014. [14] J.-L. Guermond and A. Salgado. A splitting method for incompressible flows with variable density based on a pressure Poisson equation. J. Comput. Phys. , 228(8):2834–2846, 2009. [15] W. Herreman, C. Nore, J.-L. Guermond, L. Cappanera, N. Weber, and G. M. Horstmann. Perturbation theory for metal pad roll instability in cylindrical reduction cells. J. Fluid Mech. , 878:598–646, 2019. [16] R. Hiptmair, L. Li, S. Mao, and W. Zheng. A fully divergence-free finite element method for magnetohydrody-namic equations. Math. Models Methods Appl. Sci. , 28(4):659–695, 2018. [17] K. Hu, Y. Ma, and J. Xu. Stable finite element methods preserving ∇ · B = 0 exactly for MHD models. Numer. Math. , 135(2):371–396, 2017. [18] B. Li, J. Wang, and L. Xu. A convergent linearized Lagrange finite element method for the magneto-hydrodynamic equations in two-dimensional nonsmooth and nonconvex domains. SIAM J. Numer. Anal. , 58(1):430–459, 2020. [19] L. Li, M. Ni, and W. Zheng. A charge-conservative finite element method for inductionless MHD equations. Part I: Convergence. SIAM J. Sci. Comput. , 41(4):B796–B815, 2019. [20] J. Lowengrub and L. Truskinovsky. Quasi-incompressible Cahn–Hilliard fluids and topological transitions. R. Soc. Lond. Proc. Ser. A Math. Phys. Eng. Sci. , 454(1978):2617–2654, 1998. [21] D. Lunz and P. D. Howell. Flow of a thin liquid-metal film in a toroidal magnetic field. J. Fluid Mech. , 867:835– 876, 2019. [22] F. Magaletti, F. Picano, M. Chinappi, L. Marino, and C. M. Casciola. The sharp-interface limit of the Cahn– Hilliard/Navier–Stokes model for binary fluids. J. Fluid Mech. , 714:95–126, 2013. [23] S. Mao and R. Xi. An incompressibility, div B = 0 preserving, current density, helicity, energy-conserving finite element method for incompressible MHD systems. J. Comput. Phys. , 538:114130, 2025. [24] N. Morley, S. Smolentsev, R. Munipalli, M.-J. Ni, D. Gao, and M. Abdou. Progress on the modeling of liquid metal, free surface, MHD flows for fusion liquid walls. Fusion Eng. Des. , 72(1):3–34, 2004. [25] D. Munger and A. Vincent. A level set approach to simulate magnetohydrodynamic-instabilities in aluminum reduction cells. J. Comput. Phys. , 217(2):295–311, 2006. 
+
+20 [26] J.-H. Pan, M.-J. Ni, and N.-M. Zhang. A consistent and conservative immersed boundary method for MHD flows and moving boundary problems. J. Comput. Phys. , 373:425–445, 2018. [27] T. Qian, X.-P. Wang, and P. Sheng. A variational approach to moving contact line hydrodynamics. J. Fluid Mech. , 564:333–360, 2006. [28] R. Samulyak, J. Du, J. Glimm, and Z. Xu. A numerical algorithm for MHD of free surface flows at low magnetic Reynolds numbers. J. Comput. Phys. , 226(2):1532–1549, 2007. [29] J. Shen and X. Yang. Decoupled, energy stable schemes for phase-field models of two-phase incompressible flows. 
+
+SIAM J. Numer. Anal. , 53(1):279–296, 2015. [30] A. Tucs, V. Bojarevics, and K. Pericleous. Magnetohydrodynamic stability of large scale liquid metal batteries. 
+
+J. Fluid Mech. , 852:453–483, 2018. [31] C. Wang, J. Wang, S. M. Wise, Z. Xia, and L. Xu. Convergence analysis of a temporally second-order accurate finite element scheme for the Cahn–Hilliard-magnetohydrodynamics system of equations. J. Comput. Appl. Math. ,436:115409, 2024. [32] J. Wang, M. Li, and C. Wang. Efficient finite element schemes for a phase field model of two-phase incompressible flows with different densities. J. Comput. Phys. , 518:113331, 2024. [33] J. Wang, Z. Xia, L. Xu, and Z. Yang. Sharp interface modeling and simulations of two-phase ferrofluid flows. J. Comput. Phys. , 547:Paper No. 114542, 19, 2026. [34] X. Xu, Y. Di, and H. Yu. Sharp-interface limits of a phase-field model with a generalized Navier slip boundary condition for moving contact lines. J. Fluid Mech. , 849:805–833, 2018. [35] J. Yang, S. Mao, and X. He. Unconditionally optimal convergent zero-energy-contribution scheme for two phase MHD model. J. Sci. Comput. , 102(2):55, 2025. [36] J. Yang, S. Mao, X. He, X. Yang, and Y. He. A diffuse interface model and semi-implicit energy stable finite element method for two-phase magnetohydrodynamic flows. Comput. Methods Appl. Mech. Engrg. , 356:435–464, 2019. [37] J. Zhang and M.-J. Ni. Direct simulation of multi-phase MHD flows on an unstructured Cartesian adaptive system. J. Comput. Phys. , 270:345–365, 2014. [38] J. Zhang and M.-J. Ni. Direct numerical simulations of incompressible multiphase magnetohydrodynamics with phase change. J. Comput. Phys. , 375:717–746, 2018. 
+
+21

@@ -1,0 +1,1733 @@
+Title: Development and application of a multiphase Lagrangian structure function model in anisotropic turbulence
+
+URL Source: https://arxiv.org/pdf/2607.03455v1
+
+Published Time: Tue, 07 Jul 2026 01:31:35 GMT
+
+Number of Pages: 40
+
+Markdown Content:
+APS/123-QED 
+
+# Development and application of a multiphase Lagrangian structure function model in anisotropic turbulence 
+
+Andrew P. Grace ∗
+
+Department of Applied Mathematics, University of Colorado Boulder, Boulder, Colorado 80309, U.S.A. 
+
+David Richter 
+
+Department of Civil and Environmental Engineering and Earth Sciences, University of Notre Dame, Notre Dame, Indiana 46556, U.S.A. 
+
+(Dated: July 7, 2026) 
+
+1
+
+> arXiv:2607.03455v1 [physics.flu-dyn] 3 Jul 2026
+
+# Abstract 
+
+The energetic response of inertial particles to turbulent flow motions is important for both a fundamental understanding of the multi-phase dynamics at play, and for applications such as reduced-order models of particle dispersion processes, and their two-way coupled effects onto the flow phase. Numerous studies focus on the energetics of ensembles of particles in homogeneous isotropic turbulence, where the influence of flow anisotropy (such as that provided by boundary conditions, or other external forcing) is not considered a priori . In this work, we investigate the role of flow anisotropy on the Eulerian scale-wise particle phase energetics in a turbulent wall bounded flow for settling inertial Lagrangian particles. By using coupled Eulerian-Lagrangian direct numer-ical simulations at moderate Reynolds number, we aim to unravel the complex dependency of the scale-wise particle energetics on the turbulence intensity, particle inertia, and particle settling. In particular, we focus on how the developing anisotropy of the underlying turbulent flow (derived from the presence of the wall) is donated to the particle phase, and how particle inertia and settling preserve this large scale anisotropy into the formally isotropic scale range of the flow. We derive an exact (but unclosed) conservation law for the particle phase energetics at arbitrary scale, and use an asymptotic argument to help elucidate our DNS data. We discuss the relative changes to the quasi-streamwise and vertical components of the fluctuating particle field, and finish by discussing the implications of anisotropic non-local effects for more general flows, and the implications for continuum models of inertial settling Lagrangian particles. 
+
+I. INTRODUCTION 
+
+Particle-laden turbulent flows are ubiquitous in the natural and engineered environment, and understanding the characteristics of these systems is important for many applications in the natural sciences and industry [1, 2]. Depending on the process in question, particles of interest can range in size from nanometer scales, to thousands of microns. As particles become larger, so too does their inertia, and it is known that inertial particle trajectories can differ significantly from the trajectories of fluid parcels in non-trivial ways [3]. One important implication of particle inertia is that particles may carry some memory of the  
+
+> ∗Contact author: andrew.grace@colorado.edu
+
+2flow motions that they have experienced in their history, leading to a dynamically interesting path-history effect. This path-history effect is implicitly linked to particle clustering and dispersion, which has many important implications for the transport of aerosols such as dust and droplets [4–6], their collision tendencies, and how energy is transferred spatially and spectrally within the solid phase. Properly understanding these small scale dynamical features of the solid phase is essential for accurately modeling the inherently multi-scale nature of their dynamics in a computationally efficient continuum model. Despite many existing studies focusing on energetics of particles in homogeneous isotropic turbulence (HIT), turbulent flows of practical interest often contain spatial inhomogeneities and anisotropies (directional dependence). The HIT model is possibly the simplest model for real turbulence, and allows investigators to probe the effects turbulent flow motions on particle dynamics in the dissipative range [7], and the inertial sub-range [8] in a controlled and isolated manner. However, inhomogeneity and anisotropy lend some important tenden-cies to particle dynamics that must be considered. In a wall-bounded turbulent flow such as a turbulent boundary layer (TBL), energy is extracted from a mean shear to feed turbulent fluctuations, which are damped by viscosity near the solid wall. Depending on the distance from the wall, these motions appear as large streak-like structures, known as large scale motions (LSMs), and at large enough Reynolds numbers, they are referred to as very large scale motions (VLSMs) [9]. Thus, a solid boundary creates the conditions necessary for a (relatively) simple anisotropic and inhomogeneous turbulent flow; an increase in complexity compared to HIT. Importantly, as inertial particles carry the memory of larger scale fluc-tuations into smaller scale ranges, it is reasonable to suppose that if those larger scales are anisotropic, that they may carry some memory of the large scale flow anisotropy into the formally isotropic small scales. Therefore, for a formally isotropic small scale flow structure, the particle phase may be anisotropic due to the memory effect. An additional fundamental consideration is that near the solid boundary, turbulent fluc-tuations become weak, and one may not generally make the assumption that the flow fluc-tuations will possess accelerations large enough to overcome the accelerations due to a mean drift, such as gravitational accelerations. If we are considering a case with net particle de-position (i.e. the particles are, on average, traveling in the direction of gravity) the effect of the gravitational field cannot necessarily be disentangled from particle inertia [2], since its effect is not simply additive, but is instead implicit to the particle dynamics. For example, 3recent work on settling inertial particle dynamics in turbulent boundary layers have revealed a complex coupling between gravity and inertia as particles enter the buffer layer and viscous sublayer of the wall bounded flow [10, 11]. As such, particle inertia and gravity must be considered simultaneously [2]. In this work, we investigate the scale-wise energetics of the particle phase in a turbulent boundary layer (TBL) under net deposition conditions using what are known as second or-der structure functions (abbreviated as SoSF), which quantify the energy contained below a longitudinal scale separation r. Our aim is to provide crucial insight into the scale-wise energy fluxes, and how the large scale anisotropy imparted on the solid phase by the fluid phase is preserved in the particle phase. In section II, we introduce our measure of scale-wise flow anisotropy, η(p), in terms of the particle phase SoSF, and we use a kinetic theory approach to derive a continuum equation for this quantity. In section III, we compare η(p)
+
+and the particle phase SoSF to the fluid phase counterpart, and investigate their behavior numerically by performing Eulerian-Lagrangian direction numerical simulations (DNS) of a TBL (discussed in section II D), and use an asymptotic argument to analyze the observed balance. Finally, we close with section IV, which contains a summary and discussion high-lighting the implications for continuum modeling of inertial settling particles, and how the preserved anisotropy may affect two-way coupled dynamics.  
+
+> II. ENERGETIC CHARACTERIZATION AND ANISOTROPY ANALYSIS METH-ODS
+
+To quantify the scale-wise energy distribution in both the solid phase and the fluid phase, and thus the particle phase anisotropy, η(p), we consider the second order longitudinal and vertical structure functions, which capture the energy (or more strictly speaking, the vari-ance) contained in motion below a scale r. To facilitate a direct comparison between fluid and solid phases, we adopt an Eulerian view of the particle phase structure functions. For the solid phase, we consider the energy contained below a longitudinal scale r in a continuum representation of the Lagrangian particle field. This will allow us to make a direct compar-ison to the fluid phase second order structure functions in sections II B and III, which are an Eulerian quantity a priori .For the solid phase, we use a kinetic theory approach to derive the governing continuum 4equations for the second order structure functions. As these continuum equations will take into account the particle equations of motion (discussed below), they will allow us to under-stand the physical mechanisms that govern the energetic balance for a scale r. This analysis is outlined in section II A. Comparatively, to compare to the energetics for the fluid phase, we consider the scaling laws developed for second order structure functions outlined in [12], which highlight how these quantities scale in the logarithmic region of a turbulent boundary layer. For both phases, we also compute these quantities using high resolution direction numer-ical simulations of one way coupled particle-laden wall bounded turbulent flow. The model setup can be found in section II D.  
+
+> A. Particle Phase Energetic Characterization
+
+In the following analysis, particles are implemented in a Lagrangian frame of reference. Solid-phase anisotropies have been studied in a TBL by considering the Lagrangian structure functions [13], where the dependent variable is a time lag, instead of a spatial separation. Here, we make the comparison to the Eulerian fluid phase by instead considering the particle response from an Eulerian perspective. In the following section, we define the particle field via an approach leveraging kinetic theory [14]. First, we consider the conservation of momentum for small spherical particles immersed in a viscous fluid in the limit of a large particle-to-fluid density ratio. These are known as the Maxey-Riley equations, and are written 
+
+ddt x(r,s ) 
+
+> p
+
+= v(r,s ) 
+
+> p
+
+, (1) St + ddt v(r,s ) 
+
+> p
+
+= u(x(r,s ) 
+
+> p
+
+(t), t ) − v(r,s ) 
+
+> p
+
+− Sv + ˆz, (2) where xp represents the vector location of the particle centroid, and vp represents the parti-cle’s vector velocity, and u represents the fluid velocity at the particle’s location (referred to as the sampled velocity). We assume that the particle Reynolds number is small, meaning that the viscous drag along the surface of such particles is linear. For finite particle Reynolds number, one may consider a non-linear drag correction [15], however this correction renders the derivation of the continuum equations intractable [10], and is ignored in the following analysis. The superscript ( r, s ) indicates whether or not a particle is a reference particle 5or satellite particle, respectively, and will be necessary to describe the statistics of parti-cle separation in the following analysis. Finally, these equations are characterized by two governing parameters, St +, and Sv +, defined as St + = τpu2
+
+> τ
+
+ν , Sv + = vg
+
+uτ
+
+. (3) St + is known as the Stokes number, which is the ratio between the particle’s natural re-laxation time, τp, and the friction timescale ν/u 2 
+
+> τ
+
+(ν is the flow viscosity and uτ is the flow friction velocity), whereas Sv + is known as the settling parameter, and is a ratio of the laminar settling velocity, vg = τpg (the theoretical speed with which a particle a settles through a viscous fluid under the action of gravity, g), and the friction velocity scale. The + superscript indicates that dimensional quantities are scaled by these viscous quantities. Next, we define the time-dependent Lagrangian particle separation vector as rp = x(s) −
+
+x(r), as well as the Lagrangian relative velocity vector of the particles, ω = v(s) − v(r).Taking time derivatives of rp and ω and using (2), the equations governing the evolution of the Lagrangian separation and relative velocities are 
+
+ddt rp = ωp, (4) St + ddt ωp = ∆ u(rp(t), x(s) 
+
+> p
+
+(t), t ) − ωp. (5) We have illustrated this setup in figure 1(a). Here, we have defined the relative sampled velocity as ∆ u(r(t), x(s)(t), t )) = u(x(s)(t), t )−
+
+u(x(r)(t), t ), and this is a function of the positions of the reference particle and the satellite particle, or equivalently, the position of the satellite particle and the separation between the reference and satellite particles. The equations governing the particle positions (velocities), i.e. equation (2), share qualitative similarities with the relative positions (relative veloci-ties), with one notable difference being the absence of the mean drift term for the particle relative velocities. However, this term implicitly affects the trajectories of the particles, and therefore the sampled relative velocity, ∆ u. The separation vector and the relative velocity vectors are shown in the original frame of reference in figure 1(a) and in the frame of reference of the reference particle in figure 1(b). In this work, we shift the coordinate system from cartesian to cylindrical polar by making the coordinate change 
+
+ωp = ω∥ ˆr + ωz ˆzr, (6) 6v(r)
+
+> p
+
+## x(r)
+
+> p
+> x
+> y
+> z
+> 𝒪
+> Gravity
+
+## x(s)
+
+> p
+
+## rp
+
+## v(s)
+
+> p
+
+## ωr
+
+# (a) (b)
+
+ω∥
+
+vr
+
+> p
+
+vs
+
+> p
+
+ωr
+
+ωz
+
+ωr = ω∥̂r + ωẑ ẑ
+
+## r = xr̂ x + yr̂ y
+
+## x2 
+
+> r
+
+## + y2
+
+> r
+
+̂
+
+r̂
+
+zFIG. 1. Panel (a) shows the location and velocity vectors of reference and satellite particles (superscript ( r) and ( s), respectively) in a fixed cartesian frame. rp is the vector pointing from the reference particle to the satellite particle, wr is the relative velocity vector of the two particles, and gravity points in the − ˆz direction. Panel (b) shows the reference and satellite particles in the frame of reference of the reference particle, and highlights the coordinate system used to represent the two-point quantities. 
+
+allowing us to express the separation velocity in terms of longitudinal separation velocity 
+
+ω∥, transverse separation velocity ωθ, and vertical separation velocity ωz .We may consider these equations, along with (2), as a dynamical system characterizing the two-particle evolution. To move to the Eulerian frame, we must consider an ensemble of these systems. We may define the joint probability distribution function (JPDF) P =
+
+P(x, r, v, w) as 
+
+P = δ(x(s) 
+
+> p
+
+− x)δ(rp − r)δ(v(s) 
+
+> p
+
+− v)δ(ωp − ω), (7) where δ(·) is the Dirac Delta function, and · indicates an ensemble average over all turbulent realizations of the system. Here, x, v, r, and ω are the phase space variables. They are the spatial location and velocity of the satellite particles, the separation, and the relative velocity. Note that the JPDF can be equivalently defined in terms of the reference particle position and velocity in place of the relative position and relative velocity [8]. In this work, we consider “slab-wise” statistics, where we condition our analysis on a 7zero vertical separation. Our practical approach for this conditioning is discussed more in section II D. This simplification allows us to consider spatially local information in the vertical direction, i.e. we only consider satellite and reference particles located at the same height, meaning particle statistics are now conditioned only a height z(r) = z. Overall, these simplifications reduce the functional dependence of the JPDF to P = P(r, θ, x, v, ω) and importantly R 
+
+> Ω
+
+Pdξ = 1 where dξ = rdrdθd xdvdω and Ω = [0 , ∞) ∪ [−π, π ] ∪ R3 ∪ R3 ∪ R3
+
+represents the domain of the phase space. Switching to index notation, the exact PDE governing the evolution of the JPDF is 
+
+∂P
+
+∂t + ∂∂x α
+
+vαP + ∂∂v α
+
+˙vαP + 1
+
+r∂∂r rω ∥P + ∂∂ω α
+
+˙ωαP = 0 , (8) indicating that the JPDF is conserved in phase space. Note that in this work, Greek indices will imply the Einstein summation convection, whereas Latin indices do not. Our interest lies in the second order structure functions, which are defined as 
+
+⟨ω′
+
+> i
+> 2
+
+⟩ = 1
+
+ϱ
+
+Z ∞−∞ 
+
+(ωi − ⟨ ωi⟩)2 P dωdv, (9) where in the above, i = ∥, z is a short-hand for the longitudinal and vertical components, respectively. In this work, we do not consider transverse separations, and therefore do not consider the θ component. Transverse separation has been considered previously with regards to particle clustering in HIT and a TBL (see Gualtieri et al. [16], Wang et al. [17] for example). The notation ⟨·⟩ denotes an average conditioned on a longitudinal separation 
+
+r and height z. Note that in some work, the notation ⟨·⟩ r,z is used, where the subscripts explicitly indicate the quantities conditioned upon (see [10], for example). We choose to simplify the notation in this work as the conditional average will always be upon z and r in this work, meaning the average is unambiguous. 
+
+⟨ωi⟩ represents the average relative velocities in each direction, which are not zero in general in this system, and ϱ is defined as the marginal JPDF, i.e. 
+
+ϱ(r, z ) = 
+
+Z
+
+> w
+
+P dωdv, (10) which represents the probability density that two particles are both located at height z, and are separated by a longitudinal distance r. This quantity is related to the horizontal radial distribution function [18]. To compute conservation laws for ⟨ω′
+
+> i
+> 2
+
+⟩, we compute the second relative velocity moments of (8). The computation is done explicitly in Appendix A. Here we re-produce the equations 8in compact form using index notation to highlight the structural dependence of the particle phase SoSF: 
+
+ϱ⟨ω′
+
+> i
+> 2
+
+⟩+ = ϱ⟨∆u′
+
+> i
+
+ω′
+
+> i
+
+⟩+ − 12St + (Di + Mi + Fi) . (11) The term ⟨∆u′
+
+> i
+
+ω′
+
+> i
+
+⟩+ represents the covariance between flow separation velocities and particle separation velocities. For St + → 0, this term approaches the flow phase SoSF, but when particles possess a sufficiently large inertia, particle trajectories become de-coupled from flow streamlines, and their covariance approaches zero. There is also an explicit functional dependence on St +, and is composed of three parts. The term Di is a linear transport oper-ator that acts on the particle SoSF itself, meaning that the above equations are differential equations instead of algebraic equations, and is defined (in dimensionless terms) as 
+
+Di = ϱ⟨w⟩+ ∂∂z + ⟨ω′
+
+> i
+> 2
+
+⟩+ + ϱ⟨ω∥⟩+ ∂∂r + ⟨ω′
+
+> i
+> 2
+
+⟩+, (12) where ⟨w⟩+ is a one point statistical quantity that represents the averaged vertical velocity of a set of particles a longitudinal distance r from a reference particle (i.e. irrespective of the reference particle’s velocity) and is formally defined as 
+
+ϱ⟨w⟩ =
+
+Z ∞−∞ 
+
+wP dvdω. (13) 
+
+Mi represents a coupling to the first order moments and appears as 
+
+Mi = 2 ⟨w′ω′ 
+
+> z
+
+⟩+ ∂∂z + ⟨ω′
+
+> i
+
+⟩+ + 2 ⟨ω′
+
+> i
+
+ω′∥⟩+ ∂∂r + ⟨ωi⟩+, (14) whereas Fi represents the particle phase energy flux and is expressed as 
+
+Fi = ∂∂z + ϱ⟨w′ω′
+
+> i
+> 2
+
+⟩+ + 1
+
+r+
+
+∂∂r + r+ϱ⟨ω′∥ω′
+
+> i
+> 2
+
+⟩+. (15) Therefore, F∥ represents a coupling to higher order moments and renders (11) unclosed. Importantly, Fi contains ϱ within the derivative. The implication here is that if we were to take a derivative, Fi would contain a term proportional to the r and z derivatives of ϱ, and one to ϱ itself. This kind of term is often interpreted as having a diffusion tendency and a drift tendency [19]. Importantly, since the terms comprising the conservation equations for ⟨ω′∥
+
+> 2
+
+⟩ are not equal to those comprising ⟨ω′
+
+> z
+> 2
+
+⟩ in general, an anisotropy in the particle phase is created. We define the metric quantifying the anisotropy for the particle phase as: 
+
+η(p)(r, z ) = ⟨ω′∥
+
+> 2
+
+⟩+ − ⟨ ω′
+
+> z
+> 2
+
+⟩+
+
+⟨ω′∥
+
+> 2
+
+⟩+ + ⟨ω′ 
+
+> z2
+
+⟩+ . (16) 9When η(p) → 1, particle phase “eddies” are pancake-like structures, with horizontal fluc-tuations being much stronger than vertical ones, while converse is true for η(p) → − 1. Furthermore, when η(p) = 0, horizontal and vertical fluctuation magnitudes are equal and the particle phase is isotropic. Finally, the particle phase SoSF are defined such that r → ∞ ,
+
+η(p) → η(p) 
+
+> ∞
+
+where η(p) 
+
+> ∞
+
+is the anisotropy of the integral scale.  
+
+> B. Flow Phase Energetic Characterization
+
+In this section, we review the theory underscoring the flow energetics TBL, specifi-cally the scaling behavior of the flow phase SoSF, and use these to define the flow phase anisotropy. The goal here is to provide the basis through which we will discuss the particle field anisotropy in section II A. Turbulent boundary layers exhibit horizontal homogene-ity, leaving mean quantities to be dependent only on height, z. As such, we can define 
+
+xh = ( x2 + y2)1/2 as the position in the horizontal plane, and uh = ( u2 + v2)1/2 as the magni-tude of horizontal fluctuations. As both z and Re τ change independently, uh → u since it is thought that outer scale motions tend to couple with inner scale motions in the horizontal whereas the spanwise and vertical components saturate [9, 20, 21]. To quantify the energetics of the flow in this work, we rely on the horizontal two-point statistics at a fixed height z. That is, we quantify the the variance (and therefore the energy) contained in each component of the fluctuating velocity field up to a horizontal separation 
+
+r. The SoSFs are defined for the horizontal and vertical components as 
+
+⟨δu 2
+
+> h
+
+⟩ = ⟨(uh(xh + r) − uh(xh)) 2⟩, ⟨δw 2⟩ = ⟨(w(xh + r) − w(xh)) 2⟩, (17) which quantify the variance of the flow field in the horizontal and vertical directions below a scale horizontal scale r, and therefore the kinetic energy of flow motions in scales below 
+
+r. Note that the interpretation of the second order structure function is different than that of the kinetic energy spectra (an alternative way of measuring the scale-wise energy), which gives a measure of the kinetic energy containing between wavenumbers k and k + dk . Thus, the second order structure function is a strictly non-decreasing function which asymptotes to the total energy contained in all horizontal scales. 10 C. Scaling of the fluid phase second order structure functions 
+
+Our primary focus in this work is analyzing settling particle dynamics within the loga-rithmic layer and the buffer layer. Below, we qualitatively analyze the dynamics in these two regions. The scaling behavior of the horizontal components of the SoSF in the logarithmic region of a turbulent boundary layer are documented in [12, 22–24], whereas the horizontal structure of the vertical component is often not considered. Instead of an exhaustive anal-ysis, the reader is referred to the aforementioned work by Davidson and collaborators for a detailed description, and here, we only touch on the salient details for the purpose of this work. The SoSF in the logarithmic region of the TBL takes on different scaling behavior depending on the horizontal scale of the fluctuations. The relevant length scales are the Kolmogorov microscale ηk, the local eddy scale z, and the boundary layer outer scale pro-portional to its total height h. These three length scales correspond to four scaling regimes: the dissipative range ( r ≪ ηk), the inertial subrange ( ηk ≪ r ≪ z), the logarithmic range, (z < r ≪ h), and the uncorrelated range ( r > h ). At large enough Reynolds number and far enough from the influence of the solid boundary, we expect both the dissipative and inertial range dynamics to be identical for the horizontal and vertical components of the SoSF, as those motions have a short enough overturning times that they “forget” the influence of the wall (i.e., they behave isotropically). Upon normalizing r by the local large scale eddy size z and expressing the structure function in terms of wall units, for the logarithmic region of the flow, it can be shown that in the dissipative scaling regime appears as 
+
+⟨δu 2⟩+ ∼ ⟨ δw 2⟩+ ∼
+
+ z+
+
+15 κ
+
+  rz
+
+2 rz ≪ κ1/4z+−3/4, (18) where κ is the von K´ arm´ an constant. Likewise, in the inertial sub-range (should it exist), it can be shown that 
+
+⟨δu 2⟩+ ∼ ⟨ δw 2⟩+ ∼ C3/20
+
+κ
+
+!2/3  rz
+
+2/3
+
+κ1/4z+−3/4 ≪ rz ≪ 1, (19) where C0 is an O(1) constant. These results are highlighted in [12]. Once in the logarithmic scaling region z < r ≪ h (not to be confused with the logarithmic region of the flow, ν/u τ ≪ z ≪ h), the flow motions are no longer isotropic. Davidson and colleagues argue that a logarithmic scaling range occurs for the horizontal component. This 11 is a consequence of the fact that horizontal motions in the overlap region between z and h
+
+are influenced by both their distance from the boundary as well as the outer scale of the boundary layer. It can be shown by using boundary layer matching techniques and field observation that the kinetic energy spectra in this overlap region must scale as k−1 [25, 26], and by relating the spectra to the SoSF, the result is a logarithmic scaling law [12]. As far as we can tell, Davidson et al. [12] do not specifically mention the scaling behavior of ⟨δw 2⟩+ in their work. However, the vertical component becomes independent of the outer scale within the logarithmic layer at asymptotically large Reynolds number [20], thus implying no overlap with the outer scale, and no logarithmic scaling range in the vertical SoSF. Therefore, we match to the integral scale behavior for r > z , which is thought to be a constant for asymptotically high Reynolds number. Specifically, we take 
+
+⟨δu 2⟩+ ∼ A1 + B1 log 
+
+ rz
+
+
+
+, ⟨δw 2⟩+ ∼ A0, 1 < rz ≪ hz , (20) where A0, A1, and B1 are O(1) constants, specified in [22]. Finally, for r > h , we expect motion in both components to be completely uncorrelated, which brings us to the expressions for 2 ⟨δu 2⟩+ ∼ ⟨ u′2⟩ and 2 ⟨δw 2⟩+ ∼ ⟨ w′2⟩ so that, at asymptotically high Reynolds number, 
+
+⟨δu 2⟩+ ∼ A2 + B2 log 
+
+hz
+
+
+
+, ⟨δw 2⟩+ ∼ A0
+
+hz < rz , (21) where A2, and B2 are O(1) constants defined in [20]. Strictly speaking, the above analysis is relevant for the logarithmic layer of the flow only. In regions of the logarithmic layer near the buffer layer, the size of the inertial sub-range may be small or even non-existent, meaning that some of the large scale anisotropy in the loga-rithmic range may “leak” into the dissipative range, resulting in dissipative range anisotropy at certain heights, especially in the buffer layer where characteristic flow quantities scale with neither ν/u τ nor z. For the buffer region, we do not attempt to derive analytical scaling laws, and instead appeal to DNS. We quantify the flow phase scale anisotropy in an identical way to (16), denoted by 
+
+η(f )(r, z ), defined as: 
+
+η(f )(r, z ) = ⟨δu 2
+
+> h
+
+⟩+ − ⟨ δw 2⟩+
+
+⟨δu 2
+
+> h
+
+⟩+ + ⟨δw 2⟩+ . (22) Within the logarithmic layer, the theoretical scaling behavior of the fluid phase SoSFs imply that the ansiotropy should go to zero within the dissipative and inertial sub-range scaling 12 regimes, whereas at larger separations (specifically when r > z ), the anisotropy should grow until is saturates at r ≫ h.
+
+D. Numerical Model Setup h
+
+Γx = 2πĥ
+
+x̂
+
+ŷ
+
+z
+
+# No slip  Γy = πh
+
+# No stress 
+
+Point Particle Injection 
+
+Forcing > 0
+
+FIG. 2. A schematic of the simulation domain. A pressure gradient is applied to generate the mean flow, which creates turbulence due to the friction at the no-slip lower boundary. Point particles are injected with at the no-stress upper boundary and are allowed to come to statistical equilibrium with the flow. Particles exiting the domain through the lower boundary are injected in a random horizontal location at the upper boundary to maintain a constant particle number, while particle reflect off the upper wall. Particles exiting through the periodic side boundaries are placed at the opposite wall while maintaining their velocity. 
+
+1. Flow Phase Model 
+
+We use the NCAR Turbulence with Lagrangian Particles Model [4] to perform DNS of the incompressible Navier-Stokes equations one-way coupled to inertial Lagrangian particles 13 Re τ = 315 
+
+(a) (b)FIG. 3. Panel (a) shows curves highlighting the horizontal and vertical components of the fluid phase SoSF at z+ = 30 , 90 at fixed Re τ = 315. Panels (b) shows the flow phase anisotropy measure at the same heights (colored curves) overlaid with the Lagrangian proxy (discussed in section II D 2). 
+
+in a turbulent open channel flow. The equations solved are 
+
+∂u
+
+∂t + u · ∇ u = −∇ p + 1Re τ
+
+∇2u + ˆ x (23) 
+
+∇ · u = 0 , (24) where Re τ is the friction Reynolds number, u = ( u, v, w ) is the three dimensional velocity vector evaluated at the cartesian coordinates x = ( x, y, z ) (streamwise, spanwise, vertical), and ˆ x represents a unit vector in the streamwise direction. The forcing (of unit magnitude) is required to achieve a statistically steady flow state. The numerical setup is schematized in 2. The domain is horizontally periodic, and the flow is subjected to a no-slip boundary condition along z = 0, and a no-stress boundary condition along z = h (i.e. the maximum height of the domain). Since we are focused on the dynamics of the logarithmic and buffer regions, the upper boundary condition does not affect the dynamics in a meaningful way. Due to computational restrictions, we focus on cases with a relatively low fixed Re τ = 315 so as to accommodate enough Lagrangian particles to achieve statistical convergence at the small scales. As an example, Figure 3(a) shows the normalized second order structure functions of the horizontal and vertical fluctuations at two different heights for Re τ = 315 from DNS. These heights are representative of the logarithmic region of the flow, z+ = 90, and the 14 near-wall region, which is theoretically independent of the outer scale dynamics, z+ = 30. For the logarithmic layer curves (orange), the nature of the curves above and below r/z ≈ 1is different, and is a reflection of the dissipative range and logarithmic range scaling laws respectively, (i.e. (18) and (20) respectively). Specifically, in the dissipative range, the curves approximately collapse onto one another, suggesting good agreement with our hypothesis above that η(f ) → 0 (shown in figure 3(b)) in the limit of r ≪ z, whereas they separate from one another for r > z , and will eventually saturate for r ≫ h.Moreover, figure 3(a) shows the fluid phase SoSFs, highlighting that there is no obvious inertial sub-range in at these heights. We note that at the heights we are concerned with, the size of the inertial subrange will be relatively small irrespective of the Reynolds number. The size of the inertial subrange scales as z/η k ∼ κ−1/4 (z+)3/4, so that the size of the inertial subrange is fixed for fixed z+ and is independent of the outer scale. In fact, the lack of an inertial subrange is an important feature for this system and its impact will be discussed later in this work. Finally, for the near-wall region, z+ = 30 (blue curves), we see that the curves do not collapse on one another in the dissipative region, suggesting both small and large scale anisotropy as we approach the wall, i.e. η(f ) > 1 as z/h ≪ 1. This is expected as the scalings above are formally valid within the logarithmic layer of the flow, specifically where kinetic energy dissipation roughly balances shear production of turbulence [21]. Importantly, this balance is not generally the case at z+ = 30. In Section III, we contrast the anisotropy of the fluctuating particle velocity field, and use the insight gained from the above analysis to investigate how the anisotropies donated to the fluctuating particle velocity field by the carrier phase are modified by the particle’s inertia and mean drift due to gravity (i.e. St +
+
+and Sv +).  
+
+> 2. Particle Phase Model
+
+The particle treatment occurs via the Maxey-Riley equations for a small rigid spheres subjected to linear drag and the gravitational force, and are represented by equation (2) shown in Section II A. The particles are assumed to be non-interacting, small (relative to the local Kolmogorov scales), monodisperse, and have no effect on the flow state (i.e. one-way coupling). Therefore, the results contained within this work are relevant for dilute 15 suspensions of dense but small spherical particles, such as in the atmospheric surface layer [5, 6]. Particles are removed when their centroid passes below z = 0 and re-injected at a random horizontal location along z = h. This setup has been used frequently [10, 11, 27] in order to maintain both a total particle number in the domain, as well as a constant downward flux. We have also included the flow structure functions sampled by particles with St + = 0 .1 and Sv + = 0 .025 (dashed black curves) in figure 3 as our Lagrangian proxy for the flow structure functions as a comparison, and we refer to these values as “Unconditional” in figure legends in section III below. These are included as they provide some information regarding the flow velocities sampled by the particles below the grid scale (due to the linear interpolation scheme), which the Eulerian flow velocities cannot show.   
+
+> III. RESULTS A. Results from Direct Numerical Simulation
+
+Our primary focus of this work is to identify the broad role of settling perturbations on the particle field energetics, and especially on how the large scale anisotropy may be reflected in the particle phase at smaller scales (i.e., smaller separations). However, before we move into an analysis of the modification of Sv +, it is useful to examine the overall qualitative characteristics of the particle field at fixed Sv + and varying St +. Figure 4(a) shows the longitudinal and vertical particle structure functions for three different values of St +, while figure 4(b) shows the particle phase anisotropy. These quantities are plotted at a height of 
+
+z+ = 90 and against r/z (i.e., the logarithmic scaling). We have also plotted slopes as a point of reference to qualitatively analyze the particle structure function behavior relative to expected flow phase scaling laws. As particle inertia becomes large, the particle phase acquires much larger energy at small scales ( r/z < 1) relative to the flow. These non-local effects are evident in figure 4(a) but the magnitude of the increase is dependent upon the particle response to the horizontal or vertical fluctuations. The differences in this energetic content are also evident in the particle phase anisotropy, figure 4(b). At small Stokes numbers (i.e. St + = 1) and small separations (approximately emulating the small scale fluid phase energetics), fluctuations are roughly of similar magnitude, suggesting isotropy, confirmed by the fact that η(p) approaches zero 16 Sv + = 0.025, z+ = 90                
+
+> (a)(b)
+> ⟨ω′∥2⟩+, ⟨ω′z2⟩+
+> 2
+> 3
+> 2
+> 1
+> ⟨ω2
+> z⟩+
+> r
+> Sv +=0
+> Sv +=0.025
+> Sv +=0.25
+> ⟨ω2
+> ∥⟩+
+> r
+> St +=1
+> St +=10
+> St +=100
+> ⟨ω′z2⟩+⟨ω′∥2⟩+
+> Unconditional
+
+FIG. 4. Panel (a) shows particle phase horizontal (thick solid curves) and vertical (thin solid curves) second order structure functions at z+ = 90 at fixed Sv +. Panel (b) shows particle phase anisotropy, η(p). Curve colors correspond to different values of St +. Inertial range and dissipative range slopes are indicated on each figure. 
+
+in figure 4(b) as r/z → 0. Conversely, at larger Stokes numbers, there is a more significant difference between the longitudinal and vertical fluctuations across all scales, leading to a large degree of small-scale anisotropy in the particle phase, while the flow phase remains isotropic. Figure 4(b) also shows that the small scale anisotropy is at least as significant as the large scale anisotropy, even for for St + = 10, suggesting that the memory effects of particle inertia preserve the large scale anisotropy in some way. The role of particle inertia on the structure functions has been investigated by many stud-ies in HIT [19, 28], and the qualitative findings of those studies follow for the axisymmetric particle dynamics in a wall bounded flow. Therefore, for the remainder of this work, we fix the particle Stokes number at St + = 10, and vary Sv + to foster insight into how settling, paired with moderate inertia, modifies the small scale particle phase anisotropy. Figure 5 shows the horizontal and vertical structure functions at two different heights: z+ = 30 and 
+
+z+ = 90. These two heights were chosen as representative examples of the buffer layer and the logarithmic layer flow dynamics. Note that we cannot choose z+ much larger than 90 owing to the relatively low Reynolds number. For larger choices of z+, there is likely to 17 ℱz /r ϵ                     
+
+> Sv +=0
+> Sv +=0.025
+> Sv +=0.25
+> ℱ∥/rϵ
+> Sv +=2.5
+> ⟨ω2
+> z⟩+
+> r
+> Sv +=0
+> Sv +=0.025
+> Sv +=0.25
+> ⟨ω2
+> ∥⟩+
+> r
+> Sv +=2.5
+> Unconditional
+> 2⟨δu′2⟩+
+> 2⟨δw′2⟩+
+> 2
+> 3
+> 2
+> 1
+
+St + = 10, z+ = 30  St + = 10, z+ = 90       
+
+> 2
+> 3
+> 2
+> 1
+> Sv +=0.025
+> Sv +=0.25
+> Sv +=2.5
+> Unconditional
+
+(a) (b)
+
+> 2
+> 3
+> 2
+> 1
+> ⟨ω′z2⟩+
+> r⟨ω′∥2⟩+
+> r
+> ⟨ω′∥2⟩+
+> r , ⟨ω′z2⟩+
+> r
+
+FIG. 5. Particle phase horizontal (thick solid curves) and vertical (thin solid curves) second order structure functions at z+ = 30 (a) and z+ = 90 (b) for St + = 10. Curve colors correspond to different values of Sv +. Unconditional (fluid phase) structure functions are plotted as dashed curves. Inertial range and dissipative range slopes are indicated on each figure. 
+
+be some influence from the upper boundary condition (and thus the domain height) on the self-similar characteristics of the logarithmic region. However, we believe that z+ = 90 is a representative example of the qualitative logarithmic layer dynamics expected at higher Reynolds numbers. Figure 5 shows the modification of the particle structure functions relative to the flow state (i.e. the unconditional structure functions) as Sv + is changed, and therefore provides some insight into how the particle phase energetics are modified by particle settling. The particle phase structure function curves are strongly modified by particle settling within the buffer layer, shown in figure 5(a), with smaller changes appearing within the logarithmic layer, shown in figure 5(b). In common to both heights is the fact that the longitudinal components decrease minimally across all scales until Sv + surpasses unity when there is a dramatic drop in magnitude. Interestingly, the vertical component actually increases back towards the unconditional value in the buffer layer whereas it remains fixed in the logarithmic layer. Moreover, at large Sv +, the structure functions collapse together within the logarithmic layer (indicating small scale isotropy for these cases) whereas they do not 18 collapse in the buffer layer (indicating some preserved anisotropy at small scale). One potential explanation for this behavior is that the particle phase at large Sv + tends towards the underlying flow anisotropy. As the small scales within the buffer layer are themselves anisotropic, the particle phase simply tends towards an anisotropic state. Conversely, the small scales within the logarithmic layer are isotropic (even at the relatively low Reynolds number here; see figure 3(a)), so the state the particle phase tends towards at large Sv + is an isotropic one. The slopes on figure 5 indicate that as the flow approaches a dissipative scaling range (i.e., r2), the inertial particle structure functions exhibit a shallower inertial-range like scaling (i.e. r2/3). This behavior is a reflection of the scale non-locality of particles and is driven primarily by particle inertia, and modulated by particle settling. For example, see the work of Ireland et al. [29] that highlights this scale non-locality in homogeneous isotropic turbulence for settling particles. Importantly, this basic qualitative result is preserved in both the buffer and logarithmic layers across all values of Sv + considered. However, while both the longitudinal and vertical structure functions sharing a similar scaling, it is clear that both Sv + and z+ control their displacement from one another, revealing a complicated coupling between St +, Sv +, and z+.Figures 6(a) and (b) demonstrate the scale-wise anisotropy within the buffer layer and logarithmic layers, respectively, with the flow phase anisotropy indicated by the dashed curve (i.e. the Lagrangian proxy). Examination of these curves reveals a fundamental difference between the solid and fluid phases within both regions of the flow. For both regions under consideration, the flow phase anisotropy asymptotes towards some minimum value. In the buffer layer ( z+ = 30), the flow anisotropy asymptotes towards a value around 0.2 as r → 0, indicating that the buffer layer dynamics are not isotropic since the presence of the wall significantly affects the dynamics. Within the logarithmic layer ( z+ = 90), the flow recovers isotropy at small scales and approaches a value around 0 (though it is slightly negative here, likely due to the numerical scheme). Comparatively, the particle phase shows fundamentally different characteristics due to the scale non-locality. The particle phase for Sv = 0 .025 and 0.25 hit a local minimum, and then begin to increase once again as r/z → 0. This is broadly consistent across both values 
+
+z+, but the value of the minimum, and the scale at which it occurs are modified by these parameters. Interestingly, for Sv + = 2 .5, the large scale anisotropy is decreased, but the 19 St + = 10, z+ = 30  St + = 10, z+ = 90         
+
+> Sv +=0.025
+> Sv +=0.25
+> Sv +=2.5
+> η(p)
+> Unconditional
+> (a)(b)
+
+FIG. 6. Particle phase anisotropy metric, η(p) at z+ = 30 (a) and z+ = 90 (b) for St + = 10. Curve colors correspond to different values of Sv +. Unconditional (fluid phase) anisotropy is plotted as dashed curves for each height. 
+
+small scale anisotropy is reminiscent of the fluid phase, suggesting that for a large enough influence by gravity, the small scales may recover towards an isotropic state. However, as discussed above, the “isotropic recovery” could be compensated in some way by the fact that the flow is itself somewhat anisotropic, especially in the buffer layer. The non-monotonicity of these curves suggests the competition between (at least) two different mechanisms. At the large scales, the particle phase anisotropy is governed (at least in part) by the underlying anisotropy of the flow itself, meaning that as the flow phase anisotropy increases, so too does the particle phase anisotropy, suggesting some Reynolds number dependence. At the small scales, the story appears more complicated, since particles become increasingly insensitive to flow fluctuations, so the anisotropy must be governed by the inter-scale energy transfer of particle phase; a persistent energy flux from the large scales to the small scales. In the following section, we use the continuum theory derived in section II A as a lens through which we analyze these results. 20 B. Interpretation via asymptotic analysis of the continuum equations 
+
+The goal of the following analysis is not to provide a predictive theory, but instead to provide deeper insight into the DNS results and to understand the underlying dynamics of the small scales of the particle phase. An approximate theory is required here due to the unclosed nature of the continuum equations (11) (i.e. due to Fi, which contains the third order moments of the velocity increments). We make the following power law assumptions for the mean two point quantities in the range r/z ≪ 1. Note that we leave the lower bound unspecified and this will become clear later. This is partly motivated by previous work on particle energetics in turbulent flows and is consistent with the phenomenology of Kolmogorov’s formulation of structure functions of arbitrary order [30, 31]. Using DNS data later in this section, we will verify the validity of this assumption. Assuming a power law for each the moments of the relative velocity, we assume that 
+
+⟨ωi⟩+ ∼ C1/3
+
+> i
+
+ rz
+
+1/3
+
+, ⟨ω′
+
+> i
+
+ω′ 
+
+> j
+
+⟩+ ∼ φij (LiLj )1/3  rz
+
+2/3
+
+, ⟨ω′
+
+> i
+
+ω′
+
+> j
+> 2
+
+⟩+ = −ψij 
+
+ LiL2
+
+> j
+
+1/3  rz
+
+
+
+,
+
+(25) where i = ∥, z and φij and ψij are tensors of the correlation coefficients between longitudinal and vertical relative velocity fluctuations. Specifically, φij , ψ ij = 1 if i = j and −1 <φij , ψ ij < 1 otherwise. The coefficients 0 < L∥ < 1, 0 < Lz < 1 are dimensionless parameters that characterize the magnitude of the particle phase energy fluxes (i.e., each component of the particle phase has downscale energy fluxes that are some proportion of the flow phase energy flux at a height z). Ci are dimensionless proportionality coefficients characterizing the magnitude of the mean relative velocities. This form assumes a linear relationship between the mean relative velocity and its standard deviation. This scaling behavior has been noted in past studies of particle collisions, where the mean inward relative velocity is a primary quantity of interest [29]. We also adopt a power law representation of the radial distribution function 
+
+ϱ = R
+
+ rz
+
+−α
+
+, (26) where R and α are constants characterizing the RDF and the degree of spatial clustering in the horizontal plane. It is known that in HIT for non-settling particles, ϱ exhibits a power law behavior in the dissipation range [18], though different theories predict slightly different 21 values for the exponents themselves. The dynamics for inertial sub-range clustering take on a more complicated form (see [8]) but for the Stokes numbers under consideration in this work, and within a turbulent boundary layer near a solid boundary, the inertial sub-range is not expected to be large enough to render such effects visible. Furthermore, settling is known to modify the power law exponents [29, 32], but in fact it remains that ϱ retains power-law characteristics. We must also consider the mixed moments ⟨w′ω′
+
+> in
+
+⟩. To estimate these quantities, we make the following assumption based on the triangle inequality: 
+
+⟨w′ω′
+
+> in
+
+⟩ ∼ λi
+
+
+
+⟨w′2⟩
+
+1/2 
+
+⟨ω′
+
+> i
+> 2n
+
+⟩
+
+1/2
+
+, (27) where λi is a proportionality constant. It follows from [20] that the large scale vertical fluctuations are independent of height within the logarithmic layer, giving ⟨w′2⟩ ∼ A0u2
+
+> τ
+
+(recall A0 is a constant). Moreover, we make a Kolmogorov-like assumption that 2 n-th moment of the relative velocity fluctuation is related to the square of the nth moment, so it follows that 
+
+⟨w′ω′
+
+> in
+
+⟩ ∼ un+1 
+
+> τ
+
+
+
+λiA0Ln/ 3
+
+> i
+
+ rz
+
+n/ 3
+
+. (28) Finally, the quantity ⟨w⟩+ is a one point statistical quantity that represents the vertical velocity of particles located at a distance between r and r + dr from a reference particle and is irrespective of the reference particle’s velocity. As r/z approaches unity, we expect ⟨w⟩+
+
+to approach the ensemble average vertical settling velocity, which can be larger in magnitude than Sv + due to preferential sweeping [33]. Conversely, as r/z becomes very small, we expect that the turbulent fluctuations will have too short a correlation time to make significant changes to the average particle velocity, so ⟨w⟩+ ∼ Sv +. Notably, if there is no mean drift (i.e. if Sv + ≡ 0), then ⟨w⟩+ ≡ 0. For the current analysis, we assume that ⟨w⟩+ = −βSv +,where β could be a function or r/z that is bounded below by one and increases to some finite value characterized by the large scales at r/z → 1. This assumption allows us to characterize the ensemble average settling velocity across all particles (for example, see the work of [11]). For our argument below, knowledge of the exact magnitudes of these proportionality coefficients is not necessary, as we are only concerned with order of magnitude behavior in 
+
+r/z , but we retain them as they provide information as to what terms may affect the overall tendencies controlling the second order particle structure functions. 22 Using these expressions, we can compute each term in (11) for the longitudinal component (i.e. for i = ∥) of the continuum equations. The algebraic details can be found in the Appendix B, and we only report the final scaled expression here: 
+
+⟨ω′∥
+
+> 2
+
+⟩+ ∼ ⟨ ∆u′∥ω′∥⟩+ + St +L∥
+
+z+ 1 − α
+
+2 − 23
+
+C∥
+
+L∥
+
+1/3
+
++ O
+
+ rz
+
+2/3!
+
+. (29) What we find is that each of D∥, M∥, and F∥ contribute terms at O(1) and at O
+
+  rz
+
+2/3
+
+.Therefore, in the limit r/z ≪ 1, we find that the higher moment terms tend towards a constant, which is the minimum longitudinal variance attained by the particle field at equilibrium for a given height, and is due to non-local effects from larger scales. This minimum is proportional to the term St +L∥
+
+z+ 1 − α
+
+2 − 23
+
+C∥
+
+L∥
+
+1/3!
+
+, rz ≪ 1. (30) The minimum has to do with particle inertia, the distance from the wall, and the downscale energy flux (through L∥), but is modulated by particle clustering through α, as well as the mean relative velocity through C∥, both of which decrease the minimum. This term can be interpreted as a mean downscale diffusion driven by clustering [8], and a mean drift independent of the degree of clustering. The form of (30) implies that the downscale energy flux is persistent but modified by particle clustering. Notably, particle settling does not explicitly appear at O(1), so as we move to smaller and smaller scales, our analysis suggests that the role of settling becomes unimportant, giving further credence that settling is only affected by the large scales of the flow motion. However, the situation is more complicated as settling affects both the mean relative velocity, ∆ ui,and particle clustering, so while there is no explicit O(1) effect, there is an implicit effect on the downscale energy flux of the particle phase. The above approximation scheme demonstrates that ⟨ω′∥
+
+> 2
+
+⟩ is controlled in part by 
+
+⟨∆u′∥ω′∥⟩+ which represents covariance between flow velocity increments and particle ve-locity increments. This term represents a direct coupling to the flow, and we will not approximate this term here. As we show later, this term is dominant in the r/z ≥ 1 scaling range. The vertical component takes on a similar form, though due to the underlying anisotropy of the flow, the magnitudes of the tendencies will be different (see appendix B for details). 23 The vertical component appears in a similar form to the longitudinal component: 
+
+⟨ω′
+
+> z
+> 2
+
+⟩+ ∼ ⟨ ∆u′ 
+
+> z
+
+ω′ 
+
+> z
+
+⟩+ + St +L∥
+
+z+
+
+Lz
+
+L∥
+
+2/3
+
+. . . 
+
+
+
+1 − α
+
+2
+
+
+
+ψ − φ
+
+3
+
+Cz
+
+Lz
+
+1/3
+
+− 13
+
+C∥
+
+L∥
+
+1/3
+
++ O
+
+ rz
+
+2/3!
+
+, (31) so that in the limit of r/z ≪ 1, the second term becomes St +L∥
+
+z+
+
+Lz
+
+L∥
+
+2/3 
+
+1 − α
+
+2
+
+
+
+ψ − φ
+
+3
+
+Cz
+
+Lz
+
+1/3
+
+− 13
+
+C∥
+
+L∥
+
+1/3!
+
+, rz ≪ 1, (32) again highlighting the role of the mean relative velocity (through C∥ and Cz ) and clustering (through α). Importantly, the constant above is different than the longitudinal compo-nent necessarily, showing that the vertical relative velocity is necessarily different than the longitudinal as r/z → 0. We can use the insight gained from the above asymptotic analysis to interpret our DNS results, which are presented below in figure 7. These figures demonstrate the dominant tendencies controlling the structure functions across a wide range of r/z available from the DNS. Figures 7(a,c) show the horizontal (a), and vertical (c), structure functions themselves (depicted by thin black curves), the correlation terms (depicted by thin colored curves), and the flux terms (depicted by thick colored curves) at z+ = 30, while figures 7(b,d) show the same for z+ = 90. To produce these plots, we directly computed the covariance terms, but as the higher order structure functions require a significant amount of data for statistical convergence, taking numerical derivatives directly would yield a noisy result. To overcome this, we compute the flux terms by computing ⟨ω′
+
+> i
+> 2
+
+⟩+ − ⟨ ∆u′
+
+> i
+
+ω′
+
+> i
+
+⟩+. This is suitable for our purposes as no approximations are made in order to derive the model in equation (11). Our DNS results suggest a competition between the covariance terms, ⟨∆u′
+
+> i
+
+ω′
+
+> i
+
+⟩+, at large scales, and the flux terms, 12 St + (Di + Mi + Fi), at small scales, which is then modified implicitly by particle settling. At the large scales the covariance tendencies dominate the overall balance, and tend to fall off rapidly as r/z → 0. However, the explicit modification by settling to the covariance terms (by increasing Sv +) is almost negligible. While the covari-ance terms drop out, the flux terms tend to become the leading order tendency controlling the magnitude of the horizontal and vertical structure functions. At r/z ≤ 1, the horizontal component of the flux terms at both heights (figures 7(a,b)) are more strongly modified by 24 St + = 10, z+ = 30 
+
+# (a)
+
+St + = 10, z+ = 90 
+
+# (b)
+
+# (c)
+
+# (d)                
+
+> Sv +=0.025
+> Sv +=0.25
+> Sv +=2.5
+> ⟨Δu′zω′z⟩+⟨ω′z2⟩+−⟨Δu′zω′z⟩+
+> Sv +=0.025
+> Sv +=0.25
+> Sv +=2.5
+> ⟨Δu′∥ω′∥⟩+⟨ω′∥2⟩+−⟨Δu′∥ω′∥⟩+
+> ⟨ω′∥2⟩+, ⟨ω′∥2⟩+ − ⟨Δu∥ω′∥⟩+, ⟨Δu∥ω′∥⟩+⟨ω′z2⟩+, ⟨ω′z2⟩+ − ⟨Δuzω′z⟩+, ⟨Δuzω′z⟩+
+
+FIG. 7. The numerically computed second order structure functions (black curves) for the hori-zontal (a,b) and vertical (c,d) at z+ = 30 (a,c) and z+ = 90 (b,d). Note the horizontal axis is extended relative to previous figures to highlight the structure across a wide range of r/z . Thin colored curves show ⟨u′
+
+> i
+
+ω′
+
+> i
+
+⟩+, whereas the thick colored curves show ⟨ω′
+
+> i
+> 2
+
+⟩+ − ⟨ u′
+
+> i
+
+ω′
+
+> i
+
+⟩+, the exact values of the flux terms. 
+
+the settling, while the vertical component (figures 7(c,d)) shows almost no changes in this same limit. The insight here is that the flux terms (quantifying the small scale energy of the particle phase) are noticeably different at small scales, and the difference is decreased as the impact of settling increases (i.e. as Sv + increases). While settling decreases the flux terms leaving 25 the correlation terms mostly unaffected (or at least affected to a lesser degree), the net effect is that settling changes the dynamic balance controlling the energy exchange in the particle phase. With a larger settling parameter, the particle dynamics are more closely linked to the flow phase dynamics for a larger range of r/z . This effect is more evident closer to the wall (figures 7(a,c)) as the magnitude of the second order structure function at small scales tends to decrease with distance from the boundary anyways. This observation is consistent with our asymptotic analysis showing the pre-factor proportional to ( z+)−1.Contrary to the asymptotic analysis, the DNS shows that the flux terms in the horizontal components at both heights have a shallow finite slope as r/z → 0. While the behavior predicted by the asymptotic analysis suggests a constant behavior, there may still some finite coupling between the particle phase and flow dissipative range dynamics (which our scaling analysis ignores). This changes the scaling behavior as the particles under consideration do not possess a Stokes number large enough to be completely insensitive to dissipation scale flow phase eddies. Moreover, since we have a limited inertial range (if one exists at all), we may not be able to ignore the O
+
+
+
+(r/z )2/3
+
+contribution suggested by our analysis. However, from a qualitative standpoint, it is reassuring that the variation in the flux terms is slow, suggesting that while the scaling of the third moments may change, the qualitative conclusions remain unchanged. Using the insight of our analysis above, we finally consider the particle phase anisotropy. To analyze the results from our direct numerical simulations, the above asymptotic form motivates us to decompose the anisotropy metric into two components. The first is the difference between the correlation terms, defined as 
+
+ηC = ⟨∆u′∥ω′∥⟩+ − ⟨ ∆u′ 
+
+> z
+
+ω′ 
+
+> z
+
+⟩+
+
+⟨ω′∥
+
+> 2
+
+⟩+ + ⟨ω′ 
+
+> z2
+
+⟩+ . (33) This term describes how the anisotropy changes as the particle phase becomes decoupled from the flow phase as r/z → 0. The second component, defined as 
+
+ηF = −St +
+
+ D∥ + M∥ + F∥
+
+ − (Dz + Mz + Fz )
+
+ϱ⟨ω′∥
+
+> 2
+
+⟩+ + ϱ⟨ω′ 
+
+> z2
+
+⟩+ , (34) describes the effect of settling and the mean downscale drift on the particle phase anisotropy. Note that η(p) = ηC + ηF exactly. These components are plotted for z+ = 30 in figure 8(a) and z+ = 90 in figure 8(b). 26 FIG. 8. Components of the anisotropy metric, ηC and ηF (defined in the text) for different values of Sv +.
+
+Figure 8 shows the correlation terms (thick curves) and the flux terms (thin curves) for 
+
+z+ = 30 and z+ = 90 at fixed St + and varied Sv +. Figure 8 shows that the anisotropy at large scales (i.e. r/z > 1) at both heights is due primarily to the correlation between flow increments and particle velocity increments through ηC . This verifies that the large scale anisotropy in the particle phase is strongly controlled by the anisotropy of the underlying flow phase. Moreover, we can see that there is very little change to ηC by progressively increasing Sv +, until Sv + = 2 .5, where it is significantly affected at both heights. Interestingly, at 
+
+z+ = 90, ηC becomes negative when r/z < 1 suggesting that settling leads to a faster decorrelation from horizontal components than the vertical. When one considers the small scales, the majority of the contribution to the particle phase anisotropy comes from the flux terms. These curves underscore the importance of the non-linear energy cascade (i.e. non-local effects) within the particle phase, and how then almost wholly govern the scale anisotropy. Moreover, since these flux terms are scaled by large scale quantities ( Li), the implication is that the small scale anisotropy is influenced by the large scale response of the particle phase to the fluid phase. Figure 8(a) shows significant differences in ηF at z+ = 30, suggesting that the cascade of energy in the particle phase is significantly modified by settling at high Sv +, thus rendering the small scales only weakly anisotropic. Interestingly, in figure 8(b), the effect of settling on the small scale anisotropy 27 is smaller. This is evident in equation (29), where ηF is proportional to ( z+)−1, meaning a smaller effect further from the boundary. Overall, the small scale anisotropy is only weakly modified by particle settling when one considers distances far enough from the wall.  
+
+> IV. DISCUSSION AND CONCLUSIONS
+
+In this work, we considered the broad question of how anisotropy present in a wall bounded turbulent flow is imparted onto a field of Lagrangian particles. We defined both an Eulerian scalewise anisotropy for both the fluid and the dispersed phases by employing second order structure functions (SoSF) in r − z space. This technique allowed us to make a direct comparison of the energetic anisotropy of both phases, and how their characteristics differ with scale. We focused our analysis on two regions of the flow: the logarithmic layer (the self-similar region of the flow), and the buffer layer, where the underlying flow phase anisotropy is strong across all scales of motion. To analyze our system, we derived a theoret-ical model for the tendencies controlling the particle phase second order structure functions, and despite the relatively low Reynolds number, we found qualitative agreement between an asymptotic scaling argument for the the particle phase SoSF and Eulerian-Lagrangian cou-pled DNS in this region, suggesting that our results may scale to higher Reynolds numbers. The main conclusion from this work is that for sufficiently inertial Lagrangian point particles, the particle phase demonstrates a significant level of anisotropy in the formally isotropic dissipative range of the flow phase. We hypothesize that this is driven by the multi-scale inertial response of particles to the large scale anisotropy of the flow. These so-called non-local effects (a downscale drift) lead to increased energy in the at small scales relative to purely passive particles and has been noted in previous studies. The novelty here is that since the large scales of the flow are strongly anisotropic (an effect increasing with Reynolds number), the horizontal and vertical energy densities of the dispersed phase at small scales were anisotropic themselves. By computing the scalewise anisotropy, we found that the small scale (i.e. r/z ≪ 1) anisotropy was comparable to the large scale anisotropy (i.e. r/z > 1), with a minimum in between. Our asymptotic analysis found that the role of particle settling in the small scales was minor until small separations (i.e. r/z ≪ 1), and was unsurprisingly strongest when Sv +
+
+became order unity for St + = 10. We found that as Sv + was increased, this preserved 28 anisotropy at the small scales began to decrease, and we showed that this is due to particle settling directly decreasing the minimum horizontal variance at small separations more than the vertical. By considering Sv + = 2 .5, we see that the anisotropy of the small scales actually becomes negative, suggesting a fundamental change in the topology of dispersed phase “eddies”. The implication is that that since the small scales in the particle phase are already positively anisotropic (i.e. fluctuations have a pancake-like topology), settling works to draw the small scales to isotropy, and continually increasing Sv + eventually leads to a slightly negative anisotropy (fluctuations have a column-like topology). This work also brings about several interesting considerations for a potential prognostic Eulerian model for inertial settling particles. Our results point to a more general phe-nomenon that while the fluid phase may return to isotropy at small enough scales (i.e., in the inertial subrange and dissipative ranges), the emergence of non-local effects due to particle inertia may imply more generally that the large scale anisotropy of the flow state is fossilized at smaller scales in the particle field. This multi-scale effect could have inter-esting and important consequences for properly modeling both one- and two-way coupled phenomena across a wide range of applications. For example, particle collision rates (which inherently depend upon the small scale statistics of the particle field) may require informa-tion regarding the large scale flow state. Another consideration may be derived from the practical concerns associated with the choice of numerical method for modeling the particle phase as a continuum. For example, a diffusivity may be required for numerical solution stability (as is often a necessity for high order spectral methods), or may be implicit in the method itself, such as for lower order finite difference or finite volume methods. Therefore, to reproduce the small scale statistics of a multi-phase continuum model (i.e. the particle phase energy cascade), care must be taken to pick a particle diffusivity small enough such that the minimum energy is not too strongly attenuated while still preserving model stability. One potential approach may be to use a LES-style closure for the particle phase, making sure to appropriately model the solid phase energy flux from the resolved scales. This is especially relevant for appropriately modeling the subgrid scale dynamics of Eulerian-Lagrangian LES, which are a popular middle ground between small scale DNS and operational scale models ([34] and references therein). A final consequence is how energy is passed from the particle phase back to the flow phase in a two-way coupled sense. There is significant evidence to suggest that the two 29 way coupling between solid particles and the flow phase may either augment or attenuate turbulence introduce energy at the small scales and attenuate energy at larger scales (known as pivoting [35, 36]. Our work suggests a potential hypothesis for this, whereas since the energy of the particle phase is much higher than the flow phase in the dissipative range, the back reaction onto the flow phase by the particles may scale with the minimum energy attained by the particle phase due to non-local effects (i.e. the flux terms described above), thereby implying that energy is injected directly into dissipative range. The findings of this study also highlight that the energy exchange between the solid phase and the fluid phase in this range may not be isotropic, since the energy flux in each compo-nent is different (due to the large scale anisotropy). Since our results highlight that the small scale energetic content of the horizontal component is higher on average than in the vertical component, two-way coupling in anisotropic turbulence may in fact place a much larger drag onto the horizontal component, thus warping their characteristic shapes more than the vertical component. For example, [35] comment that settling particles at sufficient loading tend to warp eddies in the vertical as potential energy from the particle phase is passed to kinetic energy, and then onto the flow, thereby weakening horizontal fluctuations and adding energy to vertical ones. This could lead to fundamentally different energy exchange pathways in anisotropic turbulence, versus isotropic turbulence, but a dedicated study is required to test this hypothesis. 
+
+> ACKNOWLEDGMENTS
+
+The authors would like to acknowledge Grant No. W911NF2220222 from the U.S. Army Research Office, and the Center for Research Computing at the University of Notre Dame and the University of Colorado Research Computing Office. AG would also like to acknowl-edge partial funding by the Natural Science and Engineering Research Council of Canada number PDF - 587364 - 2024. 30 Appendix A: Derivation of second order structure functions 
+
+This appendix uses techniques from kinetic theory to derive the continuum equations for the second order relative velocity moments of the particle phase JPDF. These second order moment corresponds to the second order structure functions of the particle phase velocity. We first defined the JFPF as 
+
+P = P(r, z, w, ω ∥, ω z ), (A1) which represents the probability density of a pair of particles existing in a hypercube in phase space. Recall that r represents the longitudinal separation between two particles, z
+
+represents the height of a reference particle, w is the vertical veloctiy of a reference particle, 
+
+ω∥ is the longitudinal relative velocity between satellite and reference particles, and ωz is the relative vertical velocity of satellite and reference particles. Assuming that we can neglect particle collisions, the JPDF is a conserved quantity in phase space and we can take the time derivative of P to write down the master transport equation 
+
+∂P
+
+∂t + ∂∂z wP + 1
+
+r∂∂r rω ∥P + ∂∂ω ∥
+
+˙ω∥P + ∂∂ω z
+
+˙ωz P = 0 . (A2) For the following, we ignore time dependence in all quantities as we are concerned only with the steady state dynamics. Note that ˙ ω∥ and ˙ ωz are defined by their configuration space equations in the main text. A useful intermediate step is to derive the equation for the zeroth moment by integrating the above equations across all longitudinal and vertical relative velocities. This equation will be used to simplify the equation of the second order moments, and represents a conservation equation for the zeroth relative velocity moment of the JPDF: 
+
+∂∂z ⟨w⟩ϱ + 1
+
+r∂∂r r⟨ω∥⟩ϱ = 0 (A3) where the marginal JDF is defined by 
+
+ϱ =
+
+Z
+
+> R3
+
+Pdω ∥ωz dw. (A4) The marginal is related to the probability of two particles separated by a longitudinal dis-tance r where one is located at a height z (i.e. the longitudinal RDF centered at a height 
+
+z). 31 The averages of the vertical particle velocity and the longitudinal separation velocity conditioned on the remaining phase space variables r and z (denoted by ⟨·⟩ ) are defined as 
+
+ϱ⟨w⟩ =
+
+Z
+
+> R3
+
+wPdω ∥dω z dw, ϱ⟨ω∥⟩ =
+
+Z
+
+> R3
+
+ω∥Pdω ∥dω z dw. (A5) The first term represents the average vertical velocity of particles such that they are a longitudinal distance away from a reference particle irrespective of the reference particle’s velocity (i.e. ⟨w⟩ is a one-point quantity). The second quantity is the mean longitudinal relative velocity of all particles. Equation (A3) indicates that if ϱ⟨w⟩ is dependent upon height (say due to particle settling, and dynamic effects such as preferential sweeping and turbophoresis [11]), then there is a non-zero mean longitudinal relative velocity in general. Therefore, we must account for both the mean and the fluctuating components of the longitudinal relative velocities and satellite (or reference) particle velocities. First, we make s variable substitutions ωi = ω′ 
+
+> i
+
++ ⟨ωi⟩ and w = w′ + ⟨w⟩, so that ω′ 
+
+> i
+
+and 
+
+w′ are new phase space variables while ⟨ωi⟩ and ⟨w⟩ represent the conditional average on r
+
+and z (and are thus dependent only upon those variables). Under this change of variables, the derivatives with respect to ωi become 
+
+∂∂ω ∥
+
+→ ∂∂ω ′∥
+
+, (A6) whereas the r and z derivatives become (by the chain rule from calculus) 
+
+∂∂z → ∂∂z − ∂⟨ωi⟩
+
+∂z ∂∂ω ′
+
+> i
+
+, 1
+
+r∂∂r r → 1
+
+r∂∂r r − ∂⟨ωi⟩
+
+∂r ∂∂ω ′
+
+> i
+
+, (A7) where the repeated subscript i implies summation over the longitudinal and vertical com-ponents. Upon making the above substitution, the master equation becomes 
+
+∂∂z w′P + 1
+
+r∂∂r rω ′∥P + ∂∂ω ′∥
+
+˙ω′∥P + ∂∂ω ′
+
+> z
+
+˙ω′ 
+
+> z
+
+P = . . . 
+
++ ∂⟨ωi⟩
+
+∂z ∂∂ω ′
+
+> i
+
+wP + ∂⟨ωi⟩
+
+∂r ∂∂ω ′
+
+> i
+
+ω∥P − ∂∂z ⟨w⟩P − 1
+
+r∂∂r r⟨ω∥⟩P . . . 
+
+− ⟨ ˙ω∥⟩ ∂∂ω ′∥
+
+P − ⟨ ˙ωz ⟩ ∂∂ω ′
+
+> z
+
+P, (A8) where all terms on the left hand side on hold have to do with fluctuating variables, while terms on the right hand side each have some influence from mean quantities. Note that 32 mean and fluctuating components of ˙ωi are defined as 
+
+⟨ ˙ωi⟩ = ⟨∆ui⟩w,ω i − ⟨ ωi⟩
+
+τp
+
+(A9) ˙ω′ 
+
+> i
+
+= ⟨∆u′
+
+> i
+
+⟩w,ω i − ω′
+
+> i
+
+τp
+
+, (A10) where the notation ⟨·⟩ w,ω i represents an average sampled relative velocity conditioned on all phase space variables. See [14] for an explanation. To compute the equations for the second order particle phase structure function, we multiply the master equation by ω′ 
+
+> i
+> 2
+
+and integrate over all relative velocity fluctuations and satellite particle velocity fluctuations. Noting that any terms multiplied by a first order fluctuating quantity integrate to zero, the master equation simplifies quite significantly to the following form 
+
+ϱ⟨ω′∥
+
+> 2
+
+⟩ = ϱ⟨∆u′∥ω′∥⟩ − τp
+
+2
+
+ D∥ + M∥ + F∥
+
+ . (A11) In the above, D∥ can be thought of as a mean transport term and is defined as 
+
+D∥ = ϱ⟨w⟩ ∂∂z ⟨ω′∥
+
+> 2
+
+⟩ + ϱ⟨ω∥⟩ ∂∂r ⟨ω′∥
+
+> 2
+
+⟩, (A12) 
+
+F∥ is defined as 
+
+F∥ = ∂∂z ϱ⟨w′ω′∥
+
+> 2
+
+⟩ + 1
+
+r∂∂r rϱ ⟨ω′∥
+
+> 3
+
+⟩, (A13) and M∥ represents an additional contribution from the mean 
+
+M∥ = 2 ϱ⟨w′ω′∥⟩ ∂∂z ⟨ω∥⟩ + 2 ϱ⟨ω′2
+
+> ∥
+
+⟩ ∂∂r ⟨ω∥⟩ (A14) Likewise, following an identical series of manipulations, the vertical component is 
+
+ϱ⟨ω′
+
+> z
+> 2
+
+⟩ = ϱ⟨∆u′ 
+
+> z
+
+ω′ 
+
+> z
+
+⟩ − τp
+
+2 (Dz + Mz + Fz ) . (A15) The vertical transport term is 
+
+Dz = ϱ⟨w⟩ ∂∂z ⟨ω′
+
+> z
+> 2
+
+⟩ + ϱ⟨ω∥⟩ ∂∂r ⟨ω′
+
+> z
+> 2
+
+⟩, (A16) 
+
+Fz is defined as 
+
+Fz = ∂∂z ϱ⟨w′ω′
+
+> z
+> 2
+
+⟩ + 1
+
+r∂∂r rϱ ⟨ω′∥ω′
+
+> z
+> 2
+
+⟩, (A17) and Mz is defined as 
+
+Mz = 2 ϱ⟨w′ω′ 
+
+> z
+
+⟩ ∂∂z ⟨ωz ⟩ + 2 ϱ⟨ω′∥ω′z ⟩ ∂∂r ⟨ωz ⟩ (A18) 33 Appendix B: Asymptotic approximation for flux terms 
+
+This appendix derives the flux terms given the power law assumptions described in the main manuscript and are assumed to hold in the limit r/z ≪ 1 and r/z ≫ viscous should it exist. Finally, we are assuming the above relationships hold in the asymptotic sense (i.e. 
+
+r/z ≪ 1) which is why we use ‘ ∼’
+
+1. Power law assumptions of mean quantities 
+
+We make the following assumptions for the mean two point quantities: 
+
+⟨ωi⟩ ∼ uτ C1/3
+
+> i
+
+ rz
+
+1/3
+
+, ⟨ω′
+
+> i
+
+ω′ 
+
+> j
+
+⟩ ∼ u2 
+
+> τ
+
+φij (LiLj )1/3  rz
+
+2/3
+
+, ⟨ω′
+
+> i
+
+ω′
+
+> j
+> 2
+
+⟩ = −u3 
+
+> τ
+
+ψij 
+
+ LiL2
+
+> j
+
+1/3  rz
+
+
+
+,
+
+(B1) where φij and ψij are tensors of the correlation coefficients between longitudinal and vertical relative velocity fluctuations. Specifically, φij , ψ ij = 1 if i = j and −1 < φ ij , ψ ij < 1otherwise. The coefficients Li and Ci are defined in the main text. Recall that we also adopt a power law representation of the radial distribution function 
+
+ϱ = R
+
+ rz
+
+−α
+
+, (B2) with R and α discussed in the main text. We must also consider the mixed moments ⟨w′ω′
+
+> in
+
+⟩. To estimate these quantities, we make the following assumption based on the triangle inequality; 
+
+⟨w′ω′
+
+> in
+
+⟩ ∼ λi
+
+
+
+⟨w′2⟩
+
+1/2 
+
+⟨ω′
+
+> i
+> 2n
+
+⟩
+
+1/2
+
+, (B3) and it follows from [20] that since the large scale vertical fluctuations are independent of height within the logarithmic regime, we have ⟨w′2⟩ ∼ A0u2 
+
+> τ
+
+(recall A0 is a constant), and it follows that 
+
+⟨w′ω′
+
+> in
+
+⟩ ∼ un+1 
+
+> τ
+
+
+
+λiA0Ln/ 3
+
+> i
+
+ rz
+
+n/ 3
+
+. (B4) Finally, as discussed in the text, we make the assumption that ⟨w⟩ ∼ − βSv +, where β may be a function of function of r/z with a positive exponent, but for we leave it undetermined for the sake of the following analysis. 34 2. Asymptotic analysis 
+
+First, we consider the terms M∥ and Mz , defined as 
+
+M∥ = 2 ϱ⟨w′ω′∥⟩ ∂∂z ⟨ω∥⟩ + 2 ϱ⟨ω′∥
+
+> 2
+
+⟩ ∂∂r ⟨ω∥⟩ (B5) 
+
+Mz = 2 ϱ⟨w′ω′ 
+
+> z
+
+⟩ ∂∂z ⟨ωz ⟩ + 2 ϱ⟨ω′∥ω′ 
+
+> z
+
+⟩ ∂∂r ⟨ωz ⟩. (B6) Taking the z and r derivatives of ⟨ωi⟩, we find that 
+
+∂∂z ⟨ωi⟩ ∼ − 13
+
+uτ
+
+z C1/3
+
+> i
+
+ rz
+
+1/3
+
+, (B7) whereas 
+
+∂∂r ⟨ωi⟩ ∼ 13
+
+uτ
+
+r C1/3
+
+> i
+
+ rz
+
+1/3
+
+. (B8) Focusing first on M∥, substituting our expressions for ⟨w′ω′∥⟩, ⟨ω′∥
+
+> 2
+
+⟩, and ⟨ω∥⟩ we have 
+
+M∥ ∼ − 23ϱu 3
+
+> τ
+
+λ∥A0L1/3 
+
+> ∥
+
+C1/3
+
+> ∥
+
+z
+
+ rz
+
+2/3
+
++ 23ϱu 3
+
+> τ
+
+L2/3 
+
+> ∥
+
+C1/3
+
+> ∥
+
+r
+
+ rz
+
+
+
+. (B9) Simplifying the above by removing a common factor from both terms, we arrive at the following simplified expression for M∥
+
+M∥ ∼ 23ϱu 3
+
+> τ
+
+L2/3 
+
+> ∥
+
+C1/3
+
+> ∥
+
+z
+
+
+
+1 − γ∥
+
+ rz
+
+2/3
+
+, (B10) where we have grouped constants to define 
+
+γ∥ = A0λ∥
+
+L1/3
+
+> ∥
+
+. (B11) Likewise, following the same series of manipulations, but instead using ⟨w′ω′ 
+
+> z
+
+⟩, ⟨ω′∥ω′ 
+
+> z
+
+⟩, and 
+
+⟨ωz ⟩, we arrive at a similar expression for Mz
+
+Mz ∼ 23ϱu 3
+
+> τ
+
+ L∥Lz Cz
+
+1/3
+
+z
+
+
+
+φ − γz
+
+ rz
+
+2/3
+
+, (B12) where γz is defined as 
+
+γz = A0λz
+
+L1/3
+
+> ∥
+
+(B13) noting that there are differences in magnitude at both O(1) and O
+
+
+
+(r/z )2/3
+
+relative to 
+
+M∥.35 Next, we consider the transport terms defined as follows (for the ith component) 
+
+Di = ϱ⟨w⟩ ∂∂z ⟨ω′
+
+> i
+> 2
+
+⟩ + ⟨ω∥
+
+∂∂r ⟨ω′
+
+> i
+> 2
+
+⟩. (B14) Taking the z and r derivatives of ⟨ω′
+
+> i
+> 2
+
+⟩, we find that 
+
+∂∂z ⟨ω′
+
+> i
+> 2
+
+⟩ ∼ − 23
+
+u2
+
+> τ
+
+z L2/3
+
+> i
+
+ rz
+
+2/3
+
+, (B15) whereas 
+
+∂∂r ⟨ω′
+
+> i
+> 2
+
+⟩ ∼ 23
+
+u2
+
+> τ
+
+r L2/3
+
+> i
+
+ rz
+
+2/3
+
+. (B16) Substituting in the definitions for ⟨ω∥⟩ and ⟨w⟩, we arrive at 
+
+Di ∼ 23ϱu2 
+
+> τ
+
+βv gL2/3
+
+> i
+
+z
+
+ rz
+
+2/3
+
++ 23ϱu3 
+
+> τ
+
+C1/3 
+
+> ∥
+
+L2/3
+
+> i
+
+z , (B17) where we have canceled the common r in the numerator and denominator in the second term above. After some rearrangement, the above is written as 
+
+Di ∼ 23ϱu 3
+
+> τ
+
+L2/3 
+
+> i
+
+C1/3
+
+> ∥
+
+z 1 + βSv +
+
+C1/3
+
+> ∥
+
+ rz
+
+2/3
+
+!
+
+. (B18) Finally, we consider the flux terms defined as follows, 
+
+F∥ = ∂∂z ϱ⟨w′ω′∥
+
+> 2
+
+⟩ + 1
+
+r∂∂r rϱ ⟨ω′∥
+
+> 3
+
+⟩, (B19) 
+
+Fz = ∂∂z ϱ⟨w′ω′
+
+> z
+> 2
+
+⟩ + 1
+
+r∂∂r rϱ ⟨ω′∥ω′
+
+> z
+> 2
+
+⟩, (B20) Importantly, ϱ is located within the derivatives, meaning we must evaluate the derivatives of the following two terms 
+
+ϱ⟨ω′∥ω′
+
+> j
+> 2
+
+⟩ = −u3 
+
+> τ
+
+Rψ∥j
+
+ L∥L2
+
+> j
+
+1/3  rz
+
+1−α
+
+(B21) 
+
+ϱ⟨w′ω′
+
+> j
+> 2
+
+⟩ = u3 
+
+> τ
+
+Rλj A0L2/3
+
+> j
+
+ rz
+
+2/3−α
+
+(B22) Taking the z derivative of ϱ⟨w′ω′
+
+> j
+> 2
+
+⟩, we find that 
+
+∂∂z ϱ⟨w′ω′
+
+> j
+> 2
+
+⟩ ∼ − 
+
+23 − α
+
+
+
+ϱu 3
+
+> τ
+
+λj A0L2/3
+
+> j
+
+z
+
+ rz
+
+2/3
+
+, (B23) where we have re-substituted in the definition for ϱ. Likewise, taking the radial derivative of ϱ⟨ω′∥ω′
+
+> j
+> 2
+
+⟩,1
+
+r∂∂r rϱ ⟨ω′∥ω′
+
+> j
+> 2
+
+⟩ ∼ − (2 − α)ϱu 3
+
+> τ
+
+ψ∥j
+
+ L∥L2
+
+> j
+
+1/3
+
+z . (B24) 36 Plugging the all third order terms into the above equations, we get the following estimates for the magnitudes of these terms 
+
+F∥ = −ϱu 3
+
+> τ
+
+L∥
+
+z
+
+
+
+(2 − α) + 
+
+23 − α
+
+
+
+γ∥
+
+ rz
+
+2/3
+
+, (B25) 
+
+Fz = −ϱu 3
+
+> τ
+
+L∥
+
+z
+
+Lz
+
+L∥
+
+2/3 
+
+(2 − α)ψ +
+
+23 − α
+
+
+
+γz
+
+ rz
+
+2/3
+
+. (B26) 37 [1] S. Balachandar and J. K. Eaton, Turbulent Dispersed Multiphase Flow, Annual Review of Fluid Mechanics 42 , 111 (2010). [2] L. Brandt and F. Coletti, Particle-Laden Turbulence: Progress and Perspectives, Annual Review of Fluid Mechanics 54 , 159 (2022). [3] A. D. Bragg, P. J. Ireland, and L. R. Collins, On the relationship between the non-local clustering mechanism and preferential concentration, Journal of Fluid Mechanics 780 , 327 (2015). [4] D. Richter and M. Chamecki, Inertial Effects on the Vertical Transport of Suspended Particles in a Turbulent Boundary Layer, Boundary-Layer Meteorology 167 , 235 (2018). [5] T. Berk and F. Coletti, Dynamics of small heavy particles in homogeneous turbulence: aLagrangian experimental study, Journal of Fluid Mechanics 917 , A47 (2021). [6] T. Berk and F. Coletti, Dynamics and scaling of particle streaks in high-Reynolds-number turbulent boundary layers, Journal of Fluid Mechanics 975 , A47 (2023). [7] J. Bec, L. Biferale, M. Cencini, A. Lanotte, S. Musacchio, and F. Toschi, Heavy Particle Concentration in Turbulence at Dissipative and Inertial Scales, Physical Review Letters 98 ,084502 (2007). [8] A. D. Bragg, P. J. Ireland, and L. R. Collins, Mechanisms for the clustering of inertial particles in the inertial range of isotropic turbulence, Physical Review E 92 , 023029 (2015). [9] A. J. Smits, B. J. McKeon, and I. Marusic, High–Reynolds Number Wall Turbulence, Annual Review of Fluid Mechanics 43 , 353 (2011). [10] A. D. Bragg, D. H. Richter, and G. Wang, Mechanisms governing the settling velocities and spatial distributions of inertial particles in wall-bounded turbulence, Physical Review Fluids 
+
+6, 064302 (2021). [11] A. P. Grace, D. H. Richter, and A. D. Bragg, A Reinterpretation of Phenomenological Model-ing Approaches for Lagrangian Particles Settling in a Turbulent Boundary Layer, Boundary-Layer Meteorology 190 , 15 (2024). [12] P. A. Davidson, T. B. Nickels, and P.-˚ A. Krogstad, The logarithmic structure function law in wall-layer turbulence, Journal of Fluid Mechanics 550 , 51 (2006). [13] E. Pitton, C. Marchioli, V. Lavezzo, A. Soldati, and F. Toschi, Anisotropy in pair dispersion 
+
+38 of inertial particles in turbulent channel flow, Physics of Fluids 24 , 073305 (2012). [14] M. W. Reeks, The Development and Application of a Kinetic Theory for Modeling Dispersed Particle Flows, Journal of Fluids Engineering 143 , 080803 (2021). [15] R. Clift, J. Grace, and M. Weber, Bubbles, drops, and particles (Courier Corporation, 2005). [16] P. Gualtieri, F. Picano, and C. M. Casciola, Anisotropic clustering of inertial particles in homogeneous shear flow, Journal of Fluid Mechanics 629 , 25 (2009). [17] G. Wang, K. O. Fong, F. Coletti, J. Capecelatro, and D. H. Richter, Inertial particle velocity and distribution in vertical turbulent channel flow: A numerical and experimental comparison, International Journal of Multiphase Flow 120 , 103105 (2019). [18] A. D. Bragg and L. R. Collins, New insights from comparing statistical theories for inertial particles in turbulence: I. Spatial distribution of particles, New Journal of Physics 16 , 055013 (2014). [19] A. D. Bragg and L. R. Collins, New insights from comparing statistical theories for inertial particles in turbulence: II. Relative velocities, New Journal of Physics 16 , 055014 (2014). [20] G. J. Kunkel and I. Marusic, Study of the near-wall-turbulent region of the high-Reynolds-number boundary layer using an atmospheric flow, Journal of Fluid Mechanics 548 , 375 (2006). [21] S. B. Pope, Turbulent flows , 1st ed. (Cambridge Univ. Press, Cambridge, 2015). [22] P. A. Davidson and P.-˚ A. Krogstad, A simple model for the streamwise fluctuations in the log-law region of a boundary layer, Physics of Fluids 21 , 055105 (2009). [23] P. A. Davidson, P.-˚ A. Krogstad, and T. B. Nickels, A refined interpretation of the logarithmic structure function law in wall layer turbulence, Physics of Fluids 18 , 065112 (2006). [24] P. A. Davidson and P.-˚ A. Krogstad, A universal scaling for low-order structure functions in the log-law region of smooth- and rough-wall boundary layers, Journal of Fluid Mechanics 
+
+752 , 140 (2014). [25] A. E. Perry, S. Henbest, and M. S. Chong, A theoretical and experimental study of wall turbulence, Journal of Fluid Mechanics 165 , 163 (1986). [26] T. B. Nickels, I. Marusic, S. Hafez, and M. S. Chong, Evidence of the k 1 - 1 Law in a High-Reynolds-Number Turbulent Boundary Layer, Physical Review Letters 95 , 074501 (2005). [27] A. P. Grace, T. Berk, A. D. Bragg, and D. H. Richter, Effects of settling on inertial particle slip velocity statistics in wall-bounded flows, Journal of Fluid Mechanics 1015 , A21 (2025). 
+
+39 [28] P. J. Ireland, A. D. Bragg, and L. R. Collins, The effect of Reynolds number on inertial particle dynamics in isotropic turbulence. Part 1. Simulations without gravitational effects, Journal of Fluid Mechanics 796 , 617 (2016). [29] P. J. Ireland, A. D. Bragg, and L. R. Collins, The effect of Reynolds number on inertial particle dynamics in isotropic turbulence. Part 2. Simulations with gravitational effects, Journal of Fluid Mechanics 796 , 659 (2016). [30] A. Kolmogorov, The local structure of turbulence in incompressible viscous fluid for very large Reynolds numbers, Doklady Akademii nauk SSSR 30 , 301 (1941). [31] K. R. Sreenivasan and R. A. Antonia, THE PHENOMENOLOGY OF SMALL-SCALE TUR-BULENCE, Annual Review of Fluid Mechanics 29 , 435 (1997). [32] J. Bec, H. Homann, and S. S. Ray, Gravity-Driven Enhancement of Heavy Particle Clustering in Turbulent Flow, Physical Review Letters 112 , 184501 (2014). [33] L.-P. Wang and M. R. Maxey, Settling velocity and concentration distribution of heavy par-ticles in homogeneous isotropic turbulence, Journal of Fluid Mechanics 256 , 27 (1993). [34] G. I. Park, M. Bassenne, J. Urzay, and P. Moin, A simple dynamic subgrid-scale model for LES of particle-laden turbulence, Physical Review Fluids 2, 044301 (2017). [35] R. Hassaini and F. Coletti, Scale-to-scale turbulence modification by small settling particles, Journal of Fluid Mechanics 949 , A30 (2022). [36] C. Poelma and G. Ooms, Particle-Turbulence Interaction in a Homogeneous, Isotropic Tur-bulent Suspension, Applied Mechanics Reviews 59 , 78 (2006). 
+
+40
