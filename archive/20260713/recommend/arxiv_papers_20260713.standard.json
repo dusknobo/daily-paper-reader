@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-13T21:33:06.347891+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.09446v1",
+      "source": "arxiv",
+      "title": "Topology-Preserving Mesh Adaptation for Sharp-Interface Multiphase PFEM",
+      "abstract": "This paper presents a robust, fully Lagrangian framework based on the Particle Finite Element Method (PFEM) capable of simulating multiphase flows with an arbitrary number of immiscible phases. Interface-tracking methods can sometimes suffer from numerical diffusion or allow the underlying mesh resolution to prematurely dictate topological changes. To address these limitations, we introduce a dynamic mesh adaptation strategy that naturally preserves sharp geometric interfaces without relying on classical constrained triangulation. A node-empty disk is assigned to each segment of the discretized interface, ensuring that the edge is part of the Delaunay triangulation. Our approach decouples the interface physics from the grid size, allowing the integration of sub-grid physical models to properly govern topological changes independently of the user-defined mesh size. The capabilities and accuracy of the framework are validated against standard multiphase benchmarks, closely matching references while maintaining a remarkably low overall node count. We demonstrate the scalability and geometric versatility of the method, in particular with a challenging 16-phase Rayleigh-Taylor simulation.",
+      "authors": [
+        "Félix Ruyffelaere",
+        "Michel Henry",
+        "Jonathan Lambrechts",
+        "Jean-François Remacle"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE",
+        "cs.CG"
+      ],
+      "published": "2026-07-10T14:16:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.09446v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "presents a sharp-interface multiphase PFEM framework with topology-preserving mesh adaptation for immiscible phases",
+      "llm_evidence_cn": "提出了一种针对不混溶相的多相流锐界面PFEM框架，并实现了保拓扑的网格自适应",
+      "llm_evidence": "提出了一种针对不混溶相的多相流锐界面PFEM框架，并实现了保拓扑的网格自适应",
+      "canonical_evidence": "提出了一种针对不混溶相的多相流锐界面PFEM框架，并实现了保拓扑的网格自适应",
+      "llm_tldr_en": "This paper presents a Lagrangian Particle Finite Element Method for multiphase flows with sharp interfaces, using a dynamic mesh adaptation strategy that preserves geometric interfaces without constrained triangulation, enabling robust simulations of complex multiphase systems.",
+      "llm_tldr_cn": "针对多相流模拟中界面跟踪方法可能出现的数值扩散和拓扑预先由网格分辨率决定的问题，本文提出了一种基于粒子有限元法的全拉格朗日框架，通过动态保拓扑网格自适应策略自然保持锐利几何界面。该方法将界面物理与网格尺寸解耦，允许在不依赖经典约束三角剖分的情况下实现稳定高效的多相流计算，对降膜等复杂多相问题具有潜在应用价值。",
+      "llm_tldr": "针对多相流模拟中界面跟踪方法可能出现的数值扩散和拓扑预先由网格分辨率决定的问题，本文提出了一种基于粒子有限元法的全拉格朗日框架，通过动态保拓扑网格自适应策略自然保持锐利几何界面。该方法将界面物理与网格尺寸解耦，允许在不依赖经典约束三角剖分的情况下实现稳定高效的多相流计算，对降膜等复杂多相问题具有潜在应用价值。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

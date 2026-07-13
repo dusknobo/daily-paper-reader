@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-13",
+  "date": "2026-07-13",
+  "generated_at": "2026-07-13T21:34:40",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/13/2607.09446v1-topology-preserving-mesh-adaptation-for-sharp-interface-multiphase-pfem",
+      "section": "quick",
+      "title_en": "Topology-Preserving Mesh Adaptation for Sharp-Interface Multiphase PFEM",
+      "authors": "Félix Ruyffelaere, Michel Henry, Jonathan Lambrechts, Jean-François Remacle",
+      "date": "2026-07-10",
+      "pdf": "https://arxiv.org/pdf/2607.09446v1",
+      "score": "7.0",
+      "evidence": "提出了一种针对不混溶相的多相流锐界面PFEM框架，并实现了保拓扑的网格自适应",
+      "tldr": "多相流界面追踪常受数值扩散或过早拓扑变化影响，传统方法依赖网格分辨率。本研究提出基于粒子有限元法的拓扑保持动态网格自适应策略，为界面段分配节点空圆盘确保Delaunay三角剖分，自然保持尖锐几何界面。该方法解耦界面物理与网格尺寸，用亚网格模型独立控制拓扑变化。基准测试中结果高度吻合且节点数极少，成功模拟16相瑞利-泰勒不稳定性，展示了可扩展性和几何通用性，为任意数量不可混相流提供精确高效框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "This paper presents a robust, fully Lagrangian framework based on the Particle Finite Element Method (PFEM) capable of simulating multiphase flows with an arbitrary number of immiscible phases. Interface-tracking methods can sometimes suffer from numerical diffusion or allow the underlying mesh resolution to prematurely dictate topological changes. To address these limitations, we introduce a dynamic mesh adaptation strategy that naturally preserves sharp geometric interfaces without relying on classical constrained triangulation. A node-empty disk is assigned to each segment of the discretized interface, ensuring that the edge is part of the Delaunay triangulation. Our approach decouples the interface physics from the grid size, allowing the integration of sub-grid physical models to properly govern topological changes independently of the user-defined mesh size. The capabilities and accuracy of the framework are validated against standard multiphase benchmarks, closely matching references while maintaining a remarkably low overall node count. We demonstrate the scalability and geometric versatility of the method, in particular with a challenging 16-phase Rayleigh-Taylor simulation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
