@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-14",
+  "date": "2026-07-14",
+  "generated_at": "2026-07-14T20:31:20",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/14/2607.10164v1-an-integral-surface-tension-scheme-for-three-dimensional-front-tracking-frameworks",
+      "section": "quick",
+      "title_en": "An integral surface tension scheme for three-dimensional front tracking frameworks",
+      "authors": "Gabriele Gennari, Berend van Wachem",
+      "date": "2026-07-11",
+      "pdf": "https://arxiv.org/pdf/2607.10164v1",
+      "score": "7.0",
+      "evidence": "两相流的积分表面张力格式",
+      "tldr": "表面张力积分格式天然保持动量守恒且易于处理变表面张力，但其三维实现此前因界面几何复杂性而缺失。本文在尖锐前跟踪框架中提出首个三维积分表面张力方案，通过静态/移动液滴、振荡、热毛细迁移及上升气泡等全流程测试验证。结果表明，该方法伪速度水平与CSF法相当，而在其他所有测试中精度均显著提升，尤其将热毛细迁移终端速度误差降低最多五个数量级，且预测的上升气泡稳态形状与实验吻合更佳。该方案为复杂两相流动的高保真模拟提供了关键数值工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "Surface tension is central to many two-phase flows, making accurate numerical schemes essential for predicting its effects. The integral formulation introduced by Popinet and Zaleski (1999) provides a natural discretisation that conserves momentum locally and globally and extends directly to variable surface tension, including Marangoni flows. However, to the authors' knowledge, only two-dimensional formulations have been reported, mainly because robust implementation in three dimensions is challenging for interfaces with complex geometries.   This work presents the first three-dimensional integral surface tension scheme, implemented within a sharp front-tracking framework. The method is tested for static and translating spherical droplets, oscillating droplets, thermocapillary motion, and rising bubbles. Results are compared with analytical solutions, experimental data, and established approaches, including the continuous surface force (CSF) and smoothing-based methods.   The proposed scheme produces spurious velocities comparable to CSF, while providing greater accuracy in all other tests. The largest improvements occur for droplets oscillating at low Ohnesorge numbers, variable-surface-tension flows, and strongly deforming rising bubbles. For a thermocapillary-driven droplet, terminal-velocity errors are reduced by up to five orders of magnitude relative to smoothing-based methods. The predicted steady-state shapes of rising bubbles also agree substantially better with experiments, particularly at low Morton numbers.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
