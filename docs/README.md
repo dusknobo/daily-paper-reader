@@ -6,26 +6,27 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-14
-- 运行时间：2026-07-14 20:31:11 UTC
+- 最新运行日期：2026-07-15
+- 运行时间：2026-07-15 21:37:51 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：2
 - 精读区：0
-- 速读区：1
+- 速读区：2
 
 ### 今日简报（AI）
-今日速读一篇关于三维前跟踪框架中积分表面张力新方案的论文，评分7.0。
-该研究提出了一种求解表面张力的积分格式，可提升多相流界面模拟的稳定性与精度。
-建议关注该方案在复杂几何下的验证效果，或与现有连续表面张力模型做比较。
-- 详情：[/202607/14/README](/202607/14/README)
+今天速览了两篇计算流体力学与薄膜流动相关的论文。一篇自动推导守恒律系统的格子玻尔兹曼方法，另一篇揭示可溶表面活性剂液膜在斜面上的铺展破裂机制。建议关注自动构建数值方法的范式突破，或表面活性剂对流动稳定性的调控规律。
+- 详情：[/202607/15/README](/202607/15/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [An integral surface tension scheme for three-dimensional front tracking frameworks](/202607/14/2607.10164v1-an-integral-surface-tension-scheme-for-three-dimensional-front-tracking-frameworks)  
-   标签：评分：7.0/10、query:falling-film
-   evidence：两相流的积分表面张力格式
+1. [Automated Derivation of Lattice Boltzmann Methods for Systems of Conservation Laws](/202607/15/2607.05668v2-automated-derivation-of-lattice-boltzmann-methods-for-systems-of-conservation-laws)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：多物理场LBM自动推导，可用于多相流
+2. [Spreading and rupture dynamics of soluble surfactant-laden thin film flow down a slippery incline in presence of external shear](/202607/15/2607.10875v1-spreading-and-rupture-dynamics-of-soluble-surfactant-laden-thin-film-flow-down-a-slippery-incline-in-presence-of-external-shear)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：可溶表面活性剂在润滑斜面薄膜流中的铺展和破裂，属于降膜流动
 
 
 <div class="dpr-home-promo-card">

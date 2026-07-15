@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-15",
+  "date": "2026-07-15",
+  "generated_at": "2026-07-15T21:38:05",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/15/2607.05668v2-automated-derivation-of-lattice-boltzmann-methods-for-systems-of-conservation-laws",
+      "section": "quick",
+      "title_en": "Automated Derivation of Lattice Boltzmann Methods for Systems of Conservation Laws",
+      "authors": "Adrian Kummerländer, Fedor Bukreev, Mathias J. Krause",
+      "date": "2026-07-06",
+      "pdf": "https://arxiv.org/pdf/2607.05668v2",
+      "score": "6.0",
+      "evidence": "多物理场LBM自动推导，可用于多相流",
+      "tldr": "多物理LBM模拟需手工推导每个PDE方案，费力易错。本文提出自动推导方法，将PDE系统重排为守恒律一阶级联，用离散速度动力学松弛近似，并结合标准LBM离散，生成碰撞-流算法。符号编译器仅从PDE声明自动推导平衡态、梯度级联和网格缩放。在12个系统上验证，收敛近二阶，GPU效率达96%带宽。该方法实现全自动生成，提升开发效率。",
+      "tags": "query:falling-film",
+      "abstract_en": "Multiphysics simulation with lattice Boltzmann methods (LBM) requires a scheme hand-derived for each partial differential equation (PDE), a labor-intensive, error-prone bottleneck. We recognize our recently proposed class of LBM schemes as a discrete-kinetic relaxation approximation of conservation laws and generalize its hand derivation to an automated one for systems of hyperbolic, parabolic, and mixed-type conservation laws.   The derivation splits into three steps: First, the PDE system is equivalently rearranged into a first-order cascade of conservation laws: every spatial derivative in flux or source becomes an auxiliary variable, recursively for higher derivatives, so all fluxes are algebraic and updates stay local. Second, the augmented system is approximated by a discrete-velocity kinetic relaxation model with linear, constant-coefficient transport: all nonlinearity resides in a local equilibrium embedding the flux exactly in its first moment, trading the low-Mach truncation for an a priori checkable sub-characteristic wave-speed bound. Third, the relaxation system is discretized by a standard LBM, yielding collide-and-stream algorithms running unchanged on existing solvers.   A symbolic compiler using a domain-specific language encapsulates these steps: unlike existing LBM code generators, which start from the discrete scheme, it automatically derives equilibrium, gradient-tracking cascade, and grid scaling from the declared PDE alone. We exercise it across twelve PDE systems, including compressible Navier--Stokes--Fourier flow, resistive magnetohydrodynamics, and nonlinear elasticity. Manufactured-solution verification confirms convergence at or near second order in double precision, retained in single precision by a reference- and equilibrium-shifted formulation. Targeting OpenLB, the generated GPU kernels reach up to 96% of the memory-bandwidth roofline.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/15/2607.10875v1-spreading-and-rupture-dynamics-of-soluble-surfactant-laden-thin-film-flow-down-a-slippery-incline-in-presence-of-external-shear",
+      "section": "quick",
+      "title_en": "Spreading and rupture dynamics of soluble surfactant-laden thin film flow down a slippery incline in presence of external shear",
+      "authors": "Dipankar Paul, Harekrushna Behera",
+      "date": "2026-07-12",
+      "pdf": "https://arxiv.org/pdf/2607.10875v1",
+      "score": "6.0",
+      "evidence": "可溶表面活性剂在润滑斜面薄膜流中的铺展和破裂，属于降膜流动",
+      "tldr": "研究可溶性表面活性剂在倾斜滑移薄液膜中的铺展与破裂，考虑外部剪切和吸附动力学。采用润滑近似推导耦合演化方程，分析快速和慢速吸附情形。发现滑移促进流动并增高毛细脊，剪切加剧减薄；慢吸附产生脉冲状膜厚，滑移与剪切对脉冲作用相反；线性稳定性表明剪切失稳，滑移效应受Bond数等影响。揭示多因素协同调控膜稳定性与破裂的机理，为相关工艺提供理论指导。",
+      "tags": "query:falling-film",
+      "abstract_en": "The spreading and rupture of local distribution of surfactant on a slippery inclined thin film flow in the presence of external shear is explored in this article. The surfactant can be adsorbed at the free surface or can be dissolved in the bulk. The surfactant concentrations are governed by advection and diffusion equations for bulk as well as the interface. Moreover, the adsorption-desorption rates of the bulk and interface surfactants are regulated by sorption kinetics rates. The van der Waals forces are considered for rupture dynamics. The lubrication approximation method is used to derive the evolution equations of film thickness and interface surfactant concentration. Two different scenarios are considered for sorption kinetics rates: (i) rapid and (ii) slow in the case of the spreading phenomenon. Then, two cases are considered related to the distribution of the surfactant in case of rapid sorption kinetics. The slippery bottom helps more fluid to flow and the capillary ridge to gain height for rapid sorption kinetics, and the external shear force amplifies the thinning of the film. However, in the case of slow sorption kinetics, the adsorption-desorption takes place at a slow rate, and the transient period results in a reduced Marangoni gradient at the interface. This leads to a pulse-type character in the film thickness profile. The external shear force reduces the pulse height, whereas a slippery surface at the bottom increases the pulse height. On the other hand, van der Waals forces are considered to be the major factor behind the rupture mechanism. The linear stability analysis depicts that external shear force destabilizes the flow, but the slip parameter displays a dual effect based on the Bond number, capillary number, and Hamaker constant.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

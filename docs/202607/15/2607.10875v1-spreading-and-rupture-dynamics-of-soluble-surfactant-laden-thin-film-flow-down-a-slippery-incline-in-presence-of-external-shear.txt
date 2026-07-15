@@ -1,0 +1,2483 @@
+Title: Spreading and rupture dynamics of soluble surfactant-laden thin film flow down a slippery incline in presence of external shear
+
+URL Source: https://arxiv.org/pdf/2607.10875v1
+
+Published Time: Tue, 14 Jul 2026 02:35:45 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+## Spreading and rupture dynamics of soluble surfactant-laden thin film flow down a slippery incline in presence of external shear 
+
+Dipankar Paul ∗
+
+Department of Mathematics, SRM Institute of Science and Technology, Chennai, India 
+
+Harekrushna Behera †
+
+Center of Excellence for Ocean Engineering, National Taiwan Ocean University, Keelung 202301, Taiwan 
+
+The spreading and rupture of local distribution of surfactant on a slippery inclined thin film flow in the presence of external shear is explored in this article. The surfactant can be adsorbed at the free surface or can be dissolved in the bulk. The surfactant concentrations are governed by advection and diffusion equations for bulk as well as the interface. Moreover, the adsorption-desorption rates of the bulk and interface surfactants are regulated by sorption kinetics rates. The van der Waals forces are considered for rupture dynamics. The lubrication approximation method is used to derive the evolution equations of film thickness and interface surfactant concentration. Also, the rapid vertical diffusion is considered for cross-sectional averaged concentration to derive the evolution equation of bulk surfactant concentration. Besides, van der Waals forces are taken into account to observe the rupture dynamics. Two different scenarios are considered for sorption kinetics rates: (i) rapid and (ii) slow in the case of the spreading phenomenon. Then, two cases are considered related to the distribution of the surfactant in case of rapid sorption kinetics. The slippery bottom helps more fluid to flow and the capillary ridge to gain height for rapid sorption kinetics, and the external shear force amplifies the thinning of the film. However, in the case of slow sorption kinetics, the adsorption-desorption takes place at a slow rate, and the transient period results in a reduced Marangoni gradient at the interface. This leads to a pulse-type character in the film thickness profile. The external shear force reduces the pulse height, whereas a slippery surface at the bottom increases the pulse height. On the other hand, van der Waals forces are considered to be the major factor behind the rupture mechanism. The linear stability analysis depicts that external shear force destabilizes the flow, but the slip parameter displays a dual effect based on the Bond number, capillary number, and Hamaker constant. 
+
+I. INTRODUCTION 
+
+If a certain amount of surfactant is deposited on a thin film flow, then surface tension gradients will create flow, which eventually spreads the surfactants throughout. This phenomenon is called Marangoni spreading. For a thin film fluid with insoluble surfactant-laden flow, Marangoni spreading can generate significant deformation of the fluid layer, and film height exhibits shock at the leading edge of the monolayer [1–3]. On the other hand, if the surfactant is soluble, then film thickness demonstrates a pulse-like structure instead of a shock, with a steep slope at the upstream end[4]. This Marangoni spreading has a widespread application in the industrial sector, such as, ultra-clean technology [5], coating [6, 7], oil spreading on the sea [8], encapsulation process [9], pattern deposition [10, 11] and nature, as surface replacement therapy [12], drug delivery for airway infection [13, 14] etc. The lubrication approximation method [1, 3] is one of the most widely used mechanisms to handle the spreading phenomena of thin film flow [15, 16], droplet [17–19] etc [20]. This method allows studying wave propagation, flow of insoluble and soluble surfactant-laden flow, and flow over an incline, and has discovered some of the most interesting phenomena. Using this method, typically two nonlinear evolution equations are obtained involving film thickness 
+
+h(x, t ) and surfactant concentration Γ( x, t ). These equations are then solved either numerically or analytically to comprehend the spreading dynamics. For insoluble surfactant-contaminated thin film flow, Jensen and Grotberg [21] used lubrication theory and derived the similarity transformation to approximate the solutions along with numerical results, whereas Halpern and Grotberg [22] chose soluble surfactant-laden flow over a rigid bottom and ignored the sorption kinetics. As they considered thin film, the vertical diffusion is very fast, and there is an uninterrupted flux from the free surface to the bottom of the film. They observed that the flux of the liquid layer depends on the film thickness, and the surface tension gradients decline sporadically, so over an extended period of time, an area of weak reverse flow emerges. Jensen and Grotberg [4] chooses the same model with consideration of sorption kinetics along   
+
+> ∗dipankarpaul3103@gmail.com
+> †hkb.math@gmail.com arXiv:2607.10875v1 [physics.flu-dyn] 12 Jul 2026
+
+2with advection and diffusion to regulate the surfactant distribution. They found out that the transient desorption of the surfactant from the free surface to the bulk flow slows down the spreading rate, but once the concentrations of the surfactant species are in equilibrium, a steep shock emerges in the film thickness upstream of the leading edge of the monolayer. Jensen et al. [23] extended their previous work [4] by allowing the bottom to absorb the solute and the transportation of the passive solute. They reported that transportation of solute by spreading a strip of insoluble surfactant-driven flow takes place in two stages, with the first part comprising vertical diffusion, and if at the end of this stage, solute is not absorbed by the bottom layer, then horizontal diffusion dominates in the second step. Moreover, the spreading of insoluble surfactant monolayer as a planar strip and axisymmetric drop on deep viscous fluid is explored by Jensen [24]. They noticed that at the initial stage, a laminar subsurface boundary layer flow developed, and capillarity, gravity, and diffusion were influential at this stage, but at a sufficiently large prescribed time, the flow transitioned to a viscous-dominated flow. Further, fingering instability identified in experimental studies led Matar and Troian to a series [25–28] of inves-tigations on surfactant spreading over a thin film in the presence of external factors such as capillarity, diffusion, van der Waals forces, and Marangoni forces through linear stability and transient growth analyses along with direct numerical simulation for nonlinear equations. They observed that substantial growth can be achieved for significant van der Waals forces; however, large transient growth can be noticed with decay to follow if those forces are absent. Fischer and Troian [29] chooses a different methodology to describe this same model and observed that large transient growth occurs if there is sufficient time for surfactant gradient and film thickness to develop their characteristic kink and shock at the leading edge of the monolayer. Also, these structures are delicate in nature to disturbances and usually appear in the spreading region. The dynamics of the surfactant-laden flow are examined by Edmonstone et al. [30], where they noted the formation of capillary ridges due to the Marangoni forces, and their transient growth analysis reveals that the film is linearly unstable to the transverse disturbances with maximum growth at the moderate wavenumbers. Warner et al. [16] investigated the linear and nonlinear stability analysis of insoluble surfactant spreading over a thin film using transient growth analysis and direct numerical analysis. They observed prominent ridge formation at the leading edge, but due to mass conservation, the interface goes through thinning upstream of the leading edge. Moreover, they concluded that this thinning zone is unstable in the spanwise direction because of the fingering instability. The spreading of a surfactant-laden drop over a thin liquid layer is examined by Jensen and Naire [31]. They observed that the initial conditions have a major influence on the spreading rates, as the initial condition influences the contact line before the droplet. Moreover, thinning can appear in the neighbourhood of the contact line because the large surfactant gradient at the beginning can forbid the transport of the solute before the droplet. Kovalchuk et al. [15] performed an experimental study with two different types of surfactants, triethylene glycol monodecyl ether C10 EO 3 and trisiloxane superspreader, ( BT − 278) to observe the wetting and adsorption kinetics. They reported that BT − 278 drops spread more rapidly than the C10 EO 3 and mentioned that the flow due to the surface tension gradient induced Marangoni stress is a pivotal element in the spreading of the surfactant drops. Furthermore, the effect of the fluid thickness on surfactant spreading is explored by Bergemann et al. [32]. They concluded that if the film thickness is very small, then the drop creates a steep front, which creates minimal disturbance to the fluid layer in front of it. In case of moderate thickness, the drop generates a wedge-like structure and produces substantial perturbation to the fluid layer ahead of the drop, and for a thick layer, the drop sinks into the layer and causes upwelling in the fluid layer and forms a transient bulge, and when this bulge is influenced by the gravity, the leading edge of the drop displays a wedge-like profile with a smaller angle. If the surface tension gradients caused by surfactant distribution are sufficiently large, then they can lead to the deformation of the thin film in the draining part to cause rupture [21, 33, 34]. The study [35] of stability of film rupture has been the subject of extensive research over the past few decades because of its applicability as a medium to transport aerosol in alveoli [36], assisting in cell adhesion in aqueous surroundings [37], treatment of dry eye syndrome [33, 38] etc. Derjaguin [39] was one of the earliest works available in the literature. Then, extensive investigations [38, 40–45] are conducted in the subsequent years, where predominantly long-range van der Waals forces are considered as the major mechanism behind the rupture. These kinds of forces are feasible for a fluid of thickness 100 − 1000 ˚ A. Moreover, the aforementioned research articles took into account the other forces such as surface tension, surfactant, evaporation, etc. In the current study, soluble surfactant-laden flow is considered. In that case, desorption and adsorption between the interfacial and bulk surfactant concentrations are regulated through the flux condition, and this condition helps to reduce the effect of Marangoni stress ([45, 46] and the reference therein). Previously, Matar [41] examined the rupture dynamics of soluble surfactant-laden flow. They derived the one-dimensional nonlinear film thickness equation in the rapid diffusion limit and high-order long-wave theory. In case of slow diffusion, a one-dimensional bulk concentration model was also approximated. Their numerical results showed that the van der Waals forces, sorption kinetics rates, and surfactant solubility advance the rupture of the film. Recently, the stability analysis of soluble surfactant-contaminated trilayer thin film to observe the rupture of the thin film between two droplets during coalescence was explored by Yang et al. [44]. They observed that surfactant solubility reduces the 3effect of Marangoni stress by diminishing interfacial surfactant gradients for symmetric outer-layer thickness, and the impact of soluble surfactant depends on the thickness of the layers. Most of the aforementioned studies subtly overlook the vertical concentration gradients by introducing the rapid diffusion, which allows the concentration of the bulk surfactant to be represented by the cross-sectional average value. Yang et al. [45] addresses this issue by considering a 2-dimensional description of the bulk surfactant concentration along with a traditional vertical averaging approximation and performs a comparative analysis between the two approaches. At initial stages of surfactant equilibrium, they noticed that vertical average approximation inaccuracy for prediction of the rupture time is below 10 % for surfactant with P e ∼ 10 4, but that increased up to 40 % for surfactant with P e ∼ with 10 6.Most of the above studies focused on the spreading and rupture of thin film flow over solid substrates except Zhang et al. [42]. However, their study considered insoluble surfactant-laden flow. But, in general, the bottom surface is not smooth and can be very different from being solid. There are several studies that suggest the conventional is not suited for hydrophilic liquid flow over hydrophobic boundaries at both nano- and micro-scales [47–50]. Experimental results of hydrophilic flow over hydrophobic surfaces are consistent with the Navier slip condition [35, 51]. Using the condition, Bhat and Samanta [52] investigated the stability analysis of insoluble surfactant-contaminated fluid flow over a slippery bottom. They observed different modes and noted that the P´ eclet number associated with the surfactant segregates the shear mode region into two different parts with contrasting behaviour. On the other hand, externally imposed shear stress is one of the important mechanisms to regulate the thin film flow. Smith [53] being one of the earliest to use external shear on the free surface in thin film flow dynamics. They reported that the stress induced by external shear influences the base flow and subsequently intensifies longitudinal flow disturbances. Due to its physical significance, such as bolus dispersal in the lungs during surfactant replacement theory [54] or airway closure method [55], it is used in numerous studies [56, 57]. Samanta [58] considered externally imposed shear as tangential stress destabilizes the flow near the criticality but stabilizes for large values of the Reynolds number. The influence of externally imposed shear on insoluble surfactant-coated thin film flow is investigated by Bhat and Samanta [59]. They observed three modes: surface mode, surfactant mode, and shear mode instability with external shear force, unstable surface, and surfactant modes. Paul et al. [60] investigates the effect of external shear for soluble surfactant-contaminated thin film flow over an inclined slippery plane. They recognized the three modes observed previously[56, 59]. Moreover, they found out that the surfactant parameter βa, and sorption kinetics parameter ka stabilize the surfactant mode, whereas the solubility parameter Ra destabilizes the surfactant mode. The above discussion indicates that the spreading phenomenon of surfactant-laden thin film flow is studied in detail, but the dual effect of the external shear force and slippery bottom on the spreading and rupture of soluble surfactant-laden flow has not been investigated till now, as per the knowledge of the authors. This motivates the authors to extend the work of Jensen and Grotberg [4] for externally imposed shear force and slippery bottom. In that context, the lubrication approximation is applied to the governing equations. Then, the evolution equations of the film thickness and surfactant concentration are derived and solved numerically. Section II is dedicated to the mathematical modeling, and the numerical investigation is enclosed in Section III. Then, the rupture mechanism is discussed in section IV. Finally, the summary and conclusion are given in Section V.  
+
+> II. MATHEMATICAL MODEL & NON-DIMENSIONALISATION
+
+An incompressible, Newtonian fluid filled with non-volatile soluble surfactant and flowing down a hydrophobic incline is considered here. An externally imposed shear force is also assumed to act along the free surface. The angle of inclination of the incline with the is ξ. The concentration of the bulk surfactant is assumed to be below CMC, so the emergence of a micelle is ignored. Also, the surfactant may dissolve in the bulk or be adsorbed at the surface. The dimensional governing equations along with the boundary conditions can be found in Paul et al. [60]. The characteristic length L of the thin film flow is substantially greater than the depth H of the fluid layer. So, 
+
+ε = HL ≪ 1which allows the application of the lubrication approximation. Now, before transforming the equations into dimen-sionless form under the framework of lubrication approximation, it is important to identify the dominant forces driving the system and create appropriate scales for the physical relevance of the scales. In the case of thin film flow, the van der Waals force is one of the major factors that instigate the disturbance. This kind of instability can be explained through height-dependent disjoining pressure. The external disturbances experienced by a sufficiently thin film (of thickness 100 − 1000 ˚ A as attractive van der Waals forces are operative for fluid thickness of that range) promote higher disjoining pressure at the troughs compared to the crests of the perturbed thin flow, which drives the fluid away from the troughs and intensifies the disturbances. However, viscosity and capillarity of the free surface promote stability by opposing the effect of van der Waals forces. The competition 4
+
+> FIG. 1. The schematic diagram of thin film fluid flow contaminated with soluble surfactant over a slippery inclined plane in the presence of external shear.
+
+between these forces creates an imbalance of forces within the system, and after a threshold wavenumber, the dispersion forces become dominant, which leads to the rupture of the thin film [34, 40, 41, 43–45, 61]. Also, it is feasible to estimate the wavelength at which the perturbation growth rate would attain the maxima that trigger the rupture [34, 41, 43–45]. Here, the planar distribution of the surfactant is considered for simplicity. Moreover, the difference in surface tension between the surfactant-free interface and the surfactant-adsorbed interface is S, which is the spreading coefficient. So, 
+
+S = σc − σm
+
+where σc and σm represent the surface tension of the clean fluid and surfactant-absorbed interface, respectively. Then the following non-dimensional scales: 
+
+x = L¯x; y = H¯y; h = H¯h; u = U¯u; v = εU¯v; t = LU ¯t; p = μvisc UL H2 ¯p;Γa = Γ a,eq ¯Γa; Γ = k1
+
+k2Γa,eq 
+
+¯Γ; Jba = UΓa,eq 
+
+L ¯Jba ; μ = μvisc UH ¯μ; σ = σm + S¯σ;
+
+U = SH 
+
+μvisc L ; Σ = σc
+
+σm
+
+; δ = δs
+
+H ; ka = k2LU ;are used for the applicability of lubrication approximation theory. Here, k1 is the adsorption rate and k2 is the desorption rate. It is noteworthy to mention the potential energy φ per volume in the liquid due to the effect of the van der Waals force. The potential energy is defined [21, 38, 61] as 
+
+φ(h) = A
+
+6πh 3
+
+with A the Hamaker constant, and its dimensionless form is defined by A = 6 πSH 2 ¯A.The dimensionless Shelduko equation of state [21, 60, 62] is considered 
+
+σ = ( α + 1) [1 + θ(α)Γ a]−3 − α
+
+for surface tension profile. Here, θ(α) = 
+
+ α + 1 
+
+α
+
+1/3
+
+− 1 with α = σm
+
+S .Using the above scaling, all the governing equations and the boundary conditions are made dimensionless, and following the lubrication approximation [21, 45], the terms of O(ε2) are ignored for brevity. Moreover, throughout the article, the distribution of surfactant is considered to be of a planar type. Also, the overhead bars are suppressed from the 5dimensionless variables. The free surface or interface is considered at y = h(x, t ). Hence, dimensionless governing equations at the leading order ( O(1)) are 
+
+ux + vy = 0 , (1) 
+
+uyy + Bo = ( p + φ)x, (2) 
+
+py = 0 , (3) where Bo = ρg sin( ξ)HL S . The dimensionless tangential stress condition at y = h(x, t ) will be 
+
+uy = σx + μ. (4) and the kinematic boundary condition is 
+
+v = ht + uh x, (5) The leading-order dimensionless normal stress boundary condition is 
+
+p y=h
+
+= −C hxx , (6) where C = ε2Ca = ε2 σm
+
+S corresponds to the capillary effect. The dimensionless interface surfactant transport equation at the interface O(1) is Γa,t + ( uΓa)x = 1
+
+P e s
+
+Γa,xx + Jba (7) and the bulk surfactant transportation equation is Γt + uΓx + vΓy = 1
+
+P e b
+
+
+
+Γxx + 1
+
+ε2 Γyy 
+
+
+
+. (8) Here, P e s = UL 
+
+Ds
+
+and P e b = UL 
+
+Db
+
+are the P´ eclet numbers corresponding to the interface and the monomers in the bulk, respectively, with Ds, and Db being the diffusivity coefficients corresponding to the interface and bulk surfactant, respectively. It is to be noted that (8) retains a term O(1 /ε 2), which is kept intentionally, as the rapid vertical diffusion will be explored in Section II B where ε2P e b ≪ 1 is considered. The Navier-slip [51] and no penetration boundary conditions at the bottom are 
+
+u = δu y ; v = 0 (9) At the beginning of the surfactant deposition, it is assumed that it behaves as a surface monolayer. Also, during the transitional phase when surfactant molecules desorb from the interface and enter the bulk fluid, linearized sorption kinetics are considered. Thus, the flux of surfactant at the interface can be described as 
+
+J(Γ a, Γ
+
+> y=h
+
+) = − 1
+
+βaP e b
+
+(n · ∇Γ) 
+
+> y=h
+
+= ka
+
+(
+
+Γ
+
+> y=h
+
+(1 − Γa) − Γa
+
+)
+
+(10) where Γ a, Γ y=h
+
+are the dimensionless surfactant concentrations of the interface and bulk. Now, if ka = k2T is the ratio between the time scale of the flow and the time scale of desorption, then after a period of O(1 /k a), the interface and bulk surfactant concentrations reach an instantaneous equilibrium due to the linearized Langmuir isotherm and the adsorption and desorption fluxes balance. That gives Γ a = ( k1/k 2)Γ 
+
+> y=h
+
+in dimensional form and becomes Γa = Γ 
+
+> y=h
+
+in dimensionless form. The flux equation (10) can be written as 
+
+Jba = 1
+
+βa
+
+
+
+− 1
+
+ε2P e b
+
+Γy + 1
+
+P e b
+
+hxΓx
+
+
+
+> y=h
+
+= ka
+
+(
+
+Γ
+
+> y=h
+
+(1 − Γa) − Γa
+
+)
+
+, (11) 6where βa = Γa∞
+
+HΓCM C 
+
+= k1
+
+k2H is the ratio between the rates of adsorption and desorption. That means if βa is large, then the adsorption rate is high, and the surfactant concentrates near the interface and behaves as an insoluble surfactant. However, if βa is small, then the desorption rate dominates the adsorption rate, and the surfactant dissolves within the bulk fluid. Finally, if there is no flux of surfactant at the bottom, then Γy = 0 , at y = 0 . (12) The no flux condition at the bottom guarantees the conservation of the total mass of the different species of surfactant from the equations (7) and (8), so 
+
+M =
+
+Z ∞
+
+> 0
+
+Γadx + 1
+
+βa
+
+Z ∞
+
+> 0
+
+Z h(x,t )0
+
+Γdz 
+
+!
+
+dx (13)  
+
+> A. Evolution equation
+
+This subsection is devoted to deriving the evolution equation of the film thickness. First of all, the equation (3) is solved using the appropriate boundary conditions at (6) which gives 
+
+p(x, y, t ) = −C hxx (14) Then, solving the equation (2) with boundary conditions at (4) & (9), we get 
+
+u(x, y, t ) = 
+
+
+
+− 3( α + 1) θ(α)(1 + θ(α)Γ a)4 Γa,x + μ
+
+
+
+(y + δ) + 
+
+
+
+Bo +
+
+
+
+Chxx − A
+
+h3
+
+
+
+> x
+
+  
+
+hδ + ( h − δ)y − y2
+
+2
+
+
+
+. (15) Now, substituting the expression (15) on the kinematic equation (5), 
+
+ht +
+
+ 
+
+− 3( α + 1) θ(α)(1 + θ(α)Γ a)4 Γa,x + μ
+
+  h2
+
+2 + δh 
+
+
+
++
+
+
+
+Bo +
+
+
+
+Chxx − A
+
+h3
+
+
+
+> x
+
+  13 h3 + δ
+
+2 h2
+
+ 
+
+> x
+
+= 0 , (16) and the evolution equation (7) for surfactant monomers, Γa,t +
+
+ 
+
+− 3( α + 1) θ(α)(1 + θ(α)Γ a)4 Γa,x + μ
+
+
+
+(h + δ) + 
+
+
+
+Bo +
+
+
+
+Chxx − A
+
+h3
+
+
+
+> x
+
+ h2
+
+2
+
+
+
+Γa
+
+
+
+> x
+
+= 1
+
+P e s
+
+Γa,xx 
+
++ka
+
+"
+
+Γ
+
+> y=h
+
+(1 − Γa) − Γa
+
+#
+
+(17)  
+
+> B. Cross-Sectional Average
+
+The spreading of aqueous surfactant solution on thin film flow accompanies the risk of the emergence of fingering instability. This phenomenon can be smoothed out by eradicating vertical variations. To do that, rapid vertical diffusion can be a useful tool. For that ε2P e b ≪ 1 is considered. Then, the surfactant bulk concentration can be segregated into components comprising Γ 0(x, t ) independent of y and an infinitesimal fluctuation Γ 1(x, y, t ) that has zero vertical average, such as Γ( x, y, t ) = Γ 0(x, t ) + ε2Γ1(x, y, t ), (18) with ¯Γ1 = 1
+
+h
+
+Z h
+
+> 0
+
+Γ1(x, y, t )dy = 0 (19) as considered in the literature[4, 16, 63]. Substituting (18) in (7) results in, Γa,t +
+
+hnn 
+
+− 3( α+1) θ(α)(1+ θ(α)Γ a)4 Γa,x + μ
+
+
+
+(h + δ) +  Bo +  Chxx − A
+
+> h3
+
+
+
+> x
+
+ h2
+
+> 2
+
+oo 
+
+Γa
+
+i
+
+> x
+
+= 1
+
+P e s
+
+Γa,xx + ka [Γ 0(1 − Γa) − Γa] + O(ε2). (20) 7Again, the expression (18) is substituted in the equation (8) and then integrated with respect to ‘ y’ over the interval [0 , h ] and then divided by the film thickness gives, Γ0,t +
+
+hn 
+
+− 3( α+1) θ(α)(1+ θ(α)Γ a)4 Γa,x + μ
+
+o   h 
+
+> 2
+
++ δ + Bo +  Chxx − A
+
+> h3
+
+
+
+> x
+
+  13 h2 + δ 
+
+> 2
+
+hi
+
+Γ0,x 
+
+− (hΓ0,x )x
+
+hP e b
+
++ βa
+
+h ka [(1 − Γa) Γ 0 − Γa] = O(ε2) (21) Now, for simplicity, all the O(ε2) terms are ignored. Hence, the evolution equations of film thickness and surfactant concentration of the interface and the bulk are given by (16), (20), (21), respectively. If ka → 0, then there will be no sorption kinetics, and the problem reduces to insoluble surfactant-laden thin film flow. However, if ka → ∞ , then sorption rates are extremely fast, and the bulk and surface surfactants reach equilibrium such that Γ a(x, t ) = Γ 0(x, t )at the leading order. But still, there exists a brisk diffusive flux between the surface and bulk surfactant concentrations, which acts on any spatial or temporal disturbances. So, eliminating the flux terms between the equations (19) & (20), 
+
+h
+
+
+
+Γ0,t +
+
+hn 
+
+− 3( α+1) θ(α)(1+ θ(α)Γ a)4 Γa,x + μ
+
+o   h 
+
+> 2
+
++ δ + Bo +  Chxx − A
+
+> h3
+
+
+
+> x
+
+  13 h2 + δ 
+
+> 2
+
+hi
+
+Γ0,x − (hΓ0,x )x
+
+hP e b
+
+
+
++βa
+
+
+
+Γa,t +
+
+hnn 
+
+− 3( α+1) θ(α)(1+ θ(α)Γ a)4 Γa,x + μ
+
+
+
+(h + δ) +  Bo +  Chxx − A
+
+> h3
+
+
+
+> x
+
+ h2
+
+> 2
+
+oo 
+
+Γa
+
+i
+
+> x
+
+− 1
+
+P e s
+
+Γa,xx 
+
+
+
+= 0 , (22) Now, if the stream function is defined as 
+
+u = ∂ψ ∂y ; v = − ∂ψ ∂x (23) then, the stream function can be calculated as 
+
+ψ(x, y, t ) = 
+
+Z y
+
+> 0
+
+u(x, y, t )dy. (24)  
+
+> III. NUMERICAL SIMULATIONS AND DISCUSSION
+
+The set of equations (16), (20),(21) reveals that there will be an evanescent period of O(1 /k a) when the surfactant species will come to local equilibrium. Thus, the equations (16), (22) can be used to describe the dynamics of the system. Hence, the spreading of the surfactant-laden flow will be analyzed in two perspectives: ( i) for rapid sorption kinetics ka ≫ 1, ( ii ) for slow sorption kinetics ka ≪ 1. Moreover, the distribution of surfactant is one of the important aspects that needs to be considered. Here, two types, (i) strip and (ii) front distributions, are taken into account following Jensen and Grotberg [4, 21]. In each scenario, the equations are solved numerically using a central difference scheme for the spatial variable and Gear’s method [3, 4] in time.     
+
+> A. Rapid sorption kinetics (ka≫1)
+
+The impact of gravity, van der Waals forces, and capillarity is ignored during the exploration of the spreading phenomena, so the Marangoni forces and viscous effect will be two possible forces impacting the spreading of surfactant in the case of rapid sorption kinetics. One of the distributions is a planar strip for which the no-flux boundary condition is imposed at x = 0, and the other one is an advancing front with a flux boundary condition applied at x = 0. To gain sufficient numerical advantages, following Jensen and Grotberg [4], the evolution equations are transformed.  
+
+> 1. Strip
+
+In case of βa → ∞ and for large values of the interface surfactant P´ eclet number P e s, the width of the spreading surfactant monolayer strip grows proportionally to t1/3. This scaling is even valid for soluble surfactant-contaminated flow [4]. So, define, 
+
+ζ = xt1/3 ; τ = t; H(ζ, τ ) = h(x, t ); F(ζ, τ ) = t1/3Γ0(x, t ) (25) 8and the equations (16) & (22) converts into 
+
+τ Hτ − 13 ζHζ +
+
+ 12
+
+
+
+− 3( α)θ(α)τ 4/3
+
+(τ 1/3 + θ(α)F )4 Fζ + μτ 2/3
+
+  H2 + 2 δH
+
+> ζ
+
+= 0 , (26) 
+
+H
+
+(
+
+τ Fτ − 13 (ζF)ζ +
+
+"
+
+− 3( α + 1) θ(α)2  τ 1/3 + θ(α)F4 F2 
+
+> ζ
+
++ μ
+
+2 τ 1/3
+
+!
+
+(H + 2 δ)
+
+#
+
+Fζ − τ 1/3 (HF ζ )ζ
+
+HP e b
+
+)
+
++βa
+
+τ Fτ − 13 (ζF)ζ +
+
+"
+
+− 3( α + 1) θ(α)
+
+ τ 1/3 + θ(α)F4 Fζ + μτ 1/3
+
+!
+
+(H + δ)F
+
+#
+
+> ζ
+
++ 1
+
+P e s
+
+τ 1/3Fζζ 
+
+ = 0 . (27) The equations (26) & (27) are solved using the aforementioned method, and the initial condition used here is 
+
+H(ζ, 1) = 1; F(ζ, 1) = 12
+
+
+
+1 − tanh 
+
+ ζ − 0.50.1
+
+ 
+
+. (28) In order to solve the above boundary value problem, Gear’s method based on the built-in solver “GMRES” is used from the package “IterativeSolvers.jl” using Julia programming language [64].                               
+
+> FIG. 2. The (a) H, and (b) Fprofiles for a soluble surfactant-laden spreading strip in case of fast sorption kinetics by solving the set of equations (26)-(27) subjected to the boundary conditions (28). These profiles are obtained when σx= Γ xas was considered by Jensen and Grotberg [4] in the absence of external shear force ( μ= 0 .0) and no-slip bottom condition (i.e., δ= 0 .0). The profiles are plotted at time
+> τ= 1 .05 ,1.1,1.2,1.5,2.0,5.0. The red bullets are the data points obtained from Figure 2(a) of Jensen and Grotberg [4] for τ= 5 .0. The relevant parameters are P e s= 100 .0, P e b= 100 .0, ξm= 0 .25, ξw= 0 .1
+
+The H and F profiles in the figures (2) are plotted in the absence of externally imposed shear force ( μ = 0 .0) and slip length ( δ = 0 .0) along with a linear interface surfactant profile ( σx = −Γx). The red bullets are data points obtained from Figure 2(a) of Jensen and Grotberg [4] for τ = 5 .0. It can be seen that the results are in good agreement. Figure 2(a) shows that, as the planar strip of surfactant spreads, the film surges at the leading edge of the surfactant monolayer and a thinning in the film thickness occurs behind the surge. A shock-like structure is formed initially but smoothed as time advances due to the diffusion and capillarity. The surfactant concentration maintains a fairly uniform distribution except at the shock and at the upstream end. The figures (3) illustrate the effects of externally imposed shear μ and slip parameters δ on the spreading dynamics of strip-type distribution of soluble surfactant thin-film flow. In the absence of a slippery bottom (see figure (3(a) - 3(c))), the film thickness experiences Marangoni thinning at the surfactant deposition zone, as a surfactant concentration gradient influences the liquid outward, which creates a capillary ridge at the leading edge of the monomer. However, with the introduction of a slippery bottom, the resistance at the bottom reduces, and the base of the capillary ridge undergoes less viscous drag. Hence, the fluid front spreads faster and advances horizontally sooner compared to the no-slip scenario. On the other hand, the introduction of external shear acts as an auxiliary driving force besides Marangoni stress. Consequently, the increased external shear amplifies the thinning of the film and drives the capillary ridge at a faster rate. As the slip parameter δ and external shear τ drive the spreading of the surfactant much faster, the state of equilibrium between the surfactant at the interface and the bulk due to the rapid sorption kinetics dilutes the localized concentration peaks over time (see figures (3(d) - 3(f))). 9                
+
+> (a) δ= 0 .00 (b) δ= 0 .04 (c) δ= 0 .08
+> (d) δ= 0 .00 (e) δ= 0 .04 (f) δ= 0 .08
+
+Figure 3. The variation of (a)-(c) H, (d)-(f) F profile at δ = 0 .00 , 0.04 , 0.08 respectively for a soluble surfactant-laden spreading strip in the case of fast sorption kinetics by varying the externally imposed shear force. The solid, dashed, dotted, and dash-dot curves correspond to                 
+
+> τ= 1 .05 ,1.1,1.5,5.0. The relevant parameters are βa= 1 .0, P e s= 1 .0, P e b= 1 .0, α= 0 .25, ξm= 0 .25, ξw= 0 .1.
+
+In the following figures (4), the film thickness H and the corresponding surfactant concentration F are plotted for different external shear μ. In the absence of a slippery bottom (figures 4(a)-4(c)), the higher viscous drag near the bottom reduces the amount of fluid that can be accumulated at the shock at the leading edge of the monomer deposition. But as soon as a hydrophobic substrate is considered, the viscous drag or the friction at the bottom reduces, a greater volume of fluid is transported, and it piles up in the shock front and heightens it. In contrast, in the absence of external shear force ( μ = 0 .0), the shock is primarily driven by the localized surfactant gradient or Marangoni stress, and slip bottom increases the shock amplitude and flattens the film. However, the positive external shear force provides a constant momentum at the interface, and paired with the slip parameter, the film experiences less resistance at the bottom, which in turn shows an advancing front and sharper capillary ridge. The surfactant concentration F attains the peak value, and with increasing slip length, the peak drops more quickly, but the surfactant distribution spreads over a substantially wider spatial domain (see figures 4(d)-4(f)). The positive slip length increases the convective transport of the fluid interface, and since the surfactant is distributed in a faster interface, the distribution of the surfactant is spread much more quickly. The individual effect of slip parameter δ in the absence of external shear μ on the streamfunction is portrayed in figures 5(a) - 5(c). It can be seen in all the figures that the closed recirculation vortex is created near the deposition of surfactant and bounded next to the region behind the capillary ridge. The viscous drag at the bottom wall in the case of no-slip forces the streamlines to attain a zero velocity and squeezes the vortex vertically. By contrast, the slippery substrate stimulates the streamlines near the bottom wall to gain momentum and the lower part of the vortex to slide along the slippery wall. The slippery walls help more fluid to slide along and help the shock fronts to gain volume and become elongated and shift forward. Moreover, the solitary effect of external shear μ in the absence of slip length 
+
+δ on the streamfunction is shown in figures 5(d) - 5(e). The streamlines clearly suggest that the external shear force inserts a uniform forward momentum along the streamwise direction across the entire interface. Also, the increasing external shear force pushes the recirculation vortex towards the front edge of the monomer, compacting it vertically. The shear force propels the top layer of the fluid so firmly that the vortex is pinned near the bottom layer and the streamlines near the recirculation zone become almost vertical (see figure 5(e)). Next, the combined effect of external shear force and slippery bottom on the streamfunction is explored in Figure 5(f). In this scenario, the vortex at the 10 
+
+(a) μ = 0 .0 (b) μ = 0 .05 (c) μ = 0 .1
+
+(d) μ = 0 .0 (e) μ = 0 .05 (f) μ = 0 .1
+
+Figure 4. The variation of (a)-(c) H, (d)-(f) F profile at μ = 0 .0, 0.05 , 0.1 respectively for a soluble surfactant-laden spreading strip in the case of fast sorption kinetics by varying the slip length. The solid, dashed, dotted, and dash-dot curves correspond to τ = 1 .05 , 1.1, 1.5, 5.0. The relevant parameters are βa = 1 .0, P e s = 1 .0, P e b = 1 .0, α = 0 .25, ξm = 0 .25, ξw = 0 .1. 
+
+recirculation zone is stretched out along the swelling as the acceleration due to the external shear along the interface and slide along the slippery bottom moves more fluid volume into the accelerating wedge as the viscous dissipation within the vortex reduces. 
+
+2. Front 
+
+If the supply rate of surfactant to a monolayer is chosen at t1/2 instead of t1/3, then the growth rate of monolayer length and shock becomes the same, and it continues to be so [1, 4, 21]. The transformation for this scenario can be considered as 
+
+ζ = xt1/2 ; τ = t; H(ζ, τ ) = h(x, t ); F(ζ, τ ) = Γ 0(x, t ) (29) and the total mass of surfactant will be 
+
+M = Mt1/2, where M =
+
+Z ∞
+
+> 0
+
+ H
+
+βa
+
++ 1 
+
+
+
+Fdζ. (30) With the transformations (29), the evolution equations (16) & (22) reduces to 11 
+
+(a) μ = 0 .00 , δ = 0 .00 (b) μ = 0 .00 , δ = 0 .04 (c) μ = 0 .00 , δ = 0 .08 
+
+(d) μ = 0 .05 , δ = 0 .00 (e) μ = 0 .1, δ = 0 .00 (f) μ = 0 .05 , δ = 0 .04 
+
+Figure 5. The streamfunction of the H- profile for (a) μ = 0 .0, δ = 0 .0, (b) μ = 0 .0, δ = 0 .04, (c) μ = 0 .0, δ = 0 .08, (d) μ = 0 .05 , δ = 0 .0, (e)                    
+
+> μ= 0 .1, δ = 0 .0, (f) μ= 0 .05 , δ = 0 .04 at time τ= 5 .0. The relevant parameters are βa= 1 .0, P e s= 10 .0, P e b= 10 .0, α= 1 /7, ξm= 0 .25,
+> ξw= 0 .1.
+
+τ Hτ − 12 ζHζ +
+
+ H2 + 2 δH 
+
+− 3( α + 1) θ(α)(1 + θ(α)F)4 Fζ + μ
+
+2 τ 1/2
+
+ 
+
+> ζ
+
+= 0 , (31) 
+
+H
+
+(
+
+τ Fτ − 12 ζFζ +
+
+"
+
+− 3( α + 1) θ(α)2 (1 + θ(α)F)4 Fζ + μ
+
+2 τ 1/2
+
+!
+
+(H + 2 δ)
+
+#
+
+Fζ + (HF ζ )ζ
+
+HP e b
+
+)
+
++βa
+
+τ Fτ − 12 ζFζ +
+
+"
+
+− 3( α + 1) θ(α)(1 + θ(α)F)4 Fζ + μτ 1/2
+
+!
+
+(H + δ) F
+
+#
+
+> ζ
+
++ 1
+
+P e s
+
+Fζζ 
+
+ = 0 . (32) Here, the diffusion terms have no explicit time dependence, so the equations (31)-(32) conserve the total mass of the surfactant M during the flow, with the availability of the upstream boundary condition 
+
+M + 2 Fζ
+
+ H
+
+βa
+
+ 1
+
+P e b
+
++ HF 
+
+2
+
+
+
++ 1
+
+P e s
+
++ HF 
+
+
+
+= 0 , at ζ = 0 . (33) The equations (31)-(32) were solved using the methods previously mentioned with the following initial conditions 
+
+H(ζ, 1) = 1 and (34) 
+
+ζ − ζm + ζm
+
+ζa
+
+F 
+
+> τ=1
+
++ ν log 
+
+
+
+F 
+
+> τ=1
+
+
+
+= 0 , with ν ≪ 1. (35) Figures (6) illustrate the combined effect of external shear force μ and slip parameter δ on the film thickness 
+
+H and surfactant concentration F in the case of front-type surfactant distribution. In this kind of distribution, a localized Marangoni stress is created at the leading edge, which drives fluid from the contaminated to the clean region, 12                 
+
+> (a) δ= 0 .00 (b) δ= 0 .04 (c) δ= 0 .08
+> (d) δ= 0 .00 (e) δ= 0 .04 (f) δ= 0 .08
+
+Figure 6. The variation (a) H, and (b) F profile for a soluble surfactant-laden spreading front in the case of fast sorption kinetics by varying the externally imposed shear force. The solid, dashed, dotted, and dash-dot curves correspond to τ = 1 .05 , 1.1, 1.5, 3.0. The relevant parameters are βa = 1 .0, P e s = 10 .0, P e b = 1 .0, α = 1 /7, ξm = 1 .36, ξa = 0 .5, ν = 0 .02. 
+
+generating a hump, which is followed by a depressed thinning region due to the drainage of fluid to the hump (see figure 6(a)). In the absence of a slippery bottom (i.e., δ = 0 .0), the increasing external force μ pushes the hump front downstream, and the steep slope of the upstream gets even more elevated. But, as slip length is introduced and increased, the hump gets even taller and advances much more rapidly, as can be seen from figures 6(a)-6(c). Physically, a slippery bottom relaxes the wall friction, which helps fluid to accelerate faster, and conservation of surfactant mass ensures the positive gradient along the free surface, which generates the hump. This hump gains height due to the more fluid sliding along the slippery substrate and the presence of external shear that pushes the advancing shock front. Furthermore, the convective velocity of the surfactant monolayer mainly depends on the surface velocity. As slippery bottom δ and external shear μ accelerate the surface advection [60], the surfactant front is transported at an amplified velocity and turns into a linear profile over a large time (see figures 6(d) - 6(f)). The figures (7) are plotted for different external shear forces μ by varying slip length δ in the case of front-type surfactant deposition. In each panel 7(a) - 7(c), it can be observed that as slip length δ is increased, the hump in the film thickness gets systematically taller. When δ = 0 .0, the viscous drag resists the fluid flow, but positive slip length (δ > 0) allows more volume of fluid to flux through, and this extra volume of fluid piles up in the pulse and increases its height. However, the increased external shear mobilizes the interface fluid and reduces the time for the extra volume of fluid (due to the slip bottom) to pile up in the pulse. The surfactant concentration F is impacted by external shear as it pushes the interface; the monolayer is also swept, which tends to increase the surfactant concentration for higher external shear force μ (see figures 7(d) - 7(f)). 13 
+
+(a) μ = 0 .00 (b) μ = 0 .03 (c) μ = 0 .06 
+
+(d) μ = 0 .00 (e) μ = 0 .03 (f) μ = 0 .06 
+
+Figure 7. The variation (a) H, and (b) F profile for a soluble surfactant-laden spreading front in the case of fast sorption kinetics by varying the slip parameter. The solid, dashed, dotted, and dash-dot curves correspond to τ = 1 .05 , 1.1, 1.5, 3.0. The relevant parameters are βa = 1 .0,            
+
+> P e s= 10 .0, P e b= 1 .0, α= 1 /7, ξm= 1 .36, ξa= 0 .5, ν= 0 .02.
+
+B. Slow sorption kinetics (ka ≪ 1) 
+
+1. Strip 
+
+This subsection is dedicated to deciphering the transient phase due to the slow sorption kinetics for the case of the spreading strip. So, it is convenient to transform the equations (18)-(20) with the following 
+
+ζ = xt1/3 ; τ = t; H(ζ, τ ) = h(x, t ); F(ζ, τ ) = t1/3Γ0(x, t ); G(ζ, τ ) = t1/3Γa(x, t ); (36) rules, which results in 
+
+τ Hτ − 13 ζHζ +
+
+ H2 + 2 δH 
+
+− 3( α + 1) θ(α)τ 1/3
+
+2( τ 1/3 + θ(α)G) Gζ + μ
+
+2 τ 2/3
+
+ 
+
+> ζ
+
+= 0 , (37) 
+
+τ Gτ − 13 (ζG)ζ +
+
+ 
+
+− 3( α + 1) θ(α)τ 4/3
+
+(τ 1/3 + θ(α)G) Gζ + μτ 2/3
+
+
+
+(H + δ) G
+
+
+
+> ζ
+
+− 1
+
+P e s
+
+τ 1/3Gζζ 
+
+−ka
+
+h
+
+F
+
+
+
+τ − τ 2/3G
+
+
+
+− τ G
+
+i
+
+= 0 , (38) 
+
+τ Fτ − 13 (ζF)ζ +
+
+
+
+− 3( α + 1) θ(α)τ 4/3
+
+2( τ 1/3 + θ(α)G) Gζ + μ
+
+2 τ 2/3
+
+
+
+(H + 2 δ) Fζ − 1
+
+HP e b
+
+τ 1/3 (HF ζ )ζ
+
+− 1
+
+H βaka
+
+h
+
+F
+
+
+
+τ − τ 2/3G
+
+
+
+− τ G
+
+i
+
+= 0 . (39) 14 These equations are solved with the initial conditions 
+
+H(ζ, 1) = 1 .0; 
+
+F(ζ, 1) = 0 .0; (40) 
+
+G(ζ, 1) = 12
+
+
+
+1 − tanh 
+
+ ζ − 0.50.1
+
+ 
+
+.
+
+(a) δ = 0 .00 (b) δ = 0 .04 (c) δ = 0 .08 
+
+(d) δ = 0 .00 (e) δ = 0 .04 (f) δ = 0 .08 
+
+(g) δ = 0 .00 (h) δ = 0 .04 (i) δ = 0 .08 
+
+Figure 8. The variation (a)-(c) H, (d)-(f) G, and (g)-(i) F profile for a soluble surfactant-laden spreading strip in case of slow sorption kinetics by varying the externally imposed shear force. The solid, dashed, dotted, and dash-dot curves correspond to τ = 1 .05 , 1.1, 2.0, 3.0. The relevant parameters are βa = 1 .0, P e s = 100 .0, P e b = 100 .0, α = 1 /7, ξm = 0 .25, ξw = 0 .1, ka = 1 .0, Ra = 1 .0. 
+
+The equations (37)-(39) are solved using the initial conditions at (40) and illustrated in the figures (8). It is important to note that in this case, the flux term is present and will play an important role in spreading dynamics. Here, the timescale of desorption is taken to be slow, so at the beginning, the distributed surfactant behaves more as an insoluble. This can be observed from the figures 8(a), where at the initial stages, i.e., τ = 1 .05 and τ = 1 .1, the film thickness displays a sharp shock at the surfactant deposition. As time passes, the desorption takes place in a transient period, and at this time, the surfactant dissolves into the bulk from the interface, which is observable from figures 8(d) 15 and 8(g), as the concentration of G decreases and F increases at the later part of the simulated results (see figures 8(d) and 8(g) at time τ = 2 .0 and τ = 3 .0). Moreover, as desorption happens, the amount of surfactant at the interface reduces, which relaxes the local Marangoni stress that consequently slows down the spreading rate. Now, the effect of the external shear force τ for different slip lengths δ is portrayed in the figures (8). These figures clearly show that as external shear force is in effect, it boosts the driving force of the fluid behind the leading edge, which leads to an additional thinning of the fluid thickness. This reduction in fluid volume amplifies the local surfactant concentration 
+
+F, which promotes the adsorption of surfactant from the bulk to the interface and eventually reaches equilibrium. Also, as time progresses, the interfacial surfactant concentration reduces due to the desorption, which moderates the local Marangoni stress and converts the film thickness from shock to pulse (see figure 8(a)). Furthermore, the external shear force μ reduces the pulse height systematically. Meanwhile, the slippery bottom helps the bulk fluid to move faster and also the bulk and interface surfactant to maintain the adsorption-desorption rates by reducing the concentration lag (see figures 8(a) - 8(i)).                         
+
+> (a) μ= 0 .00 (b) μ= 0 .05 (c) μ= 0 .10
+> (d) μ= 0 .00 (e) μ= 0 .05 (f) μ= 0 .10
+> (g) μ= 0 .00 (h) μ= 0 .05 (i) μ= 0 .10
+
+Figure 9. The variation (a) H, (b) G, and (c) F profile for a soluble surfactant-laden spreading strip in case of slow sorption kinetics by varying the slip parameter. The solid, dashed, dotted, and dash-dot curves are corresponding to τ = 1 .05 , 1.1, 2.0, 3.0. The relevant parameters are              
+
+> βa= 1 .0, P e s= 100 .0, P e b= 100 .0, α= 1 /7, ξm= 0 .25, ξw= 0 .1, ka= 1 .0.
+
+Figures (9) demonstrate the impact of the slip parameter on the film thickness H, surfactant concentrations F16 and G for some fixed external shear force μ. In case of no slip (see figure 9(a)), the viscous drag restricts the fluid volume to be drawn by the Marangoni gradient, which creates the shock, just like the case of strip-type distribution of rapid sorption kinetics; and in a similar way, when the slip parameter is introduced, more fluid passes through and accumulates at the pulse and helps the pulse gain the extra bit of volume because of the slippery bottom. More so, due to the assumption of cross-sectional average, squeezing of fluid film means the concentration of the bulk surfactant rises and it reaches up to a point where the concentration of bulk surfactant is more than that of the interface surfactant, which reverses the flux (see figures 9(d)-9(i)). As the introduction of a slippery bottom allows more fluid flow, so does more surfactant concentration spread; hence, the concentration G of interface surfactant reduces. On the contrary, the external shear force μ pushes the fluid and stretches the film horizontally, which acts as a suppression to reduce the pulse height (see figure 9(a)-9(c)).  
+
+> IV. RUPTURE DYNAMICS
+
+The above discussion about surfactant-induced spreading dynamics clearly indicates thinning of the film underneath the surfactant monolayer, which can lead to film rupture. Although, Jensen and Grotberg [21] mentioned that Marangoni and viscous forces are not sufficient to instigate film rupture in finite time, several experimental and theoretical [65–68] explorations suggest otherwise. It can be described as due to the surfactant deposition, the thin film experiences thinning because of the Marangoni forces, and when the film thickness reaches below 1000 ˚ A, van der Waals forces become effective. However, the van der Waals forces reduce the film thickness to zero at some point, which eventually leads to a rupture phenomenon.  
+
+> A. Linear stability analysis
+
+This section is dedicated to examining the linear stability analysis of the one-dimensional evolution equations, which describe the rupture of the soluble surfactant-laden thin film flow over an inclined plane in the presence of external shear. The aim is to observe the combined influence of external shear force and slip parameter on the rupture of the thin film. Infinitesimal perturbations to an initially ruptured thin film are considered as normal mode form in terms of complex frequency ω and wavenumbers k as 
+
+h(x, t ) = Hb + eh1 exp(i kx + ωt ),
+
+Γa(x, t ) = Γ a,B + eΓa, 1 exp(i kx + ωt ), (41) Γ0(x, t ) = Γ 0,B + eΓ0,1 exp(i kx + ωt ).
+
+Now, the equations (41) are substituted in the equations (16), (20), and (21), where Hb denotes the uniform thickness, Γ a,B , Γ 0,B are interface and bulk surfactant concentrations at equilibrium, respectively. Moreover, the terms with tilde notations denote the amplitude of the infinitesimal perturbation. The linear terms of the perturbations are only considered here for the linear stability analysis. Hence, the following homogeneous system of equations can be obtained: 
+
+N X = 0 (42) where N is given by 17 
+
+
+
+iBoH bk(Hb + δ)+ k2  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)6H2
+
+> b
+
++ ik (Hb + δ)μ + ω
+
+3Hbk2(1 + α)
+
+
+
+1 +   1+ αα
+
+1/3
+
+(Hb + 2 δ)2
+
+
+
+1 + Γ aB +   1+ αα
+
+1/3 Γa,B 
+
+4 0
+
+iBoH bkΓa,B 
+
++ k2  −3A + CH 4 
+
+> b
+
+k2 Γa,B 
+
+2H2
+
+> b
+
++ ik Γa,B μka + k2
+
+P e s
+
++ kaΓ0,B 
+
++3k2(1 + α)
+
+
+
+1 +   1+ αα
+
+1/3
+
+Γa,B (Hb + δ)
+
+
+
+1 + Γ a,B +   1+ αα
+
+1/3 Γa,B 
+
+4
+
++ ik 
+
+ BoH 2
+
+> b
+
+2 + ( Hb + δ)μ
+
+
+
++ ωka − kaΓa,B 
+
+kaβaΓ0,B 
+
+H2
+
+> b
+
+− kaβaΓa,B 
+
+H2
+
+> b
+
+− kaβaΓ0,B Γa,B 
+
+H2
+
+> b
+
+kaβa
+
+Hb
+
++ kaβaΓ0,B 
+
+Hb
+
+− k2
+
+P e b
+
+− kaβa
+
+Hb
+
++ kaβaΓa,B 
+
+Hb
+
++ 16
+
+ −2iBoH 2 
+
+> b
+
+k − 3iBoH bkδ − 6iH bkμ − 6ikδμ − 6ω
+
+and X = [ eh1 eΓa, 1 eΓ0,1]T .Now, the non-trivial solutions of the system of equations (42) exist only if det( A) = 0. Using this condition, the dispersion relation is obtained as 
+
+ω3 − a1ω2 − a2ω + a3 = 0 (43) This equation is obtained and solved using “MATHEMATICA” software, and the solution is given in appendix VI. The complex frequency can be written as ω = Re [ω] + i Im [ω], where Re [ω] represents the growth rate of perturbation, and Im [ω]/k is the phase velocity. If the real part of the perturbation growth rate Re [ω] > 0, then the film is unstable, and if Re [ω] < 0, then the film is stable. The equation (43) has three roots or modes, and the real part of those (Re [ω]) plotted against wavenumbers k in figure 10(a) for fixed values of all the remaining parameters. Figure 10(a) illustrates that only one root has a positive real part and the other two have a negative real part. So, only one mode is unstable in this parameter range. The rest of the article will focus solely on this mode. However, in the insoluble surfactant limit, the behaviour of the other two modes becomes interesting, which is explored in the next figure 10(b). The modes are validated in the insoluble surfactant limit with the results from Figure 3(a) of Vivek et al. [34] (see Figure 10(b)). In the insoluble surfactant limit, the modes obtained from dispersion relation (43) are coalesced. Also, the data points of mode 1 from Vivek et al. [34] lies on two modes obtained by the current article, as can be observed in Figure 10(b). On the other hand, the mode 2 of Vivek et al. [34] lies on three modes obtained by the current article. Next, the effect of external shear force μ and slip length δ on the linear stability is explored in the subsequent subsections.   
+
+> 1. Influence of external shear force μ
+
+Figure 11(a) depicts that, when the Bond number is zero, the system becomes more unstable if the external shear force increases. Although in the case of a positive Bond number, the system tends to remain stable in the long-wave zone and the amplitude of the Bond number influences the range for a stable wavenumber regime, external shear force μ destabilizes the flow, as can be seen from figures 11(b)-11(c). Moreover, when the Bond number is sufficiently large ( Bo = 10 .0), multiple cut-off wavenumbers appear (see figure 11(c)). The gravitational effect due to the Bond number stabilizes the flow when an external shear force is absent but behaves exactly opposite for increasing positive shear force. Here, the competing influences of these two forces cause the wave crests to move faster than the troughs, which results in rupture of the thin film. On the other hand, the effect of capillarity on the external shear force is explored in the figures 12(a)-12(c). It is observed from figure 12(a) that when C is low, the magnitude perturbation growth rate is very high, and it grows 18 
+
+(a) (b) 
+
+Figure 10. (a) The real part of perturbation growth rate Re [ω] against wavenumbers k by solving the dispersion relation (43). The parameters chosen are Bo = 1 .0, H b = 1 .0, k a = 0 .1, P e b = 10 .0, P e s = 100 , Γ0B = 1 .0, β a = 1 .0, ΓaB = 0 .5, A = 1 .0, C = 1 .0, α = 100 , μ = δ = 0 .0. (b) The perturbation growth rate Re [ω] against wavenumbers k in the insoluble surfactant limit. Bo = 2 .0, H b = 1 .0, k a = 0 .0, P eb → ∞ , P e s =1000 , Γ0B = 1 .0, β a = 1 .0, ΓaB = 0 .5, A = 1 .0, C = 1 .0, μ = δ = 0 .0. The cyan circular and violet square points are the data points extracted from Vivek et al. [34]. The cyan circular points refer to mode one, and the violet square points denote another mode in Figure 3(a) of their paper[34]. 
+
+(a) Bo = 0 .0 (b) Bo = 1 .0 (c) Bo = 10 .0
+
+Figure 11. The growth rate curves corresponding to the dispersion relation against wavenumbers k for different external shear force μ in case of (a) Bo = 0 .0, (b) Bo = 1 .0, and (c) Bo = 10 .0. The rest of the parameters are Hb = 1 .0, Γ 0,B = 1 .0, Γ a,B = 1 .0, ka = 0 .01, P e b = 10, P e s = 100,          
+
+> βa= 1 .0, A= 1 .0, C= 1 .0, α= 0 .01, δ= 0 .05.
+
+with external shear force μ. In case of unit value of Capillary force C, the system remains stable in the long-wave regime, and when external shear force is absent, the flow remains stable even in the finite wave zone (see figure 12(b)). Moreover, for C = 10 .0 and μ = 0 .0, the flow is stable throughout, and even for μ = 0 .5, the system is almost stable, evident from figure 12(c). For small C, surface tension dominates the viscous and shear-layer forces. So, at C = 0 .01, external shear force μ and surface tension compete, and from figure 12(a), it can be observed that external shear force elevates the disturbances generated due to the perturbation. However, when the capillary number increases, the viscous shear stress regulates the surface tension and external shear force. As C ↑ , the flow becomes stable at lower values of μ at finite wavenumbers. Moreover, the cut-off wavenumbers were also reduced for a higher capillary number. Furthermore, the figures 13 explores the effect of the Hamaker constant A on the mode 3 of the linear stability analysis. It can be seen in figure 13(a) that when A = 0 .01, the system is stable for all wavenumbers when external shear μ < 1. If μ = 1, then only the system becomes unstable. For moderate values of A (read A = 1 .0 ), the flow displays an unstable nature in the finite wavenumbers regime, and when A = 10 .0, it remains unstable for all wavenumbers (see figures 13(b)-13(c)). Also, in each scenario, growth rates increase for increasing external shear force μ. That implies that the Hamaker constant and external shear both destabilize the mode 3 . Physically, the 19 
+
+(a) C = 0 .01 (b) C = 1 .0 (c) C = 10 .0
+
+Figure 12. The growth rate curves corresponding to the dispersion relation against wavenumbers k for different external shear forces μ in case of (a) C = 0 .01, (b) C = 1 .0, and (c) C = 10 .0. The rest of the parameters are Hb = 1 .0, Γ 0,B = 1 .0, Γ a,B = 1 .0, Bo = 10 .0, ka = 0 .01, P e b = 10,          
+
+> P e s= 100, βa= 1 .0, A= 1 .0, α= 0 .01, δ= 0 .05.
+
+(a) A = 0 .01 (b) A = 1 .0 (c) A = 10 .0
+
+Figure 13. The growth rate curves corresponding to the dispersion relation against wavenumbers k for different external shear forces μ in case of (a) A = 0 .01, (b) A = 1 .0, and (c) A = 10 .0. The rest of the parameters are Hb = 1 .0, Γ 0,B = 1 .0, Γ a,B = 1 .0, Bo = 10 .0, ka = 0 .01, P e b = 10,          
+
+> P e s= 100, βa= 1 .0, C= 1 .0, α= 0 .01, δ= 0 .05.
+
+Hamaker constant represents the van der Waals forces, which contribute to the disjoining pressure. Thus, when the flow undergoes perturbation, the thinner regions experience a more attractive force due to the van der Waals force. Also, the external shear force acts along the interface, which amplifies the disjoining pressure and helps the rupture process of the flow. 
+
+2. Influence of slip parameter δ
+
+The impact of the slip parameter δ on the linear stability is explored in this subsection. First of all, the dual effect of the Bond number Bo and the slip parameter δ is illustrated in the figures (14). When Bo = 0, the slip parameter destabilizes the flow by scaling greater heights for a bigger slip length (see figure 14(a)). The behaviour of the slip parameter δ remains the same even when Bo = 1 as evident from figure 14(b). However, figure 14(c) shows that the slip parameter shows a stabilizing nature for Bo = 10 .0 in the finite wave regime, as in the long-wave regime, the flow remains stable. For a low Bond number, the fluid is governed by surface tension, and increasing slip length reduces the viscous drag at the bottom substrate, which increases the velocity. This amplified velocity helps to advect the soluble surfactant quickly, which generates local surfactant concentration gradients and draws more fluid towards the crests, which destabilizes the flow. Figures (15) describes the influence of capillary number C = 0 .01 and slip parameter δ on the soluble surfactant-laden fluid flow. When the capillary number is low, the slip length destabilizes the flow, as can be seen from figure 15(a). However, the slip parameter δ stabilizes the thin film flow for moderate to high capillarity. In case of C = 1 .0, the flow, it remains stable in the long-wave regime, and cut-off wavenumbers increase for increasing slip length. Moreover, 20 
+
+(a) Bo = 0 .0 (b) Bo = 1 .0 (c) Bo = 10 .0
+
+Figure 14. The growth rate curves corresponding to the dispersion relation against wavenumbers k for different slip length δ in case of (a)                         
+
+> Bo = 0 .0, (b) Bo = 1 .0, and (c) Bo = 10 .0. The rest of the parameters are Hb= 1 .0, Γ 0,B = 1 .0, Γ a,B = 1 .0, ka= 0 .01, P e b= 10, P e s= 100,
+> βa= 1 .0, A= 1 .0, C= 1 .0, α= 0 .01, τ= 0 .5.
+
+(a) C = 0 .01 (b) C = 1 .0 (c) C = 10 .0
+
+Figure 15. The growth rate curves corresponding to the dispersion relation against wavenumbers k for different external shear force μ in case of (a) C = 0 .01, (b) C = 1 .0, and (c) C = 10 .0. The rest of the parameters are Hb = 1 .0, Γ 0,B = 1 .0, Γ a,B = 1 .0, Bo = 10 .0, ka = 0 .01, P e b = 10,          
+
+> P e s= 100, βa= 1 .0, A= 1 .0, α= 0 .01, τ= 0 .5.
+
+higher slip length ( δ = 0 .08) stabilizes the flow for any wavenumbers when C = 10 .0. At low capillary numbers, surface tension dominates, and the slip parameter allows the fluid layers near the boundary to move smoothly, which amplifies the surface waves, promoting the instability. But, at a high capillary number, viscous and solutal Marangoni forces dominate the other forces. In that case, increasing slip length allows more fluid flow and more circulation of surfactant between bulk and interface, which mitigates the Marangoni stress. Thus, the chance of generating the rupture due to the Marangoni stress attenuates. The binary effect of slip parameter δ and Hamaker constant A are studied in the figures (16). The slip parameter δ
+
+has a stabilizing effect on the flow when the Hamaker constant is small. In fact, Figure 16(a) shows that for A = 0 .01, the system is unstable when the no-slip condition is imposed at the bottom substrate and becomes stable when slip parameter δ > 0. For a moderate value of A(= 1 .0), the system becomes stable for increasing slip length in the finite wavenumbers zone, and in the long-wave regime, the flow is stable irrespective of the slip length (see figure 16(b)). Moreover, the cut-off wavenumbers amplify for increasing slip length δ. On the contrary, the growth rates increase for increasing slip length when Hamaker constant A = 10 .0, implying the destabilizing nature of slip length δ for higher van der Waals force (see figure 16(c)). When A = 0 .01, the van der Waals force is weak, a slippery substrate helps the fluid flow easily into the thinning regions and reduces the growth of disturbances and stabilizes the thin film. But, when A = 10 .0, the attractive van der Waals forces pull the fluid out of the thinning region and a higher slip length drives the fluid more efficiently, it increases the chance of destabilizing the flow and rupturing the film. 21         
+
+> (a) A= 0 .01 (b) A= 1 .0(c) A= 10 .0
+
+Figure 16. The growth rate curves corresponding to the dispersion relation against wavenumbers k for different external shear force μ in case of (a) A = 0 .01, (b) A = 1 .0, and (c) A = 10 .0. The rest of the parameters are Hb = 1 .0, Γ 0,B = 1 .0, Γ a,B = 1 .0, Bo = 10 .0, ka = 0 .01, P e b = 10,          
+
+> P e s= 100, βa= 1 .0, C= 1 .0, α= 0 .01, τ= 0 .5.
+
+V. SUMMARY AND CONCLUSION 
+
+Spreading and rupture dynamics of soluble surfactant-laden fluid over a slippery bottom in the presence of external shear are investigated in the article. The lubrication approximation method is used to derive the evolution equation of the film thickness and interface surfactant concentration. Moreover, the rapid vertical diffusion is assumed to eliminate the fingering instability, and then the cross-sectionally averaged bulk surfactant concentration is considered. The equations are particularly suitable to describe the flow nature during the surfactant distribution and evanescent period when sorption kinetics is in effect. This evanescent period is quantified through O(1 /k a), where ka denotes the time taken by the sorption kinetics to take place. The shear stress promotes horizontal and vertical velocities. This vertical velocity-induced flow generates the fluid thickness to increase, and the local bulk surfactant concentration is diluted. This causes the flow to experience a squeezing action, which results in a welling up of fluid. This article focused on the influence of external shear force and slip length on this welling up of the fluid. Based on ka time, the study considers two different scenarios, such as when ka ≫ 1 rapid sorption kinetics happens, i.e., the sorption reaction happens very fast and the whole system comes to equilibrium. On the other hand, when ka ≪ 1, the slow sorption kinetics occur, the sorption reaction takes time to reach equilibrium. Again, in the case of rapid sorption kinetics, two types of surfactant distribution, planar strip and planar front, are considered. These are basically based on different supply rates of the surfactant with ∝ t1/3 for the strip and ∝ t1/2 for the front. In the case of strip-type distribution of surfactant for rapid sorption kinetics, the slippery bottom helps the capillary ridge move faster, whereas the external shear force τ acts as an auxiliary force along with the Marangoni stress, which amplifies the thinning of the film. The streamfunction plots show that a distinct recirculation zone is created next to the surfactant distribution, and the slippery substrate helps more fluid to flow by lowering viscous drag at the bottom and the shock front to gain more volume and advance horizontally. In contrast, the front type distribution of rapid sorption kinetics generates a hump at the leading edge of the monomer followed by a depressed thinning region. The slippery bottom δ reduces the viscous dissipation at the boundary, resulting in a taller hump and an even steeper depression at the trailing end behind the hump. The external shear force μ pushes the hump downstream and reduces the fluid shock height. Furthermore, the front-type deposition of surfactant in case of slow sorption kinetics reveals that bulk and interface surfactant concentration goes through an adsorption-desorption transient stage, which eventually reduces the surface tension gradient at the interface i.e., the Marangoni stress diminishes, resulting in pulse-type behaviour in the film thickness. The external shear force μ acts along the interface of the fluid and reduces the pulse height systematically, but the slip substrate at the bottom allows more fluid to flow and the pulse to gain more volume. The linear stability analysis using the rupture dynamics mechanism is explored from the evolution equation obtained earlier. The van der Waals forces are considered to be one of the major factors behind the rupture of the thin film. The results clearly state that the Bond number Bo destabilizes the flow in the presence of external shear in the finite wave regime. However, the flow remains stable in the long-wave zone for a positive Bond number. In contrast, the capillarity stabilizes the flow, whereas the Hamaker constant destabilizes it. In all scenarios, the external shear force 
+
+μ destabilizes the flow. Conversely, the slip parameter δ has a binary effect on the linear stability of the rupture dynamics of the flow. For a low Bond number Bo , the slip parameter destabilizes the flow, but for high Bo, this trend reverses. The same characteristics can be observed for capillary number C. The slip parameter stabilizes the flow for low to moderate values of the Hamaker constant A, but destabilizes for high A.22 
+
+ACKNOWLEDGMENTS 
+
+The first author would like to acknowledge the help from Dr. Prashant Kumar Pandey (Department of Applied Science, Amity University, Ranchi, Jharkhand, India) during the preparation of this manuscript. Also, he acknowl-edged the financial support from SERB, Department of Science and Technology, Government of India, through the CRG project, Award No. CRG/2022/006698. 
+
+VI. APPENDIX 
+
+a1 =
+
+"
+
+− 12 iBoH 2 
+
+> b
+
+k − ka − k2
+
+P e b
+
+− k2
+
+P e s
+
+− kaRaΓ0,B + kaRaβa(−1 + Γ a,B )
+
+Hb
+
+− iBoH bk(Hb + δ)
+
+−
+
+3k2
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4 − 16 iBoH bk(2 Hb + 3 δ)
+
+− k2  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)6H2
+
+> b
+
+− 3ik (Hb + δ)τ
+
+#23 
+
+a2 =
+
+"
+
+− k2ka
+
+P e b
+
+− k4
+
+P e bP e s
+
+− k2kaRaΓ0,B 
+
+P e b
+
++ k2
+
+> a
+
+Raβa(−1 + Γ a,B )
+
+Hb
+
++ k2kaRaβa(−1 + Γ a,B )
+
+HbP e s
+
++ k2
+
+> a
+
+R2
+
+> a
+
+βaΓ0,B (−1 + Γ a,B )
+
+Hb
+
++ k2
+
+> a
+
+Raβa(1 + RaΓ0,B )( −1 + Γ a,B )
+
+Hb
+
+− iBoH bkk a(Hb + δ)
+
+− iBoH bk3(Hb + δ)
+
+P e b
+
+− iBoH bk3(Hb + δ)
+
+P e s
+
+− iBoH bkk aRaΓ0,B (Hb + δ)+ iBokk aRaβa(−1 + Γ a,B )( Hb + δ) −
+
+3k4
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)
+
+P e b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++3k2kaRa
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)βa(−1 + Γ a,B )Γ a,B (Hb + δ)
+
+Hb
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+−
+
+3iBoH bk3
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)2
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4 − 16 iBoH bkk a(2 Hb + 3 δ)
+
+− k2  −3A + CH 4 
+
+> b
+
+k2 ka(2 Hb + 3 δ)6H2
+
+> b
+
+− k4  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)6H2 
+
+> b
+
+P e b
+
+− iBoH bk3(2 Hb + 3 δ)6P e s
+
+− k4  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)6H2 
+
+> b
+
+P e s
+
+− 16 iBoH bkk aRaΓ0,B (2 Hb + 3 δ)
+
+− k2  −3A + CH 4 
+
+> b
+
+k2 kaRaΓ0,B (2 Hb + 3 δ)6H2
+
+> b
+
++ k2  −3A + CH 4 
+
+> b
+
+k2 kaRaβa(−1 + Γ a,B )(2 Hb + 3 δ)6H3
+
+> b
+
++ 16 Bo 2H2 
+
+> b
+
+k2(Hb + δ)(2 Hb + 3 δ) −
+
+iBoH bk3
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)(2 Hb + 3 δ)2
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+−
+
+k4  −3A + CH 4 
+
+> b
+
+k2 
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)(2 Hb + 3 δ)2H2
+
+> b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+− iBok 3  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)2
+
+36 Hb
+
+− 2ikk a(Hb + δ)τ − ik 3(Hb + δ)τP e b
+
+− 2ik 3(Hb + δ)τP e s
+
+− 2ikk aRaΓ0,B (Hb + δ)τ + ikk aRaβa(−1 + Γ a,B )( Hb + δ)τHb
+
++ BoH bk2(Hb + δ)2τ
+
+−
+
+6ik 3
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)2τ
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4 + 16 BoH bk2(Hb + δ)(2 Hb + 3 δ)τ
+
+− ik 3  −3A + CH 4 
+
+> b
+
+k2 (Hb + δ)(2 Hb + 3 δ)τ
+
+6H2
+
+> b
+
++ k2(Hb + δ)2τ 2
+
++3k3
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + 2 δ)  2iBoH 3 
+
+> b
+
+− 3Ak + CH 4 
+
+> b
+
+k3 + 2 iH 2 
+
+> b
+
+τ 
+
+4Hb
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+−
+
+ik 3
+
+ BoH 2 
+
+> b
+> 2
+
++ ( Hb + δ)τ
+
+
+
+P e b
+
++
+
+ikk aRaβa(−1 + Γ a,B )
+
+ BoH 2 
+
+> b
+> 2
+
++ ( Hb + δ)τ
+
+
+
+Hb
+
++ BoH bk2(Hb + δ)
+
+ BoH 2
+
+> b
+
+2 + ( Hb + δ)τ
+
+
+
++ 112 BoH bk2(2 Hb + 3 δ)  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
+− ik 3  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
+12 H2
+
+> b
+
++ k2(Hb + δ)τ  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ  #24 
+
+a3 =
+
+"
+
+− iBoH bk3ka(Hb + δ)
+
+P e b
+
+− iBoH bk5(Hb + δ)
+
+P e bP e s
+
+− iBoH bk3kaRaΓ0,B (Hb + δ)
+
+P e b
+
++ i Bokk 2
+
+> a
+
+Raβa(−1 + Γ a,B )( Hb + δ) + iBok 3kaRaβa(−1 + Γ a,B )( Hb + δ)
+
+P e s
+
++ i Bokk 2
+
+> a
+
+R2
+
+> a
+
+βaΓ0,B (−1 + Γ a,B )( Hb + δ) + i Bokk 2
+
+> a
+
+Raβa(1 + RaΓ0,B )( −1 + Γ a,B )( Hb + δ)
+
+−
+
+3i BoH bk5
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)2
+
+P e b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++3i Bok 3kaRa
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)βa(−1 + Γ a,B )Γ a,B (Hb + δ)2
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++3k2k2
+
+> a
+
+Ra
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)βa(−1 + Γ a,B )( RaΓ0,B (−1 + Γ a,B ) + Γ a,B )( Hb + 2 δ)2Hb
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+− k4  −3A + CH 4 
+
+> b
+
+k2 ka(2 Hb + 3 δ)6H2 
+
+> b
+
+P e b
+
+− k6  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)6H2 
+
+> b
+
+P e bP e s
+
+− k4  −3A + CH 4 
+
+> b
+
+k2 kaRaΓ0,B (2 Hb + 3 δ)6H2 
+
+> b
+
+P e b
+
++ k2  −3A + CH 4 
+
+> b
+
+k2 k2
+
+> a
+
+Raβa(−1 + Γ a,B )(2 Hb + 3 δ)6H3
+
+> b
+
++ k4  −3A + CH 4 
+
+> b
+
+k2 kaRaβa(−1 + Γ a,B )(2 Hb + 3 δ)6H3 
+
+> b
+
+P e s
+
++ k2  −3A + CH 4 
+
+> b
+
+k2 k2
+
+> a
+
+R2
+
+> a
+
+βaΓ0,B (−1 + Γ a,B )(2 Hb + 3 δ)6H3
+
+> b
+
++ k2  −3A + CH 4 
+
+> b
+
+k2 k2
+
+> a
+
+Raβa(1 + RaΓ0,B )( −1 + Γ a,B )(2 Hb + 3 δ)6H3
+
+> b
+
++ 16 Bo 2H2 
+
+> b
+
+k2ka(Hb + δ)(2 Hb + 3 δ)+ Bo 2H2 
+
+> b
+
+k4(Hb + δ)(2 Hb + 3 δ)6P e s
+
++ 16 Bo 2H2 
+
+> b
+
+k2kaRaΓ0,B (Hb + δ)(2 Hb + 3 δ)
+
+−
+
+k6  −3A + CH 4 
+
+> b
+
+k2 
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)(2 Hb + 3 δ)2H2 
+
+> b
+
+P e b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++
+
+k4  −3A + CH 4 
+
+> b
+
+k2 kaRa
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)βa(−1 + Γ a,B )Γ a,B (Hb + δ)(2 Hb + 3 δ)2H3
+
+> b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++
+
+Bo 2H2 
+
+> b
+
+k4
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)2(2 Hb + 3 δ)2
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+− iBok 3  −3A + CH 4 
+
+> b
+
+k2 ka(2 Hb + 3 δ)2
+
+36 Hb
+
+− iBok 5  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)2
+
+36 HbP e s
+
+− iBok 3  −3A + CH 4 
+
+> b
+
+k2 kaRaΓ0,B (2 Hb + 3 δ)2
+
+36 Hb
+
+−
+
+iBok 5  −3A + CH 4 
+
+> b
+
+k2 
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)(2 Hb + 3 δ)2
+
+12 Hb
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+− ik3ka(Hb + δ)τP e b
+
+− ik5(Hb + δ)τP e bP e s
+
+− ik3kaRaΓ0,B (Hb + δ)τP e b
+
++ ikk 2
+
+> a
+
+Raβa(−1 + Γ a,B )( Hb + δ)τHb25 + ik3kaRaβa(−1 + Γ a,B )( Hb + δ)τHbP e s
+
++ ikk 2
+
+> a
+
+R2
+
+> a
+
+βaΓ0,B (−1 + Γ a,B )( Hb + δ)τHb
+
++ ikk 2
+
+> a
+
+Raβa(1 + RaΓ0,B )( −1 + Γ a,B )( Hb + δ)τHb
+
++ BoH bk2ka(Hb + δ)2τ + BoH bk4(Hb + δ)2τP e s
+
++ BoH bk2kaRaΓ0,B (Hb + δ)2τ −
+
+3i k5
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)2τP e b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++3ik 3kaRa
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)βa(−1 + Γ a,B )Γ a,B (Hb + δ)2τHb
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++3BoH bk4
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)3τ
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4 + 16 BoH bk2ka(Hb + δ)(2 Hb + 3 δ)τ
+
+− ik 3  −3A + CH 4 
+
+> b
+
+k2 ka(Hb + δ)(2 Hb + 3 δ)τ
+
+6H2
+
+> b
+
++ BoH bk4(Hb + δ)(2 Hb + 3 δ)τ
+
+6P e s
+
+− ik 5  −3A + CH 4 
+
+> b
+
+k2 (Hb + δ)(2 Hb + 3 δ)τ
+
+6H2 
+
+> b
+
+P e s
+
++ 16 BoH bk2kaRaΓ0,B (Hb + δ)(2 Hb + 3 δ)τ
+
+− ik 3  −3A + CH 4 
+
+> b
+
+k2 kaRaΓ0,B (Hb + δ)(2 Hb + 3 δ)τ
+
+6H2
+
+> b
+
++
+
+BoH bk4
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)2(2 Hb + 3 δ)τ
+
+2
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+−
+
+ik 5  −3A + CH 4 
+
+> b
+
+k2 
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)2(2 Hb + 3 δ)τ
+
+2H2
+
+> b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4 + k2ka(Hb + δ)2τ 2
+
++ k4(Hb + δ)2τ 2
+
+P e s
+
++ k2kaRaΓ0,B (Hb + δ)2τ 2
+
++3k4
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)3τ 2
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++3k5
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + 2 δ)  2iBoH 3 
+
+> b
+
+− 3Ak + CH 4 
+
+> b
+
+k3 + 2 iH 2 
+
+> b
+
+τ 
+
+4HbP e b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
+−
+
+3k3kaRa
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)βa(−1 + Γ a,B )Γ a,B (Hb + 2 δ)  2iBoH 3 
+
+> b
+
+− 3Ak + CH 4 
+
+> b
+
+k3 + 2 iH 2 
+
+> b
+
+τ 
+
+4H2
+
+> b
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++
+
+iBok 4
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + 2 δ)(2 Hb + 3 δ)  2iBoH 3 
+
+> b
+
+− 3Ak + CH 4 
+
+> b
+
+k3 + 2 iH 2 
+
+> b
+
+τ 
+
+8
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++3ik 4
+
+
+
+1 +  1 + 1
+
+> α
+
+1/3
+
+(1 + α)Γ a,B (Hb + δ)( Hb + 2 δ)τ  2iBoH 3 
+
+> b
+
+− 3Ak + CH 4 
+
+> b
+
+k3 + 2 iH 2 
+
+> b
+
+τ 
+
+4Hb
+
+
+
+1 + Γ a,B +  1 + 1
+
+> α
+
+1/3 Γa,B 
+
+4
+
++
+
+BoH bk4(Hb + δ)
+
+ BoH 2 
+
+> b
+> 2
+
++ ( Hb + δ)τ
+
+
+
+P e b
+
+− Bok 2kaRaβa(−1 + Γ a,B )( Hb + δ)
+
+ BoH 2
+
+> b
+
+2 + ( Hb + δ)τ
+
+
+
++
+
+k4(Hb + δ)τ
+
+ BoH 2 
+
+> b
+> 2
+
++ ( Hb + δ)τ
+
+
+
+P e b
+
+−
+
+k2kaRaβa(−1 + Γ a,B )( Hb + δ)τ
+
+ BoH 2 
+
+> b
+> 2
+
++ ( Hb + δ)τ
+
+
+
+Hb26 + iBoH bk3(Hb + δ)2τ
+
+ BoH 2
+
+> b
+
+2 + ( Hb + δ)τ
+
+
+
++ i k3(Hb + δ)2τ 2
+
+ BoH 2
+
+> b
+
+2 + ( Hb + δ)τ
+
+
+
+− ik 5  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
+12 H2 
+
+> b
+
+P e b
+
++ ik 3  −3A + CH 4 
+
+> b
+
+k2 kaRaβa(−1 + Γ a,B )(2 Hb + 3 δ)  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
+12 H3
+
+> b
+
++ 112 iBo 2H2 
+
+> b
+
+k3(Hb + δ)(2 Hb + 3 δ)  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
++ Bok 4  −3A + CH 4 
+
+> b
+
+k2 (2 Hb + 3 δ)2  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
+72 Hb
+
++ 112 iBoH bk3(Hb + δ)(2 Hb + 3 δ)τ  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
++ k4  −3A + CH 4 
+
+> b
+
+k2 (Hb + δ)(2 Hb + 3 δ)τ  BoH 2 
+
+> b
+
++ 2( Hb + δ)τ 
+
+12 H2
+
+> b
+
+#
+
+REFERENCES 
+
+[1] Michael S Borgas and James B Grotberg. Monolayer flow on a thin film. Journal of Fluid Mechanics , 193:151–170, 1988. [2] SM Troian, E Herbolzheimer, and SA Safran. Model for the fingering instability of spreading surfactant drops. Physical review letters , 65(3):333, 1990. [3] Donald P Gaver and James B Grotberg. The dynamics of a localized surfactant on a thin film. Journal of Fluid Mechanics ,213:127–148, 1990. [4] OE Jensen and JB Grotberg. The spreading of heat or soluble surfactant along a thin liquid film. Physics of Fluids A: Fluid Dynamics , 5(1):58–68, 1993. [5] OK Matar and RV Craster. Models for marangoni drying. Physics of Fluids , 13(7):1869–1883, 2001. [6] Hyoungsoo Kim, Fran¸ cois Boulogne, Eujin Um, Ian Jacobi, Ernie Button, and Howard A Stone. Controlled uniform coating from the interplay of marangoni flows and surface-adsorbed macromolecules. Physical review letters , 116(12):124501, 2016. [7] Dieter A Baumgartner, Samira Shiri, Shayandev Sinha, Stefan Karpitschka, and Nate J Cira. Marangoni spreading and contracting three-component droplets on completely wetting surfaces. Proceedings of the National Academy of Sciences ,119(19):e2120432119, 2022. [8] David P Hoult. Oil spreading on the sea. Annual review of fluid mechanics , 4(1):341–368, 1972. [9] Robin BJ Koldeweij, Bram F Van Capelleveen, Detlef Lohse, and Claas Willem Visser. Marangoni-driven spreading of miscible liquids in the binary pendant drop geometry. Soft Matter , 15(42):8525–8531, 2019. [10] Asher P Mouat, Clay E Wood, Justin E Pye, and Justin C Burton. Liquid deposition through evaporation. Physical Review Fluids , 4(10):100512, 2019. [11] Cihan Kaplan, Ning Wu, Shreyas Mandre, Joanna Aizenberg, and Lakshminarayanan Mahadevan. Dynamics of evaporative colloidal patterning. Physics of Fluids , 27(9), 2015. [12] James B Grotberg. Respiratory fluid mechanics and transport processes. Annual review of biomedical engineering , 3(1): 421–457, 2001. [13] Amy Z Stetten, Steven V Iasella, Timothy E Corcoran, Stephen Garoff, Todd M Przybycien, and Robert D Tilton. Surfactant-induced marangoni transport of lipids and therapeutics within the lung. Current opinion in colloid & interface science , 36:58–69, 2018. [14] Xue Ma, Menglin Zhong, Yifeng He, Zhanwei Liu, and Zhenzhen Li. Fingering instability in marangoni spreading on a deep layer of polymer solution. Physics of Fluids , 32(11), 2020. [15] NM Kovalchuk, OK Matar, RV Craster, R Miller, and VM Starov. The effect of adsorption kinetics on the rate of surfactant-enhanced spreading. Soft Matter , 12(4):1009–1013, 2016. [16] MRE Warner, RV Craster, and OK Matar. Fingering phenomena created by a soluble surfactant deposition on a thin liquid film. Physics of fluids , 16(8):2933–2951, 2004. [17] Maziyar Jalaal, Boris Stoeber, and Neil J Balmforth. Spreading of viscoplastic droplets. Journal of Fluid Mechanics , 914: A21, 2021. [18] Nikolai Kubochkin and Tatiana Gambaryan-Roisman. Surface force-mediated dynamics of droplets spreading over wetting films. Physics of Fluids , 33(12), 2021. 27 
+
+[19] Raphael Saiseau, Christian Pedersen, Anwar Benjana, Andreas Carlson, Ulysse Delabre, Thomas Salez, and Jean-Pierre Delville. Near-critical spreading of droplets. Nature communications , 13(1):7442, 2022. [20] Hugo L Fran¸ ca, Maziyar Jalaal, and Cassio M Oishi. Elasto-viscoplastic spreading: From plastocapillarity to elastocapil-larity. Physical Review Research , 6(1):013226, 2024. [21] OE Jensen and JB Grotberg. Insoluble surfactant spreading on a thin viscous film: shock evolution and film rupture. 
+
+Journal of Fluid Mechanics , 240:259–288, 1992. [22] D Halpern and JB Grotberg. Dynamics and transport of a localized soluble surfactant on a thin film. Journal of Fluid Mechanics , 237:1–11, 1992. [23] OE Jensen, D Halpern, and JB Grotberg. Transport of a passive solute by surfactant-driven flows. Chemical engineering science , 49(8):1107–1117, 1994. [24] OE Jensen. The spreading of insoluble surfactant at the free surface of a deep fluid layer. Journal of Fluid Mechanics ,293:349–378, 1995. [25] Omar K Matar and Sandra M Troian. Linear stability analysis of an insoluble surfactant monolayer spreading on a thin liquid film. Physics of Fluids , 9(12):3645–3657, 1997. [26] Omar K Matar and Sandra M Troian. Growth of non-modal transient structures during the spreading of surfactant coated films. Physics of Fluids , 10(5):1234–1236, 1998. [27] Omar K Matar and Sandra M Troian. The development of transient fingering patterns during the spreading of surfactant coated films. Physics of Fluids , 11(11):3232–3246, 1999. [28] Omar K Matar and Sandra M Troian. Spreading of a surfactant monolayer on a thin liquid film: Onset and evolution of digitated structures. Chaos: An Interdisciplinary Journal of Nonlinear Science , 9(1):141–153, 1999. [29] Benjamin J Fischer and Sandra M Troian. Growth and decay of localized disturbances on a surfactant-coated spreading film. Physical Review E , 67(1):016309, 2003. [30] BD Edmonstone, OK Matar, and RV Craster. Flow of surfactant-laden thin films down an inclined plane. Journal of engineering mathematics , 50(2):141–156, 2004. [31] OE Jensen and S Naire. The spreading and stability of a surfactant-laden drop on a prewetted substrate. Journal of Fluid Mechanics , 554:5–24, 2006. [32] Nico Bergemann, Anne Juel, and Matthias Heil. Viscous drops on a layer of the same fluid: from sinking, wedging and spreading to their long-time evolution. Journal of Fluid Mechanics , 843:1–28, 2018. [33] Richard J Braun. Dynamics of the tear film. Annual Review of Fluid Mechanics , 44(1):267–297, 2012. [34] Atul S Vivek, Ranabir Dey, and Harish N Dixit. Rupture of a surfactant-laden draining thin film. Physical Review Fluids ,9(7):074004, 2024. [35] Alexander Oron, Stephen H Davis, and S George Bankoff. Long-scale evolution of thin liquid films. Reviews of modern physics , 69(3):931, 1997. [36] Eline Hermans, M Saad Bhamla, Peter Kao, Gerald G Fuller, and Jan Vermant. Lung surfactants and different contributions to thin film stability. Soft matter , 11(41):8048–8057, 2015. [37] Dominique Gallez. Non-linear stability analysis for animal cell adhesion to solid support. Colloids and Surfaces B: Biointerfaces , 2(1-3):273–280, 1994. [38] Yong Liang Zhang, Omar K Matar, and Richard V Craster. Analysis of tear film rupture: effect of non-newtonian rheology. 
+
+Journal of colloid and interface science , 262(1):130–148, 2003. [39] BV Derjaguin. The definition and magnitude of disjoining pressure and its role in the statics and dynamics of thin fluid films. Kolloid Zh , 17:207–214, 1955. [40] A De Wit, D Gallez, and CI Christov. Nonlinear evolution equations for thin liquid films with insoluble surfactants. 
+
+Physics of fluids , 6(10):3256–3266, 1994. [41] OK Matar. Nonlinear evolution of thin free viscous films in the presence of soluble surfactant. Physics of Fluids , 14(12): 4216–4234, 2002. [42] Yong Liang Zhang, Richard V Craster, and Omar K Matar. Surfactant driven flows overlying a hydrophobic epithelium: film rupture in the presence of slip. Journal of colloid and interface science , 264(1):160–175, 2003. [43] Mohar Dey, Atul S Vivek, Harish N Dixit, Ashutosh Richhariya, and James J Feng. A model of tear-film breakup with continuous mucin concentration and viscosity profiles. Journal of Fluid Mechanics , 858:352–376, 2019. [44] Shu Yang, Satish Kumar, and Cari S Dutcher. Rupture of thin liquid trilayer films with soluble surfactants: fundamentals and applications to droplet coalescence. Soft Matter , 20(25):4972–4987, 2024. [45] Shu Yang, Satish Kumar, and Cari S Dutcher. Vertical concentration gradients of soluble surfactants in the rupture of thin liquid films. Journal of Colloid and Interface Science , 687:238–247, 2025. [46] Chaur-Kie Lin, Chi-Chuan Hwang, and Wu-Yih Uen. A nonlinear rupture theory of thin liquid films with soluble surfactant. 
+
+Journal of colloid and interface science , 231(2):379–393, 2000. [47] Eli Ruckenstein and P Rajora. On the no-slip boundary condition of hydrodynamics. In Wetting Theory , pages 45–49. CRC Press, 2018. [48] Derek C Tretheway and Carl D Meinhart. Apparent fluid slip at hydrophobic microchannel walls. Physics of fluids , 14(3): L9–L12, 2002. [49] Doyoung Byun, Jihoon Kim, Han Seo Ko, and Hoon Cheol Park. Direct measurement of slip flows in superhydrophobic microchannels with transverse grooves. Physics of Fluids , 20(11), 2008. [50] Peichun Tsai, Alisia M Peters, Christophe Pirat, Matthias Wessling, Rob GH Lammertink, and Detlef Lohse. Quantifying effective slip length over micropatterned hydrophobic surfaces. Physics of Fluids , 21(11), 2009. [51] Arghya Samanta, Christian Ruyer-Quil, and Benoit Goyeau. A falling film down a slippery inclined plane. Journal of 28 
+
+Fluid Mechanics , 684:353–383, 2011. [52] Farooq Ahmad Bhat and Arghya Samanta. Linear stability of a contaminated fluid flow down a slippery inclined plane. 
+
+Physical Review E , 98(3):033108, 2018. [53] Marc K Smith. The mechanism for the long-wave instability in thin liquid films. Journal of Fluid Mechanics , 217:469–485, 1990. [54] FF Espinosa and RD Kamm. Bolus dispersal through the lungs in surfactant replacement therapy. Journal of Applied Physiology , 86(1):391–410, 1999. [55] David Halpern and James B Grotberg. Surfactant effects on fluid-elastic instabilities of liquid-lined flexible tubes: a model of airway closure. 1993. [56] Arnab Choudhury and Arghya Samanta. Thermocapillary instability of a surfactant-laden shear-imposed film flow. Physical Review Fluids , 9(8):084002, 2024. [57] Md Mouzakkir Hossain, Mrityunjoy Saha, Sukhendu Ghosh, and Harekrushna Behera. Stability dynamics of an odd-viscosity induced fluid flow over a vibrating inclined surface. Physics of Fluids , 37(10), 2025. [58] Arghya Samanta. Shear-imposed falling film. Journal of fluid mechanics , 753:131–149, 2014. [59] Farooq Ahmad Bhat and Arghya Samanta. Linear stability analysis of a surfactant-laden shear-imposed falling film. 
+
+Physics of Fluids , 31(5), 2019. [60] Dipankar Paul, Harekrushna Behera, and Sukhendu Ghosh. Stability of soluble surfactant-laden falling film over a hy-drophobic incline in the presence of external shear. Physics of Fluids , 37(12), 2025. [61] Eli Ruckenstein and Rakesh K Jain. Spontaneous rupture of thin liquid films. In Wetting Theory , pages 588–603. CRC press, 2018. [62] Adv Sheludko. Thin liquid films. Advances in Colloid and Interface Science , 1(4):391–464, 1967. [63] A Mavromoustaki, OK Matar, and RV Craster. Dynamics of a climbing surfactant-laden film–i: base-state flow. Journal of colloid and interface science , 371(1):107–120, 2012. [64] Jeff Bezanson, Alan Edelman, Stefan Karpinski, and Viral B Shah. Julia: A fresh approach to numerical computing. SIAM review , 59(1):65–98, 2017. [65] Sumeet Suresh Thete, Christopher Anthony, Osman A Basaran, and Pankaj Doshi. Self-similar rupture of thin free films of power-law fluids. Physical Review E , 92(2):023014, 2015. [66] Miguel A Dur´ an-Olivencia, Rishabh S Gvalani, Serafim Kalliadasis, and Grigorios A Pavliotis. Instability, rupture and fluctuations in thin liquid films: theory and computations. Journal of statistical physics , 174(3):579, 2019. [67] Daniel Moreno-Boza, Alejandro Mart´ ınez-Calvo, and A Sevilla. Stokes theory of thin-film rupture. Physical Review Fluids ,5(1):014002, 2020. [68] James E Sprittles, Jingbang Liu, Duncan A Lockerby, and Tobias Grafke. Rogue nanowaves: a route to film rupture. 
+
+Physical Review Fluids , 8(9):L092001, 2023.

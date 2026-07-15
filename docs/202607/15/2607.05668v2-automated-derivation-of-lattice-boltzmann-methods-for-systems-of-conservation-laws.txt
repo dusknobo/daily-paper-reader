@@ -1,0 +1,4232 @@
+Title: Automated Derivation of Lattice Boltzmann Methods for Systems of Conservation Laws
+
+URL Source: https://arxiv.org/pdf/2607.05668v2
+
+Published Time: Wed, 15 Jul 2026 11:58:58 GMT
+
+Number of Pages: 61
+
+Markdown Content:
+AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS FOR SYSTEMS OF CONSERVATION LAWS 
+
+ADRIAN KUMMERLÄNDER ∗, † , FEDOR BUKREEV ∗, ‡ , AND MATHIAS J. KRAUSE ∗, †, ‡
+
+Abstract. Multiphysics simulation with lattice Boltzmann methods (LBM) requires a scheme hand-derived for each partial differential equation (PDE), a labor-intensive, error-prone bottleneck. We recognize our recently proposed class of LBM schemes [11] as a discrete-kinetic relaxation approximation of conservation laws and generalize its hand derivation to an automated one for systems of hyperbolic, parabolic, and mixed-type conservation laws. The derivation splits into three steps: First, the PDE system is equivalently rearranged into a first-order cascade of conservation laws: every spatial derivative in flux or source becomes an auxiliary variable, recursively for higher derivatives, so all fluxes are algebraic and updates stay local. Second, the augmented system is approximated by a discrete-velocity kinetic relaxation model with linear, constant-coefficient transport: all nonlinearity resides in a local equilibrium embedding the flux exactly in its first moment, trading the low-Mach truncation for an a priori checkable sub-characteristic wave-speed bound. Third, the relaxation system is discretized by a standard LBM, yielding collide-and-stream algorithms running unchanged on existing solvers. A symbolic compiler using a domain-specific language encapsulates these steps: unlike existing LBM code generators, which start from the discrete scheme, it automatically derives equilibrium, gradient-tracking cascade, and grid scaling from the declared PDE alone. We exercise it across twelve PDE systems, including compressible Navier–Stokes–Fourier flow, resistive magnetohydrodynamics, and nonlinear elasticity. Manufactured-solution verification confirms convergence at or near second order in double precision, retained in single precision by a reference- and equilibrium-shifted formu-lation. Targeting OpenLB, the generated GPU kernels reach up to 96% of the memory-bandwidth roofline. 
+
+Key words. Lattice Boltzmann methods, automatic code generation, symbolic computation, method of manufactured solutions, high-performance computing 
+
+MSC codes. 76M28, 65M12, 68W30, 65Y05, 35L65 
+
+1. Introduction. Traditional frameworks for approximating continuous systems of conservation laws on unstructured meshes, most prominently finite volume and finite element methods, evaluate spatial derivatives and interfacial flux tensors by gathering extended, irregularly addressed node neighborhoods. While robust and geometrically flexible, these indirect, non-local memory access patterns map poorly onto coalesced, throughput-oriented memory systems on contemporary High-Performance Computing 
+
+(HPC) architectures. As modern HPC nodes commonly lean on thousands of concurrent execution threads within heterogeneous GPU accelerators, the performance of Partial Differential Equation (PDE) solvers is increasingly bound by memory bandwidth and synchronization limits rather than raw floating-point throughput. The classical Lattice Boltzmann Method (LBM) [38] circumvents this bottleneck by considering the continuous problem at the mesoscopic level. By tracking particle distribution functions across a discrete velocity space, the algorithm decomposes into a perfectly parallel collision step and a neighborhood-local streaming step along discrete characteristics. This locality yields excellent scalability on heterogeneous supercomputers [5, 25, 39, 41, 66]. However, standard scalar LBM formulations are structurally rigid. Constructing a scheme for a new target is fundamentally a moment-
+
+> ∗
+
+The three authors contributed equally to this work. All authors are with the Lattice Boltzmann Research Group (LBRG), Karlsruhe Institute of Technology (KIT), 76131 Karlsruhe, Germany (kummerlaender@kit.edu, corresponding author). 
+
+> †
+
+Institute for Applied and Numerical Mathematics (IANM), KIT, Englerstraße 2. 
+
+> ‡
+
+Institute of Mechanical Process Engineering and Mechanics (MVM), KIT, Straße am Forum 8. 1arXiv:2607.05668v2 [cs.MS] 14 Jul 2026 2 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+matching problem: the discrete velocity moments of the equilibrium distribution must reproduce, order by order, the macroscopic densities and fluxes of the target equations. This matching is classically realized through high-order Hermite expansions of the equilibrium, custom-tailored to a limited set of target equations [14, 58], or through entropic equilibria on enlarged velocity sets [22]. Because the number of independent moments a lattice can represent isotropically is fixed by its stencil, supporting the moments a given physics demands typically requires case-specific multi-speed lattices. To overcome these limitations, a class of LBM schemes relying on a point-wise, state-decoupled kinetic formulation was recently advanced in [11]. By assigning an independent set of distribution functions to each element of the macroscopic state vector, this approach embeds nonlinear physical fluxes directly in the first-order discrete moments, so a single compact lattice serves diverse conservation laws [27]. Such point-wise kinetic schemes have so far remained case-specific, requiring manual derivation and custom code for each targeted system [8, 11, 20, 51, 68]. Yet this case-by-case effort is a single mechanical procedure, much as automatic differentiation reduced the hand calculus of derivatives to one graph transformation. The enabling observation is that the flux-in-first-moment construction is an instance of the discrete-kinetic relaxation approximation of conservation laws [2, 9, 33, 54] (Section 2.2.2): a single map from conservation laws to a lattice scheme, whose validity is fixed a priori by a sub-characteristic condition (Section 2.4.2) rather than rediscovered case by case. The present work goes beyond these specialized formulations by establishing a generalized and fully automated symbolic compiler for this class of LBM schemes. Automated code generation for LBM is itself well established: templated GPU solvers such as Sailfish [31] and TCLB [44], the lbmpy /waLBerla toolchain [5, 6, 29], and OpenLB’s expression-level kernel optimization and generated adjoints [30, 39]. All of these optimize or transform the executable form of a lattice scheme the user must still select: collision model, equilibrium ansatz, stencil, and grid scaling enter as choices. Our contribution sits one step upstream, deriving the equilibrium, gradient-tracking cascade, and grid scaling automatically from the continuous PDE, and kernel-level generation can consume the schemes we emit. Driven by a coordinate-free, declarative Domain-Specific Language (DSL) built on top of SymPy [52], our framework automatically deconstructs systems of mixed hyperbolic and parabolic PDEs into point-wise advection-relaxation loops. When higher-order spatial derivatives or nonlinear coupling tensors are present, the compiler recursively extends the global state vector with auxiliary local gradient-tracking states. This reduces multi-node differential operators to nested, first-order kinetic interactions, bypassing macroscopic difference stencils to preserve local concurrency. This paper presents the theoretical foundation, validation, and hardware exe-cution of this multi-physics compiler targeting the platform-transparent framework OpenLB [37, 39]: asymptotic convergence across twelve PDE systems and near-roofline GPU-kernel performance. The remainder of this manuscript is organized as follows: Section 2 analyzes the kinetic formulation, its macroscopic recovery via Chapman–Enskog expansion, and the automated gradient-tracking cascade. Section 3 states the continuous formulation and compiled configuration of the test cases. Section 4 reports the recursive Method of Manufactured Solutions (MMS) convergence study, and Section 5 evaluates the roofline efficiency of the generated kernels. Listing 1 gives the complete DSL specification of the compressible Euler equations: from these few coordinate-free lines the compiler generates a validated OpenLB solver. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 3                                       
+
+> PDE  Conservation form
+> ∂tQ+∇ · Φ=S
+> Augmented system
+> ∂tQ++∇ · Φ+=S+
+> Q+= ( Q,G),G=
+> ∇Q,Φ+algebraic
+> Relaxation system
+> ∂tfk,i +ξi· ∇ fk,i
+> =1
+> ε(feq
+> k,i −fk,i )
+> P
+> iξifeq
+> k,i =Φk
+> Lattice scheme
+> fk,i (x+ci, t +1) =
+> fk,i −1
+> τ(fk,i −feq
+> k,i ) + wiSk
+> Kernels
+> Step 1: reformulation Step 2: relaxation Step 3: discretization
+
+Fig. 1: A PDE declared in the DSL (Listing 1) is equivalently rearranged into a first-order cascade of conservation laws by adjoining an auxiliary variable for each spatial derivative ((2.1)). This exact system is approximated by a discrete-velocity relaxation model whose collision both embeds the physical flux in the equilibrium and relaxes the auxiliary variables onto the gradients they represent ((2.2) and (2.7)), then integrated into the collide-and-stream update ((2.11)). Listing 1: DSL formulation of the compressible Euler equations targeting OpenLB.  
+
+> 1
+
+from pde2lbm import * 
+
+> 23
+
+eqs = ConservationLaws ( dim =2)  
+
+> 45
+
+# 1. Define Variables  
+
+> 6
+
+rho , E = eqs . scalars ( " rho " , " E " )  
+
+> 7
+
+rhoU = eqs . vector ( " rhoU " )  
+
+> 89
+
+gamma = eqs . register_parameter ( " gamma " )  
+
+> 10 11
+
+# 2. Dependent Variables  
+
+> 12
+
+u = rhoU / rho  
+
+> 13
+
+p = ( gamma - 1) * ( E - 0.5 * rho * u . dot ( u ) )  
+
+> 14 15
+
+# 3. Equation System  
+
+> 16
+
+eqs . add ([  
+
+> 17
+
+Eq ( dt ( rho ) + div ( rhoU ) , 0) ,  
+
+> 18
+
+Eq ( dt ( rhoU ) + div ( outer ( rhoU , u ) + p * eye (2) ) , 0) ,  
+
+> 19
+
+Eq ( dt ( E ) + div (( E + p ) * u ) , 0)  
+
+> 20
+
+])  
+
+> 21 22
+
+# 4. Track Statistics  
+
+> 23
+
+eqs . track ( " rho " , rho )  
+
+> 24
+
+eqs . track ( " uSqr " , u . dot ( u ) )  
+
+> 25 26
+
+# 5. Generate OpenLB solver  
+
+> 27
+
+eqs . compile ( class_name = " EulerDynamics " ) 
+
+2. Methodology. 2.1. Reformulation to Conservation Form. We consider a system of K
+
+continuous PDEs specified on a D-dimensional spatial domain Ω ⊂ RD . The target problem class is cast into the general conservation form: 
+
+∂tQ + ∇ · Φ = S,(2.1) where Q = [ Q1, Q 2, . . . , Q K ]T ∈ RK denotes the primary macroscopic state vector field. The physical flux tensor Φ ∈ RK×D and the localized source vector S ∈ RK
+
+capture linear or nonlinear couplings in the primary states Q, their spatial gradients 
+
+G = ∇Q, or higher-order derivative tensors. A broad range of physical systems admits this form, differing only in the functional form of the flux Φ and source S. The derivation that follows takes (2.1) as its sole entry point and proceeds in three mechanical steps (Figure 1, Introduction): the 4 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+conservation law is first equivalently rearranged into a first-order cascade by adjoining an auxiliary variable for each spatial derivative, rendering the fluxes algebraic in the augmented state (Section 2.1.1), then approximated by a discrete-velocity kinetic relaxation scheme whose collision embeds the flux and relaxes those auxiliaries onto the gradients they represent (Section 2.2), and finally marched by the standard lattice-Boltzmann integration into a local collide-and-stream update (Section 2.3). Table 1 catalogues the twelve systems to which we apply this construction, grouped by the character of their principal part (hyperbolic, parabolic, or mixed), which fixes the refinement scaling (acoustic or diffusive, Section 2.4.1) under which each is verified. Each system is derived, generated, and validated in detail in Section 3. Table 1: Taxonomy of the verified PDEs and the scaling under which each is refined. 
+
+Category Example PDEs Scaling I. Hyperbolic Inviscid Burgers Compressible Euler Shallow Water Ideal Ultrarelativistic Maxwell (TM mode) Nonlinear Elasticity (finite-strain) Acoustic 
+
+II. Parabolic Scalar ADR Allen–Cahn Phase-Field Incompressible Navier–Stokes Diffusive 
+
+III. Mixed Compressible Navier–Stokes–Fourier Resistive Magnetohydrodynamics †
+
+3D Homogenized Compressible Navier–Stokes–Fourier †
+
+Diffusive / Acoustic †† Physically parabolic (resistive/viscous) but wave-dominated: diffusion is sub-dominant to the fast waves, so these systems are refined acoustically, their lattice diffusion number growing only linearly in  
+
+> Nand remaining sub-critical on all reported grids.
+
+2.1.1. Recursive Gradient Tracking. When physical fluxes or sources contain spatial derivatives, traditional methods typically rely on multi-node difference stencils. To preserve locality, the compiler instead scans each declared flux Φk and source Sk
+
+for gradients: the field under a gradient ∇V is its parent field V . In the compressible Navier–Stokes–Fourier system, for instance, the heat flux −K∇T has the temperature 
+
+T as its parent and the viscous stress has the velocity u. Each such ∇V is then replaced by an independent auxiliary tracker G ≈ ∇ V appended to the global state vector Q,so no macroscopic difference stencil is ever formed. A parent that is itself a conserved state is tracked directly, while a derived parent is first expanded over the conserved fields, a reduction the compiler performs automatically (Section 2.5). Following this approach [11], each gradient ∇V is resolved via a dedicated linear advection-relaxation equation [10, 32] for the tracker G:
+
+∂tG + ∇ · ΦG = SG,(2.2) AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 5where the auxiliary flux tensor and relaxation source vector are defined as: 
+
+ΦG = G ⊗ u − I ⊗ Vτ∇
+
+, SG = − G
+
+τ∇
+
+.(2.3) Here, u represents a background advection velocity vector, I is the Kronecker identity tensor, and τ∇ is a small gradient-tracker relaxation time. Pre-scaling the injected field by 1/τ ∇ makes the tracker carry the physical gradient directly. In the limit τ∇ → 0 the relaxation penalty dominates, forcing ∂tG → 0. Since 
+
+∇ ·  I ⊗ Vτ∇
+
+ ≡ ∇Vτ∇ , the steady-state balance recovers the spatial derivative locally: 
+
+G = ∇V + O(τ∇).(2.4) Each tracker is a separate linear advection-relaxation system whose equilibrium en-codes ∇V , so its O(τ∇) consistency follows from (2.4) directly, with a relaxation lag whenever the parent field is unsteady. The tracker time is fixed at τ∇ = gτ ∆t with a resolution-independent step count gτ (supplementary materials), so both offset and lag are O(∆ t), their interaction with the two refinement laws quantified in Section 2.4.1. First derivatives are alternatively available from the non-equilibrium populations, but we adopt prognostic trackers uniformly here and note that route as future work. For physical systems demanding higher-order derivatives, nested gradient tracking hierar-chies are constructed by recursively applying this tracking mechanism to previously generated auxiliary states (e.g., G2 = ∇G1 = ∇(∇V )). This reduces multi-node macroscopic differential operators to chains of nested, first-order kinetic interactions, maintaining stencil locality throughout the calculation. 
+
+2.2. Relaxation to a Discrete Kinetic Scheme. 2.2.1. Vector Populations and the Exact-Flux Equilibrium. To solve (2.1) while maintaining spatial locality, the continuous system is mapped into a discrete kinetic phase space by allocating an independent set of particle distribution functions 
+
+fk,i (x, t ) for each component k ∈ { 1, . . . , K } of the macroscopic state vector. The formulation is dimension- and stencil-agnostic, accommodating any symmetric lattice whose discrete velocities ci and weights wi satisfy the tensor isotropy conditions: 
+
+X
+
+> i
+
+wi = 1 , X
+
+> i
+
+wici = 0, X
+
+> i
+
+wici ⊗ ci = c2
+
+> s
+
+I,(2.5) where I is the identity tensor and cs is the dimensionless lattice speed of sound. The primary macroscopic variables are recovered point-wise via the zeroth moment: 
+
+Qk(x, t ) = 
+
+> I−1
+
+X
+
+> i=0
+
+fk,i (x, t ).(2.6) Classical LBM equilibria truncate a Hermite expansion of the Maxwell–Boltzmann distribution. We instead embed the analytical physical flux Φk directly and exactly 
+
+into the first-order discrete moment of the equilibrium distribution function f eq 
+
+> k,i
+
+, which is therefore linear in the macroscopic data: 
+
+f eq 
+
+> k,i
+
+(x, t ) = wi Qk(x, t ) + ci ·  ∆t 
+
+> ∆x
+
+Φk(x, t )
+
+c2
+
+> s
+
+!
+
+.(2.7) 6 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Because no series in u/c s is formed, no low-Mach truncation ceiling arises from this construction: the minimal lattice serves at high Mach number without enlarging the velocity set (wave speeds are instead limited by the sub-characteristic condition of Section 2.4.2), whereas moment-matched Maxwell–Boltzmann constructions extend the compressible range only by enlarging the velocity set [22] or abandoning the fixed lattice frame [18]. We adopt this per-field, flux-in-first-moment equilibrium in the form of [11], where it is exercised in the strongly compressible regime. Taking the exact discrete moments confirms the linear projection: 
+
+X
+
+> i
+
+f eq  
+
+> k,i
+
+= Qk, X
+
+> i
+
+f eq 
+
+> k,i
+
+ci = ∆t
+
+∆x Φk.(2.8) 
+
+2.2.2. Relation to Classical Relaxation Schemes. The construction of (2.7)– (2.11) is not merely analogous to a relaxation method but an instance of one. Introduc-ing the physical lattice velocities ξi = ci ∆x 
+
+> ∆t
+
+, the equilibrium moment constraints (2.8) read 
+
+X
+
+> i
+
+f eq  
+
+> k,i
+
+= Qk, X
+
+> i
+
+ξi f eq  
+
+> k,i
+
+= Φk,(2.9) which are precisely the conditions defining the multidimensional discrete-velocity kinetic approximation of conservation laws analysed by Natalini and Aregba-Driollet [2, 54], a class that includes the Jin–Xin relaxation schemes [33]. In this correspondence the BGK collision is the discretization of a local relaxation toward equilibrium with relaxation time ε = ( τLB − 12 )∆ t set by the collide-and-stream relaxation time τLB 
+
+of (2.11). The discrete velocities ξi act as the constant characteristic speeds of the underlying linear transport operator. All nonlinearity resides in the local equilibrium. The streaming is linear and constant-coefficient. The canonical scalar instance makes the identification concrete: For a one-dimensional law ∂tu + ∂xf (u) = 0 , the two-velocity ( ξ1,2 = ±a) scheme has equilibria 
+
+M±(u) = 12 u ± 12a f (u),(2.10) whose zeroth and first moments return u and f (u) exactly, the one-dimensional form of (2.7). At full relaxation, τLB = 1 , the populations are replaced by their equilibria in every step and this two-velocity scheme collapses to the classical Lax–Friedrichs update, the relaxation time thus tuning the stabilizing diffusion of Section 2.4.1 continuously below the Lax–Friedrichs level as τLB → 12 . Recognizing the scheme as a discrete kinetic relaxation scheme is what grounds the consistency and stability statements that follow: the asymptotic recovery of (2.1) (Section 2.4.1) and the admissibility boundary (Section 2.4.2). The correspondence between LBM and relaxation or finite-difference schemes is well established [7,19,26,34,59,62], and vectorial schemes placing physical fluxes in the first moments have been constructed by hand for particular settings [3, 20, 26, 51]. Here the correspondence is used generatively : the compiler derives the scheme directly from the supplied conservation law, whose flux Jacobians fix the admissibility condition a priori. The gradient trackers of Section 2.1.1 are the same relaxation construction with a different target: each tracker equilibrium encodes the gradient of an external field rather than an algebraic flux of a conserved state, so its O(τ∇) consistency follows from the steady-state balance (2.4) directly. For scalar diffusion this is classically AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 7the Jin–Liu relaxation system [32], a diffusive BGK approximation [10, 46], with the difference that here the tracked gradient feeds a flux whose physical diffusivity is prescribed independently of the kinetic relaxation times. 
+
+2.3. Discretization. Integrating the discrete-velocity relaxation system along its characteristics over one time step, with the collision treated by the trapezoidal rule and absorbed into the relaxation time, yields the collide-and-stream update, instantiated here with the single-relaxation-time Bhatnagar–Gross–Krook (BGK) collision [38]: 
+
+fk,i (x + ci∆x, t + ∆ t) = fk,i − 1
+
+τLB 
+
+
+
+fk,i − f eq 
+
+> k,i
+
+
+
++ ∆ tw iStotal  
+
+> k
+
+(x, t + ∆ t/ 2) ,(2.11) where τLB is the relaxation time parameter, unqualified populations are evaluated at (x, t ), and Stotal  
+
+> k
+
+incorporates the target PDE sources, evaluated at the temporal midpoint for second-order source coupling. This is the standard lattice-Boltzmann time-marching. The construction is orthogonal to the collision operator: the compiler fixes the equilibria, sources, and per-field relaxation slots, and any collision operator relaxing populations toward these equilibria, such as two-relaxation-time or regularized operators [38, 45], consumes them unchanged in the target framework. BGK is the operator we analyse and run. 
+
+2.4. Consistency and Stability. 2.4.1. Asymptotic Consistency. To evaluate asymptotic consistency, we per-form a Chapman–Enskog expansion, perturbing the distribution around its equilibrium state: fk,i = f (0)  
+
+> k,i
+
++ ∆ tf (1)  
+
+> k,i
+
++ O(∆ t2), where f (0)  
+
+> k,i
+
+≡ f eq  
+
+> k,i
+
+and P 
+
+> i
+
+f (1)  
+
+> k,i
+
+= 0 . A Taylor series expansion of the left-hand side of (2.11) yields: 
+
+fk,i (x + ci∆x, t + ∆ t) = fk,i + ∆ t
+
+
+
+∂t + ∆x
+
+∆t ci · ∇ 
+
+
+
+fk,i 
+
++ ∆t2
+
+2
+
+
+
+∂t + ∆x
+
+∆t ci · ∇ 
+
+2
+
+fk,i + O(∆ t3).
+
+(2.12) Isolating the first-order non-equilibrium perturbation yields: 
+
+f (1)  
+
+> k,i
+
+= −τLB 
+
+
+
+∂tf (0)  
+
+> k,i
+
++ ∆x
+
+∆t ci · ∇ f (0)  
+
+> k,i
+
+− wiStotal 
+
+> k
+
+
+
+.(2.13) Taking the first moment of f (1)  
+
+> k,i
+
+with respect to ξi = ci ∆x 
+
+> ∆t
+
+defines the non-equilibrium deviation flux Π(1)  
+
+> k
+
+= P 
+
+> i
+
+f (1)  
+
+> k,i
+
+ξi. Using the isotropy conditions (odd moments vanish on the symmetric stencil), the second equilibrium moment is P 
+
+> i
+
+f (0)  
+
+> k,i
+
+ξi ⊗ ξi = a2QkI
+
+with the squared lattice speed a2 = c2
+
+> s
+
+(∆ x/ ∆t)2, giving: 
+
+Π(1)  
+
+> k
+
+= −τLB 
+
+ ∂tΦk + a2∇Qk
+
+ .(2.14) The standard second-order accounting reduces the prefactor τLB to τLB − 12 [38], so the deviation enters the macroscopic balance through the relaxation time ε = ( τLB − 12 )∆ t
+
+of Section 2.2.2: 
+
+∂tQk + ∇ · Φk = Stotal  
+
+> k
+
++ ∇ ·  ε ∂ tΦk + ε a 2 ∇Qk
+
+ + O(ε2).(2.15) The correction is not yet closed: it still contains the time derivative ∂tΦk. We take the flux to be an algebraic function of the state, Φ = Φ(Q). Gradient-dependent fluxes 8 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+are reduced to this form by the tracker construction of Section 2.1.1, and prescribed coefficient fields (the homogenized compressible-flow case of Section 3) add an O(ε)
+
+closure term that vanishes under refinement. To leading order the conserved fields then obey ∂tQ = −∇ · Φ + S + O(ε), so with the flux Jacobians Aα = ∂Φα/∂ Q,
+
+∂tΦα = Aα ∂tQ = − AαAβ ∂β Q + AαS + O(ε).(2.16) Substituting (2.16) fuses the temporal and spatial corrections into a single second-order operator, the relaxation diffusion ,
+
+∂tQk + ∇ · Φk = Stotal  
+
+> k
+
++ ∇ ·  νeff ∇Q 
+
+> k
+
++ O(ε2),(2.17) 
+
+νeff (n) = ε a2I − A2
+
+> n
+
+, An = P 
+
+> α
+
+nαAα,(2.18) anisotropic through the directional flux Jacobian An, the combination that governs a plane wave propagating along the unit direction n (the source coupling AαS of (2.16) modifies only the effective source, not the principal symbol, and is absorbed into 
+
+Stotal  
+
+> k
+
+). For a scalar law this collapses to νeff = ε (a2 − f ′(u)2). The collision entered this derivation only through the relaxation rate of Π(1)  
+
+> k
+
+: any operator preserving (2.9) and relaxing this moment at a single rate recovers (2.17) with ε set by that rate, differing only at O(ε2). Whether a2I − A2 
+
+> n
+
+keeps the net operator dissipative is the question taken up in Section 2.4.2. Under refinement the correction is controlled by ε = ( τLB − 12 )∆ t together with the lattice speed a. Throughout this work the relaxation time is parametrized by a resolution-independent rate τR > 0 as τLB = 12 + τR ∆t, so εa 2 = c2 
+
+> s
+
+τR ∆x2
+
+contracts under any refinement law: the relaxation diffusion is a second-order-consistent numerical stabilizer, never a modelled transport coefficient (at fixed τLB it converges to a finite limit instead, the classical route to modelling physical diffusion [10, 34]). Physical diffusion, where the target carries it, enters through the tracked-gradient fluxes of Section 2.1.1. The two refinement laws differ in which lattice number they hold fixed. Diffusive 
+
+scaling ( ∆t ∝ ∆x2) fixes the lattice diffusion number D ∆t/ ∆x2 of the tracked diffusive flux, the explicit-stability requirement of a parabolic principal part, while the lattice speed grows as a ∝ ∆x−1 and the sub-characteristic condition of Section 2.4.2 relaxes under refinement. Acoustic scaling ( ∆t ∝ ∆x) instead fixes the wave Courant number 
+
+λ ∆t/ ∆x of the physical signal speeds λ while νeff = O(∆ x2) → 0, the natural regime for hyperbolic targets, which carry no physical diffusion to sustain. In either regime the truncation error is O(∆ x2). The trackers’ O(∆ t) offset and lag accordingly become 
+
+O(∆ x2) under diffusive and O(∆ x) under acoustic scaling, entering only through the small-diffusivity fluxes and staying below the O(∆ x2) remainder at the reported resolutions. No single refinement holds both numbers fixed as ∆x → 0, so each target is refined by whichever timescale binds. 
+
+2.4.2. Sub-Characteristic Stability. The relaxation structure that supplies the consistency above also delimits the class of systems the framework can stably represent. The leading correction νeff of (2.17) is dissipative only where it is positive semi-definite. Where it is indefinite, the leading-order correction is anti-diffusive. For a scalar conservation law with lattice speed a this is the sign of a2 − f ′(u)2, i.e. the classical sub-characteristic condition [48, 67] 
+
+a ≥ | f ′(u)| for all attained u, (2.19) i.e. the lattice must propagate faster than the fastest physical wave. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 9For a system the requirement is positive semi-definiteness of νeff (n) = ε(a2I − A2
+
+> n
+
+)
+
+in every direction. For systems admitting a symmetrizer (equivalently, a convex entropy) [12, 23], An = P 
+
+> α
+
+nαAα(Q) is diagonalizable with real spectrum in the symmetrized inner product, and positive semi-definiteness of a2I − A2 
+
+> n
+
+is equivalent to the lattice dominating the physical wave speeds in every direction, so that the scalar bound becomes the spectral condition 
+
+max eig X
+
+> α
+
+nαAα(Q) ≤ a, ∀ n, ∥n∥ = 1 , and attained Q.(2.20) Both inequalities are checkable symbolically from the Jacobians of the fluxes the compiler already assembles, yielding an a priori admissibility criterion and, where it fails, a principled rescaling of the lattice speed or time step. Systems whose principal symbol violates hyperbolicity or whose signal speeds no finite lattice can dominate (elliptic constraints, higher-order dispersive operators) fall outside the admissible class a priori, delimiting the targets the framework represents by construction. 
+
+2.5. Declarative DSL and Automated Compiler. The reformulation, the equilibrium construction, and the admissibility check each manipulate only the declared fluxes and their Jacobians, and are therefore mechanizable. We encapsulate them in a symbolic compiler that wraps the derivation in two further stages the mathematics does not require, dedimensionalization and reference shifting, so that a model declared in physical units compiles directly to executable kernels. Rather than requiring manual, error-prone decomposition of physical fluxes, spatial derivatives, and gradient-tracking variables, the framework exposes a coordinate-free declarative DSL on top of the SymPy Computer Algebra System (CAS) [52].          
+
+> Layer 1
+> DSL frontend
+> coordinate-free PDE in SI units
+> Layer 2
+> Dedimensionalize
+> Buckingham-Π(p, q )exponents
+> Layer 3
+> Kinetic mapping
+> point-wise relaxation scheme
+> Layer 4
+> Code generation
+> cross-platform OpenLB operators
+> Physical PDE
+> Nondim. PDE
+> Kinetic Scheme
+> Layer 3 passes (Algorithm 2.1): 1. Split : terms under a ∇· to the flux, the re-mainder to the source 2. Cascade : nested ∇resolved into tracker fields, optional strain reduction 3. Assemble : exact-flux equilibria and relax-ation slots per field
+
+Fig. 2: The compiler is a four-layer pipeline. A coordinate-free PDE declared in SI units (Layer 1) is dedimensionalized by a Buckingham-Π projection that reads off the scaling (Layer 2), mapped to a local vector-kinetic scheme (Layer 3), and emitted as a platform-transparent OpenLB operator (Layer 4). Each layer consumes the previous intermediate representation and produces the next. The continuous model of any target system is declared by applying operators directly to symbolic state variables: the temporal derivative ( dt ), spatial gradient (grad ), divergence ( div ), Laplacian ( laplacian ), outer tensor product ( outer ), and identity tensor ( eye ). For instance, the nonlinear Euler equations of compressible fluid dynamics are declared in a few lines (Listing 1 in the Introduction). The compiler 10 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Algorithm 2.1 The PDE2LBM compiler: from conservation law to LBM scheme 
+
+Input: conservation laws {∂tQ + ∇ · Φ − S = 0 } declared over conserved states, derived quantities, and parameters, in SI units. Lattice (ci, w i) and characteristic references. 
+
+Output: parameterized collision operator with per-field populations and equilibria 
+
+Dedimensionalize (Layer 2) physical PDE → dimensionless PDE  
+
+> 1:
+
+(p, q ) ← Π D(X) for every declared quantity X, by Buckingham-Π ((2.21))  
+
+> 2:
+
+rescale states by dx −pdt −q , fluxes by dx −(p+1) dt −(q−1) , sources by dx −pdt 1−q
+
+Split (Layer 3) dimensionless PDE → (Q, Φ, S) 
+
+> 3:
+
+for each equation do  
+
+> 4:
+
+Qk ← the conserved field under ∂t 
+
+> 5:
+
+Φk ← terms under a ∇·  
+
+> 6:
+
+Sk ← the remainder  
+
+> 7:
+
+end for  
+
+> 8:
+
+Φ, S are now algebraic over the states Qj , derived quantities (e.g. u, T = p/ρR ), parameters, coordinates, and their gradients 
+
+Cascade (Layer 3) (Q, Φ, S) → gradient-free (Q+, Φ+, S+) 
+
+> 9:
+
+while some Φk or Sk contains a gradient ∇V do ▷ innermost first  
+
+> 10:
+
+if V is a conserved state or an existing tracker then  
+
+> 11:
+
+append tracker GV to the state vector ((2.2)) and substitute ∇V 7 → GV 
+
+> 12:
+
+else if V is a parameter or coordinate field then  
+
+> 13:
+
+differentiate analytically  
+
+> 14:
+
+else ▷ V derived  
+
+> 15:
+
+expand ∇V over the conserved state, or track V as an auxiliary field  
+
+> 16:
+
+end if  
+
+> 17:
+
+end while  
+
+> 18:
+
+optional: symmetric velocity-gradient tensor → strain trackers, D2 7 → D(D+1) /2 
+
+> 19:
+
+invariant: every Φk, Sk is algebraic in Q+ (closure premise, Section 2.4.1) 
+
+Assemble (Layer 3) (Q+, Φ+, S+) → kinetic scheme  
+
+> 20:
+
+for each field k of Q+, conserved and tracker do  
+
+> 21:
+
+allocate fk,i with the exact-flux equilibrium f eq  
+
+> k,i
+
+= wi
+
+ Qk + ci · Φk/c 2
+
+> s
+
+ ((2.7), lattice units)  
+
+> 22:
+
+assign the free relaxation slot τk (conserved) or τ∇ (tracker)  
+
+> 23:
+
+end for Emit (Layer 4) kinetic scheme → OpenLB operator  
+
+> 24:
+
+shift by the reference state (Q0, F0) (Section 2.5.2)  
+
+> 25:
+
+eliminate common subexpressions and emit the collision operator then processes these declared equations through a sequence of symbolic transformation passes prior to C++ code generation, as detailed in Algorithm 2.1. The compiler recursively resolves gradient cascades, which we illustrate by returning to the compressible Navier–Stokes–Fourier system. Neither its heat-flux gradient ∇T
+
+(with temperature T = p/ (ρR )) nor its viscous-stress gradient ∇u is the gradient of a conserved variable, so the Cascade step of Algorithm 2.1 expands them by the chain rule over the conserved fields the scheme can transport ( Gρ = ∇ρ, Gρu = ∇(ρu), GE =
+
+∇E). This gives ∇u = ρ−1(Gρu −u⊗Gρ) for the stress and ∇T = ρ−1(R−1Gp −T Gρ)
+
+for the heat flux (with the pressure gradient Gp = ∇p itself reconstructed from 
+
+Gρ, Gρu, GE ), then resolves the resulting conserved-field gradients into trackers. A AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 11 single sweep therefore resolves this chain of nested first-order derivatives without ever forming a multi-node stencil. Systems whose fluxes contain still higher derivatives trigger additional passes of the same loop, each registering the gradient of a previously generated auxiliary state, so the cascade terminates at the highest derivative order present in Φ and S.
+
+2.5.1. Automated Physical-Unit Scaling. In traditional hand-coded LBMs, converting physical variables Qphys into dimensionless lattice variables QLBM requires solving by hand for the exponents p and q in the grid-dependent conversion Qphys =
+
+QLBM · dx p dt q . To eliminate this bookkeeping, our symbolic DSL lets the user declare the governing PDE directly in physical (SI) units: each state variable and parameter is registered with its physical dimension (e.g. a velocity as length /time ). The compiler then reduces every quantity to the lattice scales by a Buckingham-Π projection (the 
+
+Dedimensionalize step of Algorithm 2.1). Each declared quantity X carries an SI dimension whose exponents over the b base dimensions (length and time first) form a rational vector D(X) ∈ Qb. The lattice carries only two independent scales, the spacings dx and dt , so reducing D(X) to them is a linear map π : D(X) 7 → (p, q )
+
+fixed by three requirements: length and time map to themselves, π( length ) = (1 , 0) 
+
+and π( time ) = (0 , 1) , and each remaining base dimension is eliminated through a characteristic reference quantity R3, . . . , R b already present in the model and held lattice-invariant, π(D(Rk)) = (0 , 0) . These conditions make {length , time , R 3, . . . , R b}
+
+an alternative basis of dimension space, whose exponent vectors form the columns of the invertible b × b matrix B = [ e1, e2, D(R3), . . . , D(Rb) ] , so that the projection becomes the explicit linear map (2.21)  p(X), q (X)⊤ = Π D(X), Π = [ I2 | 0 ] B−1,
+
+in which B−1 re-expresses any SI dimension in the {length , time , reference } basis and 
+
+Π reads off its length and time content. The references need only be dimensionally independent of length, time, and each other, so that B is invertible. The exponents are in general non-zero and field-specific (for example (p, q ) = (1 , −1) for a velocity), degenerating to (p, q ) = (0 , 0) for already lattice-dimensionless quantities, including each characteristic reference itself: the density, once mass is eliminated through ρ0,carries no grid-dependent conversion at all. Fluxes and sources carry their own grid-dependent conversions: a flux is the conserved quantity carried at a velocity, so it inherits the field’s own scaling dx −p dt −q
+
+together with one velocity conversion factor dt/dx :(2.22) FLBM = Fphys · dx −p dt −q dt dx = Fphys · dx −(p+1) dt −(q−1) ,
+
+while a source, being a rate, picks up one time step instead, SLBM = Sphys · dx −p dt 1−q .Each gradient tracker carries its parent field’s exponents shifted by one inverse length, 
+
+(p − 1, q ), so the gradient cascade is scaled consistently. The compiler injects these transformations automatically: each PDE is written once, in SI form. Returning to the running example, the same system is declared in SI units, the 
+
+dynamic viscosity ( Pa s), thermal conductivity ( W m −1 K−1), and specific gas constant each carrying named SI dimensions (the complete DSL specification is given in the supplementary material). Eliminating the mass and temperature dimensions through the density and the gas constant and projecting via (2.21), both the dynamic viscosity and the thermal conductivity collapse to the identical (p, q ) = (2 , −1) scaling of a 12 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+length 2/time diffusivity, recovering the momentum and thermal diffusion scalings. The result is the compressible Navier–Stokes–Fourier kernel verified at second order in Section 3, generated and run with no hand-derived equilibrium, stencil, or unit conversion. 
+
+2.5.2. Automated Reference and Equilibrium Shifting. Many target sys-tems carry a small fluctuation δQ(x, t ) on a large background Q0, |δQ| ≪ | Q0|.Populations formed from absolute state values then push the active variations into the low mantissa bits, and spatial differences suffer catastrophic cancellation, especially in single precision ( float ). Each component Qk is carried by its own substencil whose resting equilibrium 
+
+f eq  
+
+> k,i
+
+= wiQk distributes Qk over the lattice weights, so near a background reference state Q0 even the quiescent populations carry a large static offset wiQk, 0̸ = 0 [37]. The compiler removes this bias at code-generation time through two coordinated shifts. First, a reference-state shift moves the macroscopic origin off the large back-ground: the compiler evolves only the fluctuation δQ = Q − Q0 about a declared background state Q0. Second, an equilibrium-population shift subtracts the matching background equilibrium from every population: evaluating Q0 and its flux Fk, 0, the compiler stores only the deviation (2.23) f ∗ 
+
+> k,i
+
+= fk,i − f eq 
+
+> k,i
+
+(Q0, F0),
+
+subtracting the background equilibrium of (2.7), so the zeroth-moment state offset 
+
+wiQk, 0 and the first-moment flux offset are removed together. The kernels then run entirely on these shifted populations f ∗ 
+
+> k,i
+
+= O(δQ ), which vanish at background equilibrium, so the full mantissa is spent on the active fluctuation. This reduces roundoff and improves stability, decisively so under single precision. 
+
+3. Applications. To validate the generality of the compiler’s kinetic mapping, a suite of twelve continuous target systems has been classified in Table 1. The systems span fluid mechanics, electromagnetics, and solid mechanics. All are evaluated on a two-dimensional periodic domain Ω = [0 , 1] 2, except the three-dimensional Homogenized Compressible Navier–Stokes–Fourier (HCNSF) case, which uses Ω = [0 , 1] 3. Each system is refined under the lattice scaling matched to its dominant transport mechanism (Section 2.4.1): diffusive ( ∆t ∝ ∆x2) for the diffusion-resolving parabolic systems and acoustic ( ∆t ∝ ∆x) for the hyperbolic and convection-dominated ones. 
+
+3.1. Inviscid Burgers. The inviscid Burgers equation is the minimal scalar conservation law with a state-dependent characteristic speed f ′(u) = u. It isolates the core mechanism of the framework (the exact nonlinear flux 12 u2 embedded directly in the equilibrium first moment) with no gradient trackers, no coupling, and a single field. The scalar law reads 
+
+∂tu + ∇ · 
+
+ 12 u212 u2
+
+
+
+= 0 ,(3.1) so that ∇ · Φ = u (∂x0 u + ∂x1 u), where u is a velocity-like scalar field. This continuous system maps directly onto (2.1) with: 
+
+Q =  u , Φ =
+
+ 12 u212 u2
+
+
+
+, S =  0 .(3.2) Because max |f ′(u)| = max |u|, the manufactured amplitude directly sets the physical wave speeds the lattice must dominate, making this the cleanest setting in which to probe the sub-characteristic bound empirically. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 13 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6            
+
+> Ma = A/cs
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2.0
+> collision rate  ω
+> Ma = 1
+> viscosity-stabilised
+> (low ω)
+> ω→2 ceiling:
+> Ma = 1/ √3 (positivity limit)
+> stability boundary
+> N= 64
+> N= 128
+> N= 256
+> N= 512
+> EOC point ( A= 1.3, ω→2)
+> rel L2= 8.57 × 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> relative  L2 error at  N = 512
+
+Fig. 3: Brute-force stability map for the inviscid Burgers scheme, sweeping Mach number Ma = A/a against collision rate ω. Background shading is the relative 
+
+L2 error at N = 512 , and solid curves trace the empirical stability boundary at 
+
+N = 64 , 128 , 256 , 512 . The boundary converges to the equilibrium-monotonicity bound 
+
+Ma = 1 /√3 as ω → 2 (dash-dotted line), tightening the sub-characteristic condition of Section 2.4.2. The star marks the verification working point of Table 2. 
+
+Empirical Sub-Characteristic Boundary. Figure 3 reports a brute-force stability sweep of the generated scheme over the manufactured Mach number Ma = A/a and the collision rate ω. For each pair the simulation is run to t = 1 .0 and classified as stable or divergent, while the background shading records the relative L2 error at N = 512 . Mapped stability boundaries in the velocity–relaxation plane are an established tool of lattice Boltzmann stability analysis [61, 64, 70]. The empirically resolved boundary tightens under grid refinement toward Ma = 1 /√3 at ω → 2: the bound max |f ′(u)| ≤ cs a at which the exact-flux equilibria (2.7) cease to be monotone in u, the monotone-equilibria condition of the relaxation framework [2]. It sharpens the sub-characteristic condition of (2.19) by the factor cs in the over-relaxation limit, while under heavier relaxation damping the boundary rises toward the per-axis wave-speed ceiling. The verification working point ( A = 1 .3, Ma ≈ 0.45 , starred) lies safely within the stable interior, consistent with the a priori criterion of Section 2.4.2. 
+
+3.2. Compressible Euler. The Euler equations govern the conservation of mass, momentum, and energy in inviscid compressible fluids, where thermal and mechanical 14 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+energy modes are coupled dynamically through an equation of state. The system reads 
+
+∂tρ + ∇ · (ρu) = 0 ,∂t(ρu) + ∇ · (ρu ⊗ u + pI) = 0,∂tE + ∇ · (( E + p)u) = 0 ,
+
+(3.3) where ρ represents the fluid mass density, u is the physical velocity vector, E is the total energy density, and p is the static thermal pressure. LBM formulations for the compressible Euler equations have been developed using multi-speed lattices to decouple fluid velocity from temperature [35]. This system maps onto (2.1) with: 
+
+Q =
+
+
+
+ρρu
+
+E
+
+ , Φ =
+
+
+
+ρu
+
+ρu ⊗ u + pI
+
+(E + p)u
+
+ , S =
+
+
+
+0
+
+0
+
+0
+
+ .(3.4) The pressure is dynamically closed via the ideal gas equation of state p = ( γ − 1)( E −
+
+> 1
+
+/2ρ|u|2), where γ = 1 .4 is the adiabatic index. 
+
+3.3. Shallow Water. The Shallow Water equations (SWE) describe flow propa-gation in open channels and coastal zones, modeling depth-averaged fluid thickness and momentum under hydrostatic pressure. LBM formulations for the shallow water equations identify the fluid height with density [57] and the system is also a code-generation example in lbmpy [29]. The depth-averaged nonlinear free-surface model simulates channel hydraulics over a static spatial bottom topography field zb(x):
+
+∂th + ∇ · (hu) = 0 ,∂t(hu) + ∇ · 
+
+
+
+hu ⊗ u + 12 gh 2I
+
+
+
+= −gh ∇zb,
+
+(3.5) where h represents the depth-averaged fluid thickness (water column height), u is the depth-averaged horizontal velocity vector, g is the gravitational acceleration constant, and zb is the stationary spatial bottom topography profile. It maps onto (2.1) with: 
+
+Q =
+
+hhu
+
+
+
+, Φ =
+
+hu
+
+hu ⊗ u + 12 gh 2I
+
+
+
+, S =
+
+0
+
+−gh ∇zb
+
+
+
+.(3.6) 
+
+3.4. Ideal Ultrarelativistic Fluid. The ultrarelativistic fluid is the ideal gas of massless particles ( c = 1 , equation of state p = e/3), whose dynamics is closed by energy–momentum conservation alone: the barotropic relativistic Euler system with sound speed 1/√3 [63]. LBM formulations have been developed for relativistic [50] and ultrarelativistic [53] hydrodynamics. Tracking the energy density E and relativistic momentum density vector S,
+
+∂tE + ∇ · S = 0 ,∂tS + ∇ · (S ⊗ v + pI) = 0,
+
+(3.7) the system maps onto (2.1) with: 
+
+Q =
+
+E
+
+S
+
+
+
+, Φ =
+
+SS ⊗ v + pI
+
+
+
+, Ssource =
+
+0
+
+0
+
+
+
+.(3.8) For the massless gas the primitive recovery is algebraic: 
+
+p =
+
+p4E2 − 3|S|2 − E
+
+3 , v = S
+
+E + p ,(3.9) with physicality requiring E > |S|, the null limit |v| → 1 attained at equality. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 15 
+
+3.5. Maxwell Electromagnetics. Maxwell’s equations are a first-order linear hyperbolic system of conservation laws whose defining operator is the curl, carried here as a pure flux divergence in the equilibrium first moment, realized previously by hand for the full three-dimensional system [51]. We treat the two-dimensional 
+
+Transverse-Magnetic (TM) mode in vacuum, with out-of-plane electric field Ez and in-plane magnetic field (Hx, H y ) propagating at light speed c [28]: 
+
+∂tEz + ∇ ·  c (−Hy , H x) = 0 ,∂tHx + ∇ ·  c (0 , E z ) = 0 ,∂tHy + ∇ ·  c (−Ez , 0)  = 0 ,
+
+(3.10) which reproduce Ampère’s and Faraday’s laws and, on eliminating H, the scalar wave equation ∂tt Ez = c2∇2Ez . The system maps onto (2.1) with 
+
+Q =
+
+
+
+Ez
+
+Hx
+
+Hy
+
+ , Φ =
+
+
+
+c (−Hy , H x)
+
+c (0 , E z )
+
+c (−Ez , 0) 
+
+ , S =
+
+
+
+000
+
+ .(3.11) 
+
+Admissibility at Constant Wave Speed. For Maxwell the admissibility condition of Section 2.4.2 applies identically at every state: the flux Jacobians are constant , with eigenvalues {+c, −c, 0} independent of the field magnitude. With the naive choice c = 1 
+
+the wave speed equals the full lattice speed, so the effective diffusion of (2.17) carries 
+
+c2 
+
+> s
+
+− c2 = 13 − 1 < 0: the recovered operator is anti-diffusive and the scheme is unstable at every τ . The remedy is to declare c as a physical quantity of dimension length/time: the dedimensionalizer then scales the flux by the acoustic factor f = ∆ t/ ∆x, as for every hyperbolic case. The lattice wave speed is then cf , and the sub-characteristic bound of (2.20) becomes the ordinary lattice-Mach constraint 
+
+c f ≤ cs = 1√3 , i.e. f ≤ cs
+
+c .(3.12) At the working point c = 1 , f = 0 .2 the bound holds with nearly threefold margin, and the scheme runs stably and at second order at the BGK edge ( τLB ≈ 0.5). 
+
+3.6. Nonlinear Finite-Strain Elasticity. For large-deformation solid mechan-ics we take the deformation gradient F = ∂x/∂ X and the velocity v as the conserved state, evolved through the kinematic compatibility relation and the momentum balance in total-Lagrangian form (gradients with respect to the reference coordinate X): 
+
+∂tF − ∇ v = 0,∂t(ρ0v) − ∇ · P = 0,
+
+(3.13) where ρ0 is the constant reference-configuration density and P is the first Piola– Kirchhoff stress of a compressible neo-Hookean solid, 
+
+P = μs
+
+ F − F−T  + λs ln( J) F−T , J = det F,(3.14) with shear modulus μs and first Lamé parameter λs. This system maps onto (2.1) with 
+
+Q =
+
+F
+
+ρ0v
+
+
+
+, Φ =
+
+−v ⊗ I
+
+−P
+
+
+
+, S =
+
+00
+
+
+
+.(3.15) Prior LBM treatments of elasticity map Cauchy-stress components to single-distribution moments [49] or build vectorial formulations for linear elastic media [8]. The same deformation-gradient formulation was arrived at concurrently [21]. 16 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+3.7. Advection-Diffusion-Reaction. The Advection-Diffusion-Reaction (ADR) equation models scalar chemical transport under a prescribed constant velocity field coupled with linear isotropic diffusion and a nonlinear logistic Fisher–KPP reaction source term. The governing equation reads 
+
+∂tc + ∇ · (cuadv − D∇c) = R c (1 − c),(3.16) where c is the scalar concentration field, uadv is the constant advective velocity vector, 
+
+D is the isotropic diffusion coefficient, and R is the reaction rate constant. The LBM has long been applied to such transport, from an early diffusion model [69] to the single-relaxation-time advection-diffusion scheme [13]. The system maps onto (2.1) with: 
+
+Q =
+
+c
+
+Gc
+
+
+
+, Φ =
+
+cuadv − DGc
+
+Gc ⊗ uadv − I c/τ ∇
+
+
+
+, S =
+
+R c (1 − c)
+
+−Gc/τ ∇
+
+
+
+.(3.17) 
+
+3.8. Allen–Cahn Phase-Field. The Allen–Cahn equation models non-conservative interface dynamics, coupling diffusion with a bistable cubic reaction. The governing equation reads 
+
+∂tϕ + ∇ · (−γ∇ϕ) = r  ϕ − ϕ3 ,(3.18) where ϕ is the dimensionless order parameter, γ is the interface diffusivity (with units of length 2/time ), and r is the reaction rate. LBM phase-field models have been developed for interface capturing [24]. The system maps onto (2.1) with: 
+
+Q =
+
+ϕ
+
+Gϕ
+
+
+
+, Φ =
+
+−γGϕ
+
+−I ϕ/τ ∇
+
+
+
+, S =
+
+r  ϕ − ϕ3
+
+−Gϕ/τ ∇
+
+
+
+.(3.19) 
+
+3.9. Incompressible Navier–Stokes. The Incompressible Navier–Stokes Equa-tions (NSE) model the conservation of momentum and mass in viscous, constant-density fluids. The equations read 
+
+∇ · u = 0 ,∂tu + u · ∇ u + 1
+
+ρ0
+
+∇p − ν∇2u = 0,
+
+(3.20) where ρ0 is the constant mass density, u is the fluid velocity vector, p is the physical pressure, and ν = μ/ρ 0 is the kinematic viscosity. Because the divergence-free condition is a kinematic constraint requiring a non-local elliptic Poisson solver, it cannot be directly represented in our explicit local framework ((2.1)). Instead, isothermal viscous transport is solved using a weakly compressible formulation [38], where density fluctuations represent a pressure proxy p = ρc 2 
+
+> s, phys
+
+with prescribed artificial sound speed cs, phys in the low-Mach limit, restoring a local conservation form: 
+
+∂tρ + ∇ · (ρu) = 0 ,∂t(ρu) + ∇ ·  ρu ⊗ u + ρc 2
+
+> s, phys
+
+I − τ  = 0,
+
+(3.21) where τ = μ(∇u + ( ∇u)T ) is the viscous shear stress tensor with dynamic viscosity coefficient μ. Closing ∇u ≈ ∇ (ρu)/ρ to O(Ma 2), this system maps onto (2.1) with: 
+
+Q =
+
+
+
+ρρuGρu
+
+ , Φ =
+
+
+
+ρu
+
+ρu ⊗ u + ρc 2
+
+> s, phys
+
+I − μρ (Gρu + GTρu)
+
+Gρu ⊗ u − I ⊗ ρu/τ ∇
+
+ , S =
+
+
+
+0
+
+0
+
+−Gρu/τ ∇
+
+ .
+
+(3.22) AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 17 
+
+3.10. Compressible Navier–Stokes–Fourier. The Navier–Stokes–Fourier 
+
+(NSF) equations, the running example of Section 2.5, govern viscous, heat-conducting gas flows: the full compressible system closing the momentum balance with the Newtonian viscous stress and the energy balance with Fourier heat conduction q =
+
+−K∇T . This is the first-order Chapman–Enskog closure, as opposed to extended-moment methods such as Grad-13 [65]. Prior LBM treatments rely on tailored equilibria [1] or multi-speed lattices [22]. The governing equations read: 
+
+∂tρ + ∇ · (ρu) = 0 ,∂t(ρu) + ∇ · (ρu ⊗ u + pI − τ ) = 0,∂tE + ∇ · (( E + p)u − τ · u − K∇T ) = 0 ,
+
+(3.23) where ρ represents the fluid density, u is the physical fluid velocity vector, E is the total energy density, p is the ideal-gas pressure of the Euler system, T = p/ρR 
+
+is the temperature field with specific gas constant R, K is the isotropic thermal conductivity, and τ = μ  ∇u + ( ∇u)T − 23 (∇ · u)I is the viscous stress tensor with dynamic viscosity coefficient μ. The system maps onto (2.1) with: 
+
+Q =
+
+
+
+ρρu
+
+E
+
+Gρ
+
+Gρu
+
+GE
+
+
+
+, Φ =
+
+
+
+ρu
+
+ρu ⊗ u + pI − τ
+
+(E + p)u − τ · u − KGT
+
+Gρ ⊗ u − I ρ/τ ∇
+
+Gρu ⊗ u − I ⊗ ρu/τ ∇
+
+GE ⊗ u − I E/τ ∇
+
+
+
+, S =
+
+
+
+0
+
+0
+
+0
+
+−Gρ/τ ∇
+
+−Gρu/τ ∇
+
+−GE /τ ∇
+
+
+
+,(3.24) where the trackers and the chain-rule reconstruction of ∇u and GT = ∇T are those of the running example (Section 2.5). 
+
+3.11. Resistive Compressible Magnetohydrodynamics. The Resistive Mag-netohydrodynamics (MHD) equations couple viscous, thermally conducting, electrically active fluids to magnetic fields, capturing shear stress, heat flux, and magnetic dis-sipation. Existing LBMs represent the magnetic field by vector-valued distribution functions, with the divergence error controlled rather than enforced [16, 17]. The system, augmented by the Godunov–Powell divergence-cleaning that restores the symmetrizability assumed in Section 2.4.2 and controls the growth of ∇ · B [56], reads: 
+
+∂tρ + ∇ · (ρu) = 0 ,∂t(ρu) + ∇ · (ρu ⊗ u + ptot I − B ⊗ B − τ ) = −(∇ · B) B,∂tE + ∇ · (( E + ptot )u − B(u · B) − τ · u + q + η(j × B)) = −(∇ · B)( u · B),∂tB + ∇ · (B ⊗ u − u ⊗ B − η∇B) = −(∇ · B) u,
+
+(3.25) where ρ represents the mass density, u is the physical velocity vector, E is the total energy density, B is the magnetic field vector, η is the uniform magnetic resistivity, 
+
+τ = μ  ∇u + ( ∇u)T − 23 (∇ · u)I is the viscous shear stress tensor with dynamic viscosity coefficient μ, q = −K∇T is the thermal heat flux vector with conductivity 
+
+K and temperature T = pgas /ρ, j = ∇ × B is the electrical current density, and 
+
+ptot = pgas + 1/2|B|2 is the total pressure with pgas = ( γ − 1)( E − 1/2ρ|u|2 − 1/2|B|2).To evaluate the dissipative gradients without stencils, the system maps onto (2.1) with: 18 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+(3.26)                                                                      
+
+> Q=
+> 
+> ρρu
+> E
+> BGB
+> Gρ
+> Gρu
+> GE
+> 
+> ,Φ=
+> 
+> ρu
+> ρu⊗u+ptot I−B⊗B−τ
+> (E+ptot )u−B(u·B)−τ·u+q+η(j×B)
+> B⊗u−u⊗B−ηGB
+> GB⊗u−I⊗B/τ ∇
+> Gρ⊗u−Iρ/τ ∇
+> Gρu⊗u−I⊗ρu/τ ∇
+> GE⊗u−IE/τ ∇
+> 
+> ,S=
+> 
+> 0
+> −(∇ · B)B
+> −(∇ · B)( u·B)
+> −(∇ · B)u
+> −GB/τ ∇
+> −Gρ/τ ∇
+> −Gρu/τ ∇
+> −GE/τ ∇
+> 
+> .
+
+The divergence-cleaning source is itself stencil-free: ∇ · B = tr GB is read off the same tracker, so the Powell correction is generated automatically alongside the resistive term. This system is treated by hand in the companion work [11]. The compiler derives the same scheme from the conservation form alone, differing only in the dissipative closure: conserved-field gradient trackers with chain-rule reconstruction in place of the transported viscous stress. 
+
+3.12. Homogenized Compressible Navier–Stokes–Fourier. This case ex-ercises two capabilities at once: a three-dimensional lattice (D3Q7) and prescribed external coefficient fields that enter the dynamics without being functions of the evolved state. It models compressible viscous flow interacting with a moving solid through a homogenized formulation: a prescribed porosity field α(x, t ) ∈ [0 , 1] (α = 1 pure fluid, α → 0 solid) volume-averages the dissipative fluxes, while a velocity coupling drives the momentum toward a prescribed solid velocity us(x, t ) in the solid region. The porosity acts as a numerical volume penalization rather than a physical homoge-nization: a volume-averaged form of Brinkman penalization [47], in the tradition of partially saturated cells and Homogenized Lattice Boltzmann (HLBM) fluid–structure coupling [36, 42, 55]: 
+
+∂tρ + ∇ · (ρu) = 0 ,∂t(ρu) + ∇ · (ρu ⊗ u + pI − α τ ) = 1 − αη
+
+ ρus(x, t ) − ρu,∂tE + ∇ · (( E + p)u − α τ · u + α q) = 1 − αη
+
+ ρus − ρu · u,
+
+(3.27) with viscous stress τ = μ ∇u + ( ∇u)T − 23 (∇ · u)I, Fourier flux q = −κ∇T , tem-perature T = p/ρ (gas constant absorbed, R = 1 ), pressure p = ( γ − 1)  E − 12 ρ|u|2
+
+with adiabatic index γ, drag time scale η, and the limit α → 1 recovering the plain compressible NSF system. Relative to the two-dimensional compressible NSF case of Section 3, the closure is built from a reduced tracker basis that evolves the symmetric velocity gradient Gu = sym ∇u and the temperature gradient GT = ∇T directly, now in three dimensions and augmented by the homogenization: 
+
+Q =
+
+
+
+ρρu
+
+E
+
+Gu
+
+GT
+
+ , Φ =
+
+
+
+ρu
+
+ρu ⊗ u + pI − ατ
+
+(E + p)u − ατ · u − ακ GT
+
+Gu ⊗ u − sym( I ⊗ u)/τ ∇
+
+GT ⊗ u − I T /τ ∇
+
+ , S =
+
+
+
+0 
+
+> 1−αη
+
+(ρus − ρu) 
+
+> 1−αη
+
+(ρus − ρu) · u
+
+−Gu/τ ∇
+
+−GT /τ ∇
+
+ .
+
+(3.28) AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 19 
+
+4. Validation. To verify the convergence and execution precision of the compiled schemes, we track the global L2 error norm reduction rates across successive grid resolutions ( N ∈ { 64 , . . . , 512 }; N ∈ { 32 , . . . , 256 } for the three-dimensional case). For each system, the compiler evaluates the continuous residual of the analytical profiles to construct a manufactured source correction: 
+
+SMMS (x, t ) = ∂tQexact + ∇ · Φ(Qexact ) − S(Qexact ).(4.1) This source field is injected directly into the mesoscopic update loop via (2.11). At the final time t = 1 we report, per macroscopic component, the discrete relative L2 error 
+
+∥Qh − Qexact ∥2/∥Qexact ∥2 with ∥f ∥2 = ( N −1
+
+> cells
+
+P 
+
+> x
+
+f (x)2)1/2, and take the Empirical Order of Convergence (EOC) to be the negative of the least-squares slope of log 2∥e∥2
+
+against log 2 N over the full resolution sequence. The manufactured fields are designed to stress the generated operators rather than for analytical convenience, using large-amplitude fluctuations, broken axis symmetry, independent thermodynamic modes, and exactly satisfied involutions. The compressible working points are genuinely supersonic, with per-axis mean-flow Mach numbers up to 3 for the Euler, Navier– Stokes–Fourier, and resistive MHD systems on the same minimal five-velocity lattice. The per-case design principles are detailed in the supplementary materials. All cases run on periodic domains, verifying the bulk scheme in isolation. The generation of boundary operators from the same PDE-level representation is in development. The resulting convergence matrix across IEEE single and double precisions, each system refined under the lattice scaling matched to its dominant transport mechanism (per the Scaling column of Table 1), is documented in Table 2. Every case is fully specified by its refinement law and three resolution-independent scalars: the time-step factor f (∆t = f ∆x acoustic, f ∆x2 diffusive), the relaxation rate τR (τLB = 12 +τR ∆t,Section 2.4.1), and the tracker step count gτ (τ∇ = gτ ∆t, Section 2.1.1). The refinement law follows the dominant transport mechanism, f is bounded by the sub-characteristic condition of Section 2.4.2, and τR trades stability margin against the relaxation-diffusion error constant. No parameter is retuned per grid. Per-case values are tabulated in the supplementary materials. 
+
+4.1. Convergence Characteristics. 
+
+Second-Order Convergence in Double Precision. Across the twelve physical systems under double-precision arithmetic, the fitted EOC of the macroscopic state variables is at or near second order, with L2 slopes between 1.70 and 2.51 . The fitted slopes near 2.5 of the three diffusively refined light systems (scalar ADR, Allen–Cahn, incompressible NSE) are not asymptotic superconvergence: their pairwise orders decrease monotonically toward two ( 2.8 down to 2.2 pairwise). Physical diffusion is carried by the tracked-gradient fluxes, so under both refinement laws the relaxation diffusion of (2.17) is a second-order-consistent numerical stabilizer (Section 2.4.1). For the hyperbolic and convection-dominated systems the observed second order is thus a property of the resolved smooth solutions, not a claim of intrinsic second-order accuracy in the inviscid limit. In both regimes the clean rate corroborates that the compiler correctly deconstructs the declared PDEs, resolves the automatic gradient cascades, and emits consistent kernels. 
+
+Single Precision. Comparing the single- and double-precision columns isolates the floating-point floor of the method. Single-precision execution is a standard lever for LBM throughput on GPUs [4, 43], so it matters whether the generated schemes retain their convergence order in float . The reference- and equilibrium-shifted formulation (Section 2.5.2) evolves the fluctuation δQ about the background state directly, so small 20 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Table 2: Overview of empirical verification results at the final time t = 1 .0. Errors are relative ( L∞ and L2) at grid resolution Nmax . Each EOC is the negative least-squares log-log slope over all simulated resolutions for that norm. The Scaling column reports the lattice refinement scaling chosen per system (Section 2.4.1). Rows are grouped per physical system, and the Field column lists the system’s macroscopic components. 
+
+System Scaling Field Precision Nmax Rel. L∞ L∞ EOC Rel. L2 L2 EOC 
+
+Inviscid Burgers Acoustic u Double 512 6.1175e-04 1.46 8.5671e-05 1.87 Float 512 5.5348e-03 1.34 8.0850e-04 1.73 Compressible Euler Acoustic 
+
+E Double 512 3.3385e-06 2.01 1.8316e-06 2.00 Float 512 6.7902e-05 1.47 2.2799e-05 1.73 
+
+ρ Double 512 1.4401e-06 1.98 6.8435e-07 1.99 Float 512 6.6678e-05 1.34 2.4365e-05 1.65 
+
+ρu Double 512 3.2141e-06 2.00 1.8745e-06 2.00 Float 512 1.0204e-04 1.38 3.6474e-05 1.62 Shallow Water (SWE) Acoustic 
+
+h Double 512 5.5560e-06 1.87 2.3433e-06 1.88 Float 512 1.5929e-05 1.89 6.8696e-06 1.95 
+
+hu Double 512 2.6837e-05 1.76 2.0838e-05 1.70 Float 512 5.4059e-05 1.81 3.6489e-05 1.83 Ideal Ultrarelativistic Fluid Acoustic 
+
+E Double 512 4.3449e-06 2.00 2.1354e-06 2.00 Float 512 1.1342e-05 1.59 4.7227e-06 1.64 
+
+S Double 512 9.6256e-06 2.00 6.3943e-06 2.00 Float 512 1.3004e-05 1.88 6.4705e-06 2.00 Maxwell (TM) Acoustic 
+
+Ez Double 512 2.9956e-05 1.95 2.9956e-05 1.95 Float 512 3.7205e-05 1.85 3.0632e-05 1.93 
+
+Hx Double 512 1.0951e-04 2.00 1.0951e-04 2.00 Float 512 1.2184e-04 1.95 1.1675e-04 1.97 
+
+Hy Double 512 1.1587e-05 2.02 1.1587e-05 2.02 Float 512 1.3310e-05 1.96 5.9351e-06 2.33 Nonlinear Elasticity Acoustic 
+
+F Double 512 3.1874e-05 2.00 2.8940e-05 2.00 Float 512 9.7364e-05 1.48 4.2667e-05 1.79 
+
+v Double 512 6.4804e-05 2.01 4.5664e-05 1.99 Float 512 1.2099e-04 2.40 5.8314e-05 2.68 Scalar ADR Diffusive c Double 512 2.2901e-04 2.50 1.2680e-04 2.49 Float 512 1.9430e-04 2.55 1.0911e-04 2.55 Allen–Cahn Phase-Field Diffusive ϕ Double 512 7.3196e-04 2.50 7.8653e-04 2.51 Float 512 7.0154e-04 2.53 5.6359e-04 2.66 Incompressible NSE Diffusive 
+
+ρ Double 512 1.3419e-06 2.43 6.0683e-07 2.47 Float 512 2.6675e-05 1.48 1.1146e-05 1.58 
+
+ρu Double 512 8.2447e-04 2.51 8.5394e-04 2.49 Float 512 4.1288e-03 2.23 4.1154e-03 2.23 Compressible NSF Diffusive 
+
+E Double 512 8.3354e-05 1.98 4.5785e-05 2.01 Float 512 2.4601e-04 1.50 1.5715e-04 1.46 
+
+ρ Double 512 7.3384e-05 1.91 3.7592e-05 1.95 Float 512 2.5013e-04 1.36 1.5397e-04 1.32 
+
+ρu Double 512 1.1775e-04 1.95 6.8579e-05 1.99 Float 512 3.7982e-04 1.43 2.4644e-04 1.41 Resistive MHD Acoustic 
+
+B Double 512 2.4829e-04 2.16 1.6277e-04 2.22 Float 512 2.8267e-04 2.18 1.8840e-04 2.24 
+
+E Double 512 3.6516e-04 1.90 2.1223e-04 1.96 Float 512 4.0480e-04 1.91 2.2318e-04 2.00 
+
+ρ Double 512 2.7365e-04 1.76 1.6299e-04 1.75 Float 512 3.2867e-04 1.70 1.9287e-04 1.70 
+
+ρu Double 512 4.6103e-04 1.82 2.4482e-04 1.88 Float 512 5.2219e-04 1.82 2.6853e-04 1.90 HCNSF Acoustic 
+
+E Double 256 1.7303e-04 1.70 7.4269e-05 1.78 Float 256 1.7001e-04 1.86 9.0488e-05 1.79 
+
+Gu Double 256 1.0801e-02 1.82 1.0391e-02 1.83 Float 256 1.1265e-02 1.81 1.0592e-02 1.83 
+
+ρ Double 256 2.5489e-04 1.87 8.4492e-05 1.87 Float 256 3.9397e-04 1.87 1.3437e-04 1.89 
+
+ρu Double 256 1.3203e-04 1.92 5.5799e-05 1.96 Float 256 2.2766e-04 1.95 1.0948e-04 1.97 AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 21 fluctuations are never formed as the difference of two large numbers. This removes the catastrophic cancellation that would otherwise destroy the single-precision result, and in several cases is empirically what enables convergence in float at all. Two residual effects remain when comparing against the double-precision columns. First, the per-step rounding errors of slowly evolving fields accumulate into a field-dependent relative error floor of order 10 −5–10 −4 over the ∼ 10 5 steps of the finest diffusive grids. Systems whose discretization error stays above it track their double-precision columns (scalar ADR at 2.55 , Allen–Cahn at 2.66 ). The compressible NSF system, whose double error dives below it, tracks double through N = 256 and is floor-limited at 
+
+N = 512 . The incompressible NSE density ( 1.58 ) is floor-limited in the same way. Second, single precision is unstable near the over-relaxation limit ω = 1 /τ LB → 2
+
+where double precision is not. The affected systems run a uniformly stiffer relaxation configuration in single precision (supplementary materials) and converge cleanly under that single uniform configuration (incompressible NSE momentum at 2.23 , resistive MHD at 2.24 ). The acoustic hyperbolic systems, taking only ∝ N steps, erode where the double-precision error is smallest, most visibly the compressible Euler momentum (1.62 ). 
+
+5. Performance. In the final code generation layer (cf. Fig. 2) the compiled schemes are emitted as platform-transparent C++ operators for the open-source multi-physics framework OpenLB [37, 39], whose Common Subexpression Elimination (CSE) machinery compacts them algebraically: OpenLB extracts each operator’s expression tree, reduces it in SymPy, and re-emits it as a per-target template specialization [39]. By abstracting memory layout and execution from the continuous equations, this architecture enables compile-time binding to platform-specific data structures, through which OpenLB targets multi-core CPUs and diverse GPU accelerators [39 –41]. As shown in Figure 4, the generated cell-level kernels approach the memory-bandwidth roofline on an exemplary NVIDIA RTX A5000, reaching up to 96% of peak in single precision. The per-cell byte traffic reported in Table 3 is obtained by introspecting the compiled OpenLB dynamics, counting the populations and field components actually read and written per cell update. The attained throughput is then measured directly from the kernel runtime on a saturating grid, and the saturation column is its ratio to the measured 680 GB /s peak (BabelStream Triad [15]). The per-kernel resource columns of Table 3 account for the two single-precision bandwidth outliers. The two largest-state kernels, the 18-field resistive MHD and the 14-field HCNSF system, both reach the 255-register ceiling of the sm_86 architecture and spill to local memory ( 32 and 104 bytes per thread). They are precisely the two whose bandwidth saturation falls below the 85 –97% band, at 78% and 63% . Occupancy alone does not explain this: the 12-field compressible NSF kernel runs at comparable occupancy ( 19% against 17% ) but, fitting within the register file without spilling, still sustains 94% of peak. Of the two, the HCNSF system saturates the least: its 14-field state on the D3Q7 lattice (seven populations per field against five on D2Q5 ) is the largest live-quantity count in the suite, so at the shared register ceiling it spills the hardest, and the uncounted local-memory traffic of that spill displaces the useful bandwidth. In double precision the three largest-state kernels become compute-bound: compressible NSF, resistive MHD, and HCNSF sustain 345 , 361 , and 363 GFLOP /s
+
+against the 434 GFLOP /s FP64 peak ( 79 –84% ), so their low bandwidth-saturation figures (all under 38% ) reflect the 1:64 FP64 throughput of the architecture rather than a memory-system inefficiency. Of the remaining double-precision points, Burgers and Maxwell stay at the bandwidth roofline and nonlinear elasticity at the FP64 ceiling. 22 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+> Table 3: Performance and per-kernel resource characteristics of the generated LBM kernels across all 12 physical models, measured on an NVIDIA RTX A5000 ( sm_86 : 65536 registers and 48 warps per SM,  680 .0 GB /s peak bandwidth). Throughput columns are for the CSE-optimized build: arithmetic intensity  AI  in FLOP/byte,  Util. BW  in  GB /s, BW Sat.  relative to peak,  GFLOP/s  attained. Each row reports the faster of the two emitted CSE variants at that precision together with its exact operation count, so  FLOP/cell  can differ between precisions. The resource columns give the binding collide kernel’s per-thread register count ( Reg. ), local-memory spill ( Spill , bytes), and register-limited occupancy ( Occ. , %) for the native-CSE build.
+> System  Lattice  Fields  Prec.  FLOP/cell  Byte/cell  AI  MLUP/s  Util. BW  BW Sat.  GFLOP/s  Reg.  Spill  Occ.
+> Inviscid Burgers  D2Q5  1 Single  30  40  0.75  14474  579  85.1%  434  36  – 100 Double  30  80  0.38  7830  626  92.1%  235  36  – 100 Compressible Euler  D2Q5  4 Single  422  160  2.64  4000  640  94.1%  1688  78  – 52 Double  255  320  0.80  1003  321  47.2%  256  78  – 52 Shallow Water (SWE)  D2Q5  3 Single  310  120  2.58  5093  611  89.9%  1579  56  – 75 Double  183  240  0.76  958  230  33.8%  175  56  – 75 Ideal Ultrarelativistic Fluid  D2Q5  3 Single  304  120  2.53  5349  642  94.4%  1626  54  – 75 Double  151  240  0.63  1618  388  57.1%  244  54  – 75 Maxwell (TM)  D2Q5  3 Single  281  120  2.34  5269  632  93.0%  1481  56  – 75 Double  114  240  0.48  2634  632  93.0%  300  56  – 75 Nonlinear Elasticity  D2Q5  6 Single  656  240  2.73  2536  609  89.5%  1664  56  – 75 Double  656  480  1.37  641  308  45.2%  420  56  – 75 Scalar ADR  D2Q5  3 Single  253  120  2.11  5405  649  95.4%  1367  58  – 67 Double  141  240  0.59  1673  402  59.0%  236  58  – 67 Allen–Cahn Phase-Field  D2Q5  3 Single  245  120  2.04  5487  658  96.8%  1344  64  – 67 Double  124  240  0.52  1918  460  67.7%  238  64  – 67 Incompressible NSE  D2Q5  7 Single  387  280  1.38  2328  652  95.8%  901  126  – 33 Double  387  560  0.69  662  371  54.6%  256  126  – 33 Compressible NSF  D2Q5  12  Single  840  480  1.75  1335  641  94.2%  1121  206  – 19 Double  1344  960  1.40  256  246  36.2%  345  210  – 19 Resistive MHD  D2Q5  18  Single  2141  720  2.97  736  530  78.0%  1577  255  32  17 Double  2141  1440  1.49  168  242  35.7%  361  255  16  17 HCNSF  D3Q7  14  Single  2234  784  2.85  546  428  63.0%  1220  255  104  17 Double  2234  1568  1.42  163  255  37.5%  363  255  104  17
+
+AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 23 10 −1 10 0 10 1
+
+Arithmetic Intensity (FLOP/Byte) 
+
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> Performance (GFLOPs/s)
+> FP32 Peak (27.8 TFLOP/s)
+> FP64 Peak (0.43 TFLOP/s)
+> Measured Bandwidth (680 GB/s)
+> Relativistic Hydro (94.4%)
+> Burgers (85.1%)
+> Scalar ADR (95.4%)
+> Shallow Water (89.9%)
+> Compressible Euler (94.1%)
+> Allen-Cahn (96.8%)
+> Navier-Stokes (95.8%)
+> Nonlinear Elasticity (89.5%)
+> Compressible Navier-Stokes (94.2%)
+> Resistive MHD (78.0%)
+> HCNSF (63.0%)
+> Maxwell (TM) (93.0%)
+> Double Precision
+> Single Precision
+> Precision Trajectory
+
+Fig. 4: Empirical roofline analysis of the generated LBMs on an NVIDIA RTX A5000. 
+
+6. Conclusion. We introduced a symbolic compiler that automates the transla-tion of systems of continuous conservation laws into optimized, local lattice Boltzmann schemes, work previously restricted to manual and case-specific derivations. Driven by point-wise advection-relaxation cascades, it maps nonlinear physical fluxes directly onto the first-order discrete moments of independent distribution functions and recur-sively deconstructs higher-order derivatives into auxiliary states, eliminating non-local finite-difference stencils and preserving local concurrency. Asymptotic spatial conver-gence at or near second order of the generated models was verified by MMS across twelve PDEs spanning fluid dynamics, resistive MHD, phase-field interface dynamics, electromagnetics, and nonlinear finite-strain elasticity. The reference- and equilibrium-shifted formulation makes single precision usable at close to the double-precision convergence order, and the arithmetically minimized device kernels generated for the platform-transparent OpenLB framework reach up to 96% of the memory-bandwidth roofline. The present framework is the first in which LBMs themselves are derived auto-matically from continuous conservation laws rather than supplied as input, in contrast to prior top-down constructions of individual schemes [20, 26, 51, 60]. Within this class, retargeting LBM to a new system is thereby reduced from a manual derivation to a declarative specification, pairing the rapid PDE retargeting that historically distinguished general-purpose finite-volume and finite-element frameworks with the structural locality and efficiency inherent to LBM. Building on this, boundary condition generation from the PDE-level representation is in development as the prerequisite for validation against physical, non-manufactured benchmarks, as already demonstrated manually for MHD [11]. 
+
+Code Availability. All generated schemes are specified by Sections 2 and 3 along-side the component equations, manufactured solutions, and numerical configurations in the supplement. The PDE2LBM compiler is available upon reasonable request. 24 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Acknowledgement. Google Gemini and Anthropic Claude assisted in drafting and revising the manuscript. All content was reviewed, verified, and approved by the authors, who take full responsibility for it. 
+
+REFERENCES [1] F. J. Alexander, H. Chen, S. Chen, and G. D. Doolen , Lattice Boltzmann model for compressible fluids , Phys. Rev. A, (1992), 10.1103/PhysRevA.46.1967. [2] D. Aregba-Driollet and R. Natalini , Discrete kinetic schemes for multidimensional systems of conservation laws , SIAM J. Numer. Anal., (2000), 10.1137/S0036142998343075. [3] D. Aregba-Driollet, R. Natalini, and S. Tang , Explicit diffusive kinetic schemes for non-linear degenerate parabolic systems , Math. Comp., (2004), 10.1090/S0025-5718-03-01549-7. [4] P. Bailey, J. Myre, S. D. C. Walsh, D. J. Lilja, and M. O. Saar , Accelerating lattice Boltzmann fluid flow simulations using graphics processors , in International Conference on Parallel Processing, 2009, 10.1109/ICPP.2009.38. [5] M. Bauer, S. Eibl, C. Godenschwager, N. Kohl, M. Kuron, C. Rettinger, F. Schorn-baum, C. Schwarzmeier, D. Thönnes, H. Köstler, and U. Rüde , waLBerla: Ablock-structured high-performance framework for multiphysics simulations , Comput. Math. Appl., (2021), 10.1016/j.camwa.2020.01.007. [6] M. Bauer, H. Köstler, and U. Rüde , lbmpy: Automatic code generation for efficient parallel lattice Boltzmann methods , J. Comput. Sci., (2021), 10.1016/j.jocs.2020.101269. [7] T. Bellotti, B. Graille, and M. Massot , Finite difference formulation of any lattice Boltzmann scheme , Numer. Math., (2022), 10.1007/s00211-022-01302-2. [8] O. Boolakee, M. Geier, and L. De Lorenzis , Lattice Boltzmann for linear elastodynamics: periodic problems and Dirichlet boundary conditions , Comput. Methods Appl. Mech. Engrg., (2025), 10.1016/j.cma.2024.117469. [9] F. Bouchut , Construction of BGK models with a family of kinetic entropies for a given system of conservation laws , J. Stat. Phys., (1999), 10.1023/A:1004525427365. [10] F. Bouchut, F. R. Guarguaglini, and R. Natalini , Diffusive BGK approximations for nonlinear multidimensional parabolic equations , Indiana Univ. Math. J., (2000), 10.1512/ iumj.2000.49.1811. [11] F. Bukreev, A. Kummerländer, and M. J. Krause , Lattice Boltzmann methods for compressible (Magneto)hydrodynamics , arXiv:2606.00641, (2026). [12] G.-Q. Chen, C. D. Levermore, and T.-P. Liu , Hyperbolic conservation laws with stiff relaxation terms and entropy , Comm. Pure Appl. Math., (1994), 10.1002/cpa.3160470602. [13] B. Chopard, J. L. Falcone, and J. Latt , The lattice Boltzmann advection-diffusion model revisited , Eur. Phys. J. Spec. Top., (2009), 10.1140/epjst/e2009-01035-5. [14] C. Coreixas, G. Wissocq, G. Puigt, J.-F. Boussuge, and P. Sagaut , Recursive regularization step for high-order lattice Boltzmann methods , Phys. Rev. E, (2017), 10.1103/PhysRevE.96.033306. [15] T. Deakin, J. Price, M. Martineau, and S. McIntosh-Smith , Evaluating attainable memory bandwidth of parallel programming models via BabelStream , Internat. J. Comput. Sci. Engrg., (2018), 10.1504/IJCSE.2018.095847. [16] P. J. Dellar , Lattice kinetic schemes for magnetohydrodynamics , J. Comput. Phys., (2002), 10.1006/jcph.2002.7044. [17] P. J. Dellar , Moment equations for magnetohydrodynamics , J. Stat. Mech. Theory Exp., (2009), 10.1088/1742-5468/2009/06/P06003. [18] B. Dorschner, F. Bösch, and I. V. Karlin , Particles on demand for kinetic theory , Phys. Rev. Lett., (2018), 10.1103/PhysRevLett.121.130602. [19] F. Dubois , Equivalent partial differential equations of a lattice Boltzmann scheme , Comput. Math. Appl., (2008), 10.1016/j.camwa.2007.08.003. [20] F. Dubois , Simulation of strong nonlinear waves with vectorial lattice Boltzmann schemes ,Internat. J. Modern Phys. C, (2014), 10.1142/S0129183114410149. [21] J. Feng and X. Chu , A total-Lagrangian vectorial lattice Boltzmann method for finite-strain hyperelastic dynamics , arXiv:2605.26677, (2026). [22] N. Frapolli, S. S. Chikatamarla, and I. V. Karlin , Entropic lattice Boltzmann model for gas dynamics: Theory, boundary conditions, and implementation , Phys. Rev. E, (2016), 10.1103/PhysRevE.93.063302. [23] K. O. Friedrichs and P. D. Lax , Systems of conservation equations with a convex extension ,Proc. Natl. Acad. Sci. USA, (1971), 10.1073/pnas.68.8.1686. [24] M. Geier, A. Fakhari, and T. Lee , Conservative phase-field lattice Boltzmann model for AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 25 
+
+interface tracking equation , Phys. Rev. E, (2015), 10.1103/PhysRevE.91.063309. [25] C. Godenschwager, F. Schornbaum, M. Bauer, H. Köstler, and U. Rüde , A framework for hybrid parallel flow simulations with a trillion cells in complex geometries , in Proceedings of the International Conference on High Performance Computing, Networking, Storage and Analysis (SC ’13), 2013, 10.1145/2503210.2503273. [26] B. Graille , Approximation of mono-dimensional hyperbolic systems: A lattice Boltzmann scheme as a relaxation method , J. Comput. Phys., (2014), 10.1016/j.jcp.2014.02.017. [27] K. Guillon, R. Hélie, and P. Helluy , Stability analysis of the vectorial lattice-Boltzmann method , arXiv:2402.09813, (2024). [28] S. M. Hanasoge, S. Succi, and S. A. Orszag , Lattice Boltzmann method for electromagnetic wave propagation , Europhys. Lett., (2011), 10.1209/0295-5075/96/14002. [29] F. Hennig, M. Holzer, and U. Rüde , Advanced automatic code generation for multi-ple relaxation-time lattice Boltzmann methods , SIAM J. Sci. Comput., (2023), 10.1137/ 22M1531348. [30] S. Ito, A. Kummerländer, J. Jeßberger, J. L. Grafen, E. Öz, N. R. Gauger, M. Sagebaum, and M. J. Krause , Generation of efficient adjoint lattice Boltzmann methods with algorithmic differentiation , 2026, 10.2139/ssrn.6505987. Preprint, SSRN. [31] M. Januszewski and M. Kostur , Sailfish: A flexible multi-GPU implementation of the lattice Boltzmann method , Comput. Phys. Comm., (2014), 10.1016/j.cpc.2014.04.018. [32] S. Jin and H. Liu , Diffusion limit of a hyperbolic system with relaxation , Methods Appl. Anal., (1998), 10.4310/maa.1998.v5.n3.a6. [33] S. Jin and Z. Xin , The relaxation schemes for systems of conservation laws in arbitrary space dimensions , Comm. Pure Appl. Math., (1995), 10.1002/cpa.3160480303. [34] M. Junk, A. Klar, and L.-S. Luo , Asymptotic analysis of the lattice Boltzmann equation , J. Comput. Phys., (2005), 10.1016/j.jcp.2005.05.003. [35] T. Kataoka and M. Tsutahara , Lattice Boltzmann method for the compressible Euler equations , Phys. Rev. E, (2004), 10.1103/PhysRevE.69.056702. [36] M. J. Krause, F. Klemens, T. Henn, R. Trunk, and H. Nirschl , Particle flow simulations with homogenised lattice Boltzmann methods , Particuology, (2017), 10.1016/j.partic.2016. 11.001. [37] M. J. Krause, A. Kummerländer, S. J. Avis, H. Kusumaatmaja, D. Dapelo, F. Klemens, M. Gaedtke, N. Hafen, A. Mink, R. Trunk, J. E. Marquardt, M. L. Maier, M. Haussmann, and S. Simonis , OpenLB—open source lattice Boltzmann code , Comput. Math. Appl., (2021), 10.1016/J.CAMWA.2020.04.033. [38] T. Krüger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, and E. Viggen , The Lattice Boltzmann Method: Principles and Practice , 2016. [39] A. Kummerländer, F. Bukreev, L. Dorneles, M. Dorn, S. Ito, and M. J. Krause , Ahardware abstraction for exascale lattice Boltzmann simulations: rotor-resolved wind farms on Aurora and LUMI , in Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis (SC26), 2026. Accepted for publication. [40] A. Kummerländer, F. Bukreev, D. Teutscher, M. Dorn, and M. J. Krause , Opti-mization of single node load balancing for lattice Boltzmann method on heterogeneous high performance computers , J. Parallel Distrib. Comput., (2025), 10.1016/j.jpdc.2025.105169. [41] A. Kummerländer, M. Dorn, M. Frank, and M. J. Krause , Implicit propagation of directly addressed grids in lattice Boltzmann methods , Concurr. Comput. Pract. Exp., (2023), 10.1002/cpe.7509. [42] A. Kummerländer, S. Ito, M. Schecher, D. Dapelo, S. Simonis, M. J. Krause, and F. Bukreev , Efficient wall-modelled large eddy simulation of rotors using homogenized lattice Boltzmann methods , Internat. J. Numer. Methods Heat Fluid Flow, (2026), 10.1108/ HFF-09-2025-0724. [43] F. Kuznik, C. Obrecht, G. Rusaouen, and J.-J. Roux , LBM based flow simulation using GPU computing processor , Comput. Math. Appl., (2010), 10.1016/j.camwa.2009.08.052. [44] Ł. Łaniewski-Wołłk and J. Rokicki , Adjoint lattice Boltzmann for topology optimization on multi-GPU architecture , Comput. Math. Appl., (2016), 10.1016/j.camwa.2015.12.043. [45] J. Latt and B. Chopard , Lattice Boltzmann method with regularized pre-collision distribution functions , Math. Comput. Simul., (2006), 10.1016/j.matcom.2006.05.017. [46] C. Lattanzio and R. Natalini , Convergence of diffusive BGK approximations for non-linear strongly parabolic systems , Proc. Roy. Soc. Edinburgh Sect. A, (2002), 10.1017/ S0308210500001669. [47] Q. Liu and O. V. Vasilyev , A Brinkman penalization method for compressible flows in complex geometries , J. Comput. Phys., (2007), 10.1016/j.jcp.2007.07.037. [48] T.-P. Liu , Hyperbolic conservation laws with relaxation , Comm. Math. Phys., (1987), 10.1007/ 26 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE BF01210707. [49] S. Marconi and B. Chopard , A lattice Boltzmann model for a solid body , Internat. J. Modern Phys. B, (2003), 10.1142/s0217979203017254. [50] M. Mendoza, B. M. Boghosian, H. J. Herrmann, and S. Succi , Fast lattice Boltzmann solver for relativistic hydrodynamics , Phys. Rev. Lett., (2010), 10.1103/PhysRevLett.105. 014502. [51] M. Mendoza and J. D. Muñoz , Three-dimensional lattice Boltzmann model for electrody-namics , Phys. Rev. E, (2010), 10.1103/PhysRevE.82.056708. [52] A. Meurer, C. P. Smith, M. Paprocki, O. Čertík, S. B. Kirpichev, M. Rocklin, A. Ku-mar, S. Ivanov, J. K. Moore, S. Singh, T. Rathnayake, S. Vig, B. E. Granger, R. P. Muller, F. Bonazzi, H. Gupta, S. Vats, F. Johansson, F. Pedregosa, M. J. Curry, A. R. Terrel, v. Roučka, A. Saboo, I. Fernando, S. Kulal, R. Cimrman, and A. Scopatz , SymPy: symbolic computing in Python , PeerJ Comput. Sci., (2017), 10.7717/peerj-cs.103. [53] F. Mohseni, M. Mendoza, S. Succi, and H. J. Herrmann , Lattice Boltzmann model for ultrarelativistic flows , Phys. Rev. D, (2013), 10.1103/PhysRevD.87.083003. [54] R. Natalini , A discrete kinetic approximation of entropy solutions to multidimensional scalar conservation laws , J. Differential Equations, (1998), 10.1006/jdeq.1998.3460. [55] D. R. Noble and J. R. Torczynski , A lattice-Boltzmann method for partially saturated computational cells , Internat. J. Modern Phys. C, (1998), 10.1142/S0129183198001084. [56] K. G. Powell, P. L. Roe, T. J. Linde, T. I. Gombosi, and D. L. D. Zeeuw , Asolution-adaptive upwind scheme for ideal magnetohydrodynamics , J. Comput. Phys., (1999), 10.1006/jcph.1999.6299. [57] R. Salmon , The lattice Boltzmann method as a basis for ocean circulation modeling , J. Mar. Res., (1999), 10.1357/002224099764805174. [58] X. Shan, X.-F. Yuan, and H. Chen , Kinetic theory representation of hydrodynamics: a way beyond the Navier–Stokes equation , J. Fluid Mech., (2006), 10.1017/S0022112005008153. [59] S. Simonis, M. Frank, and M. J. Krause , On relaxation systems and their relation to discrete velocity Boltzmann models for scalar advection–diffusion equations , Philos. Trans. Roy. Soc. A, (2020), 10.1098/rsta.2019.0400. [60] S. Simonis, M. Frank, and M. J. Krause , Constructing relaxation systems for lattice Boltzmann methods , Appl. Math. Lett., (2023), 10.1016/j.aml.2022.108484. [61] S. Simonis, M. Haussmann, L. Kronberg, W. Dörfler, and M. J. Krause , Linear and brute force stability of orthogonal moment multiple-relaxation-time lattice Boltzmann methods applied to homogeneous isotropic turbulence , Philos. Trans. Roy. Soc. A, (2021), 10.1098/rsta.2020.0405. [62] S. Simonis and M. J. Krause , Limit consistency of lattice Boltzmann equations , ESAIM Math. Model. Numer. Anal., (2025), 10.1051/m2an/2025026. [63] J. Smoller and B. Temple , Global solutions of the relativistic Euler equations , Comm. Math. Phys., (1993), 10.1007/BF02096733. [64] J. D. Sterling and S. Chen , Stability analysis of lattice Boltzmann methods , J. Comput. Phys., (1996), 10.1006/jcph.1996.0016. [65] H. Struchtrup , Macroscopic Transport Equations for Rarefied Gas Flows: Approximation Methods in Kinetic Theory , 2005, 10.1007/3-540-32386-4. [66] J. Tölke , Implementation of a lattice Boltzmann kernel using the Compute Unified Device Architecture developed by nVIDIA , Comput. Vis. Sci., (2010), 10.1007/s00791-008-0120-2. [67] G. B. Whitham , Linear and Nonlinear Waves , 1974. [68] G. Wissocq, Y. Liu, and R. Abgrall , A positive- and bound-preserving vectorial lattice Boltzmann method in two dimensions , SIAM J. Sci. Comput., (2025), 10.1137/24M1712412. [69] D. Wolf-Gladrow , A lattice Boltzmann equation for diffusion , J. Stat. Phys., (1995), 10. 1007/BF02181215. [70] R. A. Worthing, J. Mozer, and G. Seeley , Stability of lattice Boltzmann methods in hydrodynamic regimes , Phys. Rev. E, (1997), 10.1103/PhysRevE.56.2243. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 27 
+
+## Supplementary Materials 
+
+SM1. Empirical Convergence Profile Plots. In this appendix, we present the Empirical Order of Convergence (EOC) profiles for all twelve verified PDE targets. Each plot displays the relative L1, L2, and L∞ error norms of the macroscopic state components across consecutive grid resolutions, in both double and single precision, together with a second-order reference slope. Each system is refined under the lattice scaling matched to its dominant transport mechanism (diffusive for the diffusion-resolving parabolic systems, acoustic for the hyperbolic and convection-dominated ones). The numerical configuration underlying these runs is tabulated in Appendix SM2. 28 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 64 128 256 512 
+
+Resolution N
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+> Relative Error
+
+Field 
+
+u
+
+L1 L2 L∞ Double Float Ideal (N−2)
+
+Fig. SM1: EOC profile for the inviscid Burgers system. 64 128 256 512 
+
+Resolution N
+
+10 −9
+
+10 −8
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+> Relative Error
+
+Field 
+
+E
+
+rho 
+
+rhou 
+
+L1 L2 L∞ Double Float Ideal (N−2)
+
+Fig. SM2: EOC profile for the compressible Euler system. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 29 64 128 256 512 
+
+Resolution N
+
+10 −8
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+> Relative Error
+
+Field 
+
+h
+
+hu 
+
+L1 L2 L∞ Double Float Ideal (N−2)
+
+Fig. SM3: EOC profile for the shallow water equations. 64 128 256 512 
+
+Resolution N
+
+10 −8
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+> Relative Error
+
+Field 
+
+E
+
+S_mom 
+
+L1 L2 L∞ Double Float Ideal (N−2)
+
+Fig. SM4: EOC profile for the ideal ultrarelativistic fluid. 30 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 64 128 256 512 
+
+Resolution N
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+> Relative Error
+
+Field       
+
+> c
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM5: EOC profile for the scalar advection-diffusion-reaction system. 64 128 256 512 
+
+Resolution N
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+> Relative Error
+
+Field       
+
+> phi
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM6: EOC profile for the Allen–Cahn phase-field equation. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 31 64 128 256 512 
+
+Resolution N
+
+10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> Relative Error
+
+Field       
+
+> rho
+> rhou
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM7: EOC profile for the incompressible Navier–Stokes equations. 64 128 256 512 
+
+Resolution N
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+> Relative Error
+
+Field       
+
+> E
+> rho
+> rhou
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM8: EOC profile for the compressible Navier–Stokes–Fourier equations. 32 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 64 128 256 512 
+
+Resolution N
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+> Relative Error
+
+Field       
+
+> B
+> E
+> rho
+> rhou
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM9: EOC profile for the resistive magnetohydrodynamics system. 32 64 128 256 
+
+Resolution N
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+10 0
+
+> Relative Error
+
+Field       
+
+> E
+> S_u
+> rho
+> rhou
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM10: EOC profile for the three-dimensional homogenized compressible Navier– Stokes–Fourier system. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 33 64 128 256 512 
+
+Resolution N
+
+10 −8
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+> Relative Error
+
+Field       
+
+> Ez
+> Hx
+> Hy
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM11: EOC profile for the Maxwell electromagnetics (TM mode). 64 128 256 512 
+
+Resolution N
+
+10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+> Relative Error
+
+Field       
+
+> Fg
+> v
+> L1L2L∞Double Float Ideal (N−2)
+
+Fig. SM12: EOC profile for the nonlinear (neo-Hookean) elasticity system. 34 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+SM2. Numerical Configuration of the Convergence Study. This appendix documents the complete numerical configuration behind the convergence results re-ported in the main article, so that every run is reproducible from the tabulated values. All cases share one study harness parametrized by the refinement scaling and three scalar knobs. The time step follows the per-system scaling law, ∆t = f ∆x under acoustic and ∆t = f ∆x2 under diffusive refinement, with time-step factor f . The re-laxation time of the physical fields is parametrized by a resolution-independent rate τR
+
+as τLB = 12 + τR ∆t, so the bare relaxation diffusion contracts as εa 2 = c2 
+
+> s
+
+τR ∆x2 under either scaling. The gradient-tracker fields relax on the tracker time τ∇ = gτ ∆t, and their populations collide at the fixed lattice rate 1/(gτ + 1) . The two-dimensional cases run the D2Q5 stencil and the three-dimensional HCNSF case runs D3Q7. Table SM1 lists the discrete velocity sets, weights, and lattice speeds of sound. All populations are initialized at the (shifted) equilibrium of the exact manufactured fields at t = 0 .Table SM1: Discrete velocity sets of the two stencils used in the study.                                
+
+> Lattice Velocities ciCount wic2
+> s
+> D2Q5 (0 ,0) 11313(±1,0) ,(0 ,±1) 416
+> D3Q7 (0 ,0,0) 11414(±1,0,0) ,(0 ,±1,0) ,(0 ,0,±1) 618
+
+Table SM2 lists the per-case values. Every configuration is uniform across the reported resolutions in both precisions: no parameter is retuned per grid, so each fitted convergence order measures a single fixed scheme family. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 35 Table SM2: Per-case numerical configuration of the convergence study. The param-etrization of the time-step factor f , relaxation rate τR, and tracker relaxation gτ is defined in the text, and tracker-free systems are marked with a dash. Every value is uniform across all reported grids of its case ( N = 64 to 512 , and N = 32 to 256 for the 3D HCNSF case): no parameter is retuned per resolution in either precision. 
+
+System Scaling Precision f τR gτ
+
+Inviscid Burgers Acoustic Double 0.2 0.2 –Float 0.2 2 –Compressible Euler Acoustic Double 0.05 0.2 –Float 0.05 5 –Shallow Water (SWE) Acoustic Double 0.2 0.5 –Float 0.2 2 –Ideal Ultrarelativistic Fluid Acoustic Double 0.2 0.2 –Float 0.2 0.2 –Maxwell (TM) Acoustic Double 0.2 0.2 –Float 0.2 0.2 –Nonlinear Elasticity Acoustic Double 0.1 0.2 –Float 0.15 2 –Scalar ADR Diffusive Double 1.9 50 6Float 1.9 50 6Allen–Cahn Phase-Field Diffusive Double 1.9 50 6Float 1.9 50 6Incompressible NSE Diffusive Double 2 50 6Float 2 90 6Compressible NSF Diffusive Double 2 60 6Float 2 60 6Resistive MHD Acoustic Double 0.025 140 4Float 0.025 160 4HCNSF Acoustic Double 0.05 10 3Float 0.05 20 336 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+SM3. Domain-Specific Language Example. Complementing the compress-ible Euler specification in the main article, Listing 2 gives the complete DSL specifi-cation of the compressible Navier–Stokes–Fourier system declared in SI units. Two non-dimensionalization steps are declared. First, characteristic references (the density and the gas constant) eliminate the mass and temperature base dimensions, from which the compiler derives every lattice grid-scaling exponent automatically, with the dynamic viscosity ( Pa s) and thermal conductivity ( W m −1 K−1) reducing to the diffu-sive ( length 2/time ) scaling. Second, the realistic-SI magnitudes (density 1.225 kg /m3,sound speed 340 m /s) are declared as characteristic symbols, and the manufactured so-lution is then authored as (scale) × (dimensionless), so the value non-dimensionalization divides the scales out through the products and places the working point at the O(1) 
+
+lattice scale. Listing 2: Formulation of the Navier–Stokes–Fourier equations in SI units.  
+
+> 1
+
+from pde2lbm import * 
+
+> 2
+
+from sympy . physics . units import ( length , time , velocity , mass ,  
+
+> 3
+
+temperature , energy , pressure , power , momentum )  
+
+> 45
+
+cns = ConservationLaws ( dim =2)  
+
+> 67
+
+# 1. States and parameters with named SI dimensions  
+
+> 8
+
+rho = cns . register_state ( " rho " , dim = mass / length **3) # density  
+
+> 9
+
+rhou = cns . register_state ( " rhou " , shape =2 , dim = momentum / length **3)  
+
+> 10
+
+E = cns . register_state ( " E " , dim = energy / length **3) # energy  
+
+> 11 12
+
+gamma = cns . register_parameter ( " gamma " )  
+
+> 13
+
+mu = cns . register_parameter ( " mu " , dim = pressure * time ) # Pa s 
+
+> 14
+
+K = cns . register_parameter ( " K " , dim = power /( length * temperature ) ) # W /( m K )  
+
+> 15
+
+R = cns . register_parameter ( " R " , dim = energy /( mass * temperature ) ) # gas const  
+
+> 16 17
+
+# 2 a . Eliminate mass and temperature base dimensions  
+
+> 18
+
+cns . set_characteristic ( mass , rho )  
+
+> 19
+
+cns . set_characteristic ( temperature , R )  
+
+> 20 21
+
+# 2 b . Value non - dimensionalization : realistic SI working scales as characteristic symbols  
+
+> 22
+
+rho0 = cns . ch ar act er is tic _s ym bol ( mass , 1.225 , name = " rho0 " ) # air at ~1 atm  
+
+> 23
+
+c_s = cns . ch ar ac ter is ti c_s ym bol ( velocity , 340.0 , name = " c_s " ) # sound speed  
+
+> 24 25
+
+# 3. Dependent variables  
+
+> 26
+
+u = cns . register_derived ( " u " , rhou / rho ) # registers u_0 , u_1  
+
+> 27
+
+p = ( gamma - 1) *( E - 0.5* rho * u . dot ( u ) )  
+
+> 28
+
+T = p /( rho * R ) # temperature  
+
+> 29 30
+
+# 4. Newtonian stress + Fourier flux  
+
+> 31
+
+gu = cgrad ( u )  
+
+> 32
+
+tau = mu *( gu + gu . T - (2.0/3.0) * trace ( gu ) * eye (2) )  
+
+> 33
+
+q = -K * cgrad ( T )  
+
+> 34 35
+
+# 5. Equation system  
+
+> 36
+
+cns . add ([  
+
+> 37
+
+Eq ( dt ( rho ) + div ( rhou ) , 0) ,  
+
+> 38
+
+Eq ( dt ( rhou ) + div ( outer ( rhou , u ) + p * eye (2) - tau ) , 0) ,  
+
+> 39
+
+Eq ( dt ( E ) + div (( E + p ) * u - tau * u + q ) , 0) ,  
+
+> 40
+
+])  
+
+> 41 42
+
+# 6. Generate OpenLB solver  
+
+> 43
+
+cns . compile ( class_name = " CompressibleNSF " ) AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 37 
+
+SM4. Fully Expanded Compiled Component Equations. In this appendix, we present the component-level mathematical expressions of the macroscopic state vectors ( Q), physical flux tensors ( Φ), and local source or sink vectors ( S) as auto-matically compiled and executed point-wise on the lattice by our symbolic backend. Each element is listed individually. Compound conserved symbols such as ρu 0 are atomic state components, so ratios like ρu 20/ρ are already in final form: no cancellation against the separate state ρ is available or intended. 
+
+SM4.1. Inviscid Burgers Equation. The 2D continuous system has a state vector of dimension N = 1 .
+
+Macroscopic State Components ( Qi).   
+
+> Q0=u
+
+Flux Tensor Components ( Φi,j ).     
+
+> Φ0,0=u2
+> 2Φ0,1=u2
+> 2
+
+Source Vector Components ( Si). All components of the source vector are identically zero: Sburgers = 0.
+
+SM4.2. Compressible Euler Equations. The 2D continuous system has a state vector of dimension N = 4 .
+
+Macroscopic State Components ( Qi).           
+
+> Q0=ρ, Q1=ρu 0,Q2=ρu 1
+> Q3=E
+
+Flux Tensor Components ( Φi,j ).                                               
+
+> Φ0,0=ρu 0
+> Φ0,1=ρu 1
+> Φ1,0=Eγ −E−γρu 20
+> 2ρ−γρu 21
+> 2ρ+ 3ρu 20
+> 2ρ
+> +ρu 21
+> 2ρ
+> Φ1,1=ρu 0ρu 1
+> ρ
+> Φ2,0=ρu 0ρu 1
+> ρ
+> Φ2,1=Eγ −E−γρu 20
+> 2ρ−γρu 21
+> 2ρ+ρu 20
+> 2ρ
+> + 3ρu 21
+> 2ρ
+> Φ3,0=Eγρu 0
+> ρ−γρu 30
+> 2ρ2−γρu 0ρu 21
+> 2ρ2
+> +ρu 30
+> 2ρ2+ρu 0ρu 21
+> 2ρ2
+> Φ3,1=Eγρu 1
+> ρ−γρu 20ρu 1
+> 2ρ2−γρu 31
+> 2ρ2
+> +ρu 20ρu 1
+> 2ρ2+ρu 31
+> 2ρ2
+
+Source Vector Components ( Si). All components of the source vector are identically zero: Scompressible_euler = 0.38 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+SM4.3. Shallow Water Equations. The 2D continuous system has a state vector of dimension N = 3 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = h, Q1 = hu 0, Q2 = hu 1
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = hu 0
+
+Φ0,1 = hu 1
+
+Φ1,0 = gh 2
+
+2 + hu 20
+
+h
+
+Φ1,1 = hu 0hu 1
+
+h
+
+Φ2,0 = hu 0hu 1
+
+h
+
+Φ2,1 = gh 2
+
+2 + hu 21
+
+h
+
+Source Vector Components ( Si). 
+
+S0 = 0 
+
+S1 = − πgh cos (2 πx 0) cos (2 πx 1)50 
+
+S2 = πgh sin (2 πx 0) sin (2 πx 1)50 
+
+SM4.4. Ideal Ultrarelativistic Fluid. The 2D continuous system has a state vector of dimension N = 3 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = E, Q1 = S0, Q2 = S1
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = S0
+
+Φ0,1 = S1
+
+Φ1,0 = − E
+
+3 + 3S20
+
+2E +
+
+q
+
+4E2 − 3S20 − 3S21
+
++
+
+q
+
+4E2 − 3S20 − 3S21
+
+3Φ1,1 = 3S0S1
+
+2E +
+
+q
+
+4E2 − 3S20 − 3S21
+
+Φ2,0 = 3S0S1
+
+2E +
+
+q
+
+4E2 − 3S20 − 3S21
+
+Φ2,1 = − E
+
+3 + 3S21
+
+2E +
+
+q
+
+4E2 − 3S20 − 3S21
+
++
+
+q
+
+4E2 − 3S20 − 3S21
+
+3
+
+Source Vector Components ( Si). All components of the source vector are identically zero: Srelativistic_hydro = 0.
+
+SM4.5. Maxwell Electromagnetics (TM Mode). The 2D continuous system has a state vector of dimension N = 3 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = Ez , Q1 = Hx, Q2 = HyAUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 39 
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = −Hy c
+
+Φ0,1 = Hxc
+
+Φ1,0 = 0 Φ1,1 = Ez c
+
+Φ2,0 = −Ez c
+
+Φ2,1 = 0 
+
+Source Vector Components ( Si). All components of the source vector are identically zero: Smaxwell = 0.
+
+SM4.6. Nonlinear Finite-Strain Elasticity. The 2D continuous system has a state vector of dimension N = 6 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = F00 , Q1 = F01 , Q2 = F10 
+
+Q3 = F11 , Q4 = v0, Q5 = v1
+
+Flux Tensor Components ( Φi,j ). with the shared subexpressions 
+
+χ0 = −v0
+
+χ1 = −v1
+
+χ2 = μs
+
+ρ0
+
+χ3 = F00 F11 
+
+χ4 = F01 F10 
+
+χ5 = 1
+
+χ3ρ0 − χ4ρ0
+
+χ6 = log ( χ3 − χ4)
+
+χ7 = χ5χ6λs
+
+χ8 = χ5μs
+
+the flux components evaluate to 
+
+Φ0,0 = χ0
+
+Φ0,1 = 0 Φ1,0 = 0 Φ1,1 = χ0
+
+Φ2,0 = χ1
+
+Φ2,1 = 0 Φ3,0 = 0 Φ3,1 = χ1
+
+Φ4,0 = −F00 χ2 + F11 χ5μs − F11 χ7
+
+Φ4,1 = −F01 χ2 + F10 χ5χ6λs − F10 χ8
+
+Φ5,0 = F01 χ5χ6λs − F01 χ8 − F10 χ2
+
+Φ5,1 = F00 χ5μs − F00 χ7 − F11 χ2
+
+Source Vector Components ( Si). All components of the source vector are identically zero: Snonlinear_elasticity = 0.
+
+SM4.7. Scalar Advection-Diffusion-Reaction. The 2D continuous system has a state vector of dimension N = 3 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = c, Q1 = Gc, 0, Q2 = Gc, 140 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = −DG c, 0 + cu 0
+
+Φ0,1 = −DG c, 1 + cu 1
+
+Φ1,0 = Gc, 0u0 − cτ∇
+
+Φ1,1 = Gc, 0u1
+
+Φ2,0 = Gc, 1u0
+
+Φ2,1 = Gc, 1u1 − cτ∇
+
+Source Vector Components ( Si). 
+
+S0 = −Rc 2 + Rc S1 = − Gc, 0
+
+τ∇
+
+S2 = − Gc, 1
+
+τ∇
+
+SM4.8. Allen–Cahn Phase-Field Equation. The 2D continuous system has a state vector of dimension N = 3 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = ϕ, Q1 = Gϕ, 0, Q2 = Gϕ, 1
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = −Gϕ, 0γ
+
+Φ0,1 = −Gϕ, 1γ
+
+Φ1,0 = − ϕτ∇
+
+Φ1,1 = 0 Φ2,0 = 0 Φ2,1 = − ϕτ∇
+
+Source Vector Components ( Si). 
+
+S0 = −ϕ3r + ϕr S1 = − Gϕ, 0
+
+τ∇
+
+S2 = − Gϕ, 1
+
+τ∇
+
+SM4.9. Weakly Compressible Navier–Stokes Equations (Incompressible Limit). The 2D continuous system has a state vector of dimension N = 7 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = ρ, Q1 = ρu 0, Q2 = ρu 1
+
+Q3 = Gρu, 0,0, Q4 = Gρu, 0,1, Q5 = Gρu, 1,0
+
+Q6 = Gρu, 1,1
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = ρu 0
+
+Φ0,1 = ρu 1
+
+Φ1,0 = − 2Gρu, 0,0μρ + c2
+
+> s, phys
+
+ρ + ρu 20
+
+ρ
+
+Φ1,1 = − Gρu, 0,1μρ − Gρu, 1,0μρ + ρu 0ρu 1
+
+ρAUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 41 
+
+Φ2,0 = − Gρu, 0,1μρ − Gρu, 1,0μρ + ρu 0ρu 1
+
+ρ
+
+Φ2,1 = − 2Gρu, 1,1μρ + c2
+
+> s, phys
+
+ρ + ρu 21
+
+ρ
+
+Φ3,0 = Gρu, 0,0ρu 0
+
+ρ − ρu 0
+
+τ∇
+
+Φ3,1 = Gρu, 0,0ρu 1
+
+ρ
+
+Φ4,0 = Gρu, 0,1ρu 0
+
+ρ
+
+Φ4,1 = Gρu, 0,1ρu 1
+
+ρ − ρu 0
+
+τ∇
+
+Φ5,0 = Gρu, 1,0ρu 0
+
+ρ − ρu 1
+
+τ∇
+
+Φ5,1 = Gρu, 1,0ρu 1
+
+ρ
+
+Φ6,0 = Gρu, 1,1ρu 0
+
+ρ
+
+Φ6,1 = Gρu, 1,1ρu 1
+
+ρ − ρu 1
+
+τ∇
+
+Source Vector Components ( Si). 
+
+S0 = 0 
+
+S1 = 0 
+
+S2 = 0 
+
+S3 = − Gρu, 0,0
+
+τ∇
+
+S4 = − Gρu, 0,1
+
+τ∇
+
+S5 = − Gρu, 1,0
+
+τ∇
+
+S6 = − Gρu, 1,1
+
+τ∇
+
+SM4.10. Compressible Navier–Stokes–Fourier Equations. The 2D contin-uous system has a state vector of dimension N = 12 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = ρ, Q1 = ρu 0, Q2 = ρu 1
+
+Q3 = E, Q4 = Gρu, 1,0, Q5 = Gρu, 1,1
+
+Q6 = GE, 0, Q7 = GE, 1, Q8 = Gρ, 0
+
+Q9 = Gρ, 1, Q10 = Gρu, 0,0, Q11 = Gρu, 0,1
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = ρu 0
+
+Φ0,1 = ρu 1
+
+Φ1,0 = Eγ − E + 4Gρ, 0μρu 0
+
+3ρ2 − 2Gρ, 1μρu 1
+
+3ρ2
+
+− 4Gρu, 0,0μ
+
+3ρ + 2Gρu, 1,1μ
+
+3ρ − γρu 20
+
+2ρ
+
+− γρu 21
+
+2ρ + 3ρu 20
+
+2ρ + ρu 21
+
+2ρ
+
+Φ1,1 = Gρ, 0μρu 1
+
+ρ2 + Gρ, 1μρu 0
+
+ρ2 − Gρu, 0,1μρ42 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+− Gρu, 1,0μρ + ρu 0ρu 1
+
+ρ
+
+Φ2,0 = Gρ, 0μρu 1
+
+ρ2 + Gρ, 1μρu 0
+
+ρ2 − Gρu, 0,1μρ
+
+− Gρu, 1,0μρ + ρu 0ρu 1
+
+ρ
+
+Φ2,1 = Eγ − E − 2Gρ, 0μρu 0
+
+3ρ2 + 4Gρ, 1μρu 1
+
+3ρ2
+
++ 2Gρu, 0,0μ
+
+3ρ − 4Gρu, 1,1μ
+
+3ρ − γρu 20
+
+2ρ
+
+− γρu 21
+
+2ρ + ρu 20
+
+2ρ + 3ρu 21
+
+2ρ
+
+Φ3,0 = EG ρ, 0Kγ Rρ 2 − EG ρ, 0KRρ 2 + Eγρu 0
+
+ρ
+
+− GE, 0Kγ Rρ + GE, 0KRρ − Gρ, 0Kγρu 20
+
+Rρ 3
+
+− Gρ, 0Kγρu 21
+
+Rρ 3 + Gρ, 0Kρu 20
+
+Rρ 3
+
++ Gρ, 0Kρu 21
+
+Rρ 3 + 4Gρ, 0μρu 20
+
+3ρ3
+
++ Gρ, 0μρu 21
+
+ρ3 + Gρ, 1μρu 0ρu 1
+
+3ρ3
+
++ Gρu, 0,0Kγρu 0
+
+Rρ 2 − Gρu, 0,0Kρu 0
+
+Rρ 2
+
+− 4Gρu, 0,0μρu 0
+
+3ρ2 − Gρu, 0,1μρu 1
+
+ρ2
+
++ Gρu, 1,0Kγρu 1
+
+Rρ 2 − Gρu, 1,0Kρu 1
+
+Rρ 2
+
+− Gρu, 1,0μρu 1
+
+ρ2 + 2Gρu, 1,1μρu 0
+
+3ρ2
+
+− γρu 30
+
+2ρ2 − γρu 0ρu 21
+
+2ρ2 + ρu 30
+
+2ρ2
+
++ ρu 0ρu 21
+
+2ρ2
+
+Φ3,1 = EG ρ, 1Kγ Rρ 2 − EG ρ, 1KRρ 2 + Eγρu 1
+
+ρ
+
+− GE, 1Kγ Rρ + GE, 1KRρ + Gρ, 0μρu 0ρu 1
+
+3ρ3
+
+− Gρ, 1Kγρu 20
+
+Rρ 3 − Gρ, 1Kγρu 21
+
+Rρ 3
+
++ Gρ, 1Kρu 20
+
+Rρ 3 + Gρ, 1Kρu 21
+
+Rρ 3
+
++ Gρ, 1μρu 20
+
+ρ3 + 4Gρ, 1μρu 21
+
+3ρ3
+
++ 2Gρu, 0,0μρu 1
+
+3ρ2 + Gρu, 0,1Kγρu 0
+
+Rρ 2
+
+− Gρu, 0,1Kρu 0
+
+Rρ 2 − Gρu, 0,1μρu 0
+
+ρ2
+
+− Gρu, 1,0μρu 0
+
+ρ2 + Gρu, 1,1Kγρu 1
+
+Rρ 2
+
+− Gρu, 1,1Kρu 1
+
+Rρ 2 − 4Gρu, 1,1μρu 1
+
+3ρ2AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 43 
+
+− γρu 20ρu 1
+
+2ρ2 − γρu 31
+
+2ρ2
+
++ ρu 20ρu 1
+
+2ρ2 + ρu 31
+
+2ρ2
+
+Φ4,0 = Gρu, 1,0ρu 0
+
+ρ − ρu 1
+
+τ∇
+
+Φ4,1 = Gρu, 1,0ρu 1
+
+ρ
+
+Φ5,0 = Gρu, 1,1ρu 0
+
+ρ
+
+Φ5,1 = Gρu, 1,1ρu 1
+
+ρ − ρu 1
+
+τ∇
+
+Φ6,0 = − Eτ∇
+
++ GE, 0ρu 0
+
+ρ
+
+Φ6,1 = GE, 0ρu 1
+
+ρ
+
+Φ7,0 = GE, 1ρu 0
+
+ρ
+
+Φ7,1 = − Eτ∇
+
++ GE, 1ρu 1
+
+ρ
+
+Φ8,0 = Gρ, 0ρu 0
+
+ρ − ρτ∇
+
+Φ8,1 = Gρ, 0ρu 1
+
+ρ
+
+Φ9,0 = Gρ, 1ρu 0
+
+ρ
+
+Φ9,1 = Gρ, 1ρu 1
+
+ρ − ρτ∇
+
+Φ10 ,0 = Gρu, 0,0ρu 0
+
+ρ − ρu 0
+
+τ∇
+
+Φ10 ,1 = Gρu, 0,0ρu 1
+
+ρ
+
+Φ11 ,0 = Gρu, 0,1ρu 0
+
+ρ
+
+Φ11 ,1 = Gρu, 0,1ρu 1
+
+ρ − ρu 0
+
+τ∇
+
+Source Vector Components ( Si). 
+
+S0 = 0 
+
+S1 = 0 
+
+S2 = 0 
+
+S3 = 0 
+
+S4 = − Gρu, 1,0
+
+τ∇
+
+S5 = − Gρu, 1,1
+
+τ∇
+
+S6 = − GE, 0
+
+τ∇
+
+S7 = − GE, 1
+
+τ∇
+
+S8 = − Gρ, 0
+
+τ∇44 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+S9 = − Gρ, 1
+
+τ∇
+
+S10 = − Gρu, 0,0
+
+τ∇
+
+S11 = − Gρu, 0,1
+
+τ∇
+
+SM4.11. Resistive Compressible Magnetohydrodynamics. The 2D con-tinuous system has a state vector of dimension N = 18 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = ρ, Q1 = ρu 0, Q2 = ρu 1
+
+Q3 = E, Q4 = B0, Q5 = B1
+
+Q6 = Gρ, 0, Q7 = Gρ, 1, Q8 = Gρu, 1,0
+
+Q9 = Gρu, 1,1, Q10 = GE, 0, Q11 = GE, 1
+
+Q12 = GB, 1,0, Q13 = GB, 1,1, Q14 = Gρu, 0,0
+
+Q15 = Gρu, 0,1, Q16 = GB, 0,0, Q17 = GB, 0,1
+
+Flux Tensor Components ( Φi,j ). 
+
+Φ0,0 = ρu 0
+
+Φ0,1 = ρu 1
+
+Φ1,0 = − B20 γ
+
+2 − B21 γ
+
+2 + B21 + Eγ − E + 4Gρ, 0μρu 0
+
+3ρ2
+
+− 2Gρ, 1μρu 1
+
+3ρ2 − 4Gρu, 0,0μ
+
+3ρ + 2Gρu, 1,1μ
+
+3ρ
+
+− γρu 20
+
+2ρ − γρu 21
+
+2ρ + 3ρu 20
+
+2ρ
+
++ ρu 21
+
+2ρ
+
+Φ1,1 = −B0B1 + Gρ, 0μρu 1
+
+ρ2 + Gρ, 1μρu 0
+
+ρ2
+
+− Gρu, 0,1μρ − Gρu, 1,0μρ + ρu 0ρu 1
+
+ρ
+
+Φ2,0 = −B0B1 + Gρ, 0μρu 1
+
+ρ2 + Gρ, 1μρu 0
+
+ρ2
+
+− Gρu, 0,1μρ − Gρu, 1,0μρ + ρu 0ρu 1
+
+ρ
+
+Φ2,1 = − B20 γ
+
+2 + B20 − B21 γ
+
+2 + Eγ − E − 2Gρ, 0μρu 0
+
+3ρ2
+
++ 4Gρ, 1μρu 1
+
+3ρ2 + 2Gρu, 0,0μ
+
+3ρ − 4Gρu, 1,1μ
+
+3ρ
+
+− γρu 20
+
+2ρ − γρu 21
+
+2ρ + ρu 20
+
+2ρ
+
++ 3ρu 21
+
+2ρ
+
+Φ3,0 = − B20 Gρ, 0Kγ 
+
+2ρ2 + B20 Gρ, 0K
+
+2ρ2
+
+− B20 γρu 0
+
+2ρ − B0B1ρu 1
+
+ρ + B0GB, 0,0Kγ ρ
+
+− B0GB, 0,0Kρ − B21 Gρ, 0Kγ 
+
+2ρ2 + B21 Gρ, 0K
+
+2ρ2
+
+− B21 γρu 0
+
+2ρ + B21 ρu 0
+
+ρ + B1GB, 0,1ηAUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 45 
+
++ B1GB, 1,0Kγ ρ − B1GB, 1,0Kρ − B1GB, 1,0η
+
++ EG ρ, 0Kγ ρ2 − EG ρ, 0Kρ2 + Eγρu 0
+
+ρ
+
+− GE, 0Kγ ρ + GE, 0Kρ − Gρ, 0Kγρu 20
+
+ρ3
+
+− Gρ, 0Kγρu 21
+
+ρ3 + Gρ, 0Kρu 20
+
+ρ3
+
++ Gρ, 0Kρu 21
+
+ρ3 + 4Gρ, 0μρu 20
+
+3ρ3
+
++ Gρ, 0μρu 21
+
+ρ3 + Gρ, 1μρu 0ρu 1
+
+3ρ3
+
++ Gρu, 0,0Kγρu 0
+
+ρ2 − Gρu, 0,0Kρu 0
+
+ρ2
+
+− 4Gρu, 0,0μρu 0
+
+3ρ2 − Gρu, 0,1μρu 1
+
+ρ2
+
++ Gρu, 1,0Kγρu 1
+
+ρ2 − Gρu, 1,0Kρu 1
+
+ρ2
+
+− Gρu, 1,0μρu 1
+
+ρ2 + 2Gρu, 1,1μρu 0
+
+3ρ2
+
+− γρu 30
+
+2ρ2 − γρu 0ρu 21
+
+2ρ2 + ρu 30
+
+2ρ2
+
++ ρu 0ρu 21
+
+2ρ2
+
+Φ3,1 = − B20 Gρ, 1Kγ 
+
+2ρ2 + B20 Gρ, 1K
+
+2ρ2
+
+− B20 γρu 1
+
+2ρ + B20 ρu 1
+
+ρ − B0B1ρu 0
+
+ρ
+
++ B0GB, 0,1Kγ ρ − B0GB, 0,1Kρ − B0GB, 0,1η + B0GB, 1,0η
+
+− B21 Gρ, 1Kγ 
+
+2ρ2 + B21 Gρ, 1K
+
+2ρ2
+
+− B21 γρu 1
+
+2ρ + B1GB, 1,1Kγ ρ − B1GB, 1,1Kρ
+
++ EG ρ, 1Kγ ρ2 − EG ρ, 1Kρ2 + Eγρu 1
+
+ρ
+
+− GE, 1Kγ ρ + GE, 1Kρ + Gρ, 0μρu 0ρu 1
+
+3ρ3
+
+− Gρ, 1Kγρu 20
+
+ρ3 − Gρ, 1Kγρu 21
+
+ρ3
+
++ Gρ, 1Kρu 20
+
+ρ3 + Gρ, 1Kρu 21
+
+ρ3
+
++ Gρ, 1μρu 20
+
+ρ3 + 4Gρ, 1μρu 21
+
+3ρ3
+
++ 2Gρu, 0,0μρu 1
+
+3ρ2 + Gρu, 0,1Kγρu 0
+
+ρ2
+
+− Gρu, 0,1Kρu 0
+
+ρ2 − Gρu, 0,1μρu 0
+
+ρ2
+
+− Gρu, 1,0μρu 0
+
+ρ2 + Gρu, 1,1Kγρu 1
+
+ρ2
+
+− Gρu, 1,1Kρu 1
+
+ρ2 − 4Gρu, 1,1μρu 1
+
+3ρ246 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+− γρu 20ρu 1
+
+2ρ2 − γρu 31
+
+2ρ2
+
++ ρu 20ρu 1
+
+2ρ2 + ρu 31
+
+2ρ2
+
+Φ4,0 = −GB, 0,0η
+
+Φ4,1 = B0ρu 1
+
+ρ − B1ρu 0
+
+ρ − GB, 0,1η
+
+Φ5,0 = − B0ρu 1
+
+ρ + B1ρu 0
+
+ρ − GB, 1,0η
+
+Φ5,1 = −GB, 1,1η
+
+Φ6,0 = Gρ, 0ρu 0
+
+ρ − ρτ∇
+
+Φ6,1 = Gρ, 0ρu 1
+
+ρ
+
+Φ7,0 = Gρ, 1ρu 0
+
+ρ
+
+Φ7,1 = Gρ, 1ρu 1
+
+ρ − ρτ∇
+
+Φ8,0 = Gρu, 1,0ρu 0
+
+ρ − ρu 1
+
+τ∇
+
+Φ8,1 = Gρu, 1,0ρu 1
+
+ρ
+
+Φ9,0 = Gρu, 1,1ρu 0
+
+ρ
+
+Φ9,1 = Gρu, 1,1ρu 1
+
+ρ − ρu 1
+
+τ∇
+
+Φ10 ,0 = − Eτ∇
+
++ GE, 0ρu 0
+
+ρ
+
+Φ10 ,1 = GE, 0ρu 1
+
+ρ
+
+Φ11 ,0 = GE, 1ρu 0
+
+ρ
+
+Φ11 ,1 = − Eτ∇
+
++ GE, 1ρu 1
+
+ρ
+
+Φ12 ,0 = − B1
+
+τ∇
+
++ GB, 1,0ρu 0
+
+ρ
+
+Φ12 ,1 = GB, 1,0ρu 1
+
+ρ
+
+Φ13 ,0 = GB, 1,1ρu 0
+
+ρ
+
+Φ13 ,1 = − B1
+
+τ∇
+
++ GB, 1,1ρu 1
+
+ρ
+
+Φ14 ,0 = Gρu, 0,0ρu 0
+
+ρ − ρu 0
+
+τ∇
+
+Φ14 ,1 = Gρu, 0,0ρu 1
+
+ρ
+
+Φ15 ,0 = Gρu, 0,1ρu 0
+
+ρ
+
+Φ15 ,1 = Gρu, 0,1ρu 1
+
+ρ − ρu 0
+
+τ∇
+
+Φ16 ,0 = − B0
+
+τ∇
+
++ GB, 0,0ρu 0
+
+ρAUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 47 
+
+Φ16 ,1 = GB, 0,0ρu 1
+
+ρ
+
+Φ17 ,0 = GB, 0,1ρu 0
+
+ρ
+
+Φ17 ,1 = − B0
+
+τ∇
+
++ GB, 0,1ρu 1
+
+ρ
+
+Source Vector Components ( Si). 
+
+S0 = 0 
+
+S1 = −B0GB, 0,0 − B0GB, 1,1
+
+S2 = −B1GB, 0,0 − B1GB, 1,1
+
+S3 = − B0GB, 0,0ρu 0
+
+ρ − B0GB, 1,1ρu 0
+
+ρ − B1GB, 0,0ρu 1
+
+ρ
+
+− B1GB, 1,1ρu 1
+
+ρS4 = − GB, 0,0ρu 0
+
+ρ − GB, 1,1ρu 0
+
+ρS5 = − GB, 0,0ρu 1
+
+ρ − GB, 1,1ρu 1
+
+ρS6 = − Gρ, 0
+
+τ∇
+
+S7 = − Gρ, 1
+
+τ∇
+
+S8 = − Gρu, 1,0
+
+τ∇
+
+S9 = − Gρu, 1,1
+
+τ∇
+
+S10 = − GE, 0
+
+τ∇
+
+S11 = − GE, 1
+
+τ∇
+
+S12 = − GB, 1,0
+
+τ∇
+
+S13 = − GB, 1,1
+
+τ∇
+
+S14 = − Gρu, 0,0
+
+τ∇
+
+S15 = − Gρu, 0,1
+
+τ∇
+
+S16 = − GB, 0,0
+
+τ∇
+
+S17 = − GB, 0,1
+
+τ∇
+
+SM4.12. 3D Homogenized Compressible Navier–Stokes–Fourier Equa-tions. The 3D continuous system has a state vector of dimension N = 14 .
+
+Macroscopic State Components ( Qi). 
+
+Q0 = ρ, Q1 = ρu 0, Q2 = ρu 1
+
+Q3 = ρu 2, Q4 = E, Q5 = Gu, 1,1
+
+Q6 = Gu, 2,2, Q7 = Gaux  
+
+> 0
+
+, Q8 = Gaux 
+
+> 1
+
+Q9 = Gaux  
+
+> 2
+
+, Q10 = Gu, 0,0, Q11 = Su, 01 
+
+Q12 = Su, 02 , Q13 = Su, 12 
+
+Flux Tensor Components ( Φi,j ). with the shared subexpressions 
+
+χ0 = ρu 2048 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+χ1 = 1
+
+ρχ2 = 3χ1
+
+2
+
+χ3 = αμ χ4 = 4χ3
+
+3
+
+χ5 = −Eχ6 = Eγ χ7 = ρu 22
+
+χ8 = χ1
+
+2
+
+χ9 = χ7χ8
+
+χ10 = χ0χ8
+
+χ11 = −χ10 γχ12 = ρu 21
+
+χ13 = χ12 χ8
+
+χ14 = −χ13 γχ15 = −χ9γχ16 = 2χ3
+
+3
+
+χ17 = Gu, 2,2χ16 + χ11 + χ14 + χ15 + χ5 + χ6 + χ9
+
+χ18 = Gu, 1,1χ16 + χ13 
+
+χ19 = 2 χ3
+
+χ20 = −Su, 01 χ19 + χ1ρu 0ρu 1
+
+χ21 = −Su, 02 χ19 + χ1ρu 0ρu 2
+
+χ22 = Gu, 0,0χ16 + χ10 
+
+χ23 = −Su, 12 χ19 + χ1ρu 1ρu 2
+
+χ24 = ακ χ25 = 1
+
+ρ2
+
+χ26 = ρu 30
+
+χ27 = χ25 
+
+2
+
+χ28 = χ1ρu 0
+
+χ29 = Gu, 0,0χ28 
+
+χ30 = χ1ρu 1
+
+χ31 = Su, 01 χ30 
+
+χ32 = χ1ρu 2
+
+χ33 = Su, 02 χ32 
+
+χ34 = χ27 ρu 0
+
+χ35 = ρu 31
+
+χ36 = Gu, 1,1χ30 
+
+χ37 = Su, 01 χ28 
+
+χ38 = Su, 12 χ32 
+
+χ39 = χ27 ρu 1
+
+χ40 = ρu 32
+
+χ41 = Gu, 2,2χ32 
+
+χ42 = Su, 02 χ28 AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 49 
+
+χ43 = Su, 12 χ30 
+
+χ44 = χ27 ρu 2
+
+χ45 = 1
+
+τ∇
+
+χ46 = χ1χ45 
+
+χ47 = χ27 χ45 
+
+χ48 = χ0χ47 
+
+χ49 = χ12 χ47 
+
+χ50 = χ47 χ7
+
+χ51 = Eχ 46 − χ46 χ6 + χ48 γ − χ48 + χ49 γ − χ49 + χ50 γ − χ50 
+
+χ52 = χ45 χ8
+
+χ53 = −χ52 ρu 1
+
+χ54 = −χ52 ρu 0
+
+χ55 = −χ52 ρu 2
+
+the flux components evaluate to 
+
+Φ0,0 = ρu 0
+
+Φ0,1 = ρu 1
+
+Φ0,2 = ρu 2
+
+Φ1,0 = −Gu, 0,0χ4 + χ0χ2 + χ17 + χ18 
+
+Φ1,1 = χ20 
+
+Φ1,2 = χ21 
+
+Φ2,0 = χ20 
+
+Φ2,1 = −Gu, 1,1χ4 + χ12 χ2 + χ17 + χ22 
+
+Φ2,2 = χ23 
+
+Φ3,0 = χ21 
+
+Φ3,1 = χ23 
+
+Φ3,2 = −Gu, 2,2χ4 + χ11 + χ14 + χ15 + χ18 + χ2χ7 + χ22 + χ5 + χ6
+
+Φ4,0 = Eχ 1γρu 0 − Gaux  
+
+> 0
+
+χ24 + 2Gu, 1,1αχ 1μρu 0
+
+3+ 2Gu, 2,2αχ 1μρu 0
+
+3 + χ12 χ25 ρu 0
+
+2 − χ12 χ34 γ
+
+− χ19 χ31 − χ19 χ33 + χ25 χ26 
+
+2 + χ25 χ7ρu 0
+
+2
+
+− χ26 χ27 γ − χ29 χ4 − χ34 χ7γ
+
+Φ4,1 = Eχ 1γρu 1 − Gaux  
+
+> 1
+
+χ24 + 2Gu, 0,0αχ 1μρu 1
+
+3+ 2Gu, 2,2αχ 1μρu 1
+
+3 + χ0χ25 ρu 1
+
+2 − χ0χ39 γ
+
+− χ19 χ37 − χ19 χ38 + χ25 χ35 
+
+2 + χ25 χ7ρu 1
+
+2
+
+− χ27 χ35 γ − χ36 χ4 − χ39 χ7γ
+
+Φ4,2 = Eχ 1γρu 2 − Gaux  
+
+> 2
+
+χ24 + 2Gu, 0,0αχ 1μρu 2
+
+3+ 2Gu, 1,1αχ 1μρu 2
+
+3 + χ0χ25 ρu 2
+
+2 − χ0χ44 γ
+
++ χ12 χ25 ρu 2
+
+2 − χ12 χ44 γ − χ19 χ42 − χ19 χ43 
+
++ χ25 χ40 
+
+2 − χ27 χ40 γ − χ4χ41 
+
+Φ5,0 = Gu, 1,1χ28 
+
+Φ5,1 = −χ30 χ45 + χ36 50 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Φ5,2 = Gu, 1,1χ32 
+
+Φ6,0 = Gu, 2,2χ28 
+
+Φ6,1 = Gu, 2,2χ30 
+
+Φ6,2 = −χ32 χ45 + χ41 
+
+Φ7,0 = Gaux 
+
+0 χ28 + χ51 
+
+Φ7,1 = Gaux 
+
+0 χ30 
+
+Φ7,2 = Gaux 
+
+0 χ32 
+
+Φ8,0 = Gaux 
+
+1 χ28 
+
+Φ8,1 = Gaux 
+
+1 χ30 + χ51 
+
+Φ8,2 = Gaux 
+
+1 χ32 
+
+Φ9,0 = Gaux 
+
+2 χ28 
+
+Φ9,1 = Gaux 
+
+2 χ30 
+
+Φ9,2 = Gaux 
+
+2 χ32 + χ51 
+
+Φ10 ,0 = −χ28 χ45 + χ29 
+
+Φ10 ,1 = Gu, 0,0χ30 
+
+Φ10 ,2 = Gu, 0,0χ32 
+
+Φ11 ,0 = χ37 + χ53 
+
+Φ11 ,1 = χ31 + χ54 
+
+Φ11 ,2 = Su, 01 χ32 
+
+Φ12 ,0 = χ42 + χ55 
+
+Φ12 ,1 = Su, 02 χ30 
+
+Φ12 ,2 = χ33 + χ54 
+
+Φ13 ,0 = Su, 12 χ28 
+
+Φ13 ,1 = χ43 + χ55 
+
+Φ13 ,2 = χ38 + χ53 
+
+Source Vector Components ( Si). 
+
+S0 = 0 
+
+S1 = − αu s, 0ρη + αρu 0
+
+η + us, 0ρη − ρu 0
+
+ηS2 = − αu s, 1ρη + αρu 1
+
+η + us, 1ρη − ρu 1
+
+ηS3 = − αu s, 2ρη + αρu 2
+
+η + us, 2ρη − ρu 2
+
+ηS4 = − αu s, 0ρu 0
+
+η − αu s, 1ρu 1
+
+η − αu s, 2ρu 2
+
+η
+
++ αρu 20
+
+ηρ + αρu 21
+
+ηρ + αρu 22
+
+ηρ 
+
++ us, 0ρu 0
+
+η + us, 1ρu 1
+
+η + us, 2ρu 2
+
+η − ρu 20
+
+ηρ 
+
+− ρu 21
+
+ηρ − ρu 22
+
+ηρ S5 = − Gu, 1,1
+
+τ∇
+
+S6 = − Gu, 2,2
+
+τ∇
+
+S7 = − Gaux 
+
+0
+
+τ∇
+
+S8 = − Gaux 
+
+1
+
+τ∇AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 51 
+
+S9 = − Gaux 
+
+> 2
+
+τ∇
+
+S10 = − Gu, 0,0
+
+τ∇
+
+S11 = − Su, 01 
+
+τ∇
+
+S12 = − Su, 02 
+
+τ∇
+
+S13 = − Su, 12 
+
+τ∇52 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+SM5. Method of Manufactured Solutions (MMS) Exact Fields. In this appendix, we document the analytical expressions of the Method of Manufactured Solutions (MMS) exact fields ( Qexact ) for all twelve verified physical PDE targets. The volume forcing terms are derived from these fields symbolically at compile time as the continuous residual Smms = ∂tQexact + ∇ · Φ(Qexact ) − S(Qexact ). We list the conserved macroscopic components. The gradient-tracker components carried by some systems are initialized from the spatial derivatives of these fields and are omitted here. Cases declared with SI-valued scales author their fields as (scale) × (dimensionless), and the value non-dimensionalization divides the scales out to reach the O(1) lattice working point tabulated per case. 
+
+SM5.1. Design Principles for the Manufactured Solutions. 
+
+1. Smoothness. All fields are C∞ trigonometric–exponential profiles, so the measured order reflects the truncation error of the scheme. 2. Large amplitudes. Fluctuations reach a finite fraction of the mean state, so the nonlinearities are exercised. 3. Independent modes. Fields coupled by a constitutive law carry independent fluctuation modes rather than being slaved to one another. 4. Broken axis symmetry. Per-axis wavenumbers, Mach numbers, or phase patterns are distinct. 5. Off-resonance forcing. Temporal frequencies avoid the free eigenfrequencies, and the evaluation instant falls at a generic phase. 6. Involutions by construction. Differential constraints carried by the physics are satisfied analytically by the exact fields. 
+
+SM5.2. Inviscid Burgers Equation MMS. 
+
+Manufactured solution (physical form). The exact manufactured profile is a smooth periodic wave of amplitude A = max |u|:
+
+uexact (x, t ) = A sin(2 πx 0) sin(2 πx 1) cos t. (SM5.1) Table SM3: Symbol values for Inviscid Burgers Equation MMS.     
+
+> Symbol Value Quantity
+> A1.3manufactured-solution amplitude
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+).    
+
+> Qexact
+> 0=Asin (2 πx 0) sin (2 πx 1) cos ( t)
+
+SM5.3. Compressible Euler Equations MMS. 
+
+Manufactured solution (physical form). The manufactured solution superimposes smooth fluctuations on a supersonic advection background at per-axis Mach number 
+
+3.0. The reference state has density ρ0 and sound speed cs = pγp 0/ρ 0, with reference pressure p0 = ρ0c2
+
+> s
+
+/γ and background velocity u0 = v0 = 3 cs. With wavenumber 
+
+k = 2 π the fluctuations are 
+
+∆ρ = 0 .3 ρ0 sin( kx 0) cos( kx 1) cos t, 
+
+∆u = 0 .3 cs cos( kx 0) sin( kx 1) sin t, 
+
+∆v = 0 .3 cs sin( kx 0) sin( kx 1) sin t, 
+
+∆p = c2 
+
+> s
+
+∆ρ + 0 .2 p0 cos( kx 0) sin( kx 1) sin t, 
+
+(SM5.2) AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 53 so the pressure carries an independent mode in addition to the linear response c2
+
+> s
+
+∆ρ.The conserved state is assembled as ρexact = ρ0 + ∆ ρ, (ρu)exact = ρexact (u0 + ∆ u),
+
+pexact = p0 + ∆ p, and Eexact = pexact /(γ − 1) + 12 ρexact |uexact |2.Table SM4: Symbol values for Compressible Euler Equations MMS. 
+
+Symbol Value Quantity 
+
+ρ0 1.225 kg /m3 reference density 
+
+cs 340 .3 m /s sound-speed scale 
+
+γ 1.4 adiabatic index 
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)10 + ρ0
+
+Qexact  
+
+> 1
+
+= ( 3cs sin ( t) sin (2 πx 1) cos (2 πx 0)10 + 3 cs)( 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)10 + ρ0)
+
+Qexact  
+
+> 2
+
+= ( 3cs sin ( t) sin (2 πx 0) sin (2 πx 1)10 + 3 cs)( 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)10 + ρ0)
+
+Qexact  
+
+> 3
+
+= 5c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 1) cos (2 πx 0)14 + 3c2 
+
+> s
+
+ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)4 + 25 c2 
+
+> s
+
+ρ0
+
+14 + ( 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)20 + ρ0
+
+2 )(( 3cs sin ( t) sin (2 πx 0) sin (2 πx 1)10 + 3 cs)2
+
++ ( 3cs sin ( t) sin (2 πx 1) cos (2 πx 0)10 + 3 cs)2)
+
+SM5.4. Shallow Water Equations MMS. 
+
+Manufactured solution (physical form). The manufactured fields evolve the water depth h and discharge hu over a static bathymetry zb(x) = 0 .01 sin (2 πx 0) cos (2 πx 1).Depth fluctuations are 40% of the mean depth, giving a subcritical Froude number 
+
+≈ 0.3 with h ∈ [0 .06 , 0.14] so h > 0 everywhere: 
+
+hexact = 0 .04 sin(2 πx 0) sin(2 πx 1) cos t + 0 .1,
+
+(hu 0)exact = 0 .02 cos(2 πx 0) cos(2 πx 1) sin t + 0 .03 ,
+
+(hu 1)exact = 0 .02 sin(2 πx 0) sin(2 πx 1) sin t + 0 .03 .
+
+(SM5.3) The characteristic gravity-wave speed cs = √gH at reference depth H = 0 .1 sets the convective time scale and reduces the realistic-SI gravity to the working point. The values are listed below. Table SM5: Symbol values for Shallow Water Equations MMS. 
+
+Symbol Value Quantity 
+
+cs 0.9905 m /s sound-speed scale 
+
+g 9.81 m /s2 gravitational acceleration 54 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= sin (2 πx 0) sin (2 πx 1) cos ( t)25 + 110 
+
+Qexact  
+
+> 1
+
+= sin ( t) cos (2 πx 0) cos (2 πx 1)50 + 3100 
+
+Qexact  
+
+> 2
+
+= sin ( t) sin (2 πx 0) sin (2 πx 1)50 + 3100 
+
+SM5.5. Ideal Ultrarelativistic Fluid MMS. 
+
+Manufactured solution (physical form). The manufactured fields for the ideal ultrarelativistic fluid are smooth fluctuations about a uniform background, kept inside the physicality region E > |S| (three-velocities up to |v| ≈ 0.79 , Lorentz factor Γ ≈ 1.6
+
+where E is low and |S| high): 
+
+Eexact (x, t ) = 0 .4 sin(2 πx 0) sin(2 πx 1) cos t + 3 .0,S0,exact (x, t ) = 0 .4 cos(2 πx 0) cos(2 πx 1) sin t + 1 .2,S1,exact (x, t ) = 0 .4 sin(2 πx 0) sin(2 πx 1) sin t + 1 .2,
+
+(SM5.4) with conserved energy density E and momentum S in natural units ( c = 1 ). 
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= 2 sin (2 πx 0) sin (2 πx 1) cos ( t)5 + 3 
+
+Qexact  
+
+> 1
+
+= 2 sin ( t) cos (2 πx 0) cos (2 πx 1)5 + 65
+
+Qexact  
+
+> 2
+
+= 2 sin ( t) sin (2 πx 0) sin (2 πx 1)5 + 65
+
+SM5.6. Maxwell Electromagnetics (TM Mode) MMS. 
+
+Manufactured solution (physical form). The manufactured solution is a TM pattern with distinct wavenumbers kx = 2 π and ky = 4 π, amplitude A = 12 , and temporal frequency ω = 4 , with the electric and magnetic fields in the physical 90 ◦ quadrature (Ez ∼ cos ωt , H ∼ sin ωt ): 
+
+Ez, exact (x, t ) = A sin( kxx0) sin( ky x1) cos( ωt ),Hx, exact (x, t ) = A sin( kxx0) cos( ky x1) sin( ωt ),Hy, exact (x, t ) = −A kx
+
+ky
+
+cos( kxx0) sin( ky x1) sin( ωt ).
+
+(SM5.5) The field satisfies ∇ · H = 0 analytically. Table SM6: Symbol values for Maxwell Electromagnetics (TM Mode) MMS. 
+
+Symbol Value Quantity 
+
+c 1 electromagnetic wave speed 
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= sin (2 πx 0) sin (4 πx 1) cos (4 t)2
+
+Qexact  
+
+> 1
+
+= sin (4 t) sin (2 πx 0) cos (4 πx 1)2
+
+Qexact  
+
+> 2
+
+= − sin (4 t) sin (4 πx 1) cos (2 πx 0)4AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 55 
+
+SM5.7. Nonlinear Finite-Strain Elasticity MMS. 
+
+Manufactured solution (physical form). The case is the deformation-gradient (total-Lagrangian) formulation of compressible neo-Hookean elastodynamics of the main article, with conserved state (F, v). The manufactured fields derive from a smooth, non-separable displacement potential w of amplitude A = 0 .06 via F = I + ∇w
+
+(curl-free, so the compatibility involution holds exactly) and v = ∂tw, reaching a 37% 
+
+finite strain with det F ≥ 0.68 > 0 everywhere: 
+
+w0 = A  sin(2 πx 0) sin(2 πx 1) cos t + 12 sin(2 πx 0) cos(2 πx 1) sin t
+
++ 14 cos(2 π(x0 + x1)) cos t,w1 = A  cos(2 πx 0) cos(2 πx 1) sin t + 12 cos(2 πx 0) sin(2 πx 1) cos t
+
++ 14 sin(2 π(x0 − x1)) sin t.
+
+(SM5.6) The material values (aluminium-like) are listed below. The rest state F = I, v = 0 
+
+gives P(I) = 0 , so the reference state is the rest configuration. Table SM7: Symbol values for Nonlinear Finite-Strain Elasticity MMS. 
+
+Symbol Value Quantity 
+
+ρ0 2700 reference density 
+
+μs 2.6 × 10 10 shear modulus 
+
+λs 5.2 × 10 10 first Lame parameter 
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= 3π sin ( t) cos (2 πx 0) cos (2 πx 1)50 + 3π sin (2 πx 1) cos ( t) cos (2 πx 0)25 − 3π sin ( π(2 x0 + 2 x1)) cos ( t)100 + 1 
+
+Qexact  
+
+> 1
+
+= − 3π sin ( t) sin (2 πx 0) sin (2 πx 1)50 + 3π sin (2 πx 0) cos ( t) cos (2 πx 1)25 − 3π sin ( π(2 x0 + 2 x1)) cos ( t)100 
+
+Qexact  
+
+> 2
+
+= − 3π sin ( t) sin (2 πx 0) cos (2 πx 1)25 + 3π sin ( t) cos ( π(2 x0 − 2x1)) 100 
+
+− 3π sin (2 πx 0) sin (2 πx 1) cos ( t)50 
+
+Qexact  
+
+> 3
+
+= − 3π sin ( t) sin (2 πx 1) cos (2 πx 0)25 − 3π sin ( t) cos ( π(2 x0 − 2x1)) 100 + 3π cos ( t) cos (2 πx 0) cos (2 πx 1)50 + 1 
+
+Qexact  
+
+> 4
+
+= − 3 sin ( t) sin (2 πx 0) sin (2 πx 1)50 − 3 sin ( t) cos ( π(2 x0 + 2 x1)) 200 + 3 sin (2 πx 0) cos ( t) cos (2 πx 1)100 
+
+Qexact  
+
+> 5
+
+= − 3 sin ( t) sin (2 πx 1) cos (2 πx 0)100 + 3 sin ( π(2 x0 − 2x1)) cos ( t)200 + 3 cos ( t) cos (2 πx 0) cos (2 πx 1)50 
+
+SM5.8. Scalar Advection-Diffusion-Reaction MMS. 56 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Manufactured solution (physical form). The exact manufactured verification profile is defined as: 
+
+cexact (x, t ) = 0 .5 sin(2 π(x0 − u0t)) cos(2 π(x1 − u1t)) exp( −t) + 0 .5.(SM5.7) System parameters are listed below. Table SM8: Symbol values for Scalar Advection-Diffusion-Reaction MMS.           
+
+> Symbol Value Quantity
+> u00.1advection velocity (x)
+> u1−0.1advection velocity (y)
+> D0.01 diffusivity
+> R1reaction rate
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+).      
+
+> Qexact
+> 0= 12 +e−tsin ( π(−2tu 0+ 2 x0)) cos ( π(−2tu 1+ 2 x1)) 2
+
+SM5.9. Allen–Cahn Phase-Field Equation MMS. 
+
+Manufactured solution (physical form). The exact manufactured verification profile is a smooth periodic order parameter whose amplitude is kept below unity: 
+
+ϕexact (x, t ) = 0 .7 sin(2 πx 0) cos(2 πx 1) cos( t).(SM5.8) System parameters are listed below. Table SM9: Symbol values for Allen–Cahn Phase-Field Equation MMS.       
+
+> Symbol Value Quantity
+> γ0.01 interface mobility times width squared
+> r1reaction rate
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+).  
+
+> Qexact
+> 0= 7 sin (2 πx 0) cos ( t) cos (2 πx 1)10
+
+SM5.10. Weakly Compressible Navier–Stokes Equations (Incompress-ible Limit) MMS. 
+
+Manufactured solution (physical form). The manufactured solution is the two-dimensional Taylor–Green vortex, an exact solution of the incompressible Navier–Stokes equations, used here to verify the weakly compressible (artificial-compressibility) scheme in its incompressible limit. The working point is weakly compressible at Mach number Ma = U/c s = 0 .1 and Reynolds number Re = U L/ν = 10 , with reference density ρ0, artificial sound speed cs, velocity amplitude U , and kinematic viscosity ν (μ = ρ0ν). With wavenumber k = 2 π and the exact viscous decay 
+
+D(t) = exp( −2( ν/c s)k2t) in characteristic time, the velocity and pressure are 
+
+u = −U cos( kx 0) sin( kx 1) D(t),v = U sin( kx 0) cos( kx 1) D(t),p = − 14 ρ0U 2 [cos(2 kx 0) + cos(2 kx 1)] D(t)2.
+
+(SM5.9) AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 57 The density is slaved to the dynamic pressure, ρexact = ρ0 + p/c 2
+
+> s
+
+, so the density fluctuation is O(Ma 2), and the conserved momentum is (ρu)exact = ρexact u.Table SM10: Symbol values for Weakly Compressible Navier–Stokes Equations (In-compressible Limit) MMS. 
+
+Symbol Value Quantity 
+
+ρ0 1.225 kg /m3 reference density 
+
+cs 340 m /s sound-speed scale 
+
+μ 4.165 Pa s dynamic viscosity 
+
+U 34 m /s velocity amplitude 
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= − ρ0(cos (4 πx 0) + cos (4 πx 1)) e− 4π2t
+
+> 25
+
+400 + ρ0
+
+Qexact  
+
+> 1
+
+= − csρ0e− 2π2t 
+
+> 25
+
+sin (2 πx 1) cos (2 πx 0)10 + csρ0e− 6π2t 
+
+> 25
+
+sin (2 πx 1) cos (2 πx 0) cos (4 πx 0)4000 + csρ0e− 6π2t 
+
+> 25
+
+sin (2 πx 1) cos (2 πx 0) cos (4 πx 1)4000 
+
+Qexact  
+
+> 2
+
+= csρ0e− 2π2t 
+
+> 25
+
+sin (2 πx 0) cos (2 πx 1)10 
+
+− csρ0e− 6π2t 
+
+> 25
+
+sin (2 πx 0) cos (4 πx 0) cos (2 πx 1)4000 
+
+− csρ0e− 6π2t 
+
+> 25
+
+sin (2 πx 0) cos (2 πx 1) cos (4 πx 1)4000 
+
+SM5.11. Compressible Navier–Stokes–Fourier Equations MMS. 
+
+Manufactured solution (physical form). The manufactured solution models a supersonic viscous flow with an anisotropic mean velocity at per-axis Mach numbers 
+
+3.0 and 2.0, at Prandtl number Pr = 0 .71 (air). The reference state has density ρ0, gas constant R, and sound speed cs = √γRT 0 at temperature T0 = 288 K , with reference pressure p0 = ρ0RT 0 and background velocity u0 = 3 cs, v0 = 2 cs. With wavenumber 
+
+k = 2 π the fluctuations use a distinct amplitude and spatial structure per field, 
+
+∆ρ = 0 .20 ρ0 sin( kx 0) cos( kx 1) cos t, 
+
+∆u = 0 .20 cs cos( kx 0) sin( kx 1) sin t, 
+
+∆v = 0 .15 cs sin( kx 0) sin( kx 1) cos t, 
+
+∆p = c2 
+
+> s
+
+∆ρ + 0 .20 p0 cos( kx 0) sin( kx 1) sin t, 
+
+(SM5.10) so the pressure carries an independent mode beyond the linear response. The conserved state is ρexact = ρ0 + ∆ ρ, (ρu)exact = ρexact (u0 + ∆ u), and Eexact = pexact /(γ − 1) +  
+
+> 12
+
+ρexact |uexact |2 with pexact = p0 + ∆ p. The thermal conductivity follows from the Prandtl number, K = μ c p/Pr with cp = γR/ (γ − 1) , placing the flow in a resolved viscous regime (Re = ρ0u0L/μ ≈ 3.5 × 10 2 on the unit domain L = 1 ). 58 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+Table SM11: Symbol values for Compressible Navier–Stokes–Fourier Equations MMS. 
+
+Symbol Value Quantity 
+
+ρ0 1.225 kg /m3 reference density 
+
+cs 340 .2 m /s sound-speed scale 
+
+γ 1.4 adiabatic index 
+
+R 287 J kg −1 K−1 specific gas constant 
+
+μ 3.52 Pa s dynamic viscosity 
+
+K 4980 W m −1 K−1 thermal conductivity 
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)5 + ρ0
+
+Qexact  
+
+> 1
+
+= ( cs sin ( t) sin (2 πx 1) cos (2 πx 0)5+ 3 cs)( ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)5 + ρ0)
+
+Qexact  
+
+> 2
+
+= ( 3cs sin (2 πx 0) sin (2 πx 1) cos ( t)20 + 2 cs)( ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)5 + ρ0)
+
+Qexact  
+
+> 3
+
+= 5c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 1) cos (2 πx 0)14 + c2 
+
+> s
+
+ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)2 + 25 c2 
+
+> s
+
+ρ0
+
+14 + ( ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)10 + ρ0
+
+2 )(( cs sin ( t) sin (2 πx 1) cos (2 πx 0)5 + 3 cs)2
+
++ ( 3cs sin (2 πx 0) sin (2 πx 1) cos ( t)20 + 2 cs)2)
+
+SM5.12. Resistive Compressible Magnetohydrodynamics MMS. 
+
+Manufactured solution (physical form). The manufactured solution is a supersonic magnetized flow at per-axis Mach number 3.0 with smooth fluctuations about a uniform background. The magnetic field is carried in Alfven (velocity) units. The reference state has density ρ0 and sound speed cs = pγp 0/ρ 0 (reference pressure p0 = ρ0c2
+
+> s
+
+/γ ), with background velocity u0 = v0 = 3 cs and background field Bx, 0 = By, 0 = 0 .5 cs
+
+(plasma β = 4 /γ ≈ 2.9). With wavenumber k = 2 π the fluctuations are 
+
+∆ρ = 0 .3 ρ0 sin( kx 0) cos( kx 1) cos t, 
+
+∆p = c2 
+
+> s
+
+∆ρ + 0 .2 p0 cos( kx 0) sin( kx 1) sin t, 
+
+∆u = 0 .3 cs cos( kx 0) sin( kx 1) sin t, 
+
+∆v = 0 .3 cs sin( kx 0) sin( kx 1) sin t, 
+
+∆Bx = −0.3 cs cos( kx 0) sin( kx 1) sin t, 
+
+∆By = 0 .3 cs sin( kx 0) cos( kx 1) sin t, 
+
+(SM5.11) with the magnetic perturbation divergence-free by construction ( ∂x0 ∆Bx + ∂x1 ∆By =0), and the pressure carrying an independent mode beyond the linear response c2
+
+> s
+
+∆ρ.The conserved energy is Eexact = pexact /(γ − 1) + 12 ρexact |uexact |2 + 12 |Bexact |2, and a Powell source proportional to ∇ · B controls the solenoidal error. The magnetic diffusivity, dynamic viscosity, and heat-flux coefficient are set to equal diffusivities. AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 59 Table SM12: Symbol values for Resistive Compressible Magnetohydrodynamics MMS. 
+
+Symbol Value Quantity 
+
+ρ0 1.225 kg /m3 reference density 
+
+cs 340 m /s sound-speed scale 
+
+γ 1.4 adiabatic index 
+
+η 3.4 m 2/s magnetic diffusivity 
+
+μ 4.165 Pa s dynamic viscosity 
+
+K 4.165 Pa s heat-flux coefficient ( T = p/ρ )
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+). 
+
+Qexact  
+
+> 0
+
+= 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)10 + ρ0
+
+Qexact  
+
+> 1
+
+= ( 3cs sin ( t) sin (2 πx 1) cos (2 πx 0)10 + 3 cs)( 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)10 + ρ0)
+
+Qexact  
+
+> 2
+
+= ( 3cs sin ( t) sin (2 πx 0) sin (2 πx 1)10 + 3 cs)( 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)10 + ρ0)
+
+Qexact  
+
+> 3
+
+= 5c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 1) cos (2 πx 0)14 + 3c2 
+
+> s
+
+ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)4 + 25 c2 
+
+> s
+
+ρ0
+
+14 + ( 3cs sin ( t) sin (2 πx 0) cos (2 πx 1)10 + cs 
+
+> 2
+
+)2
+
+2+ (− 3cs sin ( t) sin (2 πx 1) cos (2 πx 0)10 + cs 
+
+> 2
+
+)2
+
+2+ ( 3ρ0 sin (2 πx 0) cos ( t) cos (2 πx 1)20 + ρ0
+
+2 )(( 3cs sin ( t) sin (2 πx 0) sin (2 πx 1)10 + 3 cs)2
+
++ ( 3cs sin ( t) sin (2 πx 1) cos (2 πx 0)10 + 3 cs)2)
+
+Qexact  
+
+> 4
+
+= − 3cs sin ( t) sin (2 πx 1) cos (2 πx 0)10 + cs
+
+2
+
+Qexact  
+
+> 5
+
+= 3cs sin ( t) sin (2 πx 0) cos (2 πx 1)10 + cs
+
+2
+
+SM5.13. 3D Homogenized Compressible Navier–Stokes–Fourier Equa-tions MMS. 
+
+Manufactured solution (physical form). The manufactured solution is fully three-dimensional with active compressibility ( ∇ρ̸ = 0 ), evolved as fluctuations of amplitude 
+
+A = 0 .2 about a subsonic mean state at per-axis Mach number Ma = 0 .5 (air at standard conditions; reference density ρ0, isothermal sound-speed scale cs = pp0/ρ 0,reference pressure p0 = ρ0c2
+
+> s
+
+, mean (adiabatic) sound speed ¯c = √γ c s, drift U0 = Ma ¯c). 60 A. KUMMERLÄNDER, F. BUKREEV, AND M. J. KRAUSE 
+
+The fluid primitives ( k = 2 π) are 
+
+ρ = ρ0 + A sin( kx 0) cos( kx 1) sin( kx 2) cos t, u0 = U0 + A cos( kx 0) sin( kx 1) sin( kx 2) sin t, u1 = U0 + A sin( kx 0) cos( kx 1) sin( kx 2) sin t, u2 = U0 + A sin( kx 0) sin( kx 1) cos( kx 2) sin t, p = p0 + ¯ c2(ρ − ρ0) + A p 0 cos( kx 0) sin( kx 1) cos( kx 2) sin t, 
+
+(SM5.12) so the pressure combines the linear response ¯c2(ρ − ρ0) with an independent mode, and the conserved state is assembled algebraically as Q = ( ρ, ρ u, E ) with E =
+
+p/ (γ − 1) + 12 ρ|u|2. The prescribed solid-velocity input field superimposes a rotation (amplitude 0.2), a uniform translation c = (0 .1, −0.1, 0.05) , and an independent oscillation (amplitude 0.1), 
+
+us, 0 = 0 .2 sin( kx 0) cos( kx 1) cos( kx 2) cos t + c0 + 0 .1 sin t cos( kx 2),us, 1 = −0.2 cos( kx 0) sin( kx 1) cos( kx 2) cos t + c1 + 0 .1 cos t cos( kx 0),us, 2 = 0 .2 cos( kx 0) cos( kx 1) sin( kx 2) sin t + c2 + 0 .1 sin t cos( kx 1),
+
+(SM5.13) and the porosity is a smooth, fully three-dimensional and non-separable sinusoid advected along the solid displacement ξ = x − d(x, t ),
+
+α = 12 + 110 
+
+h
+
+sin( kξ 0) + sin( kξ 1) + sin( kξ 2)+ 2 sin( kξ 0) sin( kξ 1) sin( kξ 2)
+
+i
+
+∈ [0 , 1] ,(SM5.14) with di = ( rotation ) sin t + ci t a smooth solid displacement, so α spans the full solid-to-fluid range and is transported. Table SM13: Symbol values for 3D Homogenized Compressible Navier–Stokes–Fourier Equations MMS.                 
+
+> Symbol Value Quantity
+> ρ01.225 kg /m3reference density
+> cs287 .4 m /ssound-speed scale
+> γ1.4adiabatic index
+> μ3.52 Pa s dynamic viscosity
+> κ3.52 Pa s heat-flux coefficient ( T=p/ρ )
+> η0.000 348 s drag relaxation time
+
+Compiler-expanded fields ( Qexact  
+
+> i
+
+).          
+
+> Qexact
+> 0=ρ0( sin (2 πx 0) sin (2 πx 2) cos ( t) cos (2 πx 1)5+ 1)
+> Qexact
+> 1=csρ0( sin ( t) sin (2 πx 1) sin (2 πx 2) cos (2 πx 0)5+ 0 .591607978309962)( sin (2 πx 0) sin (2 πx 2) cos ( t) cos (2 πx 1)5+ 1)
+> Qexact
+> 2=csρ0( sin ( t) sin (2 πx 0) sin (2 πx 2) cos (2 πx 1)5+ 0 .591607978309962)( sin (2 πx 0) sin (2 πx 2) cos ( t) cos (2 πx 1)5+ 1)
+
+AUTOMATED DERIVATION OF LATTICE BOLTZMANN METHODS 61 
+
+Qexact  
+
+> 3
+
+= csρ0( sin ( t) sin (2 πx 0) sin (2 πx 1) cos (2 πx 2)5+ 0 .591607978309962)( sin (2 πx 0) sin (2 πx 2) cos ( t) cos (2 πx 1)5 + 1) 
+
+Qexact  
+
+> 4
+
+= c2 
+
+> s
+
+ρ0 sin 2 (t) sin 3 (2 πx 0) sin 2 (2 πx 1) sin (2 πx 2) cos ( t) cos (2 πx 1) cos 2 (2 πx 2)250 + c2 
+
+> s
+
+ρ0 sin 2 (t) sin 3 (2 πx 0) sin 3 (2 πx 2) cos ( t) cos 3 (2 πx 1)250 + c2 
+
+> s
+
+ρ0 sin 2 (t) sin 2 (2 πx 0) sin 2 (2 πx 1) cos 2 (2 πx 2)50 + c2 
+
+> s
+
+ρ0 sin 2 (t) sin 2 (2 πx 0) sin 2 (2 πx 2) cos 2 (2 πx 1)50 + c2 
+
+> s
+
+ρ0 sin 2 (t) sin (2 πx 0) sin 2 (2 πx 1) sin 3 (2 πx 2) cos ( t) cos 2 (2 πx 0) cos (2 πx 1)250 + c2 
+
+> s
+
+ρ0 sin 2 (t) sin 2 (2 πx 1) sin 2 (2 πx 2) cos 2 (2 πx 0)50 + 0 .0236643191323985 c2 
+
+> s
+
+ρ0 sin ( t) sin 2 (2 πx 0) sin (2 πx 1) sin (2 πx 2) cos ( t) cos (2 πx 1) cos (2 πx 2)+ 0 .0236643191323985 c2 
+
+> s
+
+ρ0 sin ( t) sin 2 (2 πx 0) sin 2 (2 πx 2) cos ( t) cos 2 (2 πx 1)+ 0 .0236643191323985 c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 0) sin (2 πx 1) sin 2 (2 πx 2) cos ( t) cos (2 πx 0) cos (2 πx 1)+ 0 .118321595661992 c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 0) sin (2 πx 1) cos (2 πx 2)+ 0 .118321595661992 c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 0) sin (2 πx 2) cos (2 πx 1)+ 0 .118321595661992 c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 1) sin (2 πx 2) cos (2 πx 0)+ c2 
+
+> s
+
+ρ0 sin ( t) sin (2 πx 1) cos (2 πx 0) cos (2 πx 2)2+ 161 c2 
+
+> s
+
+ρ0 sin (2 πx 0) sin (2 πx 2) cos ( t) cos (2 πx 1)200 + 121 c2 
+
+> s
+
+ρ0
+
+40
