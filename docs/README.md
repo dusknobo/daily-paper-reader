@@ -6,27 +6,32 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-15
-- 运行时间：2026-07-15 21:37:51 UTC
+- 最新运行日期：2026-07-16
+- 运行时间：2026-07-16 21:28:17 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：3
 - 精读区：0
-- 速读区：2
+- 速读区：3
 
 ### 今日简报（AI）
-今天速览了两篇计算流体力学与薄膜流动相关的论文。一篇自动推导守恒律系统的格子玻尔兹曼方法，另一篇揭示可溶表面活性剂液膜在斜面上的铺展破裂机制。建议关注自动构建数值方法的范式突破，或表面活性剂对流动稳定性的调控规律。
-- 详情：[/202607/15/README](/202607/15/README)
+今日速读三篇，涵盖多原子气体蒸发的熵产模型、相场-流体耦合无条件稳定算法与任意剖面上的高阶通量格式。  
+值得关注的是非平衡蒸发中的最大熵产判据以及Cahn–Hilliard–Navier–Stokes模型的全解耦能量稳定新方法。  
+下一步可深入对比不同约束下的熵产极值原理，或尝试将解耦稳定化思路推广至更复杂的多物理场问题。
+- 详情：[/202607/16/README](/202607/16/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Automated Derivation of Lattice Boltzmann Methods for Systems of Conservation Laws](/202607/15/2607.05668v2-automated-derivation-of-lattice-boltzmann-methods-for-systems-of-conservation-laws)  
+1. [On Maximal Total Entropy Production Models for Steady Evaporation of a Calorically Perfect Polyatomic Gas](/202607/16/2607.09574v1-on-maximal-total-entropy-production-models-for-steady-evaporation-of-a-calorically-perfect-polyatomic-gas)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：多原子气体稳态蒸发的熵产生模型
+2. [A linear, fully decoupled, and unconditionally energy-stable SAV-FEM for the Cahn--Hilliard--Navier--Stokes model](/202607/16/2607.13253v1-a-linear-fully-decoupled-and-unconditionally-energy-stable-sav-fem-for-the-cahn--hilliard--navier--stokes-model)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：针对Cahn-Hilliard-Navier-Stokes系统开发两相流模拟方法
+3. [High-order complete flux schemes for convection-diffusion equations on arbitrary subdivisions](/202607/16/2607.08422v1-high-order-complete-flux-schemes-for-convection-diffusion-equations-on-arbitrary-subdivisions)  
    标签：评分：6.0/10、query:falling-film
-   evidence：多物理场LBM自动推导，可用于多相流
-2. [Spreading and rupture dynamics of soluble surfactant-laden thin film flow down a slippery incline in presence of external shear](/202607/15/2607.10875v1-spreading-and-rupture-dynamics-of-soluble-surfactant-laden-thin-film-flow-down-a-slippery-incline-in-presence-of-external-shear)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：可溶表面活性剂在润滑斜面薄膜流中的铺展和破裂，属于降膜流动
+   evidence：用于对流-扩散方程的高阶有限体积格式，可应用于多相流传热传质的CFD模拟
 
 
 <div class="dpr-home-promo-card">

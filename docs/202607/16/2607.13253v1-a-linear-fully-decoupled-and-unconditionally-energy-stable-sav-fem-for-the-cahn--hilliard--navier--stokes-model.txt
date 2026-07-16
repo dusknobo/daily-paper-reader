@@ -1,0 +1,4688 @@
+Title: A linear, fully decoupled, and unconditionally energy-stable SAV-FEM for the Cahn–Hilliard–Navier–Stokes model
+
+URL Source: https://arxiv.org/pdf/2607.13253v1
+
+Published Time: Thu, 16 Jul 2026 00:21:25 GMT
+
+Number of Pages: 27
+
+Markdown Content:
+A LINEAR, FULLY DECOUPLED, AND UNCONDITIONALLY ENERGY-STABLE SAV-FEM FOR THE CAHN–HILLIARD–NAVIER–STOKES MODEL 
+
+JINTING YANG ∗, NIANYU YI † , AND PEIMENG YIN ‡
+
+Abstract. In this paper, we develop a linear, fully decoupled, and unconditionally energy-stable fully discrete finite element scheme for the Cahn–Hilliard–Navier–Stokes (CHNS) system by employing the scalar auxiliary variable (SAV) approach. Unlike existing SAV-based formulations that typically introduce multiple auxiliary variables or additional techniques to handle different nonlinearities, we introduce only one scalar auxiliary variable together with a novel update of the auxiliary variable to reformulate all nonlinear terms arising from the Cahn–Hilliard and Navier–Stokes equations, yielding an equivalent reformulation of the original CHNS system. An implicit–explicit (IMEX) Euler scheme is applied for temporal discretization, where the linear terms are treated implicitly and the nonlinear terms explicitly, while a finite element method is adopted for spatial discretization. The resulting fully discrete scheme can be efficiently decomposed into two linear subproblems and one scalar quadratic algebraic equation, which significantly simplifies the implementation. Furthermore, we prove that the proposed scheme satisfies an unconditional discrete energy dissipation law and establish its stability with respect to several relevant norms. Optimal-order L2 error estimates are also derived for the fully discrete finite element approximation. Finally, a series of numerical experiments are presented to verify the theoretical results and demonstrate the efficiency of the proposed method. 
+
+Key words. Cahn-Hilliard-Navier-Stokes equations; SAV approach; IMEX Euler scheme; Finite element method; Error estimates. 
+
+MSC codes. 35K58, 65F55, 65M60, 65Y20 
+
+1. Introduction. In this paper, we propose and analyze an SAV-based implicit–explicit (IMEX) Euler finite element method for the following CHNS system 
+
+ϕt − M △μ + ∇ · (uϕ) =0 , in Ω × (0 , T ],(1.1a) 
+
+μ + λ△ϕ − g(ϕ) =0 , in Ω × (0 , T ],(1.1b) 
+
+ut + ( u · ∇ )u + ∇p − ν△u − μ∇ϕ =0 , in Ω × (0 , T ],(1.1c) 
+
+∇ · u =0 , in Ω × (0 , T ],(1.1d) subject to the initial conditions 
+
+u|t=0 = u0, ϕ|t=0 = ϕ0, in Ω,(1.2) and the boundary conditions 
+
+∇ϕ · n = ∇μ · n = 0 , u = 0, on ∂Ω × (0 , T ].(1.3) Here, Ω ⊂ Rd (d = 2 , 3) is a polygonal domain with boundary ∂Ω, and n denotes the unit outward normal vector on ∂Ω. The nonlinear term is given by g(ϕ) = F ′(ϕ), where F (ϕ) = 14ε2 (1 − ϕ2)2 is the Ginzburg–Landau free-energy density, with ε > 0 representing the interfacial width parameter. The positive constants M , λ, and ν denote the mobility, mixing coefficient, and fluid viscosity, respectively. The unknowns u, p, ϕ, and μ represent the velocity field, pressure, phase variable, and chemical potential, respectively. By taking suitable inner products of (1.1) and applying the boundary conditions (1.3), one readily obtains the following energy dissipation law for the initial-boundary value problem (1.1)–(1.3): 
+
+dE (ϕ, u)
+
+dt = −M ∥∇ μ∥20 − ν∥∇ u∥20,
+
+> ∗
+
+School of Mathematics and Information Science, Henan Polytechnic University, Jiaozuo, 454003, Henan, P.R.China, jtyang@hpu.edu.cn). 
+
+> †
+
+Hunan Key Laboratory for Computation and Simulation in Science and Engineering; School of Mathematics and Computational Science, Xiangtan University, Xiangtan 411105, P.R.China (yinianyu@xtu.edu.cn). 
+
+> ‡
+
+Corresponding author. Department of Mathematical Sciences, The University of Texas at El Paso, El Paso, TX 79968, USA (pyin@utep.edu). 1arXiv:2607.13253v1 [math.NA] 14 Jul 2026 2where E(ϕ, u) = R
+
+> Ω
+
+{ 12 (|u|2 + |∇ ϕ|2) + F (ϕ)}dx denotes the total free energy, and ∥ · ∥ 0 denotes the 
+
+L2(Ω) norm for scalar functions and vector fields, with the squared norm defined by integrating the sum of squares of all components over Ω. For convenience in the subsequent analysis, we assume throughout the paper that M = λ = ν = 1. As a coupled nonlinear system, (1.1)–(1.3) presents several challenges in the design of effective numerical schemes: (i) the nonlinear coupling between the velocity and phase variables through the convective term in the phase equation and the stress term in the momentum equation; (ii) the nonlinear energy potential and the stiffness induced by the small interfacial width parameter ε in the phase equation; (iii) the requirement that the resulting discrete scheme, even after decoupling the variables, preserves the energy dissipation law. Constructing efficient numerical schemes for the CHNS system is highly challenging, particularly when one seeks to preserve a discrete energy dissipation law at the numerical level. Over the past two decades, a variety of numerical methods have been developed for the CHNS system. Among the most widely used approaches for temporal discretization are the linear stabilization method [4, 25, 34, 36, 43], the convex-splitting method [17, 23, 31, 37], the invariant energy quadratization (IEQ) method [12, 11, 41, 42, 45], and the scalar auxiliary variable (SAV) method [32, 33, 39, 38, 44]. Shen and Yang [35] developed several effective time-discrete schemes for two-phase incompressible flows with variable densities and viscosities, and established the corresponding discrete energy dissipation laws. Combining the convex-splitting method for the Cahn–Hilliard equation with a pressure-projection method for the Navier–Stokes equations, Han and Wang [17] constructed a second-order time-stepping scheme for the CHNS system. For two-phase incompressible flow models with variable density and viscosity, Chen and Yang [7] proposed a fully decoupled numerical approach that combines Strang operator splitting with a decoupling strategy based on the zero-energy-contribution property. More recently, first- and second-order unconditionally energy-stable finite element schemes for the CHNS system were developed in [11] by combining the IEQ approach with finite element discretization. The resulting schemes were shown to preserve mass conservation and energy dissipation, and the theoretical findings were validated through a series of numerical experiments. On the other hand, rigorous error analysis for numerical schemes of the CHNS system is con-siderably more challenging. Cai et al. [4, 5] established error estimates for both semi-discrete and fully discrete energy-stable schemes for two-phase incompressible flows. Li and Shen [26] developed a second-order, weakly coupled, linear, and energy-stable SAV-MAC scheme for the CHNS equations, and proved convergence results for the corresponding Cahn–Hilliard–Stokes system. For further theo-retical developments on error analysis of numerical schemes for CHNS-type models, we refer the reader to [3, 9, 10, 16]. Subsequently, Diegel, Wang, Wang and Wise [13] extended this framework to the Cahn–Hilliard–Navier–Stokes system with a second-order in time scheme combining Crank–Nicolson and Adams–Bashforth extrapolation, and established unconditional energy stability and optimal con-vergence rates. To the best of our knowledge, Cai et al. [3] were the first to establish optimal L2-error estimates for a convex-splitting finite element scheme for the CHNS system. By introducing a novel projection operator and employing negative-norm superconvergence techniques, they proved that, in both the Taylor–Hood and MINI finite element spaces, the phase-field variable, chemical potential, and pressure achieve optimal-order convergence in the L2 norm for r ≥ 1, while the velocity at-tains optimal-order L2 convergence for r ≥ 2. The theoretical predictions were further confirmed by numerical experiments. More recently, a fully discrete finite element scheme based on a double scalar auxiliary variable (SAV) approach combined with a pressure-correction projection method was proposed in [16]. The resulting scheme is linear, fully decoupled, and unconditionally energy stable. Furthermore, optimal-order L2 error estimates were rigorously established in the Pr × Pr × Pr+1 × Pr
+
+finite element space without relying on any specially designed projection operator. In this paper, we propose a linear, fully decoupled, and unconditionally energy-stable fully discrete finite element scheme for the CHNS system based on the SAV approach. The SAV method, originally introduced in [32, 33], provides an efficient framework for the numerical approximation of gradient flow systems with nonlinear free-energy potentials. Its key idea is to introduce a scalar auxiliary variable associated with the nonlinear energy functional, thereby transforming the original nonlinear system into a linear one while preserving a discrete energy dissipation law at the fully discrete level. 3In the literature, existing SAV-based schemes for the CHNS system have been developed to treat the nonlinearities arising from the Cahn–Hilliard and Navier–Stokes components separately. They employed either the multi-scalar auxiliary variable (MSAV) approach [16, 27] or a combination of the scalar auxiliary variable (SAV) and zero-energy-contribution (ZEC) techniques [6, 40]. In the MSAV framework, multiple independent scalar auxiliary variables are introduced to facilitate the decoupling of different nonlinear components. For the CHNS system, two auxiliary variables are typically employed to treat the nonlinear terms arising from the Cahn–Hilliard and Navier–Stokes equations separately, resulting in two independent scalar ordinary differential equations and enabling the development of linear, decoupled, and unconditionally energy-stable schemes. The SAV-ZEC approach also introduces two auxiliary variables, but they serve different purposes. One auxiliary variable is associated with the nonlinear free-energy potential and contributes directly to the discrete energy, while the other is introduced to handle the nonlinear convection and coupling terms whose overall contribution to the energy dissipation law is zero. By exploiting the zero-energy-contribution property of these terms, the SAV-ZEC approach achieves linearization and unconditional energy stability while preserving a decoupled and efficient numerical structure. Although both the MSAV and SAV-ZEC approaches provide effective decoupling strategies and lead to unconditionally energy-stable schemes, they require the introduction of multiple auxiliary variables. As a result, the nonlinear system needs to be decomposed multiple times, which increases the complexity of both the numerical formulation and implementation and may introduce additional computational costs. In contrast, the present work introduces only a single scalar auxiliary variable to simultaneously reformulate all nonlinear terms, together with a novel update strategy for the scalar auxiliary variable. An implicit–explicit (IMEX) Euler time discretization is then employed, combined with a finite element spatial discretization. The strategy of employing a unified technique to handle multiple nonlinear terms has become an effective strategy for solving large-scale coupled systems [28, 24]. Moreover, unlike the pressure-correction SAV scheme proposed in [38], where the velocity and pressure variables are decoupled through a projection step, our approach preserves the velocity–pressure coupling by directly solving the Navier–Stokes subsystem at each time step. This choice is motivated by both analytical and computational considerations: it simplifies the error analysis and allows us to establish optimal error estimates under the weaker regularity assumption ϕ ∈ H2(Ω), rather than requiring 
+
+ϕ ∈ H3(Ω). The proposed method remains computationally efficient, as each time step only involves solving one linear Cahn–Hilliard-type system, one Stokes-type system, and one scalar quadratic equation for the auxiliary variable. Furthermore, we prove that the proposed single-SAV IMEX finite element scheme is uniquely solvable and satisfies an unconditional discrete energy dissipation law. We also establish stability and derive optimal-order L2 error estimates for the fully discrete finite element approximation. The error analysis is developed by decomposing the total error into a projection error and a discrete error using the standard L2 projection and the Ritz projection. A major challenge is that the nonlinear potential g(ϕ) = F ′(ϕ) is not globally Lipschitz. This difficulty is resolved by proving the uniform L∞ boundedness of the numerical solution, allowing the error estimates to be established without requiring any restrictive assumptions on the free energy. The remainder of this paper is organized as follows. In Section 2, we present the model and its equivalent form. Then we develop the decoupled scheme and show its associated stability results. In Section 3, we establish the optimal error estimates for the solutions of a fully discrete system. Finally, several numerical examples are presented to test and verify the theoretical results of the proposed numerical scheme in Section 4. 
+
+2. The fully discrete SAV-FEM scheme. 2.1. Prerequisites and the fully discrete scheme. We first introduce the scalar energy functional ˜E1[ϕ] = R 
+
+> Ω
+
+F (ϕ) dx , ˜E1[ϕ] > −c0 with c0 > 0, and choose a constant ˜C0 > c 0 such that ˜E1[ϕ] + ˜C0 > 0. Define 
+
+E1[ϕ] = ˜E1[ϕ] + C0, C0 = ˜C0 − c0 > 0,4so that E1[ϕ] ≥ C0 > 0. We then introduce the scalar auxiliary variable 
+
+r(t) = pE1[ϕ(t)] .
+
+With this reformulation, the CHNS system (1.1) can be reformulated as 
+
+ϕt − △ μ + r(t)
+
+pE1[ϕ] ∇ · (uϕ) = 0 , in Ω × (0 , T ],(2.1a) 
+
+μ + △ϕ − g(ϕ) = 0 , in Ω × (0 , T ],(2.1b) 
+
+ut + r(t)
+
+pE1[ϕ] (u · ∇ )u + ∇p − △ u − r(t)
+
+pE1[ϕ] μ∇ϕ = 0 , in Ω × (0 , T ],(2.1c) 
+
+∇ · u = 0 , in Ω × (0 , T ],(2.1d) 
+
+rt = 12r(t)
+
+ Z
+
+> Ω
+
+g(ϕ)ϕtdx + r(t)
+
+pE1[ϕ] (( u · ∇ u, u)+( u · ∇ ϕ, μ ) − (μ∇ϕ, u)) 
+
+
+
+, in Ω × (0 , T ].(2.1e) Unlike the standard SAV approach, the update equation for r in (2.1e) contains additional cor-rection terms. These additional terms are essential for enabling a single scalar auxiliary variable to simultaneously treat multiple nonlinear terms while maintaining the key structural properties of the original system. For any integer k ≥ 0 and real number 1 ≤ p ≤ ∞ , we denote by Lp(Ω) and W k,p (Ω) the Lebesgue and Sobolev spaces of functions defined on Ω, respectively. We set Hk(Ω) = W k, 2(Ω). Let 
+
+Lp(Ω) = ( Lp(Ω)) d and Hk(Ω) = ( Hk(Ω)) d be the corresponding vector-valued spaces. Moreover, 
+
+H10(Ω) denotes the closed subspace of H1(Ω) consisting of functions with vanishing trace on ∂Ω. We endow Hk(Ω) with the norm ∥ · ∥ k and introduce the following spaces: 
+
+W = H1(Ω) , X = H10(Ω) , Y = L2(Ω) ,M = L20(Ω) = 
+
+
+
+q ∈ L2(Ω); 
+
+Z
+
+> Ω
+
+qdx = 0 
+
+
+
+,
+
+H = {v ∈ Y; ∇ · v = 0 in Ω , and v · n|∂Ω = 0 },
+
+V = {v ∈ X; ∇ · v = 0 }, R = {the space of real numbers }.
+
+For all u ∈ V and v, w ∈ X, it follows (( u · ∇ )v, w) = (( u · ∇ )v, w) + 12 (( ∇ · u)v, w) = 12 (( u · ∇ )v, w) − 12 (( u · ∇ )w, v).
+
+In particular, taking w = v yields (2.2) (( u · ∇ )v, v) = 0 .
+
+Taking the inner products of (2.1a)–(2.1d) with μ, ϕt, u, and p, respectively, and multiplying (2.1e) by 2 r, then using (2.2) together with the identity 2( a − b, a ) = |a|2 − | b|2 + |a − b|2, ∀a, b ∈ R, (2.3) we obtain the following energy dissipation law: 
+
+d ˜E(ϕ, u, r )
+
+dt = −∥∇ μ∥20 − ∥∇ u∥20 ≤ 0,
+
+where ˜E(ϕ, u, r ) = R 
+
+> Ω12
+
+(|u|2 + |∇ ϕ|2)dx + r2 denotes the modified energy. 5In order to establish the stability and convergence of the SAV schemes for the CHNS system (2.1), we shall frequently make use of the following Sobolev inequalities (see, e.g., [1, 15, 18, 19, 21]): 
+
+∥v∥Lr ≤ C∥∇ v∥0 (2 ≤ r ≤ 6) , ∥v∥L4 ≤ C∥v∥ 12 
+
+> 0
+
+∥∇ v∥ 12 
+
+> 0
+
+, ∀ v ∈ X,(2.4) 
+
+∥v∥L∞ ≤ C∥v∥ 12 
+
+> 0
+
+∥Av∥ 12 
+
+> 0
+
+, ∥v∥2 ≤ C∥Av∥0, ∀ v ∈ H2(Ω) ∩ V,(2.5) 
+
+∥ϕ∥Lr ≤ C∥ϕ∥1 (2 ≤ r ≤ ∞ ), ∀ϕ ∈ W, (2.6) 
+
+∥ϕ∥L∞ ≤ C∥ϕ∥ 12 
+
+> 0
+
+(∥ϕ∥20 + ∥△ ϕ∥20) 14 , ∀ ϕ ∈ H2(Ω) with ∂ϕ ∂n ∂Ω
+
+= 0 .(2.7) Here, A = −P △ denotes the Stokes operator, where P is the L2-orthogonal projection from Y onto 
+
+H. Throughout this paper, C > 0 denotes a generic constant depending only on the domain Ω. The value of C may vary from one estimate to another. We will frequently use the following classical discrete Gronwall’s Lemma in the subsequent analy-sis. 
+
+Lemma 2.1. [29, 30] For integers n ≥ 0, let c, a n, b n, c n, d n ≥ 0 such that 
+
+am + ∆ t
+
+> m
+
+X
+
+> n=0
+
+bn ≤ ∆t
+
+> m
+
+X
+
+> n=0
+
+dnan + ∆ t
+
+> m
+
+X
+
+> n=0
+
+cn + c, ∀ m ≥ 0.(2.8) 
+
+Suppose further that ∆td n < 1, ∀n ≥ 0, and define σn = (1 − ∆td n)−1. Then 
+
+am + ∆ t
+
+> m
+
+X
+
+> n=0
+
+bn ≤ e 
+
+> 
+> ∆tmP
+> n=0
+> dnσn
+> 
+
+∆t
+
+> m
+
+X
+
+> n=0
+
+cn + c
+
+!
+
+, ∀ m ≥ 0.(2.9) 
+
+Remark 2.1. If the first summation on the right-hand side of (2.8) is taken from n = 0 to m − 1,namely, then the estimate (2.9) holds for all n > 0 with σn = 1 .
+
+We consider the fully discrete finite element method based on the IMEX Euler scheme for solving the model system (2.1). Denote ∆t = T /N, tn = n∆t, dtf n+1 = f n+1 − f n
+
+∆t , for n ≤ N, 
+
+where T denotes the final time, N is the number of time steps, and ∆ t is the uniform time-step size. Let Ω ⊂ Rd be a polygonal domain, and let Th be a shape-regular triangulation of Ω consisting of triangular elements K. We denote h = max K∈T h hK , where hK is the diameter of the element K.For any non-negative integer l, let Pl(K) denote the space of polynomials on K of degree less than or equal to l. Let ˆb ∈ H10 (K) be the bubble function satisfying ˆb(xK ) = 1 at the barycenter xK
+
+of K and 0 ≤ ˆb(x) ≤ 1 for all x ∈ K. We define the phase-field, velocity, and pressure finite element spaces as follows: 
+
+Wh = {ϕh ∈ C0(Ω) ∩ W ; ϕh|K ∈ P1(K), ∀ K ∈ T h},
+
+Xh = {vh ∈ C0(Ω) ∩ X; vh|K ∈
+
+
+
+P1(K) ⊕ span {ˆb}
+
+d
+
+, ∀ K ∈ T h},Mh = {qh ∈ C0(Ω) ∩ M ; qh|K ∈ P1(K), ∀ K ∈ T h}.
+
+Define the subspace Vh of Xh as 
+
+Vh = {vh ∈ Xh; ∇ · vh = 0 }.
+
+The inf-sup condition is stated as follows: for each qh ∈ Mh, there exists a nonzero vh ∈ Xh such that (2.10) (qh, ∇ · vh) ≥ β|qh|0|vh|1,6where β > 0 is a constant independent of h and ∆ t.Let Ph : Y → Xh be the L2-orthogonal projection [2, 20, 22] defined by (Phv, vh) = ( v, vh), ∀ v ∈ Y, vh ∈ Xh.(2.11) The projection satisfies the following inequalities 
+
+(
+
+∥Phv∥1 ≤ C∥v∥1, ∥v − Phv∥0 ≤ Ch ∥v∥1, ∀ v ∈ X,
+
+∥v − Phv∥0 + h∥v − Phv∥1 ≤ Ch 2∥Av∥0, ∀ v ∈ H2(Ω) ∩ V.
+
+(2.12) Denote the discrete Stokes operator Ah = −Ph△h : Xh → Xh by the definition: (Ahuh, vh) = ( A1/2 
+
+> h
+
+uh, A 1/2 
+
+> h
+
+vh) = ( ∇uh, ∇vh), ∀ uh, vh ∈ Xh,
+
+and the discrete Laplacian operator △h is defined by (−△ hwh, s h) = ( ∇wh, ∇sh), ∀ wh, s h ∈ Wh(or Xh).(2.13) We also introduce the following discrete norms. For vh ∈ Vh, define 
+
+∥vh∥2 = ∥Ahvh∥0, ∥vh∥−1 = ∥A−1/2 
+
+> h
+
+vh∥0,(2.14) 
+
+∥A1/2 
+
+> h
+
+vh∥0 = ∥∇ vh∥0, ∥∇ A−1/2 
+
+> h
+
+vh∥0 = ∥vh∥0.(2.15) Let Rh : H1(Ω) → Wh be the Ritz orthogonal projection [8] in the finite element space (∇Rhϕ, ∇ψh) = ( ∇ϕ, ∇ψh), ∀ ϕ ∈ H1, ψ h ∈ Wh.(2.16) The projection satisfies the following inequality 
+
+∥ϕ − Rhϕ∥0 + h∥∇ (ϕ − Rhϕ)∥0 ≤ Ch 2∥ϕ∥2.(2.17) 
+
+Lemma 2.2. [8] For all ϕh ∈ Wh, the discrete Laplacian operator △h satisfies the following esti-mates: 
+
+∥△ hϕh∥−2 ≤ C∥ϕh∥0,
+
+∥△ hϕ∥−1 ≤ C∥∇ ϕ∥0.
+
+The fully discrete SAV-FEM scheme based on the formulation (2.1) is formulated as follows: find ( ϕn+1  
+
+> h
+
+, μ n+1  
+
+> h
+
+, un+1  
+
+> h
+
+, p n+1  
+
+> h
+
+, r n+1  
+
+> h
+
+) ∈ Wh × Wh × Xh × Mh × R such that, for all ( ψh, τ h, vh, q h) ∈
+
+Wh × Wh × Xh × Mh, it holds (dtϕn+1  
+
+> h
+
+, ψ h) + ( ∇μn+1  
+
+> h
+
+, ∇ψh) + rnh
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ ϕnh , ψ h) = 0 ,(2.18a) (μn+1  
+
+> h
+
+, τ h) − (∇ϕn+1  
+
+> h
+
+, ∇τh) − (g(ϕnh ), τ h) = 0 ,(2.18b) (dtun+1  
+
+> h
+
+, vh) + rnh
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ unh , vh) − (pn+1  
+
+> h
+
+, ∇ · vh) + ( ∇un+1  
+
+> h
+
+, ∇vh)
+
+− rnh
+
+q
+
+En
+
+> 1,h
+
+(μnh ∇ϕnh , vh) = 0 ,(2.18c) (∇ · un+1  
+
+> h
+
+, q h) = 0 ,(2.18d) 
+
+dtrn+1  
+
+> h
+
+= 12rn+1 
+
+> h
+
+
+
+(g(ϕnh ), d tϕn+1  
+
+> h
+
+) + rnh
+
+q
+
+En
+
+> 1,h
+
+(( unh · ∇ unh , un+1  
+
+> h
+
+)7+ ( unh · ∇ ϕnh , μ n+1  
+
+> h
+
+) − (μnh ∇ϕnh , un+1  
+
+> h
+
+)) 
+
+
+
+,(2.18e) with 
+
+ϕ0 
+
+> h
+
+= Rhϕ0, μ0 
+
+> h
+
+= Rhμ0, u0 
+
+> h
+
+= Phu0, r0 
+
+> h
+
+=
+
+q
+
+E01,h =
+
+q
+
+E1[ϕ0
+
+> h
+
+],
+
+and 
+
+En 
+
+> 1,h
+
+= E1[ϕnh ] = 
+
+Z
+
+> Ω
+
+F (ϕnh )dx. 
+
+Theorem 2.1. Scheme (2.18) is unconditionally energy stable in the sense that 
+
+˜En+1  
+
+> h
+
+(ϕ, u, r ) − ˜Enh (ϕ, u, r ) ≤ − ∆t(∥∇ μn+1  
+
+> h
+
+∥20 + ∥∇ un+1  
+
+> h
+
+∥20),(2.19) 
+
+where ˜Enh (ϕ, u, r ) = R 
+
+> Ω12
+
+(|unh |2 + |∇ ϕnh |2)dx + |rnh |2.Proof. Taking the inner products of (2.18a)–(2.18d) with μn+1  
+
+> h
+
+, dtϕn+1  
+
+> h
+
+, un+1  
+
+> h
+
+, and pn+1  
+
+> h
+
+, respec-tively, and multiplying (2.18e) by 2 rn+1  
+
+> h
+
+, then applying (2.2) and the identity (2.3), we obtain 12 (∥un+1  
+
+> h
+
+∥20 − ∥ unh ∥20 + ∥un+1  
+
+> h
+
+− unh ∥20) + 12 (∥∇ ϕn+1  
+
+> h
+
+∥20 − ∥∇ ϕnh ∥20 + ∥∇ (ϕn+1  
+
+> h
+
+− ϕnh )∥20)+|rn+1  
+
+> h
+
+|2 − | rnh |2 + |rn+1  
+
+> h
+
+− rnh |2
+
+= −∆t(∥∇ μn+1  
+
+> h
+
+∥20 + ∥∇ un+1  
+
+> h
+
+∥20),
+
+which yields (2.19). 
+
+Remark 2.2. The scalar coefficient r(t)
+
+√E1[ϕ] introduced in (2.1) is not restricted to the nonlinear coupling terms and may also be incorporated into the nonlinear potential term g(ϕ). In this case, equations (2.1b) and (2.1e) become 
+
+μ + ∆ ϕ − r(t)
+
+pE1[ϕ] g(ϕ) = 0 ,(2.20) 
+
+rt = 12r(t)
+
+r(t)
+
+pE1[ϕ]
+
+Z
+
+> Ω
+
+g(ϕ)ϕt dx + r(t)
+
+pE1[ϕ]
+
+ (u · ∇ u, u) + ( u · ∇ ϕ, μ ) − (μ∇ϕ, u)!
+
+.(2.21) 
+
+The corresponding fully discrete SAV-FEM scheme remains linear, fully decoupled, and uncondition-ally energy stable. Furthermore, the same optimal-order error estimates established in Section 3 can be obtained for this alternative formulation. However, to simplify the theoretical analysis and com-putational realization of the proposed SAV-FEM framework, we do not pursue this formulation in the present work. Instead, the nonlinear potential term g(ϕ) is treated explicitly in the fully discrete scheme (2.18) , while the scalar coefficient is introduced only to handle the nonlinear coupling terms. 
+
+Remark 2.3. We introduce a single scalar auxiliary variable, together with a novel update equa-tion, to reformulate all nonlinear terms arising from the Cahn–Hilliard and Navier–Stokes equations. The proposed approach is combined with an IMEX time discretization, where the nonlinear terms are treated explicitly. This strategy shares a similar philosophy with the conventional explicit Euler method, where nonlinear terms are evaluated explicitly without the aid of an auxiliary variable. However, the conventional explicit Euler method generally fails to preserve an unconditional energy dissipation law. The proposed SAV reformulation overcomes this limitation by incorporating the nonlinear energy con-tributions into the auxiliary variable, thereby recovering unconditional energy stability. Furthermore, the auxiliary variable is updated explicitly, allowing the resulting scheme to remain fully decoupled while preserving the energy dissipation property. Consequently, the proposed approach achieves both unconditional energy stability and enhanced computational efficiency. 8
+
+2.2. Stability analysis of the fully discrete scheme. We assume that 
+
+ϕ0 ∈ H2(Ω) , u0 ∈ H2(Ω) ∩ V.
+
+Under these assumptions, we establish several stability estimates for the numerical solution of scheme (2.18) in various norms throughout this subsection. 
+
+Lemma 2.3. [38] For all m ≥ 0, there exist positive constants M1, M 2 such that 
+
+| ˜Em+1  
+
+> h
+
+| + ∆ t
+
+> m
+
+X
+
+> n=0
+
+(∥∇ un+1  
+
+> h
+
+∥20 + ∥∇ μn+1  
+
+> h
+
+∥20) ≤ M1,
+
+∥ϕm+1  
+
+> h
+
+∥21 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+∥μn+1  
+
+> h
+
+∥21 ≤ M2,
+
+where 
+
+M1 = | ˜E0
+
+> h
+
+|, M2 = M ′ 
+
+> 2
+
++ 2 M1(1 + ∆ t) + C∆t(( M ′ 
+
+> 2
+
++ M1)3 + M ′
+
+> 2
+
+),M ′ 
+
+> 2
+
+=
+
+
+
+∥ϕ0
+
+> h
+
+∥20 + M1
+
+
+
+1 + 4∆ t + CM 21
+
+C0
+
+ 
+
+e CM 21 
+
+> C0
+
+.
+
+Lemma 2.4. [38] For all m ≥ 0, there exists a positive constant M3 such that 
+
+∥△ hϕm+1  
+
+> h
+
+∥20 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+∥△ hμn+1  
+
+> h
+
+∥20 ≤ M3,
+
+where M3 =
+
+
+
+∥△ hϕ0
+
+> h
+
+∥20 + C(M 32 + M2) + CM 31
+
+> C0
+
+
+
+e CM 21 
+
+> C0
+
+.
+
+Lemma 2.5. For all m ≥ 0, there exists a positive constant M4 such that 
+
+∥∇ um+1  
+
+> h
+
+∥20 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+∥Ahun+1  
+
+> h
+
+∥20 ≤ M4,
+
+where M4 =
+
+
+
+∥∇ u0
+
+> h
+
+∥20 + ∆ t∥Ahu0
+
+> h
+
+∥20 + CM 1M2 
+
+> C0
+
+(M1 + M3)
+
+
+
+e  
+
+> CM 41
+> C20
+
+.Proof. Taking inner product with 2∆ tA un+1  
+
+> h
+
+in (2.18c), we have 
+
+∥∇ un+1  
+
+> h
+
+∥20 − ∥∇ unh ∥20 + ∥∇ (un+1  
+
+> h
+
+− unh )∥20 + 2∆ t∥Aun+1  
+
+> h
+
+∥20
+
+= 2∆ t rnh
+
+q
+
+En
+
+> 1,h
+
+(( μnh ∇ϕnh , A un+1  
+
+> h
+
+) − (unh · ∇ unh , A un+1  
+
+> h
+
+)) .(2.22) For the terms on the right-hand side of (2.22), by (2.4)–(2.6), the Cauchy–Schwarz inequality, and Young’s inequality, we obtain 
+
+2∆ t rnh
+
+q
+
+En
+
+> 1,h
+
+(μnh · ∇ ϕnh , A un+1  
+
+> h
+
+) ≤ 2∆ t |rnh |
+
+q
+
+En
+
+> 1,h
+
+∥μnh ∥L4 ∥∇ ϕnh ∥L4 ∥Aun+1  
+
+> h
+
+∥0
+
+≤ ∆t
+
+2 ∥Aun+1  
+
+> h
+
+∥20 + ∆ t CM 1
+
+C0
+
+∥μnh ∥21(M1 + M3),
+
+2∆ t rnh
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ unh , A un+1  
+
+> h
+
+) ≤ 2∆ t |rnh |
+
+q
+
+En
+
+> 1,h
+
+∥unh ∥L∞ ∥∇ unh ∥0∥Aun+1  
+
+> h
+
+∥0
+
+≤ C∆t |rnh |
+
+q
+
+En
+
+> 1,h
+
+∥unh ∥1/20 ∥∇ unh ∥0∥Aunh ∥1/20 ∥Aun+1  
+
+> h
+
+∥09
+
+≤ ∆t
+
+2 ∥Aun+1  
+
+> h
+
+∥20 + ∆ t CM 1
+
+C0
+
+∥unh ∥0∥∇ unh ∥20∥Aunh ∥0
+
+≤ ∆t
+
+2 ∥Aun+1  
+
+> h
+
+∥20 + ∆t
+
+2 ∥Aunh ∥20 + ∆ t CM 21
+
+C20
+
+∥unh ∥20∥∇ unh ∥40.
+
+Combining the above inequalities with (2.22) and summing from n = 0 to m, we obtain 
+
+∥∇ um+1  
+
+> h
+
+∥20 + ∆t
+
+2 ∥Aum+1  
+
+> h
+
+∥20 + ∆t
+
+2
+
+> m
+
+X
+
+> n=0
+
+∥Aun+1  
+
+> h
+
+∥20
+
+≤ ∥∇ u0
+
+> h
+
+∥20 + ∆t
+
+2 ∥Au0
+
+> h
+
+∥20 + CM 21
+
+C20
+
+∆t
+
+> m
+
+X
+
+> n=0
+
+∥unh ∥20∥∇ unh ∥40
+
++ CM 1
+
+C0
+
+∆t
+
+> m
+
+X
+
+> n=0
+
+∥μnh ∥21(M1 + M3),
+
+which, together with the discrete Gronwall’s Lemma (with σn = 1 for all n ≥ 0) and Lemmas 2.3 and 2.4, yields the desired result. 
+
+3. Error estimates for fully discrete scheme. This section is devoted to establishing the error estimates for scheme (2.18). First, we derive error estimates for the phase field, velocity, and auxiliary variable based on the stability results established above. Then, an error estimate for the pressure is provided. By Taylor’s formula with integral remainder, we have 
+
+f (tn+1 ) = f (tn) + ∆ tf t(tn) + 
+
+Z tn+1 
+
+> tn
+
+(tn+1 − t)ftt (t)dt, 
+
+and 
+
+f (tn) = f (tn+1 ) − ∆tf t(tn+1 ) + 
+
+Z tn
+
+> tn+1
+
+(tn − t)ftt (t)dt. 
+
+Then we discretize equations (2.1) at the time level as (dtϕ(tn+1 ), ψ ) + ( ∇μ(tn+1 ), ψ ) + r(tn+1 )
+
+pE1(tn+1 ) (u(tn+1 ) · ∇ ϕ(tn+1 ), ψ )
+
+− (Rϕ, ψ ) = 0 ,(3.1a) (μ(tn+1 ), τ ) − (∇ϕ(tn+1 ), ∇τ ) − (g(ϕ(tn+1 )) , τ ) = 0 ,(3.1b) (dtu(tn+1 ), v) + r(tn+1 )
+
+pE1(tn+1 ) (u(tn+1 ) · ∇ u(tn+1 ), v) + ( ∇p(tn+1 ), v) + ( ∇u(tn+1 ), ∇v)
+
+− r(tn+1 )
+
+pE1(tn+1 ) (μ(tn+1 )∇ϕ(tn+1 ), v) − (Ru, v) = 0 ,(3.1c) (∇ · u(tn+1 ), q ) = 0 ,(3.1d) 
+
+dtr(tn+1 ) = 12r(tn) (g(ϕ(tn)) , d tϕ(tn+1 )) + 12pE1(tn) (( u(tn) · ∇ u(tn), u(tn)) + ( u(tn)∇ϕ(tn), μ (tn)) − (μ(tn)∇ϕ(tn), u(tn))) − T1 + Rr ,(3.1e) where 
+
+Rϕ = 1∆t
+
+Z tn+1 
+
+> tn
+
+(tn − t)ϕtt (t)dt, Ru = 1∆t
+
+Z tn+1 
+
+> tn
+
+(tn − t)utt (t)dt, 10 
+
+Rr = 1∆t
+
+Z tn+1 
+
+> tn
+
+(tn+1 − t)rtt (t)dt, T1 = 12∆ tr (tn) g(ϕ(tn)) ,
+
+Z tn+1 
+
+> tn
+
+(tn+1 − t)ϕtt (t)dt 
+
+!
+
+.
+
+We impose the following regularity assumption on the solution. 
+
+Assumption 3.1. Assume that the solution (ϕ, μ, u) of system (1.1) satisfies 
+
+
+
+u ∈ L∞(0 , T ; H2(Ω)) , ϕ, μ ∈ L∞(0 , T ; H2(Ω)) ,ϕt ∈ L∞(0 , T ; L2(Ω)) ∩ L2(0 , T ; H1(Ω)) ,
+
+ut ∈ L∞(0 , T ; L2(Ω)) , μt ∈ L∞(0 , T ; H1(Ω)) ,
+
+utt ∈ L2(0 , T ; H−1(Ω)) , ϕtt ∈ L2(0 , T ; L2(Ω)) .
+
+(3.2) The following truncation error estimates can be established, provided that the exact solutions satisfy Assumption 3.1. 
+
+Lemma 3.1. [38] Under Assumption 3.1 , for all m ≥ 0, the truncation errors satisfy 
+
+> m
+
+X
+
+> n=0
+
+(∥Rϕ∥2 
+
+> −1
+
++ ∥Ru∥2 
+
+> −1
+
++ ∥T1∥20 + |Rr |2) ≤ C∆t, 
+
+Lemma 3.2. Let E1(tn) = R 
+
+> Ω
+
+F (ϕ(tn)) dx and En 
+
+> 1,h
+
+= R 
+
+> Ω
+
+F (ϕnh ) dx denote the continuous and discrete energies at time tn, respectively. Assume that F (ϕ) is Lipschitz continuous on the range of 
+
+ϕ. Then there exists a constant C > 0, independent of the mesh size h and time step ∆t, such that 
+
+1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+≤ C∥enϕh ∥0,
+
+where enϕh = ϕ(tn) − ϕnh is the phase-field error. Proof. Using the algebraic identity 1
+
+√A − 1
+
+√B = B − A
+
+√AB (√A + √B) ,
+
+we obtain 
+
+1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+= |E1(tn) − En
+
+> 1,h
+
+|
+
+q
+
+E1(tn)En
+
+> 1,h
+
+pE1(tn) + 
+
+q
+
+En
+
+> 1,h
+
+ .
+
+By the positivity assumption E1(tn), E n 
+
+> 1,h
+
+≥ C′ 
+
+> 0
+
+> 0, the denominator satisfies 
+
+q
+
+E1(tn)En
+
+> 1,h
+
+p E1(tn) + 
+
+q
+
+En
+
+> 1,h
+
+
+
+≥ C′ 
+
+> 0
+
+· 2pC′ 
+
+> 0
+
+=: C1 > 0,
+
+so that 
+
+1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+≤ 1
+
+C1
+
+|E1(tn) − En
+
+> 1,h
+
+|.
+
+Since F is Lipschitz continuous on the range of ϕ, there exists L > 0 such that |F (a)−F (b)| ≤ L|a−b|.Therefore, 
+
+|E1(tn) − En
+
+> 1,h
+
+| =
+
+Z
+
+> Ω
+
+ F (ϕ(tn)) − F (ϕnh ) dx ≤ L
+
+Z
+
+> Ω
+
+|ϕ(tn) − ϕnh | dx ≤ L|Ω|1/2∥enϕh ∥0.
+
+Combining the above estimates yields the desired result with C = L|Ω|1/2/C 1.11 
+
+Lemma 3.3. [38] For all m ≥ 0, there exists a positive constant C such that 
+
+∥dtϕm+1  
+
+> h
+
+∥1 ≤ C. 
+
+Define the errors 
+
+enϕh = ϕ(tn) − ϕnh , Φnϕh = Rhϕ(tn) − ϕnh , Θnϕh = ϕ(tn) − Rhϕ(tn),enμh = μ(tn) − μnh , Φnμh = Rhμ(tn) − μnh , Θnμh = μ(tn) − Rhμ(tn),enuh = u(tn) − unh , Φnuh = Phu(tn) − unh , Θnuh = u(tn) − Phu(tn),enrh = r(tn) − rnh , enph = p(tn) − pnh .
+
+By subtracting (2.18) from (3.1), we obtain the error equations (dten+1  
+
+> ϕh
+
+, ψ h) + ( ∇en+1  
+
+> μh
+
+, ∇ψh) + 
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ ϕnh , ψ h
+
+
+
++ ( Rϕ, ψ h) = 0 ,(3.3a) (en+1  
+
+> μh
+
+, τ h) − (∇en+1  
+
+> ϕh
+
+, ∇τh) − (g(ϕ(tn+1 )) − g(ϕnh ), τ h) = 0 ,(3.3b) (dten+1  
+
+> uh
+
+, vh) + ( ∇en+1  
+
+> uh
+
+, ∇vh) − (en+1  
+
+> ph
+
+, ∇ · vh) − (Ru, vh)+
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , vh
+
+
+
+−
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , vh
+
+ = 0 ,(3.3c) (∇ · en+1  
+
+> uh
+
+, q h) = 0 ,(3.3d) 
+
+dten+1  
+
+> rh
+
+= 12r(tn) (g(ϕ(tn)) , d tϕ(tn+1 )) − 12rn+1 
+
+> h
+
+(g(ϕnh ), d tϕn+1  
+
+> h
+
+)+ 12pE1(tn) (( u(tn) · ∇ u(tn), u(tn)) + ( u(tn) · ∇ ϕ(tn), μ (tn)) 
+
+− (μ(tn)∇ϕ(tn), u(tn))) 
+
+− rnh
+
+2rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(( unh · ∇ unh , un+1  
+
+> h
+
+) + ( unh · ∇ ϕnh , μ n+1  
+
+> h
+
+) − (μnh ∇ϕnh , un+1  
+
+> h
+
+)) 
+
+− T1 + Rr .(3.3e) Following the proofs of Lemmas 3.2 and 3.4 in [38], with l = 1, we can derive the following two conclusions. 
+
+Lemma 3.4. Under Assumption 3.1 , for all m ≥ 0 and e0 
+
+> ϕh
+
+= 0 , it holds 
+
+∥Φm+1  
+
+> ϕh
+
+∥21 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+∥en+1  
+
+> μh
+
+∥21 ≤ C
+
+
+
+∆t2 + h2 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+(∥ϕ(tn)∥22 + ∥∇ unh ∥20
+
++∥∇ unh ∥20∥∇ ϕnh ∥20)( ∥Φn+1  
+
+> uh
+
+∥20 + |en+1  
+
+> rh
+
+|2)
+
+
+
+.
+
+Lemma 3.5. Under Assumption 3.1 , for all m ≥ 0 and e0 
+
+> rh
+
+= 0 , it holds 
+
+|em+1  
+
+> rh
+
+|2 ≤ C
+
+
+
+∆t2 + h2 + ∆t
+
+4
+
+> m
+
+X
+
+> n=0
+
+∥en+1  
+
+> μh
+
+∥21 + ∆t
+
+2
+
+> m
+
+X
+
+> n=0
+
+∥∇ Φn+1  
+
+> uh
+
+∥2012 +C∆t
+
+> m
+
+X
+
+> n=0
+
+(∥ϕ(tn)∥22 + ∥∇ unh ∥20(∥ϕnh ∥21 + ∥unh ∥20) + ∥μn+1  
+
+> h
+
+∥21
+
++( ∥ϕ(tn)∥22 + ∥∇ unh ∥20)∥μ(tn)∥21 + ∥∇ ϕ(tn)∥20∥∇ u(tn)∥20
+
++∥∇ ϕnh ∥20∥μnh ∥21 + ∥∇ u(tn)∥20∥μnh ∥21 + ∥∇ un+1  
+
+> h
+
+∥20
+
++∥ϕt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+)( ∥Φn+1  
+
+> ϕh
+
+∥21 + ∥Φn+1  
+
+> uh
+
+∥20)
+
+
+
+.
+
+Next, we prove the error estimation for the velocity u.
+
+Lemma 3.6. Under Assumption 3.1 , for all m ≥ 0 and e0 
+
+> uh
+
+= 0 , it holds 
+
+∥Φm+1  
+
+> uh
+
+∥20 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+∥∇ Φn+1  
+
+> uh
+
+∥20 ≤ C
+
+
+
+∆t2 + h2 + ∆t
+
+4
+
+> m
+
+X
+
+> n=0
+
+∥en+1  
+
+> μh
+
+∥21
+
++∆ t
+
+> m
+
+X
+
+> n=0
+
+(∥ϕ(tn)∥22 + ∥μnh ∥21∥∇ ϕnh ∥20 + ∥∇ u(tn)∥20
+
++∥unh ∥20∥∇ unh ∥20)( ∥Φn+1  
+
+> ϕh
+
+∥20 + |en+1  
+
+> rh
+
+|2)
+
+
+
+.
+
+Proof. Taking vh = 2∆ tΦn+1  
+
+> uh
+
+in (3.3c) and using the projection (2.11), we obtain 
+
+∥Φn+1  
+
+> uh
+
+∥20 − ∥ Φnuh ∥20 + ∥Φn+1  
+
+> uh
+
+− Φnuh ∥20 + ∆ t(∥∇ Φn+1  
+
+> uh
+
+∥20 + ∥∇ en+1  
+
+> uh
+
+∥20)= ∆ t∥∇ Θn+1  
+
+> uh
+
+∥20 + 2∆ t(Ru, Φn+1  
+
+> uh
+
+)+2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , Φn+1 
+
+> uh
+
+
+
+−
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , Φn+1 
+
+> uh
+
+
+
+= ∆ t∥∇ Θn+1  
+
+> uh
+
+∥20 +
+
+> 3
+
+X
+
+> i=1
+
+Hi.(3.4) We now estimate the terms on the right-hand side of (3.4) one by one. For H1 and H2, it follows 
+
+|H1| = |2∆ t(Ru, Φn+1  
+
+> uh
+
+)| ≤ ∆t
+
+3 ∥∇ Φn+1  
+
+> uh
+
+∥20 + C∆t∥Ru∥2
+
+> −1
+
+,
+
+|H2| = 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , Φn+1 
+
+> uh
+
+
+
+= 2∆ t (μ(tn+1 )∇ϕ(tn+1 ), Φn+1  
+
+> uh
+
+) − (μ(tn)∇ϕ(tn), Φn+1  
+
+> uh
+
+)+( μ(tn)∇ϕ(tn), Φn+1  
+
+> uh
+
+) − (μnh ∇ϕnh , Φn+1  
+
+> u
+
+) + enrh 
+
+pE1(tn) (μnh ∇ϕnh , Φn+1  
+
+> uh
+
+)+rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (μnh ∇ϕnh , Φn+1  
+
+> uh
+
+) .
+
+By (2.4), (2.6), and Young’s inequality, we have 2∆ t|(μ(tn+1 )∇ϕ(tn+1 ), Φn+1  
+
+> uh
+
+) − (μ(tn)∇ϕ(tn), Φn+1  
+
+> uh
+
+)|13 = 2∆ t|(( μ(tn+1 ) − μ(tn)) ∇ϕ(tn+1 ) + μ(tn)∇(ϕ(tn+1 ) − ϕ(tn)) , Φn+1  
+
+> uh
+
+)|≤ ∆t
+
+12 ∥∇ Φn+1  
+
+> uh
+
+∥20 + C∆t3(∥μt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+∥∇ ϕ(tn+1 )∥20 + ∥μ(tn)∥21∥ϕt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+),
+
+2∆ t|(μ(tn)∇ϕ(tn), Φn+1  
+
+> uh
+
+) − (μnh ∇ϕnh , Φn+1  
+
+> uh
+
+)|
+
+= 2∆ t|(enμh ∇ϕ(tn), Φn+1  
+
+> uh
+
+) + ( μnh ∇enϕh , Φn+1  
+
+> uh
+
+)|≤ ∆t
+
+12 ∥∇ Φn+1  
+
+> uh
+
+∥20 + ∆t
+
+8 ∥enμh ∥21 + C∆t(∥μnh ∥21 + ∥ϕ(tn)∥22)( ∥∇ Φnϕh ∥20
+
++∥∇ Θnϕh ∥20 + ∥Φn+1  
+
+> uh
+
+∥20),
+
+2∆ t enrh 
+
+pE1(tn) (μnh ∇ϕnh , Φn+1  
+
+> uh
+
+)
+
+≤ 2∆ t |enrh |√C0
+
+∥μnh ∥1∥∇ ϕnh ∥0∥∇ Φn+1  
+
+> uh
+
+∥0
+
+≤ ∆t
+
+12 ∥∇ Φn+1  
+
+> uh
+
+∥20 + C∆t∥μnh ∥21∥∇ ϕnh ∥20|enrh |2,
+
+and using Lemma 3.2, it follows 2∆ t rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (μnh ∇ϕnh , Φn+1  
+
+> uh
+
+)
+
+≤ C∆t∥enϕh ∥0∥μnh ∥1∥∇ ϕnh ∥0∥∇ Φn+1  
+
+> uh
+
+∥0
+
+≤ ∆t
+
+12 ∥∇ Φn+1  
+
+> uh
+
+∥20 + C∆t∥μnh ∥21∥∇ ϕnh ∥20(∥Φnϕh ∥20 + ∥Θnϕh ∥20).
+
+Thus, it holds 
+
+|H2| ≤ ∆t
+
+3 ∥∇ Φn+1  
+
+> uh
+
+∥20 + C∆t3(∥μt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+∥∇ ϕ(tn+1 )∥20 + ∥μ(tn)∥21∥ϕt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+)+ ∆t
+
+4 ∥enμh ∥21 + C∆t(∥μnh ∥21 + ∥ϕ(tn)∥22)( ∥∇ Φnϕh ∥20 + ∥∇ Θnϕh ∥20 + ∥Φn+1  
+
+> uh
+
+∥20)+C∆t∥μnh ∥21∥∇ ϕnh ∥20|enrh |2 + C∆t∥μnh ∥21∥∇ ϕnh ∥20(∥Φnϕh ∥20 + ∥Θnϕh ∥20)
+
+H3 can be derived similarly, 
+
+|H3| = 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , Φn+1 
+
+> uh
+
+
+
+= 2∆ t (u(tn+1 ) · ∇ u(tn+1 ), Φn+1  
+
+> uh
+
+) − (u(tn) · ∇ u(tn), Φn+1  
+
+> uh
+
+)+( u(tn) · ∇ u(tn), Φn+1  
+
+> uh
+
+) − (unh · ∇ unh , Φn+1  
+
+> uh
+
+) + enrh 
+
+pE1(tn) (unh · ∇ unh , Φn+1  
+
+> uh
+
+)+rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (unh · ∇ unh , Φn+1  
+
+> uh
+
+) .
+
+≤ ∆t
+
+3 ∥∇ Φn+1  
+
+> uh
+
+∥20 + C∆t3∥ut∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+(∥Au(tn+1 )∥20 + ∥Au(tn)∥20)+C∆t(∥∇ u(tn)∥20 + ∥∇ unh ∥20)( ∥Φnuh ∥20 + ∥Θnuh ∥20)+C∆t∥unh ∥20∥∇ unh ∥20|enrh |2 + C∆t∥unh ∥20∥∇ unh ∥20(∥Φnϕh ∥20 + ∥Θnϕh ∥20).14 Substituting the above inequalities into (3.4), summing from n = 0 to m, we get 
+
+∥Φm+1  
+
+> uh
+
+∥20 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+∥∇ Φn+1  
+
+> uh
+
+∥20
+
+≤ ∥ Φ0
+
+> uh
+
+∥20 + C∆t
+
+> m
+
+X
+
+> n=0
+
+∥Ru∥2 
+
+> −1
+
++ ∆t
+
+4
+
+> m
+
+X
+
+> n=0
+
+∥en+1  
+
+> μh
+
+∥21
+
++C∆t3
+
+> m
+
+X
+
+> n=0
+
+(∥Au(tn+1 )∥20 + ∥∇ ϕ(tn+1 )∥20 + ∥μ(tn)∥21)( ∥ut∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
++∥ϕt∥2  
+
+> L∞(0 ,T ;H1(Ω))
+
++ ∥μt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+)+C∆t
+
+> m
+
+X
+
+> n=0
+
+(∥ϕ(tn)∥22 + ∥μnh ∥21∥∇ ϕnh ∥20 + ∥∇ u(tn)∥20 + ∥unh ∥20∥∇ unh ∥20)( ∥Θn+1  
+
+> ϕh
+
+∥21
+
++∥Θn+1  
+
+> uh
+
+∥21 + ∥Φn+1  
+
+> ϕh
+
+∥21 + ∥Φn+1  
+
+> uh
+
+∥20 + |en+1  
+
+> rh
+
+|2).
+
+Using (2.11), (2.16), Lemma 3.1, Lemma 3.4, Lemma 3.5, Assumption 3.1, and Gronwall’s lemma, we finish the proof. 
+
+Proposition 3.1. Under the conditions of Lemma 3.4-Lemma 3.6, it holds 
+
+∥ϕ(tm+1 ) − ϕm+1  
+
+> h
+
+∥21 + |r(tm+1 ) − rm+1  
+
+> h
+
+|2 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+(∥∇ (u(tn+1 ) − un+1  
+
+> h
+
+)∥20 + ∥μ(tn+1 ) − μn+1  
+
+> h
+
+∥21)
+
+≤ C(∆ t2 + h2).
+
+We next prove the optimal L2-norm error estimates for the numerical solutions of the fully discrete SAV-FEM scheme (2.18). 
+
+Theorem 3.2. Under Assumption 3.1 , for all m ≥ 0, dn∆t < 1 and e0 
+
+> ϕh
+
+= e0 
+
+> uh
+
+= e0 
+
+> rh
+
+= 0 , it holds 
+
+∥em+1  
+
+> ϕh
+
+∥20 + ∥em+1  
+
+> uh
+
+∥2 
+
+> −1
+
++ ( em+1  
+
+> rh
+
+)2 +
+
+> m
+
+X
+
+> n=0
+
+∥en+1  
+
+> μh
+
+∥20 ≤ Ce  
+
+> 
+> ∆tmP
+> n=0
+> (1 −dn∆t)−1dn
+> 
+
+(∆ t2 + h4),
+
+where dn > 0 is a bounded constant. Proof. Choosing ( ψh, τ h, vh) = 2∆ t(△−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+, d t△−1 
+
+> h
+
+Φn+1  
+
+> ϕh
+
+, A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) in (3.3a)-(3.3c), and mul-tiplying (3.3e) by 2 en+1  
+
+> rh
+
+, and using (2.13)-(2.15), we get 
+
+∥Φn+1  
+
+> ϕh
+
+∥20 − ∥ Φnϕh ∥20 + ∥Φn+1  
+
+> ϕh
+
+− Φnϕh ∥20 + ∥Φn+1  
+
+> uh
+
+∥2 
+
+> −1
+
+− ∥ Φnuh ∥2 
+
+> −1
+
++ ∥Φn+1  
+
+> uh
+
+− Φnuh ∥2
+
+> −1
+
++|en+1  
+
+> rh
+
+|2 − | enrh |2 + |en+1  
+
+> rh
+
+− enrh |2 + ∆ t(∥Φn+1  
+
+> μh
+
+∥20 + ∥en+1  
+
+> μh
+
+∥20 + ∥Φn+1  
+
+> uh
+
+∥20 + ∥en+1  
+
+> uh
+
+∥20)= ∆ t(∥Θn+1  
+
+> μh
+
+∥20 + ∥Θn+1  
+
+> uh
+
+∥20) + 2∆ t(( Ru, A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) + ( Rϕ, △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) − (Θ n+1  
+
+> ϕh
+
+, d tΦn+1  
+
+> ϕh
+
+)+en+1  
+
+> rh
+
+(Rr − T1)) + 2∆ t(g(ϕ(tn+1 )) − g(ϕnh ), d t△−1 
+
+> h
+
+Φn+1  
+
+> ϕh
+
+)+∆ te n+1 
+
+> rh
+
+ g(ϕ(tn)) 
+
+r(tn) − g(ϕnh )
+
+rn+1 
+
+> h
+
+, d tϕn+1 
+
+> h
+
+
+
++
+
+ g(ϕ(tn)) 
+
+r(tn) , d ten+1 
+
+> ϕh
+
+ 
+
++2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , A −1 
+
+> h
+
+Φn+1 
+
+> uh
+
+
+
+−
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , A −1 
+
+> h
+
+Φn+1 
+
+> uh
+
+
+
++
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1 
+
+> μh
+
+15 +∆ te n+1 
+
+> rh
+
+ 1
+
+pE1(tn) (u(tn) · ∇ u(tn), u(tn)) − rnh
+
+rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ unh , un+1  
+
+> h
+
+)+ 1
+
+pE1(tn) (u(tn) · ∇ ϕ(tn), μ (tn)) − rnh
+
+rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ ϕnh , μ n+1  
+
+> h
+
+)
+
+−
+
+ 1
+
+pE1(tn) (μ(tn) · ∇ ϕ(tn), u(tn)) − rnh
+
+rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(μnh · ∇ ϕnh , un+1  
+
+> h
+
+)
+
+
+
+= ∆ t(∥Θn+1  
+
+> μh
+
+∥20 + ∥Θn+1  
+
+> uh
+
+∥20) + 
+
+> 9
+
+X
+
+> i=1
+
+Gi.(3.5) We next estimate each term on the right-hand side of (3.5) separately. 
+
+|G1| = |2∆ t(( Ru, A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) + ( Rϕ, △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) − (Θ n+1  
+
+> ϕh
+
+, d tΦn+1  
+
+> ϕh
+
+) + en+1  
+
+> rh
+
+(Rr − T1)) |≤ ∆t
+
+6 (∥Φn+1  
+
+> uh
+
+∥20 + ∥Φn+1  
+
+> μh
+
+∥20) + C∆t(∥Ru∥2 
+
+> −2
+
++ ∥Rϕ∥2
+
+> −2
+
+) + ∆ t2∥dtΦn+1  
+
+> ϕh
+
+∥20
+
++∥dtΘn+1  
+
+> ϕh
+
+∥20 + ∆ t(|en+1  
+
+> rh
+
+|2 + ∥T1∥20 + |Rr |2),
+
+|G2| = |2∆ t(g(ϕ(tn+1 )) − g(ϕnh ), d t△−1 
+
+> h
+
+Φn+1  
+
+> ϕh
+
+)|
+
+= 2∆ t|(g(ϕ(tn+1 )) − g(ϕ(tn)) + g(ϕ(tn)) − g(ϕnh ), d t△−1 
+
+> h
+
+Φn+1  
+
+> ϕh
+
+)|≤ 2∆ t∥g(ϕ(tn+1 )) − g(ϕ(tn)) + g(ϕ(tn)) − g(ϕnh )∥0∥dtΦn+1  
+
+> ϕh
+
+∥−2.
+
+By (3.3a), Lemma 3.1, and the fact that ∥ · ∥ −2 ≤ ∥ · ∥ −1, we have 
+
+∥dtΦn+1  
+
+> ϕh
+
+∥−2 ≤ ∥△ hen+1  
+
+> μh
+
+∥−2 + ∥dtΘn+1  
+
+> ϕh
+
+∥−1 + ∥Rnϕ∥−1
+
++ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ ϕnh
+
+> −1
+
+≤ ∥ en+1  
+
+> μh
+
+∥0 + C h2
+
+∆t1/2
+
+Z tn+1 
+
+> tn
+
+∥ϕt∥1dt + ∥Rnϕ∥−1
+
++C∆t(∥ut∥L∞(0 ,T ;L2(Ω)) ∥ϕ(tn+1 )∥2 + ∥Au(tn)∥0∥ϕt∥L∞(0 ,T ;L2(Ω)) )+C(∥ϕ(tn)∥2 + ∥Ahunh ∥0 + ∥∇ unh ∥0∥ϕnh ∥1)( ∥Φnuh ∥0 + ∥Θnuh ∥0
+
++∥Φnϕh ∥0 + ∥Θnϕh ∥0 + |enrh |).(3.6) Then, it follows 
+
+|G2| ≤ ∆t
+
+6 ∥en+1  
+
+> μh
+
+∥20 + C∆t∥Rnϕ∥2 
+
+> −1
+
++ C∆t3(∥ut∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+∥ϕ(tn+1 )∥22
+
++∥Au(tn)∥20∥ϕt∥2  
+
+> L∞(0 ,T ;L2(Ω))
+
++ ∥ϕt∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+) + C∆t(∥ϕ(tn)∥22 + ∥Ahunh ∥20
+
++∥∇ unh ∥20∥ϕnh ∥21)( ∥Φnuh ∥20 + ∥Θnuh ∥20 + ∥Φnϕh ∥20 + ∥Θnϕh ∥20 + |enrh |2)+Ch 4
+
+Z tn+1 
+
+> tn
+
+∥ϕt∥21dt. 
+
+Next, we estimate the term G3,
+
+|G3| = ∆te n+1 
+
+> rh
+
+ g(ϕ(tn)) 
+
+r(tn) − g(ϕnh )
+
+rn+1 
+
+> h
+
+, d tϕn+1 
+
+> h
+
+
+
++
+
+ g(ϕ(tn)) 
+
+r(tn) , d ten+1 
+
+> ϕh
+
+ 
+
+= ∆te n+1 
+
+> rh
+
+ g(ϕ(tn)) 
+
+r(tn) − g(ϕnh )
+
+rn+1 
+
+> h
+
+, d tϕn+1 
+
+> h
+
+
+
++ ∆te n+1 
+
+> rh
+
+ g(ϕ(tn)) 
+
+r(tn) , d ten+1 
+
+> ϕh
+
+16 = |B1| + |B2|.
+
+For B1, we decompose the coefficient difference into two parts 
+
+g(ϕ(tn)) 
+
+r(tn) − g(ϕnh )
+
+rn+1 
+
+> h
+
+= g(ϕ(tn)) 
+
+r(tn) − g(ϕ(tn)) 
+
+rn+1 
+
+> h
+
+| {z }
+
+> I1
+
++ g(ϕ(tn)) 
+
+rn+1 
+
+> h
+
+− g(ϕnh )
+
+rn+1 
+
+> h
+
+| {z }
+
+> I2
+
+.
+
+According to Lemma 3.2, 
+
+∥I1∥0 = g(ϕ(tn)) 1
+
+r(tn) − 1
+
+rn+1  
+
+> h0
+
+= g(ϕ(tn)) 1
+
+r(tn) − 1
+
+r(tn+1 ) + 1
+
+r(tn+1 ) − 1
+
+rn+1  
+
+> h0
+
+= g(ϕ(tn)) E1(tn+1 ) − E1(tn)
+
+r(tn+1 )r(tn)( r(tn+1 ) + r(tn)) + En+1 1,h − E1(tn+1 )
+
+rn+1  
+
+> h
+
+r(tn+1 )( rn+1  
+
+> h
+
++ r(tn+1 )) 0
+
+≤ C(∆ t∥ϕt∥L∞(0 ,T ;L2(Ω)) + ∥en+1  
+
+> ϕh
+
+∥0),I2 = 1
+
+rn+1 
+
+> h
+
+ g(ϕ(tn)) − g(ϕnh ).
+
+There exists ζn between ϕ(tn) and ϕnh such that 
+
+g(ϕ(tn)) − g(ϕnh ) = g′(ζn) ϕ(tn) − ϕnh
+
+,
+
+where we have used the fact that ζn lies between ϕ(tn) and ϕnh . By Assumption 3.1, the Sobolev embedding theorem, (2.7), and Lemma 2.4, both ϕ(tn) and ϕnh are uniformly bounded in L∞(Ω). Consequently, ζn is also uniformly bounded in L∞(Ω), implying that g′(ζn) admits a uniform upper bound. Combining this with the estimate 1  
+
+> |rn+1
+> h|
+
+≤ C, we obtain 
+
+∥I2∥0 ≤ C ∥ϕ(tn) − ϕnh ∥0 = C ∥enϕh ∥0.
+
+By Lemma 3.3, it follows 
+
+|B1| ≤ C∆t|en+1  
+
+> rh
+
+|2 + C∆t(∥en+1  
+
+> ϕh
+
+∥20 + ∥enϕh ∥20)+C∆t3∥ϕt∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+.
+
+By (3.6), it holds 
+
+|B2| ≤ C∆t|en+1  
+
+> rh
+
+|∥ dten+1  
+
+> ϕh
+
+∥−2
+
+≤ ∆t
+
+6 ∥en+1  
+
+> μh
+
+∥20 + C∆t∥Rnϕ∥2 
+
+> −1
+
++ C∆t|en+1  
+
+> rh
+
+|2 + C∆t3(∥ut∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+∥ϕ(tn+1 )∥22
+
++∥Au(tn)∥20∥ϕt∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+) + C∆t(∥ϕ(tn)∥22 + ∥Ahunh ∥20
+
++∥∇ unh ∥20∥ϕnh ∥21)( ∥Φnuh ∥20 + ∥Θnuh ∥20 + ∥Φnϕh ∥20 + ∥Θnϕh ∥20 + |enrh |2).
+
+Then, 
+
+|G3| ≤ ∆t
+
+6 ∥en+1  
+
+> μh
+
+∥20 + C∆t∥Rnϕ∥2 
+
+> −1
+
++ C∆t3(∥ut∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+∥ϕ(tn+1 )∥22
+
++∥Au(tn)∥20∥ϕt∥2  
+
+> L∞(0 ,T ;L2(Ω))
+
++ ∥ϕt∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+)+C∆t(∥ϕ(tn)∥22 + ∥Ahunh ∥20 + ∥∇ unh ∥20∥ϕnh ∥21)( ∥enuh ∥20 + ∥enϕh ∥2017 +∥en+1  
+
+> ϕh
+
+∥20 + |enrh |2 + |en+1  
+
+> rh
+
+|2).
+
+Using (2.4)–(2.7), the remaining terms on the right-hand side of (3.5) can be estimated as follows: 
+
+|G4| = 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , A −1 
+
+> h
+
+Φn+1 
+
+> uh
+
+
+
+= 2∆ t (μ(tn+1 ) · ∇ ϕ(tn+1 ), A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) − (μ(tn) · ∇ ϕ(tn), A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+)+( μ(tn) · ∇ ϕ(tn), A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) − (μnh · ∇ ϕnh , A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) + enrh 
+
+pE1(tn) (μnh · ∇ ϕnh , A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+)+rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (μnh · ∇ ϕnh , A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) .
+
+By (2.4), (2.6), and Young’s inequality, we obtain 2∆ t|(μ(tn+1 ) · ∇ ϕ(tn+1 ), A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) − (μ(tn) · ∇ ϕ(tn), A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+)|
+
+= 2∆ t|(( μ(tn+1 ) − μ(tn)) · ∇ ϕ(tn+1 ) + μ(tn) · ∇ (ϕ(tn+1 ) − ϕ(tn)) , A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+)|≤ ∆t∥Φn+1  
+
+> uh
+
+∥2 
+
+> −1
+
++ ∆ t3(∥μt∥2  
+
+> L∞(0 ,T ;H1(Ω))
+
++ ∥ϕt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+)( ∥ϕ(tn+1 )∥21 + ∥μ(tn)∥21).
+
+2∆ t|(μ(tn) · ∇ ϕ(tn), A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) − (μnh · ∇ ϕnh , A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+)|
+
+= 2∆ t|(enμh · ∇ ϕ(tn), A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) + ( μnh · ∇ enϕh , A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+)|≤ ∆t
+
+6 (∥Φn+1  
+
+> uh
+
+∥20 + ∥enμh ∥20) + C∆t(∥ϕ(tn)∥22∥Φn+1  
+
+> uh
+
+∥2 
+
+> −1
+
++ ∥μnh ∥21∥Φnϕh ∥20)+C∆t∥μnh ∥21∥Θnϕh ∥20.
+
+Using Lemma 3.2, it follows 2∆ t enrh 
+
+pE1(tn) (μnh · ∇ ϕnh , A −1 
+
+> h
+
+Φn+1  
+
+> uh
+
+) + rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (μnh · ∇ ϕnh , ˜Φn+1  
+
+> uh
+
+)
+
+≤ ∆t
+
+6 ∥Φn+1  
+
+> uh
+
+∥20 + C∆t∥μnh ∥20∥∇ ϕnh ∥20(|enrh |2 + ∥enϕh ∥20),
+
+Then, 
+
+|G5| = 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , A −1 
+
+> h
+
+Φn+1 
+
+> uh
+
+
+
+≤ ∆t3∥ut∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+(∥∇ u(tn+1 )∥20 + ∥∇ u(tn)∥20)+ ∆t
+
+6 (∥Φn+1  
+
+> uh
+
+∥20 + ∥enuh ∥20) + C∆t(∥Au(tn)∥20 + ∥Ahunh ∥20)∥Φn+1  
+
+> uh
+
+∥2
+
+> −1
+
++C∆t∥unh ∥20∥∇ unh ∥20(|enrh |2 + ∥enϕh ∥20),G6 is estimated as follows 
+
+|G6| = 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1 
+
+> μh
+
+18 = 2∆ t (u(tn+1 ) · ∇ ϕ(tn+1 ), △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) − (u(tn) · ∇ ϕ(tn), △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)+( u(tn) · ∇ ϕ(tn), △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) − (unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)+ enrh 
+
+pE1(tn) (unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)+rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) .
+
+By (2.4) and (2.6), we can derive 2∆ t|(u(tn+1 ) · ∇ ϕ(tn+1 ), △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) − (u(tn) · ∇ ϕ(tn), △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)|
+
+= 2∆ t|(( u(tn+1 ) − u(tn)) · ∇ ϕ(tn+1 ) + u(tn) · ∇ (ϕ(tn+1 ) − ϕ(tn)) , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)|≤ ∆t
+
+5 ∥Φn+1  
+
+> μh
+
+∥20 + C∆t3(∥ut∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+∥ϕ(tn+1 )∥21 + ∥∇ u(tn)∥20∥ϕt∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+),
+
+2∆ t|(u(tn) · ∇ ϕ(tn), △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) − (unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)|
+
+= 2∆ t|(enuh · ∇ ϕ(tn) + unh · ∇ enϕh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)|
+
+= 2∆ t|((Θ nuh + Φ nuh ) · ∇ ϕ(tn) + unh · ∇ enϕh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)|≤ ∆t
+
+6 ∥Φn+1  
+
+> μh
+
+∥20 + C∆t(∥ϕ(tn)∥21(∥Θnuh ∥20 + ∥Φnuh ∥2
+
+> −1
+
+) + ∥∇ unh ∥20∥enϕh ∥20),
+
+2∆ t enrh 
+
+pE1(tn) (unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+) + rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (unh · ∇ ϕnh , △−1 
+
+> h
+
+Φn+1  
+
+> μh
+
+)
+
+≤ ∆t
+
+6 ∥Φn+1  
+
+> μh
+
+∥20 + C∆t∥unh ∥20∥∇ ϕnh ∥20(|enrh |2 + ∥enϕh ∥20).
+
+The last three terms on the right-hand side of (3.5) can be estimated as follows: 
+
+|G7| = ∆te n+1 
+
+> rh
+
+ 1
+
+pE1(tn) (u(tn) · ∇ ϕ(tn), μ (tn)) − rnh
+
+rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ ϕnh , μ n+1  
+
+> h
+
+)
+
+
+
+= ∆t|en+1  
+
+> rh
+
+|
+
+pE1(tn) |(enuh · ∇ ϕ(tn), μ (tn)) + ( unh · ∇ enϕh , μ (tn)) + ( unh · ∇ ϕnh , μ (tn) − μ(tn+1 )) +( unh · ∇ ϕnh , e n+1  
+
+> μh
+
+)|
+
++ ∆t|en+1  
+
+> rh
+
+|
+
+rn+1 
+
+> h
+
+ rn+1 
+
+> h
+
+pE1(tn) − rnh
+
+q
+
+En
+
+> 1,h
+
+ (unh · ∇ ϕnh , μ n+1  
+
+> h
+
+)
+
+≤ ∆t
+
+6 ∥en+1  
+
+> μh
+
+∥20 + ∆t
+
+4 ∥enuh ∥20 + C∆t3(∥μt∥2  
+
+> L∞(0 ,T ;H1(Ω))
+
++ |rt|2)∥∇ unh ∥20∥∇ ϕnh ∥20
+
++C∆t(|en+1  
+
+> rh
+
+|2 + |enrh |2)( ∥∇ unh ∥20∥△ hϕnh ∥20 + ∥μn+1  
+
+> h
+
+∥21 + 1) +C∆t(∥ϕ(tn)∥22∥μ(tn)∥21 + ∥∇ unh ∥20∥μ(tn)∥22 + ∥∇ unh ∥20∥△ hϕnh ∥20)∥enϕh ∥20,
+
+|G8| = ∆te n+1 
+
+> rh
+
+ 1
+
+pE1(tn) (u(tn) · ∇ u(tn), u(tn)) − rnh
+
+rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ unh , un+1  
+
+> h
+
+)
+
+19 = ∆ t|en+1  
+
+> rh
+
+| 1
+
+pE1(tn) (u(tn) · ∇ u(tn), u(tn)) − rnh
+
+rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(unh · ∇ unh , un+1  
+
+> h
+
+)
+
+= ∆t|en+1  
+
+> rh
+
+|
+
+pE1,h (tn) (enuh · ∇ u(tn), u(tn)) + ( unh · ∇ enuh , u(tn)) + ( unh · ∇ unh , u(tn) − u(tn+1 )) +( unh · ∇ unh , e n+1  
+
+> uh
+
+)
+
++ ∆t|en+1  
+
+> rh
+
+|
+
+rn+1 
+
+> h
+
+ rn+1 
+
+> h
+
+pE1(tn) − rnh
+
+q
+
+En
+
+> 1,h
+
+ (unh · ∇ unh , un+1  
+
+> h
+
+)
+
+≤ ∆t
+
+4 ∥enuh ∥20 + ∆t
+
+4 ∥en+1  
+
+> uh
+
+∥20 + C∆t3 
+
+∥ut∥2  
+
+> L∞(0 ,T ;H1(Ω))
+
++ |rt|2∥unh ∥20∥∇ unh ∥20
+
+
+
++C∆t
+
+
+
+∥Au(tn)∥20(∥∇ u(tn)∥20 + ∥∇ unh ∥20) + ∥unh ∥20∥∇ unh ∥20 + ∥unh ∥21∥Ahunh ∥20
+
+  |en+1  
+
+> rh
+
+|2 + |enrh |2
+
++∥Θnϕh ∥20 + ∥Φnϕh ∥20
+
+ ,
+
+|G9| = ∆te n+1 
+
+> rh
+
+ 1
+
+pE1(tn) (μ(tn) · ∇ ϕ(tn), u(tn)) − rnh
+
+rn+1 
+
+> h
+
+q
+
+En
+
+> 1,h
+
+(μnh · ∇ ϕnh , un+1  
+
+> h
+
+)
+
+
+
+≤ C∆t3 
+
+∥ut∥2  
+
+> L∞(0 ,T ;H1(Ω))
+
++ |rt|2∥μnh ∥20∥∇ ϕnh ∥20
+
+
+
++ C∆t
+
+
+
+∥Au(tn)∥20(∥∇ ϕ(tn)∥20
+
++∥μnh ∥21) + ∥μnh ∥21∥∇ ϕnh ∥20 + ∥μnh ∥21∥ϕnh ∥22 + ∥∇ un+1  
+
+> h
+
+∥20
+
+  |en+1  
+
+> rh
+
+|2 + |enrh |2
+
++∥θnϕh ∥20 + ∥Φnϕh ∥20
+
+ + ∆t
+
+4 ∥en+1  
+
+> uh
+
+∥20.
+
+Substituting the above inequalities into (3.5), summing the resulting inequality from n = 0 to m,and applying (2.12), (2.17), Lemma 3.1, Lemmas 2.3–2.5, and the triangle inequality, we obtain the desired result. 
+
+Theorem 3.3. For all m ≥ 0, under the assumptions of Theorem 3.2 and e0 
+
+> uh
+
+= 0 , it holds 
+
+∥em+1  
+
+> uh
+
+∥20 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+∥dten+1  
+
+> uh
+
+∥2 
+
+> −1
+
+≤ C(∆ t2 + h4).
+
+Proof. Taking vh = −2∆ tA −1 
+
+> h
+
+dten+1  
+
+> uh
+
+in (3.3c), it holds 
+
+∥en+1  
+
+> uh
+
+∥20 − ∥ enu ∥20 + ∥en+1  
+
+> uh
+
+− enu ∥20 + 2∆ t∥dten+1  
+
+> uh
+
+∥2
+
+> −1
+
+= 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , A −1 
+
+> h
+
+dten+1 
+
+> uh
+
+
+
+−2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , A −1 
+
+> h
+
+dten+1 
+
+> uh
+
+
+
+−2∆ t(Ru, A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)= P1 + P2 + P3.(3.7) We estimate the terms on the right-hand side of (3.7) as follows: 
+
+|P1| = 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , A −1 
+
+> h
+
+dten+1 
+
+> uh
+
+20 = 2∆ t  (u(tn+1 ) − u(tn)) · ∇ u(tn+1 ) + u(tn) · ∇ (u(tn+1 ) − u(tn)) , A −1 
+
+> h
+
+dten+1 
+
+> uh
+
+
+
++( enuh · ∇ u(tn), A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+) + ( unh · ∇ enuh , A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)+ enrh 
+
+pE1(tn) (unh · ∇ unh , A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)+rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (unh · ∇ unh , A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)
+
+≤ ∆t
+
+3 ∥dten+1  
+
+> uh
+
+∥2 
+
+> −1
+
++ C∆t3∥ut∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+ ∥∇ u(tn+1 )∥20 + ∥∇ u(tn)∥20
+
+
+
++C∆t  ∥Au(tn)∥20 + ∥Ahunh ∥20 + ∥∇ unh ∥40
+
+   |enrh |2 + ∥enϕh ∥20 + ∥enuh ∥20
+
+ .
+
+|P2| = 2∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , A −1 
+
+> h
+
+dten+1 
+
+> uh
+
+
+
+= 2∆ t  (μ(tn+1 ) − μ(tn)) · ∇ ϕ(tn+1 ) + μ(tn) · ∇ (ϕ(tn+1 ) − ϕ(tn)) , A −1 
+
+> h
+
+dten+1 
+
+> uh
+
+
+
++( enμh · ∇ ϕ(tn), A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+) + ( μnh · ∇ enϕh , A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)+ enrh 
+
+pE1(tn) (μnh · ∇ ϕnh , A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)+rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (μnh · ∇ ϕnh , A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)
+
+≤ ∆t
+
+3 ∥dten+1  
+
+> uh
+
+∥2 
+
+> −1
+
++ C∆t3 
+
+∥μt∥2  
+
+> L∞(0 ,T ;H1(Ω))
+
++ ∥ϕt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+  ∥ϕ(tn+1 )∥22 + ∥μ(tn)∥21
+
+
+
++C∆t  ∥ϕ(tn)∥22∥enμh ∥20 + ( ∥μnh ∥21 + ∥μnh ∥21∥ϕnh ∥22)  ∥enϕh ∥20 + |enrh |2 .
+
+|P3| = |2∆ t(Ru, A −1 
+
+> h
+
+dten+1  
+
+> uh
+
+)| ≤ ∆t
+
+3 ∥dten+1  
+
+> uh
+
+∥2 
+
+> −1
+
++ C∆t∥Ru∥2
+
+> −1
+
+.
+
+Combining the above inequalities with (3.7), summing over n = 0 , . . . , m , and applying Theorem 3.2, we complete the proof. In the subsequent analysis of the pressure error estimate, the term |en+1  
+
+> u
+
+− enu |−1 arises. To handle this term, we establish the following lemma. 
+
+Lemma 3.7. Under Assumption 3.1 , for all m ≥ 0 and e0 
+
+> uh
+
+= 0 , it holds 
+
+> m
+
+X
+
+> n=0
+
+∥en+1  
+
+> u
+
+− enu ∥2 
+
+> −1
+
+≤ C∆t(∆ t2 + h2).
+
+Proof. Taking vh = ∆ tA −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh ) in (3.3c), we have 
+
+∥en+1  
+
+> uh
+
+− enuh ∥2 
+
+> −1
+
+− (△hen+1  
+
+> uh
+
+, ∆tA −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) = ∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )
+
+
+
+−
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )
+
+
+
++∆ t(Ru, A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) .(3.8) For the second term on the left side of (3.8), it follows 
+
+−(△hen+1  
+
+> uh
+
+, ∆tA −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) 21 = ( en+1  
+
+> uh
+
+, −∆t△hA−1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) = ∆ t(en+1  
+
+> uh
+
+, e n+1  
+
+> uh
+
+− enuh )= ∆t
+
+2 (∥en+1  
+
+> uh
+
+∥20 − ∥ enuh ∥20 + ∥en+1  
+
+> uh
+
+− enuh ∥20).
+
+Then, (3.8) yields 
+
+∥en+1  
+
+> uh
+
+− enuh ∥2 
+
+> −1
+
++ ∆t
+
+2 (∥en+1  
+
+> uh
+
+∥20 − ∥ enuh ∥20 + ∥en+1  
+
+> uh
+
+− enuh ∥20)= ∆ t(Ru, A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) +∆ t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )
+
+
+
+−
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )
+
+ .(3.9) For terms on the right hand side of (3.9), we have 
+
+|∆t(Ru, A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) | ≤ 16 ∥en+1  
+
+> uh
+
+− enuh ∥2 
+
+> −1
+
++ C∆t2∥Rnu ∥2
+
+> −1
+
+,
+
+∆t
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )
+
+
+
+= ∆ t (μ(tn+1 ) · ∇ ϕ(tn+1 ), A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) − (μ(tn) · ∇ ϕ(tn), A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) +( enμh · ∇ ϕ(tn), A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) + ( μnh · ∇ enϕh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) + enrh 
+
+pE1(tn) (μnh · ∇ ϕnh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) +rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (μnh · ∇ ϕnh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) 
+
+≤ 16 ∥en+1  
+
+> uh
+
+− enuh ∥2 
+
+> −1
+
++ C∆t4(∥μt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+∥ϕ(tn+1 )∥21 + ∥μ(tn)∥21∥ϕt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+)+C∆t2(∥ϕ(tn)∥21∥enμh ∥21 + ∥μnh ∥21∥ϕnh ∥21(|enrh |2 + ∥enϕh ∥20)) .
+
+Similarly, 
+
+∆t
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )
+
+
+
+= ∆ t (u(tn+1 ) · ∇ u(tn+1 ), A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) − (u(tn) · ∇ u(tn), A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) +( enuh · ∇ u(tn), A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) + ( unh · ∇ enuh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) + enrh 
+
+pE1(tn) (unh · ∇ unh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) +rnh
+
+ 1
+
+pE1(tn) − 1
+
+q
+
+En
+
+> 1,h
+
+ (unh · ∇ unh , A −1 
+
+> h
+
+(en+1  
+
+> uh
+
+− enuh )) 
+
+≤ 16 ∥en+1  
+
+> uh
+
+− enuh ∥2 
+
+> −1
+
++ C∆t4∥ut∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
+(∥∇ u(tn+1 )∥20 + ∥∇ u(tn)∥20)22 +C∆t2(∥∇ u(tn)∥20 + ∥∇ unh ∥20)∥enuh ∥21 + ∥unh ∥20∥∇ unh ∥20(|enrh |2 + ∥enϕh ∥20).
+
+Combining the above inequalities with (3.9), summing the resulting inequality from n = 0 to m, and applying Lemma 3.1 and Lemmas 3.4–3.6, we obtain the desired result. 
+
+Theorem 3.4. For all m ≥ 0, it holds 
+
+∥ϕ(tn) − ϕnh ∥20 + ∥u(tn) − unh ∥20 + |r(tn) − rnh |2 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+(∥μ(tn) − μnh ∥20) ≤ C(∆ t2 + h4),
+
+∆t
+
+> m
+
+X
+
+> n=0
+
+∥pnh − p(tn)∥20 ≤ C(∆ t2 + h2).
+
+Proof. By Theorem 3.2, Theorem 3.3, and the triangle inequality, we obtain 
+
+∥ϕ(tn) − ϕnh ∥20 + ∥u(tn) − unh ∥20 + |r(tn) − rnh |2 + ∆ t
+
+> m
+
+X
+
+> n=0
+
+(∥μ(tn) − μnh ∥20) ≤ C(∆ t2 + h4).
+
+By (3.3)c and the inf-sup condition (2.10), we obtain 
+
+β∥en+1  
+
+> ph
+
+∥0 ≤ (en+1  
+
+> ph
+
+, ∇ · vh)
+
+∥∇ vh∥0
+
+= (dten+1  
+
+> uh
+
+, vh) − (Ru, vh) + ( ∇en+1  
+
+> uh
+
+, ∇vh)+
+
+ r(tn+1 )
+
+pE1(tn+1 ) u(tn+1 ) · ∇ u(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+unh · ∇ unh , vh
+
+
+
+−
+
+ r(tn+1 )
+
+pE1(tn+1 ) μ(tn+1 )∇ϕ(tn+1 ) − rnh
+
+q
+
+En
+
+> 1,h
+
+μnh ∇ϕnh , vh
+
+ /∥∇ vh∥0
+
+≤ 1∆t ∥en+1  
+
+> uh
+
+− enuh ∥−1 + ∥∇ en+1  
+
+> uh
+
+∥0 + ∥Ru∥−1 + C∆t(∥μt∥2 
+
+> L∞(0 ,T ;H1(Ω))
+
++∥ϕt∥2  
+
+> L∞(0 ,T ;H1(Ω))
+
++ ∥ut∥2 
+
+> L∞(0 ,T ;L2(Ω))
+
+)( ∥∇ ϕ(tn+1 )∥20 + ∥μ(tn)∥21 + ∥Au(tn+1 )∥20)+C∥enμh ∥21 + C∆t(∥∥ μnh ∥21∥∇ ϕnh ∥20 + ∥unh ∥20∥∇ unh ∥20 + ∥ϕ(tn)∥22 + ∥∇ u(tn)∥20)( ∥enϕh ∥21
+
++∥en+1  
+
+> uh
+
+∥20 + |enrh |2).
+
+Multiplying both sides of the inequality by ∆ t, summing over n = 0 , . . . , m , and applying Lemma 3.7, Lemma 2.3, and Theorems 3.2–3.3, we complete the proof. 
+
+4. Numerical experiment. In this section, we present several numerical experiments to demon-strate the reliability and efficiency of the proposed numerical scheme for the following CHNS system: (4.1) 
+
+
+
+ϕt + u · ∇ ϕ − M ∆μ = 0 , in Ω × [0 , T ],μ + λ∆ϕ − F ′
+
+(ϕ) = 0 , in Ω × [0 , T ],
+
+ut − ν∆u + ( u · ∇ )u + ∇p − μ∇ϕ = g, in Ω × [0 , T ],
+
+∇ · u = 0 , in Ω × [0 , T ],
+
+∇ϕ · n = ∇μ · n = 0 , u = 0, on ∂Ω × (0 , T ],
+
+where the corresponding parameters will be specified in each example. The associated Ginzburg– Landau energy is defined as follows: (4.2) eEnh (ϕ, u, r ) = 
+
+Z
+
+> Ω
+
+ 12 |unh |2 + λ
+
+2 |∇ ϕnh |2
+
+
+
+dx + λ|rnh |2.
+
+We first present a numerical example to demonstrate the accuracy of the proposed scheme. Since the exact solution is not available, we use the Cauchy error to assess the convergence behavior. Specifically, the error between two successive mesh sizes h and h/ 2 is defined by ∥eζ ∥ = ∥ζh − ζh/ 2∥.23 
+
+Example 4.1. [26] We consider the CHNS system (4.1) on the domain Ω = [0 , 1] 2. The initial conditions are chosen as 
+
+(4.3) 
+
+ϕ0 = cos( πx ) cos( πy ),
+
+u0 =  −x2(x − 1) 2(y − 1)(2 y − 1) y/ 128 , y 2(y − 1) 2(x − 1)(2 x − 1) x/ 128 T ,p0 = 0 .
+
+The external force is taken as g = (0 , 0) T . The parameters are given by ε2 = 0 .1, λ = 0 .1, M =0.001 , ν = 0 .1, T = 0 .1, ∆t = 1 e − 4.
+
+Fig. 1: Errors and convergent rates. The errors and convergence rates for the spatial discretization, obtained using two successive mesh sizes h and h/ 2, are plotted in Figure 1. From the figures, we observe that 
+
+E1 : = ϕn+1  
+
+> h
+
+− ϕn+1  
+
+> h/ 2H1
+
+≈ O(h), E2 := ϕn+1  
+
+> h
+
+− ϕn+1  
+
+> h/ 2L2
+
+≈ O(h2),E3 : = μn+1  
+
+> h
+
+− μn+1   
+
+> h/ 2H1
+
+≈ O(h), E4 := μn+1  
+
+> h
+
+− μn+1   
+
+> h/ 2L2
+
+≈ O(h2),E5 : = un+1  
+
+> h
+
+− un+1   
+
+> h/ 2(H1)2
+
+≈ O(h), E6 := un+1  
+
+> h
+
+− un+1   
+
+> h/ 2(L2)2
+
+≈ O(h2),E7 : = pn+1  
+
+> h
+
+− pn+1  
+
+> h/ 2L2
+
+≈ O(h2), E8 := rn+1  
+
+> h
+
+− rn+1  
+
+> h/ 2L2
+
+≈ O(h2).
+
+Example 4.2. [14] In the second example, we consider the CHNS system (4.1) on the domain 
+
+Ω = [ −0.4, 0.4] 2. The parameters are set to ε = 0 .01 , λ = 1 , M = 0 .1, ν = 1 and the external force is given by g = (1 , 0) T . We impose homogeneous Dirichlet boundary conditions for the velocity and homogeneous Neumann boundary conditions for ϕ and w. The initial velocity and pressure are both taken to be zero, while the initial phase-field profile is given by 
+
+(4.4) ϕ0 = tanh 
+
+ x2
+
+0.01 + y2
+
+0.0225 − 1
+
+
+
+.
+
+The snapshots of the numerical solutions obtained using the proposed scheme for the phase-field function at six different time instants are presented in Figure 2 for Example 4.2. As shown in the figures, the initially elliptical interface gradually evolves into a more circular shape over time. 24 
+
+Fig. 2: Example 4.2, snapshots of numerical solutions for phase field function. 
+
+Example 4.3. [26] In this example, we consider the CHNS system (4.1) on the domain Ω = [0 , 1] 2. The parameters are chosen as ε = 0 .01 , λ = 0 .01 , M = 0 .002 , ν = 1 and the external force is given by g = (0 , 0) T . The initial velocity and pressure are both taken to be zero, while the initial phase-field profile is prescribed as a rectangular bubble: 
+
+(4.5) ϕ0(x, y ) = 
+
+( 1 if 0.25 ≤ x ≤ 0.75 & 0 .25 ≤ y ≤ 0.75 ,
+
+−1 if otherwise. 
+
+For the boundary conditions, homogeneous Neumann boundary conditions are imposed for ϕ and w,while homogeneous Dirichlet boundary conditions are applied to the velocity field. 
+
+A sequence of snapshots of the numerical solutions for the phase-field function is presented in Figure 3 for Example 4.3, based on the proposed scheme. It can be clearly observed that the interface gradually evolves toward a circular shape over time. 
+
+Example 4.4. In the fourth example, we consider the CHNS equations (4.1) on the domain 
+
+[−1, 1] × [−1, 1] with a random initial phase-field function to simulate coarsening dynamics. The initial velocity and pressure are both set to zero, while the initial profile of the phase-field function is given by 
+
+(4.6) ϕ0(x, y ) = rand( x, y ),
+
+where rand( x, y ) generates random values uniformly distributed in [−1, 1] . For the boundary con-ditions, homogeneous Neumann boundary conditions are imposed for ϕ and w, while no-slip (zero) boundary conditions are prescribed for the velocity field. The parameters are chosen as ε = 0 .02 ,
+
+λ = 0 .01 , M = 0 .002 , ν = 1 , and the external force is set to g = (0 , 0) T.
+
+A sequence of snapshots of the numerical solutions for the phase-field function is presented in Figure 4 for Example 4.4, based on the proposed scheme. It can be clearly observed that coarsening phenomena occur over time. Finally, the time-history curves of the modified discrete energy defined in (4.2) for Examples 
+
+4.2-4.4 are presented in Figure 5. It can be observed that the modified energy decreases monotonically at each time step. 25 
+
+Fig. 3: Example 4.3: snapshots of numerical solutions for phase field function. 
+
+Fig. 4: Example 4.4: snapshots of numerical solutions for phase field function. 
+
+Conclusion. In this work, we develop a linear, fully decoupled, and unconditionally energy-stable fully discrete finite element scheme for the CHNS system by combining the SAV approach with an IMEX Euler time discretization. Unlike existing SAV-based schemes, which typically require multiple auxiliary variables or additional techniques to handle different nonlinearities, the proposed method introduces only a single scalar auxiliary variable together with a novel update equation for the auxiliary variable. This design yields an efficient decoupled solver structure while preserving the unconditional energy stability of the system. We established the unconditional discrete energy dissi-pation law and stability estimates of the scheme, and further derived optimal-order error estimates for the fully discrete finite element approximation. The main difficulty caused by the non-globally 26 
+
+Fig. 5: The modified discrete energy history, First line: Example 4.2; Second line, Left: Example 4.3; Right: Example 4.4. Lipschitz nonlinear potential was overcome by proving the uniform boundedness of the numerical so-lution, which enables the error analysis without additional assumptions on the free energy. Numerical experiments confirmed the theoretical convergence rates and demonstrated the monotonic decay of the modified discrete energy. Future work will focus on extending the proposed framework to higher-order time discretizations and to more physically realistic CHNS models with variable density and variable viscosity while maintaining unconditional energy stability and efficient decoupling. 
+
+Funding. J. Yang was supported by the Fundamental Research Funds for the Universities of Henan Province under Grant No. NSFRF2502090, and Natural Science Foundation of Henan Province under Grant No. 262300422624. N. Yi was supported by the National Key R & D Program of China (2024YFA1012600) and the NSFC Project (12431014) P. Yin’s research was supported by the University of Texas at El Paso Startup Award. 
+
+REFERENCES [1] R. Adams. Sobolev Spaces . Academic Press, New York, 1975. [2] A. Ammi and M. Marion. Nonlinear Galerkin methods and mixed finite elements: two-grid algorithms for the Navier-Stokes equations. Numerische Mathematik , 68:189–213, 1994. [3] W. Cai, W. Sun, J. Wang, and Z. Yang. Optimal L2 error estimates of unconditionally stable finite element schemes for the Cahn-Hilliard-Navier-Stokes system. SIAM J. Numer. Anal. , 61(3):1218–1245, 2023. [4] Y. Cai, H. Choi, and J. Shen. Error estimates for time discretizations of Cahn-Hilliard and Allen-Cahn phase-field models for two-phase incompressible flows. Numerische Mathematik , 137:417–449, 2017. [5] Y. Cai and J. Shen. Error estimates for a fully discretized scheme to a Cahn-Hilliard phase-field model for two-phase incompressible flows. Mathematics of Computation , 87:661–681, 2018. [6] C. Chen and X. Yang. Fully-discrete finite element numerical scheme with decoupling structure and energy stability for the Cahn-Hilliard phase-field model of two-phase incompressible flow system with variable density and viscosity. ESAIM: Mathematical Modelling and Numerical Analysis , 55(5):2323–2347, 2021. [7] C. Chen and X. Yang. Highly efficient and unconditionally energy stable semi-discrete time-marching numerical scheme for the two-phase incompressible flow phase-field system with variable-density and viscosity. Science China Mathematics , 65(12):2631–2656, 2022. [8] H. Chen, J. Mao, and J. Shen. Optimal error estimates for the scalar auxiliary variable finite-element schemes for gradient flows. Numerische Mathematik , 145(6):167–196, 2020. [9] W. Chen, J. Jing, Q. Liu, C. Wang, and X. Wang. A second order numerical scheme of the Cahn-Hilliard-Navier-Stokes system with Flory-Huggins potential. Commun. Comput. Phys. , 35(3):633–661, 2024. [10] W. Chen, J. Jing, C. Wang, and X. Wang. A positivity preserving, energy stable finite difference scheme for the Flory-Huggins-Cahn-Hilliard-Navier-Stokes system. J. Sci. Comput. , 92(2):31, 2022. [11] Y. Chen, D. Li, Y. Yang, and P. Yin. Unconditional energy stable IEQ-FEMs for the Cahn-Hilliard-Navier-Stokes equations. arXiv preprint arXiv:2409.14551 , 2024. [12] Y. Chen, H. Liu, N. Yi, and P. Yin. Unconditionally energy stable IEQ-FEMs for the Cahn-Hilliard equation and Allen-Cahn equation. Numerical Algorithms , 99(3):1161–1202, 2025. [13] A. Diegel, C. Wang, X. Wang, and S. Wise. Convergence analysis and error estimates for a second order accurate finite element method for the Cahn-Hilliard-Navier-Stokes system. Numerische Mathematik , 137:495–534, 2017. [14] X. Feng. Fully Discrete Finite Element Approximations of the Navier–Stokes–Cahn-Hilliard Diffuse Interface Model for Two-Phase Fluid Flows. SIAM Journal on Numerical Analysis , 44(3):1049–1072, 2006. 27 
+
+[15] X. Feng, Y. He, and C. Liu. Analysis of finite element approximations of a phase field model for two-phase fluids. 
+
+Mathematics of Computation , 76(258):539–571, 2007. [16] H. Gao, X. Li, C. Wang, and M. Feng. Optimal convergence analysis of fully discrete SAVs-FEM for the Cahn-Hilliard-Navier-Stokes equations. arXiv preprint arXiv:2502.15234 , 2025. [17] D. Han and X. Wang. A second order in time, uniquely solvable, unconditionally stable numerical scheme for Cahn-Hilliard-Navier-Stokes equation. Journal of Computational Physics , 290:139–156, 2015. [18] Y. He. Two-level method based on finite element and Crank-Nicolson extrapolation for the time-dependent Navier-Stokes equations. SIAM Journal on Numerical Analysis , 41:1263–1285, 2003. [19] Y. He. Stability and error analysis for a spectral Galerkin method for the Navier-Stokes equations with H2 or H1
+
+initial data. Numerical Methods for Partial Differential Equations , 21:875–904, 2005. [20] Y. He. Unconditional convergence of the Euler semi-implicit scheme for the three-dimensional incompressible MHD equations. IMA Journal of Numerical Analysis , 35:767–801, 2015. [21] Y. He and W. Sun. Stability and convergence of the Crank-Nicolson/Adams-Bashforth scheme for the time-dependent Navier-Stokes equations. SIAM Journal on Numerical Analysis , 45(2):837–869, 2007. [22] T. Hou and Z. Shi. An efficient semi-implicit immersed boundary method for the Navier-Stokes equations. Journal of Computational Physics , 227:8968–8991, 2008. [23] Z. Hu, S. M. Wise, C. Wang, and J. Lowengrub. Stable and efficient finite-difference nonlinear-multigrid schemes for the phase field crystal equation. Journal of Computational Physics , 228:5323–5339, 2009. [24] D. Li, H. Liu, Y. Yang, and P. Yin. A fully decoupled and structure-preserving relaxation Crank–Nicolson finite element method for Gross–Pitaevskii–Poisson model. arXiv preprint arXiv:2603.21589 , 2026. [25] D. Li, Z. Qiao, and T. Tang. Characterizing the stabilization size for semi-implicit Fourier-spectral method to phase field equations. SIAM Journal on Numerical Analysis , 54:1653–1681, 2016. [26] X. Li and J. Shen. On a SAV-MAC scheme for the Cahn-Hilliard-Navier-Stokes phase-field model and its error analysis for the corresponding Cahn-Hilliard-Stokes case. Mathematical Methods in the Applied Sciences ,30(12):2263–2297, 2020. [27] X. Li and J. Shen. On fully decoupled MSAV schemes for the Cahn-Hilliard-Navier-Stokes model of two-phase incompressible flows. Mathematical Models and Methods in Applied Sciences , 32(3):457–495, 2022. [28] H. Liu, N. Yi, and P. Yin. A structure-preserving relaxation Crank–Nicolson finite ele-ment method for the Schr¨ odinger–Poisson equation. IMA Journal of Numerical Analysis ,https://doi.org/10.1093/imanum/draf117, 2026. [29] J. Shen. Long time stability and convergence for fully discrete nonlinear Galerkin methods. Applicable Analysis ,38:201–229, 1990. [30] J. Shen. On error estimates of projection methods for Navier-Stokes equations: First-order schemes. SIAM Journal on Numerical Analysis , 29:57–77, 1992. [31] J. Shen, C. Wang, S. Wang, and X. Wang. Second-order convex splitting schemes for gradient flows with ehrlich-schoebel type energy: application to thin film epitaxy. SIAM Journal on Numerical Analysis , 50:105–125, 2012. [32] J. Shen and L. Xu. Convergence and error analysis for the scalar auxiliary variable (SAV) schemes to gradient flows. SIAM Journal on Numerical Analysis , 56:2895–2912, 2018. [33] J. Shen, L. Xu, and J. Yang. The scalar auxiliary variable (SAV) approach for gradient flows. Journal of Computational Physics , 353:407–416, 2018. [34] J. Shen and X. Yang. Numerical approximations of Allen-Cahn and Cahn-Hilliard equations. Discrete and Continuous Dynamical Systems. Series A , 28:1669–1691, 2010. [35] J. Shen and X. Yang. Energy stable schemes for Cahn-Hilliard phase-field model of two-phase incompressible flows. Chinese Annals of Mathematics , 3:743–758, 2011. [36] J. Shen and X. Yang. Decoupled, energy stable schemes for phase-field models of two-phase incompressible flows. 
+
+SIAM Journal on Numerical Analysis , 53:279–296, 2015. [37] S. Wise, C. Wang, and J. Lowengrub. An energy-stable and convergent finite-difference scheme for the phase field crystal equation. SIAM Journal on Numerical Analysis , 47(3):2269–2288, 2009. [38] J. Yang and N. Yi. Convergence analysis of a decoupled pressure-correction SAV-FEM for the Cahn–Hilliard– Navier–Stokes model. Journal of Computational and Applied Mathematics , 449:115985, 2024. [39] J. Yang, N. Yi, and Y. Chen. Optimal error estimates of a SAV-FEM for the Cahn-Hilliard-Navier-Stokes model. 
+
+Journal of Computational and Applied Mathematics , 438:115577, 2024. [40] X. Yang. On a novel fully decoupled, second-order accurate energy stable numerical scheme for a binary fluid-surfactant phase-field model. SIAM Journal on Scientific Computing , 43(2):B479–B507, 2021. [41] X. Yang, J. Zhao, and X. He. Linear, second order and unconditionally energy stable schemes for the viscous Cahn-Hilliard equation with hyperbolic relaxation using the invariant energy quadratization method. Journal of Computational and Applied Mechanics , 343:80–97, 2018. [42] X. Yang, J. Zhao, and Q. Wang. Numerical approximations for the molecular beam epitaxial growth model based on the invariant energy quadratization method. Journal of Computational Physics , 333:104–127, 2017. [43] H. Yu and X. Yang. Decoupled energy stable schemes for phase field model with contact lines and variable densities. Journal of Computational Physics , 334:665–686, 2017. [44] T. Zhang and J. Yuan. Unconditional stability and optimal error estimates of Euler implicit/explicit-SAV scheme for the Navier-Stokes equations. Journal of Scientific Computing , 90:1–20, 2022. [45] J. Zhao, Q. Wang, and X. Yang. Numerical approximations for a phase field dendritic crystal growth model based on the invariant energy quadratization approach. International Journal for Numerical Methods in Engineering , 110(3):279–300, 2017.

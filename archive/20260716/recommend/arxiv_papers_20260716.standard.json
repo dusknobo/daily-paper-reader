@@ -1,0 +1,128 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-16T21:25:14.389288+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.09574v1",
+      "source": "arxiv",
+      "title": "On Maximal Total Entropy Production Models for Steady Evaporation of a Calorically Perfect Polyatomic Gas",
+      "abstract": "This study investigates the boundary conditions for fluid-dynamic equations at the interface of a gas and its condensed phase during steady evaporation of a polyatomic gas. Evaporation curves illustrating the dependence of the temperature and pressure ratios on the Mach number are considered for a calorically perfect gas whose molecules behave like rigid rotors. At the condensed phase, complete absorption conditions are assumed. Also an extension to cases in which a part of the molecules is diffusely reflected at the condensed phase is also considered. We revisit the half-space evaporation problem for polyatomic gases based on previous results, applied to a slightly modified entropy functional. The structure of the (modified) maximal total entropy production curves is investigated, and simple functions that accurately fit the numerical results are proposed. Functions of the proposed form, with modified coefficients, also fit the evaporation curves previously obtained by different numerical methods surprisingly well. The approximation is performed for different numbers of internal degrees of freedom or ratios of specific heats. Simple functions that depend on the ratio of specific heats are found to fit the obtained evaporation curves for different ratios of specific heats very well.",
+      "authors": [
+        "Niclas Bernhoff",
+        "Eddie Wadbro"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP",
+        "math-ph"
+      ],
+      "published": "2026-07-10T16:20:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.09574v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "steady evaporation of polyatomic gas with entropy production models",
+      "llm_evidence_cn": "多原子气体稳态蒸发的熵产生模型",
+      "llm_evidence": "多原子气体稳态蒸发的熵产生模型",
+      "canonical_evidence": "多原子气体稳态蒸发的熵产生模型",
+      "llm_tldr_en": "Investigates boundary conditions for fluid-dynamic equations at the gas-condensed phase interface during steady evaporation. Provides evaporation curves for polyatomic gases. The evaporation physics is transferable to falling film evaporation modeling in CFD.",
+      "llm_tldr_cn": "该文研究多原子气体稳态蒸发过程中气-凝相界面处的流体动力学边界条件。通过最大总熵产率原理，计算了温度比和压力比与马赫数的蒸发曲线。虽然研究对象为多原子气体，但所建立的蒸发界面模型可为垂直管降膜蒸发CFD模拟中的相变边界条件提供理论基础。",
+      "llm_tldr": "该文研究多原子气体稳态蒸发过程中气-凝相界面处的流体动力学边界条件。通过最大总熵产率原理，计算了温度比和压力比与马赫数的蒸发曲线。虽然研究对象为多原子气体，但所建立的蒸发界面模型可为垂直管降膜蒸发CFD模拟中的相变边界条件提供理论基础。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "Falling film evaporation and heat transfer in vertical tubes CFD",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.08422v1",
+      "source": "arxiv",
+      "title": "High-order complete flux schemes for convection-diffusion equations on arbitrary subdivisions",
+      "abstract": "We develop a complete flux finite volume method for convection-diffusion equations that works on arbitrary meshes in two and three dimensions and for discrete spaces of any polynomial degree. Unlike standard finite volume discretizations, where the numerical flux is directly approximated from the flux definition, we derive the exact normal flux across each control volume edge/face from the underlying PDE. This exact flux splits naturally into a homogeneous part (the classical Scharfetter-Gummel flux) and an inhomogeneous part expressed via a Green's function that incorporates the tangential flux and the source term. The resulting formulation is exactly equivalent to the continuous equation and, once the discrete space is chosen, yields high-order schemes without any correction or stabilization.   For piecewise linear spaces, the scheme achieves optimal second-order accuracy in convection-dominated regimes and can preserve positivity on moderately coarse meshes. For quadratic spaces, standard finite volume methods, based on the Lagrange elements or B-splines, fail to attain optimal $L^2$ convergence unless the control volume mesh is specially designed. The proposed complete flux scheme, however, always achieves optimal $L^2$ convergence independently of the control volume mesh. Numerical experiments in two and three dimensions confirm the robustness and optimal accuracy of the approach.",
+      "authors": [
+        "Peng Yang",
+        "Wenyu Lei",
+        "Liwei Xu"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-09T12:45:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.08422v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "High-order finite volume scheme for convection-diffusion equations, applicable to CFD for multiphase flow and heat transfer",
+      "llm_evidence_cn": "用于对流-扩散方程的高阶有限体积格式，可应用于多相流传热传质的CFD模拟",
+      "llm_evidence": "用于对流-扩散方程的高阶有限体积格式，可应用于多相流传热传质的CFD模拟",
+      "canonical_evidence": "用于对流-扩散方程的高阶有限体积格式，可应用于多相流传热传质的CFD模拟",
+      "llm_tldr_en": "Develops a high-order complete flux finite volume method for convection-diffusion equations on arbitrary meshes; provides exact numerical fluxes from the PDE, enabling accurate simulations that could benefit multiphase flow and heat transfer computations.",
+      "llm_tldr_cn": "该论文针对对流-扩散方程提出了一种高阶完全通量有限体积方法，可在任意网格上实现高阶精度。通过从底层PDE导出精确通量，该方法避免了传统有限体积法的近似误差，特别适用于需要高精度求解的多相流和传热仿真。数值实验验证了其高效性，为复杂流体与传热问题的数值模拟提供了有力工具。",
+      "llm_tldr": "该论文针对对流-扩散方程提出了一种高阶完全通量有限体积方法，可在任意网格上实现高阶精度。通过从底层PDE导出精确通量，该方法避免了传统有限体积法的近似误差，特别适用于需要高精度求解的多相流和传热仿真。数值实验验证了其高效性，为复杂流体与传热问题的数值模拟提供了有力工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.13253v1",
+      "source": "arxiv",
+      "title": "A linear, fully decoupled, and unconditionally energy-stable SAV-FEM for the Cahn--Hilliard--Navier--Stokes model",
+      "abstract": "In this paper, we develop a linear, fully decoupled, and unconditionally energy-stable fully discrete finite element scheme for the Cahn--Hilliard--Navier--Stokes (CHNS) system by employing the scalar auxiliary variable (SAV) approach. Unlike existing SAV-based formulations that typically introduce multiple auxiliary variables or additional techniques to handle different nonlinearities, we introduce only one scalar auxiliary variable together with a novel update of the auxiliary variable to reformulate all nonlinear terms arising from the Cahn--Hilliard and Navier--Stokes equations, yielding an equivalent reformulation of the original CHNS system. An implicit--explicit (IMEX) Euler scheme is applied for temporal discretization, where the linear terms are treated implicitly and the nonlinear terms explicitly, while a finite element method is adopted for spatial discretization. The resulting fully discrete scheme can be efficiently decomposed into two linear subproblems and one scalar quadratic algebraic equation, which significantly simplifies the implementation. Furthermore, we prove that the proposed scheme satisfies an unconditional discrete energy dissipation law and establish its stability with respect to several relevant norms. Optimal-order $L^2$ error estimates are also derived for the fully discrete finite element approximation. Finally, a series of numerical experiments are presented to verify the theoretical results and demonstrate the efficiency of the proposed method.",
+      "authors": [
+        "Jinting Yang",
+        "Nianyu Yi",
+        "Peimeng Yin"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-14T20:36:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.13253v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "develops a two-phase flow simulation method for the Cahn-Hilliard-Navier-Stokes system",
+      "llm_evidence_cn": "针对Cahn-Hilliard-Navier-Stokes系统开发两相流模拟方法",
+      "llm_evidence": "针对Cahn-Hilliard-Navier-Stokes系统开发两相流模拟方法",
+      "canonical_evidence": "针对Cahn-Hilliard-Navier-Stokes系统开发两相流模拟方法",
+      "llm_tldr_en": "A novel energy-stable finite element method for two-phase Cahn-Hilliard-Navier-Stokes flows is proposed, using a single scalar auxiliary variable to decouple and linearize the system, enabling efficient and stable multiphase CFD simulations applicable to falling films.",
+      "llm_tldr_cn": "本文针对Cahn-Hilliard-Navier-Stokes两相流模型，提出了一种线性、完全解耦且无条件能量稳定的SAV有限元全离散格式。通过引入仅一个标量辅助变量和创新的更新方式，将所有非线性项重新表述，避免了传统方法中多个辅助变量的复杂性。理论证明了格式的能量稳定性和最优误差估计。该方法为两相流模拟提供了高效稳定的数值工具，可潜在应用于降膜流动问题的计算流体动力学研究。",
+      "llm_tldr": "本文针对Cahn-Hilliard-Navier-Stokes两相流模型，提出了一种线性、完全解耦且无条件能量稳定的SAV有限元全离散格式。通过引入仅一个标量辅助变量和创新的更新方式，将所有非线性项重新表述，避免了传统方法中多个辅助变量的复杂性。理论证明了格式的能量稳定性和最优误差估计。该方法为两相流模拟提供了高效稳定的数值工具，可潜在应用于降膜流动问题的计算流体动力学研究。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

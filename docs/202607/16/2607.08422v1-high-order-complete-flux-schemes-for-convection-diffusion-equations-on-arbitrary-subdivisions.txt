@@ -1,0 +1,1461 @@
+Title: High-order complete flux schemes for convection-diffusion equations on arbitrary subdivisions
+
+URL Source: https://arxiv.org/pdf/2607.08422v1
+
+Published Time: Fri, 10 Jul 2026 00:51:37 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+HIGH-ORDER COMPLETE FLUX SCHEMES FOR CONVECTION-DIFFUSION EQUATIONS ON ARBITRARY SUBDIVISIONS 
+
+PENG YANG ∗, WENYU LEI ∗, AND LIWEI XU ∗
+
+Abstract. We develop a complete flux finite volume method for convection-diffusion equations that works on arbitrary meshes in two and three dimensions and for discrete spaces of any poly-nomial degree. Unlike standard finite volume discretizations, where the numerical flux is directly approximated from the flux definition, we derive the exact normal flux across each control volume edge/face from the underlying PDE. This exact flux splits naturally into a homogeneous part (the classical Scharfetter-Gummel flux) and an inhomogeneous part expressed via a Green’s function that incorporates the tangential flux and the source term. The resulting formulation is exactly equivalent to the continuous equation and, once the discrete space is chosen, yields high-order schemes without any correction or stabilization. For piecewise linear spaces, the scheme achieves optimal second-order accuracy in convection-dominated regimes and can preserve positivity on moderately coarse meshes. For quadratic spaces, standard finite volume methods, based on the Lagrange elements or B-splines, fail to attain optimal 
+
+L2 convergence unless the control volume mesh is specially designed. The proposed complete flux scheme, however, always achieves optimal L2 convergence independently of the control volume mesh. Numerical experiments in two and three dimensions confirm the robustness and optimal accuracy of the approach. 
+
+Key words. complete flux, finite volume, convection-diffusion, high-order, B-spline 
+
+MSC codes. 65N08, 65D07, 65L11 
+
+1. Introduction. Steady-state convection-diffusion equations arise in numerous physical and engineering applications, including semiconductor device simulation [24], groundwater contaminant transport [30], heat and mass transfer in fluid flows [20], and atmospheric pollutant dispersion [23]. When the convection coefficient dominates over diffusion, the problem becomes singularly perturbed and its numerical approximation is notoriously challenging: standard Galerkin methods produce spurious oscillations unless the mesh is excessively refined [3], while simple upwinding introduces excessive numerical diffusion [20]. Finite volume methods are attractive for these problems due to their local con-servation property and their natural ability to handle discontinuous coefficients and complex geometries [1, 7, 10, 15, 16]. A particularly influential class of methods for convection-dominated problems originates from the work of Scharfetter and Gum-mel [22] in semiconductor physics. The Scharfetter–Gummel (SG) scheme solves a local one-dimensional boundary value problem on the interval between two adjacent grid points, assuming constant coefficients and neglecting the source term. The re-sulting numerical flux, expressed in terms of the Bernoulli function, resolves sharp layers without spurious oscillations even on relatively coarse meshes. Building on the same exponential fitting technique, related methods have been developed in various numerical frameworks, including finite element and finite volume discretizations [21], and recently discontinuous Galerkin methods [14]. A more systematic generalization of this idea is the complete flux (CF) scheme proposed by Thiart [27] and further investigated by Ten Thije Boonkkamp and co-workers [19, 25, 26], who derived the CF formulation by retaining the source term contribution in the Scharfetter–Gummel flux. In multiple spatial dimensions, the tangential flux divergence naturally enters 
+
+> ∗
+
+School of Mathematical Sciences, University of Electronic Science and Technology of China, Chengdu, Sichuan 611731, China (pyang@uestc.edu.cn, wenyu.lei@uestc.edu.cn, xul@uestc.edu.cn). 1
+
+This manuscript is for review purposes only. arXiv:2607.08422v1 [math.NA] 9 Jul 2026 2 P. YANG, W. LEI AND L. XU 
+
+the local ODE as part of the effective source term, leading to a generalized represen-tation of the numerical flux [6, 26]. A uniform second-order convergent CF scheme on unstructured one-dimensional grids was established in [8], which also outlines an extension to unstructured triangular meshes; numerical experiments indicate that second-order accuracy on such meshes is attained only on locally orthogonal grids with one direction aligned along the advection vector. Despite these developments, the extension of the complete flux methodology to high-order finite volume schemes on arbitrary multi-dimensional meshes remains largely unexplored. On the other hand, higher-order finite volume discretizations in multiple dimensions have traditionally been pursued within several related frame-works, including the finite volume element method (FVEM) [4, 5], the control volume finite element method (CV-FEM) [9], the box method [2], the vertex-centered finite volume schemes [29], and etc. For linear and bilinear spaces, these approaches are well understood and second-order accuracy is obtained under mild mesh conditions [28]. For quadratic and higher even-degree polynomial spaces, however, a well-documented difficulty arises: the standard FVEM (or CV-FEM) does not achieve optimal L2
+
+convergence on arbitrary dual meshes [5]. Optimal accuracy can be recovered only when the control volumes are constructed using specific points: the Gauss–Legendre points [18, 29]. A similar issue has been observed in the context of isogeometric analysis with B-spline spaces [12, 13]. For B-spline spaces, employing the Greville abscissae as control volume centers is currently the only systematic way to construct a dual partition. However, numerical evidence indicates that this choice yield subop-timal convergence rates for quadratic and higher even-degree splines, and no strategy analogous to the Gauss–Legendre points for Lagrange finite elements is currently known for B-spline spaces. The underlying mechanism for this suboptimal behavior is still not fully understood. The question of achieving optimal high-order accuracy through suitably positioned control volume boundaries remains open. In this paper, we construct a family of complete flux finite volume schemes based on an exact representation of the normal flux derived from the underlying PDE. The starting point is the observation that, for a given control volume edge, the convection-diffusion equation reduces to a one-dimensional ODE along the normal direction, parametrized by the tangential coordinate. Solving this ODE with a Green’s function yields an exact expression for the normal flux that decomposes into a homogeneous part (the classical SG flux) and an inhomogeneous part involving integrals of the source term and the tangential flux divergence against the Green’s function. By in-serting this flux representation into the control volume balance, we obtain an exact relation in which no approximation has been introduced. Discrete schemes are then generated by restricting this exact relation to a chosen finite-dimensional approxima-tion space and evaluating the resulting integrals either analytically or by quadrature. Within this framework, we develop the following concrete schemes: 
+
+• A second-order scheme on general triangular and quadrilateral meshes using piecewise linear or bilinear approximation spaces. For constant or piecewise-constant convection fields, all quantities reduce to compact expressions in-volving Bernoulli-type functions. The scheme inherits the upwind character of the SG flux in convection-dominated regimes. 
+
+• A third-order scheme on rectangular meshes using the biquadratic C0 La-grange space, with a family of dual partitions parametrized by a scalar p∗.
+
+• A third-order scheme on rectangular meshes using the biquadratic C1 B-spline space, with control volumes centered at the Greville abscissae. 
+
+• An extension to three-dimensional problems on tetrahedral or hexahedral 
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 3meshes. The proposed formulation offers two notable advantages. First, the exact derivation reveals that the signed normal distances from each edge to the adjacent control vol-ume centers can be chosen freely without affecting the exactness of the flux relation. This geometric flexibility, which is unavailable in standard finite volume discretiza-tions, can be exploited to enforce the discrete maximum principle on relatively coarse meshes. Second, for quadratic spaces, the complete flux scheme achieves optimal L2
+
+convergence independently of the placement of control volume boundaries, in con-trast to the standard FVEM (or CV-FEM) which requires a carefully designed dual mesh. On rectangular meshes with biquadratic C0 Lagrange elements, the scheme attains optimal accuracy for any admissible dual-mesh parameter p∗; for biquadratic 
+
+C1 B-spline spaces, optimal convergence is obtained at the Greville abscissae without additional tuning. The remainder of the paper is organized as follows. Section 2 introduces the model problem, the control volume construction, and the local coordinate system. Section 3 derives the exact flux relations, including the Green’s function representation and the control volume balance. Section 4 presents the construction of concrete complete flux schemes: a second-order scheme on general triangular and quadrilateral meshes, third-order schemes on rectangular meshes using both C0 Lagrange and C1 B-spline spaces, and the extension to three dimensions. Numerical experiments are reported in Section 5, and conclusions are given in Section 6. 
+
+2. Preliminaries. 2.1. Model problem. We consider the steady-state convection-diffusion equa-tion on a bounded domain Ω ⊂ Rd (d = 2 , 3): (2.1) −∇ · (α∇u − β(x)u) = f in Ω ,
+
+where α > 0 is the constant diffusion coefficient, β(x) = ( β1(x), ..., β d(x)) T is the convection velocity, and f (x) is a given source term. Equation (2.1) is supplemented by appropriate boundary conditions on ∂Ω, which may be of Dirichlet, Neumann, or Robin type. In this work, we are particularly interested in the convection-dominated regime, i.e. the case where the diffusion constant α may be very small compared to the velocity |β|.Thereafter, we shall focus on the two-dimensional case ( d = 2) in our description and analysis, with the understanding that the extension to the three-dimensional case (d = 3) is conceptually straightforward, albeit notationally more involved. At the end of Section 4, based on the main results obtained for d = 2, we will directly present the corresponding results for d = 3; it will be seen that the two cases are very similar, differing only in dimensionality. 
+
+2.2. Control volumes in two dimension. Assume that the domain Ω ⊂ R2
+
+is a polygonal domain. Let Ω be partitioned into a set of non-overlapping polygonal elements, e.g., triangles, quadrilaterals, or general polygons. Denote the partition by 
+
+Th, where h is the maximum diameter of all elements. For the control volume grid, we consider another polygonal partition of the domain Ω, which is constructed based on the primary mesh Th and is therefore referred to as the dual partition of Th. Suppose that each dual element (control volume) VP of the dual partition is associated with a point P (often taken as the centroid of VP ); the dual partition is then denoted by 
+
+T ∗ 
+
+> h
+
+= {VP }P ∈V ,
+
+This manuscript is for review purposes only. 4 P. YANG, W. LEI AND L. XU  
+
+> (a) Rectangular mesh (b) Triangular mesh
+
+Fig. 1: Dual partitions (control volume grids) for triangular and rectangular primary meshes of a square domain Ω. where V is the set of such points. In a vertex-centered finite volume method, the control volume centers coincide with the computational nodes of the primary mesh. Figure 1 illustrates the dual partitions (control volume grids) for triangular and rec-tangular primary meshes of a square domain Ω: the solid lines indicate the primary mesh edges which describe Th, while the dashed lines represent control volume bound-aries which describe T ∗ 
+
+> h
+
+. The dual mesh shown for the triangular case is constructed using the barycenters and edge midpoints of the triangles. Additional dual grid constructions will be introduced in connection with the higher-order solution spaces discussed later; these are detailed in Subsection 4.2. In those cases, the control volumes will occupy more complex spatial positions. For in-stance, P may not be a vertex of the primary mesh, or more precisely, the control volume may no longer be centered around a primary mesh vertex. In all cases, the number of control volumes matches the dimension of the discrete solution space, i.e. the number of unknowns. 
+
+2.3. Local coordinate system in two dimension. Consider a control volume edge e, which is a finite line segment with endpoints Pe, 1 and Pe, 2, e.g., see Figure 1, the dashed line segment connecting the center of a primary element to a edge midpoint. This edge has an orientation (from Pe, 1 to Pe, 2); we denote by te its unit tangential vector and by ne its unit normal vector, chosen such that ( ne, te) forms a right-handed orthonormal system. Let Me be the midpoint of e. On the two sides of e lie two points PK and PL, which are the centers of the adjacent control volumes, e.g., see Figure 1(b), in our barycentric dual mesh, these are the vertices of the original triangle. We introduce a local Cartesian coordinate system ( ξ, η ) as follows (see Figure 2): 
+
+• The origin is placed at the midpoint Me.
+
+• The η-axis is aligned with the tangential direction te, i.e. η increases in the direction of te.
+
+• The ξ-axis is aligned with the normal direction ne, i.e. ξ increases in the direction of ne.In this system, the edge e lies on the line ξ = 0, with η ranging from the η-coordinates of its endpoints. The points PK and PL have local coordinates ( ξK , η K ) and ( ξL, η L), respectively. By construction, PK and PL lie on opposite sides of e, so ξK and ξL
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 5
+
+Fig. 2: Local coordinate system on a control volume edge. have opposite signs. Without loss of generality, we assume that PK is on the negative side ( ξK < 0) and PL on the positive side ( ξL > 0). Note that the line segment PK PL
+
+is not required to be perpendicular to e.
+
+3. Exact flux relations in two dimension. In this section we derive exact expressions for the flux across a control volume edge and for its contribution to the control volume balance. We adopt the local coordinate system ( ξ, η ) and the asso-ciated notation introduced in Subsection 2.3. The derivation proceeds in two steps: first, we analyse the local one-dimensional problem along the normal direction on a single edge, obtaining an exact representation of the normal flux in terms of the traces of the solution and of the source term. Second, we insert this representation into the integral balance over a control volume, which yields an exact relation that involves some integrals of the traces of the solution and the source term. The exact flux relations are the foundation for our numerical schemes. 
+
+3.1. Local equation near the edge e. Define the flux (3.1) j = α∇u − βu. 
+
+Its normal and tangential components with respect to e (see Figure 2) are 
+
+jn := j · ne = α ∂u 
+
+∂ξ − βnu, jt := j · te = α ∂u 
+
+∂η − βtu, 
+
+where βn = β · ne and βt = β · te. Equation (2.1) can be rewritten in the local coordinates as (3.2) −∇ · j = − ∂j n
+
+∂ξ − ∂j t
+
+∂η = f. 
+
+Substituting the expression for jn yields (3.3) −α ∂2u
+
+∂ξ 2 + βn,η (ξ) ∂u 
+
+∂ξ = f + ∂j t
+
+∂η =: Sη(ξ).
+
+This manuscript is for review purposes only. 6 P. YANG, W. LEI AND L. XU 
+
+Here, βn,η (ξ) simply denotes βn(ξ, η ). For a fixed η, (3.3) is an ordinary differential equation in ξ on the interval ( ξK , ξ L) with boundary conditions 
+
+u(ξK , η ) = uK,η , u(ξL, η ) = uL,η ,(3.4) where uK,η and uL,η denote the traces of u along the lines ξ = ξK and ξ = ξL,respectively. The solution of (3.3) can be split into a homogeneous part uh and a inhomogeneous part ui, i.e. 
+
+u = uh + ui.(3.5) Denote 
+
+w(ξ) = e   
+
+> ∫ξξKβn,η (t)
+> αdt
+
+,(3.6) then the homogeneous equation 
+
+−α ∂2u
+
+∂ξ 2 + βn,η (ξ) ∂u 
+
+∂ξ = −αw (ξ) ∂
+
+∂ξ 
+
+(
+
+w−1(ξ) ∂u 
+
+∂ξ 
+
+)
+
+= 0 ,
+
+has the general solution 
+
+uh = C1 + C2
+
+∫ ξξK
+
+w(t)d t, (3.7) which together with the boundary condition (3.4) gives 
+
+uh = uK,η + ( uL,η − uK,η )
+
+∫ ξξK w(t)d t
+
+∫ ξL 
+
+> ξK
+
+w(t)d t .(3.8) The inhomogeneous solution of (3.3) is (3.9) ui =
+
+∫ ξL
+
+> ξK
+
+G(ξ, s )Sη (s)ds, 
+
+where G(ξ, s ) is the Green’s function satisfying 
+
+−α ∂2G(ξ, s )
+
+∂ξ 2 + βn,η (ξ) ∂G (ξ, s )
+
+∂ξ = δ(ξ − s),
+
+and 
+
+G(ξK , s ) = 0 , G(ξL, s ) = 0 .
+
+It can be constructed from two independent solutions (3.7) of the homogeneous equa-tion that satisfy the left and right boundary conditions respectively: (3.10) y1(ξ) = 
+
+∫ ξξK
+
+w(t)d t, y2(ξ) = 
+
+∫ ξL
+
+> ξ
+
+w(t)d t. 
+
+Their Wronskian is 
+
+W (ξ) = y1(ξ)y′
+
+> 2
+
+(ξ) − y2(ξ)y′
+
+> 1
+
+(ξ) = −w(ξ)
+
+∫ ξL
+
+> ξK
+
+w(t)d t (6= 0) .(3.11) 
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 7The standard formula for Green’s function is 
+
+G(ξ, s ) = 
+
+
+
+1
+
+−αW (s) y1(ξ)y2(s), ξK ≤ ξ ≤ s, 
+
+1
+
+−αW (s) y1(s)y2(ξ), s ≤ ξ ≤ ξL.
+
+Substituting (3.10) and (3.11) yields 
+
+G(ξ, s ) = 
+
+∫ ξξK w(t)d t ∫ ξL 
+
+> s
+
+w(t)d t
+
+αw (s) ∫ ξL 
+
+> ξK
+
+w(t)d t , ξK ≤ ξ ≤ s, 
+
+∫ sξK w(t)d t ∫ ξL 
+
+> ξ
+
+w(t)d t
+
+αw (s) ∫ ξL 
+
+> ξK
+
+w(t)d t , s ≤ ξ ≤ ξL.
+
+(3.12) 
+
+3.2. Control volume integration. By (3.5), the exact flux integrated over the control volume edge e is defined by 
+
+Je := 
+
+∫ ηe, 2
+
+> ηe, 1
+
+jn
+
+∣∣ξ=0 dη =
+
+∫ ηe, 2
+
+> ηe, 1
+
+(α ∂u h
+
+∂ξ − βn,η uh)∣∣ξ=0 dη +
+
+∫ ηe, 2
+
+> ηe, 1
+
+(α ∂u i
+
+∂ξ − βn,η ui)∣∣ξ=0 dη
+
+:= Jhe + Jie,
+
+where ηe, 1 and ηe, 2 are the η-coordinates of the two endpoints Pe, 1 and Pe, 2 of e,respectively. By (3.8), we have 
+
+Jhe =
+
+∫ ηe, 2
+
+> ηe, 1
+
+(uL,η − uK,η )(αw (0) − βn,η (0) ∫ 0 
+
+> ξK
+
+w(t)d t)
+
+∫ ξL 
+
+> ξK
+
+w(t)d t − βn,η (0) uK,η dη. (3.13) Use the Green’s function G(ξ, s ) in (3.12) and introduce the function 
+
+Q(s) := α ∂G (0 , s )
+
+∂ξ − βn,η (0) G(0 , s )=
+
+(αw (0) − βn,η (0) ∫ 0 
+
+> ξK
+
+w(t)d t) ∫ ξL 
+
+> s
+
+w(t)d t
+
+αw (s) ∫ ξL 
+
+> ξK
+
+w(t)d t , s ≥ 0,
+
+( − αw (0) − βn,η (0) ∫ ξL 
+
+> 0
+
+w(t)d t) ∫ sξK w(t)d t
+
+αw (s) ∫ ξL 
+
+> ξK
+
+w(t)d t , s ≤ 0.
+
+(3.14) Note here that Q(s) is related to η, because βn,η (0) is related to η. By (3.9) and the definition (3.3) of Sη, we get 
+
+Jie =
+
+∫ ηe, 2
+
+> ηe, 1
+
+∫ ξL
+
+> ξK
+
+Q(s)f dsdη +
+
+∫ ξL
+
+> ξK
+
+∫ ηe, 2
+
+> ηe, 1
+
+Q(s) ∂j t
+
+∂η dηds. 
+
+Integrating (3.2) over a control volume V ∈ T ∗ 
+
+> h
+
+associated with a vertex PV and applying the divergence theorem gives 
+
+∫
+
+> V
+
+−∇ · jdx = ∑
+
+> e⊂∂V
+
+−
+
+∫
+
+> e
+
+j · neds =
+
+∫
+
+> V
+
+f dx.(3.15) 
+
+This manuscript is for review purposes only. 8 P. YANG, W. LEI AND L. XU 
+
+That is, 
+
+∑
+
+> e⊂∂V
+
+−(Jhe + Jie) = 
+
+∫
+
+> V
+
+f dx,
+
+which together with (3.13) and (3.2) gives a formulation that incurs no error from the original equation: 
+
+KV, 1(u) + KV, 2(u) = FV, 1(f ) + FV, 2(f ) ∀V ∈ T ∗ 
+
+> h
+
+,(3.16) with 
+
+KV, 1(u) = − ∑
+
+> e⊂∂V
+
+∫ ηe, 2
+
+> ηe, 1
+
+(uLe,η − uKe ,η )(αw (0) − βn,η (0) ∫ 0
+
+> ξKe
+
+w(t)d t)
+
+∫ ξLe  
+
+> ξKe
+
+w(t)d t − βn,η (0) uKe ,η dη, KV, 2(u) = − ∑
+
+> e⊂∂V
+
+∫ ξLe 
+
+> ξKe
+
+∫ ηe, 2
+
+> ηe, 1
+
+Q(s) ∂j t
+
+∂η dηds, FV, 1(f ) = 
+
+∫
+
+> V
+
+f dx,FV, 2(f ) = ∑
+
+> e⊂∂V
+
+∫ ηe, 2
+
+> ηe, 1
+
+∫ ξLe 
+
+> ξKe
+
+Q(s)f (s, η ) d sdη, 
+
+where w(ξ) and Q(s) are defined by (3.6) and (3.14), respectively. Here, endpoints 
+
+Ke and Le denote the two adjacent control volume centers, following the notation introduced earlier for a single edge; the subscript e is used to distinguish the centers associated with different edges of the control volume V . Relation (3.16) is exact for a sufficiently smooth solution u and serves as the starting point for constructing our numerical schemes. 
+
+Remark 3.1. The derivation of the exact relation (3.16) does not require PKe and 
+
+PLe to be the centroids of the adjacent control volumes; equivalently, ξKe and ξLe
+
+need not represent the actual distances from the control volume centers to the edge e.In fact, for each edge e, the parameters ξKe and ξLe can be chosen independently with substantial freedom while (3.16) remains exact. Different choices of {ξKe , ξ Le } lead to distinct discrete schemes that share the same asymptotic convergence order but may exhibit notably different numerical behavior. As will be demonstrated in the numerical experiments (Subsection 5.2), this flexibility can be exploited to enforce desirable physical properties, such as positivity preservation, on relatively coarse meshes. 
+
+4. Construction of complete flux schemes. This section develops several complete flux schemes from the exact balance relation (3.16). Subsection 4.1 presents a second-order scheme for general two-dimensional meshes, where piecewise constant velocity approximations yield compact expressions involving Bernoulli-type functions. Subsection 4.2 extends the construction to third-order accuracy on rectangular meshes using richer approximation spaces. Finally, Subsection 4.3 outlines the extension to three dimension, highlighting the treatment of tangential fluxes on polygonal faces. 
+
+4.1. Second-order complete flux schemes in two dimension. In this sub-section, assuming that βn,η (ξ) := β(ξ, η ) · n is piecewise constant with respect to e.We denote this piecewise constant by βn. Then the first term in the relation (3.16) can be simplified to 
+
+KV, 1(u) = ∑
+
+> e⊂∂V
+
+βn
+
+uKe,η e βn  
+
+> αξLe
+
+− uLe,η e βn 
+
+> αξKe
+
+e βn  
+
+> αξLe
+
+− e βn 
+
+> αξKe
+
+,(4.1) 
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 9where 
+
+uKe,η =
+
+∫ ηe, 2
+
+> ηe, 1
+
+u(ξKe , η )d η, uLe,η =
+
+∫ ηe, 2
+
+> ηe, 1
+
+u(ξLe , η )d η. 
+
+As βn,η (ξ) is piecewise constant (and therefore does not involve η), Q(s) is indepen-dent of η. The second term in the relation (3.16) then reduces to 
+
+KV, 2(u) = − ∑
+
+> e⊂∂V
+
+∫ ξLe 
+
+> ξKe
+
+Q(s)( jt(s, η e, 2) − jt(s, η e, 1))d s, (4.2) where Q(s) given by (3.14) is simplified to 
+
+Q(s) = 
+
+
+
+e βn   
+
+> α(ξLe −s)
+
+− 1
+
+e βn    
+
+> α(ξLe −ξKe )
+
+− 1 , s ≥ 0,
+
+− 1 − e− βn  
+
+> α(s−ξKe )
+
+1 − e− βn    
+
+> α(ξLe −ξKe )
+
+, s ≤ 0.
+
+(4.3) Assume Th is a triangular or rectangular mesh. The complete flux scheme on Th
+
+is: find piecewise linear or bi-linear solution uh satisfying 
+
+KV, 1(uh) + KV, 2(uh) = FV, 1(f ) + FV, 2(f ) ∀V ∈ T ∗ 
+
+> h
+
+.(4.4) Here, using the fact that uh is piecewise linear or bi-linear, (4.2) gives (4.5) KV, 2(uh) = ∑
+
+> e⊂∂V
+
+∫ ξLe 
+
+> ξKe
+
+Q(s)βt(uh(s, η e, 2) − uh(s, η e, 1))d s, 
+
+with piecewise constant βt := β · t. For a rectangular mesh, in the computations associated with each control volume edge e, the quantities uKe,η , uLe,η , uh(s, η e, 1)and uh(s, η e, 2) can always be expressed using the same rectangular element (i.e. the element containing e), which is convenient. For a triangular primary mesh, such computations become more involved because the points ( ξKe , 0) and ( ξLe , 0) never lie in the same triangle; more severely, the points ( s, η e, 1) and ( s, η e, 2) with s ∈ (ξKe , ξ Le )vary across different triangles, i.e. some of them lie in the triangle containing e, while others do not. Nevertheless, to facilitate computations on triangular meshes, one may approximate these quantities using uh on the element containing e (the definition of 
+
+uh on one element naturally extends its domain to neighboring elements), albeit at the cost of introducing errors in the values of uh across different elements. This error becomes particularly significant in problems exhibiting boundary layer effects, where the gradient of u is large; when the mesh is not sufficiently refined, substituting uh
+
+from different elements may lead to substantial inaccuracies (the error being strongly influenced by the magnitude of the gradient). Such errors can be mitigated by adaptive mesh refinement. Since the scheme is valid for arbitrary triangular meshes, adaptivity can indeed be implemented; in contrast, rectangular meshes are less flexible in this respect. At the end of this subsection, we employ certain special functions to simplify expressions (4.1) and (4.5). For (4.1), dividing the numerator and denominator of the fractional coefficient for uLe,η by e βn  
+
+> αξLe
+
+and for uKe ,η by e βn  
+
+> αξKe
+
+, after rearrangement we obtain 
+
+KV, 1(uh) = ∑
+
+> e⊂∂V
+
+− α
+
+ξLe − ξKe
+
+(B( βn
+
+α (ξLe − ξKe )) uLe,η − B(− βn
+
+α (ξLe − ξKe )) uKe,η ),
+
+This manuscript is for review purposes only. 10 P. YANG, W. LEI AND L. XU 
+
+where B(z) is the Bernoulli function 
+
+B(z) = z
+
+ez − 1 (z 6 = 0) , B(0) = 1 .
+
+For the evaluation of the tangential flux contribution KV, 2(uh) in (4.5), the co-efficients involve integrals of Q(s) (defined in (4.3)) multiplied by powers of s. The highest power of s that appears is determined by the polynomial degree of the discrete solution space used for uh. It is therefore natural to introduce the general moments (4.6) IQ,m (e) := 
+
+∫ ξLe 
+
+> ξKe
+
+Q(s) sm ds, m = 0 , 1, 2, . . . 
+
+Splitting the integral at s = 0 and inserting the two branches of Q(s) leads, after a direct calculation, to the compact representation 
+
+IQ,m (e) = (ξLe − ξKe )m+1 
+
+ez − 1
+
+(
+
+emLe z
+
+zm+1 
+
+∫ mLe z
+
+> 0
+
+tme−t dt − mm+1 
+
+> Le
+
+m + 1 
+
+)
+
++ (−1) m+1 (ξLe − ξKe )m+1 
+
+e−z − 1
+
+(
+
+e−mKe z
+
+(−z)m+1 
+
+∫ −mKe z
+
+> 0
+
+tme−t dt − mm+1 
+
+> Ke
+
+m + 1 
+
+)
+
+,
+
+where z = ( ξLe − ξKe )βn/α , and 
+
+mLe = ξLe
+
+ξLe − ξKe
+
+, mKe = −ξKe
+
+ξLe − ξKe
+
+= 1 − mLe .
+
+The remaining integrals are of the elementary type ∫ x 
+
+> 0
+
+tme−tdt; for non-negative in-tegers m, they can be written in closed form as 
+
+∫ x
+
+> 0
+
+tme−t dt = m!
+
+(
+
+1 − e−xm∑
+
+> k=0
+
+xk
+
+k!
+
+)
+
+.
+
+Substituting this formula into the expression for IQ,m (e) yields explicit expressions in terms of elementary functions. For the lowest two moments we recover precisely the quantities needed in the second-order scheme: 
+
+IQ, 0(e) = ( ξLe − ξKe )
+
+[
+
+B1(z, m Le ) − B1(−z, m Ke )
+
+]
+
+,IQ, 1(e) = ( ξLe − ξKe )2[
+
+B2(z, m Le ) + B2(−z, m Ke )
+
+]
+
+,
+
+with the auxiliary functions 
+
+B1(z, m ) = emz − 1 − mz 
+
+z(ez − 1) (z 6 = 0) , B1(0 , m ) = m2
+
+2 ,B2(z, m ) = emz − 1 − mz − 1 
+
+> 2
+
+(mz )2
+
+z2(ez − 1) (z 6 = 0) , B2(0 , m ) = m3
+
+6 .
+
+Since uh(s, η e,i ), i = 1 , 2, is linear, we have 
+
+uh(s, η e,i ) = s − ξKe
+
+ξLe − ξKe
+
+uh(ξLe , η e,i ) + ξLe − s
+
+ξLe − ξKe
+
+uh(ξKe , η e,i ),
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 11 then (4.5) is 
+
+KV, 2(uh) = ∑
+
+> e⊂∂V
+
+IQ, 1(e) − ξKe IQ, 0(e)
+
+ξLe − ξKe
+
+βt
+
+(
+
+uh(ξLe , η e, 2) − uh(ξLe , η e, 1)
+
+)
+
++ ∑
+
+> e⊂∂V
+
+ξLe IQ, 0(e) − IQ, 1(e)
+
+ξLe − ξKe
+
+βt
+
+(
+
+uh(ξKe , η e, 2) − uh(ξKe , η e, 1)
+
+)
+
+.
+
+In the evaluation of the flux contributions KV, 1(uh) and KV, 2(uh), the coefficients involve the special functions B(z), B1(z, m ) and B2(z, m ). For an efficient and robust implementation, it is essential to compute these functions accurately for arbitrary real arguments, without suffering from overflow or indeterminate forms when the quantity 
+
+|z|, which is related to the local P´ eclet number, becomes large or approaches zero. The following lemma collects their basic analytic properties, from which a simple piecewise evaluation strategy follows. 
+
+Lemma 4.1 (Stable evaluation of B, B1 and B2). For m ∈ [0 , 1] and z ∈ R,define 
+
+B(z) = z
+
+ez − 1 , z 6 = 0 , B(0) = 1 ,B1(z, m ) = emz − 1 − mz 
+
+z(ez − 1) , z 6 = 0 , B1(0 , m ) = m2
+
+2 ,B2(z, m ) = emz − 1 − mz − 1 
+
+> 2
+
+(mz )2
+
+z2(ez − 1) , z 6 = 0 , B2(0 , m ) = m3
+
+6 .
+
+For fixed m > 0, all three are strictly decreasing in z. Their asymptotic behavior is 
+
+lim  
+
+> z→+∞
+
+B(z) = 0 , lim  
+
+> z→−∞
+
+B(z) = −z, 
+
+lim  
+
+> z→+∞
+
+B1(z, m ) = 0 , lim  
+
+> z→−∞
+
+B1(z, m ) = m, 
+
+lim  
+
+> z→+∞
+
+B2(z, m ) = 0 , lim  
+
+> z→−∞
+
+B2(z, m ) = m2
+
+2 .
+
+Consequently, the functions remain bounded for z ≥ 0 and grow at most linearly for 
+
+z < 0. Evaluating them by switching between Taylor series (for |z| ≪ 1), the exact definition (moderate |z|), and the asymptotic forms (large |z|) guarantees full accuracy and avoids overflow. Proof. Monotonicity follows from B′(z) = ez (1 −z)−1  
+
+> (ez−1) 2
+
+≤ 0, with strict inequality for 
+
+z 6 = 0; the same sign pattern holds for B1 and B2 after similar derivative calculations. For z → +∞, ez dominates and all three vanish exponentially. For z → −∞ , write 
+
+z = −t (t → +∞): B(−t) ∼ t = −z, B1(−t, m ) ∼ −1+ mt  
+
+> t
+
+→ m, B2(−t, m ) ∼   
+
+> −1+ mt −1
+> 2m2t2
+> −t2
+
+→ m2 
+
+> 2
+
+. The stability claim is immediate from these bounds and the piecewise evaluation strategy. 
+
+4.2. Higher-order complete flux schemes on rectangular meshes. In this subsection, we present two third-order complete flux schemes, where the solution space is taken as the bi-quadratic C0 finite element space which corresponds to a vertex-centered finite volume scheme with dual meshes formed piecewise around com-puting nodes, and the bi-quadratic C1 B-spline polynomial space for which the dual 
+
+This manuscript is for review purposes only. 12 P. YANG, W. LEI AND L. XU        
+
+> (a) p∗=1
+> 4(b) p∗=1
+> 3
+
+Fig. 3: Construction of the element-level dual mesh (control volumes) for a bi-quadratic element, where p∗ denotes the ratio of the distance from a control volume boundary (dashed line) to the nearest element edge (solid line) to the total span of the element in that direction; thus 0 < p ∗ < 1/2. meshes are no longer formed piecewise around vertices, respectively. Even higher-order schemes can be constructed following the same idea as the third-order schemes; they are omitted here for brevity. For the bi-quadratic C0 finite element space, each rectangular element possesses nine computational nodes: the four vertices, the four edge midpoints, and the ele-ment centroid. Correspondingly, nine control volumes must be associated with each element. The construction of these element-level control volumes is not unique; sev-eral variants exist in the literature [5]. A convenient parametrization introduces a scalar p∗ with 0 < p ∗ < 1/2 that specifies the ratio of the distance from a control volume boundary to the nearest element edge to the total span of the element in that direction. Two typical choices are p∗ = 1 /4 and p∗ = 1 /3, which are illustrated in Figure 3. Figure 4(a) displays a rectangular primary mesh on a square domain Ω together with the corresponding dual mesh (control volume partition) for p∗ = 1 /4.      
+
+> (a) Bi-quadratic C0finite element space (b) Bi-quadratic C1B-spline space
+
+Fig. 4: Primary rectangular meshes and corresponding dual meshes for different func-tion spaces. The red “ ∗” denotes the Greville abscissae for the bi-quadratic C1 B-spline space. For the bi-quadratic C1 B-spline space, the primary mesh originates from a para-metric construction. Let a strictly increasing sequence a = x1 < x 2 < · · · < x m = b
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 13 be given. By repeating the first and last knots to multiplicity three, we obtain the augmented knot vector Ξ = {x1, x 1, x 1, x 2, x 3, . . . , x m−1, x m, x m, x m} := {t1, t 2, . . . , t m+4 },
+
+which generates the one-dimensional quadratic C1 B-spline basis {Bi(x)}m+1  
+
+> i=1
+
+via the standard Cox–de Boor recurrence [11]. The support of each Bi is the interval [ti, t i+3 ]. An analogous construction in the second coordinate direction with knots 
+
+c = y1 = y1 = y1 < y 2 < · · · < y n−1 < y n = yn = yn = d or c = s1 = s2 = s3 < s 4 <
+
+· · · < s n+1 < s n+2 = sn+3 = sn+4 = d yields the basis {Bj (y)}n+1  
+
+> j=1
+
+. The support of each Bj is the interval [ sj , s j+3 ]. The tensor-product space on [ a, b ] × [c, d ] is spanned by {Bi(x)Bj (y)}. The primary mesh (solid lines in Figure 4(b)) consists of the knot lines x = xk and y = yl; the solution is a polynomial within each rectangle and is 
+
+C1 across the knot lines. To construct the dual mesh (control volumes) [12, 13], we associate with each tensor-product basis function Bi(x)Bj (y) a rectangular control volume whose center is located at the Greville abscissae (t∗ 
+
+> i
+
+, s ∗ 
+
+> j
+
+), defined by 
+
+t∗ 
+
+> i
+
+= ti+1 + ti+2 
+
+2 for 1 ≤ i ≤ m + 1 , s∗ 
+
+> j
+
+= sj+1 + sj+2 
+
+2 for 1 ≤ j ≤ n + 1 .
+
+The Greville abscissa is the average of the two interior knots, and these points serve as the natural collocation nodes for the control volume scheme. The boundaries of the control volumes (dashed lines in Figure 4(b)) are placed midway between adjacent Greville abscissae in each direction. Because some of these boundaries coincide with the edges of the primary mesh, the dashed lines are colored blue in the figure to distinguish them clearly from the primary mesh lines. This dual partition guarantees that the number of control volumes equals the dimension of the approximation space, and is particularly well suited for higher-order complete flux discretizations. Both the bi-quadratic C0 finite element space with control volumes parametrized by p∗ and the bi-quadratic C1 B-spline space with control volumes centered at the Greville points lead to the same structure of the complete-flux discretization: find uh
+
+in the chosen discrete space such that (4.7) KV, 1(uh) + KV, 2(uh) = FV, 1(f ) + FV, 2(f ) ∀V ∈ T ∗ 
+
+> h
+
+,
+
+where the functionals KV, 1, K V, 2, F V, 1, F V, 2 are defined in (3.16). When the convec-tion field β is constant, these expressions simplify considerably and can be evaluated in closed form. The normal flux contribution retains the familiar Bernoulli-type for-mula (4.1). The tangential flux contribution becomes (4.2). For i = 1 , 2, the function 
+
+uh(s, η e,i ) is quadratic. The partial derivatives ∂u h 
+
+> ∂x
+
+(s, η e,i ) and ∂u h 
+
+> ∂y
+
+(s, η e,i ), when re-stricted along the normal direction s, are in general either linear or quadratic, de-pending on the orientation of the edge e relative to the coordinate axes. To obtain a unified treatment that does not introduce any approximation error, we interpolate all these quantities by quadratic polynomials. Denote ξMe = ( ξKe +ξLe )/2. Using the three nodal points ξKe , ξ Me , ξ Le , we obtain 
+
+uh(s, η e,i ) = φ1(s)uh(ξKe , η e,i ) + φ2(s)uh(ξMe , η e,i ) + φ3(s)uh(ξLe , η e,i ),∂u h
+
+∂x (s, η e,i ) = φ1(s) ∂u h
+
+∂x (ξKe , η e,i ) + φ2(s) ∂u h
+
+∂x (ξMe , η e,i ) + φ3(s) ∂u h
+
+∂x (ξLe , η e,i ),jt(s, η e,i ) = φ1(s)jt(ξKe , η e,i ) + φ2(s)jt(ξMe , η e,i ) + φ3(s)jt(ξLe , η e,i ),
+
+This manuscript is for review purposes only. 14 P. YANG, W. LEI AND L. XU 
+
+where φ1, φ 2, φ 3 are the quadratic Lagrange basis functions 
+
+φ1(s) = λKe (λKe − λLe ), φ2(s) = 4 λKe λLe , φ3(s) = λLe (λLe − λKe ),
+
+and 
+
+λKe (s) = ξLe − s
+
+ξLe − ξKe
+
+, λLe (s) = s − ξKe
+
+ξLe − ξKe
+
+.
+
+Using 
+
+jt(s, η e,i ) = ((α∇uh − βuh) · t)(s, η e,i ),
+
+the integral in KV, 2(uh) can be evaluated analytically, expressing it in terms of the moments IQ, 0(e), IQ, 1(e) and IQ, 2(e) defined in (4.6). For IQ, 2(e), we have 
+
+IQ, 2(e) = ( ξLe − ξKe )3[
+
+B3(z, m Le ) − B3(−z, m Ke )
+
+]
+
+,
+
+with the auxiliary function 
+
+B3(z, m ) = 2(emz − 1 − mz − 1 
+
+> 2
+
+(mz )2 − 1 
+
+> 6
+
+(mz )3)
+
+z3(ez − 1) (z 6 = 0) , B3(0 , m ) = m4
+
+12 .
+
+4.3. Extension to three dimension. The extension of the two-dimensional complete flux scheme to three-dimensional problems is conceptually straightforward but notationally more involved. In the following we present the key steps, focusing on the modifications required when the control volume boundary e (now a polygonal face) is treated. First, we introduce the local coordinate system in three dimension. Let e be a polygonal face of a control volume V ∈ T ∗ 
+
+> h
+
+(the dual mesh). We introduce a local orthonormal coordinate system ( ξ, η 1, η 2) with origin at the centroid of e:- the ξ axis is aligned with the unit normal ne pointing outward from V ;- η := ( η1, η 2) denotes the orthogonal tangential coordinates on e.Thus any point on e has ξ = 0, while the two neighboring control volume centers PK
+
+and PL lie at ξ = ξK < 0 and ξ = ξL > 0, respectively. The face e is parameterized by ( η1, η 2) over a two-dimensional domain. The total flux vector is j = α∇u − βu. Its normal and tangential components with respect to e are 
+
+jn = j · ne = α ∂u 
+
+∂ξ − βnu, jt = α∇tu − βtu, 
+
+where βn = β · ne, βt = β − βnne, and ∇t = ( ∂/∂η 1, ∂/∂η 2)T is the tangential gradi-ent. Note that jt is a two-dimensional vector field defined on the face e. Following a derivation completely analogous to the two-dimensional case, we obtain a formulation similar to (3.16), namely a formulation that incurs no error from the original equation: 
+
+KV, 1(u) + KV, 2(u) = FV, 1(f ) + FV, 2(f ) ∀V ∈ T ∗ 
+
+> h
+
+,(4.8) 
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 15 with 
+
+KV, 1(u) = − ∑
+
+> e⊂∂V
+
+∫
+
+> e
+
+(uLe ,η − uKe,η )(αw (0) − βn,η (0) ∫ 0
+
+> ξKe
+
+w(t)d t)
+
+∫ ξLe  
+
+> ξKe
+
+w(t)d t − βn,η (0) uKe,η dη
+
+KV, 2(u) = − ∑
+
+> e⊂∂V
+
+∫ ξLe 
+
+> ξKe
+
+∫
+
+> e
+
+Q(s)∇t · jt(s, η)d ηdsFV, 1(f ) = 
+
+∫
+
+> V
+
+f dx
+
+FV, 2(f ) = ∑
+
+> e⊂∂V
+
+∫ ξLe 
+
+> ξKe
+
+∫
+
+> e
+
+Q(s)f (s, η) d ηds ∀V ∈ T ∗ 
+
+> h
+
+,
+
+where uKe,η and uLe,η are the traces of u along the planes ξ = ξK and ξ = ξL,respectively, and ∇t· denotes the tangential divergence on e.We present here the second-order discretization; higher-order variants can be de-rived analogously but are notationally more involved and are omitted for brevity. For tensor-product meshes (hexahedra), the extension to higher-order elements follows as a direct generalization of the two-dimensional construction described in Subsec-tion 4.2. For simplex meshes (tetrahedra), the construction of control volumes for arbitrary higher-order finite volume schemes can be found in [17]. For a second-order scheme, we assume the convection field β is piecewise constant with respect to e. Let uh be a piecewise trilinear approximation on a hexahedral mesh, or a piecewise linear approximation on a tetrahedral mesh. Under the constant-coefficient assumption, the expression KV, 1(uh) from (4.8) reduces exactly to the same form as in two dimensions, only with the edge integral replaced by a face integral. The treatment of the tangential contribution KV, 2(uh) from (4.8) requires more care because it involves the tangential divergence of the discrete flux jt. Applying the tangential divergence theorem on the face e yields 
+
+∫
+
+> e
+
+∇t ·jt(s, η) d η =
+
+∫
+
+> ∂e
+
+jt(s, η) · n∂e dl, 
+
+where n∂e is the outward unit normal to ∂e lying in the tangent plane of e. Since 
+
+Q(s) is independent of η, interchanging the order of integration in KV, 2(uh) gives 
+
+KV, 2(uh) = − ∑
+
+> e⊂∂V
+
+∫ ξL
+
+> ξK
+
+Q(s)
+
+∫
+
+> ∂e
+
+(α∇tuh − βtuh
+
+) · n∂e dl ds. 
+
+Obviously, 
+
+∫
+
+> ∂e
+
+α∇tuh · n∂e dl = 0 .
+
+Let the boundary ∂e consist of m edges γ1, . . . , γ m, and denote the vertices of e
+
+by v1, . . . , vm in counterclockwise order. On each edge γj = vj vj+1 (with cyclic indexing), the convection part yields 
+
+∫
+
+> γj
+
+(βt · n∂e ) uh dl = ( βt · n∂e ) |γj | uh(s, vj ) + uh(s, vj+1 )
+
+2 ,
+
+where |γj | is the length of edge γj and we have used the midpoint rule (exact for 
+
+This manuscript is for review purposes only. 16 P. YANG, W. LEI AND L. XU 
+
+linear uh). Assembling the edge contributions, we obtain for each fixed s ∈ (ξK , ξ L)(4.9) 
+
+∫
+
+> ∂e
+
+(α∇tuh − βtuh
+
+) · n∂e dl = −
+
+> m
+
+∑
+
+> j=1
+
+|γj |
+
+2 (βt · n∂e,γ j ) (uh(s, vj ) + uh(s, vj+1 )),
+
+where uh(s, vj ) denotes the value of uh on the line η = vj at normal coordinate s.The dependence on s is linear, we can write 
+
+uh(s, vj ) = s − ξK
+
+ξL − ξK
+
+uh(ξL, vj ) + ξL − s
+
+ξL − ξK
+
+uh(ξK , vj ).
+
+Inserting this representation into (4.9) and integrating over s weighted by Q(s) yields an expression that depends only on the nodal values at ξK and ξL on the vertices of 
+
+e. After collecting terms, the final discrete form of KV, 2(uh) reads 
+
+KV, 2(uh) = ∑
+
+> e⊂∂V m
+
+∑
+
+> j=1
+
+IQ, 1(e) − ξKe IQ, 0(e)
+
+ξLe − ξKe
+
+|γj |(βt · n∂e,γ j )uh(ξL, vj )+ ∑
+
+> e⊂∂V m
+
+∑
+
+> j=1
+
+ξLe IQ, 0(e) − IQ, 1(e)
+
+ξLe − ξKe
+
+|γj |(βt · n∂e,γ j )uh(ξK , vj ).
+
+5. Numerical experiments. The accuracy and robustness of the complete flux schemes are examined through three test cases. The first (Section 5.1) verifies conver-gence rates in two dimensions using a manufactured solution with constant convec-tion, covering second-order schemes on triangles and rectangles as well as third-order schemes on rectangles. The second test (Section 5.2) studies a variable-coefficient rotating flow with a steep inlet; solution profiles and self-convergence are compared for different piecewise pairs {ξKe , ξ Le }.
+
+5.1. Convergence order verification in two dimension. We verify the the-oretical convergence rates of the four schemes using a manufactured solution on the unit square Ω = (0 , 1) 2.
+
+Example 5.1. Consider the steady-state convection-diffusion equation (2.1) with constant velocity field β = (50 , 60) T and two representative diffusion coefficients: α =10 −1 (mildly convection-dominated) and α = 10 −8 (strongly convection-dominated). The source term f and the homogeneous Dirichlet boundary conditions are chosen so that the exact solution is (5.1) u(x, y ) = xy 
+
+(1 − eβ1(x−1) )( 1 − eβ2(y−1) )
+
+(1 − e−β1
+
+)( 1 − e−β2
+
+) .
+
+This solution vanishes on the whole boundary and develops sharp exponential layers near x = 1 and y = 1 when β1 and β2 are large enough, see Figure 5(a). The performance of four distinct complete flux (CF) schemes is evaluated: 
+
+• CF2-Tri : second-order CF scheme on triangular meshes (piecewise linear approximation), see Subsection 4.1; 
+
+• CF2-Quad : second-order CF scheme on rectangular meshes (piecewise bi-linear approximation), see Subsection 4.1; 
+
+• CF3-QuadC0 : third-order CF scheme on rectangular meshes using the biquadratic C0 finite element space, with dual control volumes defined by 
+
+p∗ = 1 /4 (cf. Figure 4(a)), see Subsection 4.2; 
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 17 
+
+• CF3-QuadC1 : third-order CF scheme on rectangular meshes using the bi-quadratic C1 B-spline space, with dual partitions constructed from the Gre-ville abscissae (cf. Figure 4(b)), see Subsection 4.2. As pointed out in Remark 3.1, the parameters ξKe and ξLe associated with each control volume edge can be chosen independently while keeping the flux relation exact. In the present subsection, we consistently adopt the standard choice: ξKe and ξLe are taken as the actual signed distances from the edge e to the adjacent control volume centers. For a simple verification of the flexibility of ξKe and ξLe , we also test an alternative variant of the CF2-Quad scheme. In this variant, for each edge e, we replace the geometric parameters by random perturbations ˜ξKe = ξKe
+
+(0.1 + 0 .8re
+
+), ˜ξLe = ξLe
+
+(0.1 + 0 .8re
+
+),
+
+where re is a random number drawn uniformly from (0 , 1), independently for each edge 
+
+e. All rectangular meshes are uniform Cartesian grids. For the triangular meshes,      
+
+> (a) Exact solution
+> 00.2 0.4 0.6 0.8 1
+> 00.2 0.4 0.6 0.8 1
+> (b) Initial triangular mesh
+
+Fig. 5: Exact solution and locally refined triangular mesh for Example 5.1. we start from an initial grid with 170 triangles that is locally refined near the point (0 .98 , 0.98), i.e., in the vicinity of the corner (1 , 1) where the sharp boundary layers are most pronounced (see Figure 5(b)); the subsequent triangular grids are obtained by uniform refinement of this initial mesh. For each scheme, the error is measured in the discrete maximum norm taken over all control volume centers (computational nodes): 
+
+‖u − uh‖ℓ∞ = max  
+
+> P∈N h
+
+∣∣u(P ) − uh(P )∣∣,
+
+where Nh denotes the set of nodes associated with the respective discrete space: the vertices for the piecewise linear or bilinear spaces, the nine computing nodes of each biquadratic C0 element, and the Greville abscissae for the biquadratic C1 B- spline space. Table 1 reports the discrete maximum errors and the corresponding conver-gence orders for both α = 10 −1 and α = 10 −8. The data for the CF2-Tri scheme correspond to the third and subsequent uniform refinement levels of the ini- tial grid shown in Figure 5(b). Figure 6 displays the discrete maximum error versus degrees of freedom for the two third-order schemes on rectangular meshes. The observed 
+
+This manuscript is for review purposes only. 18 P. YANG, W. LEI AND L. XU 
+
+convergence orders, as confirmed in Table 1 and visualized in Figure 6, demonstrate the expected second-order accuracy for the CF2-Tri and CF2-Quad schemes and the fourth-order accuracy for the CF3-QuadC0 and CF3-QuadC1 schemes, the latter of which yields superconvergence at computing nodes and the Greville abscissae, respec-tively. Additionally, it is observed that for the two third-order schemes, the solution obtained with the C1 B-spline basis functions achieves higher accuracy per degree of freedom, a well-known advantage often emphasized by the spline community [11]. For α = 10 −1, however, this advantage diminishes as the number of degrees of free-dom increases. This is because the C0 Lagrange numerical solution not only exhibits superconver- gence but also attains a convergence order close to five, thereby display-ing an even more remarkable “ultra-convergence” behavior. This is a noteworthy and superior numerical performance. At the end of this subsection, we highlight a crucial observation concerning higher-order finite volume methods on rectangular meshes. Classical finite volume schemes that are obtained by inserting the primitive flux definition (3.1) directly into the bal-ance relation (3.15) are known to impose stringent constraints on the dual grid for quadratic trial spaces. For the biquadratic C0 finite volume method, the optimal L2
+
+convergence order can be achieved only when the control volumes are constructed us-ing the Gauss points of the elements [18, 29]; in the parametrization of Subsection 4.2 this corresponds to a very specific choice of p∗ = 1 /2 − √3/6, and any other value de- grades the L2 accuracy. Similarly, for the biquadratic C1 B-spline space, the standard finite volume scheme that places the control volume centers at the Greville abscissae is observed to deliver suboptimal second-order L2 convergence [12, 13], and the underlying mechanism is still not fully understood. In contrast, the complete flux schemes developed in the present work rely on a fundamentally different flux reconstruction (Sections 3 and 4). This reconstruction renders the resulting discrete scheme essentially insensitive to the geometric param-eters that define the dual mesh. Concretely, the CF3-QuadC0 scheme maintains its optimal convergence order for any admissible value of the parameter p∗; the choice 
+
+p∗ = 1 /4 reported in Table 1 is just one convenient instance, and other values also yield the optimal convergence order provided that ξKe + ξLe = 0. Likewise, the CF3-QuadC1 scheme retains optimal high-order accuracy when the control volumes are centered at the Greville points. Hence, at least for quadratic trial spaces on rectan-gular meshes, the complete flux approach eliminates the traditional dependence on the precise positioning of control volume boundaries, although a rigorous theoretical explanation of this robustness is still missing. 
+
+5.2. Rotating flow with steep inlet profile. We further investigate the per-formance of the second-order complete flux scheme on quadrilateral meshes (CF2-Quad) for a demanding convection-dominated problem with a variable velocity field, and show the influence of the geometric parameters ξKe , ξ Le on the numerical solution. 
+
+Example 5.2. Consider the steady-state convection-diffusion equation (2.1) on Ω := ( −1, 1) × (0 , 1), where the source term is f (x, y ) = 0, the rotating velocity field is 
+
+β(x, y ) = (2y(1 − x2), −2x(1 − y2))T ,
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 19 Table 1: Discrete maximum error and convergence order for Example 5.1 with β =(50 , 60) T and α = 10 −1, 10 −8.
+
+Scheme Dofs α = 10 −1 α = 10 −8
+
+‖u − uh‖ℓ∞ Rate ‖u − uh‖ℓ∞ Rate 
+
+CF2-Quad 9409 4.4780e-03 – 8.3455e-04 –37249 5.7713e-04 2.9781 2.5104e-03 -1.6007 148225 7.0555e-05 3.0435 1.1186e-03 1.1706 591361 1.3737e-05 2.3651 3.5915e-04 1.6421 2362369 3.1825e-06 2.1118 1.0108e-04 1.8308 
+
+CF2-Quad (random ( ξKe , ξ Le )) 9409 4.9993e-02 – 7.2598e-02 –37249 1.1260e-02 2.1667 1.7711e-02 2.0506 148225 2.3916e-03 2.2436 5.7124e-03 1.6386 591361 4.9624e-04 2.2731 1.7253e-03 1.7305 2362369 1.0605e-04 2.2223 4.9098e-04 1.8148 
+
+CF2-Tri 5578 1.3964e-02 – 2.2567e-02 –22034 4.9049e-03 1.5232 8.1318e-03 1.4860 87586 1.4053e-03 1.8116 2.7328e-03 1.5803 349250 3.6543e-04 1.9476 8.6833e-04 1.6578 1394818 9.2750e-05 1.9804 2.5712e-04 1.7578         
+
+> 10 110 210 3
+> 10 -8
+> 10 -6
+> 10 -4
+> 10 -2
+> 10 0
+> (a) α= 10 −1
+> 10 110 210 3
+> 10 -8
+> 10 -6
+> 10 -4
+> 10 -2
+> 10 0
+> (b) α= 10 −8
+
+Fig. 6: Discrete maximum error ‖u − uh‖ℓ∞ versus degrees of freedom (Dof) for Example 5.1 with β = (50 , 60) T and α = 10 −1, 10 −8. The discrete solution spaces are taken as biquadratic Lagrange and B-spline basis spaces. and the boundary conditions are 
+
+u(x, 0) = 1 + tanh (10(2 x + 1) ), − 1 ≤ x ≤ 0 (inlet) ,∂u 
+
+∂y (x, 0) = 0 , 0 < x ≤ 1 (outlet) ,u(x, y ) = 1 − tanh(10) , on the remaining boundaries .
+
+A steep interior layer is specified at the inlet on the bottom-left boundary, which is then advected by the rotating velocity field for sufficiently small α. We take α = 10 −8,
+
+This manuscript is for review purposes only. 20 P. YANG, W. LEI AND L. XU 
+
+so that the problem is strongly convection-dominated and the sharp front should be preserved. No closed-form analytical solution is available for this problem, so the accuracy of the numerical solution can be assessed through profile inspection and self-convergence analysis. A useful qualitative feature arises from the structure of the velocity field: for a pure convection problem ( α = 0), the outlet profile on y = 0, x ∈ [0 , 1] would be the exact mirror image of the inlet interior layer prescribed on y = 0, x ∈ [−1, 0]; for a convection-dominated problem with sufficiently small α, the outlet profile remains approximately equal to that mirror image, so that the solution along y = 0 exhibits an approximate symmetry about x = 0. Faithful preservation of this symmetry on a finite mesh indicates that the scheme suppresses spurious numerical diffusion effectively. On the other hand, we perform a self-convergence study: let uh be the discrete solution on a mesh of characteristic size h, and uh/ 2 the solution on the mesh obtained by one uniform refinement. For a given point P , the self-convergence rate at P is estimated from three successively refined meshes via (5.2) rh(P ) = log 2
+
+|uh(P ) − uh/ 2(P )|
+
+|uh/ 2(P ) − uh/ 4(P )| .
+
+We employ the second-order complete flux scheme on quadrilateral meshes (CF2-Quad) for this experiment. As stated in Remark 3.1, the parameters ξKe and ξLe
+
+associated with each control volume edge may be chosen independently while keeping the flux relation exact. The previous subsection has already confirmed that the as-ymptotic convergence order is preserved under different choices of these parameters for a problem with a known exact solution. Here we simply compare the numerical behavior of two sets of {ξKe , ξ Le }:
+
+• CF2-Quad ( ξKe , ξ Le ): the standard choice, where ξKe and ξLe are taken as the geometric distances from the edge e to the adjacent control volume centers; 
+
+• CF2-Quad ( ξ∗ 
+
+> Ke
+
+, ξ ∗ 
+
+> Le
+
+): a scaled variant ξ∗ 
+
+> Ke
+
+= 0 .3 ξKe , ξ∗ 
+
+> Le
+
+= 0 .3 ξLe .Figure 7 displays the numerical solutions and the profiles along y = 0 obtained on a uniform 80 × 40 mesh ( h = 1 /40) for the two parameter choices. The result with the scaled parameters ξ∗ 
+
+> Ke
+
+, ξ ∗ 
+
+> Le
+
+is clearly superior: it yields a maximum value closer to the inlet peak value. On this mesh, for the solution uh using CF2-Quad ( ξKe , ξ Le ), max uh = 2 .000150302020861 , min uh = −3.729054086736460e-08 ,
+
+and for the solution u∗ 
+
+> h
+
+using CF2-Quad ( ξ∗ 
+
+> Ke
+
+, ξ ∗ 
+
+> Le
+
+), max u∗ 
+
+> h
+
+= 1 .999999995877693 , min u∗ 
+
+> h
+
+= 4 .075487859649230e-09 .
+
+Self-convergence is examined at the two points P1 = (0 .5, 0.5) and P2 = (0 , 0.5). Both points lie on mesh lines of every uniform rectangular grid used in the refinement sequence and therefore remain vertices of the primary mesh, so that the discrete solution uh is evaluated at these locations without any interpolation. The estimated convergence orders, computed from (5.2), are reported in Table 2. In summary, self-convergence of the CF2-Quad scheme attains the optimal order for both parameter choices. However, the scaled variant with ξ∗ 
+
+> Ke
+
+= 0 .3ξKe , ξ∗ 
+
+> Le
+
+=0.3ξLe exhibits significantly better numerical performance: it respects the discrete maximum principle on relatively coarse meshes. In contrast, a more aggressive scaling, e.g., ξ∗ 
+
+> Ke
+
+= 0 .2ξKe , ξ∗ 
+
+> Le
+
+= 0 .2ξLe , does not lead to improved behavior, indicating that blindly reducing the distances ξKe , ξ Le is not universally beneficial. Since the 
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 21 
+
+(a) CF2-Quad ( ξKe , ξ Le )    
+
+> -1 -0.5 00.5 1
+> -0.5 00.5 11.5 22.5
+
+(b) CF2-Quad ( ξKe , ξ Le )
+
+(c) CF2-Quad ( ξ∗ 
+
+> Ke
+
+, ξ ∗ 
+
+> Le
+
+)    
+
+> -1 -0.5 00.5 1
+> 00.2 0.4 0.6 0.8 11.2 1.4 1.6 1.8 2
+
+(d) CF2-Quad ( ξ∗ 
+
+> Ke
+
+, ξ ∗ 
+
+> Le
+
+)
+
+Fig. 7: Numerical solutions and the profiles along y = 0 obtained on a uniform 80 ×40 mesh ( h = 1 /40) for CF2-Quad with two parameter choices. Table 2: Self-convergence orders at P1 = (0 .5, 0.5) and P2 = (0 , 0.5) computed from (5.2). 
+
+1/h CF2-Quad ( ξKe , ξ Le ) CF2-Quad ( ξ∗ 
+
+> Ke
+
+, ξ ∗ 
+
+> Le
+
+)
+
+rh(P1) rh(P2) r∗
+
+> h
+
+(P1) r∗
+
+> h
+
+(P2)
+
+20 7.2060 1.7540 6.7866 1.7981 40 – 2.4142 1.1335 2.4965 80 1.4485 2.8438 2.5045 2.8871 160 1.7926 2.9824 2.3789 2.9896 320 1.9069 3.0022 2.2421 3.0046 
+
+parameters ξKe , ξ Le can be chosen independently for each edge e, it remains an open issue whether a theoretical strategy exists to select these parameters (possibly in an edge-wise fashion) so as to enforce desirable properties such as positivity or sharp resolution of layers. One may speculate that such a strategy, if it exists, is nontrivial 
+
+This manuscript is for review purposes only. 22 P. YANG, W. LEI AND L. XU 
+
+and likely depends on the local flow structure. 
+
+6. Conclusion. We have developed a family of complete flux finite volume schemes for convection-diffusion equations on arbitrary polygonal and polyhedral grids. By deriving the exact normal flux from the underlying PDE via a Green’s function, the framework yields discrete schemes that are automatically high-order accurate once the approximation space is chosen, without the dual-mesh constraints that plague standard finite volume methods for quadratic and higher-order elements. Concrete schemes include second-order discretizations on triangles and rectangles, third-order schemes on rectangles using C0 Lagrange and C1 B-spline spaces, and higher-order extensions to three-dimensional hexahedral and tetrahedral meshes. Nu-merical experiments in two and three dimensions confirm optimal convergence and robustness in both mildly and strongly convection-dominated regimes. Future work includes the stability and convergence analysis for the third-order schemes, a theoreti-cal understanding of the scheme’s insensitivity to dual-mesh geometry, and extensions to time-dependent problems and coupled systems. 
+
+REFERENCES [1] I. Aavatsmark , An introduction to multipoint flux approximations for quadrilateral grids ,Comput. Geosci., 6 (2002), pp. 405–432. [2] R. E. Bank and D. J. Rose , Some error estimates for the box method , SIAM J. Numer. Anal., 24 (1987), pp. 777–787. [3] A. N. Brooks and T. J. R. Hughes , Streamline upwind/petrov-galerkin formulations for convection dominated flows with particular emphasis on the incompressible navier-stokes equations , Comput. Methods Appl. Mech. Engrg., 32 (1982), pp. 199–259. [4] Z. Cai , On the finite volume element method , Numer. Math., 58 (1991), pp. 713–735. [5] Z. Chen, J. Wu, and Y. Xu , Higher-order finite volume methods for elliptic boundary value problems , Adv. Comput. Math., 37 (2012), pp. 191–253. [6] H. M. Cheng and J. ten Thije Boonkkamp , A generalised complete flux scheme for aniso-tropic advection-diffusion equations , Adv. Comput. Math., 47 (2021), pp. Paper No. 19, 26. [7] R. Eymard, T. Gallou¨ et, and R. Herbin , Finite volume methods , vol. VII of Handb. Numer. Anal., North-Holland, Amsterdam, 2000, pp. 713–1020. [8] P. Farrell and A. Linke , Uniform second order convergence of a complete flux scheme on unstructured 1D grids for a singularly perturbed advection-diffusion equation and some multidimensional extensions , J. Sci. Comput., 72 (2017), pp. 373–395. [9] P. A. Forsyth , A control volume finite element approach to NAPL groundwater contamina-tion , SIAM J. Sci. Statist. Comput., 12 (1991), pp. 1029–1057. [10] F. Hermeline , A finite volume method for the approximation of diffusion operators on distorted meshes , J. Comput. Phys., 160 (2000), pp. 481–499. [11] T. J. R. Hughes, J. A. Cottrell, and Y. Bazilevs , Isogeometric analysis: CAD, finite elements, NURBS, exact geometry and mesh refinement , Comput. Methods Appl. Mech. Engrg., 194 (2005), pp. 4135–4195. [12] G. Kamber, H. Gotovac, V. Kozuli´ c, and B. Gotovac , 2-D local hp adaptive isogeometric analysis based on hierarchical Fup basis functions , Comput. Methods Appl. Mech. Engrg., 398 (2022), pp. Paper No. 115272, 32. [13] G. Kamber, H. Gotovac, V. Kozuli´ c, L. Malenica, and B. z. Gotovac , Adaptive numer-ical modeling using the hierarchical Fup basis functions and control volume isogeometric analysis , Internat. J. Numer. Methods Fluids, 92 (2020), pp. 1437–1461. [14] W. Lei, S. Piani, P. Farrell, N. Rotundo, and L. Heltai , A weighted hybridizable discon-tinuous Galerkin method for drift-diffusion problems , J. Sci. Comput., 99 (2024), pp. Paper No. 33, 26. [15] R. J. LeVeque , Finite Volume Methods for Hyperbolic Problems , Cambridge University Press, 2002. [16] R. Li, Z. Chen, and W. Wu , Generalized difference methods for differential equations , vol. 226, Marcel Dekker, Inc., New York, 2000. [17] Y. Li, P. Yang, and Z. Zhang , Polynomial preserving recovery for the finite volume element 
+
+This manuscript is for review purposes only. HIGH-ORDER COMPLETE FLUX SCHEMES ON ARBITRARY SUBDIVISIONS 23 
+
+methods under simplex meshes , Math. Comp., 94 (2025), pp. 611–645. [18] Y. Lin, M. Yang, and Q. Zou , L2 error estimates for a class of any order finite volume schemes over quadrilateral meshes , SIAM J. Numer. Anal., 53 (2015), pp. 2009–2029. [19] L. Liu, J. van Dijk, J. H. M. ten Thije Boonkkamp, D. B. Mihailova, and J. J. A. M. van der Mullen , The complete flux scheme—error analysis and application to plasma simulation , J. Comput. Appl. Math., 250 (2013), pp. 229–243. [20] S. Patankar , Numerical Heat Transfer and Fluid Flow , CRC press, 2018. [21] H. G. Roos, M. Stynes, and L. Tobiska , Robust numerical methods for singularly perturbed differential equations: convection-diffusion-reaction and flow problems , Springer, 2nd ed., 2008. [22] D. Scharfetter and H. Gummel , Large-signal analysis of a silicon read diode oscillator ,IEEE Transactions on Electron Devices, 16 (1969), pp. 64–77. [23] J. H. Seinfeld and S. N. Pandis , Atmospheric Chemistry and Physics: From Air Pollution to Climate Change , Wiley, 3rd ed., 2016. [24] S. Selberherr , Analysis and Simulation of Semiconductor Devices , Springer-Verlag, 1984. [25] J. H. M. ten Thije Boonkkamp , A complete flux scheme for one-dimensional combustion simulation , in Finite volumes for complex applications IV, 2005, pp. 573–583. [26] J. H. M. ten Thije Boonkkamp and M. J. H. Anthonissen , The finite volume-complete flux scheme for advection-diffusion-reaction equations , J. Sci. Comput., 46 (2011), pp. 47–70. [27] G. Thiart , Improved finite-difference scheme for the solution of convection-diffusion problems with the simplen algorithm , Numer. Heat Transf. Part B, 18 (1990), pp. 81–95. [28] J. Xu and Q. Zou , Analysis of linear and quadratic simplicial finite volume methods for elliptic equations , Numer. Math., 111 (2009), pp. 469–492. [29] Z. Zhang and Q. Zou , Vertex-centered finite volume schemes of any order over quadrilateral meshes for elliptic boundary value problems , Numer. Math., 130 (2015), pp. 363–393. [30] C. Zheng and G. D. Bennett , Applied Contaminant Transport Modeling , Wiley, 2nd ed., 2002. 
+
+This manuscript is for review purposes only.
