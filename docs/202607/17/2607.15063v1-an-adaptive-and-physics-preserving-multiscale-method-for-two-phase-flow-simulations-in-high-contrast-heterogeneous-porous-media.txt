@@ -1,0 +1,4334 @@
+Title: An Adaptive and Physics-Preserving Multiscale Method for Two-Phase Flow Simulations in High-Contrast Heterogeneous Porous Media
+
+URL Source: https://arxiv.org/pdf/2607.15063v1
+
+Published Time: Fri, 17 Jul 2026 01:41:58 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# An Adaptive and Physics-Preserving Multiscale Method for Two-Phase Flow Simulations in High-Contrast Heterogeneous Porous Media 
+
+Junhao Huang Eric Chung Wing Tat Leung July 17, 2026 
+
+Abstract 
+
+In this paper, we propose an adaptive physics-preserving multiscale method for in-compressible and immiscible two-phase flow in high-contrast porous media. The method couples a physics-preserving implicit-pressure explicit-saturation scheme (P-IMPES) with the mixed constraint energy minimizing generalized multiscale finite element method. The core algorithmic component is an adaptive update strategy for the saturation-dependent coefficient. Since the effective permeability κn = λt(Snw)K depends on the evolving satura-tion through the total mobility, we introduce an adaptive update algorithm that monitors the variation of the mobility-weighted coefficient and regenerates the multiscale spaces only when a prescribed tolerance is exceeded. A local postprocessing step is further used to recover fine-grid mass conservation. The analysis is a central part of the paper. We prove local conservation for both phases, the unbiased property of the phase formulation, and bounds preservation under a suitable CFL condition. For the advection-dominated case, we establish velocity and saturation error estimates, which clearly identify the con-tributions from the adaptive tolerance, the coarse mesh size, the spectral approximation, and the front-layer error. Numerical experiments on different high-contrast permeability fields confirm the physical properties of the method and show that smaller adaptive tol-erances improve the saturation approximation while avoiding unnecessary updates of the multiscale spaces. 
+
+# 1 Introduction 
+
+Numerical simulation of incompressible and immiscible two-phase flow in porous media is an important problem in petroleum reservoir engineering, hydrology, and subsurface energy appli-cations. The governing model is derived from mass conservation, Darcy’s law, the saturation constraint, and the capillary pressure relation. In realistic geological media, the absolute per-meability usually contains multiple spatial scales, high-conductivity channels, inclusions, and very high contrast. These heterogeneous features strongly affect the pressure and velocity fields, while the saturation equation may develop sharp fronts or discontinuous profiles. Di-rect fine-grid simulation can resolve these effects, but it is computationally expensive when the pressure-velocity system has to be solved repeatedly during a long-time two-phase flow simulation [1–4]. For the temporal discretization of two-phase flow, fully implicit methods are robust but require solving large nonlinear systems at each time step. The implicit-pressure explicit-saturation (IMPES) method is more efficient since it separates the pressure solve from the saturation update [5–7]. However, standard IMPES schemes may suffer from restrictive stabil-ity conditions, loss of mass conservation for one phase, phase bias, and violation of saturation bounds. In heterogeneous media with capillary pressure, saturation discontinuities across mate-1arXiv:2607.15063v1 [math.NA] 16 Jul 2026 rial interfaces introduce further difficulties. Several improved IMPES, discontinuous Galerkin, and capillarity-treatment strategies have been proposed to address these issues [8–11]. Recently, Chen and Sun proposed a physics-preserving IMPES scheme, hereafter referred to as P-IMPES, for incompressible and immiscible two-phase flow in heterogeneous porous media [12]. The main idea is to rewrite the phase Darcy velocities in terms of the total velocity and an auxiliary velocity related to the capillary potential gradient. The resulting scheme is locally mass conservative for both phases, preserves the normal continuity of the total velocity, treats the wetting and non-wetting phases in an unbiased way, and keeps the saturation within physical bounds under a suitable CFL condition. These properties are especially important because the computed velocity field is directly used in the saturation transport equation. Besides time discretization, the spatial approximation of the pressure–velocity system is another major computational challenge. Classical upscaling methods reduce fine-scale hetero-geneity to effective coarse-scale coefficients [13–16]. Multiscale finite element and multiscale finite volume methods provide an alternative reduced-order strategy by constructing coarse-scale basis functions from local fine-scale problems [17–20]. Since the saturation equation is very sensitive to the quality of the velocity approximation, local mass conservation is essential for multiscale simulations of porous-media flow. This motivates mixed multiscale finite element methods, multiscale mortar methods, and conservative flux postprocessing techniques [21–24]. The Generalized Multiscale Finite Element Method (GMsFEM) improves the flexibility of multiscale methods by constructing multiple basis functions through local spectral decom-positions [25–28]. The GMsFEM framework has been further developed in adaptive enrich-ment, oversampling, randomized and sparse model reduction, and wave and space-time ap-plications [29–34, 38]. For high-contrast media, however, important features such as high-conductivity channels may be nonlocal and cannot be captured accurately by standard lo-calized basis functions. Related localized and operator-adapted multiscale ideas for rough-coefficient elliptic problems have also been developed in [39, 40]. To overcome the difficulty caused by high contrast and nonlocal features, the Constraint Energy Minimizing Generalized Multiscale Finite Element Method (CEM-GMsFEM) was introduced in [35]. The method con-structs an auxiliary space from local spectral problems and then computes constraint energy minimizing basis functions in oversampling regions. By including the eigenfunctions associated with small contrast-dependent eigenvalues, CEM-GMsFEM captures channelized features and achieves contrast-independent convergence with respect to the coarse mesh size. Its mixed for-mulation was developed in [36], where auxiliary pressure basis functions are used to construct localized velocity basis functions. The resulting method provides fine-grid mass-conservative velocity approximations and first-order convergence independent of the contrast, provided that enough oversampling layers are used. Although P-IMPES provides a physics-preserving time discretization and mixed CEM-GMsFEM provides a contrast-robust spatial discretization, their combination for two-phase flow still faces a time-dependent coefficient issue. At time level tn, the coefficient in the pressure–velocity system is κn = λt(Snw)K, where K is the absolute permeability and λt(Snw)
+
+is the total mobility depending on the current wetting-phase saturation. Hence the coefficient changes as the saturation evolves. If the multiscale spaces are constructed only from the initial coefficient and kept fixed, the resulting basis functions may no longer be well adapted to the current coefficient field, which can deteriorate the velocity approximation and the saturation front. Compared with the P-IMPES-MsFEM method in [37], which used residual-driven enrich-ment and conservative postprocessing and established phasewise conservation, unbiasedness, conditional bounds preservation, and velocitysaturation error relations, the present work ad-dresses mobility-induced coefficient obsolescence with mixed CEM-GMsFEM, whose oversam-pled energy-minimizing bases are designed for contrast-robust approximation. Its distinct in-2gredients are coefficient-variation-triggered global space reconstruction, fine-cell-residual mark-ing for postprocessing instead of source-based marking, and an error estimate separating con-tributions from the update tolerance, coarse mesh, spectral truncation, and front layer. The P-IMPES properties are therefore inherited and reverified, rather than claimed as new. In this paper, we propose an adaptive mixed CEM-GMsFEM for the physics-preserving IMPES simulation of incompressible and immiscible two-phase flow in high-contrast porous media. The method couples the P-IMPES formulation with mixed CEM-GMsFEM spaces for the total velocity, auxiliary capillary velocity, and phase pressure. To reduce the error caused by coefficient variation, we propose an error indicator ηn to monitor the saturation-induced variation of the mobility-weighted coefficient field. When ηn exceeds a prescribed tolerance, the multiscale spaces are regenerated using the current coefficient; otherwise, the existing spaces are reused. A local postprocessing step is also applied to recover fine-grid mass conservation of the total velocity. The rest of the paper is organized as follows. Section 2 introduces the two-phase flow model and the P-IMPES discretization. Section 3 presents the mixed CEM-GMsFEM construction and the adaptive update strategy. Section 4 gives the analysis of conservation, unbiased property, bounds preservation, and error estimates. Numerical results are reported in Section 5, and conclusions are given in Section 6. 
+
+# 2 Preliminaries 
+
+In this section, we introduce the foundational mathematical model for incompressible and immiscible two-phase flow within a porous medium. We denote the wetting and non-wetting phases by subscripts w and n, respectively. The mathematical model is derived from the conservation of mass, Darcy’s law, the capillary pressure relationship, and the saturation constraint. Following the model formulation, we introduce the P-IMPES scheme, which is unbiased with regard to the two phases and satisfies the mass conservation for both phases. 
+
+2.1 Mathematical model 
+
+We consider a model in porous media Ω ⊂ R2 given as follows, 
+
+ϕ ∂S α
+
+∂t + ∇ · uα = Fα, in Ω, α = w, n, (2.1) 
+
+uα = − krα 
+
+μα
+
+K∇pα, in Ω, α = w, n, (2.2) 
+
+Sn + Sw = 1 , in Ω,pc(Sw) = pn − pw, in Ω.
+
+Here ϕ is the porosity of the medium, which is a constant. Let K, Sα, uα and pα be the absolute permeability tensor, saturation, Darcy’s velocity and pressure corresponding to phase 
+
+α. Total velocity is denoted by ut = uw + un. Define krα , μα and Fα as relative permeability, viscosity and sink/source term of phase α. Besides, Ft = Fw + Fn. Phase mobility is denoted by λα = krα  
+
+> μα
+
+. Total mobility is further defined by λt = λw + λn. Then we define fractional flow functions as fw = λw/λ t, fn = λn/λ t.We let the boundary be Γ := ∂Ω and it can be partitioned as Γ = Γ D ∪ΓN , where ΓD and ΓN
+
+are Dirichlet and Neumann boundaries to solve uα. Moreover, to solve Sα, we let Γ = Γ in ∪Γout ,where Γin = {x ∈ Γ : ut(x) · n(x) < 0} is the inflow boundary, Γout = {x ∈ Γ : ut(x) · n(x) ≥ 0}
+
+is the outflow boundary, and n is the unit outer normal vector to Γ. The initial and boundary conditions are Sα = S0
+
+> α
+
+, for t = 0 , pα = pBα on ΓD and uα · n = gNα on ΓN , where α = w, n .32.2 Physics-preserving IMPES scheme (P-IMPES) 
+
+To compute the reference solutions, we solve Darcy flow on a fine-scale mesh Th. We use the lowest Raviart-Thomas vector field (RT0) denoted by Vh for fine scale velocity bases. Besides, we define Qh as the pressure space spanned by piecewise constant functions and each basis corresponds to a particular fine-scale element. And we use Vh(D) and Qh(D) to represent Vh
+
+and Qh restricted in D. The P-IMPES scheme results in the following equation system. For any test functions v ∈ Vh and q ∈ Qh, the scheme satisfies: 
+
+(κ−1 
+
+> n
+
+uh,n +1  
+
+> t
+
+, v) − (ph,n +1  
+
+> w
+
+, ∇ · v) = ( κ−1 
+
+> n
+
+fn(Sh,n w )ξh,n +1  
+
+> c
+
+, v) −
+
+∫
+
+> ΓD
+
+pBw v · n, (2.3) 
+
+∑
+
+> α
+
+βα(uh,n +1  
+
+> t
+
+, q ; Sh,n w ) = ( Ft, q ), (2.4) 
+
+(
+
+ϕ Sh,n +1  
+
+> α
+
+− Sh,n α
+
+tn+1 − tn
+
+, q 
+
+)
+
++ βα(uh,n +1  
+
+> t
+
+, q ; Sh,n w ) = ( Fα, q ) + σαβc(ξh,n +1  
+
+> c
+
+, q ; Sh,n w ), (2.5) 
+
+(κ−1 
+
+> n
+
+ξh,n +1  
+
+> c
+
+, v) = ( pc(Sh,n w ), ∇ · v) −
+
+∫
+
+> ΓD
+
+(pBn − pBw )v · n, (2.6) 
+
+(Sh,n +1  
+
+> n
+
++ Sh,n +1  
+
+> w
+
+, q ) = (1 , q ), (2.7) 
+
+(ph,n +1  
+
+> n
+
+− ph,n +1  
+
+> w
+
+, q ) = ( pc(Sh,n w ), q ). (2.8) Define ti as the i-th time step in a uniform partition of [0 , T ], where T is the final time 
+
+∆t = tn+1 − tn for each n. Set σw = 1 and σn = −1. Let uh,n t ∈ Vh(Ω) and ξh,n c ∈ Vh(Ω) 
+
+be reference velocity solutions to (2.3) and (2.6) at time tn. ph,n w is the reference pressure of wetting phase at time tn which is the solution to (2.3). And ph,n n is defined to be the pressure of non-wetting phase at time tn and it can be solved by (2.8). Define κn = λt(Sh,n w )K. After we get the solutions for uh,n +1  
+
+> t
+
+and ξh,n +1  
+
+> c
+
+, we can update the wetting and non-wetting velocities uh,n +1  
+
+> w
+
+and uh,n +1  
+
+> n
+
+on each element as follows: 
+
+uh,n +1  
+
+> w
+
+= fw(Sh,n w )uh,n +1  
+
+> t
+
+− fw(Sh,n w )fn(Sh,n w )ξh,n +1  
+
+> c
+
+,
+
+uh,n +1  
+
+> n
+
+= fn(Sh,n w )uh,n +1  
+
+> t
+
++ fw(Sh,n w )fn(Sh,n w )ξh,n +1  
+
+> c
+
+.
+
+For q ∈ Qh is piecewise constant, 
+
+βα(v, q ; Shw) = ∑
+
+> Kh∈T h
+
+∫
+
+> ∂K h
+
+fα(S∗,h w,α )v · nq, α = w, n, (2.9) 
+
+βc(v, q ; Shw) = ∑
+
+> Kh∈T h
+
+∫
+
+> ∂K h
+
+fn(S∗,h w,n )fw(S∗,h w,w )v · nq, (2.10) where the upwind value S∗,h w,α on e ⊂ ∂K h in the function fα(S∗,h w,α ) is defined as follows: 
+
+S∗,h α |e =
+
+
+
+Shα|Kh , if {uhα · n}e ≥ 0,Shα|Kh, 1 , if {uhα · n}e < 0, S∗,h w,α =
+
+
+
+S∗,h w , α = w, 
+
+1 − S∗,h n , α = n. 
+
+Here Kh ∩ Kh, 1 = e and n is an outward normal vector to Kh. For e ⊂ Γin , S∗,h w,α |e = Shw|Kh .We further define βt = βw + βn. At the initial time t = 0 , using the initial saturation S0
+
+> w
+
+, the 4numerical flux terms reduce to 
+
+βα(v, q ; S0
+
+> w
+
+) = ∑
+
+> Kh∈T h
+
+∫
+
+> Kh
+
+fα(S0
+
+> w
+
+)q∇ · v dx, α = w, n, βc(v, q ; S0
+
+> w
+
+) = ∑
+
+> Kh∈T h
+
+∫
+
+> Kh
+
+fw(S0
+
+> w
+
+)fn(S0
+
+> w
+
+)q∇ · v dx 
+
+# 3 Construction of Mixed CEM-GMsFEM 
+
+In this section, we will introduce the framework of the mixed CEM-GMsFEM. The multiscale finite element method consists of two steps. First, we construct a multiscale space Qms for approximating the pressure. Based on the space Qms , we construct another multiscale space 
+
+Vms for the velocity. First, we introduce some notations that will be used later. Given a subset S ⊂ Ω, we define Vh, 0(S) := {v ∈ Vh ∩ H(div; S) : v · nS = 0 on ∂S } and Qh(S) := Qh ∩ L2(S). Denote 
+
+κHn = λt(SH,n w )K, pnc = pc(SH,n w )
+
+Define the bilinear forms as follows: 
+
+an(v, w ) = 
+
+∫
+
+> Ω
+
+κ−1 
+
+> n
+
+v · w dx, aHn (v, w ) = 
+
+∫
+
+> Ω
+
+(κHn )−1v · w dx, b(v, q ) = 
+
+∫
+
+> Ω
+
+q∇ · v dx, bD(v, p B ) = 
+
+∫
+
+> ΓD
+
+pB v · n ds, 
+
+Note that the pressure basis functions are locally supported on individual coarse elements. In contrast, the associated velocity basis functions are supported on oversampled regions formed by adding several coarse grid layers to the original element (see Figure 1). The localized feature of these velocity bases is the key of our approach. 
+
+Figure 1: Left: coarse element K. Right: oversampled region K+ extending 2 coarse grid layers around K.
+
+3.1 Construction of pressure multiscale space 
+
+In this section, we outline the procedure for generating the pressure multiscale approxima-tion space, denoted as Qms . For each coarse grid block Ki ∈ T H , we establish a localized eigenvalue problem. Specifically, we seek the eigenpairs (ϕij , p ij ) ∈ Vh, 0(Ki) × Qh(Ki) and the corresponding eigenvalues λij ∈ R satisfying: 
+
+aH 
+
+> 0
+
+(ϕij , v ) − b(v, p ij ) = 0 ∀v ∈ Vh, 0(Ki),b(ϕij , q ) = λij sHi (pij , q ) ∀q ∈ Qh(Ki),
+
+5where j = 1 , . . . , L i, with the integer Li ∈ N+ representing the total number of localized degrees of freedom determined by the fine and coarse meshes. The localized bilinear operator 
+
+si : Qh(Ki) × Qh(Ki) → R is formulated as follows: 
+
+sHi (p, q ) = 
+
+∫
+
+> Ki
+
+˜κH pq dx, where ˜κH = κH
+
+> 0
+> Nc
+
+∑
+
+> j=1
+
+|∇ χj |2.
+
+Here, the basis functions {χj }Nc 
+
+> j=1
+
+constitute a specialized multiscale partition of unity (POU). To be precise, for any internal coarse node xj and its associated overlapping neighbor-hood ωj = ⋃{K ∈ T H : xj ∈ ∂K }, the POU function χj is computed by solving the following local elliptic PDEs within each K ⊂ ωj :
+
+−∇ · (κH 
+
+> 0
+
+∇χj ) = 0 in the interior of K ⊂ ωj ,χj = gj on ∂K \ ∂ω j (for all K ⊂ ωj ),χj = 0 on the boundary ∂ω j .
+
+In the boundary conditions above, gj is a piecewise linear and continuous function along the edges of the coarse element. Based on the normalization, we set the constraint sHi (pij , p ij ) = 1 . Then ordering the eigenvalues such that 0 ≤ λi 
+
+> 1
+
+≤ λi 
+
+> 2
+
+≤ · · · ≤ λiLi and truncate the spectrum, retain only the first 
+
+Ji (where 1 ≤ Ji ≤ Li) eigenfunctions that correspond to the smallest eigenvalues. The global multiscale space for the pressure is defined as the linear span of these selected basis functions: 
+
+Qms = span {pij : i = 1 , . . . , N, j = 1 , . . . , J i}.
+
+3.2 Construction of velocity multiscale functions 
+
+In this subsection, we detail the derivation of the multiscale velocity space, denoted as Vms .First, we define a global projection operator π : Qh → Qms , which can be explicitly formulated as: 
+
+πsq =
+
+> N
+
+∑
+
+> i=1
+> Ji
+
+∑
+
+> j=1
+
+sHi (pij , q )pij , ∀q ∈ Qh.
+
+First of all, we define a global bilinear form s : Qh × Qh → R by the local bilinear form si
+
+as s(p, q ) = ∑Ni=1 sHi (p, q ). From this perspective, the operator πs is an orthogonal projection mapping the fine grid space Qh onto Qms with respect to the s(·, ·) inner product. Global energy-minimizing solutions have decay property and are highly localized. This feature allows us to approximate the global velocity basis within a truncated oversampled region. For any given coarse grid block Ki ∈ T H , we expand its boundary by ℓ (ℓ ∈ N+)coarse grid layers, see figure 1 below. The resulting oversampled domains are defined as: 
+
+Ki, 0 = Ki, Ki,ℓ = ⋃ { 
+
+K ∈ T H : K ∩ Ki,ℓ −1̸ = ∅
+
+}
+
+, for ℓ = 1 , 2, . . . 
+
+For notational simplicity, we let K+ 
+
+> i
+
+denote the target localized region Ki,ℓ with a sufficiently large layer parameter ℓ.For each selected pressure eigenfunction pij ∈ Qms , the corresponding multiscale velocity basis function ψij,ms ∈ Vh, 0(K+ 
+
+> i
+
+) along with qij,ms ∈ Qh(K+ 
+
+> i
+
+) are determined by solving the following localized system: 
+
+aH 
+
+> 0
+
+(ψij,ms , v ) − b(v, q ij,ms ) = 0 ∀v ∈ Vh, 0(K+ 
+
+> i
+
+),s(πsqij,ms , πq ) + b(ψij,ms , q ) = s(pij , q ) ∀q ∈ Qh(K+ 
+
+> i
+
+).
+
+6Then, the global multiscale velocity space is defined by taking the linear span of all these localized velocity basis functions: 
+
+Vms = span 
+
+{
+
+ψij,ms : i = 1 , . . . , N, j = 1 , . . . , J i
+
+}
+
+.
+
+3.3 The adaptive method and discretizations 
+
+From the previous discussion, the multiscale spaces for pressure and velocity have been con-structed as Qms = span {p1, . . . , p Nms }, Vms = span {ψ1, . . . , ψ Nms }, where Nms denotes the number of multiscale basis functions in the final space. In the standard implementation, these multiscale spaces are constructed at the initial time and then kept fixed throughout the whole simulation. However, since the effective permeability κn = λt(Snw)K depends on the satura-tion, the coefficient entering the pressure and velocity equations changes as the saturation updates. Therefore, the multiscale basis functions constructed from the initial coefficient may become outdated at later time levels. To reduce this coefficient-outdated error, we introduce an adaptive update strategy for the multiscale spaces. The main idea is to monitor the variation of the coefficient field by an error indicator and update the CEM multiscale spaces once this indicator exceeds a prescribed tolerance. More precisely, when the update criterion is satisfied, the multiscale spaces are reconstructed by replacing the initial coefficient used in the bilinear forms in Subsections 3.1 and 3.2 with the current coefficient κHn .We first introduce an error indicator to measure the variation of the coefficient field. Let i
+
+denote the last time level at which the multiscale space was updated, and let n be the current time level. We define 
+
+ηn =
+
+∥∥∥∥(
+
+κHi
+
+)− 12 −
+
+(
+
+κHn
+
+)− 12
+
+∥∥∥∥L2(Ω) 
+
+Then the adaptive multiscale solution can be obtained by the following steps. For given SH,n w at the time step tn and most recent updated space Qims and V ims , we seek the multiscale solutions of the P-IMPES scheme at the time step tn+1 as follows: Step 1. First, find the capillary velocity ξH,n +1  
+
+> c
+
+by solving 
+
+aHn (ξH,n +1  
+
+> c
+
+, w ) = b(w, p c(SH,n w )) − bD(w, p Bn − pBw ) ∀w ∈ V ims (3.1) Step 2. Then seek uH,n +1  
+
+> t
+
+∈ V ims and pH,n +1  
+
+> w
+
+∈ Qims satisfying 
+
+aHn (uH,n +1  
+
+> t
+
+, w ) − b(w, p H,n +1  
+
+> w
+
+) = aHn (fn(SH,n w )ξH,n +1  
+
+> c
+
+, w ) − bD(w, p Bw ) ∀w ∈ V ims (3.2) 
+
+∑
+
+> α
+
+βα(uH,n +1  
+
+> t
+
+, q ; SH,n w ) = ( Ft, q ) ∀q ∈ Qims , (3.3) Moreover, to guarantee the uniqueness of the solution, we add an additional constraint as 
+
+∫ 
+
+> Ω
+
+pH,n +1  
+
+> w
+
+= 0 in step 2. Step 3. Update the two phase saturation SH,n +1  
+
+> w
+
+and SH,n +1  
+
+> n
+
+in every fine element Kh ∈ T h
+
+by 
+
+(ϕ SH,n +1  
+
+> w
+
+− SH,n w
+
+∆t , 1Kh ) = −βw(uH,n +1  
+
+> t
+
+, 1Kh ; SH,n w ) + βc(ξH,n +1  
+
+> c
+
+, 1Kh ; SH,n w ) + ( Fw, 1Kh ) (3.4) 
+
+SH,n +1  
+
+> n
+
+= 1 − SH,n +1  
+
+> w
+
+(3.5) Step 4. Then update the effective permeability by κHn+1 = λt(SH,n +1  
+
+> w
+
+)K, and we compute 7the error indicator 
+
+ηn+1 =
+
+∥∥∥∥(
+
+κHi
+
+)− 12 −
+
+(
+
+κHn+1 
+
+)− 12
+
+∥∥∥∥L2(Ω) 
+
+,
+
+For a given prescribed tolerance ε > 0.If ηn+1 > ε , we regenerate the multiscale spaces in Subsections 3.1 and 3.2 using the coefficient κHn+1 . The newly constructed spaces are denoted by Qn+1  
+
+> ms
+
+, V n+1  
+
+> ms
+
+. Then we set 
+
+i = n + 1 .Otherwise, if ηn+1 ≤ ε, the current multiscale spaces are reused, namely Qims , V ims , which are kept unchanged for the next time step. Although our method is formulated by focusing on the wetting phase ( α = w), in fact, this P-IMPES scheme satisfies an unbiased property. It means we can get exactly the same solution using α = n. We will theoretically prove this property in the next section and numerically check it in the numerical experiment. We note that the velocity obtained from (3.2)–(3.3) is conservative only with respect to the multiscale pressure space. To avoid unnecessary local solves, we postprocess only those coarse elements containing a nonzero fine-grid mass residual. Let ̂ uH,n +1  
+
+> t
+
+denote the multi-scale velocity before postprocessing. For each fine element Kh ∈ T h, define Rn+1  
+
+> Kh
+
+:= ( Ft, 1Kh )−
+
+∑ 
+
+> α
+
+βα
+
+(̂ 
+
+uH,n +1  
+
+> t
+
+, 1Kh ; SH,n w
+
+)
+
+, and introduce the marked set T n+1  
+
+> H, pt
+
+=
+
+{
+
+K ∈ T H : ∃Kh ∈ K, R n+1 
+
+> Kh
+
+̸ = 0 
+
+}
+
+.
+
+For each K ∈ T n+1  
+
+> H, pt
+
+, we seek uH,n +1  
+
+> t,p,K
+
+∈ Vh(K) and pH,n +1  
+
+> w,p,K
+
+∈ Qh(K)/R satisfying 
+
+aHn,K (uH,n +1  
+
+> t,p,K
+
+, v) − bK (v, p H,n +1  
+
+> w,p,K
+
+) = aHn,K 
+
+(
+
+fn(SH,n w )ξH,n +1  
+
+> c
+
+, v
+
+)
+
+, ∀v ∈ Vh, 0(K),
+
+∑
+
+> α
+
+βα,K 
+
+(
+
+uH,n +1  
+
+> t,p,K
+
+, q ; SH,n w
+
+)
+
+= ( Ft, q )K , ∀q ∈ Qh(K),
+
+subject to 
+
+uH,n +1  
+
+> t,p,K
+
+· nK =̂ uH,n +1  
+
+> t
+
+· nK on ∂K, (pH,n +1  
+
+> w,p,K
+
+, 1K ) = 0 .
+
+The upwind directions are kept fixed during each local solve. On the unmarked coarse elements, no local problem is solved, and we set uH,n +1  
+
+> t,p
+
+|K =̂ uH,n +1  
+
+> t
+
+|K , for K /∈ T n+1  
+
+> H, pt
+
+.
+
+Since the coarse-element constants belong to Qi
+
+> ms
+
+, equation (3.3) implies ∑ 
+
+> Kh⊂K
+
+Rn+1  
+
+> Kh
+
+= 0 ,
+
+which gives the compatibility condition for every marked local problem. Moreover, the nor-mal trace is unchanged on each coarse-element boundary, and hence uH,n +1  
+
+> t,p
+
+∈ Vh. We introduce the cumulative marked set Ai,n +1  
+
+> H, pt
+
+= ⋃n+1  
+
+> k=i+1
+
+T kH, pt , where i denotes the most re-cent time level at which the CEM space was updated. We then define the selectively en-riched velocity space by ˜V i,n +1 ms = V i 
+
+> ms
+
++ ⊕
+
+> K∈A i,n +1
+> H, pt
+
+Vh, 0(K) ⊂ Vh. The postprocessed pair 
+
+(uH,n +1  
+
+> t,p
+
+, p H,n +1  
+
+> w,p
+
+) ∈ ˜V i,n +1 ms × Qh/R is characterized by 
+
+aHn
+
+(
+
+uH,n +1  
+
+> t,p
+
+, w
+
+)
+
+− b
+
+(
+
+w, p H,n +1 
+
+> w,p
+
+)
+
+= aHn
+
+(
+
+fn(SH,n w )ξH,n +1  
+
+> c
+
+, w
+
+)
+
+− bD(w, p Bw ), ∀w ∈ ˜V i,n +1 ms ,
+
+(3.6) 
+
+∑
+
+> α
+
+βα
+
+(
+
+uH,n +1  
+
+> t,p
+
+, q ; SH,n w
+
+)
+
+= ( Ft, q ), ∀q ∈ Qh. (3.7) We therefore set uH,n +1  
+
+> t
+
+= uH,n +1  
+
+> t,p
+
+, p H,n +1  
+
+> w
+
+= pH,n +1  
+
+> w,p
+
+in the subsequent analysis and saturation update. Next, we will discuss the full discretization of the problem. Let the fine-scale spaces for pres-sure and velocity be spanned by Qh = span {q1, . . . , q Nf } and Vh = span {ϕ1, . . . , ϕ Ne }, and the corresponding multiscale spaces be Qims = span {p1, . . . , p Nms } and V ims = span {ψ1, . . . , ψ Nms }.To relate these spaces algebraically, we construct the mapping matrices. Since for every 8ψi ∈ Vms ⊂ Vh, we can express ψi by the linear span of fine scale basis as ψi = Ne∑
+
+> j=1
+
+vj ϕj . Col-lect all these representative vectors vi = ( vj )Ne×1 and assemble them into a mapping matrix denoted by Vi = [ v1, . . . , vNms ] ∈ RNe×Nms . Similarly, we have the mapping matrix for the multiscale pressure space Pi = [ p1, . . . , pNms ]. Recall that i is the last time level when the most recent multiscale space was updated. First, we give the following definitions of the matrices: 
+
+An =
+
+(
+
+aHn (ϕi, ϕ j )
+
+)
+
+> Ne×Ne
+
+, AH,n = V Ti AnVi
+
+Bn = ( b(ϕi, q j )) Ne×Nf , BH,n = V Ti BnPi
+
+Bnα =
+
+(
+
+βα(ϕi, q j ; SH,n w )
+
+)
+
+> Ne×Nf
+
+, BH,n α = V Ti BnαPi
+
+Bnc =
+
+(
+
+βc(ϕi, q j ; SH,n w )
+
+)
+
+> Ne×Nf
+
+, BH,n c = V Ti Bnc Pi
+
+Anc =
+
+(
+
+aHn (fn(SH,n w )ϕi, ϕ j )
+
+)
+
+> Ne×Ne
+
+, AH,n c = V Ti Anc Vi
+
+D = ( bD(ϕi, 1)) Ne×1 , DH = V Ti D
+
+Fα = ( Fα, q i)Nf ×1, Ft = Fw + Fn, ΠiFα = P Ti Fα
+
+(MatrixVector Formulation) For given SH,n w ∈ RNf at the time step tn. We seek the multiscale solutions of the P-IMPES scheme at the time step tn+1 as follows: Step 1. First, discretize the capillary velocity ξH,n +1  
+
+> c
+
+= Nms ∑
+
+> i=1
+
+xn+1  
+
+> i
+
+ψi and obtain xn+1  
+
+> c
+
+=(xn+1  
+
+> i
+
+)Nms ×1 by solving 
+
+AH,n xn+1  
+
+> c
+
+= V Ti Bnpc(SH,n w ) − (pBn − pBw )DH (3.8) Step 2. We further seek uH,n +1  
+
+> t
+
+∈ RNms , pH,n +1  
+
+> w
+
+∈ RNms by 
+
+[
+
+AH,n −BH,n 
+
+−(BH,n w + BH,n n )T 0
+
+] [ 
+
+uH,n +1 
+
+> t
+
+pH,n +1 
+
+> w
+
+]
+
+=
+
+[
+
+AH,n c xn+1  
+
+> c
+
+− pBw DH
+
+−ΠiFt
+
+]
+
+. (3.9) Then apply the local postprocessing procedure in every coarse element K ∈ A i,n +1  
+
+> H, pt
+
+and assem-ble the postprocessed fine-grid velocity uH,n +1  
+
+> t,p
+
+.Step 3. Finally, update the two phase saturation SH,n +1  
+
+> w
+
+and SH,n +1  
+
+> n
+
+by 
+
+ϕ SH,n +1  
+
+> w
+
+− SH,n w
+
+∆t = −(Bnw)T uH,n +1  
+
+> t,p
+
++ ( Bnc )T Vixn+1  
+
+> c
+
++ Fw
+
+SH,n +1  
+
+> n
+
+= 1 − SH,n +1  
+
+> w
+
+(3.10) Step 4. Adaptive update of the multiscale spaces. After obtaining SH,n +1  
+
+> w
+
+, set κHn+1 =
+
+λt(SH,n +1  
+
+> w
+
+)K and compute ηn+1 = ∥
+
+(
+
+κHi
+
+)− 12 −
+
+(
+
+κHn+1 
+
+)− 12 ∥2.
+
+If ηn+1 > ε , then regenerate the CEM multiscale spaces with the current coefficient κHn+1 ,and update 
+
+Qims = Qn+1  
+
+> ms
+
+, V ims = V n+1  
+
+> ms
+
+, Pi = Pn+1 , Vi = Vn+1 , i = n + 1 .
+
+Otherwise, the current spaces and mapping matrices are kept unchanged. We remark that Step 2 is solved together with the condition ∫ 
+
+> Ω
+
+p = 0 , so we will add Lagrange multiplier in (3.9) to satisfy the constraint. 94 Analysis 
+
+In this section, we present the theoretical analysis of the proposed method in two main parts. First, following the analytical framework in [12], we establish several key properties of the scheme. Subsequently, we derive an essential relationship between the saturation error and the velocity error. 
+
+4.1 Local conservation of mass and unbiased property 
+
+In this subsection, we prove two physical properties of the proposed multiscale P-IMPES scheme: local mass conservation and the unbiased property. Although only the wetting-phase saturation is updated explicitly, the non-wetting-phase saturation is determined by the sat-uration constraint and also satisfies a conservative discrete equation. This follows from the fine-grid conservation of the total velocity and the wetting-phase conservation equation. We also show that the same discrete solution is obtained whether the saturation equation is written for the wetting phase or for the non-wetting phase. Next We will prove the result in two parts. 
+
+(i) Local conservation of mass. The scheme updates only the wetting phase via 
+
+(
+
+ϕ SH,n +1  
+
+> w
+
+− SH,n w
+
+tn+1 − tn
+
+, q 
+
+)
+
++ βw(uH,n +1  
+
+> t
+
+, q ; SH,n w ) = ( Fw, q ) + βc(ξH,n +1  
+
+> c
+
+, q ; SH,n w ), (4.1) 
+
+SH,n +1  
+
+> n
+
+= 1 − SH,n +1 
+
+> w
+
+The two phase mass conservation means that both phases satisfy: 
+
+(
+
+ϕ SH,n +1  
+
+> w
+
+− SH,n w
+
+tn+1 − tn
+
+, q 
+
+)
+
++ βw(uH,n +1  
+
+> t
+
+, q ; SH,n w ) = ( Fw, q ) + βc(ξH,n +1  
+
+> c
+
+, q ; SH,n w ), (4.2) 
+
+(
+
+ϕ SH,n +1  
+
+> n
+
+− SH,n n
+
+tn+1 − tn
+
+, q 
+
+)
+
++ βn(uH,n +1  
+
+> t
+
+, q ; SH,n w ) = ( Fn, q ) − βc(ξH,n +1  
+
+> c
+
+, q ; SH,n w ). (4.3) Since (4.1) and (4.2) coincide, it suffices to show that SH,n +1  
+
+> n
+
+from SH,n +1  
+
+> n
+
+= 1 − SH,n +1  
+
+> w
+
+agrees with the solution of (4.3). On the one hand, adding (4.2) and (4.3), using (3.7) we have 
+
+∑
+
+> α
+
+(
+
+ϕ SH,n +1  
+
+> α
+
+− SH,n α
+
+tn+1 − tn
+
+, q 
+
+)
+
+= 0 .
+
+Choosing q = 1Kh gives ∑
+
+> α
+
+(SH,n +1  
+
+> α
+
+− SH,n α ) = 0 on each Kh. Combined with the initial condition SH, 0 
+
+> w
+
++ SH, 0 
+
+> n
+
+= 1 , this derives SH,n +1  
+
+> w
+
++ SH,n +1  
+
+> n
+
+= 1 for all n. On the other hand, subtracting (4.1) by (3.7) and replacing SHw = 1 − SHn in the first term left, we can obtain (4.3) directly. 
+
+(ii) Unbiased property for velocity. From part (i), SH,n +1  
+
+> w
+
+and SH,n +1  
+
+> n
+
+are unbiased. The total velocity uH,n +1  
+
+> t
+
+and the wetting pressure pH,n +1  
+
+> w
+
+are uniquely determined by (3.2) and (3.3); ξH,n +1  
+
+> c
+
+is uniquely solved by (3.1). The phase velocities uH,n +1  
+
+> α
+
+are unbiased via 
+
+uH,n +1  
+
+> w
+
+= fw(SH,n w )uH,n +1  
+
+> t
+
+− fw(SH,n w )fn(SH,n w )ξH,n +1  
+
+> c
+
+,
+
+uH,n +1  
+
+> n
+
+= fn(SH,n w )uH,n +1  
+
+> t
+
++ fw(SH,n w )fn(SH,n w )ξH,n +1  
+
+> c
+
+,
+
+4.2 Bounds-preserving property for both phases 
+
+This part is motivated by the arguments in [12]. We first give two auxiliary lemmas that will be used to establish the bounds-preserving property. 10 Lemma 4.1. There exists a positive constant lα such that 
+
+fα(Sα) ≤ lαSα, α = w, n. 
+
+This lemma shows that each fractional flow function can be bounded above by a linear function of the corresponding saturation. 
+
+Lemma 4.2. Suppose that Fα defined in (2.1) is a sink term, namely Fα ≤ 0. Then there exist two positive constants l1 and l2 such that 
+
+l1Sα ≤ | Fα| ≤ l2Sα.
+
+The above two lemmas have been proved in [12]. Based on these results, we now state the theorem that guarantees the bounds-preserving property. 
+
+Theorem 4.1. Assume that SH,n α ∈ (0 , 1) and that there exists a tolerance saturation Stα > 0
+
+such that 
+
+SH,n α ≥ Stα > 0, α = w, n. 
+
+Let ∆t = tn+1 − tn. For any Kh ∈ T h, if ∆th is sufficiently small, then 
+
+SH,n +1  
+
+> α
+
+∈ (0 , 1) , α = w, n. 
+
+Proof. The proof follows the argument of Lemma 4.3 in [12], with uh,n +1  
+
+> t
+
+replaced by the multiscale velocity uH,n +1  
+
+> t
+
+. We only prove the positivity of the wetting-phase saturation; the non-wetting phase can be treated in the same way. For any Kh ∈ T h, taking q = 1Kh in (3.4) gives 
+
+ϕ
+
+(
+
+SH,n +1  
+
+> w
+
+− SH,n w
+
+)
+
+= ∆ tF w + ∆th
+
+∑ 
+
+> F⊂∂K h
+
+fw(S∗,H,n w,w )
+
+(
+
+fn(S∗,H,n w,n )ξH,n +1  
+
+> c
+
+· n − uH,n +1  
+
+> t
+
+· n
+
+) ∣∣F
+
+(4.4) Define vH,n +1  
+
+> w
+
+∈ Vms by 
+
+vH,n +1  
+
+> w
+
+· n = uH,n +1  
+
+> t
+
+· n − fn(S∗,H,n w,n )ξH,n +1  
+
+> c
+
+· n on F ∈ E f .
+
+Then 
+
+SH,n +1  
+
+> w
+
+= SH,n w + ∆tϕ Fw − ∆tϕh 
+
+∑ 
+
+> F⊂∂K h
+
+fw(S∗,H,n w,w )vH,n +1  
+
+> w
+
+· n∣∣F . (4.5) Let 
+
+∂K h, + 
+
+> w,n +1
+
+=
+
+{
+
+F ⊂ ∂K h : vH,n +1  
+
+> w
+
+· n∣∣F ≥ 0
+
+}
+
+.
+
+The incoming part gives a nonnegative contribution in (4.5), and hence can be omitted when deriving a lower bound. Therefore, 
+
+SH,n +1  
+
+> w
+
+≥ SH,n w + ∆tϕ Fw − ∆tϕh 
+
+∑ 
+
+> F⊂∂K h, +
+> w,n +1
+
+fw(S∗,H,n w,w )vH,n +1  
+
+> w
+
+· n∣∣F .
+
+For the sink term, Lemma 4.2 implies Fw ≥ − l2SH,n w , while Lemma 4.1 gives 
+
+fw(S∗,H,n w,w ) ≤ lwS∗,H,n w,w .
+
+Thus the outflow contribution is bounded by a constant multiple of SH,n w , except possibly on the fine edges where the sign of vH,n +1  
+
+> w
+
+· n changes from time level n to n + 1 . On those 11 sign-changing edges, the normal flux can be made arbitrarily small when ∆t is sufficiently small. Hence there exist positive constants ε1 and ε2 such that, if 
+
+∆th ≤ ε1,
+
+∣∣∣vH,n +1  
+
+> w
+
+· n
+
+∣∣∣F ≤ ε2 on the sign-changing fine edges ,
+
+then, for some η ∈ (0 , 1) ,
+
+SH,n +1  
+
+> w
+
+≥ ηS tw > 0.
+
+Since SH,n w ≥ Stw > 0, the above two conditions are satisfied once ∆t/h is sufficiently small. Applying the same argument to the non-wetting phase yields 
+
+SH,n +1  
+
+> n
+
+≥ ηS tn > 0.
+
+Finally, using the discrete phase conservation relation 
+
+SH,n +1  
+
+> w
+
++ SH,n +1  
+
+> n
+
+= 1 ,
+
+we obtain 
+
+0 < S H,n +1  
+
+> α
+
+< 1, α = w, n. 
+
+This completes the proof. 
+
+Remark. By the proof of Theorem 4.1, the stability restriction on the time step can be written in a phase-flux form as 
+
+max  
+
+> α=w,n
+
+En+1 
+
+> α
+
+∆th + C∆t < ϕ, 
+
+where 0 < ϕ < 1, C depends on the sink term, and 
+
+En+1  
+
+> α
+
+= max 
+
+> Kh∈T h
+
+∑ 
+
+> F⊂∂K h
+
+(fα(S∗,H,n α )vH,n +1  
+
+> α
+
+· n)+, α = w, n. 
+
+Here a+ = max {a, 0}, and vH,n +1  
+
+> α
+
+denotes the effective phase velocity appearing in the sat-uration equation. In the numerical experiments, we use the following CFL condition, which includes both the convective flux induced by the total velocity and the capillary diffusion flux induced by ξH,n +1  
+
+> c
+
+:
+
+θcf l = max 
+
+> n
+
+∆tϕh 
+
+(
+
+∥uH,n +1  
+
+> t
+
+∥L∞(Ω) ∥f ′
+
+> w
+
+∥L∞(0 ,1) + ∥ξH,n +1  
+
+> c
+
+∥L∞(Ω) ∥(fwfn)′∥L∞(0 ,1) 
+
+)
+
+< 1.
+
+The time step size ∆t is chosen such that θcf l < 1.
+
+4.3 Error estimate 
+
+In this subsection, we establish the error estimates. To obtain the numerical errors induced by the multiscale velocity approximation, we restrict our analysis to the zero-capillary form, namely the advection-dominated Buckley-Leverett flow. Incorporating capillary pressure leads to a degenerate parabolic–hyperbolic problem and requires additional estimates for the capil-lary velocity, which are left for future work. Under this condition, we set zero Dirichlet and zero Neumann boundary condition, then (2.3), (2.4) can be reduced to: 
+
+an(uh,n +1  
+
+> t
+
+, v ) − b(v, p h,n +1  
+
+> w
+
+) = 0 , ∀v ∈ Vh (4.6) 
+
+b(uh,n +1  
+
+> t
+
+, q ) = ( Ft, q ) ∀q ∈ Qh (4.7) 12 Similarly for (3.6), (3.7), the postprocessed multiscale solution satisfies: 
+
+aHn (uH,n +1  
+
+> t
+
+, w ) − b(w, p H,n +1  
+
+> w
+
+) = 0 ∀w ∈ ˜V i,n +1  
+
+> ms
+
+(4.8) 
+
+b(uH,n +1  
+
+> t
+
+, q ) = ( Ft, q ) ∀q ∈ Qh (4.9) Besides, define a local version of the norms ∥·∥ ai(D), ∥·∥ Vi(D) and ∥·∥ si(D) at corresponding time t = ti.
+
+∥v∥2 
+
+> Vi(D)
+
+=
+
+∫
+
+> D
+
+˜κ−1 
+
+> i
+
+|∇ · v|2 +
+
+∫
+
+> D
+
+κ−1 
+
+> i
+
+|v|2, ∥q∥2 
+
+> si(D)
+
+=
+
+∫
+
+> D
+
+˜κi|q|2
+
+∥v∥2 
+
+> ai(D)
+
+=
+
+∫
+
+> D
+
+κ−1 
+
+> i
+
+|v|2, ∥v∥2  
+
+> aHi(D)
+
+=
+
+∫
+
+> D
+
+(κHi )−1|v|2.
+
+Next, we will introduce some assumptions used in the error analysis. 
+
+Same-direction assumption. For every fine edge F ⊂ ∂K h,
+
+(
+
+uh,n +1  
+
+> t
+
+· n
+
+) ( 
+
+uH,n +1  
+
+> t
+
+· n
+
+) ∣∣F ≥ 0. (4.10) Thus the fine-scale and multiscale velocities determine the same upwind direction on each fine edge. 
+
+Front-layer decomposition. For each time level tn, we decompose the fine mesh into a smooth region and a front layer, 
+
+Th = Gnh ∪ B nh , Gnh ∩ B nh = ∅.
+
+The set Bnh contains the cells close to the saturation fronts, shocks, and possible mismatch strips between the fine-scale and multiscale fronts. We assume that 
+
+|Ωn
+
+> B
+
+| ≤ δh, 0 ≤ n ≤ N. 
+
+On the smooth region, the two saturation profiles are locally smooth in the following discrete sense: for neighboring fine cells Kh, K h, 1 ∈ G nh which share an edge F , we define 
+
+ζh = max  
+
+> 0≤n≤N
+
+max  
+
+> Kh,K h, 1∈G nh
+> F=Kh∩Kh, 1
+
+[
+
+ω 12 
+
+> n,F
+
+|Sh,n w,K h − Sh,n w,K h, 1 | + ( ωHn,F ) 12 |SH,n w,K h − SH,n w,K h, 1 |
+
+]
+
+, (4.11) where ωn,F = max( κn|Kh , κ n|Kh, 1 ), ωHn,F = max( κHn |Kh , κ Hn |Kh, 1 ). On the smooth region, we assume that ζh
+
+h = O(1) as h → 0.
+
+Moreover, the front layer is enlarged by a fixed number of fine-cell layers so that the following stencil closure property holds: if Kh ∈ G n+1  
+
+> h
+
+, then every fine cell involved in the upwind update of Kh at time tn belongs to Gnh .For a velocity u, define the upwind update operator Lu by 
+
+(LuS)Kh = SKh − ∆tϕ|Kh|
+
+∑ 
+
+> F⊂∂K h
+
+|F |
+
+(
+
+u+ 
+
+> Kh,F
+
+fw(SKh ) + u− 
+
+> Kh,F
+
+fw(SKh,i )
+
+)
+
++ ∆tϕ|Kh| (Fw, 1Kh ),
+
+(4.12) Here u+ = max {u, 0} denotes the outgoing flux, u− = min {u, 0} denotes the incoming flux. 
+
+Lemma 4.3 (Front-aware transport estimates) . Under the bounds-preserving property 0 ≤
+
+13 Sh,n w , S H,n w ≤ 1, the same-direction condition and the front-layer assumptions. Then the fol-lowing estimates hold. 
+
+(i) Front-layer contribution. 
+
+∥enS ∥L2(Ω n  
+
+> B)
+
+≤ | Ωn
+
+> B
+
+|1/2 ≤ δ1/2 
+
+> h
+
+. (4.13) (ii) Saturation stability on the smooth region. 
+
+Let S1, S 2 ∈ Qh, 0 ≤ S1, S 2 ≤ 1, and suppose that the smooth-region condition (4.11) holds for both S1 and S2. Then 
+
+∥L uS1 − L uS2∥2,Gn+1 
+
+> h
+
+≤ (1 + Cst ∆t)∥S1 − S2∥2,Gnh , (4.14) 
+
+where Cst = Cϕ −1 (
+
+Lf ∥Ft∥L∞(Ω) + Lf ζh 
+
+> h√κmin
+
+∥u∥L∞(Ω) 
+
+)
+
+and C depends only on the shape regu-larity of the fine mesh. 
+
+(iii) Velocity estimate on the smooth region. 
+
+En+1  
+
+> G
+
+≤ (1 + Cst ∆t)EnG + Cv∆t∥en+1  
+
+> ut
+
+∥aHn (Ω) . (4.15) 
+
+where Cv = Cϕ −1Lf ζhh−1, and denote EnG = ∥enS ∥2,Gnh .
+
+Proof. We prove the estimates in four parts. Step 1, since the scheme is bounds-preserving, we have 0 ≤ Sh,n w , S H,n w ≤ 1. Hence 
+
+|enS | = |Sh,n w − SH,n w | ≤ 1,
+
+and therefore 
+
+∥enS ∥2  
+
+> L2(Ω n
+> B)
+
+≤ | Ωn
+
+> B
+
+| ≤ δh.
+
+This gives 
+
+∥enS ∥L2(Ω n  
+
+> B)
+
+≤ δ1/2 
+
+> h
+
+,
+
+which proves (i). Step 2: Saturation stability on the smooth region. Set dKh = S1|Kh − S2|Kh , DKh =(LuS1 − L uS2)Kh . For Kh ∈ G n+1  
+
+> h
+
+, the closure property implies that every cell entering the update of Kh belongs to Gnh . From (4.12), we have 
+
+DKh = dKh − ∆tϕ|Kh|
+
+> Nneigh
+
+∑ 
+
+> F=Kh∩Kh,i
+
+|F |[u+ 
+
+> Kh,F
+
+(fw(S1|Kh ) − fw(S2|Kh )) + u− 
+
+> Kh,F
+
+(fw(S1|Kh,i ) − fw(S2|Kh,i ))] .
+
+Denote θKh = fw (S1|Kh )−fw (S2|Kh ) 
+
+> dKh
+
+, θi = fw (S1|Kh,i )−fw (S2|Kh,i ) 
+
+> dKh,i
+
+and define 
+
+rKh = 1 + ∆tϕ|Kh| ( ∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )θi − ∑  
+
+> F⊂∂K h
+> uKh,F >0
+
+|F |uKh,F θKh ).
+
+Adding and subtracting ∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |uKh,F θKh , we obtain 
+
+rKh = 1 − ∆tϕ|Kh| θKh
+
+∑ 
+
+> F⊂∂K h
+
+|F |uKh,F + ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )( θi − θKh ).
+
+14 Since u ∈ RT 0, ∑ 
+
+> F⊂∂K h
+
+|F |uKh,F =
+
+∫
+
+> ∂K h
+
+u · n =
+
+∫
+
+> Kh
+
+∇ · u =
+
+∫
+
+> Kh
+
+Ft
+
+And by the Lipschitz condition in fw, we obtain 
+
+∣∣∣∣∣∣
+
+1
+
+|Kh| θKh
+
+∑ 
+
+> F⊂∂K h
+
+|F |uKh,F 
+
+∣∣∣∣∣∣ ≤ Lf ∥Ft∥L∞(Ω) .
+
+Moreover, 
+
+|θi − θKh | ≤ CL f (|S1|Kh,i − S1|Kh | + |S2|Kh,i − S2|Kh |).
+
+Using the smooth-region assumption (4.11), we obtain 
+
+|θi − θKh | ≤ CL f ζh
+
+√κmin 
+
+.
+
+Therefore, 1
+
+|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )|θi − θKh | ≤ C Lf ζh
+
+h√κmin 
+
+∥u∥L∞(Ω) .
+
+Combining above discussions gives 
+
+rKh ≤ 1 + Cst ∆t. (4.16) Here Cst = Cϕ −1 (
+
+Lf ∥Ft∥L∞(Ω) + Lf ζh 
+
+> h√κmin
+
+∥u∥L∞(Ω) 
+
+)
+
+, C only depends on the shape regularity of the mesh. Equivalently, using the expression of DKh , we can write 
+
+DKh =
+
+1 − ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F >0
+
+|F |uKh,F θKh
+
+ dKh + ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )θidKh,i .
+
+By the CFL condition, all coefficients in the above convex combination are nonnegative. Then applying Jensen’s inequality in φ(t) = t2 gives 
+
+|DKh |2 ≤ rKh
+
+[( 
+
+1 − ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F >0
+
+|F |uKh,F θKh
+
+)
+
+|dKh |2 + ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )θi|dKh,i |2
+
+]
+
+.
+
+Using (4.16), we further get 
+
+|DKh |2 ≤ (1 + Cst ∆t)
+
+[( 
+
+1 − ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F >0
+
+|F |uKh,F θKh
+
+)
+
+|dKh |2
+
++ ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )θi|dKh,i |2
+
+]
+
+.
+
+15 Multiplying ϕ|Kh| and summing over Kh ∈ G n+1  
+
+> h
+
+, we obtain 
+
+∑
+
+> Kh∈G n+1
+> h
+
+ϕ|Kh|| DKh |2 ≤(1 + Cst ∆t) ∑
+
+> Kh∈G n+1
+> h
+
+ϕ|Kh|
+
+(
+
+1 − ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F >0
+
+|F |uKh,F θKh
+
+)
+
+|dKh |2
+
++ (1 + Cst ∆t) ∑
+
+> Kh∈G n+1
+> h
+
+∆t ∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )θi|dKh,i |2.
+
+(4.17) We now use the conservation of the finite volume flux in full mesh under the zero Neumann boundary condition: 
+
+∑
+
+> Kh∈T h
+
+ϕ|Kh|
+
+1 − ∆tϕ|Kh|
+
+∑  
+
+> F⊂∂K h
+> uKh,F >0
+
+|F |uKh,F θKh
+
+ |dKh |2
+
++ ∑
+
+> Kh∈T h
+
+∆t ∑  
+
+> F⊂∂K h
+> uKh,F <0
+
+|F |(−uKh,F )θi|dKh,i |2 = ∑
+
+> Kh∈T h
+
+ϕ|Kh|| dKh |2.
+
+(4.18) If non-zero Neumann boundary conditions are prescribed, the same argument is applied after subtracting the common boundary contribution. Since all the terms in the two sums on the left-hand side of (4.18) are nonnegative, the restricted sum over Kh ∈ G n+1  
+
+> h
+
+is no larger than the full-grid sum. Moreover, by the closure property of the smooth region, only the values dKh with Kh ∈ G nh can appear in the restricted update. Thus (4.17) and (4.18) imply 
+
+∑
+
+> Kh∈G n+1
+> h
+
+ϕ|Kh|| DKh |2 ≤ (1 + Cst ∆t) ∑
+
+> Kh∈G nh
+
+ϕ|Kh|| dKh |2,
+
+which is equivalent to 
+
+∥L uS1 − L uS2∥22,Gn+1 
+
+> h
+
+≤ (1 + Cst ∆t)∥S1 − S2∥22,Gnh .
+
+which gives: 
+
+∥L uS1 − L uS2∥2,Gn+1 
+
+> h
+
+≤ (1 + Cst ∆t)∥S1 − S2∥2,Gnh .
+
+This proves the stability estimate on the smooth region. Step 3: Velocity perturbation on the smooth region. Let 
+
+en+1  
+
+> ut
+
+= uh,n +1  
+
+> t
+
+− uH,n +1  
+
+> t
+
+.
+
+By (4.7) and (4.9), 
+
+b(en+1  
+
+> ut
+
+, q ) = 0 , ∀q ∈ Qh.
+
+Thus, on each fine cell Kh, ∑ 
+
+> F⊂∂K h
+
+|F | en+1  
+
+> ut
+
+· n = 0 . (4.19) Because of the same-direction assumption (4.10), the upwind cell is the same for uh,n +1 
+
+> t
+
+and uH,n +1  
+
+> t
+
+. Therefore, for S = SH,n w ,
+
+(Luh,n +1 
+
+> t
+
+S − L uH,n +1 
+
+> t
+
+S)Kh = − ∆tϕ|Kh|
+
+∑ 
+
+> F⊂∂K h
+
+|F | fw(S∗,H w ) en+1  
+
+> ut
+
+· nKh,F . (4.20) 16 Using (4.19), we subtract fw(SH,n Kh ) and obtain 
+
+∑
+
+F ⊂∂K h
+
+|F |fw(S∗,H w )en+1 
+
+ut · nKh,F = ∑
+
+F ⊂∂K h
+
+|F |
+
+[
+
+fw(S∗,H w ) − fw(SH,n Kh )
+
+]
+
+en+1 
+
+ut · nKh,F .
+
+On an outflow edge, S∗,H w = SH,n Kh , so the corresponding term vanishes. On an inflow edge 
+
+F = Kh ∩ Kh,i , the upwind value is SKh,i . Since we are on the smooth stencil, 
+
+|SH,n Kh,i − SH,n Kh | ≤ ζh
+
+√
+
+ωHn,F 
+
+.
+
+Thus 
+
+|fw(SH,n Kh,i ) − fw(SH,n Kh )| ≤ Lf ζh
+
+√
+
+ωHn,F 
+
+.
+
+Consequently, 
+
+∣∣∣∣∣∣∑
+
+F ⊂∂K h
+
+|F |fw(S∗,H w )en+1 
+
+ut · n
+
+∣∣∣∣∣∣ ≤ CL f ζh
+
+∑
+
+F ⊂∂K h
+
+|F |
+
+√
+
+κHn
+
+|en+1 
+
+ut · n|.
+
+Then, by Cauchy’s inequality, we have 
+
+ ∑
+
+F ⊂∂K h
+
+|F |(κHn )− 12
+
+∣∣∣en+1 
+
+ut · n
+
+∣∣∣
+
+2
+
+≤
+
+ ∑
+
+F ⊂∂K h
+
+|F |
+
+ ∑
+
+F ⊂∂K h
+
+|F |(κHn )−1 ∣∣∣en+1 
+
+ut · n
+
+∣∣∣2
+
+
+
+≤ Ch ∑
+
+F ⊂∂K h
+
+|F |(κHn )−1 ∣∣∣en+1 
+
+ut · n
+
+∣∣∣2
+
+.
+
+Applying the inverse trace estimate for RT 0 functions gives 
+
+h ∑
+
+F ⊂∂K h
+
+|F |(κHn )−1 ∣∣∣en+1 
+
+ut · n
+
+∣∣∣2
+
+≤ C
+
+∥∥∥en+1 
+
+ut
+
+∥∥∥2
+
+aHn (Kh) .
+
+Consequently, 
+
+1
+
+|Kh|
+
+∣∣∣∣∣∣∑
+
+F ⊂∂K h
+
+|F |fw(S∗,H F )en+1 
+
+ut · n
+
+∣∣∣∣∣∣
+
+2
+
+≤ CL 2
+
+f ζ2
+
+h
+
+h2
+
+∥∥∥en+1 
+
+ut
+
+∥∥∥2
+
+aHn (Kh) .
+
+Using (4.20), summing over Kh ∈ G n+1 
+
+h , and using the finite-overlap property of neighboring cells, we get 
+
+∥L uh,n +1 
+
+> t
+
+S − L uH,n +1 
+
+> t
+
+S∥22,Gn+1 
+
+> h
+
+≤ C∆t2h−2ϕ−2L2
+
+f ζ2
+
+h∥en+1 
+
+ut ∥2
+
+aHn (Ω) . (4.21) .Step 4: Smooth-region recursion. The fine-scale and multiscale saturation updates are 
+
+Sh,n +1 
+
+w = Luh,n +1 
+
+> t
+
+Sh,n w , SH,n +1 
+
+w = LuH,n +1 
+
+> t
+
+SH,n w .
+
+Therefore, 
+
+en+1 
+
+S = Luh,n +1 
+
+> t
+
+Sh,n w − L uH,n +1 
+
+> t
+
+SH,n w
+
+=
+
+(
+
+Luh,n +1 
+
+> t
+
+Sh,n w − L uh,n +1 
+
+> t
+
+SH,n w
+
+)
+
++
+
+(
+
+Luh,n +1 
+
+> t
+
+SH,n w − L uH,n +1 
+
+> t
+
+SH,n w
+
+)
+
+.
+
+17 Taking the ∥ · ∥ 2,Gn+1 
+
+> h
+
+-norm and applying (4.14) and (4.21) yields 
+
+En+1  
+
+> G
+
+≤ (1 + Cst ∆t)EnG + Cv∆t∥en+1  
+
+> ut
+
+∥aHn (Ω) ,
+
+where Cv = Cϕ −1Lf ζhh−1.
+
+Lemma 4.4. Recall that i denote the last time level at which the multiscale space was updated, and n is the current time level. uh,i +1  
+
+> t
+
+and uh,n +1  
+
+> t
+
+are solutions to (4.6)-(4.7) at corresponding time levels. The following estimation holds: 
+
+∥uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥an ≤ 2∥uht ∥L∞(0 ,T ;Ω) ∥κ− 12 
+
+> i
+
+− κ− 12 
+
+> n
+
+∥L2(Ω) 
+
+Proof. First we have 
+
+∥uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥an ≤ ∥ κ− 12 
+
+> n
+
+uh,n +1  
+
+> t
+
+− κ− 12 
+
+> i
+
+uh,i +1  
+
+> t
+
+∥L2(Ω) + ∥κ− 12 
+
+> i
+
+uh,i +1  
+
+> t
+
+− κ− 12 
+
+> n
+
+uh,i +1  
+
+> t
+
+∥L2(Ω) 
+
+For the second term on the right-hand side, we directly obtain 
+
+∥κ− 12 
+
+> i
+
+uh,i +1  
+
+> t
+
+− κ− 12 
+
+> n
+
+uh,i +1  
+
+> t
+
+∥L2(Ω) ≤ ∥ uht ∥L∞(0 ,T ;Ω) ∥κ− 12 
+
+> n
+
+− κ− 12 
+
+> i
+
+∥L2(Ω) (4.22) For the first term, we recall the mixed variational forms at tn and ti. By taking v = uh,n +1 
+
+> t
+
+in (4.6) and q = ph,n +1  
+
+> h
+
+in (4.7), we have: 
+
+∫
+
+> Ω
+
+κ−1 
+
+> n
+
+|uh,n +1  
+
+> t
+
+|2 =
+
+∫
+
+> Ω
+
+Ftph,n +1 
+
+> w
+
+By choosing v = uh,i +1  
+
+> t
+
+and q = ph,n +1  
+
+> w
+
+as test functions in the corresponding systems at different time levels, we obtain relations: 
+
+∫
+
+> Ω
+
+κ−1 
+
+> n
+
+uh,n +1  
+
+> t
+
+· uh,i +1  
+
+> t
+
+=
+
+∫
+
+> Ω
+
+κ−1 
+
+> n
+
+|uh,n +1  
+
+> t
+
+|2, (4.23) and similarly, ∫
+
+> Ω
+
+κ−1 
+
+> i
+
+uh,i +1  
+
+> t
+
+· uh,n +1  
+
+> t
+
+=
+
+∫
+
+> Ω
+
+κ−1 
+
+> i
+
+|uh,i +1  
+
+> t
+
+|2. (4.24) Using the relations (4.23) and (4.24), the difference in weighted L2 norms can be expanded and simplified as: 
+
+∫
+
+> Ω
+
+|κ− 12 
+
+> n
+
+uh,n +1  
+
+> t
+
+− κ− 12 
+
+> i
+
+uh,i +1  
+
+> t
+
+|2 =
+
+∫
+
+> Ω
+
+|κ− 12 
+
+> n
+
+− κ− 12 
+
+> i
+
+|2|uh,n +1  
+
+> t
+
+· uh,i +1  
+
+> t
+
+|≤ ∥ uht ∥2 
+
+> L∞(0 ,T ;Ω)
+
+∥κ− 12 
+
+> n
+
+− κ− 12 
+
+> i
+
+∥2 
+
+> L2(Ω)
+
+(4.25) Combined with (4.22) and (4.25), we get the conclusion. 
+
+Lemma 4.5. Assume at time level ti, the multiscale space is newly updated, let uh,i +1  
+
+> t
+
+denote the fine-scale solution of (4.6) –(4.7) and uH,i +1  
+
+> t
+
+be the postprocessed multiscale velocity obtained from (4.8) –(4.9) . Then 
+
+∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi ≤ CH 
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ Cλ∥uht ∥L∞(0 ,T ;Ω) ∥eiS ∥aHi .
+
+where C is independent of the contrast and the mesh size. 
+
+18 Proof. Let uH,i +1 ms denote the mixed CEM velocity before the selective postprocessing step. We introduce the auxiliary mixed pair (˜uh,i +1  
+
+> t
+
+, ˜ph,i +1  
+
+> w
+
+) ∈ Vh × Qh/R satisfying 
+
+aHi
+
+(˜uh,i +1  
+
+> t
+
+, v
+
+)
+
+− b
+
+(
+
+v, ˜ph,i +1 
+
+> w
+
+)
+
+= 0 , ∀v ∈ Vh, (4.26) 
+
+b
+
+(˜uh,i +1  
+
+> t
+
+, q 
+
+)
+
+= ( Ft, q ), ∀q ∈ Qh.
+
+By Theorem 1 in [36], we have 
+
+∥∥∥˜ uh,i +1  
+
+> t
+
+− uH,i +1 ms 
+
+∥∥∥2
+
+> aHi
+
+≲ H2
+
+( 1Λ + ∥Ft∥2
+
+> L2(Ω)
+
+)
+
+. (4.27) We next estimate the perturbation induced by the selective postprocessing. Since Ai,i +1  
+
+> H, pt
+
+=
+
+T i+1 
+
+> H, pt
+
+, we define 
+
+eK =
+
+(
+
+uH,i +1  
+
+> t
+
+− uH,i +1 ms 
+
+)
+
+|K , K ∈ A i,i +1  
+
+> H, pt
+
+,
+
+and set eK = 0 for K / ∈ A i,i +1  
+
+> H, pt
+
+. Since the postprocessing preserves the normal flux on ∂K ,
+
+eK ∈ Vh, 0(K). Moreover, fine-grid conservation gives 
+
+bK (eK , q ) = 
+
+(
+
+Ft − ∇ · uH,i +1 ms , q 
+
+) 
+
+> K
+
+, ∀q ∈ Qh(K).
+
+The local mixed stability of the RT 0–P0 pair therefore yields ∥eK ∥aHi (K) ≲ H
+
+∥∥∥Ft − ∇ · uH,i +1 ms 
+
+∥∥∥L2(K) .
+
+Consequently, 
+
+∥∥∥uH,i +1  
+
+> t
+
+− uH,i +1 ms 
+
+∥∥∥2
+
+> aHi
+
+= ∑
+
+> K∈A i,i +1
+> H, pt
+
+∥eK ∥2  
+
+> aHi(K)
+
+≲ H2 ∑
+
+> K∈A i,i +1
+> H, pt
+
+∥∥∥Ft − ∇ · uH,i +1 ms 
+
+∥∥∥2
+
+> L2(K)
+
+≤ H2 ∥∥∥Ft − ∇ · uH,i +1 ms 
+
+∥∥∥2 
+
+> L2(Ω)
+
+≲ H2∥Ft∥2
+
+> L2(Ω)
+
+.
+
+(4.28) Combining (4.27) and (4.28) gives 
+
+∥˜uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi ≲ H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
+. (4.29) It remains to estimate ∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi . By the triangle inequality, we have 
+
+∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi ≤ ∥ uh,i +1  
+
+> t
+
+− ˜uh,i +1  
+
+> t
+
+∥aHi + ∥˜uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi , (4.30) For the first term on the right-hand side, using (4.6) and (4.26), we have 
+
+ai(uh,i +1  
+
+> t
+
+, v ) = aHi (˜ uh,i +1  
+
+> t
+
+, v ), ∀v ∈ Vh.
+
+Subtracting aHi (uh,i +1  
+
+> t
+
+, v ) from both sides and taking v = ˜ uh,i +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+, we obtain 
+
+∥˜uh,i +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥2
+
+> aHi
+
+=
+
+∫
+
+> Ω
+
+( 1
+
+κi
+
+− 1
+
+κHi
+
+)
+
+uh,i +1  
+
+> t
+
+·
+
+(
+
+˜uh,i +1  
+
+> t
+
+− uh,i +1 
+
+> t
+
+)
+
+=
+
+∫
+
+> Ω
+
+1
+
+√
+
+κHi
+
+( κHi
+
+κi
+
+− 1
+
+)
+
+uh,i +1  
+
+> t
+
+· 1
+
+√
+
+κHi
+
+(
+
+˜uh,i +1  
+
+> t
+
+− uh,i +1 
+
+> t
+
+)
+
+19 Hence, by the Cauchy–Schwarz inequality 
+
+∥˜uh,i +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥2
+
+> aHi
+
+≤ ∥ uht ∥L∞(0 ,T ;Ω) ∥ λt(SH,i w ) − λt(Sh,i w )
+
+λt(Sh,i w ) ∥aHi ∥˜uh,i +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥aHi
+
+Since the mobility function λt(Sw) is bounded and has Lipschitz condition, we have 
+
+∥˜uh,i +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥2
+
+> aHi
+
+≤ Cλ∥uht ∥L∞(0 ,T ;Ω) ∥eiS ∥aHi ∥˜uh,i +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥aHi .
+
+Therefore, 
+
+∥˜uh,i +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥aHi ≤ Cλ∥uht ∥L∞(0 ,T ;Ω) ∥eiS ∥aHi . (4.31) Combining (4.29)-(4.31), we finally obtain 
+
+∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi ≤ CH 
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ Cλ∥uht ∥L∞(0 ,T ;Ω) ∥eiS ∥aHi .
+
+The proof is complete. Remark that to obtain the O(H) convergence in ∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi , we need to choose the size of the oversampling domain l = O(log (K/H 2)) . For a detailed derivation of these contents, refer to [36]. 
+
+Theorem 4.2. We recall that uh,n +1  
+
+> t
+
+and uH,n +1  
+
+> t
+
+are solutions to (4.6) -(4.7) and (4.8) -(4.9) 
+
+at time tn. For a given tolerance ε, let i be the most recent time level at which the multiscale space is updated. Then we have the following estimate: 
+
+∥en+1  
+
+> ut
+
+∥aHn (Ω) ≤ C0∥uht ∥L∞(0 ,T ;Ω) ε + CH H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ C′
+
+> λ
+
+1
+
+√κmin 
+
+∥uht ∥L∞(0 ,T ;Ω) 
+
+(
+
+∥enS ∥L2(Ω) + ∥eiS ∥L2(Ω) 
+
+)
+
+Where the coefficients C0, CH and C′ 
+
+> λ
+
+are independent of the mesh size h, H and contrast κ.
+
+Proof. We divide the proof into 3 steps: 
+
+Step 1 : First, by the cumulative construction of the marked set, ˜V i,i +1 ms ⊆ ˜V i,n +1 ms ⊆ Vh So we have z = uH,i +1  
+
+> t
+
+− uH,n +1  
+
+> t
+
+∈ ˜V i,n +1 ms .
+
+Subtracting the enriched multiscale equation (4.8) from the fine-grid equation (4.6) at time 
+
+tn and taking v = z, we obtain 
+
+an(uh,n +1  
+
+> t
+
+, z) − aHn (uH,n +1  
+
+> t
+
+, z) = b(z, p h,n +1  
+
+> w
+
+− pH,n +1  
+
+> w
+
+) = 0 .
+
+Adding ∫ 
+
+> Ω1
+> κHn
+
+uh,n +1  
+
+> t
+
+· z to both sides, we can deduce: 
+
+∫
+
+> Ω
+
+1
+
+κHn
+
+(uh,n +1  
+
+> t
+
+− uH,n +1  
+
+> t
+
+) · z =
+
+∫
+
+> Ω
+
+( 1
+
+κHn
+
+− 1
+
+κn
+
+)
+
+uh,n +1  
+
+> t
+
+· z (4.32) Next we will estimate the equality (4.32) above. For the right hand side we have the 20 following estimate: 
+
+∫
+
+> Ω
+
+( 1
+
+κHn
+
+− 1
+
+κn
+
+)
+
+uh,n +1  
+
+> t
+
+· z =
+
+∫
+
+> Ω
+
+1
+
+√
+
+κHn
+
+(
+
+1 − κHn
+
+κn
+
+)
+
+uh,n +1  
+
+> t
+
+· 1
+
+√
+
+κHn
+
+z
+
+≤ ∥ uht ∥L∞(0 ,T ;Ω) ∥ λt(Sh,n w ) − λt(SH,n w )
+
+λt(Sh,n w ) ∥aHn ∥z∥aHn
+
+≤ Cλ∥uht ∥L∞(0 ,T ;Ω) ∥enS ∥aHn ∥z∥aHn
+
+For the left hand side, we split it into: 
+
+∫
+
+> Ω
+
+(κHn )−1(uh,n +1  
+
+> t
+
+− uH,n +1  
+
+> t
+
+) · z =
+
+∫
+
+> Ω
+
+(κHn )−1(uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
++ z) · z
+
+Combined with (4.32) and the equation above, we can obtain: 
+
+∫
+
+> Ω
+
+(κHn )−1z · z =
+
+∫
+
+> Ω
+
+(κHn )−1(uH,i +1  
+
+> t
+
+− uh,n +1  
+
+> t
+
+) · z +
+
+∫
+
+> Ω
+
+( 1
+
+κHn
+
+− 1
+
+κn
+
+)
+
+uh,n +1  
+
+> t
+
+· z
+
+Apply the Cauchy-Schwarz inequality on the right hand side and divide ∥z∥aHn in both sides, we have: 
+
+∥z∥aHn ≤ ∥ uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn + Cλ∥uht ∥L∞(0 ,T ;Ω) ∥enS ∥aHn
+
+By the triangle inequality in eun+1 
+
+> t
+
+= uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
++ z, we finally obtain the estimate: 
+
+∥eun+1 
+
+> t
+
+∥aHn ≤ ∥ uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn + ∥z∥aHn
+
+≤ 2∥uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn + Cλ∥uht ∥L∞(0 ,T ;Ω) ∥enS ∥aHn (4.33) 
+
+Step 2 : Then we will estimate the norm ∥uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn . First, apply the triangle inequality 
+
+∥uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn ≤ ∥ uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥aHn + ∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn
+
+For the first term in the right-hand side, we have 
+
+∫
+
+> Ω
+
+1
+
+κHn
+
+|uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+|2 =
+
+∫
+
+> Ω
+
+κn
+
+κHn
+
+· 1
+
+κn
+
+|uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+|2 =
+
+∫
+
+> Ω
+
+λt(Sh,n w )
+
+λt(SH,n w ) · 1
+
+κn
+
+|uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+|2
+
+≤ ∥ λt(Sh,n w )
+
+λt(SH,n w ) ∥∞∥uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥2
+
+> an
+
+Similarly for the second term ∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn ≤ ∥ λt(SH,i w )  
+
+> λt(SH,n w)
+
+∥∞∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi . Due to our numerical scheme P-IMPES, the saturation is bounded, which gives the these two coefficients are bounded by CM = 1 + 2 Cλ .Then combining it with lemma 4.4, lemma 4.5, we have 
+
+∥uh,n +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHn ≤ CM ∥uh,n +1  
+
+> t
+
+− uh,i +1  
+
+> t
+
+∥an + CM ∥uh,i +1  
+
+> t
+
+− uH,i +1  
+
+> t
+
+∥aHi
+
+≤ 2CM ∥uht ∥L∞(0 ,T ;Ω) ∥κ− 12 
+
+> i
+
+− κ− 12 
+
+> n
+
+∥L2(Ω) 
+
++ CC M H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ CλCM ∥uht ∥L∞(0 ,T ;Ω) ∥eiS ∥aHi . (4.34) 21 Step 3 : Combining conclusions (4.33) and (4.34) above, we obtain the estimate: 
+
+∥en+1  
+
+> ut
+
+∥aHn (Ω) ≤ 4CM ∥uht ∥L∞(0 ,T ;Ω) ∥κ− 12 
+
+> i
+
+− κ− 12 
+
+> n
+
+∥L2(Ω) + 2 CC M H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++Cλ
+
+1
+
+√κmin 
+
+∥uht ∥L∞(0 ,T ;Ω) ∥enS ∥L2(Ω) + 2 CλCM
+
+1
+
+√κmin 
+
+∥uht ∥L∞(0 ,T ;Ω) ∥eiS ∥L2(Ω) 
+
+By the triangle inequality and the Lipschitz continuity of λt(x)− 12 , we obtain 
+
+∥κ− 12 
+
+> i
+
+− κ− 12 
+
+> n
+
+∥L2(Ω) ≤ ∥ κ− 12 
+
+> i
+
+− (κHi )− 12 ∥L2(Ω) + ∥(κHi )− 12 − (κHn )− 12 ∥L2(Ω) + ∥(κHn )− 12 − κ− 12 
+
+> n
+
+∥L2(Ω) 
+
+≤ ∥ (κHi )− 12 − (κHn )− 12 ∥L2(Ω) + Cλκ− 12
+
+> min
+
+(
+
+∥enS ∥L2(Ω) + ∥eiS ∥L2(Ω) 
+
+)
+
+Combining these two inequality, we obtain: 
+
+∥en+1  
+
+> ut
+
+∥aHn (Ω) ≤C0∥uht ∥L∞(0 ,T ;Ω) ∥(κHi )− 12 − (κHn )− 12 ∥L2(Ω) + CH H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ C′
+
+> λ
+
+1
+
+√κmin 
+
+∥uht ∥L∞(0 ,T ;Ω) 
+
+(
+
+∥enS ∥L2(Ω) + ∥eiS ∥L2(Ω) 
+
+)
+
+.
+
+where C0 = 4 CM , CH = 2 CC M and C′ 
+
+> λ
+
+= 6 CλCM are the coefficients that are independent of the contrast and mesh size. By our adaptive update method, before solving the system at time level tn, we have 
+
+ηn = ∥(κHi )− 12 − (κHn )− 12 ∥L2(Ω) ≤ ε. 
+
+Otherwise, the multiscale space is regenerated and the update index is reset to i = n. Hence, 
+
+∥en+1  
+
+> ut
+
+∥aHn (Ω) ≤ C0∥uht ∥L∞(0 ,T ;Ω) ε + CH H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ C′
+
+> λ
+
+1
+
+√κmin 
+
+∥uht ∥L∞(0 ,T ;Ω) 
+
+(
+
+∥enS ∥L2(Ω) + ∥eiS ∥L2(Ω) 
+
+)
+
+.
+
+Theorem 4.3. Recall that Sh,n +1  
+
+> w
+
+and SH,n +1  
+
+> w
+
+are the fine-scale and multiscale saturation solutions to (2.5) and (3.4) . Then 
+
+∥en+1  
+
+> S
+
+∥L2(Ω) ≤ eC′ 
+
+> 1tn+1
+
+− 1
+
+C′
+
+> 1
+
+[
+
+C′
+
+> 0
+
+U ε + C′ 
+
+> H
+
+H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ Cδ 12
+
+> h
+
+]
+
+where U = ∥uht ∥L∞(0 ,T ;L∞(Ω)) , C′ 
+
+> 1
+
+= Cϕ −1(Lf ∥Ft∥L∞(Ω) +κ− 12
+
+> min
+
+Lf ζhh−1U )+2 Cϕ −1Lf ζhh−1C′
+
+> λ
+
+κ− 12
+
+> min
+
+U .All these constant may depend on the porosity, the relative permeability functions, the shape regularity of the mesh, but are independent of h, H, ∆t and the contrast κ.
+
+Proof. By Lemma 4.3, we have 
+
+En+1  
+
+> G
+
+≤ (1 + Cst ∆t)EnG + Cv∆t∥en+1  
+
+> ut
+
+∥aHn (Ω) .
+
+Recall that EnG = ∥enS ∥2,Gnh . Using the velocity estimate in Theorem 4.2, we obtain 
+
+En+1  
+
+> G
+
+≤ (1 + Cst ∆t)EnG + Cv∆tA + CvC′
+
+> λ
+
+κ− 12
+
+> min
+
+U ∆t
+
+(
+
+∥enS ∥L2(Ω) + ∥eiS ∥L2(Ω) 
+
+)
+
+. (4.35) where A = C0U ε + CH H
+
+( 1√Λ + ∥Ft∥L2(Ω) 
+
+)
+
+.22 Splitting the saturation error into the smooth region and the front layer gives 
+
+∥emS ∥L2(Ω) ≤ ∥ emS ∥L2(Ω m  
+
+> G)
+
++ ∥emS ∥L2(Ω m 
+
+> B)
+
+.
+
+By Lemma 4.3, 
+
+∥emS ∥L2(Ω) ≤ EmG + δ 12 
+
+> h
+
+, m = i, n. (4.36) Substituting (4.36) into (4.35), we get 
+
+En+1  
+
+> G
+
+≤ (1 + C1∆t)EnG + C2∆tE iG + Cv∆tA + C∆t δ 12 
+
+> h
+
+, (4.37) where C1 = Cst + CvC′
+
+> λ
+
+κ− 12
+
+> min
+
+U , C2 = CvC′
+
+> λ
+
+κ− 12
+
+> min
+
+U. Then define M nG = max  
+
+> 0≤m≤n
+
+EmG , which gives 
+
+En+1  
+
+> G
+
+≤ (1 + ( C1 + C2)∆ t) M nG + ∆ t
+
+(
+
+CvA + Cδ 12
+
+> h
+
+)
+
+.
+
+Moreover, the right-hand side is greater than M nG. Therefore, 
+
+M n+1  
+
+> G
+
+= max 
+
+{
+
+M nG, E n+1 
+
+> G
+
+}
+
+≤ (1 + ( C1 + C2)∆ t) M nG + ∆ t
+
+(
+
+CvA + Cδ 12
+
+> h
+
+)
+
+.
+
+Denoting C′ 
+
+> 1
+
+= C1 + C2 = Cst + 2 CvC′
+
+> λ
+
+κ− 12
+
+> min
+
+U . Iterating the above inequality and using 
+
+M 0 
+
+> G
+
+= E0 
+
+> G
+
+= 0 , we obtain 
+
+En+1  
+
+> G
+
+≤ M n+1  
+
+> G
+
+≤ (1 + C′
+
+> 1
+
+∆t)n+1 − 1
+
+C′
+
+> 1
+
+(
+
+CvA + Cδ 12
+
+> h
+
+)
+
+≤ eC′ 
+
+> 1tn+1
+
+− 1
+
+C′
+
+> 1
+
+(
+
+CvA + Cδ 12
+
+> h
+
+)
+
+.
+
+(4.38) Applying the saturation-error decomposition (4.36) at time level tn+1 and combining it with (4.38), we obtain 
+
+∥en+1  
+
+> S
+
+∥L2(Ω) ≤ eC′ 
+
+> 1tn+1
+
+− 1
+
+C′
+
+> 1
+
+[
+
+C′
+
+> 0
+
+U ε + C′ 
+
+> H
+
+H
+
+( 1
+
+√Λ + ∥Ft∥L2(Ω) 
+
+)
+
++ Cδ 12
+
+> h
+
+]
+
+,
+
+where C′ 
+
+> 0
+
+= CvC0, C ′ 
+
+> H
+
+= CvCH . These constants are independent of the mesh sizes h and H,the time step ∆t, and the contrast κ.We remark that, under the smooth-region assumption (4.11), the smoothness modulus ζh
+
+appearing in C′ 
+
+> 1
+
+satisfies ζh = O(h). Hence ζh/h = O(1) , so the apparent factor h−1 in C′ 
+
+> 1
+
+is uniformly bounded as h → 0.
+
+# 5 Numerical experiments 
+
+In this section, we present several numerical experiments to evaluate the performance of the proposed multiscale method. In particular, we focus on its mass conservation property, sat-uration approximation, and error convergence behavior in heterogeneous and high-contrast porous media. In the following experiments, the computational domain is Ω = [0 , 1] 2, the capillary pressure is modeled by the Hoteit–Firoozabadi formula pc(Sw) = − Bc√K log ¯Sw, where 
+
+Bc ≥ 0 is a capillary parameter, and ¯Sw is the effective saturation defined as ¯Sw = Sw −Srw   
+
+> 1−Srw −Srn
+
+,here we choose Srw = Srn = 10 −6. The porosity is fixed as ϕ = 0 .2 throughout all numerical tests. Moreover, the relative permeabilities of the wetting and non-wetting phases are given 23 by krw = ¯S2
+
+> w
+
+, krn = (1 − ¯Sw)2, the viscosity for two phases is set as μw = 1 and μn = 5 . We use the following relative errors to evaluate the performance of the proposed method: 
+
+eu = ∥uh − ums ∥κ−1
+
+∥uh∥κ−1
+
+, eS = ∥Sh − Sms ∥L2(Ω) 
+
+∥Sh∥L2(Ω) 
+
+,
+
+where ∥u∥2 
+
+> κ−1
+
+= ∫ 
+
+> Ω
+
+K−1|u|2, (uh, S h) is the fine-scale solution as reference solution, and 
+
+(ums , S ms ) is the multiscale solution from our scheme. 
+
+Example 5.1. (Two phase conservation) In this example we will check the two phase conservation and unbiased property using the multiscale basis obtained in a local region of the high-contrast medium κ1. As mentioned in the subsection 4.1, there are two ways (4.1) and (4.2)-(4.3) to obtain the non-wetting phase saturation, denoted by Sn, 1 and Sn, 2 respectively. If Sn, 1 = Sn, 2, the local mass conservation is attained for both two phases. We use a high contrast permeability field κ1 to check the property. See Figure 2 for the illustration of the source term Ft and the permeability field κ1. We choose only 1 basis in every coarse element, it is sufficient to conclude that multiscale solutions can well satisfy this conservation property since solutions computed with more multiscale bases will obtain higher accuracy. We set the fine mesh size to 100 × 100 , the tolerance ε = 0 .1 in adaptive algorithm and the capillary parameter Bc = 0 . The source/sink term function Ft is set to be 
+
+Ft(x) = 
+
+> 
+
+1, x ∈ [0 , 0.01] 2,
+
+−1, x ∈ [0 .99 , 1] 2,
+
+0, otherwise ,   
+
+> (a) Source term function Ft.(b) Permeability field κ1.
+
+Figure 2: Left: source term. Right: permeability field. 24 (a) Sn, 1 at T = 1 . (b) Sn, 2 at T = 1 . (c) |Sn, 1 − Sn, 2| at T = 1 .
+
+Figure 3.1. Two ways for non-wetting saturation Sn at time T = 1 .
+
+(a) Sn, 1 at T = 2 . (b) Sn, 2 at T = 2 . (c) |Sn, 1 − Sn, 2| at T = 2 .
+
+Figure 3.2. Two ways for non-wetting saturation Sn at time T = 2 .
+
+(a) Sn, 1 at T = 3 . (b) Sn, 2 at T = 3 . (c) |Sn, 1 − Sn, 2| at T = 3 .
+
+Figure 3.3. Two ways for non-wetting saturation Sn at time T = 3 .Figure 3.1-3.3 shows the non-wetting phase saturation computed by the two different for-mulations at T = 1 , 2, 3, with their absolute differences. It can be seen that Sn, 1 and Sn, 2
+
+produce nearly the same saturation distributions during the whole simulation. The difference 
+
+|Sn, 1 − Sn, 2| remains at the order of about 10 −13 throughout the simulation, indicating that the two formulations produce almost the same outcomes. 
+
+Example 5.2. (Capillary pressure effect) In this example, we investigate the influence of the capillary pressure on the two-phase flow simulation. Recall that the capillary pressure is modeled by the Hoteit-Firoozabadi formula pc(Sw) = − Bc√K log ¯Sw, the parameter Bc ≥ 0
+
+controls the strength of the capillary effect. We test three representative cases: Bc = 0 ,25 Bc = 10 −3 and Bc = 10 −2 at different time T = 1 , 2, 3. For other parameters, we keep the same as in Example 5.1. 
+
+(a) Bc = 0 at T = 1 . (b) Bc = 0 at T = 2 . (c) Bc = 0 at T = 3 .
+
+Figure 4.1. Wetting-phase saturation Sw for Bc = 0 at T = 1 , 2, 3.
+
+(a) Bc = 10 −3 at T = 1 . (b) Bc = 10 −3 at T = 2 . (c) Bc = 10 −3 at T = 3 .
+
+Figure 4.2. Wetting-phase saturation Sw for Bc = 10 −3 at T = 1 , 2, 3.
+
+(a) Bc = 10 −2 at T = 1 . (b) Bc = 10 −2 at T = 2 . (c) Bc = 10 −2 at T = 3 .
+
+Figure 4.3. Wetting-phase saturation Sw for Bc = 10 −2 at T = 1 , 2, 3.Figure 4.1-4.3 illustrate the influence of capillary pressure on the saturation evolution. When Bc = 0 , the displacement is mainly dominated by the advection and the heterogeneous permeability field, so the wetting phase mainly moves through the high-permeability channels and the fronts remain relatively sharp. As Bc increases to 10 −3 and 10 −2, the capillary pressure introduces an additional diffusion-like effect, which smooths the saturation profile and broadens the transition region near the front. In particular, for Bc = 10 −2, the channelized displacement becomes less pronounced and the wetting phase spreads more uniformly into 26 the surrounding region. These results show that stronger capillary pressure regularizes the saturation distribution and weakens sharp saturation discontinuities. 
+
+Example 5.3. In this example, we study the influence of the adaptive update tolerance 
+
+ε, coarse element size H and the number of multiscale basis functions on the velocity and saturation errors. We consider two representative high-contrast permeability fields. The first one is a high-permeability channel field, denoted by κ2, the second one is taken from the top layer of the SPE10 permeability field and is denoted by κ3. These two permeability fields are shown in the figure below. The capillary pressure parameter is set to be Bc = 0 and fine-mesh size is still h = 0 .01 . For other parameters, we keep the same as before. 
+
+(a) High-permeability channel: κ2 (b) SPE10 model: log( κ3)
+
+First, we investigate the influence of the coarse mesh size H and the number of multiscale basis functions on the velocity and pressure errors at the initial time. The results are shown in Table 1 and Table 2, respectively. 
+
+H
+
+Number of basis functions per coarse element 
+
+n = 1 n = 2 n = 3 n = 4 
+
+eu ep eu ep eu ep eu ep
+
+0.10 21 .6223% 88 .7208% 17 .0759% 41 .5622% 8.7309% 9.9324% 8.2117% 9.6430% 0.05 29 .1088% 38 .6599% 13 .1360% 16 .3047% 2.6884% 12 .5234% 1.9773% 2.8974% 0.04 38 .4517% 51 .2609% 2.0160% 13 .9070% 1.8241% 10 .1284% 1.6149% 3.5814% 0.02 0.0838% 21 .1459% 0.2611% 14 .0518% 0.0838% 4.4090% 0.0000% 0.0000% 
+
+Table 1: Convergence of the multiscale solution for κ2.
+
+H
+
+Number of basis functions per coarse element 
+
+n = 1 n = 2 n = 3 n = 4 
+
+eu ep eu ep eu ep eu ep
+
+0.10 0.3653% 21 .0482% 0.2657% 17 .2137% 0.2300% 11 .4032% 0.2208% 7.0975% 0.05 0.1002% 16 .1050% 0.2788% 12 .4962% 0.0769% 7.0368% 0.0846% 4.9290% 0.04 0.0886% 15 .0004% 0.2052% 9.9129% 0.0761% 6.0975% 0.0604% 4.6402% 0.02 0.0324% 8.5261% 0.0515% 6.8928% 0.0231% 2.2568% 0.0153% 0.0000% 
+
+Table 2: Convergence of the multiscale solution for κ3.Next, we investigate the evolution of the saturation error for the two permeability fields κ2
+
+and κ3. In particular, we study how the saturation error eS depends on the adaptive update 27 tolerance ε. To balance computational time and accuracy, we select the parameters H and n
+
+according to the Table 1 and Table 2, where the corresponding velocity error eu is sufficiently small. These results are performed at different final times and for different permeability fields.         
+
+> (a) T= 0 .1(b) T= 0 .2(c) T= 0 .4
+
+Figure 6: Reference solutions of the wetting-phase saturation Shw in the channel field κ2 at different final times.               
+
+> (a) ε= 0 .05 ,eS= 13 .09% (b) ε= 0 .05 ,eS= 13 .67% (c) ε= 0 .05 ,eS= 12 .04%
+
+Figure 7.1. Multiscale solutions with H = 0 .02 and one basis function per coarse element for 
+
+ε = 0 .05 at the corresponding T = 0 .1, 0.2, 0.4.              
+
+> (a) ε= 0 .025 ,eS= 6 .64% (b) ε= 0 .025 ,eS= 5 .12% (c) ε= 0 .025 ,eS= 2 .67%
+
+Figure 7.2. Multiscale solutions with H = 0 .02 and one basis function per coarse element for 
+
+ε = 0 .025 at the corresponding T = 0 .1, 0.2, 0.4.28 (a) ε = 0 .01 , eS = 3 .69% (b) ε = 0 .01 , eS = 2 .88% (c) ε = 0 .01 , eS = 1 .95% 
+
+Figure 7.3. Multiscale solutions with H = 0 .02 and one basis function per coarse element for 
+
+ε = 0 .01 at the corresponding T = 0 .1, 0.2, 0.4.Next, we use the SPE10 permeability field κ3 to test the influence of different adaptive tolerances ε at different final times.         
+
+> (a) T= 1 (b) T= 2 (c) T= 3
+
+Figure 8: Reference solutions of the wetting-phase saturation Shw in the SPE10 field κ3 at different final times.               
+
+> (a) ε= 1 ,eS= 12 .89% (b) ε= 1 ,eS= 11 .00% (c) ε= 1 ,eS= 11 .41%
+
+Figure 9.1. Multiscale solutions with H = 0 .1 and 3 basis functions per coarse element for 
+
+ε = 1 at the corresponding T = 1 , 2, 3.29 (a) ε = 0 .5, eS = 7 .28% (b) ε = 0 .5, eS = 7 .47% (c) ε = 0 .5, eS = 9 .37% 
+
+Figure 9.2. Multiscale solutions with H = 0 .1 and 3 basis functions per coarse element for 
+
+ε = 0 .5 at the corresponding T = 1 , 2, 3.              
+
+> (a) ε= 0 .1,eS= 2 .78% (b) ε= 0 .1,eS= 4 .51% (c) ε= 0 .1,eS= 5 .39%
+
+Figure 9.3. Multiscale solutions with H = 0 .1 and 3 basis functions per coarse element for 
+
+ε = 0 .1 at the corresponding T = 1 , 2, 3.The numerical results show that the proposed adaptive multiscale method can provide accurate approximations for both permeability fields κ2 and κ3. In general, smaller coarse mesh size H and more multiscale basis functions lead to smaller velocity and pressure errors. For the saturation equation, the numerical results show that the saturation error eS decreases as the adaptive tolerance ε becomes smaller. This indicates that updating of the multiscale space appropriately can improve the accuracy of the saturation approximation. 
+
+# 6 Conclusion 
+
+In this paper, we developed an adaptive mixed CEM-GMsFEM for incompressible and immis-cible two-phase flow in heterogeneous porous media. The method combines with a physics-preserving IMPES scheme, and the multiscale spaces are adaptively regenerated according to the variation of the effective permeability induced by the saturation evolution. We proved the local mass conservation for both phases, the unbiased property of the formulation, and the bounds-preserving property under a suitable CFL condition. For the zero-capillary case, veloc-ity and saturation error estimates were derived, showing the influence of the adaptive tolerance, coarse mesh size, spectral approximation error, and front layer. Numerical results confirm the theoretical properties and show that the capillary pressure enhances the diffusive nature of the advection-dominated motion. Moreover, smaller adaptive tolerance generally leads to smaller saturation errors, while suitable coarse mesh size and number of multiscale basis functions provide accurate velocity and pressure approximations with reduced computational cost. 30 Acknowledgement 
+
+The research of Eric Chung is partially supported by the Hong Kong RGC General Research Fund (Projects: 14305624 and 14304525). 
+
+# References 
+
+[1] K. Aziz and A. Settari. Petroleum Reservoir Simulation . Applied Science Publishers, London, 1979. [2] R. H. Brooks and A. T. Corey. Hydraulic properties of porous media. Hydrology Paper No. 3, Colorado State University, Fort Collins, 1964. [3] Z. Chen, G. Huan, and Y. Ma. Computational Methods for Multiphase Flows in Porous Media . SIAM, Philadelphia, 2006. [4] J. E. P. Monteagudo and A. Firoozabadi. Comparison of fully implicit and IMPES formu-lations for simulation of water injection in fractured and unfractured media. International Journal for Numerical Methods in Engineering , 69:698–728, 2007. [5] J. W. Sheldon, B. Zondek, and W. T. Cardwell. One-dimensional, incompressible, noncap-illary, two-phase fluid flow in a porous medium. Transactions of the AIME , 216:290–296, 1959. [6] K. H. Coats. IMPES stability: the CFL limit. In SPE Reservoir Simulation Symposium ,Houston, TX, 2001. SPE 85956. [7] G. W. Thomas and D. H. Thurnau. Reservoir simulation using an adaptive implicit method. SPE Journal , 23:759–768, 1983. [8] H. Hoteit and A. Firoozabadi. Numerical modeling of two-phase flow in heterogeneous permeable media with different capillarity pressures. Advances in Water Resources , 31:56– 73, 2008. [9] A. Ern, I. Mozolevski, and L. Schuh. Discontinuous Galerkin approximation of two-phase flows in heterogeneous porous media with discontinuous capillary pressures. Computer Methods in Applied Mechanics and Engineering , 199:1491–1501, 2010. [10] J. Kou and S. Sun. Upwind discontinuous Galerkin methods with conservation of mass of both phases for incompressible two-phase flow in porous media. Numerical Methods for Partial Differential Equations , 30:1674–1699, 2014. [11] J. Hou, J. Chen, S. Sun, and Z. Chen. Adaptive mixed-hybrid and penalty discontinuous Galerkin method for two-phase flow in heterogeneous media. Journal of Computational and Applied Mathematics , 307:262–283, 2016. [12] H. Chen and S. Sun. A new physics-preserving IMPES scheme for incompressible and immiscible two-phase flow in heterogeneous porous media. Journal of Computational and Applied Mathematics , 381:113035, 2021. [13] J. W. Barker and S. Thibeau. A critical review of the use of pseudorelative permeabilities for upscaling. SPE Reservoir Engineering , 12:138–143, 1997. [14] L. J. Durlofsky. Numerical calculation of equivalent grid block permeability tensors for heterogeneous porous media. Water Resources Research , 27:699–708, 1991. 31 [15] L. J. Durlofsky. Coarse scale models of two-phase flow in heterogeneous reservoirs: volume averaged equations and their relation to existing upscaling techniques. Computational Geosciences , 2:73–92, 1998. [16] Y. Chen, L. J. Durlofsky, M. Gerritsen, and X. H. Wen. A coupled local-global upscaling approach for simulating flow in highly heterogeneous formations. Advances in Water Resources , 26:1041–1060, 2003. [17] T. Y. Hou and X.-H. Wu. A multiscale finite element method for elliptic problems in composite materials and porous media. Journal of Computational Physics , 134:169–189, 1997. [18] Y. Efendiev, T. Y. Hou, and X.-H. Wu. Convergence of a nonconforming multiscale finite element method. SIAM Journal on Numerical Analysis , 37:888–910, 2000. [19] Y. Efendiev and T. Y. Hou. Multiscale Finite Element Methods: Theory and Applications .Springer, New York, 2009. [20] P. Jenny, S. H. Lee, and H. A. Tchelepi. Multi-scale finite-volume method for elliptic problems in subsurface flow simulation. Journal of Computational Physics , 187:47–67, 2003. [21] Z. Chen and T. Y. Hou. A mixed multiscale finite element method for elliptic problems with oscillating coefficients. Mathematics of Computation , 72:541–576, 2003. [22] J. E. Aarnes. On the use of a mixed multiscale finite element method for greater flexibility and increased speed or improved accuracy in reservoir simulation. Multiscale Modeling & Simulation , 2:421–439, 2004. [23] J. E. Aarnes, S. Krogstad, and K.-A. Lie. A hierarchical multiscale method for two-phase flow based upon mixed finite elements and nonuniform coarse grids. Multiscale Modeling & Simulation , 5:337–363, 2006. [24] L. H. Odsæter, M. F. Wheeler, T. Kvamsdal, and M. G. Larson. Postprocessing of non-conservative flux for compatibility with transport in heterogeneous media. Computer Methods in Applied Mechanics and Engineering , 315:799–830, 2017. [25] Y. Efendiev, J. Galvis, and X.-H. Wu. Multiscale finite element methods for high-contrast problems using local spectral basis functions. Journal of Computational Physics , 230:937– 955, 2011. [26] Y. Efendiev, J. Galvis, and T. Y. Hou. Generalized multiscale finite element methods. 
+
+Journal of Computational Physics , 251:116–135, 2013. [27] E. T. Chung, Y. Efendiev, and T. Y. Hou. Adaptive multiscale model reduction with generalized multiscale finite element methods. Journal of Computational Physics , 320:69– 95, 2016. [28] E. T. Chung, Y. Efendiev, and C. S. Lee. Mixed generalized multiscale finite element methods and applications. Multiscale Modeling & Simulation , 13:338–366, 2015. [29] E. T. Chung, Y. Efendiev, and G. Li. An adaptive generalized multiscale finite element method for high-contrast flow problems. Journal of Computational Physics , 273:54–76, 2014. 32 [30] Y. Efendiev, J. Galvis, G. Li, and M. Presho. Generalized multiscale finite element methods: oversampling strategies. International Journal for Multiscale Computational Engineering , 12:465–484, 2014. [31] E. T. Chung and W. T. Leung. A sub-grid structure enhanced discontinuous Galerkin method for multiscale diffusion and convection-diffusion problems. Communications in Computational Physics , 14:370–392, 2013. [32] E. T. Chung, Y. Efendiev, W. T. Leung, and G. Li. Sparse generalized multiscale finite element methods and their applications. International Journal for Multiscale Computa-tional Engineering , 14:1–23, 2016. [33] E. T. Chung, Y. Efendiev, and R. L. Gibson. An energy-conserving discontinuous multi-scale finite element method for the wave equation in heterogeneous media. Advances in Adaptive Data Analysis , 3:251–268, 2011. [34] E. T. Chung, Y. Efendiev, and W. T. Leung. Generalized multiscale finite element method for wave propagation in heterogeneous media. Multiscale Modeling & Simulation , 12:1691– 1721, 2014. [35] E. T. Chung, Y. Efendiev, and W. T. Leung. Constraint energy minimizing generalized multiscale finite element method. Computer Methods in Applied Mechanics and Engineer-ing , 339:298–319, 2018. [36] E. T. Chung, Y. Efendiev, and W. T. Leung. Constraint energy minimizing generalized multiscale finite element method in the mixed formulation. Computational Geosciences ,22:677–693, 2018. [37] Y. Wang, E. T. Chung, and S. Sun. Physics-preserving IMPES based multiscale methods for immiscible two-phase flow in highly heterogeneous porous media. Journal of Scientific Computing , 102:38, 2025. [38] E. T. Chung, Y. Efendiev, and T. Y. Hou. Multiscale Model Reduction: Multiscale Finite Element Methods and Their Generalizations . Applied Mathematical Sciences, Vol. 212, Springer, Cham, 2023. [39] A. Målqvist and D. Peterseim. Localization of elliptic multiscale problems. Mathematics of Computation , 83:2583–2603, 2014. [40] H. Owhadi. Multigrid with rough coefficients and multiresolution operator decomposition from hierarchical information games. SIAM Review , 59:99–149, 2017. 33

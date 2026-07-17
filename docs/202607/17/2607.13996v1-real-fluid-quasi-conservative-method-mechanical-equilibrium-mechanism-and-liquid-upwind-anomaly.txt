@@ -1,0 +1,794 @@
+Title: Real Fluid Quasi-Conservative Method: Mechanical Equilibrium Mechanism and Liquid-Upwind Anomaly
+
+URL Source: https://arxiv.org/pdf/2607.13996v1
+
+Published Time: Thu, 16 Jul 2026 01:30:09 GMT
+
+Number of Pages: 37
+
+Markdown Content:
+# Real Fluid Quasi-Conservative Method: Mechanical Equilibrium Mechanism and Liquid-Upwind Anomaly 
+
+Haotong Bai 1,2 , Yixin Yang ∗1,2 , Wenjia Xie †2, Ping Yi 3, and Mingbo Sun ‡1,2 1Advanced Propulsion Technology Laboratory, National University of Defense Technology, Kaifu District, Changsha, Hunan 41073, China 
+
+> 2
+
+College of Aerospace Science and Engineering, National University of Defense Technology, Kaifu District, Changsha, Hunan 41073, China 
+
+> 3
+
+Institute of Power Plants and Automation, Shanghai Jiao Tong University, Shanghai, 200240, China 
+
+Abstract Abstract From the perspective of continuum thermodynamics, we revisit the pressure oscillation problem in finite-volume methods for real fluids and clarify the physical counterpart of the Real Fluid Quasi-Conservative (RFQC) method [1]. The RFQC method recovers the mechanical-equilibrium pressure by evolving the affine parameters ξ and E0 of the isentropic internal-energy–pressure relation along path-lines, while the thermodynamic re-projection converts the deviation from the isen-tropic trajectory into an internal-energy error, thereby ensuring the thermodynamic consistency and numerical stability of the method. We then investigate the applica-bility limit of the RFQC method and identify a Liquid-upwind Anomaly (LUA) in extreme phase-change cases. For a Riemann problem involving liquid–vapor phase change, a numerical anomaly may occur if a liquid-upwind translational velocity is initially superimposed and exceeds a certain threshold. Theoretical analysis reveals that this anomaly is initiated by the orders-of-magnitude jump in the affine slope ξ
+
+during phase change, which subsequently delays the pressure rise in the downstream low-pressure cell. Concurrently, the re-projection equivalently removes the positive pressure increment. As a result, a large re-projection internal-energy error is repeat-edly generated in this anomalous cell, and the cell is trapped in a cycle of delayed low-pressure recovery. The analysis indicates that the LUA is a start-up anomaly, which can be resolved by introducing a regularization strategy at the initial discon-tinuity. With the proposed regularization strategy, the RFQC method is equipped with enhanced accuracy and robustness for extreme thermodynamic flows, such as sonic phase-change jets. 
+
+Keywords Phase transition, Real fluid, Pressure oscillation, Finite volume method 
+
+> ∗
+
+Corresponding author: yangyixin@nudt.edu.cn 
+
+> †
+
+Corresponding author: xiewenjia@nudt.edu.cn 
+
+> ‡
+
+Corresponding author: sunmingbo@nudt.edu.cn 
+
+1arXiv:2607.13996v1 [math-ph] 15 Jul 2026 1 Introduction 
+
+The pressure oscillation is a classical problem in computational fluid dynamics (CFD) of two-phase flows, multicomponent flows, and real fluids. Researchers have studied it extensively for many years and have developed a series of numerical methods and physical insights. In classical two-phase and multicomponent flows, pressure oscillations appear at vapor–liquid interfaces or contact interfaces. Researchers subsequently rec-ognized that this problem arises because two-phase fluids cannot be simply averaged within a single finite-volume cell, with the pressure recovered via a single equation of state (EoS) [2, 3, 4]. Based on this understanding, various numerical methods have been developed for two-phase and multicomponent flows. The first type assumes that pressure equilibrium in a finite-volume cell should involve physical relaxation. Additional equa-tions are introduced to describe the vapor and liquid phases separately, and relaxation terms are used to drive the two fluids toward mechanical equilibrium at the interface. Typical examples include the well-known Baer–Nunziato seven-equation model [5], the Saurel–Abgrall seven-equation model [6], and six-equation methods with pressure non-equilibrium relaxation [7, 8]. The second type assumes that the fluid in a finite-volume cell has instantaneously reached pressure equilibrium, but this equilibrium is maintained by additional numerical treatments. These treatments can be further divided into two classes. The first class maintains pressure equilibrium through additional evolution equa-tions, such as the volume-fraction equation in the Kapila five-equation model [9, 10], and the additional transport equations proposed for the Euler equations with stiffened-gas EoS [12, 13], Mie–Gruneisen EoS [14], and van der Waals EoS [15, 16]. The second class maintains pressure equilibrium by modifying the energy equation or the energy flux, such as the double-flux method [4, 17] and the pressure-based method [3, 18, 19]. In real fluids, although the pressure oscillation problem is essentially similar to that in classical two-phase flows, in the sense that fluids with different thermodynamic states cannot be directly and simply averaged, the problem becomes more challenging. Real flu-ids are described by complex EoS and their thermodynamic states may change sharply during transcritical and phase-change processes. Under the homogeneous equilibrium model (HEM) framework [20], the discretized real fluid between any two adjacent finite-volume cells or time intervals can be viewed as a ”two-phase flow” with completely dis-tinct thermodynamic properties. This leads to two main difficulties in pressure recovery for real fluids. First, the phase difference cannot be clearly identified. At supercrit-ical pressures, a fluid may directly change from a liquid-like state to a gas-like state without phase separation. During this transcritical transition, the traditional concepts of ”vapor” and ”liquid” no longer exist, which makes it difficult to naturally extend physical-relaxation methods for two phases to real fluids. The second difficulty is that complex equations of state for real fluids, such as the Peng–Robinson EoS [21] and the Redlich–Kwong EoS [22], cannot explicitly provide model parameters that can be used to maintain pressure equilibrium. This makes oscillation-free schemes designed for specific EoS difficult to directly apply to more general real fluids. Despite these difficulties, over the past decade many oscillation-free schemes have 2been proposed for real fluids with arbitrary equations of state. In general, these schemes follow the second type of the classical two-phase-flow methods discussed above, assuming that the fluids within a finite-volume cell reach an instantaneous pressure equilibrium, while this equilibrium is maintained by modifying the energy equation or the flux con-struction. The most direct approach is the pressure-based (PB) method [23, 24, 25], in which the energy equation is replaced by the pressure equation. Similar methods extended from the PB method include the pressure-equation-projected DG method [26], the conservative/non-conservative adaptive method [27], and the enthalpy-based method [28]. Other methods modify the energy flux, including the approximating equilibrium scheme [29] and the double-flux (DF) method [30, 31, 32, 33]. Notably, the DF method introduces a ”frozen” concept to extend the classic multi-phase double-flux approach to real fluids. Due to its simple and natural construction, it remains the most widely used method in the field of real-fluid simulations. However, when confronting more extreme phase-change flow problems, the DF method often exhibits compromised accuracy and stability. In our recent work, we proposed a Real Fluid Quasi-Conservative (RFQC) method [1]. Unlike the above methods, the RFQC method does not modify the form of the energy equation or the energy flux. Instead, it introduces additional thermodynamic advection equations and evolves them alongside the Euler equations: 
+
+
+
+∂U
+
+∂t + ∂F
+
+∂x = 0 ,∂Φ
+
+∂t + u ∂Φ
+
+∂x = 0 .
+
+(1) where U = ( ρ ρu ρe t)T denotes the conservative variables, F = ( ρu ρu 2 + p (ρe t +
+
+p)u)T denotes the flux vector, and Φ = ( ξ E0)T denotes the thermodynamic affine variables. The thermodynamic variables are defined as: 
+
+ξ = hc2 = e + p/ρ c2 , E0 = ρe − ξp. (2) The oscillation-free pressure is then recovered from the conservative variables and the thermodynamic variables: 
+
+p = ρe − E0
+
+ξ . (3) Finally, the RFQC method performs a thermodynamic re-projection. The updated den-sity and the recovered pressure ( ρ, p ) are combined with the EoS to recalculate the thermodynamic state ( ρe, ξ, E 0) for the next time step. This ensures the correct evolu-tion of Φ and satisfies the Abgrall condition. In various real-fluid phase-change Riemann problems [34], the RFQC method shows higher accuracy than the PB method and the DF method. Although oscillation-free schemes for real fluids have made significant progress and have advanced from the initial transcritical problems to increasingly complex phase-change problems, a current limitation of the real-fluid oscillation-free schemes should 3still be pointed out by comparing their development with that of classical two-phase-flow schemes. Unlike classical two-phase methods that possess a clear equilibrium re-laxation mechanism, the development of oscillation-free schemes for real fluids has been primarily method-driven, with their underlying physical understanding remaining under-explored. However, advancements in physical understanding are indispensable for the rational design and long-term development of numerical methods. It is worth emphasiz-ing that, whether in the pressure-based method, the enthalpy-based method, the double-flux method, or the RFQC method, the motivation is to resolve the conflict between the thermodynamic nonlinearity of real fluids and the averaging of conservative variables, rather than to answer how mechanical equilibrium of real fluids should be physically recovered. Therefore, in Section 2, from the perspective of continuum thermodynamics, we analyze how the traditional finite-volume method recovers pressure through the ther-modynamic equilibrium assumption, and how this thermodynamic equilibrium violates pressure equilibrium in real fluids. Furthermore, Section 3 interprets how the RFQC method physically recovers the oscillation-free pressure from the perspective of provid-ing mechanical-equilibrium information to real-fluid elements, and clarifies the physical origins of its thermodynamic-variable evolution and re-projection errors. Additionally, real fluids experience an abrupt jump in the speed of sound during phase change. In the single-phase region, the speed of sound is on the order of O(10 2)– 
+
+O(10 3), whereas inside the two-phase mixture region, it drops to only O(10) or even 
+
+O(1). The speed of sound in the two-phase region can be written as 1
+
+ρc 2
+
+> eq
+
+= αρvc2
+
+> v
+
++ 1 − αρlc2
+
+> l
+
++ T αρ v
+
+Cp,v 
+
+ dsv
+
+dp
+
+2
+
++ (1 − α)ρl
+
+Cp,l 
+
+ dsl
+
+dp
+
+2!
+
+(4) where α is the vapor volume fraction, and cv, cl and Cp,v , Cp,l denote the speeds of sound and specific heats at constant pressure at ( p, T ) on the saturation line, respectively. The term in the parentheses on the right-hand side represents the equilibrium heat and mass transfer between the two phases, which is the source of the speed of sound discontinuity [34]. This abrupt jump in the speed of sound poses a challenge to current real-fluid schemes. Not only do the double-flux method and the pressure-based method tend to produce large errors in such problems [1], but we also find that the RFQC method exhibits a numerical anomaly in a special class of phase-change Riemann problems with liquid-upwind advection, where the rarefaction wave cannot develop correctly. For this reason, in Sections 4 and 5, we introduce and analyze this numerical anomaly, and in Sec-tion 6 we give a remedy based on regularized initial conditions. Finally, the robustness of the RFQC method in such challenging phase-change problems is validated through two-dimensional sonic phase-change jet cases. 
+
+# 2 What is Pressure Oscillation in Physics 
+
+We point out that, from a physical viewpoint, this problem can be formulated as how pressure should be recovered from a finite-volume cell. The traditional finite-volume 4method recovers pressure based on the thermodynamic equilibrium assumption, whereas oscillation-free schemes recover pressure through the mechanical-equilibrium assump-tion. 
+
+2.1 Finite-volume update 
+
+We first consider the energy conservation equation of the one-dimensional Euler equa-tions. At a contact discontinuity where the velocity u = u0 and the pressure p = p0 are both constant, the kinetic-energy term and the pressure-work term cancel each other, and the energy equation reduces to a pure advection equation for the volumetric internal energy ρe :
+
+∂(ρe )
+
+∂t + u0
+
+∂(ρe )
+
+∂x = 0 (5) Consider a first-order finite-volume scheme. During the update from time step n to n+1, the conservative variables U in a cell are the weighted average of the fluid elements that enter this cell during the evolution. Suppose that two fluid elements enter this cell, denoted by the subscripts L and R. Let λ be the weighting coefficient determined by the CFL condition and the advection velocity. The discrete update can then be written as: 
+
+ρn+1  
+
+> i
+
+= (1 − λ)ρL + λρ R = ¯ ρ
+
+(ρe )n+1  
+
+> i
+
+= (1 − λ)( ρe )L + λ(ρe )R = ρe (6) At time n + 1, the state inside the finite-volume cell is shown in Fig. 1. What is known as the pressure oscillation problem refers to how we should resolve the pressure within this finite-volume cell. 
+
+Figure 1: Diagram of the finite-volume update. 
+
+• Thermodynamic equilibrium perspective : In traditional finite-volume meth-ods, the pressure is directly recovered from the conservative variables through 
+
+pn+1 = p
+
+
+
+¯ρ, ρe 
+
+> ¯ρ
+
+
+
+= p (¯ ρ, ¯e). The underlying logic of this treatment comes from thermodynamic equilibrium: when a continuum element is in thermodynamic 5equilibrium, its macroscopic thermodynamic state is completely determined by a thermodynamic potential formed by two independent thermodynamic parameters [35]. The internal energy, density, and entropy form the thermodynamic potential 
+
+e = e(ρ, s ). Meanwhile, since the thermodynamic absolute temperature satisfies 
+
+T = ( ∂e/∂s )ρ > 0, the inverse function s = s(e, ρ ) exists uniquely. Therefore, solely based on (¯ ρ, ¯e), the entire macroscopic thermodynamic state of the fluid element, including the pressure p, can be uniquely recovered. In this sense, recov-ering pressure with a two-parameter EoS in the traditional finite-volume method is equivalent to instantaneously homogenizing different fluid elements in the cell into a thermodynamic equilibrium final state. 
+
+• Mechanical equilibrium perspective : In a finite-volume cell that has achieved pressure equilibrium, the pressure update must continue to satisfy the mechanical equilibrium condition pn+1 = p0. The underlying logic originates from the Euler equations: pressure changes should result only from volumetric work rather than thermal effects. Therefore, to obtain the mechanical-equilibrium pressure p from the finite-volume cell at time n+1, additional information representing mechanical equilibrium is required besides (¯ ρ, ¯e). 
+
+2.2 Physical explanation of pressure oscillations 
+
+Why are traditional finite-volume methods free of pressure oscillations when calculating ideal gases? We point out that this is because the thermodynamic equilibrium process for an ideal gas happens to be a strictly isobaric process. For an ideal gas, since there is no molecular potential energy, the pressure and the volumetric internal energy have a linear relation, and both originate only from the thermal motion of molecules, namely 
+
+p = ( γ − 1) ρe = 13 nmv 2 (7) where n is the number density, m is the molecular mass, v is the thermal motion velocity, and γ is the specific heat ratio of the ideal gas. Therefore, the isochoric-adiabatic mixing process of an ideal gas in a control volume is a strictly isobaric process. Even if the traditional finite-volume method recovers pressure from the thermodynamic equilibrium perspective, its mechanical equilibrium condition is still not violated: 
+
+pn+1 = ( γ − 1) ρe = ¯ p = p0 (8) However, for real fluids, molecular potential energy also exists between fluid molecules, and the linear relation between internal energy and pressure is generally not satisfied. The isochoric-adiabatic mixing process in a control volume is therefore not isobaric. If these fluid elements are forced to reach thermodynamic equilibrium in a finite-volume cell, the pressure changes, namely p(¯ ρ, ¯e)̸ = p0. This underpins the widely used expla-nation of ”the conflict between a nonlinear EoS and linear averaging [1].” We emphasize that this mechanism represents the physical origin of pressure os-cillations; it is fundamentally a matter of choosing the appropriate equilibrium state, 6rather than a closure issue of the energy equation. If the Godunov-method perspec-tive is adopted and the pressure is updated through the thermodynamic equilibrium assumption, pressure oscillations will occur inevitably. However, the thermodynamic equilibrium assumption is not always acceptable. Constrained by complex real-fluid EoS, the recovered pressure can easily drop into negative regimes, leading to numerical breakdown. In real-fluid CFD simulations, what we truly require is a flow field that satisfies mechanical equilibrium from the perspective of the Euler equations. 
+
+# 3 How to Recover Pressure From a Finite-volume Aver-aged Cell 
+
+As pointed out previously, calculating pressure by combining (¯ ρ, ¯e) with the EoS implic-itly introduces the thermodynamic equilibrium assumption. To calculate the pressure p
+
+from the perspective of mechanical equilibrium, we should provide additional informa-tion regarding mechanical equilibrium. How then do we find this information? We need to consider two constraints: first, this information must satisfy the isentropic constraint; second, it must be amenable to finite-volume averaging. In the following, we will con-struct the pressure recovery formulation from the affine relationship between internal energy and pressure under isentropic conditions, and examine how the RFQC algorithm realizes this operation. 
+
+3.1 Affine relationship between internal energy and pressure 
+
+In the smooth regions of the Euler equations, entropy is the sole invariant carried by a fluid element, satisfying: Ds Dt = 0 . (9) Under the isentropic condition, we consider an affine form of the non-linear relation between internal energy and pressure: 
+
+ρe = ξp + E0. (10) Here, ξ represents the isentropic response of internal energy to pressure, i.e., the lin-ear coefficient of the affine relationship. It indicates the increment of internal energy absorbed per unit volume of fluid for a unit increase in pressure under isentropic com-pression. E0 denotes the reference internal energy density at a ”zero-pressure” state, which encompasses background energy such as the intermolecular cohesive potential en-ergy of the fluid. From the fundamental thermodynamic relation d e = T ds + p/ρ 2dρ,we obtain: 
+
+ξ =
+
+ ∂(ρe )
+
+∂p 
+
+
+
+> s
+
+= e + p/ρ c2 = hc2 (11) Meanwhile, ξ and E0 are both quantities that can be finite-volume averaged, which is equivalent to the mechanical equilibrium condition. Suppose that several fluid elements 7with different thermodynamic states exist in a finite-volume cell, with the element in-dex denoted by j. According to the mechanical equilibrium assumption, these elements instantaneously reach pressure equilibrium inside the cell, namely they share the same macroscopic pressure p, without requiring thermodynamic equilibrium. When perform-ing a finite-volume average on the total internal energy within the cell (with weights λj ), the shared pressure p can be extracted from the summation symbol as a constant: 
+
+ρe = X λj (pξ j + E0,j ) = p
+
+X λj ξj
+
+
+
++ X λj E0,j = ¯ξp + ¯E0 (12) Figure 2 shows the internal-energy–pressure evolution curve of a single fluid element under the isentropic condition. During the time interval d t, the fluid element evolves from state n to state n+1. Therefore, theoretically, if ξ and E0 are evolved synchronously in the finite-volume update, the mechanical-equilibrium pressure pn+1 in the cell can be recovered from the cell-averaged conservative energy ρe = P λj (ρe )n+1  
+
+> j
+
+and the affine coefficients ¯ξ = P λj ξn+1 j, ¯E0 = P λj En+1 0, j :
+
+pn+1 = ρe − ¯E0
+
+¯ξ (13) We next derive the evolution equations of ξ and E0 from the isentropic relation. 
+
+Figure 2: Isentropic pressure evolution. We choose ( ρ, s ) as the state parameters, so that ξ = ξ(ρ, s ). The material derivative of ξ along a fluid element is Dξ
+
+Dt =
+
+ ∂ξ ∂ρ 
+
+
+
+> s
+
+Dρ
+
+Dt +
+
+ ∂ξ ∂s 
+
+
+
+> .
+
+ρ Ds
+
+Dt (14) Substituting the continuity equation D ρ/ Dt = −ρ∂u/∂x and the isentropic condition (Eq. 9) yields: Dξ
+
+Dt = −ρ
+
+ ∂ξ ∂ρ 
+
+
+
+> s
+
+∂u ∂x . (15) 8To express this result in terms of the pressure–internal-energy response, the chain rule under the isentropic condition is used to replace ρ by p:Dξ
+
+Dt = −ρc 2
+
+ ∂ξ ∂p 
+
+
+
+> s
+
+∂u ∂x (16) Its Eulerian form is given by: 
+
+∂ξ ∂t + u ∂ξ ∂x = −ρc 2
+
+ ∂ξ ∂p 
+
+
+
+> s
+
+∂u ∂x (17) The derivation for E0 is similar. From the definition E0 = ρe −ξp , taking the material derivative of E0 gives: DE0
+
+Dt = D( ρe )Dt − ξ Dp
+
+Dt − p Dξ
+
+Dt . (18) On the other hand, from ρe = ( ρe )( p, s ), we have: D( ρe )Dt =
+
+ ∂(ρe )
+
+∂p 
+
+
+
+> s
+
+Dp
+
+Dt +
+
+ ∂(ρe )
+
+∂s 
+
+
+
+> p
+
+Ds
+
+Dt (19) Substituting the definition of ξ (Eq. 11) and the isentropic condition (Eq. 9) yields: D( ρe )Dt = ξ Dp
+
+Dt (20) Substituting Eq. 20 and Eq. 16 back into Eq. 18 provides the evolution equation for E0:DE0
+
+Dt = pρc 2
+
+ ∂ξ ∂p 
+
+
+
+> s
+
+∂u ∂x (21) Its Eulerian form is: 
+
+∂E 0
+
+∂t + u ∂E 0
+
+∂x = pρc 2
+
+ ∂ξ ∂p 
+
+
+
+> s
+
+∂u ∂x (22) In summary, the evolution equations for the slope ξ and intercept E0 of the internal energy–pressure affine relation are: 
+
+
+
+∂ξ ∂t + u ∂ξ ∂x = −ρc 2
+
+ ∂ξ ∂p 
+
+
+
+> s
+
+∂u ∂x ∂E 0
+
+∂t + u ∂E 0
+
+∂x = pρc 2
+
+ ∂ξ ∂p 
+
+
+
+> s
+
+∂u ∂x 
+
+(23) where the isentropic derivative of ξ with respect to p is a quantity related to the second-order curvature of the isentrope (i.e., the fundamental derivative of gasdynamics): 
+
+ ∂ξ ∂p 
+
+
+
+> s
+
+= 1
+
+ρc 2 − ξc2
+
+ ∂c 2
+
+∂p 
+
+
+
+> s
+
+(24) 93.2 What does RFQC do 
+
+For certain specific equations of state, such as the van der Waals EoS and the stiffened-gas EoS, the internal-energy–pressure affine relation discussed above can be written analytically, and its evolution equations can be constructed in a relatively direct way [12, 16]. For instance, the affine coefficients of the stiffened gas EoS are all constants; thus, their source terms are naturally zero, and Eq. 23 degenerates into advection equations for ξ and E0. However, for more complex real-fluid equations of state, such as cubic EoS and composite EoS under two-phase equilibrium, the internal energy–pressure affine relationship cannot be directly inverted from the EoS. Meanwhile, the source terms involving the derivative of the speed of sound are even more difficult to calculate. To the best of our knowledge, within the multi-component HEM framework, there is still no mature analytical framework for calculating the derivatives of the two-phase equilibrium speed of sound. The RFQC method is proposed for this class of real fluids. We recall the transport equations for the thermodynamic affine variables Φ = ( ξ, E 0)T :
+
+
+
+∂ξ ∂t + u ∂ξ ∂x = 0 
+
+∂E 0
+
+∂t + u ∂E 0
+
+∂x = 0 (25) Comparing Eq. 23 with Eq. 25, we can see that the RFQC method truncates the source terms in the isentropic evolution equations of ξ and E0. As a result, ξ and E0 are evolved along material trajectories (pathlines) rather than along isentropic trajectories. We point out that this is the key point in the construction of the RFQC method: on the one hand, RFQC avoids pressure oscillations by evolving the affine coefficients of the internal energy–pressure relationship; on the other hand, by freezing ξ and E0 along pathlines, it avoids the evaluation of source terms related to the derivatives of the speed of sound, while the re-projection converts the accumulated error caused by the off-isentropic evolution of ξ and E0 into an internal-energy residual, through which the thermodynamic state is re-anchored rigorously at the next time step. Figure 3 shows the evolution trajectories of pressure and the affine coefficient ξ on an isentropic surface in the RFQC algorithm. It provides a more direct interpretation of the physical meaning of ”internal-energy–pressure linearization–frozen evolution of the linearization coefficients–pressure-field reconstruction–thermodynamic re-projection” in the RFQC algorithm. 
+
+• Internal-energy–pressure linearization: From the physical perspective, the local linearization of the internal-energy–pressure relation in RFQC is, fundamen-tally, the exact local affine relation between internal energy and pressure. Mechan-ical equilibrium of pressure is maintained through the affine-relation coefficients that can be finite-volume averaged. 
+
+• Frozen evolution of the linear coefficients: The RFQC algorithm assumes that the affine coefficients ξn, E n 
+
+> 0
+
+are frozen along pathlines and transported by 10 Figure 3: (a) Pressure evolution; (b) Affine coefficient evolution. Diagram of the RFQC algorithm on an isentropic surface. pure advection. This is equivalent to approximating the internal-energy–pressure isentrope ρe = ψ(p, s ) within the time interval d t by the tangent line at time tn
+
+(Fig. 3(a)). 
+
+• Pressure-field reconstruction: The internal energy ρe n+1 C-L evolved by the con-servation laws and the affine coefficients ξn+1 A-L = ξn, E n+1 0,A-L = En 
+
+> 0
+
+evolved by advec-tion are used to recover the mechanical-equilibrium pressure pn+1 RFQC . There is an error between pn+1 RFQC and the actual isentropic evolution pressure of the fluid ele-ment, pn+1 real . This error originates from the second-order curvature term of ψ(p, s ), and its sign depends on the convexity of ψ.
+
+• Thermodynamic re-projection: The pressure pn+1 RFQC and the density ρn+1 are then used as the thermodynamic reference parameters at time tn+1 to recalculate the thermodynamic state at time tn+1 , including the internal energy ρe n+1 and the affine coefficients ξn+1 , E n+1 . The difference ϵp between ρe n+1 and ρe n+1 C-L is the re-projection error, which also depends on the second-order curvature term  ∂ξ ∂p 
+
+ 
+
+> s
+
+(∆ p)2 of ψ(p, s ). The present analysis demonstrates that by truncating the source terms in the isen-tropic evolution equations of the affine coefficients (Eq. 23), the RFQC method strikes a favorable balance among computational efficiency, shock-capturing stability, and conser-vation errors. Nevertheless, the theoretical framework established above also provides guidance for designing non-oscillatory schemes of even higher accuracy, such as incorpo-rating the source terms into the evolution or recovering the equilibrium pressure via more complex internal energy–pressure relations (e.g., a quadratic relation). Predictably, how-ever, such advancements will necessitate the evaluation of more complex thermodynamic derivatives and pose challenges for numerical stability. 11 4 Applicability Limit of RFQC: the Liquid-upwind Anomaly 
+
+When the RFQC algorithm is applied to solve a Riemann problem involving phase change from a high-pressure liquid to a low-pressure vapor, and an additional liquid-upwind translational velocity is superimposed on the initial conditions (the liquid phase is on the upstream side), we observe a highly reproducible anomaly. We designate this anomaly as the Liquid-upwind Anomaly (LUA). Below, we discuss the behavior of this anomaly systematically and analyze its origin. Throughout the subsequent analysis, we consider the RFQC method with first-order temporal and spatial discretization, utilizing the HLLC Riemann solver [36]. The fluid medium under consideration is n-dodecane. For detailed information regarding the discretization schemes, definitions of thermodynamic variables, equations of state, and phase equilibrium solvers, we refer readers to our previous work [1] and omit the details here. Figure 4 shows a typical case of LUA. The computational domain is L = 1m and the initial discontinuity is located at x = 0 .5m. The initial states are pL = 2 × 10 6Pa, 
+
+pR = 1 × 10 5Pa, ρL = 300kg /m3, and ρR = 2kg /m3. This represents a class of Riemann problems involving liquid–vapor phase change, also known as flash evaporation Riemann problems. The exact solution of this type of Riemann problem was given in our previous work [34]. The subsequent discussion in Sections 4 to 6 uses this case as the representative example. In Fig. 4, as the global translational velocity changes, the numerical solution obtained by the RFQC method deviates significantly from the exact solution. The main characteristics are as follows: 
+
+Figure 4: (a) Density; (b) Pressure. Liquid-upwind anomaly in the RFQC method. The computational time t = 0 .6ms, with a grid size of N = 500 and a CFL number of 0 .5. 
+
+• Residual initial discontinuity: The initial discontinuity remains over many time steps, so that the rarefaction fan cannot develop correctly and the downstream pressure stays at low values. This behavior is observed near x = 0 .5m for the 
+
+u = 150m /s curve in Fig. 4. 
+
+• Non-monotonic density inside the rarefaction wave: A local density re-12 bound appears inside the rarefaction fan, where the density should decrease mono-tonically, or the curvature of the profile changes significantly. This can be seen near x = 0 .65m for the u = 300m /s curve in Fig. 4 (a). 
+
+• Grid convergence: The wave profile improves clearly with grid refinement, as shown in Figs. 5(a) and 5(b). However, the error convergence order remains very low, as shown in Figs. 5(c) and 5(d). 
+
+• CFL number: Increasing the CFL number slightly improves the wave profile, as shown in Fig. 6, but the solution cannot be restored to the correct state observed at u = 0 in Fig. 4. 
+
+• Insensitivity to time integration: This anomaly is generally insensitive to the time-integration method, with similar results obtained from first-, second-, and third-order Runge–Kutta schemes. 
+
+Figure 5: (a) Density; (b) Pressure; (c) Global L1 error; (d) L1 error in smooth region. Grid-convergence behavior of the liquid-upwind anomaly. The computational time t =0.6ms, initial translational velocity u = 150m /s, CFL = 0 .5. The above anomaly usually occurs only when the following three conditions are satisfied simultaneously: 13 Figure 6: (a) Density; (b) Pressure. Effect of the CFL number on the liquid-upwind anomaly. The computational time t = 0 .6ms, initial translational velocity u = 150m /s, grid size N = 500. 
+
+• Splitting of the rarefaction wave: The rarefaction wave is split by phase change, and the speed of sound changes discontinuously at the end of the split plateau due to phase change. The speed of sound inside the two-phase region becomes very low, only on the order of O(1)– O(10). 
+
+• Global advection: A significant global translational velocity is prescribed in the initial condition, rather than superimposed later. 
+
+• Liquid upwind: The upstream state is a high-pressure, high-density liquid, while the downstream state is a low-pressure (below the critical pressure), low-density vapor/two-phase state. Unlike the well-known shock anomaly, the triggering condition of the LUA does not require strong compression in the flow field; instead, the LUA appears specifically in rarefaction-wave and phase-change problems. 
+
+# 5 Formation Mechanism of the Liquid-Upwind Anomaly 
+
+We now elucidate the formation mechanism of the LUA and interpret the reasons for the distinct behaviors detailed above. As shown in Fig. 7, we consider the numerical update of the two grid cells adjacent to the initial discontinuity in the RFQC algorithm. The cell to the left of the initial discontinuity interface I is denoted by L, and the cell to the right is denoted by R, with the interface located at I = L + 1 /2 = R − 1/2. Initially, cell L contains high-pressure liquid, whereas the R cell contains low-pressure vapor. At time t, cell R shifts into a two-phase mixed state due to an increase in both pressure and density. We first point out that the root cause of the LUA lies in the delayed pressure rise in cell R, which prevents a continuous rarefaction wave from forming in time. In a regular 14 evolution scenario under a liquid-upwind velocity, the initial discontinuity interface I is expected to be located within or upstream of the rarefaction fan. The downstream R
+
+cell should firstly be lifted toward the intermediate pressure of the Riemann solution, gradually rising to connect with the left state to form a continuous wave fan, or be raised to the upstream pressure, becoming part of the liquid region upstream of the rarefaction wave. In the RFQC method, however, once the R cell enters the two-phase region during phase change, the rapid drop in the speed of sound leads to a sharp increase in the affine slope ξ. The pressure increment driven by the upstream liquid flux is therefore very limited. Meanwhile, the thermodynamic re-projection performed at each time step equivalently removes the local positive pressure increment. The pressure rise in the 
+
+R cell is consequently delayed, which leads to the two observed behaviors. In the first behavior, the R cell remains in the low-pressure two-phase region and cannot be correctly updated into the liquid region, which appears as a residual initial discontinuity. In the second behavior, even if the pressure is raised into the liquid region, the increase still lags behind the correct rarefaction structure and propagates to influence downstream cells, manifesting as a non-monotonic density profile. 
+
+Figure 7: Diagram of the cells on both sides of the initial discontinuity. Below, we further explain this mechanism in detail through the pressure update equation of the RFQC method. 
+
+5.1 RFQC pressure update under fully upwind conditions 
+
+Consider a time t after the initial few steps, at which the downstream cell R of the discontinuity enters the two-phase region due to a pressure rise, and its state is given by: 
+
+ρ, u, p, q, ξ, E0, (26) with 
+
+q = ρe = ξp + E0. (27) The state of the upstream liquid cell L is denoted by: 
+
+ρL, uL, pL, qL, ξL, E0,L , (28) 15 subject to: 
+
+qL = ρLeL, qL = ξLpL + E0,L . (29) As cell R enters the two-phase region, the speed of sound drops abruptly to the order of O(10). For the case considered in Fig. 4, the speed of sound in the liquid phase is cL = 130m /s; thus, the cell L enters a fully upwind state under the condition of 
+
+uL = 150m /s. Without loss of generality, we assume that both cell L and cell R are under a fully upwind condition, which implies that both the left and right interfaces degenerate into one-sided upwind states: 
+
+bFL+1 /2 = FL, bFR−1/2 = FR. (30) Consequently, the updated state of cell R is solely determined by the upstream liquid cell L and itself, independent of any information from cells further downstream. It is worth noting that under the fully upwind condition, the state of cell R is variable, whereas the state of the liquid cell L is constant. This is because the region upstream of cell L consists entirely of the same liquid phase, while the downstream vapor cell theoretically needs to increase its pressure and density to match the state of cell L.Therefore, we explicitly use the subscript L to emphasize its constant state. 
+
+5.1.1 Mass conservation update 
+
+Define the pressure and velocity differences between the two cells: ∆p = pL − p, ∆u = u − uL. (31) We define the time-step-to-grid-spacing ratio θ and the update weights a and b as 
+
+θ = ∆t
+
+∆x , a = θu, b = θu L. (32) Let the time t + ∆ t be denoted by t+, with variables at this time indicated by a superscript ”+”. Under a fully right-going upwind condition, the mass update is given by 
+
+ρ+ = (1 − a)ρ + bρ L. (33) We introduce two mass weights defined as 
+
+wR = (1 − a)ρ, wL = bρ L, ρ+ = wR + wL. (34) 
+
+5.1.2 Φ update and pressure update equation 
+
+For a standard RFQC discrete update, Φ = ( ξ, E 0) is updated by upwind mixing: 
+
+eξ+ = (1 − b)ξ + bξ L, (35) 
+
+eE+0 = (1 − b)E0 + bE 0,L . (36) 16 Here, the tilde symbol e· denotes the values of the thermodynamic variables ξ and E0, as well as the conservatively updated internal energy q discussed below, after a single-step update but prior to re-projection. In terms of the above variables, the single-step pressure-update equation can be written as: 
+
+p+ − p =
+
+bξ L∆p − θ∆u
+
+h
+
+q + wLp+wRpL
+
+> ρ+
+
+i
+
++ wLwR 
+
+> 2ρ+
+
+∆u2 − θ2∆p2
+
+> 2ρ+
+
+eξ+ . (37) This equation represents the pressure update within cell R under fully upwind con-ditions. Since the pressure within cell R increases monotonically in LUA problems, we refer to this equation as the single-step pressure-increment equation . The detailed derivation of this equation is provided in A. The pressure increment can be decomposed into four terms: 
+
+p+ − p = Yb + Ys + YK + YH , (38) where 
+
+Yb = bξ L(pL − p)
+
+eξ+ , (39) is the thermodynamic flux-induced pressure-increment term (flux increment term), which represents the capability of the upstream liquid thermodynamic stencil Φ to lift the pressure of the current cell toward the upstream pressure. 
+
+Ys = − θ∆u
+
+eξ+
+
+
+
+q + wLp + wRpL
+
+ρ+
+
+
+
+, (40) is the velocity-difference pressure-work term, which quantifies the negative contribution to the pressure increment associated with the conversion of the pressure difference into a velocity difference. 
+
+YK = 1
+
+eξ+
+
+wLwR
+
+2ρ+ ∆u2, (41) is the kinetic-energy mixing term, which describes the pressure increment resulting from the kinetic-energy difference produced when two states with different velocities are mixed. 
+
+YH = − 1
+
+eξ+
+
+θ2(pL − p)2
+
+2ρ+ , (42) is the quadratic pressure-impulse term. It represents the negative contribution to the pressure increment arising from the conversion of the pressure difference into kinetic energy. Figure 8 presents the contributions to the pressure increment in cell R for the LUA case with u = 150m /s shown in Fig. 4. The numerical results indicate that Yb is the 17 dominant positive contribution in the anomalous cell R, whereas Ys is the dominant negative contribution. The kinetic-energy mixing term YK and the quadratic pressure-impulse term YH are smaller by orders of magnitude. Thus, the single-step pressure increment in cell R is governed primarily by the flux increment term Yb. The total pres-sure increment is only 1 .236MPa, substantially below the 1 .9MPa required to establish a continuous rarefaction wave. This result is consistent with the incomplete expansion of the rarefaction wave observed in Figs. 4, 5, and 6. The term Yp in the figure denotes the positive pressure increment removed by ther-modynamic re-projection and will be analyzed in the next subsection. 
+
+Figure 8: Contributions to the pressure increment in cell R for the liquid-upwind anomaly case over t = 0 .6ms. The initial translational velocity is u = 150m /s, the grid size is 
+
+N = 500, and CFL = 0 .5. 
+
+5.1.3 Direct source of insufficient pressure rise 
+
+Under fully upwind conditions, the upstream cell L remains in the constant liquid state: 
+
+pL = const , ξ L = const . (43) After the initial few time steps (at time t), cell R enters the two-phase region, where 
+
+ξ reaches the order of O(10 3). By contrast, the upstream liquid generally has ξ = O(10). Hence, 
+
+ξ ≫ ξL. (44) At the same time, the CFL restriction ∆ t < θ ∆x/ max( c + u) generally gives b = θu L <
+
+0.5. It follows that eξ+ = (1 − b)ξ + bξ L ≫ ξL (45) is primarily governed by the value of ξ in cell R. The dominant pressure-increment term therefore reduces to 
+
+Yb = bξ L(pL − p)(1 − b)ξ + bξ L
+
+≃ bξ L
+
+(1 − b)ξ (pL − p). (46) 18 Since the coefficient bξ L 
+
+> (1 −b)ξ
+
+is very small, the pressure increment actually introduced into cell R remains small even when ( pL − p) is large. Furthermore, as p in cell R rises over successive time steps, ( pL − p) decreases accordingly. Since ξ changes only slightly within the two-phase region, Yb decreases continuously as p rises. Thus, as the pressure in cell R approaches the upstream pressure, the pressure increment produced in each subsequent time step becomes progressively smaller. As a result, cell R remains trapped in the two-phase region for a long period. Figure 9 shows that the solution points of cell R become concentrated in the phase diagram, indicating that the pressure-rise rate decreases progressively. Meanwhile, cell R persists in the two-phase region, where ξ stays at the order of O(10 3) and varies only slightly. 
+
+Figure 9: (a) State points of the R cell on the p − ρ phase diagram; (b) Temporal variations of ξ and c in the R cell. Parameter variations in the R cell over t = 0 .6ms for the liquid-upwind anomaly case. The initial translational velocity u = 150m /s, grid size 
+
+N = 500 and CFL = 0 .5. 
+
+5.2 Thermodynamic re-projection error and the lost pressure incre-ment 
+
+Thermodynamic re-projection constitutes a central step of the RFQC method. Following pressure recovery, RFQC re-projects the thermodynamic state at the end of each time step. The updated density and pressure, ρ+ and p+, are used to recalculate q+, ξ+,and E+0 , ensuring that Φ evolves consistently and that the Abgrall condition is satisfied. The internal-energy error introduced by re-projection is defined as: 
+
+ϵp = qEOS (ρ+, p +) − eq+ = q+ − eq+. (47) As revealed by our previous study, within a correctly developed continuous rarefac-tion wave, ϵp decreases as the wave propagates and spreads, and remains a small error with second-order convergence with respect to the time-step (Section 3 of Ref. [1]). How-ever, this property holds only for smooth cells that evolve normally. In the anomalous 19 cell R, where the LUA leaves a residual discontinuity, the re-projection error remains at 
+
+O(10 6) throughout the evolution, as shown in Fig. 10. Moreover, in cell R, ϵp satisfies 
+
+ϵp ≪ 0. (48) Now, we will demonstrate that, without thermodynamic re-projection, this internal energy error would contribute a positive pressure increment in the next pressure-recovery step. By removing the excess energy residual, thermodynamic re-projection equivalently eliminates a part of the pressure increment required to correctly raise the pressure. 
+
+Figure 10: (a) Distribution of the re-projection error ϵp at t = 0 .6ms; (b) Temporal variations of re-projection error ϵp in the R cell. Behavior of the re-projection error in the liquid-upwind anomaly case. The initial translational velocity u = 150m /s, grid size 
+
+N = 500 and CFL = 0 .5. 
+
+5.2.1 Pressure increment removed by thermodynamic re-projection 
+
+Note that Eq. 37 is not valid for an arbitrary internal energy q; rather, it is derived specifically for a thermodynamically closed state after re-projection. If the internal energy is not re-projected at the end of the time step, the state becomes: 
+
+qc = ξp + E0 − ϵp = q − ϵp. (49) We emphasize again that qc cannot be substituted directly into Eq. 37, because the closure relation in Eq. 27 (with the implicit assumption ϵp = 0) was used in its derivation. Since cell L remains constant under fully upwind conditions, its re-projection error satisfies ϵp,L = 0. By contrast, the re-projection error ϵp in cell R retained from the preceding time step enters the next update with the geometric weight (1 − a). The temporary internal-energy update in the next time step therefore becomes 
+
+eq+,c = eq+ − (1 − a)ϵp. (50) 20 Note that eE+0 and eξ+ are still obtained from the upwind advection update of Φ (Eqs. 35 and 36.) The pressure recovery then becomes 
+
+p+,c = eq+ − (1 − a)ϵp − eE+0
+
+eξ+ . (51) It follows that 
+
+p+,c = p+ − (1 − a)ϵp
+
+eξ+ . (52) The extra term on the right-hand side is the pressure increment removed by thermody-namic re-projection. The CFL restriction ensures that 1 − a > 0, and since ϵp < 0, the corresponding pressure-increment term is therefore positive: 
+
+Yp = − (1 − a)ϵp
+
+eξ+ > 0. (53) Thus, the re-projection step in the RFQC method removes the positive pressure-increment term Yp, resulting in an insufficient total pressure increment in cell R. As shown in Fig. 8, the numerical results indicate that the re-projection pressure-increment term Yp is comparable in magnitude to the flux increment term Yb. If the pressure in-crement removed by re-projection is added back to the total pressure increment, then P ∆p + P Yp = 1 .865MPa, which is very close to the 1 .9MPa required to form a con-tinuous rarefaction wave. Since the anomalous cell R remains trapped in the low-pressure two-phase region, the pressure difference between the two cells ∆ p = pL −p remains substantial. Consequently, the re-projection error in this discontinuous cell does not exhibit the second-order con-vergence characteristic typical of smooth regions. Instead, as time steps advance, the error satisfies −ϵp ≫ 0 (Fig. 10), which is regenerated by the re-projection at the next time step, equivalently removing the positive pressure increment Yp once again. A closed feedback loop is thus established: 
+
+p rises sluggishly → R remains in the two-phase region → Yp ∝ − ϵp ≫ 0
+
+→ re-projection removes Yp → p+ rises sluggishly .
+
+In conclusion, while the thermodynamic reprojection constitutes an indispensable closure for RFQC to preserve pressure equilibrium, it repeatedly removes the positive pressure increment in the anomalous cell, allowing the erroneous state to persist. 
+
+5.3 Explanation of the characteristics of the liquid-upwind anomaly 
+
+Thus far, through the analytical derivation of the pressure increment equation, we have elucidated the mechanism of the LUA. Specifically, in the presence of phase transi-tion,the pressure in cell R rises far more slowly than required by the correct wave struc-ture. On the one hand, once cell R enters the two-phase region, the speed of sound 21 decreases rapidly and ξ increases sharply, so that the pressure increment introduced by the upstream liquid flux becomes very limited. Under fully upwind and phase-change conditions, the dominant positive term in the pressure increment equation, 
+
+Yb = bξ L(pL − p)(1 − b)ξR + bξ L
+
+≃ bξ L
+
+(1 − b)ξR
+
+(pL − p),
+
+is severely deficient due to the constraint ξR ≫ ξL. On the other hand, thermodynamic re-projection is performed at every time step and equivalently removes the local positive increment term: 
+
+Yp = − (1 − a)ϵp
+
+eξ+ > 0.
+
+The pressure difference ∆ p between cells L and R therefore persists. This causes a large re-projection error to be repeatedly generated at the anomalous cell, which continuously eliminates the positive pressure increment and forms a feedback loop. The resulting feedback loop delays the pressure rise in cell R and ultimately produces the LUA. Based on the mechanism described above, the characteristic behaviors of the LUA presented in Section 4 can therefore be consistently accounted for: 
+
+• Residual initial discontinuity: As established above, the pressure in cell R
+
+rises too slowly to leave the two-phase region and evolve into the liquid phase. A pressure difference ∆ p therefore persists between cells R and L, leaving a residual of the initial discontinuity. This corresponds to the u = 150m /s curve near x = 0 .5m in Fig. 4. 
+
+• Non-monotonic density in the rarefaction wave: As the advection velocity 
+
+uL increases, the dominant pressure-increment term Yb ∝ b = θu L also increases, allowing cell R to leave the two-phase region and a continuous rarefaction wave to form. At the same time, however, the entire wave is advected more rapidly, so cell 
+
+R must complete the required pressure rise within a shorter physical time. The cell may therefore be ”unlocked,” while its pressure evolution still lags behind the correct rarefaction structure. This mismatch ultimately produces an anomalous non-monotonic density profile, as observed near x = 0 .65m for the u = 300m /scurve in Fig. 4. 
+
+• Improved wave profile with an increased CFL number: Since Yb ∝ b = θu L,increasing the CFL number raises θ and hence Yb. The resulting increase in the single-step pressure increment in cell R brings the wave profile closer to the correct solution (Fig. 6). 
+
+• Improved wave profile under grid refinement: The term Yb is proportional to θ = ∆ t/ ∆x and does not depend directly on the grid size. However, grid refinement reduces the physical length of each time step. Therefore, the required pressure increment over one step decreases accordingly, the increment produced by RFQC becomes closer to the physically required value, and the wave profile improves. 22 • Insensitivity to time integration: Regardless of the Runge-Kutta integration scheme employed, the same extreme condition ξR ≫ ξL as in the first-order tem-poral update is inevitably encountered within each Runge-Kutta substep, thereby failing to resolve the LUA. 
+
+• High-pressure liquid and low-pressure vapor: The LUA requires a high-pressure phase-changing liquid on one side of the initial discontinuity and a low-pressure vapor on the other. Only then can the vapor cell enter the two-phase region during time stepping, leading to a jump of ξ by orders of magnitude and a sharp drop in the dominant pressure-increment term Yb.
+
+• Global advection with liquid upwind: In the absence of global advection, or when the liquid is downstream, cell R does not need to be raised to the liquid-phase pressure. It remains in the vapor phase or the two-phase region, while the pressure in cell L and the cells to its left decreases, allowing the continuous rarefaction wave to develop correctly. 
+
+# 6 Remedy of the Liquid-upwind Anomaly 
+
+Regularizing the initial conditions currently provides the simplest and most reliable remedy for the liquid-upwind anomaly. Numerical tests indicate that the LUA can be avoided by introducing a gradient over neighboring cells symmetrically on both sides of the initial discontinuity along the advection direction. The regularization prevents the extreme configuration pL ≫ pR, ξ L ≪ ξR from arising at the beginning of the calculation. Instead, the first time step produces pL−1 > p L > p R > p R+1 and ξL ≈ ξR ≫
+
+ξL−1, ξ R+1 . The problematic L/R interface is therefore eliminated. The regularized cells then promote a rapid pressure rise downstream and prevent the loss of pressure increment associated with the re-projection error from persisting, allowing the rarefaction wave to develop correctly. We propose a tanh-based method for generating regularized initial conditions. Both components of W = ( ρ, p ) are smoothed along the spatial grid in the advection direction, producing a gradient over one to three cells on each side of the initial discontinuity. The corresponding thermodynamic affine variables Φ(ρ, p ) are then recalculated. For two initial states, the regularized state is given by 
+
+W = φWL + (1 − φ)WR (54) where the regularization function is 
+
+φ = 12
+
+
+
+1 − tanh 
+
+ x − x0
+
+γ∆x
+
+ 
+
+(55) Here, x0 is the location of the initial discontinuity, and γ is the regularization parameter. Numerical tests for various liquid-upwind phase-change Riemann problems involving n-dodecane suggest γ = 0 .2 ∼ 1. In general, γ should be reduced as the initial liquid density increases. 23 For the cases in Fig. 4 of Section 4, the initial discontinuity is regularized with γ = 1 over Ns = 2 cells on either side. The resulting profiles are presented in Fig. 11. The regularization restores the correct wave structure, with the numerical solutions agreeing closely with the exact solutions. We then examine grid convergence for the case with 
+
+u = 150m /s, as shown in Fig. 12. The regularized solution exhibits smooth convergence curves and stable convergence orders. The overall convergence orders are approximately 0.47 for density and 0 .64 for pressure, while the corresponding values in the smooth region reach 0 .88 and 0 .8. This behavior is consistent with the expected convergence of a first-order Godunov method. 
+
+Figure 11: (a) Density; (b) Pressure. RFQC method with smooth initialization. The computational time t = 0 .6ms, with a grid size of N = 500 and a CFL number of 0 .5. 
+
+Figure 12: (a) Global L1 error; (b) L1 error in smooth region. Grid-convergence behavior of the RFQC method with smooth initialization. The computational time t = 0 .6ms, initial translational velocity u = 150m /s, CFL = 0 .5. We further investigate the evolution of the anomalous cell R after regularization, as presented in Fig. 13. As shown in Fig. 13(a), the state in cell R evolves smoothly from the two-phase region into the liquid region and reaches the target state. As the 24 state in cell R retrogradely crosses the liquid saturation line, the speed of sound c
+
+increases, while ξ decreases sharply(Fig. 13(b)). Figure 13(c) shows the temporal evo-lution of the re-projection error ϵp in cell R. The error decreases rapidly and eventually converges to nearly zero. The pressure-increment distribution in cell R (Fig. 13(d)) further shows that regularization reduces the pressure-increment loss caused by thermo-dynamic re-projection to only 0 .013MPa, compared with 0 .629MPa without regulariza-tion. This further confirms that regularization eliminates the extreme initial condition 
+
+pL ≫ pR, ξ L ≪ ξR, avoids the pressure loss caused by the large re-projection error, and ensures the correct evolution of the wave profile. 
+
+Figure 13: (a) State points on the p − ρ phase diagram; (b) Temporal variations of 
+
+ξ and c. (c) Temporal variations of re-projection error ϵp (d) Contributions to the pressure increment. Parameter variations in the R cell over t = 0 .6ms with regularized initialization. The initial translational velocity u = 150m /s, grid size N = 500 and CFL = 0 .5. Finally, we briefly comment on high-order reconstruction in the presence of the LUA. The current high-order reconstruction follows the method of Johnsen [13] and recon-structs the primitive variables W = ( ρ, u, p, ξ, E o). Strictly speaking, a direct analysis of the pressure update under high-order reconstruction remains difficult. For real fluids, 25 polynomial-based high-order reconstruction can preserve pressure equilibrium,but it is not strictly thermodynamically consistent, because the reconstructed quantities gener-ally do not satisfy Φi+1 /2 = Φ(ρi+1 /2, p i+1 /2). High-order reconstruction may slightly alleviate the LUA, but the extent of this improvement cannot be predicted quantita-tively. Consequently, for practical engineering simulations with initial conditions that may trigger the LUA, initial-condition regularization should be performed first, followed by verification of the corresponding one-dimensional solution before any two- or three-dimensional simulation is carried out. The next section illustrates this workflow with a two-dimensional sonic phase-change jet problem. 
+
+# 7 Two-dimensional Sonic Phase-change Jet 
+
+The triggering of the LUA typically manifests in the initial conditions of high-speed phase-change jet simulations. Although liquid phase-change jets in practical engines generally do not reach sonic speeds, we consider a sonic jet in this section to high-light the critical challenge posed by the LUA and to demonstrate the robustness of the RFQC method for such problems. The simulation is performed with the RFQC method combined with initial-condition regularization. Time integration is carried out with the third-order SSP-RK scheme [37], while spatial discretization adopts Johnsen’s primitive-variable reconstruction method [13]. Further details can be found in our pre-vious work [1]. Figure 14 shows the computational conditions for the sonic phase-change jet. The computational domain consists of a 0 .6m × 0.4m vapor-phase region and a 0 .1m × 0.04m liquid-phase region. Initially, the vapor-phase region has a density of ρv = 30kg /m3,a pressure of pv = 1 × 10 5Pa, and zero velocity. The pressure in the liquid-phase region is pl = 2 × 10 6Pa. Two different liquid densities are considered to represent fuel injection under different initial-density conditions. For the low-density phase-change jet, the liquid-phase density is ρl = 320kg /m3, and the jet velocity is set to ul = 150m /s. For the high-density phase-change jet, the liquid-phase density is ρl = 450kg /m3, and the jet velocity is set to ul = 300m /s. The computational domain is discretized with a uniform quadrilateral grid of spacing ∆ = 2 × 10 −3m, and the simulation time is t = 1ms. It should be noted that, although a phase-change jet was also simulated in Section 5 of our previous work [1], the LUA did not occur in that case. This is because the initial pressure in the vapor-phase region was set above the critical pressure. Consequently, during the pressure-rise process, the downstream vapor-phase region did not need to undergo compression from the vapor phase through the two-phase region and into the liquid phase. Therefore, the extreme initial condition pL ≫ pR, ξ L ≪ ξR did not arise during the early stage of the calculation. By contrast, in the cases considered in this section, the initial pressure in the downstream vapor-phase region is far below the critical pressure, representing typical LUA conditions. 26 Figure 14: Computational conditions for the sonic phase-change jet. 
+
+7.1 Low-density sonic phase-change jet 
+
+In this case, the liquid-phase region has a density of ρl = 320kg /m3 and a pressure of 
+
+pl = 2 × 10 6Pa. With the corresponding liquid speed of sound cl = 147m/s, the jet velocity is therefore set to ul = 150m /s. Before performing the two-dimensional jet simulation, we first solve the one-dimensional Riemann problem corresponding to the initial discontinuity in the two-dimensional con-figuration. The left state of the Riemann problem is set to the liquid state ( ρl, u l, p l), while the right state is set to the vapor state ( ρv, u v, p v). The computational domain has a length of L = 1m, the simulation time is t = 0 .6ms, and the initial discontinuity is located at x = 0 .5m. A third-order WENO scheme [38] is adopted for spatial recon-struction. The CFL number is set to 0 .4, with N = 500 grid cells (∆ = 2 × 10 −3m), 
+
+Ns = 2 transition cells, and a regularization parameter of γ = 1 .0. The results are shown in Fig. 15. Without initial-condition regularization, the rarefaction wave fails to evolve correctly, a residual discontinuity remains near x = 0 .5m, and the downstream pressure is not raised sufficiently. After regularization, the numerical results agree very well with the exact solution. Therefore, the same regularization settings are adopted for the two-dimensional simulation, with Ns = 2 transition cells and γ = 1 .0. The CFL number is also retained at CFL = 0 .4. The simulation results are shown in Fig. 16. 
+
+7.2 High-density sonic phase-change jet 
+
+In this case, the liquid-phase region has a density of ρl = 450kg/m 3 and a pressure of 
+
+pl = 2 × 10 6Pa. Given the corresponding liquid speed of sound cl = 295m/s, the jet velocity is set to ul = 300m/s. Before performing the two-dimensional jet simulation, we first solve the one-dimensional Riemann problem corresponding to the initial discontinuity in the two-dimensional con-figuration. Similarly, the left and right states are set to ( ρl, u l, p l) and ( ρv, u v, p v), re-spectively. The computational domain has a length of L = 1m, the simulation time is 27 Figure 15: (a) Density, (b) Pressure. Riemann problem for a low-density phase-change sonic jet: comparison without regularization (No Reg.) and with regularization of the initial discontinuity (Reg. ID). Regularization factor γ = 1 .0, third-order WENO recon-struction is employed for spatial discretization. 
+
+Figure 16: (a) Density and temperature, (b) Sound speed and pressure. Results of the low-density phase-change sonic jet. Regularization factor γ = 1 .0; third-order WENO reconstruction is employed for spatial discretization. 28 t = 0 .6ms, and the initial discontinuity is located at x = 0 .5m. A second-order MUSCL reconstruction with the minmod limiter [39] is adopted. The CFL number is set to 0 .4, with N = 500 grid cells, Ns = 2 transition cells, and a regularization parameter γ = 0 .8. The results are shown in Fig. 17. Figure 17 shows that, without initial-condition regularization, the rarefaction wave fails to evolve correctly, a significant residual discontinuity develops near the initial discontinuity, and the downstream pressure remains far below its correct level. After regularization, the numerical results agree well with the exact solution. Therefore, the same regularization settings are adopted for the two-dimensional simulation, with Ns = 2 transition cells and γ = 0 .8. The CFL number is also retained at CFL = 0 .4. The results are shown in Fig. 18. 
+
+Figure 17: (a) Density, (b) Pressure. Riemann problem for a high-density phase-change sonic jet: comparison without regularization (No Reg.) and with regularization of the initial discontinuity (Reg. ID). Regularization factor γ = 0 .8, second-order MUSCL reconstruction is employed for spatial discretization. The results demonstrate that, with initial-condition regularization, the RFQC method performs well for sonic phase-change jets. The density, temperature, and pressure within the liquid jet vary continuously, and the discontinuity in the speed of sound is also well captured. The state points from the two jet simulations are further plotted on the phase diagram, as shown in Fig. 19. In both phase-change jet cases, the isentropes exhibit a kink at the saturation line, indicating a discontinuous change in the speed of sound. For the high-density jet, the solution points within the two-phase region lie almost along a horizontal line, indicating that the speed of sound decreases to the order of O(1). 29 Figure 18: (a) Density and temperature, (b) Sound speed and pressure. Results of the high-density phase-change sonic jet. Regularization factor γ = 0 .8; second-order MUSCL reconstruction is employed for spatial discretization. 
+
+Figure 19: (a) Low-density sonic jet, (b) High-density sonic jet. Simulation points on the p − ρ phase diagram. 
+
+7.3 Comparison with the double-flux method 
+
+As discussed above, when solving such complex phase-change flows with high-speed ad-vection, the RFQC method requires the additional step of initial-condition regularization to obtain correct numerical results. However, this does not indicate degraded numer-ical performance of the RFQC method, but rather reflects the inherent computational difficulties of real multiphase flow problems with phase change. Physically, the fluid interface itself possesses a small but finite thickness due to viscosity and heat transfer. Initial-condition regularization precisely recovers this physical thickness to avoid numer-ical singularities. It should also be emphasized that the LUA is primarily a start-up anomaly, rather than a phenomenon that would emerge during practical flow evolution. Because physical flow evolutions are governed by dissipation and always tend toward 30 equilibrium, the flow field will not spontaneously generate a discontinuous interface pos-sessing such massive pressure and thermodynamic differentials. To highlight the challenge of the sonic phase-change jet case for current numeri-cal methods, in this subsection, we simulate the high-density jet considered previously with the double-flux (DF) method, which is currently more widely applied in real-fluid simulations, and compare the results with those obtained by the RFQC method. Because of stability limitations, both the temporal and spatial discretizations of the DF method are restricted to first order for these cases, and the CFL number is set to 0 .2. All other conditions are identical to those of the RFQC simulations. In principle, the LUA is specific to the RFQC scheme and does not arise in the DF method. Numerical tests also show that initial-condition regularization has almost no influence on the DF results. Therefore, the same regularization is applied to the DF simulations to ensure an identical initial condition. The numerical results are extracted along the section at x = 0 .1m in the computa-tional domain shown in Fig. 14 (corresponding to a distance of 0 .1m from the jet exit) and along the section at y = 0 .2m (corresponding to the jet centerline). These results are compared with those obtained by the RFQC method in the previous subsection, as shown in Fig. 20. The results show that the RFQC method remains stable with second-order recon-struction of the primitive variables. The pressure and density profiles vary smoothly. The jet shock near x = 0 .45m in Fig. 20(d), and the intercepting shocks near x = 0 .35m in Fig. 20(d) and near y = 0 .07m and y = 0 .33m in Fig. 20(b), are clearly resolved. By contrast, the DF method exhibits severe density and pressure oscillations even with first-order discretization (Figs. 20(a) and 20(b)). This is also why only first-order discretiza-tion and a smaller CFL number are adopted for the DF method; otherwise, numerical stability cannot be ensured. Meanwhile, the DF results exhibit an anomalous increase in density along the streamwise direction (Fig. 20(c)) and pressure fluctuations (Fig. 20(d)). These results clearly demonstrate the robustness and accuracy of the RFQC method for phase-change jet simulations. 
+
+# 8 Conclusion 
+
+This paper first revisits the pressure oscillation problem for real fluids within the finite-volume framework from the perspective of continuum thermodynamics. Physically, in traditional conservative finite-volume methods, pressure oscillations arise from the thermodynamic-equilibrium assumption, which is implicit when recovering pressure from conservative variables. Conversely, the RFQC method recovers mechanical-equilibrium pressure by introducing additional mechanical-equilibrium information. Building upon this, we interpret the central physical counterpart of the RFQC method: the affine pa-rameters ( ξ, E 0) of the isentropic internal-energy–pressure relation are evolved along the pathlines to recover mechanical-equilibrium pressure, while thermodynamic re-projection converts the deviation of the evolution from the isentropic trajectory into a controllable internal-energy error. This treatment avoids the evaluation of complex speed-of-sound 31 Figure 20: (a) Density, x = 0 .1m; (b) Pressure, x = 0 .1m; (c) Density, y = 0 .2m; (d) Pressure, y = 0 .2m. Comparison of the computational results between the DF and RFQC methods. The DF method utilizes first-order spatio-temporal discretization with a CFL number of 0.2. derivatives and preserves robust shock capturing. These insights suggest a real-fluid algorithm design strategy: introducing additional mechanical-equilibrium information into Godunov methods presents a promising avenue for balancing conservation and non-oscillatory evolution. Thermodynamic re-projection is essential for ensuring thermodynamic consistency in the RFQC method, but it may also induce a numerical anomaly in a class of extreme phase-change–advection Riemann problems. We identify and rigorously analyze this Liquid-Upwind Anomaly (LUA), and elucidate its formation mechanism. In such special Riemann problems, the jump of affine slope ξ by orders of magnitude during phase change creates a singular condition at the initial discontinuity. Consequently, the re-projection error cannot converge normally, leading to an anomalous cell with delayed pressure rise. Regularizing the initial discontinuity with a transition gradient within neighboring cells introduces a quasi-physical transition layer. The initial divergence of the re-projection error can be effectively suppressed by such regularization, thereby restoring the proper evolution of the method. 32 The numerical results demonstrate that, with initial-condition regularization, the RFQC method remains robust and accurate for the extreme flow represented by a sonic phase-change jet. Evidently, however, the current regularization strategy represents a technical remedy rather than a fundamental solution, as it relies on the empirical selection of a regularization parameter. Consequently, developing a theoretically more rigorous and effective regularization method will constitute the main direction of our future research. 
+
+# A Detailed Derivation of the Single-Step Pressure Update Equation 
+
+Under a fully right-going upwind condition, the momentum update is given by: (ρu )+ = (1 − a)ρu + bρ LuL + θ(pL − p). (56) This simplifies to: (ρu )+ = wRu + wLuL + θ∆p. (57) Therefore, 
+
+u+ = wRu + wLuL + θ∆pρ+ . (58) The total energy update is given by: (ρe t)+ = ρe t − θ [u(ρe t + p) − uL(ρLet,L + pL)] . (59) Substituting the definition of total energy yields: (ρe t)+ = q + 12 ρu 2 − θu 
+
+
+
+q + 12 ρu 2 + p
+
+
+
++ θu L
+
+
+
+qL + 12 ρLu2 
+
+> L
+
++ pL
+
+
+
+. (60) Separating the internal energy, kinetic energy, and pressure work terms gives: (ρe t)+ = (1 − a)q + bq L + 12 (1 − a)ρu 2 + 12 bρ Lu2 
+
+> L
+
++ θ(uLpL − up ). (61) Using wR = (1 − a)ρ and wL = bρ L (Eq. 34), this can be written as: (ρe t)+ = (1 − a)q + bq L + 12 wRu2 + 12 wLu2 
+
+> L
+
++ θ(uLpL − up ). (62) The temporary volumetric internal energy is obtained by subtracting the kinetic energy at the new time from the total energy: 
+
+eq+ = ( ρe t)+ − 12 ρ+(u+)2. (63) From the velocity update equation 58, the kinetic energy at the new time can be ex-pressed as: 12 ρ+(u+)2 = 12ρ+ (wRu + wLuL + θ∆p)2 . (64) 33 Substituting Eq. 64 into Eq. 63 and simplifying gives the temporary volumetric internal energy: 
+
+eq+ = (1 − a)q + bq L + Q, (65) where 
+
+Q = −θ∆u wLp + wRpL
+
+ρ+ + 12
+
+wLwR
+
+ρ+ ∆u2 − θ2∆p2
+
+2ρ+ . (66) The first term stems from the pressure work under the velocity differential, the second term arises from the kinetic energy of velocity mixing, and the third term originates from the quadratic term of the pressure impulse. The pressure-recovery equation is: 
+
+p+ = eq+ − eE+0
+
+eξ+ . (67) Substituting the thermodynamic coefficient update equations 35 and 36, as well as the internal energy–pressure affine relation 27, we have: 
+
+eq+ − eE+0 = (1 − a)q + bq L + Q − (1 − b)E0 − bE 0,L . (68) Expanding this expression gives: (1 − a)( ξp + E0) + b(ξLpL + E0,L ) + Q − (1 − b)E0 − bE 0,L . (69) Here, the E0,L terms cancel out, while the E0 terms remain as: (1 − a)E0 − (1 − b)E0 = ( b − a)E0. (70) Thus, we obtain: 
+
+eq+ − eE+0 = (1 − a)ξp + bξ LpL + ( b − a)E0 + Q. (71) To express this as a pressure increment relative to p, we subtract peξ+ from the above equation and divide by eξ+, yielding: 
+
+p+ − p = eq+ − eE+0 − peξ+
+
+eξ+ . (72) The numerator can be expanded as: (1 − a)ξp + bξ LpL + ( b − a)E0 + Q − (1 − b)ξp − bξ Lp. (73) After rearrangement, we obtain: 
+
+p+ − p = bξ L(pL − p) + ( b − a)( ξp + E0) + Q
+
+eξ+ . (74) 34 Substituting: 
+
+q = ξp + E0, b − a = −θ∆u, (75) gives: 
+
+p+ − p = bξ L∆p − θ∆uq + Q
+
+eξ+ . (76) Finally, substituting the expression for Q from Eq. 66 yields the single-step pres-sure update formulation :
+
+p+ − p =
+
+bξ L∆p − θ∆u
+
+h
+
+q + wLp+wRpL
+
+> ρ+
+
+i
+
++ wLwR 
+
+> 2ρ+
+
+∆u2 − θ2∆p2
+
+> 2ρ+
+
+eξ+ . (77) 
+
+# References 
+
+[1] H. Bai, W. Xie, Y. Yang, P. Yi, M. Sun, An oscillation-free real fluid quasi-conservative finite volume method for transcritical and phase-change flows,J. Com-put. Phys. 564 (2026) 115156. [2] R. Abgrall, How to prevent pressure oscillations in multicomponent flow calcula-tions: a quasi conservative approach, J. Comput. Phys. 125 (1996) 150–160. [3] S. Karni, Multicomponent flow calculations by a consistent primitive algorithm, J. Comput. Phys. 112 (1994) 31–43. [4] R. Abgrall, S. Karni, Computations of compressible multifluids, J. Comput. Phys. 169 (2001) 594–623. [5] M.R. Baer, J.W. Nunziato, A two-phase mixture theory for the deflagration-to-detonation transition (DDT) in reactive granular materials, Int. J. Multiphase Flow 12 (1986) 861–889. [6] R. Saurel, R. Abgrall, A multiphase Godunov method for compressible multifluid and multiphase flows, J. Comput. Phys. 150 (1999) 425–467. [7] R. Saurel, F. Petitpas, R.A. Berry, Simple and efficient relaxation methods for interfaces separating compressible fluids, cavitating flows and shocks in multiphase mixtures, J. Comput. Phys. 228 (2009) 1678–1712. [8] M. Pelanti, K.M. Shyue, A mixture-energy-consistent six-equation two-phase nu-merical model for fluids with interfaces, cavitation and evaporation waves, J. Com-put. Phys. 259 (2014) 331–357. [9] A.K. Kapila, R. Menikoff, J.B. Bdzil, S.F. Son, D.S. Stewart, Two-phase modeling of deflagration-to-detonation transition in granular materials: reduced equations, Phys. Fluids 13 (2001) 3002–3024. 35 [10] A. Murrone, H. Guillard, A five equation reduced model for compressible two phase flow problems, J. Comput. Phys. 202 (2005) 664–698. [11] G. Allaire, S. Clerc, S. Kokh, A five-equation model for the simulation of interfaces between compressible fluids, J. Comput. Phys. 181 (2002) 577–616. [12] K.M. Shyue, An efficient shock-capturing algorithm for compressible multicompo-nent problems, J. Comput. Phys. 142 (1998) 208–242. [13] E. Johnsen, T. Colonius, Implementation of WENO schemes in compressible mul-ticomponent flow problems, J. Comput. Phys. 219 (2006) 715–732. [14] K.M. Shyue, A fluid-mixture type algorithm for compressible multicomponent flow with Mie–Gr¨ uneisen equation of state, J. Comput. Phys. 171 (2001) 678–707. [15] K.M. Shyue, A fluid-mixture type algorithm for compressible multicomponent flow with van der Waals equation of state, J. Comput. Phys. 156 (1999) 43–88. [16] C. Pantano, R. Saurel, T. Schmitt, An oscillation free shock-capturing method for compressible van der Waals supercritical fluid flows, J. Comput. Phys. 335 (2017) 780–811. [17] G. Billet, R. Abgrall, An adaptive shock-capturing algorithm for solving unsteady reactive flows, Comput. Fluids 32 (2003) 1473–1495. [18] S. Karni, Viscous shock profiles and primitive formulations, SIAM J. Numer. Anal. 29 (6) (1992) 1592–1609. [19] S. Karni, Hybrid multifluid algorithms, SIAM J. Sci. Comput. 17 (5) (1996) 1019– 1039. [20] C.E. Brennen, Fundamentals of Multiphase Flow, Cambridge University Press, 2005. [21] D. Peng, D. Robinson, A new two-constant equation of state, Ind. Eng. Chem. Fundam. 15 (1) (1976) 59–64. [22] O. Redlich, J. Kwong, On the thermodynamics of solutions; An equation of state; Fugacities of gaseous solutions, Chem. Rev. 44 (1) (1949) 233–237. [23] H. Terashima, M. Koshi, Approach for simulating gas-liquid-like flows under su-percritical pressures using a high-order central differenceencing scheme, J. Comput. Phys. 231 (20) (2012) 6907–6923. [24] S. Kawai, H. Terashima, H. Negishi, A robust and accurate numerical method for transcritical turbulent flows at supercritical pressure with an arbitrary equation of state, J. Comput. Phys. 300 (2015) 116–135. 36 [25] K. Kitamura, E. Shima, Pressure-equation-based SLAU2 for oscillation-free, super-critical flow simulations, Comput. Fluids 163 (2018) 86–96. [26] E.J. Ching, R.F. Johnson, A.D. Kercher, Conservative, pressure-equilibrium-preserving discontinuous Galerkin method for compressible, multicomponent flows, arXiv preprint arXiv:2501.12532, 2025. doi:10.48550/arXiv.2501.12532. [27] B. Xu, C. Sun, P. Guo, A central differential flux with high-order dissipation for robust simulations of transcritical flows, J. Comput. Phys. 550 (2026) 114653. [28] G. Lacaze, T. Schmitt, et al., Comparison of energy-, pressure- and enthalpy-based approaches for modeling supercritical flows, Comput. Fluids 181 (2019) 35–56. [29] H. Terashima, N. Ly, M. Ihme, Approximately pressure-equilibrium-preserving scheme for fully conservative simulations of compressible multi-species and real-fluid interfacial flows, J. Comput. Phys. 524 (2025) 113701. [30] P.C. Ma, Y. Lv, M. Ihme, An entropy-stable hybrid scheme for simulations of transcritical real-fluid flows, J. Comput. Phys. 340 (2017) 330–357. [31] C. Rodriguez, A. Vidal, P. Koukouvinis, M. Gavaises, M.A. McHugh, Simulation of transcritical fluid jets using the PC-SAFT EOS, J. Comput. Phys. 374 (2018) 444–468. [32] S. Yatsuyanagi, T. Furusawa, S. Yamamoto, Double-flux model for supercritical multicomponent flows at low Mach numbers with preconditioning method, J. Com-put. Phys. 458 (2022) 111091. [33] H.Y. Zhang, N. Srinivasan, S. Yang, In situ adaptive tabulation of vapor-liquid equi-librium solutions for multi-component high-pressure transcritical flows with phase change, J. Comput. Phys. 500 (2024) 112752. [34] H. Bai, P. Yi, Y. Yang, G. Zhao, W. Xie, M. Sun, Flash evaporation Riemann problem: formulation and its exact solution, J. Fluid Mech. 1038 (2026) A35. [35] L.I. Sedov, Mechanics of a Continuous Medium, Nauka, 1973. [36] E.F. Toro, Riemann Solvers and Numerical Methods for Fluid Dynamics, 3rd edn., Springer, 2009. [37] C.-W. Shu and S. Osher, Efficient implementation of essentially non-oscillatory shock-capturing schemes, J. Comput. Phys. 77 (2) (1988) 439–471. [38] G.-S. Jiang and C.-W. Shu, Efficient implementation of weighted ENO schemes, J. Comput. Phys. 126 (1) (1996) 202–228. [39] P.K. Sweby, High resolution schemes using flux limiters for hyperbolic conservation laws, SIAM J. Numer. Anal. 21 (5) (1984) 995–1011. 37

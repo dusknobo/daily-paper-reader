@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-17",
+  "date": "2026-07-17",
+  "generated_at": "2026-07-17T21:23:38",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/17/2607.15063v1-an-adaptive-and-physics-preserving-multiscale-method-for-two-phase-flow-simulations-in-high-contrast-heterogeneous-porous-media",
+      "section": "quick",
+      "title_en": "An Adaptive and Physics-Preserving Multiscale Method for Two-Phase Flow Simulations in High-Contrast Heterogeneous Porous Media",
+      "authors": "Junhao Huang, Eric Chung, Wing Tat Leung",
+      "date": "2026-07-16",
+      "pdf": "https://arxiv.org/pdf/2607.15063v1",
+      "score": "7.0",
+      "evidence": "提出孔隙介质两相流模拟的多尺度方法",
+      "tldr": "高对比非均质多孔介质中不可压不混溶两相流因渗透率剧烈变化呈现多尺度特征，直接精细模拟代价高昂。为此提出自适应物理保持多尺度方法，耦合P-IMPES与混合约束能量最小广义多尺度有限元，根据总迁移率变化自适应触发多尺度空间更新并后处理恢复细尺度质量守恒。分析证明了两相局部守恒、无偏性和饱和度有界，对流主导时导出误差估计，显式表征自适应容差、粗网格尺寸、谱逼近和前沿层误差。数值实验表明自适应容差较小时能改善饱和度精度，同时显著降低基函数更新频次，验证了方法的高效性和物理相容性，为该类问题提供了可靠的理论与算法框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this paper, we propose an adaptive physics-preserving multiscale method for incompressible and immiscible two-phase flow in high-contrast porous media. The method couples a physics-preserving implicit-pressure explicit-saturation scheme (P-IMPES) with the mixed constraint energy minimizing generalized multiscale finite element method. The core algorithmic component is an adaptive update strategy for the saturation-dependent coefficient. Since the effective permeability \\(κ_n=λ_t(S_w^n)K\\) depends on the evolving saturation through the total mobility, we introduce an adaptive update algorithm that monitors the variation of the mobility-weighted coefficient and regenerates the multiscale spaces only when a prescribed tolerance is exceeded. A local postprocessing step is further used to recover fine-grid mass conservation. The analysis is a central part of the paper. We prove local conservation for both phases, the unbiased property of the phase formulation, and bounds preservation under a suitable CFL condition. For the advection-dominated case, we establish velocity and saturation error estimates, which clearly identify the contributions from the adaptive tolerance, the coarse mesh size, the spectral approximation, and the front-layer error. Numerical experiments on different high-contrast permeability fields confirm the physical properties of the method and show that smaller adaptive tolerances improve the saturation approximation while avoiding unnecessary updates of the multiscale spaces.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/17/2607.10724v1-a-four-field-auxiliary-reformulation-of-a-cahn-hilliard-time-step-analysis-and-conforming-finite-element-discretization",
+      "section": "quick",
+      "title_en": "A four-field auxiliary reformulation of a Cahn-Hilliard time step: Analysis and conforming finite element discretization",
+      "authors": "Marvin Fritz",
+      "date": "2026-07-12",
+      "pdf": "https://arxiv.org/pdf/2607.10724v1",
+      "score": "6.0",
+      "evidence": "Cahn-Hilliard方程离散化用于两相流模拟",
+      "tldr": "针对Cahn-Hilliard方程时间离散，本文提出一种基于Rafetseder-Zulehner分解的四场辅助重述，将负拉普拉斯算子表示为辅助标量场与矢量场散度的组合，得到保持梯度流结构的混合Stokes/弹性型系统。推导了等价连续公式及协调有限元离散，证明了空间误差和稳定辅助块估计。数值实验验证了相场收敛、质量守恒和能量衰减，并显示辅助块一致性，表明该方法为高效求解提供新思路。",
+      "tags": "query:falling-film",
+      "abstract_en": "We propose a four-field auxiliary reformulation of a time-discrete Cahn-Hilliard step. The construction is motivated by the scalar trace structure underlying two-dimensional Rafetseder-Zulehner decompositions and represents the scalar quantity $-Δc$ in the form $2p+div\\,u$ through an auxiliary scalar field $p$ and an auxiliary vector field $u$. The resulting auxiliary problem is a mixed second-order Stokes/elasticity-type system, while the evolution equation for the phase field retains its standard mass-conserving gradient-flow structure. We derive a continuous four-field formulation that is equivalent to the classical convex-splitting mixed time step. We also state a conforming finite element discretization and prove one-step spatial estimates for the phase-field variables together with a stable auxiliary block estimate containing an explicit weak-Laplacian recovery defect. The numerical experiments verify the expected phase-field convergence in a manufactured setting, mass conservation, energy decay, and projected consistency of the auxiliary block.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/17/2607.13996v1-real-fluid-quasi-conservative-method-mechanical-equilibrium-mechanism-and-liquid-upwind-anomaly",
+      "section": "quick",
+      "title_en": "Real Fluid Quasi-Conservative Method: Mechanical Equilibrium Mechanism and Liquid-Upwind Anomaly",
+      "authors": "Bai Haotong, Yang Yixin, Xie Wenjia, Yi Ping, Sun Mingbo",
+      "date": "2026-07-15",
+      "pdf": "https://arxiv.org/pdf/2607.13996v1",
+      "score": "6.0",
+      "evidence": "用于相变的真实流体准守恒方法在有限体积CFD中的应用",
+      "tldr": "针对真实流体有限体积法中的压力振荡问题，本文从连续介质热力学视角重新审视真实流体准守恒(RFQC)方法，阐明其物理对应：通过沿路径线演化等熵内能-压力关系的仿射参数恢复力学平衡压力，并利用热力学重投影保证热力学一致性。研究发现，RFQC方法在极端相变情况下存在液相上风异常(LUA)，理论分析表明，异常由相变时仿射斜率的量级跳跃引发，导致下游低压单元压力恢复延迟，重投影等价移除正压力增量，造成该单元反复产生大重投影内能误差，陷入低压恢复迟缓循环。为此，提出在初始间断处引入正则化策略，成功解决该启动异常，使RFQC方法适用于声速相变射流等极端热力学流动，精度和鲁棒性显著增强。",
+      "tags": "query:falling-film",
+      "abstract_en": "From the perspective of continuum thermodynamics, we revisit the pressure oscillation problem in finite-volume methods for real fluids and clarify the physical counterpart of the Real Fluid Quasi-Conservative (RFQC) method. The RFQC method recovers the mechanical-equilibrium pressure by evolving the affine parameters xi and E0 of the isentropic internal energy-pressure relation along pathlines, while the thermodynamic re-projection converts the deviation from the isentropic trajectory into an internal-energy error, thereby ensuring the thermodynamic consistency and numerical stability of the method. We then investigate the applicability limit of the RFQC method and identify a Liquid-upwind Anomaly (LUA) in extreme phase-change cases. For a Riemann problem involving liquid-vapor phase change, a numerical anomaly may occur if a liquid-upwind translational velocity is initially superimposed and exceeds a certain threshold. Theoretical analysis reveals that this anomaly is initiated by the orders-of-magnitude jump in the affine slope xi during phase change, which subsequently delays the pressure rise in the downstream low-pressure cell. Concurrently, the re-projection equivalently removes the positive pressure increment. As a result, a large re-projection internal-energy error is repeatedly generated in this anomalous cell, and the cell is trapped in a cycle of delayed low-pressure recovery. The analysis indicates that the LUA is a start-up anomaly, which can be resolved by introducing a regularization strategy at the initial discontinuity. With the proposed regularization strategy, the RFQC method is equipped with enhanced accuracy and robustness for extreme thermodynamic flows, such as sonic phase-change jets.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
