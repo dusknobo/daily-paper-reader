@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-18",
+  "date": "2026-07-18",
+  "generated_at": "2026-07-18T19:57:32",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/18/2607.12759v1-a-mesh-free-solver-for-multi-phase-mullins-sekerka-flow-triple-junctions-and-ninety-degree-boundary-contact",
+      "section": "deep",
+      "title_en": "A Mesh-Free Solver for Multi-Phase Mullins-Sekerka Flow: Triple Junctions and Ninety-Degree Boundary Contact",
+      "authors": "Tokuhiro Eto",
+      "date": "2026-07-14",
+      "pdf": "https://arxiv.org/pdf/2607.12759v1",
+      "score": "8.0",
+      "evidence": "开发了一种用于多相界面流动的无网格求解器，基于电荷模拟法",
+      "tldr": "多相Mullins-Sekerka流中，多个界面通过调和化学势耦合进行曲率驱动演化，模拟需同时处理三相结点、壁面正交接触及各相面积守恒，极具挑战。本文提出一种基于电荷模拟法的无网格求解器，将化学势表示为曲线外电荷点的基本解叠加，避免体网格与奇异积分；利用镜像电荷精确满足Neumann边界条件，保证移动接触角恒为90度；采用零空间投影在速度水平施加面积约束，确保各相面积守恒至机器精度，并仅允许单闭合曲线消失的拓扑变化。三相结点处曲线网络可分离不同相，含占据多区域的相。三同心圆精确解验证显示方法收敛性好、计算成本低且条件数稳定，为多相界面动力学提供了高效保结构工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "A bulk mesh-free solver for the multi-phase Mullins--Sekerka flow in $\\mathbb R^2$ and in a half-plane bounded by a Neumann wall is developed. In the underlying mathematical model, interfaces driven by their curvature are coupled through a harmonic chemical-potential field. We use a charge simulation method, a variant of the method of fundamental solutions: each chemical potential is represented by fundamental solutions centered at charge points off the curve, so no bulk mesh or singular integral is required. It treats curve networks separating several phases at triple junctions, including phases that occupy more than one region; on the half-plane boundary the no-flux condition is imposed exactly by image charges, and mobile contacts stay orthogonal to the wall. The discretization is structure-preserving: between topological events, every bounded phase area is conserved to machine precision at the velocity level by a null-space projection of the discrete area constraints. The junction connectivity is fixed, the only topological event being the disappearance of a region enclosed by a single closed curve and incident to no junction. The proposed scheme is validated against an exact three-concentric-circle solution in terms of convergence, cost, and conditioning.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

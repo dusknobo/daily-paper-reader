@@ -1,0 +1,2730 @@
+Title: A Mesh-Free Solver for Multi-Phase Mullins-Sekerka Flow: Triple Junctions and Ninety-Degree Boundary Contact
+
+URL Source: https://arxiv.org/pdf/2607.12759v1
+
+Published Time: Wed, 15 Jul 2026 11:58:22 GMT
+
+Number of Pages: 40
+
+Markdown Content:
+# A Mesh-Free Solver for Multi-Phase Mullins–Sekerka Flow: Triple Junctions and Ninety-Degree Boundary Contact 
+
+Tokuhiro Eto ∗
+
+July 15, 2026 
+
+Abstract 
+
+A bulk mesh-free solver for the multi-phase Mullins–Sekerka flow in R2 and in a half-plane H bounded by a Neumann wall W is developed. In the underlying mathematical model, interfaces driven by their curvature are coupled through a harmonic chemical-potential field. We use a charge simulation method, a variant of the method of fundamen-tal solutions: each chemical potential is represented by fundamental solutions centered at charge points off the curve, so no bulk mesh or singular integral is required. It treats curve networks separating several phases at triple junctions, including phases that occupy more than one region; on the half-plane boundary the no-flux condition is imposed exactly by image charges, and mobile contacts stay orthogonal to the wall. The discretization is structure-preserving: between topological events, every bounded phase area is conserved to machine precision at the velocity level by a null-space projection of the discrete area constraints. The junction connectivity is fixed, the only topological event being the dis-appearance of a region enclosed by a single closed curve and incident to no junction. The proposed scheme is validated against an exact three-concentric-circle solution in terms of convergence, cost, and conditioning. 
+
+Key words. multi-phase Mullins–Sekerka flow, charge simulation method, method of fun-damental solutions, triple junction, structure-preserving discretization 
+
+MSC codes. 65M80, 35R37, 53E10, 80A22 
+
+# 1 Introduction 
+
+When a two-phase mixture is quenched into its miscibility gap, it separates into domains that subsequently coarsen: large domains grow at the expense of small ones, the total interfacial length decreases, and the area of each phase is conserved. In the sharp-interface description of this late-stage Ostwald ripening [36], the phase boundaries move by the Mullins–Sekerka flow [40]. Each interface is driven by its own curvature through a Gibbs–Thomson relation, but the driving force is not local: at every instant one solves for a harmonic bulk field, the chemical potential, whose normal-derivative jump across the interface prescribes the normal velocity. The interfaces communicate only through this bulk field. This non-locality is the source of the flow’s structure: it makes the evolution an H−1/2-type gradient flow of the interfacial energy that dissipates the total length while preserving the area of each phase [18]. 
+
+> ∗
+
+Universit´ e Claude Bernard Lyon 1, CNRS, Centrale Lyon, INSA Lyon, Universit´ e Jean Monnet, ICJ UMR5208, 69622 Villeurbanne, France. email:eto@math.univ-lyon1.fr 
+
+1arXiv:2607.12759v1 [math.NA] 14 Jul 2026 At the same time it is the source of its numerical difficulty, since a global elliptic problem must be solved before the geometry can be advanced by even a single step. Moving from two phases to many turns the interface into a network of curves meeting at triple junctions, and the evolution of a smooth boundary becomes the evolution of a network with singular vertices. At each junction, the three incident curves obey a force balance, Herring’s angle condition [15, 31] (the symmetric 120 ◦ configuration when the surface tensions are equal), together with a balance of diffusive fluxes. The present paper is concerned with the numerical approximation of this multi-phase Mullins–Sekerka flow, both in the whole plane and in a half-plane bounded by a Neumann wall along which interfaces may slide while meeting the wall orthogonally. We keep the junction connectivity of the network fixed; the transitions that alter the junction topology, such as pinch-off and neighbor switching, are outside our scope. We do, however, treat the terminal event of coarsening within a phase: the disappearance of a region enclosed by a single closed interface and incident to no junction, whose area, under the flow, has been transferred to another region of the same phase. The junction structure is thus preserved throughout, while such a single-closed-interface region may vanish once it can no longer be resolved by the mesh. The governing system, together with the notation for the curve–region–phase incidence that a multi-phase configuration requires, is stated precisely in Section 2. Numerical methods for interfacial flows of this type fall broadly into three families, each with its own strengths and costs. Phase-field methods regularize the sharp interface by a thin diffuse layer and evolve the Cahn–Hilliard equation whose singular limit corresponds to the Mullins–Sekerka flow equation [3, 16, 43, 47]; they can handle topological changes, but re-solving the interfacial layer is expensive, and the junction angle conditions are recovered only asymptotically. Closely related front-capturing schemes like level-set and threshold-dynamics methods [21, 39, 46, 48] also pass through topological changes while representing the interface implicitly rather than tracking it directly. Boundary integral methods [11, 12, 17, 38, 49] were the first to discretize the interface alone, representing the harmonic field by a layer potential; they are accurate and dimension-reducing, but the evaluation of singular and nearly-singular integrals is delicate and the extension to several phases and triple junctions is cumbersome; later boundary-integral work has addressed multi-component fluids and Ostwald ripening [2, 32]. Parametric finite element methods [4, 5, 6, 7, 8, 9, 10, 27, 42] incorporate balance conditions around triple junctions naturally into a variational formulation for various surface evolution equations and have good mesh properties. Moreover, the schemes are uncondition-ally stable with respect to time steps, and some of these schemes can preserve conservative quantities (e.g., the volume of each phase) at the fully discrete level. However, they still require a mesh of the bulk. Related structure-preserving parametric finite element schemes have also been developed for the multi-phase Mullins–Sekerka problem and a degenerate multi-phase Stefan problem with triple junctions [23, 25, 24]. None of these families dis-cretizes only the interface, without singular integrals, while also treating triple junctions and boundary contacts. We pursue a fourth route, based on the charge simulation method (CSM), a variant of the 
+
+method of fundamental solutions (MFS) [13, 26, 35, 34, 29]. The idea is to represent each bulk function as a finite combination of fundamental solutions of the Laplacian centered at charge points placed off the interface. Since every basis function is exactly harmonic away from its singular point, the Laplace equation is satisfied automatically, and the only conditions left to enforce are those on the interface itself. No singular integrals arise, since the charge points are held at a positive distance from the collocation points, and no bulk mesh is needed. In 2this sense, we say that the method is bulk mesh-free and is a boundary-only method, in which the ambient domain has no mesh while the interface is discretized as a polygonal curve. For further details about the MFS, we refer the reader to a review article [19]. A CSM solver for the two-phase Mullins–Sekerka flow, including contact-angle problems on a wall boundary, has been proposed by the author [22]. The contribution of the present paper is to extend that idea to several phases, triple junctions, phases composed of more than one region, and a Neumann boundary. Since the closest existing multi-phase scheme [23] discretizes the problem through a fundamentally different, bulk or whole-domain weak formulation, we do not attempt a direct method-to-method numerical comparison; instead we validate the present method against the exact three-phase solution of [23] (Section 9). Our discretization is guided by a second principle: structure preservation. For a coarsen-ing flow, approximate area conservation is not sufficient: the phase areas are constant between topological events and change only at such events, and a slow numerical drift would be indis-tinguishable from physical mass transfer. We therefore treat the discrete area-conservation identities as hard constraints and project the reconstructed velocity onto the corresponding subspace, so that the discrete area fluxes vanish to machine precision (velocity-level conser-vation, Section 8), independently of the residual of the field solve; the residual drift of the polygonal areas after time stepping is of higher order and is reported in Section 9. Two fur-ther ingredients are handled in the same way. The discrete curvature that feeds the Gibbs– Thomson condition is unreliable on the edges adjacent to a triple junction, where a naive evaluation using the junction vertex fails to converge to the interface curvature and biases the reconstructed velocity near the junctions; we correct it locally. And the homogeneous Neumann condition on a straight wall is imposed exactly by reflecting each charge in the wall, at the cost of no additional unknowns. These ingredients might appear to combine the two-phase charge simulation of [22] with the multi-phase formulation of [23], but the extension is not a simple composition of the two. Collocating the Gibbs–Thomson and continuity conditions on both sides of every curve, correcting the discrete curvature at the triple junctions, admitting phases that occupy several regions through a non-injective region-to-phase map, and reconstructing the vertex velocities through a constrained (KKT) solve that enforces the wall, junction, and area conditions each arise only in the multi-phase, junction-bearing, half-space setting and have no counterpart in the two-phase solver. The main contributions of this paper are the following. 
+
+• A charge-simulation solver for the multi-phase Mullins–Sekerka flow with triple junc-tions in the whole plane, in which the Gibbs–Thomson and continuity conditions are collocated in a least-squares sense on both sides of every curve, with a curvature cor-rection near the junctions (Sections 5 and 6). 
+
+• Machine-precision conservation of every bounded phase area at the velocity level, en-forced by projection onto the null space of the discrete area constraints, with the ac-companying discrete structure-preservation statements (Sections 6 and 8). 
+
+• An exact treatment of a flat Neumann boundary by image charges, together with a constrained velocity solve that keeps mobile boundary contacts at a 90 ◦ angle and triple junctions in Herring–Young balance throughout the evolution (Section 7). 
+
+• A convergence study against an exact three-concentric-circle solution, a diagnostic check of the triple-junction curvature correction, a validation of unequal surface tensions 3against the Young angles, and a report of the method’s cost and conditioning, together with quantitative half-space benchmarks of the junction–wall dynamics (Section 9). 
+
+• A resolution-tied treatment of region disappearance, the sole topological event within our scope. A region enclosed by a single closed interface and incident to no junction, once it has shrunk below the mesh resolution, is removed and the phase-area constraints are re-baselined; the induced area change equals the removed residual. The junction connectivity is not altered, and no curve splicing or vertex surgery is involved (Section 9). This paper is organized as follows. In Section 2, we state the mathematical model gov-erning the multi-phase Mullins–Sekerka flow with triple junctions. In Section 3, we state assumptions and relationships among curves, regions, and phases for a curve network. In Section 4, we present the curve-shortening and area-preserving properties of classical solu-tions to the underlying problem that the proposed scheme is designed to inherit. In Section 5, we explain the spatial discretization of curves and related geometric features. In Section 6, we develop the fully discrete charge-simulation scheme in the whole plane. In Section 7, we extend the methodology to the half-plane with mobile wall contacts. In Section 8, we estab-lish the discrete structure-preservation properties of the proposed scheme. Finally, we present numerical experiments in Section 9. 
+
+# 2 Problem formulation 
+
+We develop a boundary-only, bulk-mesh-free solver for the following system of equations: ∆w(·, t ) = 0 in Rd \ Γ( t), t > 0, (2.1a) 
+
+w(·, t ) · JχK = ςκ on Γ( t), t > 0, (2.1b) 
+
+J∇w(·, t )K ·⃗ν Γ = −V JχK on Γ( t), t > 0, (2.1c) 
+
+∇w(⃗x, t ) = O
+
+ 1
+
+|⃗x| 2
+
+
+
+as |⃗x| → ∞ , t > 0, (2.1d) 
+
+> 3
+
+X
+
+> ℓ=1
+
+ςskℓ⃗μ skℓ
+
+=⃗ 0 on Tk(t), 1 ≤ k ≤ IT , t > 0, (2.1e) 
+
+Jw(·, t )K = 0 on Γ( t), t > 0, (2.1f) Γ(0) = Γ 0, (2.1g) where for each t > 0, w(·, t ) : Rd \ Γ( t) → RIP (IP ≥ 2) is a vector-valued function of harmonic functions which indicates the chemical potential of each phase; a curve network Γ is composed of curves Γ i (1 ≤ i ≤ IS ) with IS ≥ 1, and separates the ambient space Rd into one unbounded domain Ω IR and several bounded regions Ω 1, · · · , ΩIR−1 with IR ≥ 2. We assume that the chemical potentials w(·, t ) = ( w1(·, t ), · · · , w IP (·, t )) ⊤ satisfy the zero-sum condition in Rd \ Γ( t), i.e., PIP 
+
+> p=1
+
+wp(·, t ) = 0. The function χ(·, t ) : Rd \ Γ( t) → { 0, 1}IP denotes the characteristic function of the phases; the symbols ς and κ respectively denote the surface tension coefficient and the curvature of the curve Γ in the direction of the unit normal vector ⃗ν Γ, and ς is assumed to be piecewise constant. With this convention, κi := κ⌊Γi is negative when Γ i is convex (for instance, κi < 0 for a counter-clockwise convex closed curve). Then, the condition (2.1b) encodes the Dirichlet condition, the so-called Gibbs–Thomson law , to 4solve the Laplace equations (2.1a); the symbol J·K denotes the jump of a quantity (allowed to be vector-valued) across a curve Γ i defined by 
+
+JqK(⃗x) := lim  
+
+> ε→0
+
+{q(⃗x + ε⃗ ν Γi ) − q(⃗x − ε⃗ ν Γi )} for ⃗ x ∈ Γ i.
+
+The symbol Vi := V ⌊Γi denotes the normal velocity of Γ i in the direction ⃗ν Γi which is deter-mined by the jump of the normal derivative of the two chemical potential functions (2.1c), which correspond to the phases where the curve Γ i separates; for each 1 ≤ k ≤ IT , ( sk 
+
+> 1
+
+, s k 
+
+> 2
+
+, s k 
+
+> 3
+
+)with 1 ≤ sk 
+
+> 1
+
+< s k 
+
+> 2
+
+< s k 
+
+> 3
+
+≤ IS is the triplet of the curve indices at which Γ sk 
+
+> 1
+
+, Γ sk 
+
+> 2
+
+, and Γ sk
+
+> 3
+
+compose the triple junction point Tk(t). A curve network without triple junctions is also possible and can be understood in the case IT = 0. The vector ⃗μ i (1 ≤ i ≤ IS ) designates the co-normal vector field on the curve Γ i, so it is tangential to Γ i, at its endpoints; the 
+
+Herring–Young balance law should be satisfied which is encoded by (2.1e). The gradient of all chemical potentials is required to decay at the rate 1 /|⃗x| 2 as |⃗x| → ∞ (2.1d), and this is an alternative to the pure Neumann boundary condition. Each chemical potential should be continuous across the boundary (2.1f). To close the system, the initial curve network Γ 0 is given in (2.1g). Throughout this paper, we restrict ourselves to the planar case d = 2; accordingly Rd = R2,dLd = d L2, and d Hd−1 = d H1 wherever the dimension-general notation appears below. Moreover, for notation of vectors and vector-valued functions, we shall use the bold fonts and vector symbol to distinguish RIP -valued from R2-valued. 
+
+Remark 2.1. It is easily seen that the system (2.1) is invariant with respect to a choice of the direction of ⃗ν Γ. Indeed, if the sign of ⃗ν Γ changes, then so do JχK, κ, J∇wK, and V .
+
+Remark 2.2. The zero-sum condition on w is necessary to guarantee the uniqueness of the solution to (2.1) . Indeed, if w is a solution to the system, then w + c(1 , . . . , 1) ⊤, c ∈ R
+
+also satisfies all equations since the Gibbs–Thomson law (2.1b) is described in terms of the difference of two chemical potentials. In the pure Neumann boundary problems, the zero-sum condition has been used to guarantee the uniqueness of a solution to a linear system in the literature of the parametric finite element method (see [23, Theorem 4.1]). 
+
+Remark 2.3. If w(·, t ) ∈ W 1,p loc (R2)IP for some p > 2, then the continuity condition (2.1f) is automatically satisfied by the embedding W 1,p (Ω) ,→ Cα(Ω) with α := 1 − 2/p for any bounded smooth domain Ω in R2 thanks to the Morrey theorem. 
+
+Remark 2.4. The condition (2.1e) stems from the force balance at the triple junctions, the so-called Young law. To ensure this, we require that for every k ∈ N≤IT ,
+
+ςsk 
+
+> 1
+
+≤ ςsk 
+
+> 2
+
++ ςsk 
+
+> 3
+
+, ςsk 
+
+> 2
+
+≤ ςsk 
+
+> 3
+
++ ςsk 
+
+> 1
+
+, and ςsk 
+
+> 3
+
+≤ ςsk 
+
+> 1
+
++ ςsk 
+
+> 2
+
+.
+
+These three inequalities are exactly the solvability condition for the force balance (2.1e) . They are necessary and sufficient for the three surface-tension vectors to close into a triangle, hence for an equilibrium set of junction angles to exist. In particular, the three junction angles should equal 120 ◦ in the case when the surface tension coefficients are equal. 
+
+Remark 2.5. For the multi-phase Mullins–Sekerka flow, a global weak solution has been established by Bronsard, Garcke and Stoth [14] through an implicit time discretization; well-posedness of strong solutions in the presence of triple junctions and boundary contacts remains 
+
+5open. This paper concerns the numerical approximation of the flow, not its well-posedness. In the two-phase case, a global weak solution, which is called the BV solution, has been established by Luckhaus and Sturzenhecker [37] under a no mass-loss assumption on discrete solutions constructed by a minimizing movement scheme. This assumption has been removed by R¨ oger [44] by means of the notion of varifolds. For well-posedness of the two-phase Mullins–Sekerka problem in an unbounded domain in R2, we refer the reader to Escher, Matioc, and Matioc [20]. 
+
+# 3 Assumptions on curve network 
+
+In this section, we introduce the mathematical notation and assumptions for the curve net-work. For K ∈ N, let N≤K := {1, · · · , K }, and we use the convention that N≤0 := ∅.
+
+Assumption 3.1 (Curve network) . The curve network Γ is a piecewise parametrized curve which separates the whole space R2 into regions Ω1, · · · , ΩIR (IR ≥ 2) . The curve network Γ
+
+is composed of the parametrized curves Γ1, · · · , ΓIS (IS ≥ 1) , and each curve is automatically oriented by the map Γi : (0 , 1) → R2. Throughout this paper, the direction of the unit normal vector ⃗ν i,j is supposed to be so that it points to the right-hand side of the curve. Namely, we assume that 
+
+Γ = 
+
+> IS
+
+[
+
+> i=1
+
+Γi and Rd =
+
+> IR
+
+[
+
+> r=1
+
+Ωr ∪ Γ, Ωr1 ∩ Ωr2 = ∅ for r1̸ = r2.
+
+In particular, we assume that the outermost region is ΩIR , and this region is supposed to be unbounded. The curve network Γ is not necessarily connected. In other words, it possibly contains several disconnected components. Each curve in the curve network Γ is supposed to be either an open curve or a closed curve. Here, Γi is said to be open (resp. closed) if 
+
+Γi(0) ̸ = Γ i(1) (resp. Γi(0) = Γ i(1) ). Moreover, we assume that all curves in Γ do not have self intersections, i.e., Γi(t1) = Γ i(t2) implies t1 = t2 unless Γi is closed with t1 = 0 and 
+
+t2 = 1 . We also assume that no curve intersects another curve in Γ except at triple junctions. We note that each closed curve in Γ can only enclose a single region. On the other hand, with open curves, we need several curves to enclose a region. The curve network Γ is supposed to have triple junctions T1, · · · , TIT (IT ≥ 0) . Each triple junction Tk is the meeting point of three curves Γsk 
+
+> 1
+
+, Γsk 
+
+> 2
+
+, and Γsk 
+
+> 3
+
+with 1 ≤ sk 
+
+> 1
+
+< s k 
+
+> 2
+
+< s k 
+
+> 3
+
+≤ IS .We note that a curve network having no triple junctions is also considered in our paper; in this case, we suppose that the Young law (2.1e) is trivially satisfied. 
+
+To describe a curve network precisely in a mathematical manner, we now introduce map-pings which relate indices of curves, regions and phases. 
+
+Assumption 3.2 (Region to phase map Rp). A phase is possibly composed of several regions, and hence it is necessary to define the correspondence between the phase and regions. Precisely speaking, we introduce a map Rp : N≤IR → N≤IP such that the region Ωr is occupied by the phase Rp(r). Conversely, the p-th phase is composed of the regions Ωr with r ∈ R−1 
+
+> p
+
+(p). We assume that the map Rp is surjective. In other words, all phases are composed of at least one region. According to the assumption that ΩIR is the outer region and unbounded, we require that this outer region belongs to the IP -th phase, namely Rp(IR) = IP (equivalently 
+
+IR ∈ R−1 
+
+> p
+
+(IP )). In other words, the IP -th phase is the unique phase containing the unbounded 
+
+6region; it may in addition own bounded regions (for instance the inner disk together with the unbounded exterior in the three-circle benchmark of Section 9.1). 
+
+Assumption 3.3 (Curve to region map Cr). Any curve is supposed to separate exactly two regions. To prescribe this, we introduce the Curve to Region map which defines the correspon-dence between the curve and the region. Precisely speaking, it is a map Cr : N≤IS → N2 
+
+> ≤IR
+
+such that Cr(s) = ( r− 
+
+> s
+
+, r + 
+
+> s
+
+) means that the curve Γs lies between the regions Ωr− 
+
+> s
+
+and Ωr+ 
+
+> s
+
+. More-over, this relation stresses that the normal vector ⃗ν Γs points from Ωr− 
+
+> s
+
+to Ωr+ 
+
+> s
+
+. Conversely, using Cr, for each r ∈ N≤IR , the curves which enclose the r-th domain can be identified by the following index set: 
+
+s ∈ N≤IS r = r+ 
+
+> s
+
+or r = r−
+
+> s
+
+
+
+.
+
+Assumption 3.4 (Curve to phase map Cp). We compose the maps Cr and Rp to define the Curve to Phase map Cp : N≤IS → N2 
+
+> ≤IP
+
+and write as Cp(s) = ( p− 
+
+> s
+
+, p + 
+
+> s
+
+) for s ∈ N≤IS . Using this notation, we have (p− 
+
+> s
+
+, p + 
+
+> s
+
+) = ( Rp(r− 
+
+> s
+
+), Rp(r+ 
+
+> s
+
+)) . We stress that p−
+
+> s
+
+̸ = p+ 
+
+> s
+
+for all s ∈ N≤IS
+
+so that any two adjacent regions must belong to different phases. Conversely, using Cp, for each p ∈ N≤IP , the curves which enclose the p-th phase can be identified by the following index set: 
+
+
+
+s ∈ N≤IS p = p+ 
+
+> s
+
+or p = p−
+
+> s
+
+
+
+.
+
+We show a representative curve network in Figure 1 composed of three open curves Γ 1,Γ2, and Γ 3 meeting at the triple junctions T1 and T2 and one closed curve Γ 4. The curves separate the plane into the bounded regions Ω 1, Ω 2, Ω 3, and the unbounded exterior region Ω4. We note that, in the displayed case, the region-to-phase map Rp is non-injective: phase 2 occupies the two disconnected regions Ω 2 and Ω 3 (same color), and R−1 
+
+> p
+
+(2) = {2, 3}. For the curve Γ 3, the curve-to-region map gives Cr(3) = ( r− 
+
+> 3
+
+, r +3 ) = (1 , 2), and the unit normal ⃗ν Γ3 points from Ω 1 to Ω 2.⃗ν Γ3⃗ν Γ1⃗ ν Γ2⃗ν Γ4
+
+Ω1 Ω2 Ω3
+
+Ω4T1
+
+T2
+
+Γ1 Γ2
+
+Γ3
+
+Γ4
+
+Figure 1: A curve network Γ in the case IP = 3, IR = 4, IS = 4, and IT = 2. 
+
+# 4 Properties of classical solutions 
+
+In this section, we show two important properties of classical solutions to the system (2.1). We begin with the curve shortening property. We can find a similar statement in [23, Proposition 72.1], although we need some work to extend the proof to the case of the whole space Rd.
+
+Proposition 4.1. Assume that (w(·, t ), Γ( t)) is a smooth solution to the system (2.1) . As-sume further that the Dirichlet energy is finite, i.e., ∇w(·, t ) ∈ L2(Rd)IP ×d for a.e. t > 0.Then, the length of the curve Γ( t) is non-increasing in time. Precisely speaking, we have 
+
+ddt 
+
+> IS
+
+X
+
+> i=1
+
+ςi|Γi(t)| ≤ − 
+
+Z
+
+> R2
+
+|∇ w(·, t )|2 dLd for t > 0.
+
+Proof. We take R > 0 so large that Γ i(t) ⊂ BR(0). Since the curvature is the first variation of the length of the curve, we have 
+
+ddt 
+
+> IS
+
+X
+
+> i=1
+
+ςi|Γi(t)| =
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi(t)
+
+Viςiκi dHd−1 =
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi(t)
+
+Vi(w · JχK) d Hd−1
+
+=
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi(t)
+
+w · (ViJχK) d Hd−1 =
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi(t)
+
+−w · J∇wK⃗ν i dHd−1. (4.1) For each p ∈ N≤IP , let w(r) 
+
+> p
+
+:= wp⌊Ωr for r ∈ R−1 
+
+> p
+
+(p). Then, we have 
+
+−
+
+Z
+
+> BR(0)
+
+|∇ wp|2 dLd = −
+
+> IR−1
+
+X
+
+> r=1
+
+Z
+
+> Ωr
+
+∇w(r)
+
+> p
+> 2
+
+dLd −
+
+Z
+
+> BR(0) ∩ΩIR
+
+∇w(IR)
+
+> p
+> 2
+
+dLd
+
+= −
+
+> IR
+
+X
+
+> r=1
+
+Z
+
+> ∂Ωr
+
+w(r) 
+
+> p
+
+∇w(r) 
+
+> p
+
+·⃗ν Ωr dHd−1 −
+
+Z
+
+> ∂B R(0)
+
+w(IR) 
+
+> p
+
+∇w(IR) 
+
+> p
+
+·⃗ν ΩIR dHd−1
+
+=
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi(t)
+
+−wp · J∇wpK⃗ν i dHd−1 −
+
+Z
+
+> ∂B R(0)
+
+w(IR) 
+
+> p
+
+∇w(IR) 
+
+> p
+
+·⃗ν ΩIR dHd−1. (4.2) Summing up (4.2) over p ∈ N≤IP , we obtain 
+
+−
+
+Z
+
+> BR(0)
+
+|∇ w(·, t )|2 dL2 =
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi(t)
+
+−w · J∇wK⃗ν i dHd−1
+
+−
+
+> IP
+
+X
+
+> p=1
+
+Z
+
+> ∂B R(0)
+
+w(IR) 
+
+> p
+
+∇w(IR) 
+
+> p
+
+·⃗ν ΩIR dHd−1. (4.3) Here, we have invoked the fact that ∆ w(r) 
+
+> p
+
+= 0 in Ω r to obtain the last equality. We recall from [22, Lemma 3] that wp is bounded thanks to the assumption that its gradient is O(1 /|⃗x| 2)as |⃗x| → ∞ . Hence, we can estimate the second term on the right-hand side of the above equality as follows: 
+
+Z
+
+> ∂B R(0)
+
+w(IR) 
+
+> p
+
+∇w(IR) 
+
+> p
+
+·⃗ν ΩIR dHd−1 ≤ C1
+
+Z
+
+> ∂B R(0)
+
+∇w(IR) 
+
+> p
+
+dHd−1
+
+≤ C1 · C2
+
+R2
+
+Z
+
+> ∂B R(0)
+
+dH1 ≤ 2πC 1C2
+
+R , (4.4) 8where C1 and C2 are positive constants such that |wp| ≤ C1 and |∇ wp(⃗x)| ≤ C 2/|⃗x| 2 for all ⃗x ∈ R 2 with |⃗x| ≥ R. We now combine (4.1), (4.3), and (4.4) to obtain 
+
+ddt 
+
+> IS
+
+X
+
+> i=1
+
+ςi|Γi(t)| ≤ − 
+
+Z
+
+> BR(0)
+
+|∇ w(·, t )|2 dL2 + 2πC 1C2IP
+
+R .
+
+Sending R → ∞ , we obtain the desired inequality. Next, we provide a proof of the area-preserving property. Again, this property is shown in [23, Proposition 2.2], although the proof is carried out in a specific three-phase case. 
+
+Proposition 4.2. Assume that (w(·, t ), Γ( t)) is a smooth solution to the system (2.1) . Then, the area of each phase, except for the IP -th phase, is preserved in time. Namely, it holds that 
+
+ddt 
+
+X 
+
+> r∈R−1
+> p(p)
+
+|Ωr(t)| = 0 for all t > 0 and p ∈ N≤IP −1.
+
+Proof. Take R > 0 so large that Γ ⊂ BR(0). We deduce from the Laplace equation (2.1a) that 0 = 
+
+Z 
+
+> ΩIR∩BR(0)
+
+∆w(IR) 
+
+> p
+
+dL2 +
+
+> IR−1
+
+X
+
+> r=1
+
+Z
+
+> Ωr
+
+∆w(r) 
+
+> p
+
+dL2
+
+=
+
+Z
+
+> ∂B R(0)
+
+∇w(IR) 
+
+> p
+
+·⃗ν ∂B R(0) dH1 +
+
+> IR
+
+X
+
+> r=1
+
+Z
+
+> ∂Ωr
+
+∇w(r) 
+
+> p
+
+·⃗ν (r)
+
+> out
+
+dH1, (4.5) where ⃗ν (r) 
+
+> out
+
+denotes the outward unit normal vector field of Ω r. We encode the second term in terms of the index i ∈ N≤IS .
+
+> IR
+
+X
+
+> r=1
+
+Z
+
+> ∂Ωr
+
+∇w(r) 
+
+> p
+
+·⃗ν (r)
+
+> out
+
+dH1 =
+
+> IR
+
+X
+
+> r=1
+
+X
+
+> i∈N≤IS
+> r=r−
+> i
+
+Z
+
+> Γi
+
+∇w(r) 
+
+> p
+
+·⃗ν idH1 + X
+
+> j∈N≤IS
+> r=r+
+> j
+
+Z
+
+> Γj
+
+∇w(r) 
+
+> p
+
+· (−⃗ν j )d H1
+
+
+
+=
+
+> IS
+
+X
+
+> i=1
+
+X
+
+> r∈N≤IR
+> r=r−
+> i
+
+Z
+
+> Γi
+
+∇w(r) 
+
+> p
+
+·⃗ν idH1 + X
+
+> s∈N≤IR
+> s=r+
+> i
+
+Z
+
+> Γi
+
+∇w(s) 
+
+> p
+
+· (−⃗ν i)d H1
+
+
+
+=
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi
+
+−J∇wpK⃗ν idH1 =
+
+> IS
+
+X
+
+> i=1
+
+Z
+
+> Γi
+
+ViJχpKdH1. (4.6) Here, we have invoked the motion law (2.1c) to obtain the last equality. We observe that for each r ∈ R−1 
+
+> p
+
+(p), ViJχpK corresponds to the inward normal velocity of Γ i. Therefore, combining (4.5) and (4.6) together with the decay condition (2.1d), we deduce that 
+
+− ddt 
+
+X 
+
+> r∈R−1
+> p(p)
+
+|Ωr(t)| + O
+
+ 1
+
+R
+
+
+
+= 0 as R → ∞ .
+
+This concludes the proof. 95 Spatial discretization 
+
+To approximate the parametrized curves Γ i : [0 , 1] → R2 (i ∈ N≤IS ) in a curve network Γ, we follow the strategy employed in [22]. Namely, each curve Γ i is approximated by a polygonal curve Γ hi by using ordered vertices ⃗ Xi, 1, · · · ,⃗ X i,N i defined by ⃗Xi,j := 
+
+
+
+Γi
+
+ j−1
+
+> Ni
+
+
+
+if Γi is closed ,
+
+Γi
+
+ j−1
+
+> Ni−1
+
+
+
+if Γi is open .
+
+We let 
+
+σi,j : [0 , 1] ∋ t 7 → (1 − t)⃗Xi,j −1 + t⃗X i,j ∈ R2 for 1 ≤ j ≤ Ni.
+
+From now on, we identify the image of σi,j with σi,j itself. Then, we define the approximate curve by Γ hi := SNi 
+
+> j=1
+
+σi,j . The discrete curve network is composed of the polygonal curves, i.e., Γ h := SIS 
+
+> i=1
+
+Γhi ; the ambient space R2 is split into IR polygonal regions Ω hr (r ∈ N≤IR ), that is, R2 \ Γh = SIR 
+
+> r=1
+
+Ωhr . If Γ hi is open, then the vertex ⃗ Xi, 1 (resp. ⃗ Xi,N i ) is supposed to be the start point (resp. endpoint) of the curve Γ hi . Moreover, it is also supposed that the endpoints of an open curve in R2 correspond to some triple junctions in the curve network Γ h.Meanwhile, if Γ i is closed, then it is alternatively assumed that ⃗ Xi, 0 =⃗ Xi,N i (see Figure 2). ⃗Xi, 1⃗ Xi, 2⃗Xi, 3
+
+· · · ⃗Xi,N i−1⃗Xi,N i
+
+σi, 1 
+
+> (a) Closed curve
+
+⃗Xi, 1⃗Xi, 2⃗Xi, 3
+
+· · · ⃗Xi,N i−1⃗Xi,N i
+
+σi, 2
+
+ghost σi, 1 
+
+> (b) Open curve
+
+Figure 2: Vertex and edge indexing for closed and open polygonal curves Γ hi .
+
+We also define a discrete variant of the normal vector field on Γ hi by ⃗ν hi,j := 
+
+⃗Xi,j −⃗ Xi,j −1
+
+⊥
+
+ri,j 
+
+for i ∈ N≤IS and 1 ≤ j ≤ Ni,
+
+where ri,j := |σi,j | =⃗ Xi,j −⃗ Xi,j −1 , and for any vector ⃗x ∈ R 2, the symbol ⃗x ⊥ denotes the vector which is obtained by rotating ⃗x by 90 ◦ clockwise. We let ϕi,j be the outer angle of Γ hi
+
+at the vertex ⃗ Xi,j and define a discrete variant of the curvature κ by 
+
+κhi,j := tan 
+
+ ϕi,j −1
+
+> 2
+
+
+
++ tan 
+
+ ϕi,j 
+
+> 2
+
+
+
+ri,j 
+
+for i ∈ N≤IS and 1 ≤ j ≤ Ni.
+
+Since x ≈ tan x as |x| ≪ 1, the quantity κhi,j approximates the turning rate of the curve at the edge center ⃗ X∗ 
+
+> i,j
+
+defined by ⃗X∗ 
+
+> i,j
+
+:= ⃗ Xi,j −1 +⃗ Xi,j 
+
+2 for i ∈ N≤IS and 1 ≤ j ≤ Ni,
+
+10 provided that Ni is taken so large that ri,j ≪ 1, and hence κhi,j ≈ dϕ ds = −κ, where s denotes the arc-length parameter on Γ i. Here the sign is opposite to the normal-direction curvature 
+
+κ of Section 2: the outer angle ϕi,j is positive when Γ hi turns counter-clockwise, so κhi,j > 0for a curve that is convex toward the region Ω hr−
+
+> i
+
+, whereas κ < 0 there. We retain κhi,j (the implemented quantity) as the right-hand side of the discrete Gibbs–Thomson rows below and absorb the sign into the jump ordering accordingly. Here, we stress that the index j of the vertices should start from 1 if Γ hi is open, and it should start from 0 if Γ hi is closed since we cannot define the outer angle at the endpoints of open curves. 
+
+Remark 5.1. In the previous work [22], the author considered open curves whose endpoints are not triple junctions and lie on the boundary of a half space. Moreover, he defined imaginary vertices to define the values of κhi,j on the boundary of the half space. However, in the present model, triple junctions can evolve in time, and the curvature at these points does not make sense. The half-space setting is revisited in Section 7, where the wall endpoints become mobile contacts that meet the wall orthogonally and may coexist with evolving triple junctions. 
+
+Remark 5.2 (Curvature correction near triple junctions) . For an open curve Γhi , the standard formula for κhi,j uses the outer angles at both endpoints of the edge σi,j , which are unreliable for the four edges adjacent to the triple junctions ( j = 2 , 3, N − 1, N with N := Ni), since the outer angle is undefined at the junction vertices. By default the implementation re-evaluates the discrete curvature only at these four edges and only for the right-hand side of the Gibbs– Thomson rows (6.10a) , using one-sided differences of the turning angle that do not involve the junction vertex, 
+
+κhi, 2 ← ϕi, 2
+
+(ℓ2 + ℓ3)/2 , κhi, 3 ← ϕi, 2 + ϕi, 3
+
+ℓ2/2 + ℓ3 + ℓ4/2 ,κhi,N ← ϕi,N −1
+
+(ℓN −1 + ℓN )/2 , κhi,N −1 ← ϕi,N −2 + ϕi,N −1
+
+ℓN −2/2 + ℓN −1 + ℓN /2 ,
+
+with ℓj := ri,j . This correction applies to open curves only; for closed curves the discrete curvature is used unchanged. It modifies neither the curvature stored for any other purpose nor the closed-curve rows, and it can be disabled, recovering the uncorrected scheme. The size of the deficit incurred without the correction, its behavior under refinement, and its confinement to the field accuracy near the junctions are quantified in Section 9.2. 
+
+# 6 Fully discrete scheme 
+
+In this section, we give a fully discrete scheme to approximate the interface evolution governed by (2.1). To this end, given a smooth curve network Γ, we first obtain the spatial discretization Γh of Γ using the method introduced in Section 5. After that, we compute the normal velocity 
+
+V of Γ h at each vertex, which is determined by (2.1c). Therefore, we are led to compute w
+
+at each time step. In this paper, we adopt the charge simulation method (CSM) to solve the Dirichlet boundary problem (2.1a) and (2.1b). We now explain a basic idea of the CSM. Let Φ be the fundamental solution to the Laplace equation in R2, that is Φ( ⃗x) := 12π log |⃗x| for ⃗ x ∈ R 2 \ { ⃗ 0}.
+
+11 Then, for r ∈ N≤IR and p ∈ N≤IP , the approximate solution is defined by 
+
+w(r) 
+
+> p
+
+(⃗x) := c (r) 
+
+> p
+
++ X  
+
+> i∈C−1
+> r(r)
+> Ni
+
+X
+
+> j=1
+
+Q(r)
+
+> p,i,j
+
+n
+
+Φ
+
+⃗x −⃗y (r)
+
+> i,j
+
+
+
+− Φ
+
+⃗x −⃗z (r)
+
+> i,j
+
+o 
+
+for ⃗ x ∈ R 2, (6.1) where we recall that w(r) 
+
+> p
+
+:= wp⌊Ωhr , the constant c(r) 
+
+> p
+
+is a region-wise additive constant (one per region r and phase p, not shared across regions), and ⃗y (r) 
+
+> i,j
+
+and ⃗z (r) 
+
+> i,j
+
+are the charge points 
+
+of the CSM, both placed outside Ω r. Such a combination of fundamental solutions is well-known for its fast (for analytic data, exponential) convergence together with the attendant ill-conditioning of the collocation matrix in the literature [13, 26, 34, 35]. 
+
+Remark 6.1. The origin of construction for approximate solutions in (6.1) goes back to Murota [41] in which an invariant structure against affine transformations of the coordinate has been invoked in the definition of approximate solutions. Due to the appearance of one more unknown, the zero-sum condition on the unknowns has been imposed to solve a linear system. Therein, the dummy singular points ⃗z (r) 
+
+> i,j
+
+did not indeed appear in the representation of approximate solutions, and the use of this kind of points has been proposed by Sakakibara and Yazaki [45]. In their study, an area-preserving property has been encoded into a linear system instead of Murota’s zero-sum condition. This structure ensures invariance property of the approximate solution with respect to scale transformation (see [22, Remark 1]). We note that this invariant property is valid only in the planar case thanks to the logarithm of the fundamental solution. 
+
+For each r ∈ N≤IR , we let 
+
+Mr := X  
+
+> i∈C−1
+> r(r)
+
+#
+
+n
+
+edges of Γ hi
+
+o
+
+be the total number of collocation points (edge centers) on ∂Ωhr , and let ⃗ν out  
+
+> r,i,j
+
+:= or,i ⃗ν hi,j , or,i := 
+
+(
+
++1 r = r− 
+
+> i
+
+,
+
+−1 r = r+ 
+
+> i
+
+, (6.2) denote the unit normal of Γ hi pointing out of Ω hr (note that ⃗ν hi,j points from Ω hr−
+
+> i
+
+to Ω hr+
+
+> i
+
+). The charge points are then set as ⃗y (r) 
+
+> i,j
+
+:= ⃗ X∗ 
+
+> i,j
+
++ 1
+
+√Mr⃗ν out  
+
+> r,i,j
+
+and ⃗ z (r) 
+
+> i,j
+
+:= ⃗ X∗ 
+
+> i,j
+
++ M βr⃗ ν out  
+
+> r,i,j
+
+, β := 32 , (6.3) where the constant β has been chosen according to [22, §4]. Both points lie on the same (outer) side of Ω hr : the principal point ⃗y (r) 
+
+> i,j
+
+at the short distance 1 /√Mr, and the auxiliary point ⃗z (r) 
+
+> i,j
+
+far away at distance M βr . It was shown in [22, Lemma 4] that the approximate solution (6.1) satisfies the Neumann boundary condition (2.1d), i.e., 
+
+∇Φ
+
+⃗x −⃗y (r)
+
+> i,j
+
+
+
+− ∇ Φ
+
+⃗x −⃗z (r)
+
+> i,j
+
+
+
+= O
+
+ 1
+
+|⃗x| 2
+
+
+
+as |⃗x| → ∞ ,
+
+12 matching the far-field condition in (2.1d). When ∂Ωhr has several connected components (for instance the exterior region of a configuration containing an isolated closed curve), the points (6.3) are placed component by component. Figure 3 illustrates this charge-simulation set-up near an interface curve Γ hi .⃗ν hi,j ⃗Xi,j ⃗Xi,j −1⃗X∗
+
+> i,j
+
+⃗y (r− 
+
+> i)
+> i,j
+
+⃗z (r− 
+
+> i)
+> i,j
+
+⃗ y (r+ 
+
+> i)
+> i,j
+
+⃗ z (r+ 
+
+> i)
+> i,j
+
+Ωhr+
+
+> i
+
+Ωhr−
+
+> i
+
+Γhi
+
+Figure 3: Charge-simulation set-up near a polygonal curve Γ hi .
+
+Using these notations, we now explain how to determine the coefficients c(r) 
+
+> p
+
+and Q(r) 
+
+> p,i,j
+
+.We note that the chemical potentials w(r) 
+
+> p
+
+sum up to zero for each r ∈ N≤IR , so we only need to determine the coefficients for 1 ≤ p ≤ IP −1. Since the additive constant c(r) 
+
+> p
+
+is region-wise, each region contributes one constant per phase. Thus, the number of unknowns is equal to 
+
+nunk := ( IP − 1) 
+
+
+
+> IR
+
+X
+
+> r=1
+
+ X  
+
+> i∈C−1
+> r(r)
+
+Ni + 1 
+
+ . (6.4) First, the Gibbs–Thomson law (2.1b) is imposed on both sides of each curve. Recalling the discrete curvature κhi,j together with its sign convention fixed in Section 5, the relation to be discretized reads 
+
+w(r± 
+
+> i)
+> p−
+> i
+
+− w(r± 
+
+> i)
+> p+
+> i
+
+= ςi κhi on Γhi for i ∈ N≤IS . (6.5) Second, the continuity condition of the chemical potential across the curve network Γ (2.1f) is given by 
+
+w(r+  
+
+> i)
+> p
+
+= w(r−  
+
+> i)
+> p
+
+on Γhi for i ∈ N≤IS and 1 ≤ p ≤ IP − 1. (6.6) We can directly calculate the normal derivative of the approximate solution (6.1) as fol-lows: 
+
+∇w(r) 
+
+> p
+
+(⃗x) = X  
+
+> i∈C−1
+> r(r)
+> Ni
+
+X
+
+> j=1
+
+Q(r)
+
+> p,i,j
+
+n
+
+∇Φ
+
+⃗x −⃗y (r)
+
+> i,j
+
+
+
+− ∇ Φ
+
+⃗x −⃗z (r)
+
+> i,j
+
+o 
+
+,
+
+and the normal velocity vi,j at the edge center ⃗ X∗ 
+
+> i,j
+
+is computed from the motion law (2.1c), which gives the two equivalent representations: 
+
+
+
+∇w(r+ 
+
+> i)
+> p+
+> i
+
+− ∇ w(r− 
+
+> i)
+> p+
+> i
+
+
+
+·⃗ν hi,j = −vi,j and 
+
+
+
+∇w(r+ 
+
+> i)
+> p−
+> i
+
+− ∇ w(r− 
+
+> i)
+> p−
+> i
+
+
+
+·⃗ν hi,j = vi,j . (6.7) 13 In the implementation, we choose the second representation in (6.7), i.e., from the phase p−
+
+> i
+
+(= Rp(r− 
+
+> i
+
+)) on both sides of Γ hi .
+
+Remark 6.2. The two representations in (6.7) coincide for an exact solution, which expresses the flux-balance (“motion-law”) consistency 
+
+
+
+∇w(r+ 
+
+> i)
+> p+
+> i
+
+− ∇ w(r− 
+
+> i)
+> p+
+> i
+
+
+
+·⃗ν hi,j +
+
+
+
+∇w(r+ 
+
+> i)
+> p−
+> i
+
+− ∇ w(r− 
+
+> i)
+> p−
+> i
+
+
+
+·⃗ν hi,j = 0 .
+
+This identity is a property expected of the continuous solution; it is not imposed as an indepen-dent row of the discrete linear system. Instead, the Gibbs–Thomson law is collocated on both adjacent regions of each curve (see (6.5) ), so that no separate motion-law row is assembled. 
+
+We need ( IP − 1) more equations to determine the coefficients. To this end, we take the area-preserving condition for each phase into account (see Proposition 4.2). Namely, we require that 0 = ddt 
+
+X 
+
+> r∈R−1
+> p(p)
+
+|Ωr(t)| = − X 
+
+> r∈R−1
+> p(p)
+
+Z
+
+> ∂Ωr
+
+Vin (r) d H1 for 1 ≤ p ≤ IP − 1,
+
+where Vin (r) denotes the inward normal velocity at the boundary ∂Ωr. We discretize the integration over the boundary ∂Ωr by the sum of the integrals over the edges σi,j . Then, we obtain 
+
+X 
+
+> r∈R−1
+> p(p)
+
+X  
+
+> i∈C−1
+> r(r)
+> r=r+
+> i
+> Ni
+
+X
+
+> j=1
+
+vi,j ri,j + X  
+
+> i∈C−1
+> r(r)
+> r=r−
+> i
+> Ni
+
+X
+
+> j=1
+
+−vi,j ri,j 
+
+ = 0 for 1 ≤ p ≤ IP − 1. (6.8) The condition (6.8) constrains only the change of area. The area surrounded by the oriented boundary circuit ∂Ωhr is computed by the shoelace formula :
+
+Ωhr = 12
+
+X  
+
+> i∈C−1
+> r(r)
+
+or,i NiX
+
+> j=1
+
+⃗Xi,j −1 ×⃗ Xi,j ,⃗ a ×⃗ b := a1b2 − a2b1, (6.9) where the orientation sign or,i of (6.2) traverses each incident curve in the direction consistent with ∂Ωhr ; adjacent curves share their triple-junction endpoints, so the circuit closes with no connecting edges. Differentiating (6.9) in time reproduces, to leading order, the left-hand side of (6.8): the linear system enforces ddt |Ωr(t)| = 0 at the velocity level, while (6.9) is the polygonal area whose residual drift EA is reported in Section 9. Here, we note that the inward normal velocity Vin (r) at the boundary ∂Ωr is given by 
+
+Vin (r) = 
+
+(
+
+vi,j for r = r+ 
+
+> i
+
+,
+
+−vi,j for r = r− 
+
+> i
+
+.
+
+To compute the above vi,j , we can use the formulae (6.7). 14 Finally, we represent the formulae (6.5), (6.6), and (6.8) as a linear system of the coeffi-cients c(r) 
+
+> p
+
+and Q(r) 
+
+> p,i,j
+
+. To this end, we introduce the following notations: 
+
+G(r)(c1,ℓ ),(c2,j ) := Φ 
+
+⃗X∗ 
+
+> c1,ℓ
+
+−⃗y (r)
+
+> c2,j
+
+
+
+− Φ
+
+⃗X∗ 
+
+> c1,ℓ
+
+−⃗z (r)
+
+> c2,j
+
+
+
+,⃗ H(r)(c1,ℓ ),(c2,j ) := ∇Φ
+
+⃗X∗ 
+
+> c1,ℓ
+
+−⃗y (r)
+
+> c2,j
+
+
+
+− ∇ Φ
+
+⃗X∗ 
+
+> c1,ℓ
+
+−⃗z (r)
+
+> c2,j
+
+
+
+,
+
+for r ∈ N≤IR , c1, c 2 ∈ N≤IS , ℓ ∈ N≤Nc1 , and j ∈ N≤Nc2 .Then, we obtain the following linear system. 
+
+[Gibbs–Thomson law] For every i ∈ N≤IS , k ∈ N≤Ni , and each side r± 
+
+> i
+
+∈ { r− 
+
+> i
+
+, r + 
+
+> i
+
+}, it holds that 
+
+c(r± 
+
+> i)
+> p−
+> i
+
+− c(r± 
+
+> i)
+> p+
+> i
+
++ X   
+
+> ℓ∈C−1
+> r(r±
+> i)
+> Nℓ
+
+X
+
+> j=1
+
+
+
+Q(r±   
+
+> i)
+> p−
+> i,ℓ,j
+
+− Q(r±  
+
+> i)
+> p+
+> i,ℓ,j
+
+
+
+G(r±  
+
+> i)(i,k ),(ℓ,j )
+
+= ςiκhi,k . (6.10a) 
+
+[Continuity condition] For every i ∈ N≤IS , k ∈ N≤Ni , and 1 ≤ p ≤ IP − 1, it holds that 
+
+c(r+  
+
+> i)
+> p
+
+− c(r−  
+
+> i)
+> p
+
++ X   
+
+> ℓ∈C−1
+> r(r+
+> i)
+> Nℓ
+
+X
+
+> j=1
+
+Q(r+  
+
+> i)
+> p,ℓ,j
+
+G(r+  
+
+> i)(i,k ),(ℓ,j )
+
+− X   
+
+> ℓ∈C−1
+> r(r−
+> i)
+> Nℓ
+
+X
+
+> j=1
+
+Q(r−  
+
+> i)
+> p,ℓ,j
+
+G(r−  
+
+> i)(i,k ),(ℓ,j )
+
+= 0 . (6.10b) 
+
+[Area-preserving condition] For every 1 ≤ p ≤ IP − 1, it holds that 
+
+X 
+
+> r∈R−1
+> p(p)
+
+X  
+
+> i∈C−1
+> r(r)
+> r=r+
+> i
+> Ni
+
+X
+
+> j=1
+
+ri,j vi,j − X  
+
+> i∈C−1
+> r(r)
+> r=r−
+> i
+> Ni
+
+X
+
+> j=1
+
+ri,j vi,j 
+
+ = 0 , (6.10c) where the single normal velocity vi,j is taken in the p− 
+
+> i
+
+-representation (the second identity of (6.7)): 
+
+vi,j =
+
+ X   
+
+> ℓ∈C−1
+> r(r+
+> i)
+> Nℓ
+
+X
+
+> k=1
+
+Q(r+  
+
+> i)
+> p−
+> i,ℓ,k
+
+⃗ H(r+  
+
+> i)(i,j ),(ℓ,k )
+
+− X   
+
+> ℓ∈C−1
+> r(r−
+> i)
+> Nℓ
+
+X
+
+> k=1
+
+Q(r−  
+
+> i)
+> p−
+> i,ℓ,k
+
+⃗ H(r− 
+
+> i)(i,j ),(ℓ,k )
+
+ ·⃗ν hi,j .
+
+The rows (6.10a), (6.10b), and (6.10c) assemble into a linear system A⃗ q =⃗ b for the unknown vector ⃗q ∈ R nunk collecting the region-wise coefficients Q(r) 
+
+> p,i,j
+
+and constants c(r)
+
+> p
+
+(1 ≤ p ≤ IP − 1). Since the Gibbs–Thomson law is collocated on both regions of each curve and the additive constants are region-wise, this system is not square: it is in general overdetermined and rank-deficient, and we do not solve it by a direct square solve. Instead, we treat it as a constrained least-squares problem in which the area-preserving rows are imposed exactly. Let C⃗ q =⃗ 0 denote the ( IP − 1) area-preserving rows (6.10c), and let A1⃗q =⃗ b1 denote the remaining Gibbs–Thomson (6.10a) and continuity (6.10b) rows. We enforce C⃗ q =⃗ 0 as a hard constraint by the orthogonal projection onto its null space: 
+
+P := I − C⊤ 
+
+CC ⊤−1
+
+C, (6.11) 15 and we solve the projected least-squares problem: min ⃗y A1P⃗ y −⃗ b1 
+
+> 22
+
+,⃗ q := P⃗ y, (6.12) by the conjugate-gradient least-squares (CGLS) iteration. By construction, C⃗ q = CP⃗ y =⃗ 0holds to machine precision, and thus the discrete area-preserving condition (6.10c) is satisfied at the level of the reconstructed velocity field independently of the residual of (6.12). The Gibbs–Thomson and continuity rows are then satisfied in the least-squares sense. The normal velocities vi,j are computed at the edge centers ⃗ X∗ 
+
+> i,j
+
+, whereas the curve is advanced by moving its vertices ⃗ Xi,j . We therefore transfer the edge data to the vertices by averaging the adjacent edge normals and tangents. Define the (unnormalized) vertex normal and tangent ⃗ν i,j := ⃗ν hi,j +⃗ν hi,j +1 
+
+2 cos 
+
+ ϕi,j 
+
+> 2
+
+ ,⃗ τ i,j := ⃗τ i,j +⃗τ i,j +1 
+
+2 cos 
+
+ ϕi,j 
+
+> 2
+
+ ,
+
+where ⃗τ i,j is the unit tangent of the edge σi,j . Each vertex is then advanced by the nor-mal velocity along ⃗ν i,j together with a tangential redistribution velocity Ti,j , which will be determined by the uniform distribution method (UDM) below, along ⃗τ i,j :⃗X(n+1)  
+
+> i,j
+
+=⃗ X(n) 
+
+> i,j
+
++ ∆ tV (n) with V (n) := vi,j ⃗ν i,j + Ti,j ⃗τ i,j . (6.13) For an open curve the two endpoints ( j = 1 and j = Ni) are held fixed at this stage (their velocity is set to zero) and are subsequently relocated by the triple-junction correction below; for a closed curve all vertices are advanced by (6.13). Here, ∆ t > 0 is a time step size; in the numerical experiments, we take ∆ t = c/N 2 with a fixed constant c (typically c ∈ [0 .01 , 0.5]), where N is the number of vertices per curve. 
+
+Remark 6.3. The region-wise constants c(r) 
+
+> p
+
+are not shared across regions. Their differences across each curve are fixed by the continuity rows (6.10b) , and the remaining gauge freedom (a global additive constant per phase) is harmless for the velocity reconstruction, which depends only on the gradients ∇w(r) 
+
+> p
+
+. The constrained least-squares (6.12) selects a representative consistent with all rows. 
+
+To avoid mesh degeneration, we redistribute the vertices along the curve by the tangen-tial velocity Ti,j of (6.13); since this motion is tangential, it does not change the geometric evolution. To this end, we follow the strategy of [22, Eq.(21)], although we modify it so that each curve may be open. Fix a polygonal curve Γ hi with N := Ni edges, write ℓj := ri,j for the edge lengths, Lh := PNi 
+
+> j=1
+
+ℓj for its length, and ˙Lh := X
+
+> j
+
+κhi,j vi,j ℓj ≈
+
+Z
+
+> Γ
+
+κV dH1 = ˙L
+
+for the discrete derivative of length, where the sum runs over the real edges ( j = 2 , . . . , N 
+
+for an open curve, j = 1 , . . . , N for a closed one). The redistribution drives the edge lengths toward the uniform value L/N (resp. L/ (N − 1) for an open curve), where L denotes the 16 length of the curve which is supposed to be approximated by the polygonal curve Γ hi . We briefly explain its procedure. For a closed curve, set 
+
+ψj := ˙Lh
+
+N − vi,j sin ϕi,j  
+
+> 2
+
+− vi,j −1 sin ϕi,j −1 
+
+> 2
+
++
+
+ Lh
+
+N − ℓj
+
+
+
+10 N with Ψj := 
+
+> j
+
+X
+
+> m=1
+
+ψm,
+
+and define 
+
+Ti,j := Ψj + C
+
+cos ϕi,j 
+
+> 2
+
+with C := − X
+
+> j
+
+Ψj
+
+cos ϕi,j 
+
+> 2
+
+. X 
+
+> j
+
+1cos ϕi,j 
+
+> 2
+
+.
+
+Here, C is chosen so that the redistribution closes up around the loop. For an open curve, the endpoint tangential velocities are fixed, i.e., Ti, 1 = Ti,N = 0, and the interior values solve the bidiagonal least-squares system: 
+
+− cos ϕi,j  
+
+> 2
+
+Ti,j + cos ϕi,j +1  
+
+> 2
+
+Ti,j +1 
+
+= ˙Lh
+
+N − 1 +
+
+ Lh
+
+N − 1 − ℓj+1 
+
+
+
+10 N − vi,j sin ϕi,j +1  
+
+> 2
+
+− vi,j −1 sin ϕi,j 
+
+> 2
+
+for 2 ≤ j ≤ N −1, which we solve by CGLS. In both cases the factor 10 N is an implementation parameter controlling the strength of the equi-distribution. The triple junctions are updated geometrically, not as rows of the linear system (6.10a), (6.10b), and (6.10c). During the free curve update, the endpoints of each open curve are held fixed, while all interior vertices are advanced by (6.13). For each k ∈ N≤IT , let ⃗a 1,⃗ a 2,⃗ a 3
+
+denote the updated interior vertices adjacent to the junction Tk on its three incident curves. We compute a new common junction position ⃗p ∗ 
+
+> k
+
+such that the directions ⃗a m −⃗p ∗ 
+
+> k
+
+(m = 1 , 2, 3) pairwise enclose the equilibrium angles (120 ◦ in the equal-tension case). The point ⃗p ∗ 
+
+> k
+
+is obtained by a damped, regularized Gauss–Newton iteration applied to the three angle-cosine residuals, initialized at the centroid of ⃗a 1,⃗ a 2,⃗ a 3. The corresponding endpoint of every incident curve is then reset to this same point (Figure 4). Finally, the geometric quantities (edges, normals, outer angles, and the discrete curvature) of the affected curves are recomputed from the corrected vertices according to the procedure explained in Section 5. Since closed curves have no triple-junction endpoints, they are advanced by (6.13) with all of their vertices updated, without any endpoint correction. We stress that the Herring–Young condition is enforced here as a geometric correction. ⃗a 1⃗a 2⃗ a 3⃗p (n)
+
+> k
+
+(a) 120 ◦ 120 ◦⃗p ∗
+
+> k
+
+⃗a 1⃗a 2⃗ a 3
+
+(b) 
+
+Figure 4: Post-hoc geometric triple-junction update: (a) after the free curve update; (b) Reset of the endpoints to the new common point ⃗p ∗
+
+> k
+
+.
+
+17 7 Extension to Neumann boundary problem 
+
+So far, we have explained the implementation of the fully discrete scheme in the whole space 
+
+R2. In this section, we extend the proposed scheme to the half space H with boundary contacts. 
+
+7.1 Half-space Neumann problem 
+
+First, we introduce a target problem whose solution will be approximated by our proposed scheme. Let ( ⃗e 1,⃗ e 2) be the standard basis of R2. We consider the system (2.1) in the half space H with the boundary wall W defined by: 
+
+H := 
+
+⃗x = ( x 1, x 2)⊤ ∈ R2 x2 > 0
+
+
+
+and W := ∂H =
+
+⃗x = ( x 1, x 2)⊤ ∈ R2 x2 = 0 
+
+
+
+.
+
+The governing system is (2.1) with R2 replaced by H, augmented by the wall condition: 
+
+∇w(·, t )⃗ν W = 0 on W, t > 0, (7.1) where ⃗ν W = −⃗e 2 is the outward unit normal vector to H, which is constant in the half-space case. An open curve may now end either at a triple junction (as in Section 6) or at the Neumann boundary. In the latter case, the endpoint can slide along W (mobile) and is required to meet the boundary orthogonally, ⃗μ i ·⃗e 1 = 0 at a boundary contact of Γ i, (7.2) i.e., the interface tangent is vertical there (90 ◦ contact). We stress that (7.2) is a prescribed neutral contact condition of the present model, which is imposed independently of the Neu-mann condition (7.1), which constrains the chemical potential. The triple-junction force balance (the Herring–Young law, Remark 2.4) is retained unchanged. 
+
+Remark 7.1. In the two-phase case with d = 2 , 3, local well-posedness of the underlying problem in a smooth bounded domain with the pure Neumann boundary condition (7.1) and ninety-degree angle contact condition (7.2) has been established by Abels, Rauchecker, and Wilke [1]. For a stability analysis of stationary solutions to the same flow in the case d = 2 ,we refer the reader to Garcke and Rauchecker [28]. We refer the reader to Hensel and Stinson [30] for weak solutions in the case d = 2 , 3 with constant contact angle condition. 
+
+For a source point ⃗q = ( q 1, q 2)⊤, let its mirror image across the boundary be ⃗q ∗ := ( q1, −q2)⊤, (7.3) and define the half-space (Neumann) fundamental solution by superposing the source and its image with equal sign, ΦW (⃗x,⃗ q) := Φ( ⃗x −⃗q) + Φ( ⃗x −⃗q ∗), (7.4) where we recall that Φ is the fundamental solution to the Laplace equation in R2. On the boundary, the distances from ⃗q and ⃗q ∗ coincide, i.e., |⃗x −⃗q| = |⃗x −⃗q ∗| holds for ⃗x with x 2 = 0, and the normal derivative is 
+
+∂ΦW
+
+∂x 2
+
+(⃗x,⃗ q) = 12π
+
+ x2 − q2
+
+|⃗x −⃗q| 2 + x2 + q2
+
+|⃗x −⃗q ∗|2
+
+
+
+= 0 on x2 = 0 , (7.5) since on W the two numerators are x2 − q2 = −q2 and x2 + q2 = q2 while the denominators are equal. Hence, any potential built from Φ W satisfies the homogeneous Neumann condition (7.1) on the boundary exactly, with no additional unknowns. 18 7.2 Fully discrete scheme for half-space Neumann problem 
+
+In the CSM, the approximate solution (6.1) is retained with Φ replaced by Φ W , namely, the scalar and vector blocks remain the differences: 
+
+G(r)(c1,ℓ ),(c2,j ) = Φ W (⃗X∗
+
+> c1,ℓ
+
+,⃗ y (r) 
+
+> c2,j
+
+) − ΦW (⃗ X∗
+
+> c1,ℓ
+
+,⃗ z (r) 
+
+> c2,j
+
+), (7.6) ⃗H(r)(c1,ℓ ),(c2,j ) = ∇ΦW (⃗X∗
+
+> c1,ℓ
+
+,⃗ y (r) 
+
+> c2,j
+
+) − ∇ ΦW (⃗ X∗
+
+> c1,ℓ
+
+,⃗ z (r) 
+
+> c2,j
+
+),
+
+where ∇ is applied to the field point ⃗ X∗
+
+> c1,ℓ
+
+. The charge-point placement, however, differs from (6.3) as follows: ⃗y (r) 
+
+> i,j
+
+:= ⃗ X∗ 
+
+> i,j
+
++ α r i,j ⃗ν out  
+
+> r,i,j
+
+,⃗ z (r) 
+
+> i,j
+
+:= ⃗ X∗ 
+
+> i,j
+
++ M 3/2
+
+> r
+
+⃗ ν out  
+
+> r,i,j
+
+, (7.7) i.e., the principal source sits at a local-edge offset α r i,j (with α an implementation parameter, 
+
+α = 1 .5 in the runs) rather than at the 1 /√Mr distance of (6.3); the auxiliary source keeps the M 3/2 
+
+> r
+
+far placement, and the principal-minus-dummy structure of (7.6) is retained. The local scaling α r i,j (rather than the global 1 /√Mr) is used because the orthogonal wall contact makes the edge lengths strongly non-uniform along each curve; anchoring the principal source to the local edge length keeps it at a fixed multiple of the local discretization scale, whereas a single global offset would sit at very different relative distances from the fine and coarse edges. 
+
+Remark 7.2. For the structure of fundamental solutions (7.4) , we have followed the previous work [22, §5, Alternative fundamental solutions] to force the approximate solution to satisfy the pure Neumann boundary condition on ∂H = W.
+
+In Figure 5, we visualize this half-space charge-simulation construction near the Neumann wall W. A polygonal curve Γ hi contacts the boundary orthogonally at a mobile contact fulfilling (7.2); in this case, we have ⃗ν W = −⃗e 2. Each region is represented, as in the whole space, by charge points held off the curve on the side outside that region: a principal point ⃗y (r)
+
+> i,j
+
+at the near offset α r i,j and an auxiliary point ⃗z (r) 
+
+> i,j
+
+at the far distance M 3/2 
+
+> r
+
+as in (7.7). The half-space fundamental solution Φ W in (7.4) superposes each charge with its wall mirror image ⃗y (r)∗ 
+
+> i,j
+
+,⃗ z (r)∗ 
+
+> i,j
+
+reflected across W as in (7.3), using an equal sign, which enforces the homogeneous Neumann condition on W exactly as in (7.5). 
+
+W⃗ν W
+
+Γhi⃗ν hi,j ⃗y (r− 
+
+> i)
+> i,j
+
+⃗z (r− 
+
+> i)
+> i,j
+
+⃗ y (r+ 
+
+> i)
+> i,j
+
+⃗ z (r+ 
+
+> i)
+> i,j
+
+⃗y (r− 
+
+> i)∗
+> i,j
+
+⃗z (r− 
+
+> i)∗
+> i,j
+
+⃗ y (r+ 
+
+> i)∗
+> i,j
+
+⃗ z (r+ 
+
+> i)∗
+> i,j
+
+⃗Xi,j −1⃗Xi,j ⃗X∗
+
+> i,j
+
+Ωhr+
+
+> i
+
+Ωhr−
+
+> i
+
+H
+
+Figure 5: Half-space charge-simulation construction near the Neumann wall W.
+
+19 7.3 Two distinct solves: charge field and constrained velocity 
+
+Charge-field solve. The coefficients c(r) 
+
+> p
+
+and Q(r) 
+
+> p,i,j
+
+are obtained from the collocation system of Section 6 with the imaged blocks (7.6) and the placement (7.7). Writing A1 for the two-sided Gibbs–Thomson (6.10a) and continuity (6.10b) rows (right-hand side ⃗ b1) and C for the aggregate per-phase area rows (6.10c) (one per bounded phase, IP − 1 in total), the half-space solve reads min ⃗q
+
+
+
+A1⃗q −⃗ b1 22 + λD W 2 
+
+> D
+
+D⃗ q 22 C⃗ q =⃗ 0
+
+
+
+(7.8) with the constraint enforced exactly by the orthogonal projection (6.11). The block D collects, per collocation edge, the flux-balance residual: the inconsistency between the two phase representations of the normal velocity (6.7). This block is the departure from the whole-space scheme, which assembles no motion-law row (Remark 6.2). It is penalized rather than enforced, because the Neumann wall and its mobile contacts couple the interface flux to the boundary while the collocation system is already rank-deficient; the weight λD = 0 .1 keeps the Gibbs–Thomson/continuity fit dominant without ignoring the residual, and WD rescales the rows of D to the magnitude of A1 so that λD acts as a dimensionless relative weight. From the reconstructed field the edge-center normal velocities vi,j are recovered as in (6.7). 
+
+Constrained velocity solve. A separate reconstruction stage takes the vi,j as data and produces the vertex velocities and the endpoint motion; the wall and junction constraints below are not rows of the charge-field system. Each open-curve endpoint is a triple-junction node, a wall contact ( x2 = 0), or free; let IW , IT , and IA count the mobile wall contacts, the trivalent junctions, and the area hard rows. The unknowns are the per-curve vertex velocities ⃗v i,j and, for each triple junction t, a shared junction velocity ⃗ Vt ∈ R2 and a scalar angular rate ωt (every junction-incident endpoint moves with ⃗ Vt). The stage minimizes the fidelity/redistribution objective of Section 7.4 under the hard wall, junction, and area rows: min     
+
+> {⃗vi,j },{⃗Vt,ω t}
+
+P 
+
+> i
+
+ ∥Fi∥22 + ∥Ri∥22
+
+ + γ∥G∥22 + λreg ∥⃗v∥ 22 (soft rows; §7.4) 
+
+s.t. ⃗v c ·⃗e 2 = 0 , (⃗v c −⃗v a) ·⃗e 1 = 0 (wall contact, 90 ◦) 
+
+> 1
+> ℓ
+
+(R90 ⃗ taway ) · (⃗v a −⃗ Vt) = ωt (junction incidence, 120 ◦)
+
+> ddt
+
+X 
+
+> r∈R−1
+> p(p)
+
+|Ωhr (t)| = 0 (bounded region) 
+
+(7.9) Here ⃗v c is a contact velocity, ⃗v a that of the adjacent interior vertex, ℓ the junction-to-neighbor distance, ⃗ taway the unit tangent pointing away from the junction, and R90 the 90 ◦ rotation. Table 1 lists the rows: the two wall rows are the velocity-level form of (7.2); the shared ωt
+
+across a junction’s three incidences is an equal-angular-rate condition preserving the 120 ◦
+
+balance of Remark 2.4; the soft families Fi, R i, G are defined in Section 7.4; and a phase composed of several bounded regions is assigned one aggregate row C⃗ q =⃗ 0 of (7.8). The reconstructed ⃗v i,j advance the vertices, and the junction-incident endpoints move with their ⃗Vt. The hard rows sum to 
+
+nc = IA + 2 IW + 3 IT , (7.10) with IA one row per constrained bounded region (or per multi-region phase in the aggregate case). In the assembled examples, each phase occupies a single region, so IA = IR −1 = IP −1and (7.10) gives nc = 18 for the four-phase configuration of Section 9.7. 20 rows type definition count role wall contact hard ⃗ v c ·⃗e 2 = 0 , (⃗v c −⃗v a) ·⃗e 1 = 0 2IW 90 ◦ contact (7.2) junction incidence hard 1                                                    
+
+> ℓ(R90 ⃗taway )·(⃗va−⃗Vt) = ωt3ITshared ωtkeeps 120 ◦
+> area rate hard ddt|Ωhr(t)|= 0 IAphase-area conservation fidelity Fisoft, 1 b⃗ni,k ·⃗vi,k =vni,k per vertex normal-motion fidelity compatibility Gsoft, √γ⃗ ni, adj ·⃗Vt=vni, adj per incidence junction–arc coupling equidistribution Risoft, β0(7.11) per edge tangential mesh regularity Tikhonov soft, λreg λreg ∥⃗v∥22once positive-definite block
+
+Table 1: Hard and soft rows of the constrained velocity solve (7.9) ( γ = 1, β0 = 10, λreg = 10 −8; the hard counts sum to nc (7.10)). 
+
+Region closure at the wall. The area-rate row needs the region’s oriented boundary polygon, assembled by an incidence-driven traversal that chains the boundary curves through their shared junction nodes and closes a wall-touching region with a wall chord between its two contacts. A bounded region with three wall contacts or with disjoint wall intervals cannot be closed unambiguously and is excluded; the validated class is exactly that of Section 7: one contiguous wall interval, bounded by two consecutive contacts, per bounded wall-touching region. 
+
+7.4 Tangential redistribution and on-manifold endpoint update 
+
+The hard rows of (7.9) constrain the velocities to be tangent to the wall and junction constraint manifolds; the endpoint update below then advances the positions on those manifolds through explicit charts (Figure 6). The 90 ◦ and 120 ◦ angles therefore hold to machine precision at every stage of the time step, independently of the step size. 
+
+Soft rows: fidelity and redistribution. The soft rows of (7.9) form three least-squares families (Table 1): 
+
+• Fidelity Fi (weight 1): b⃗n i,k ·⃗v i,k = vni,k pins the normal component of each owned velocity to the reconstructed raw value ( k = 2 , . . . , N − 1 on an open curve, every vertex on a closed one). 
+
+• Compatibility G (weight √γ, γ = 1 ): ⃗ n i, adj ·⃗ Vt = vni, adj , one row per junction incidence, ties ⃗ Vt to the incident normal velocities as strongly as each vertex honors its own. 
+
+• Equidistribution Ri (weight β0 = 10 ): on each curve the edge rates are driven toward uniformity, ˙ℓe − ˙LNe
+
+= β  ¯ℓ − ℓe
+
+ , ¯ℓ := LNe
+
+, (7.11) with ℓe the edge lengths, L the curve length, Ne the number of edges ( N − 1 open, N
+
+closed), and β = β0 max i Ni (β0 dimensionless, distinct from the exponent in (6.3)). This rate is fast enough to keep the mesh regular and slow enough not to overwhelm the normal motion. A fixed Tikhonov term λreg ∥⃗v∥ 22 (λreg = 10 −8) makes the owned-vertex block positive-definite without perturbing the physical velocity. All are penalties, not hard equalities: (7.11) is 21 the velocity-level, curve-wide analogue of the uniform-distribution method of Section 6, and the solve targets the raw normal velocity while selecting a tangential redistribution under the hard rows; the diagnostics of Section 9.7 confirm that the constrained evolution remains consistent with the intended normal flow. 
+
+On-manifold endpoint charts. This update replaces the post-hoc geometric triple-junction correction of Section 6. Each trivalent junction is equipped with a chart ( ⃗ J, ψ, {φk, ℓ k}3
+
+> k=1
+
+), consisting of a junction point, a shared frame angle, and, per incident ray, a fixed angular offset and an evolving length (Figure 6(a)); the incident endpoint is reconstructed as ⃗Xk =⃗ J + ℓk
+
+ cos( ψ + φk), sin( ψ + φk); (7.12) the offsets φk being fixed, the 120 ◦ balance is exact for all t. Each wall contact is equipped with a chart ( X, h ) (Figure 6(b)), ⃗Xcontact = ( X, 0) ⊤,⃗ Xadj = ( X, h )⊤, (7.13) so the contact edge is vertical and the 90 ◦ angle is exact. A two-stage Heun update advances the chart coordinates (a predictor at t, a corrector at the tentative state, the rates averaged); the constraints (7.12)–(7.13) hold to machine precision at each stage. The update is formally second order (Heun/RK2); we do not measure a temporal convergence rate and do not claim unconditional stability. 
+
+ψ
+
+φ1⃗J⃗X1⃗X2⃗ X3
+
+ℓ1
+
+ℓ2 ℓ3
+
+ωt
+
+(a) 
+
+W (X, 0) (X, h )˙X
+
+˙h
+
+(b)   
+
+> Figure 6: On-manifold endpoint charts: (a) the triple-junction chart (7.12), with fixed ray offsets
+> φk; (b) the wall-contact chart (7.13), with a vertical contact edge.
+
+Adaptive time step. Unlike the whole-space runs of Section 6, which use the fixed rule ∆t = c N −2, we choose the time step adaptively in the half-space runs as ∆t = min 
+
+
+
+cCFL 
+
+min i,j ℓi,j 
+
+max Γ |V | , ∆tmax 
+
+
+
+, (7.14) where min i,j ℓi,j is the smallest polygonal edge length in the network, max Γ |V | the maximum discrete normal speed, cCFL > 0 a Courant constant, and ∆ tmax a cap (in the runs cCFL =6.25 × 10 −3 and ∆ tmax = 10 −3). The step (7.14) contracts when a high-curvature feature drives up max Γ |V | and relaxes as the network smooths. 22 8 Structural properties of the discrete scheme 
+
+We now show that the projected least-squares solve of Section 6 preserves, at the discrete level, the area-conservation structure of the continuous flow (Proposition 4.2). For the p-th bounded phase, we define a linear functional of the unknown vector ⃗q approximating the variation of area functional: 
+
+Jp(⃗q) := X 
+
+> r∈R−1
+> p(p)
+
+X  
+
+> i∈C−1
+> r(r)
+
+or,i NiX
+
+> j=1
+
+ri,j vi,j (⃗q) ≈
+
+Z
+
+> Γ
+
+−Vin dH1, (8.1) where the orientation sign or,i is recalled from (6.2), and vi,j (⃗q) is the approximate velocity in (6.7). The area rows of the linear system are C⃗ q =⃗ 0 with C the ( IP − 1) × nunk matrix, where 
+
+nunk is the total number of unknowns of the linear system (6.4), whose p-th row coincides with Jp up to an overall sign, and the projector P of (6.11) is used to solve the constrained least-squares problem (6.12). Two structural facts underlie the statements below. First, by construction the rows of C
+
+are assembled from the same kernel evaluations and the same p− 
+
+> i
+
+-representation (6.7) of the normal velocity that is later used to advance the curves. Thus the two zero constraints are exactly equivalent; their row conventions differ only by an overall sign. Second, we assume throughout this section the non-degeneracy condition: rank C = IP − 1, (ND) so that the matrix CC ⊤ ∈ R(IP −1) ×(IP −1) is regular; the redundancy of a further area row is explained by Lemma 8.1 below. 
+
+Proposition 8.1 (Solvability of the projected charge solve) . Assume (ND) . Then, the fol-lowing statements hold: (i) P = I − C⊤(CC ⊤)−1C is well-defined, symmetric, and is the orthogonal projector onto 
+
+ker C;(ii) C⃗ q =⃗ 0 holds if and only if ⃗q = P⃗ y for some ⃗y, and the constrained problem 
+
+min ⃗q
+
+
+
+∥A1⃗q −⃗ b1∥22 C⃗ q =⃗ 0
+
+
+
+is equivalent to the projected problem (6.12) , in the sense that the optimal values coincide and ⃗q ⋆ solves the former if and only if ⃗q ⋆ = P⃗ y ⋆ for a minimizer ⃗y ⋆ of the latter; (iii) the set of all solutions to the constrained problem is not empty, an affine subspace of 
+
+ker C, and it contains a unique element of minimal Euclidean norm. 
+
+Remark 8.1. In Proposition 8.1, we need no rank assumption on A1. In particular, the statement covers the overdetermined and rank-deficient Gibbs–Thomson/continuity block that occurs in practice. Proof. (i) Under (ND), the matrix CC ⊤ is symmetric positive definite, and hence it is invert-ible, and P is well-defined and symmetric. A direct computation gives P 2 = P and CP = 0, and thus range P ⊆ ker C; conversely C⃗ q =⃗ 0 gives P⃗ q =⃗q, whence range P = ker C, and 
+
+P = P ⊤ makes it the orthogonal projector. 23 (ii) The characterization of the feasible set is (i); substituting ⃗q = P⃗ y turns the constrained problem into the projected one, and conversely any minimizer ⃗y ⋆ yields the feasible point ⃗q ⋆ = P⃗ y ⋆ with the same objective, while every feasible ⃗q equals P⃗ q and so cannot do better. (iii) The projected problem is an unconstrained linear least-squares problem, whose ob-jective is a convex quadratic bounded below and therefore attains its infimum; the image of its solution set under ⃗y 7 → P⃗ y is the constrained solution set, a nonempty affine subspace of ker C, which contains a unique element of minimal norm. The same projector argument applies to the half-space charge-field solve of Section 7: reading the objective matrix as [ A1; √λD WDD ] and C as its aggregate per-phase area rows, Proposition 8.1 still holds. The subsequent half-space velocity and endpoint reconstruction is a separate constrained solve, whose per-region area, wall-contact, and junction constraints are imposed there (Section 7.3), not through this projector. 
+
+Remark 8.2. The implementation solves (6.12) by CGLS with zero initial guess. In exact arithmetic the iterates ⃗y k then lie in the Krylov subspaces generated by (A1P )⊤ = P A ⊤ 
+
+> 1
+
+, hence in range P = ker C; therefore ⃗q k := P⃗ y k =⃗y k and C⃗ q k =⃗ 0 for every k, regardless of when the iteration is stopped. This feasibility of every iterate is the property used in Proposition 8.2. Thus, feasibility of the area constraints is independent of the stopping index and of the Gibbs– Thomson/continuity residual. 
+
+Lemma 8.1 (One area constraint is redundant) . The linear functional 
+
+Rnunk ∋⃗q 7 −→ 
+
+> IP
+
+X
+
+> p=1
+
+Jp(⃗q) ∈ R
+
+is the zero map. Consequently, at most IP − 1 of J1, . . . , J IP are linearly independent, and enforcing Jp(⃗q) = 0 for p = 1 , . . . , I P − 1 implies that JIP (⃗q) = 0 .Proof. Fix an edge σi,j for some i ∈ N≤IS and j ∈ N≤Ni . The curve Γ hi appears in the boundary of exactly its two adjacent regions Ω hr−
+
+> i
+
+and Ω hr+
+
+> i
+
+, with orientation signs or−  
+
+> i,i
+
+= +1 and or+  
+
+> i,i
+
+= −1. Since the value vi,j is used per edge, it is independent of the side from which the curve is viewed (6.7); both regions contribute the same term ri,j vi,j to (8.1) once with sign +1 through the phase Rp(r− 
+
+> i
+
+) and once with sign −1 through Rp(r+ 
+
+> i
+
+). Summing (8.1) over all p = 1 , . . . , I P counts every region once, hence every term ri,j vi,j once with each sign, and the total vanishes identically. 
+
+Remark 8.3. Lemma 8.1 is purely combinatorial. Indeed, in its proof, we use only that Rp
+
+assigns each region to exactly one phase, that each curve bounds exactly two regions, and that a single velocity representation per edge is used on both sides. It explains the reason that the proposed scheme assembles area rows only for p = 1 , . . . , I P − 1. In other words, a row for 
+
+p = IP would make C rank deficient by construction and (CC ⊤)−1 undefined. It also shows that the constraint for the unbounded phase is then automatically satisfied. 
+
+Proposition 8.2 (Exact area conservation at the velocity level) . Assume (ND) . Let ⃗q be any CGLS iterate of the projected problem (6.12) with zero initial guess; in particular, ⃗q may be the computed solution, whatever the truncation index, the stopping tolerance, or the size of the Gibbs–Thomson/continuity residual. Then, in exact arithmetic, 
+
+Jp(⃗q) = 0 for all p = 1 , . . . , I P ,
+
+24 i.e. the reconstructed normal velocity field has exactly zero net flux through the boundary of every phase, including the omitted unbounded phase. Proof. By Remark 8.2, every iterate satisfies ⃗q = P⃗ y, hence C⃗ q = CP⃗ y =⃗ 0 since CP = 0 (Proposition 8.1(i)). By the assembly identity C⃗ q = ( J 1(⃗q), . . . , J IP −1(⃗q)) ⊤ this is Jp(⃗q) = 0 for p = 1 , . . . , I P − 1, and Lemma 8.1 gives JIP (⃗q) = 0. 
+
+Remark 8.4 (Floating point) . In floating-point arithmetic the identity holds up to the round-ing of forming and applying P , controlled by the condition number of the small (IP −1) ×(IP −
+
+1) Gram matrix CC ⊤, which can be monitored at run time; the residual |Jp(⃗q)| is observed at the level of 10 −13 .
+
+Remark 8.5 (Velocity-level versus polygonal conservation) . Proposition 8.2 concerns the reconstructed velocity, not the advanced polygon: once the vertices have moved by (6.13) and the junctions have been relocated, the shoelace phase areas are conserved only approximately, perturbed at higher order in h and ∆t by the angle-bisector update, the junction relocation, and the finite step. This polygonal drift is the quantity EA reported in Section 9: small, linear in the time step, and decreasing under refinement. 
+
+Remark 8.6 (Conservation across a region disappearance) . The structural conservation of Proposition 8.2 holds between topological events: at a removal (Section 9.6) the configuration is re-baselined and the projected solve again conserves every phase area, the only change being the removal step, at which the affected phase loses exactly the residual area ( < δ ) removed together with the deleted curve. A region of an unconstrained phase carries no area row, so its disappearance leaves every constrained phase area unchanged. 
+
+# 9 Numerical experiments 
+
+In this section, we carry out numerical experiments to assess the proposed scheme. All numerical experiments reported here use equal surface tensions ςi = 1, except Section 9.5, which validates a representative unequal-tension configuration against the Young angles. For each test case, we monitor the following diagnostics at every time step to measure how closely the quantities that are conserved by the continuous flow are preserved by the discretization. Let Ap(t) denote the area of the bounded phase p (the sum of the areas of its regions). Then, the relative phase-area error of the area of the phase p at time t is defined by 
+
+EAp (t) := |Ap(t) − Ap(0) |
+
+Ap(0) . (9.1) For later use, we let EA(t) := max 1≤p≤IP −1 EAp (t). Moreover, we also evaluate the triple-junction angle deviation defined by 
+
+E∠(t) := max 
+
+> k∈N≤IT
+
+max  
+
+> ℓ=1 ,2,3
+
+θskℓ
+
+(t) − 120 , (9.2) where θskℓ
+
+(t) ( ℓ = 1 , 2, 3) denote the three angles (degrees) separating 360 ◦ around each triple junction point Tk (k ∈ N≤IT ). We note that for equal surface tensions, the equilibrium angle 25 is 120 ◦. We use the convention that E∠(t) = 0 in the case IT = 0. We also measure the 
+
+discrete interfacial energy (weighted total length) 
+
+Lh(t) := 
+
+> IS
+
+X
+
+> i=1
+
+ςi Γhi (t) =
+
+> IS
+
+X
+
+> i=1
+
+ςiNiX
+
+> j=1
+
+ri,j ≈
+
+Z
+
+> Γ
+
+ςdH1, (9.3) which is non-increasing along the continuous flow (see Proposition 4.1). We finally describe the criterion that determines when each computation is stopped. Ex-cept for the convergence test of Section 9.1, which is integrated to a fixed final time, each computation is run until the flow becomes near-stationary , subject to a maximum-step and maximum-physical-time safety cap. At step n, we let v(n) 
+
+> i,j
+
+denote the normal velocity which is computed according to (6.7) and let v(n) := max i, j |v(n) 
+
+> i,j
+
+| be the maximum discrete normal speed and L(n) the interfacial energy (9.3); write v(n) 
+
+> ⋆
+
+:= max 0≤k≤n v(k) for the running peak speed and define the per-step relative length rate 
+
+ρ(n) 
+
+> L
+
+:= L(n) − L(n−1) 
+
+L(n) ∆t . (9.4) The evolution is said to be near-stationary, and the computation is stopped, at the first step 
+
+n ≥ nmin for which the velocity has decayed and the energy has plateaued, 
+
+v(n) < ε v v(n) 
+
+> ⋆
+
+and ρ(n) 
+
+> L
+
+< ε L, (9.5) on W consecutive steps; in the experiments we take εv = 5 × 10 −2, εL = 10 −2, W = 50, and 
+
+nmin = 50. For ςi ≡ 1 the energy L equals the total length, so the second condition is equally a length plateau. As a safeguard the computation also stops at a maximum step count nmax or once n ∆t reaches a maximal physical time Tmax . The whole-space experiments of Section 9.4 are run to this near-stationary criterion. Several half-space configurations of Section 9.7, however, exhibit persistent stiff high-curvature modes for which relaxation to stationarity is impractically slow; these are reported as finite-horizon validations of the constrained velocity solve, over a fixed horizon rather than to (9.5). We use three residual measures. The Gibbs–Thomson residual is the relative ℓ2 residual of the Gibbs–Thomson collocation rows (6.5) alone at the state in question; the combined Gibbs–Thomson/continuity residual ∥A1⃗q −⃗ b1∥2/∥⃗b1∥2, which also includes the continuity rows (6.6), is used only in the cost report of Section 9.3 and is named there. The circle-fit residual per unit length is the root-mean-square distance of a computed interface from its best-fit circle, divided by its arc length. All are reported as raw values. Finally, we delimit the scope of what is claimed in this section. The convergence orders quoted below are observed rates over the tested range of resolutions; we make no claim about asymptotic orders. No exact solution with a moving triple junction is available for the multi-phase flow, so the junction treatment is assessed by indirect evidence (Section 9.1). The explicit time-step rule ∆ t = cN −2 of the whole-space runs is an empirical choice, and no stability threshold is claimed. The unequal-tension validation of Section 9.5 covers a single representative configuration; a systematic sweep of tension ratios and strongly unbalanced junctions is left for future work. 26 9.1 Convergence against an exact three-phase solution 
+
+To quantify the accuracy of the whole-space scheme we use the exact radially-symmetric solution of the three-phase Mullins–Sekerka flow constructed in [23, §8.1]. Let three concentric circles of radii 0 < R 1(t) < R 2(t) < R 3(t), centered at the origin, separate the plane into four regions: the inner disk BR1 (0), the inner annulus BR2 (0) \ BR1 (0), the outer annulus 
+
+BR3 (0) \ BR2 (0), and the unbounded exterior. The three phases are assigned as follows: phase 1 is the inner annulus, phase 2 is the outer annulus, and phase 3 is the union of the inner disk and the unbounded exterior. Thus phase 3 is a single phase occupying two disconnected regions, one of them unbounded, which tests the multi-region and non-injective 
+
+Rp part of the scheme; the two bounded phases whose area is conserved are the two annuli. The color-coded configuration is the first panel of Figure 11, where Section 9.6 runs the same exact solution to its natural end at t∗ ≈ 1.62 (far beyond the horizon T = 12 used here and in the comparison of Table 3); the computed radii, interface error, and energy history are shown in Figure 7. Since the two annulus areas are conserved, the quantities D2 := R2(0) 2 − R1(0) 2 and 
+
+D3 := R3(0) 2 − R2(0) 2 are constant, and the radii satisfy the differential-algebraic system 
+
+R1(t) = pR2(t)2 − D2, R3(t) = pR2(t)2 + D3, R′
+
+> 2
+
+(t) = −F  R2(t), (9.6) with ς ≡ 1 and 
+
+F (u) = 1
+
+√u2 − D2
+
++ 1
+
+u + 1
+
+√u2 + D3
+
+2 u log  √u2 + D3/√u2 − D2
+
+ . (9.7) Following [23], we obtain the reference radius R2(t) to machine precision by inverting (9.6) through the quadrature t = R R2(0)  
+
+> R2(t)
+
+du/F (u) with a root finder, so that the reference solution is free of time-discretization error. We take the initial radii R1(0) = 2, R2(0) = 2 .5, R3(0) = 3 and integrate to T = 12 , for which (9.6) gives  R1(T ), R 2(T ), R 3(T ) ≈ (1 .60 , 2.20 , 2.75); the whole configuration contracts while the two annulus areas are preserved. Each circle is discretized with N vertices and advanced with the fixed step ∆ t = cN −2
+
+with c = 0 .5, admissible for this smooth radial flow (Section 9.3). We measure the interface error 
+
+eΓ(t) := max  
+
+> i
+
+max  
+
+> j
+
+∥⃗Xi,j (t)∥ − Ri(t) , (9.8) the per-circle radius errors eRi (t) := | ¯Rhi (t) − Ri(t)| with ¯Rhi the mean vertex radius of circle 
+
+i, and the diagnostics EA (9.1) and L (9.3). Table 2 reports the run parameters, eΓ(T ), and 
+
+EA(T ) for a sequence of refinements (the innermost circle has the largest radius error, which essentially equals eΓ, while the outer radius errors are smaller), while Figure 7 shows the computed radii against the exact ones, the interface error against N , and the energy history. The interface error decreases under refinement, with an experimental order of convergence (EOC) that grows from about 0 .5 on the coarsest mesh to 1 .1 at N = 128 (Table 2). The phase-area drift EA(T ) stays below 2 × 10 −4 and decreases with N . It is the higher-order polygonal drift of Remark 8.5, not a failure of conservation: the projection conserves the discrete area at the velocity level to machine precision (Proposition 8.2), whereas the shoelace areas of the advanced polygon drift by an amount that scales linearly with the step: at the tenfold smaller c = 0 .05 it is about ten times smaller. The interfacial energy L(t) decreases monotonically, consistent with the curve-shortening property (Proposition 4.1). 27 N ∆t steps eΓ(T ) EOC EA(T )16 1.95 × 10 −3 256 1.13 × 10 −1 – 1.93 × 10 −4
+
+32 4.88 × 10 −4 1024 7.94 × 10 −2 0.50 4.16 × 10 −5
+
+64 1.22 × 10 −4 4096 4.48 × 10 −2 0.83 8.83 × 10 −6
+
+128 3.05 × 10 −5 16384 2.04 × 10 −2 1.14 1.95 × 10 −6                                
+
+> Table 2: Spatial convergence and run parameters for the exact three-circle solution (9.6) in the whole space ( c= 0 .5, ς= 1, integrated to T=12;IR= 4, IP= 3, IS= 3, IT= 0).
+> Figure 7: Convergence for the three-circle test. (a) Computed mean radii ¯Rhi(t) (markers) against the exact Ri(t) (solid), N= 128. (b) Interface error eΓ(T) against N, log–log, with an
+> O(N−1) reference slope. (c) Interfacial energy L(t)/L (0), N= 128.
+
+The spatial order of about one is lower than the fast (for analytic data, exponential) con-vergence associated with the charge simulation; the difference shows which component of the discretization controls the error. The charge field itself is resolved essentially to solver toler-ance: at convergence the Gibbs–Thomson/continuity residual reaches 10 −10 –10 −7 (Table 4), and the reconstructed normal velocity is insensitive to further iteration, so the fundamental-solution approximation of the potential is not what limits the interface error. What remains first order is the geometric discretization of the moving polygon: the discrete curvature is formed from turning angles at the vertices, the normal velocity is carried on vertex-averaged normals and advanced along angle-bisector directions, and space and time are refined together through ∆ t = cN −2. In agreement with this, the reconstructed velocity error halves under refinement (1 .2 × 10 −1 at N = 64, 5 .5 × 10 −2 at N = 128; Section 9.3), matching the first-order interface rate of Table 2. The exponential accuracy of the charge representation does not carry over to the interface error, which is set by the first-order polygonal geometry. 
+
+Comparison with a bulk finite-element method. The three-concentric-circle solution used here is the same exact benchmark introduced in [23, §8.1] for a structure-preserving parametric finite-element method, over the same time interval 0, 12
+
+, so the two schemes can be juxtaposed at the level of published errors without re-running either (Table 3). At the one resolution where the two ladders meet ( N = 128, 3 N = 384 interface vertices), the present interface error eΓ(T ) = 2 .0 × 10 −2, with no bulk mesh at all, is of the same order as the finite-element value 1 .4 × 10 −2 computed on a bulk triangulation of KM 
+
+> Ω
+
+= 3 .6 × 10 3
+
+nodes. Under further refinement the finite-element error falls to 8 .8 × 10 −4, but its bulk count grows to 7 .3 × 10 4, whereas the charge simulation uses only the O(N ) interface unknowns of Section 9.3. The juxtaposition is of published errors only and is meant to place the present accuracy in context rather than to rank the methods: the error measures differ ( eΓ(T ) (9.8) is a final-time radius error, whereas [23] reports max m dist( ·, Γ( tm)) over all steps), the step 28 curve vertices bulk meshes ∆t / τ steps interface error area/vol. drift Present charge simulation (explicit forward Euler, no area mesh) 48 — 1.95 × 10 −3 256 1.13 × 10 −1 1.93 × 10 −4
+
+96 — 4.88 × 10 −4 1024 7.94 × 10 −2 4.16 × 10 −5
+
+192 — 1.22 × 10 −4 4096 4.48 × 10 −2 8.83 × 10 −6
+
+384 — 3.05 × 10 −5 16384 2.04 × 10 −2 1.95 × 10 −6
+
+EGN24 structure-preserving parametric FEM, scheme (7.4) 384 3605 6.40 × 10 −2 ≈ 8 1.36 × 10 −2 < 10 −10 
+
+768 7285 1.60 × 10 −2 ≈ 31 6.78 × 10 −3 < 10 −10 
+
+1536 14905 4.00 × 10 −3 ≈ 125 3.47 × 10 −3 < 10 −10 
+
+3072 30193 1.00 × 10 −3 ≈ 500 1.79 × 10 −3 < 10 −10 
+
+6144 72537 2.50 × 10 −4 ≈ 2000 8.80 × 10 −4 < 10 −10     
+
+> Table 3: The exact three-circle benchmark (9.6) over [0 ,12]: the present charge simulation (top) and the structure-preserving FEM of [23, Table 2], scheme (7.4) (bottom); “ — ” = no bulk mesh. The error measures and conservation notions differ between the methods; see the text.
+
+counts for [23] are inferred as T /τ , and the drift column compares the polygonal drift EA(T )of Remark 8.5 against the exact volume preservation of scheme (7.4). A limitation of this benchmark is that it contains no triple junction ( IT = 0): the exact solution used here, like the one in [23, §8.1], is a set of nested circles, and no closed-form solution with a moving triple junction is available for the multi-phase flow. Quantitative evidence for the junction treatment therefore comes indirectly, from three later experiments. The curvature-correction study of Section 9.2 shows, on a four-phase open-junction network, that the uncorrected junction-edge curvature, formed from the ill-defined turning angle at the junction vertex, stays a factor of two below the corrected one-sided estimate uniformly in the resolution; and the half-space M -branch of Section 9.7 (Table 7) holds its 90 ◦ wall contacts and 120 ◦ triple-junction angle to machine precision as it relaxes toward its equilibrium circular-arc class; and the unequal-tension lane of Section 9.5 (Table 5) holds the Young angles, including the non-120 ◦ ones at the right junctions, to the same precision. These probe the junction behavior that the three-circle test cannot. 
+
+9.2 Triple-junction curvature correction 
+
+We probe the local curvature correction of Remark 5.2, which re-evaluates the discrete cur-vature on the four edges adjacent to each triple junction for the Gibbs–Thomson right-hand side, by toggling it on a four-phase open-triple-junction network (six open curves, four junc-tions), sampling the same smooth configuration at N = 16 , . . . , 256. Without the correction the curvature on the two edges nearest each junction stays about a factor of two below the corrected one-sided estimate across a sixteen-fold change in N , with h decreasing accordingly, a deficit that does not improve under refinement. The switch is confined to the field accuracy near the junctions and does not reach the conserved quantities (at N = 32, EA = 2 .49 × 10 −3
+
+versus 2 .48 × 10 −3 and E∠ = 4 .6 × 10 −5 degrees with the correction on or off): the discrete areas are conserved at the velocity level by the projection (Proposition 8.2) and the junc-tion angles are restored geometrically at every step, both independently of the switch, so the correction is a local consistency fix for the junction-edge curvature input, and the discrete 29 N unknowns κ2(A1P ) κ2(CC ⊤) CGLS its GT resid. asm. [ms] solve [ms] 16 200 5.2 × 10 17 2.6 9 1.8 × 10 −10 1.11 0.22 32 392 1.4 × 10 18 2.6 9 7.3 × 10 −9 4.77 0.59 64 776 5.8 × 10 18 2.7 9 5.3 × 10 −8 19.22 1.69 128 1544 1.5 × 10 19 2.8 9 9.1 × 10 −8 81.82 11.58 256 3080 3.9 × 10 19 2.8 9 1.8 × 10 −7 407.39 40.04    
+
+> Table 4: Cost and conditioning of the whole-space solve at t= 0 for the three-circle configuration.
+
+structure preservation holds with or without it. 
+
+9.3 Cost and conditioning 
+
+We report the whole-space solve on the three-circle configuration of Section 9.1 at t = 0 (Table 4). The number of unknowns grows linearly in N ; kernel assembly and the projected solve both cost O(N 2) per step (assembly dominates: 0 .41 s versus 0 .04 s at N = 256), so a run to a fixed final time costs O(N 4) under ∆ t = cN −2. No bulk mesh is assembled. The condition number κ2(A1P ) is of order 10 17 –10 19 and grows with N , reflecting the well-known ill-conditioning of the method of fundamental solutions; the area constraints, however, are applied through the much better-conditioned Gram matrix CC ⊤, for which κ2 ≈ 2.6–2 .8over the tested resolutions. In these computations CGLS converges in nine iterations to a Gibbs–Thomson/continuity residual of 10 −10 –10 −7. In the tested runs, increasing the CGLS budget past convergence leaves the reconstructed velocity unchanged to machine precision, and the velocity error matches the first-order spatial accuracy of Section 9.1 (1 .2 × 10 −1 at 
+
+N = 64, 5 .5 × 10 −2 at N = 128), not the level of κ2(A1P )−1.The explicit whole-space runs use the empirical rule ∆ t = cN −2 with c ∈ [0 .01 , 0.5] ( c
+
+quoted per test); the half-space runs use the adaptive step of Section 7. 
+
+9.4 Whole space 
+
+Throughout the whole-space experiments the number of vertices of each Γ hi equals N and the time step is τ = cN −2; the surface tensions are equal, ςi = 1, and each run is stopped by the near-stationary criterion (9.5) unless the maximum-step cap intervenes. Snapshots are drawn on a common window at t = 0, the midpoint of the observed energy decrease, and T , with bounded regions colored by phase (the unbounded phase white) and triple junctions marked by black dots. The three-phase baseline (Figure 8) shows the full diagnostics: the per-phase relative area error EAp (t) (9.1) on a semilog axis (dashed = maximum) and the interfacial energy L(t)/L (0) (9.3), with a dashed vertical line at the stopping time; the multi-phase runs that follow show only the snapshot rows, their diagnostics being of the same character. We begin with a three-phase open triple-junction baseline, which relaxes from a large deformation to a near-stationary state with its two triple junctions preserved throughout: the maximum phase-area drift is EA = 3 .4×10 −3, the junction angles stay within E∠ = 4 .3×10 −5
+
+degrees of 120 ◦, and the interfacial energy decreases monotonically (Figure 8). A four-phase network with four triple junctions probes robustness under a large geometric distortion: the prescribed topology and the four junctions are preserved at every step, the 30 Figure 8: Three-phase open triple-junction baseline ( IR = IP = IS = 3, IT = 2) under a large mode-2 deformation; N = 32, c = 0 .05, run to the near-stationary criterion (9.5) at T ≈ 0.74. Top: snapshots; bottom: area-error and energy diagnostics.                    
+
+> Figure 9: Four-phase fixed-topology evolution ( IR=IP= 4, IS= 6, IT= 4) from a strongly deformed initial network; N= 32, c= 0 .05, run to (9.5) at T≈0.25. Snapshots at t= 0, the energy-drop midpoint, and T.
+
+maximum phase-area drift is EA = 2 .9 × 10 −3, and the network relaxes to a near-stationary configuration (Figure 9). Finally, the scheme accommodates a network with both open and closed components: an open double-bubble coexisting with an isolated closed star-shaped curve, so the unbounded region has two boundary components. Under the flow the star rounds toward a circle (round-ness rmin /r max : 0 .70 → 0.98) while the open component relaxes without any topology change; the maximum area drift is EA = 7 .1 × 10 −3 at this coarse resolution (Figure 10). 
+
+9.5 Unequal surface tensions and Young angles 
+
+The formulation of Section 2 admits unequal surface tensions ςi; we validate the proposed scheme on a representative unequal-tension configuration against the Young angles. We take a triple-bubble lane of Section 9.4, whose bounded regions are identified by A, B, and C,and raise the B–C interface tension to ςBC = 1 .3, leaving every other tension at 1. At a 31 Figure 10: Mixed open/closed run ( IR = IP = 4, IS = 4 with one closed curve, IT = 2) under large deformation: a perturbed open double-bubble component (phases 1 , 2) and a separated star-shaped closed curve r(θ) = 0 .60 (1 + 0 .18 cos 5 θ) (phase 3); N = 32, c = 0 .05, run to (9.5) at T ≈ 0.15. Snapshots at t = 0, the energy-drop midpoint, and T .
+
+TJ tensions ( ςa, ς b, ς c) Young angles [ ◦] max ∆ θ [◦] ( N =32) (N =64) TL (1 .0, 1.0, 1.0) 120 .0/120 .0/120 .0 3.72 × 10 −5 3.71 × 10 −5
+
+BL (1 .0, 1.0, 1.0) 120 .0/120 .0/120 .0 3.76 × 10 −5 3.76 × 10 −5
+
+TR (1 .0, 1.3, 1.0) 130 .5/130 .5/98 .9 4.75 × 10 −5 4.44 × 10 −5
+
+BR (1 .0, 1.3, 1.0) 130 .5/130 .5/98 .9 4.44 × 10 −5 4.11 × 10 −5     
+
+> Table 5: Young-angle validation on the unequal-tension lane at N= 32 and N= 64.
+
+Gibbs–Thomson equilibrium, the three tension vectors at a junction balance, so the angle θab 
+
+facing the curve of tension ςc satisfies the Young relation cos θab = ς2 
+
+> c
+
+− ς2 
+
+> a
+
+− ς2
+
+> b
+
+2 ςaςb
+
+, (9.9) which is solvable precisely under the triangle inequalities of Remark 2.4. The two left junc-tions keep all tensions equal (Young angles 120 ◦/120 ◦/120 ◦), while the two right junctions have tensions (1 , 1.3, 1) and hence the Young angles 130 .54 ◦/130 .54 ◦/98 .92 ◦. The junction geometry is held at these per-junction Young angles by the geometric triple-junction correc-tion of Section 6 (its 120 ◦ target generalized to the Young angles); the test is therefore not that the angles emerge unaided, but that the ς-weighted field solve stays consistent with them throughout the flow, conserving the phase areas and dissipating the weighted energy. We gen-eralize the angle diagnostic (9.2) accordingly, replacing the target 2 π/ 3 by the per-junction Young angle, and write EYoung  
+
+> ∠
+
+(t) for the resulting maximum deviation. The run is reported at N = 64, with a companion N = 32 run, both summarized in Table 5. The measured junction angles track the Young targets to EYoung  
+
+> ∠
+
+< 5 × 10 −5 degrees at every junction and both resolutions (Table 5), while the relative phase-area error stays at the same polygonal level as the equal-tension runs ( EA ≤ 1.3 × 10 −4 at N = 64, 1 .6 × 10 −3 at N = 32). The ς-weighted energy (9.3) decreases monotonically (after a brief initial adjustment while the discrete initial data settles), whereas the unweighted total length increases; the two are consistent because, once the tensions differ, it is the weighted length that the flow dissipates. 
+
+9.6 Region disappearance 
+
+In the experiments so far, the network topology does not change. In this subsection, we treat the disappearance of a bounded region that is enclosed by a single closed curve and 32 incident to no triple junction, once this curve has contracted below the resolution of the mesh; the extinction of a junction-bounded lobe or bubble is not treated, so the junction connectivity is never altered and no curve splicing or vertex surgery is involved. Because the area constraints pin the total area of each phase, an isolated bounded region cannot shrink on its own: disappearance requires the transfer of area between two regions of the same phase (intra-phase Ostwald ripening), which is possible because the region-to-phase map Rp
+
+is non-injective. In this test, we confirm the multi-region phase introduced in Section 3. 
+
+Detection and removal. A closed curve Γ hi is flagged for removal once the area it encloses falls below a prescribed threshold, 
+
+Ai < δ. (9.10) For a refinement sequence, a resolution-tied choice is δN = cδh2 
+
+> N
+
+, where hN := max j |σi,j | is the maximum edge length of the candidate curve at the removal step and cδ > 0 is held fixed. With this choice, the area removed at an event is bounded by cδh2 
+
+> N
+
+and therefore vanishes as 
+
+hN → 0. At that step, the curve is deleted, and the incidence data of Section 3 are updated: the vanished region is removed from Cr and Rp, the two regions formerly separated by Γ hi are merged, and the conserved-area target of the affected phase is reset to its new polygonal value. The charge-point layout and the constraint matrix C are rebuilt for the reduced configuration, and the evolution continues. The removal is an opt-in module of the solver, checked against the unchanged fixed-topology path by regression tests. Between events, every phase area is conserved at the velocity level (Proposition 8.2); the removal step changes the affected phase total by exactly the residual Ai < δ , an identity that vanishes as δ → 0 along such a refinement sequence (Remark 8.6) and is reported as a single step in the per-phase area history. We first let a region disappear from a phase whose area is unconstrained, by running the exact three-circle solution of Section 9.1 through to its natural end. Under (9.6) the conserved inner-annulus squared-radius gap D2 = R22 − R21 (whose area is πD 2) forces R1 → 0as R2 → √D2: the inner disk, a bounded component of the unbounded phase 3, collapses and vanishes at the finite time 
+
+t∗ =
+
+Z R2(0) 
+
+> √D2
+
+duF (u) = 1 .6189 (to machine precision) , (9.11) with F as in (9.7); the integrand is integrable at the endpoint (1 /F ∼ R1 log(1 /R 1) → 0), and after the event the exact solution is the stationary pair of concentric circles bounding the two conserved annuli. Because the vanishing region belongs to the unbounded phase, its removal leaves the two conserved annulus areas unchanged. We integrate the discrete flow with the detector in report-only mode (no removal is trig-gered) at N ∈ { 32 , 48 , 64 } and ∆ t = cN −2, recording the discrete event time tev (δ), the first step at which the discrete disk area falls below δ. In this calibration, each listed value of δ is held fixed across the three resolutions; the test therefore isolates convergence of the discrete threshold-crossing time to the corresponding exact time t∗(δ), not convergence under the coupled choice δN = cδh2 
+
+> N
+
+. Table 6 compares tev (δ) with t∗(δ): the error at δ = 0 .02 decreases as 0 .220 , 0.164 , 0.127 for N = 32 , 48 , 64, an observed order p ≈ 0.79 toward the exact threshold-crossing time t∗(0 .02). The error is dominated by the spatial resolution: at fixed N = 32, varying c over {0.5, 0.2, 0.1, 0.05 } moves tev (0 .02) by less than 10 −3. Across the event the two conserved annulus areas stay flat: their drift is the higher-order polygonal 33 Figure 11: Disappearance of an unconstrained region: the exact three-circle solution of Section 9.1 run to the collapse of the inner disk at t∗ = 1 .6189 (9.11). Left: the discrete inner-disk area Ad(t) at N = 32 , 48 , 64 against the exact πR 1(t)2, with removal thresholds δ. Center: the event time tev (δ) against 1 /N , with the exact t∗(δ) at 1 /N = 0. Right: the relative area error of the two conserved annulus phases (phase 1 solid, phase 2 dashed). 
+
+N ∆t tev (0 .10) tev (0 .05) tev (0 .02) tev (0 .01) |tev (0 .02) − t∗(0 .02) |
+
+32 4.88e-04 1.3896 1.3950 1.3975 1.3984 0.2203 48 2.17e-04 1.4462 1.4514 1.4540 1.4546 0.1638 64 1.22e-04 1.4824 1.4878 1.4905 1.4912 0.1273                 
+
+> exact t∗(0 .02) = 1 .6178, t∗= 1 .6189 (machine precision); observed order p≈0.79.
+> Table 6: Calibration of the discrete disappearance time against the exact threshold-crossing time
+> t∗(δ) for the three-circle solution, with each listed δheld fixed across resolutions ( ς= 1, ∆t=cN −2with c= 0 .5).
+
+amount, of order 10 −5–10 −4 before the terminal collapse layer (decreasing with N ) and rising to ∼ 10 −3 within that layer at the coarsest N = 32 (Figure 11). The dual case, in which the vanishing regions belong to constrained phases, corresponds to the coarsening scenario of the introduction: two dispersed phases, each split into three disks of distinct radii, embedded in the unbounded matrix phase (six closed curves, no triple junctions). Figure 12 shows the flow at N = 48 with the detector active. The four satellite disks vanish in order of increasing size, alternating between the two phases, at t = 0 .081, 0 .153, 0.240, and 0 .408; after the last event the two surviving disks relax to the near-stationary state of (9.5) at t ≈ 0.96, one round disk per phase (roundness 0 .995 and 0 .996). Between events the two constrained phase totals are flat up to a polygonal drift below 7 × 10 −5; at each event the affected phase total drops by exactly the removed residual, 0 .47%–0 .53% of the phase area; the accounting identity of the removal step holds to rounding ( ≤ 4.5 × 10 −16 ). Each step of the staircase in the middle bottom panel of Figure 12 thus equals exactly the sub-resolution residual ( < δ ) of a vanished region, an amount bounded by the prescribed removal threshold (9.10). The run reproduces the three properties stated in the introduction: the large regions grow at the expense of the small, the total interfacial length decreases ( L(T )/L (0) = 0 .62), and the area of each phase is conserved up to the four disclosed residuals. 
+
+Remark 9.1. Julin, Morini, Ponsiglione, and Spadaro [33, Theorem 1.3] have shown that any initial data E0 ⊂ R2 having perimeter less than 2 asymptotically converges to a union of disks whose areas sum up to the initial volume |E0| in the two-phase case under a periodic boundary condition. We observe a similar phenomenon in Figure 12 for the three-phase case. 
+
+34 Figure 12: Intra-phase ripening of two dispersed phases in an unbounded matrix: disks of radii 0 .90, 0.45, 0 .30 (phase 1, orange) and 0 .80, 0 .50, 0 .35 (phase 2, blue), at N = 48 per curve, ∆t = cN −2 with c = 0 .05, removal threshold δ = 0 .02. Top: snapshots at the initial time, after the second removal, and at the final near-stationary state. Bottom: the six region areas Ar (t) with the threshold δ; the normalized phase totals Ap(t)/A p(0); the total interfacial length L(t)/L (0). Dotted vertical lines mark the four removal events; the dashed line marks the stopping time (9.5). 
+
+9.7 Half space 
+
+We now validate the half-space scheme of Section 7, in which open curves may end on the Neumann wall as mobile contacts. All runs use the constrained velocity solve of Section 7.3, the on-manifold Heun update of Section 7.4, and the edge-rate redistribution constant β0 = 10; the update keeps the 90 ◦ wall contacts and the 120 ◦ junctions exact by construction, the discrete area-rate rows are met to solver precision, and the polygonal region areas drift by the small amounts quoted. In the half-space figures the thick black line is the Neumann wall W,mobile wall contacts are white markers, and interior triple junctions black dots; the bottom panels report the same area-error and energy diagnostics as in Section 9.4. We begin with a three-phase M -branch: three open curves meeting at one interior triple junction with three mobile wall contacts, started from a strongly asymmetric, unbalanced state ( A2 : A1 = 7 : 10). At a Gibbs–Thomson equilibrium every arc has constant curvature, so the expected shape class is an asymmetric circular-arc double arch. Under the flow the network relaxes toward this class: the interfaces approach circular arcs, the contact and junc-tion angles are held exactly by the endpoint-chart update, the prescribed areas are preserved, the final Gibbs–Thomson residual falls below the 0 .05 threshold, and the interfacial energy decreases to a plateau while the imposed size imbalance persists (Table 7, Figure 13). To exercise many independently mobile contacts we scale the configuration up. Figure 14 shows a strongly perturbed four-phase / three-junction network with three mobile wall con-tacts, relaxed toward a near-stationary asymmetric double arch (the maximum normal speed decays to well under 1% of its peak and the length approaches a plateau): the contacts re-main ordered and meet the wall orthogonally, the three triple junctions are preserved, and the bounded areas are conserved to solver precision. 35 Figure 13: Half-space three-phase M -branch from a strongly asymmetric, unbalanced state ( A2 :           
+
+> A1= 7 : 10); N= 28, fixed horizon T≈0.11. Top: snapshots at t= 0, T / 2, T; bottom: area-error and energy diagnostics.
+
+quantity value circle-fit residual per unit length ( t = 0 → T ) 3.8 × 10 −3 → 1.0 × 10 −3
+
+max wall-contact angle deviation from 90 ◦ 0 (machine) max triple-junction angle deviation from 120 ◦ 1.4 × 10 −11 deg max phase-area drift EA 1.0 × 10 −6
+
+final Gibbs–Thomson residual 0.019 interfacial energy L(T )/L (0) 0.984    
+
+> Table 7: Quantitative half-space benchmark for the unbalanced M-branch of Figure 13.
+
+# 10 Conclusion 
+
+In this paper, we have developed a bulk mesh-free solver for the multi-phase Mullins–Sekerka flow based on the CSM, which is a variant of the MFS, in the planar case together with the half-plane case. Representing each chemical potential by a combination of fundamental solutions to the Laplace equation centered at off-interface charge points has removed the need for a bulk mesh and the singular integrals, leaving only the interfacial conditions to impose. The discretization preserves the discrete area constraints exactly by projecting the reconstructed velocity onto their null space. Between topological events, every bounded phase area is conserved to machine precision at the velocity level; the only topological event treated here is the disappearance of a region enclosed by a single closed curve and incident to no junction. The pure Neumann boundary condition is imposed exactly by image charges, and mobile contacts are kept orthogonal to the boundary, and triple junctions remain in balance according to the Herring–Young law. The accuracy of the proposed scheme has been validated against an exact three-concentric-circle solution to the underlying model; its outcome has been compared with the parametric finite element approach, and, for the case where N = 128, the 36 Figure 14: Half-space four-phase, three-junction network with three mobile wall contacts, relaxing from a strong perturbation; N = 28, integrated to T ≈ 0.30. Top: snapshots at t = 0,   
+
+> T / 2, T; bottom: area-error and energy diagnostics.
+
+proposed scheme has yielded a comparable interface error without a bulk mesh. The structural result proved here is conditional on the non-degeneracy assumption (ND) and concerns exact phase-area conservation at the reconstructed-velocity level. For curve networks with moving triple junctions and wall contacts, for which no exact benchmark is available, the curvature correction and the half-space constrained update have instead been assessed through refinement diagnostics, constraint residuals, area errors, and energy dissipation. A convergence and stability analysis of discretization of triple junctions and half-space curve networks remains an open problem. 
+
+# References 
+
+[1] H. Abels, M. Rauchecker, and M. Wilke , Well-posedness and qualitative behaviour of the Mullins-Sekerka problem with ninety-degree angle boundary contact, Math. Ann., 381 (2021), pp. 363–403. [2] N. Akaiwa and P. W. Voorhees , Late-stage phase separation: Dynamics, spatial correlations, and structure functions, Phys. Rev. E, 49 (1994), pp. 3860–3880. [3] N. D. Alikakos, P. W. Bates, and X. Chen , Convergence of the Cahn-Hilliard equation to the Hele-Shaw model, Arch. Ration. Mech. Anal., 128 (1994), pp. 165–205. [4] W. Bao and Q. Zhao , A structure-preserving parametric finite element method for surface diffusion, SIAM J. Numer. Anal., 59 (2021), pp. 2775–2799. [5] J. W. Barrett, H. Garcke, and R. N¨ urnberg , A parametric finite element method for fourth order geometric evolution equations, J. Comput. Phys., 222 (2007), pp. 441– 467. 37 [6] , On the parametric finite element approximation of evolving hypersurfaces in R3,J. Comput. Phys., 227 (2008), pp. 4281–4307. [7] , A variational formulation of anisotropic geometric evolution equations in higher dimensions, Numer. Math., 109 (2008), pp. 1–44. [8] , On stable parametric finite element methods for the Stefan problem and the Mullins-Sekerka problem with applications to dendritic growth, J. Comput. Phys., 229 (2010), pp. 6270–6299. [9] , A stable parametric finite element discretization of two-phase Navier-Stokes flow, J. Sci. Comput., 63 (2015), pp. 78–117. [10] , Parametric finite element approximations of curvature-driven interface evolutions, in Geometric partial differential equations. Part I, Amsterdam: Elsevier/North Holland, 2020, pp. 275–423. [11] P. W. Bates and S. Brown , A numerical scheme for the Mullins-Sekerka evolution in three space dimensions, in Differential equations and computational simulations. Pro-ceedings of the international conference, Chengdu, China, June 13–18, 1999, Singapore: World Scientific, 2000, pp. 12–26. [12] P. W. Bates, X. Chen, and X. Deng , A numerical scheme for the two phase Mullins-Sekerka problem, Electron. J. Differ. Equ., 1995/11 (1995). [13] A. Bogomolny , Fundamental solutions method for elliptic boundary value problems, SIAM Journal on Numerical Analysis, 22 (1985), pp. 644–669. [14] L. Bronsard, H. Garcke, and B. Stoth , A multi-phase Mullins-Sekerka system: Matched asymptotic expansions and an implicit time discretisation for the geometric evolution problem, Proc. R. Soc. Edinb., Sect. A, Math., 128 (1998), pp. 481–506. [15] L. Bronsard and F. Reitich , On three-phase boundary motion and the singular limit of a vector-valued Ginzburg-Landau equation, Arch. Ration. Mech. Anal., 124 (1993), pp. 355–379. [16] J. W. Cahn and J. E. Hilliard , Free energy of a nonuniform system. I: Interfacial free energy, J. Chem. Phys., 28 (1958), pp. 258–267. [17] C. Chen, C. Kublik, and R. Tsai , An implicit boundary integral method for interfaces evolving by Mullins-Sekerka dynamics, in Mathematics for nonlinear phenomena – anal-ysis and computation. In honor of Yoshikazu Giga’s 60th birthday, Sapporo, Japan, August 2015, Cham: Springer, 2017, pp. 1–21. [18] X. Chen , The Hele–Shaw problem and area-preserving curve-shortening motions, Arch. Ration. Mech. Anal., 123 (1993), pp. 117–151. [19] A. H. D. Cheng and Y. Hong , An overview of the method of fundamental solutions – solvability, uniqueness, convergence, and stability, Eng. Anal. Bound. Elem., 120 (2020), pp. 118–152. 38 [20] J. Escher, A.-V. Matioc, and B.-V. Matioc , The Mullins-Sekerka problem via the method of potentials, Math. Nachr., 297 (2024), pp. 1960–1977. [21] S. Esedo¯ glu and F. Otto , Threshold dynamics for networks with arbitrary surface tensions, Commun. Pure Appl. Math., 68 (2015), pp. 808–864. [22] T. Eto , A rapid numerical method for the Mullins-Sekerka flow with application to contact angle problems, J. Sci. Comput., 98 (2024), p. 37. [23] T. Eto, H. Garcke, and R. N¨ urnberg , A structure-preserving finite element method for the multi-phase Mullins-Sekerka problem with triple junctions, Numer. Math., 156 (2024), pp. 1479–1509. [24] , A Parametric Finite Element Approach for an Anisotropic Multi-Phase Mullins–Sekerka Problem with Kinetic Undercooling. Preprint, arXiv:2602.18226 [math.NA] (2026), 2026. [25] , A parametric finite element method for a degenerate multi-phase Stefan problem with triple junctions, Comput. Methods Appl. Math., 26 (2026), pp. 43–67. [26] G. Fairweather and A. Karageorghis , The method of fundamental solutions for elliptic boundary value problems, Adv. Comput. Math., 9 (1998), pp. 69–95. [27] H. Garcke, R. N¨ urnberg, and Q. Zhao , A variational front-tracking method for multiphase flow with triple junctions, Math. Comput., 95 (2026), pp. 647–682. [28] H. Garcke and M. Rauchecker , Stability analysis for stationary solutions of the Mullins-Sekerka flow with boundary contact, Math. Nachr., 295 (2022), pp. 683–705. [29] M. A. Golberg and C. S. Chen , The method of fundamental solutions for potential, Helmholtz and diffusion problems, in Boundary integral methods: numerical and math-ematical aspects, Southampton: WIT Press/ Computational Mechanics Publications, 1999, pp. 103–176. [30] S. Hensel and K. Stinson , Weak solutions of Mullins-Sekerka flow as a Hilbert space gradient flow, Arch. Ration. Mech. Anal., 248 (2024), p. 60. [31] C. Herring , Surface tension as a motivation for sintering, in Fundamental Contributions to the Continuum Theory of Evolving Phase Interfaces in Solids: A Collection of Reprints of 14 Seminal Papers, J. M. Ball, D. Kinderlehrer, P. Podio-Guidugli, and M. Slemrod, eds., Springer Berlin Heidelberg, Berlin, Heidelberg, 1999, pp. 33–69. [32] T. Y. Hou, J. S. Lowengrub, and M. J. Shelley , Boundary integral methods for multicomponent fluids and multiphase materials., J. Comput. Phys., 169 (2001), pp. 302– 362. [33] V. Julin, M. Morini, M. Ponsiglione, and E. Spadaro , The asymptotics of the area-preserving mean curvature and the Mullins-Sekerka flow in two dimensions, Math. Ann., 387 (2023), pp. 1969–1999. [34] M. Katsurada , Asymptotic error analysis of the charge simulation method in a Jordan region with an analytic boundary, J. Fac. Sci., Univ. Tokyo, Sect. I A, 37 (1990), pp. 635– 657. 39 [35] M. Katsurada and H. Okamoto , A mathematical study of the charge simulation method. I, J. Fac. Sci., Univ. Tokyo, Sect. I A, 35 (1988), pp. 507–518. [36] I. Lifshitz and V. Slyozov , The kinetics of precipitation from supersaturated solid solutions, Journal of Physics and Chemistry of Solids, 19 (1961), pp. 35–50. [37] S. Luckhaus and T. Sturzenhecker , Implicit time discretization for the mean curvature flow equation, Calc. Var. Partial Differ. Equ., 3 (1995), pp. 253–271. [38] U. F. Mayer , A numerical scheme for moving boundary problems that are gradient flows for the area functional, Eur. J. Appl. Math., 11 (2000), pp. 61–80. [39] B. Merriman, J. K. Bence, and S. J. Osher , Motion of multiple junctions: A level set approach, J. Comput. Phys., 112 (1994), pp. 343–363. [40] W. W. Mullins and R. F. Sekerka , Morphological stability of a particle growing by diffusion or heat flow, J. Appl. Phys., 34 (1963), pp. 323–329. [41] K. Murota , Comparison of conventional and “invariant” schemes of fundamental solutions method for annular domains, Japan J. Ind. Appl. Math., 12 (1995), pp. 61–85. [42] R. N¨ urnberg , A structure preserving front tracking finite element method for the Mullins-Sekerka problem, J. Numer. Math., 31 (2023), pp. 137–155. [43] R. L. Pego , Front migration in the nonlinear Cahn-Hilliard equation, Proc. R. Soc. Lond., Ser. A, 422 (1989), pp. 261–278. [44] M. R¨ oger , Existence of weak solutions for the Mullins–Sekerka flow, SIAM J. Math. Anal., 37 (2005), pp. 291–301. [45] K. Sakakibara and S. Yazaki , Structure-preserving numerical scheme for the one-phase hele-shaw problems by the method of fundamental solutions, Computational and Mathematical Methods, 1 (2019). [46] R. I. Saye and J. A. Sethian , The Voronoi implicit interface method for computing multiphase physics, Proc. Natl. Acad. Sci. USA, 108 (2011), pp. 19498–19503. [47] B. E. E. Stoth , Convergence of the Cahn-Hilliard equation to the Mullins-Sekerka problem in spherical symmetry, J. Differ. Equations, 125 (1996), pp. 154–183. [48] H.-K. Zhao, T. Chan, B. Merriman, and S. Osher , A variational level set approach to multiphase motion, J. Comput. Phys., 127 (1996), pp. 179–195. [49] J. Zhu, X. Chen, and T. Y. Hou , An efficient boundary integral method for the Mullins-Sekerka problem, J. Comput. Phys., 127 (1996), pp. 246–267. 40

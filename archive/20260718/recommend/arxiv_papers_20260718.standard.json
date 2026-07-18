@@ -1,0 +1,52 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-18T19:54:18.401496+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 11,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.12759v1",
+      "source": "arxiv",
+      "title": "A Mesh-Free Solver for Multi-Phase Mullins-Sekerka Flow: Triple Junctions and Ninety-Degree Boundary Contact",
+      "abstract": "A bulk mesh-free solver for the multi-phase Mullins--Sekerka flow in $\\mathbb R^2$ and in a half-plane bounded by a Neumann wall is developed. In the underlying mathematical model, interfaces driven by their curvature are coupled through a harmonic chemical-potential field. We use a charge simulation method, a variant of the method of fundamental solutions: each chemical potential is represented by fundamental solutions centered at charge points off the curve, so no bulk mesh or singular integral is required. It treats curve networks separating several phases at triple junctions, including phases that occupy more than one region; on the half-plane boundary the no-flux condition is imposed exactly by image charges, and mobile contacts stay orthogonal to the wall. The discretization is structure-preserving: between topological events, every bounded phase area is conserved to machine precision at the velocity level by a null-space projection of the discrete area constraints. The junction connectivity is fixed, the only topological event being the disappearance of a region enclosed by a single closed curve and incident to no junction. The proposed scheme is validated against an exact three-concentric-circle solution in terms of convergence, cost, and conditioning.",
+      "authors": [
+        "Tokuhiro Eto"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "math.AP"
+      ],
+      "published": "2026-07-14T13:25:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.12759v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "develops a mesh-free solver for multi-phase flow with interfaces, using charge simulation method",
+      "llm_evidence_cn": "开发了一种用于多相界面流动的无网格求解器，基于电荷模拟法",
+      "llm_evidence": "开发了一种用于多相界面流动的无网格求解器，基于电荷模拟法",
+      "canonical_evidence": "开发了一种用于多相界面流动的无网格求解器，基于电荷模拟法",
+      "llm_tldr_en": "This work presents a mesh-free solver for multi-phase Mullins-Sekerka flow, capable of handling triple junctions and Neumann wall boundaries without bulk meshing. The charge simulation method represents chemical potentials, enabling efficient interface evolution simulations.",
+      "llm_tldr_cn": "针对多相Mullins-Sekerka流动中界面演化的网格生成难题，本文提出了一种无网格求解器。该方法基于电荷模拟法，将化学势用曲线外的点源表示，避免了体网格和奇异积分。求解器可处理三相点网络和Neumann壁面边界，通过镜像电荷精确施加无通量条件。该工作为多相界面动力学提供了一种灵活且高效的计算工具。",
+      "llm_tldr": "针对多相Mullins-Sekerka流动中界面演化的网格生成难题，本文提出了一种无网格求解器。该方法基于电荷模拟法，将化学势用曲线外的点源表示，避免了体网格和奇异积分。求解器可处理三相点网络和Neumann壁面边界，通过镜像电荷精确施加无通量条件。该工作为多相界面动力学提供了一种灵活且高效的计算工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}
