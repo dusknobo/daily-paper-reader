@@ -1,0 +1,89 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-19T21:11:55.586598+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.12116v1",
+      "source": "arxiv",
+      "title": "Body-fitted tracking of 2d open curves with a level set based mesh evolution method",
+      "abstract": "This article describes a novel numerical algorithm for tracking the motion of a collection of open curves in two space dimensions. The proposed strategy combines two complementary representations of these curves at each iteration of the evolution process: on the one hand, they are meshed explicitly, as a sub-collection of the entities of a mesh of the total computational domain. Concurrently, using a variant of the Level Set Method, they are captured implicitly as algebraic combinations of the negative, zero and positive subsets of two auxiliary scalar functions, defined on the whole ambient space. This coupling of representations allows to perform accurate geometric or mechanical computations on these curves, while leaving room for large evolution of their shape. After the description of its main numerical ingredients, several applications examples of this methodology are proposed, where it is used to simulate the motion of open physical discontinuities, such as a vortex sheet roll-up, and to optimize the shape of open-ended curves, e.g. with respect to their anisotropic length, with the aim to improve the trajectory of a laser acting on a powder bed in the context of additive manufacturing, or to reconstruct fracture sets.",
+      "authors": [
+        "Charles Dapogny"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "math.NA"
+      ],
+      "published": "2026-07-13T19:46:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.12116v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Level set and mesh evolution method tracks open curves, applicable to simulating falling film free surface",
+      "llm_evidence_cn": "水平集与网格演化方法跟踪开曲线，可用于模拟降膜自由表面",
+      "llm_evidence": "水平集与网格演化方法跟踪开曲线，可用于模拟降膜自由表面",
+      "canonical_evidence": "水平集与网格演化方法跟踪开曲线，可用于模拟降膜自由表面",
+      "llm_tldr_en": "A novel algorithm combines explicit meshing and level set representation to track open curves in 2D, enabling accurate interface evolution for applications like falling film simulations.",
+      "llm_tldr_cn": "该论文解决开放曲线在大变形运动中精确跟踪的难题，提出一种将显式网格与水平集隐性捕捉相结合的数值算法。算法在二维空间中通过耦合两种表示，实现对开放曲线的贴体跟踪，同时允许拓扑变化。实验表明该方法能精确执行几何与力学计算，为降膜流动自由液面演变等CFD模拟提供了有效的界面追踪工具。",
+      "llm_tldr": "该论文解决开放曲线在大变形运动中精确跟踪的难题，提出一种将显式网格与水平集隐性捕捉相结合的数值算法。算法在二维空间中通过耦合两种表示，实现对开放曲线的贴体跟踪，同时允许拓扑变化。实验表明该方法能精确执行几何与力学计算，为降膜流动自由液面演变等CFD模拟提供了有效的界面追踪工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.14808v1",
+      "source": "arxiv",
+      "title": "An unfitted boundary algebraic equation method with static-dynamic reduction for evolving implicit geometries",
+      "abstract": "Repeated elliptic solves on domains with evolving boundaries arise in moving-interface simulation, design, and reactive navigation. Even when a fixed Cartesian grid avoids remeshing, rebuilding all boundary interactions for every configuration can limit the efficiency of repeated solves. We develop a static--dynamic boundary reduction for an unfitted lattice Green's function method on prescribed moving planar domains. Like boundary integral and boundary element methods, the formulation reduces the problem to boundary-supported unknowns through a Green representation. Its construction, however, reverses the usual order: the Cartesian operator is discretized before the Green representation is formed, rather than representing the continuous problem first and then discretizing the boundary. This discretize-then-represent viewpoint avoids boundary meshes and singular quadrature. The method also separates interactions associated with stationary geometry from those affected by motion, reuses the invariant part throughout a simulation, and updates only couplings involving the changing boundary. Boundary conditions are imposed at true interface intersections, lattice-kernel data are reused, and the interior field is reconstructed by a fast sine-transform solver. The principal contribution is an implemented and validated update strategy for translating, deforming, appearing, and topology-changing obstacles.",
+      "authors": [
+        "Yizhen Huang",
+        "Qing Xia"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-16T10:26:44+00:00",
+      "link": "https://arxiv.org/pdf/2607.14808v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "evolving boundaries moving-interface simulation",
+      "llm_evidence_cn": "移动边界与移动界面模拟",
+      "llm_evidence": "移动边界与移动界面模拟",
+      "canonical_evidence": "移动边界与移动界面模拟",
+      "llm_tldr_en": "Presents a static-dynamic boundary reduction method for unfitted lattice Green's function solves on evolving domains, enabling efficient repeated elliptic solves in moving-interface simulations like multiphase flows.",
+      "llm_tldr_cn": "针对移动界面模拟中重复求解椭圆方程的效率问题，提出一种非拟合边界代数方程方法的动静缩减技术。该方法将问题转化为边界未知量，避免重构网格，能够高效处理演化几何区域，对降膜等两相流CFD模拟具有潜在应用价值。",
+      "llm_tldr": "针对移动界面模拟中重复求解椭圆方程的效率问题，提出一种非拟合边界代数方程方法的动静缩减技术。该方法将问题转化为边界未知量，避免重构网格，能够高效处理演化几何区域，对降膜等两相流CFD模拟具有潜在应用价值。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

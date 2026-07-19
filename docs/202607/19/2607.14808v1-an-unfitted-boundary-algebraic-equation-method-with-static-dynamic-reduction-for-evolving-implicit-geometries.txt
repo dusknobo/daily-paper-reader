@@ -1,0 +1,1207 @@
+Title: An unfitted boundary algebraic equation method with static-dynamic reduction for evolving implicit geometries
+
+URL Source: https://arxiv.org/pdf/2607.14808v1
+
+Published Time: Fri, 17 Jul 2026 01:30:25 GMT
+
+Number of Pages: 27
+
+Markdown Content:
+# An unfitted boundary algebraic equation method with static-dynamic reduction for evolving implicit geometries 
+
+Yizhen Huang 1 Qing Xia 1,2 ∗
+
+> 1
+
+College of Science, Mathematics and Technology, Wenzhou-Kean University, Wenzhou 325060, Zhejiang, China 
+
+> 2
+
+International Frontier Interdisciplinary Research Institute, Wenzhou-Kean University, Wenzhou 325060, Zhejiang, China 
+
+Abstract 
+
+Repeated elliptic solves on domains with evolving boundaries arise in moving-interface simulation, design, and reactive navigation. Even when a fixed Cartesian grid avoids remeshing, rebuilding all boundary interactions for every configuration can limit the efficiency of repeated solves. We develop a static–dynamic boundary reduction for an unfitted lattice Green’s function method on prescribed moving planar domains. Like boundary integral and boundary element methods, the formulation reduces the problem to boundary-supported unknowns through a Green representation. Its construction, however, reverses the usual order: the Cartesian operator is discretized before the Green representation is formed, rather than representing the continuous problem first and then discretizing the boundary. This discretize-then-represent viewpoint avoids boundary meshes and singular quadrature. The method also separates interactions associated with stationary geometry from those affected by motion, reuses the invariant part throughout a simulation, and updates only couplings involving the changing boundary. Boundary conditions are imposed at true interface intersections, lattice-kernel data are reused, and the interior field is reconstructed by a fast sine-transform solver. The principal contribution is an implemented and validated update strategy for translating, deforming, appearing, and topology-changing obstacles. 
+
+Keywords: difference potentials; lattice Green’s functions; unfitted methods; moving-boundary Laplace problems; harmonic navigation; fast Poisson solvers 
+
+## 1 Introduction 
+
+Solving an elliptic boundary value problem on a domain whose boundary is complicated, known only implicitly, and—most consequentially— changing in time is a recurring computational task in numerical analysis [ 21 , 24 ]. Free-boundary and moving-interface problems, fluid–structure interaction, and reactive navigation all require an elliptic solve to be repeated as the geometry evolves [ 2 , 6, 18 ]. Body-fitted methods can be effective for moderate boundary motion, for example through mesh deformation or arbitrary Lagrangian–Eulerian techniques [ 7 , 31 ], but large deformation, topology change, or newly appearing obstacles may require remeshing and repeated operator assembly [ 24 , 30 ]. In that regime the geometry update can become a substantial part of the total cost. This paper develops an unfitted method for a sequence of steady Laplace problems on prescribed moving implicit domains. It does not solve a coupled free-boundary evolution problem: the geometry at each frame is supplied to the elliptic solver. The driving application— which motivates the boundary conditions, the accuracy metric, and the dynamic experiments—is 
+
+> ∗Corresponding author: qxia@kean.edu
+
+1arXiv:2607.14808v1 [math.NA] 16 Jul 2026 dynamic harmonic path planning . Given a free region Ωfree bounded by obstacles, one solves Laplace’s equation with the goal held at a low Dirichlet value and the obstacle and outer boundaries held at a high Dirichlet value; the resulting potential u is harmonic, and by the maximum principle it has no interior local minima, so the descent flow of −∇ u reaches the goal from almost every starting point [ 5, 6, 18 , 27 ]. This local-minimum-free guarantee is the defining advantage of harmonic fields over the heuristic superposition of attractive and repulsive potentials [ 17 ], which can stall at spurious minima. When obstacles move, the field must be 
+
+re-solved , and the efficiency of that re-solve is exactly the moving-geometry question above. The LGF-BAE discretization separates reusable grid, kernel, and reconstruction data from boundary-local data changed by motion. The directly assembled density matrix admits a corresponding block partition; Section 4 states precisely which block is invariant. We solve the harmonic boundary value problem on a fixed Cartesian grid with an unfitted boundary algebraic equation (BAE) method built on lattice Green’s function (LGF) and difference-potentials ideas [ 26 , 28 , 33 ]. Like boundary integral and boundary element methods, LGF-BAE replaces a volumetric system by boundary-supported unknowns connected through a Green representation. The essential difference is the order of construction. Classical boundary integral and boundary element formulations first represent the continuous solution and then discretize the resulting boundary equation [ 3, 15 ]; they are represent-then-discretize methods. LGF-BAE first discretizes the elliptic operator on the Cartesian lattice and then uses the lattice Green’s function and a discrete Green identity to obtain the boundary representation; it is a discretize-then-represent method. This ordering removes the need for a body-fitted boundary mesh and singular boundary quadrature. The resulting solution is a discrete layer potential supported on boundary-adjacent exterior grid points. Compactly supported local basis functions enforce Dirichlet data at the true boundary–grid intersections. This construction belongs to the broader family of fixed-background-grid methods, including immersed interface method [ 22 ], immersed boundary method [ 25 ], kernel-free boundary integral method [ 34 –36 ] and CutFEM [ 4 ] discretizations; level-set methodology is reviewed in [ 11 ]. CutFEM provides a flexible variational framework and handles complex interfaces, but moving cut cells generally require updated interface quadrature and stabilization data. In the present LGF-BAE setting, motion changes boundary intersections, local interpolation weights, and the coupled boundary blocks, while the Cartesian operator, tabulated Green’s function, and sine-transform reconstruction remain unchanged. This narrower elliptic setting therefore exposes unusually direct reuse under geometry motion, at the cost of dense boundary interactions unless local assembly or compression is used. Closely related Cartesian-grid boundary-integral methods use fast box solvers to evaluate boundary operators for moving-interface problems and couple those solves to the interface evolution [ 37 ]; an earlier level-set/boundary-integral method likewise accommodates moving boundaries and topology change [ 10 ]. Our narrower setting uses an exact lattice kernel and table lookup for repeated prescribed-geometry Dirichlet solves, rather than evolving the interface from the PDE solution. The harmonic-navigation model is classical and is used here as a demanding application of a repeated Laplace solve. The underlying difference-potentials discretization also builds on earlier work [1, 26, 28, 33]. The contributions of the present paper are the following. 1. Moving-geometry algebraic organization. We separate the boundary algebraic data into stationary and geometry-dependent components and identify which blocks of the directly assembled density matrix change when an implicit obstacle moves. 2. Static-block Schur complement. For the density matrix, we derive a Schur reduction whose static block can be factored once when the static boundary neighborhood and ordering remain fixed. We also show why the global inverse in the trace formulation invalidates an unqualified static-block reuse claim. The implemented update caches the fixed collocation stencils and Bss factorization and assembles only the dynamic-coupled 2blocks on later frames. 3. Gradient-sensitive verification. We verify potential, gradient-magnitude, and gradient-angle errors over the full interior, a fixed physical bulk, and the first two interior grid layers, because path extraction is controlled by −∇ hu/ ∥∇ hu∥ rather than by the potential alone. 4. Evolving-geometry validation. The cached update is tested under translation and a merge–split–merge topology change, including a case with up to 23% dynamic unknowns. Additional demonstrations cover moving, deforming, appearing, and topology-changing obstacles without remeshing. The remainder of the paper is organized as follows. Section 2 states the harmonic boundary value problem and explains why gradient accuracy is the right verification metric. Section 3 presents the fixed-geometry LGF-BAE discretization. Section 4 develops the moving-geometry static/dynamic decomposition and presents the full-trace and cached block-update algorithms separately. Section 5 discusses solvability, consistency, conditioning, complexity and re-solve cost, and establishes the algebraic equivalence of the block reduction and the full density solve (Section 5.6). Section 6 presents the convergence, same-grid equivalence, and performance experiments. Section 7 gives the dynamic planning experiments, including the path-extraction procedure used there. Section 8 compares the method with fast marching and sampling-based planning, discusses limitations, and outlines extensions. Section 9 concludes. 
+
+## 2 Model problem: the harmonic navigation field 
+
+2.1 Free space and the boundary value problem 
+
+Let D ⊂ R2 be a bounded outer domain, let O1(t), . . . , Om(t) ⊂ D be closed obstacle regions, and let G ⊂ D be a fixed closed goal region. The obstacles are described implicitly by level-set functions ϕk(x, t ) [24 ], with Ok(t) = {ϕk(x, t ) ≤ 0}. See Figure 1 for an illustration. The goal is also treated as an interior boundary, Γgoal = ∂G , rather than as a point constraint. At each time t the computational free space is 
+
+Ωfree (t) = D \
+
+> (
+
+G ∪
+
+> m⋃
+> k=1
+
+Ok(t)
+
+> )
+
+, ∂Ωfree (t) = Γ goal ∪ Γobs (t) ∪ Γout , (2.1) where Γobs (t) = ⋃ 
+
+> k
+
+∂Ok(t) and Γout = ∂D . The obstacles need not be convex or simply connected and may be added, removed, translated, or deformed by updating their level-set functions. A composite level set, for instance 
+
+Ψ( x, t ) = max (ψout (x), −ϕG(x), −ϕ1(x, t ), . . . , −ϕm(x, t )), (2.2) encodes the instantaneous free space as {Ψ ≤ 0}. This implicit representation is what allows the geometry to move without remeshing. We seek a harmonic navigation field u(·, t ) : Ω free (t) → R satisfying 
+
+∆u = 0 in Ωfree (t), (2.3a) 
+
+u = 0 on Γgoal , (2.3b) 
+
+u = 1 on Γobs (t) ∪ Γout . (2.3c) For a fixed time t, the strong maximum principle gives 0 < u < 1 in Ωfree (t), with no interior local extrema. In the dynamic setting the same boundary value problem is solved repeatedly on the instantaneous domain Ωfree (t). In the fixed-time discretization and analysis below, we suppress the time variable and write Ωfree for the instantaneous computational domain. 3Ok
+
+> G
+> Ωfree
+> Γobs
+> Γgoal
+> Γout
+
+Figure 1: Computational geometry: a fixed outer boundary encloses the free space, moving obstacles, and the interior goal boundary. The harmonic field is zero on the goal and one on the obstacle and outer boundaries. 
+
+2.2 Why gradient accuracy is the relevant metric 
+
+The planned trajectory is the integral curve of the normalized descent field, 
+
+˙x(t) = − ∇u(x(t)) 
+
+∥∇ u(x(t)) ∥ , x(0) = xs, (2.4) terminating on entry to G. The following classical fact motivates the analysis target of Sections 5 and 6. We assume Ωfree ⊂ R2 is bounded, open, and connected, with ∂Ωfree = Γ goal ∪ Γobs ∪ Γout and 
+
+Γgoal = ∂G of class C2 (an interior-ball condition at Γgoal suffices). Let u ∈ C(Ω free ) ∩ C∞(Ω free )
+
+be the harmonic solution of (2.3) ; near Γgoal we have u ∈ C1. Since the Dirichlet data take the two distinct values 0 and 1, u is nonconstant. The continuous harmonic navigation field has no interior local minima by the maximum principle. Its isolated interior critical points are saddles, and only a measure-zero set of initial conditions terminates at such saddles. Hence the continuous model is locally-minimum-free for almost every starting point. In the discrete setting, however, the computed trajectory is controlled by the reconstructed field ∇hu. This makes gradient accuracy, especially near unfitted boundaries, a central numerical requirement. These are continuous statements; they do not provide an arrival or collision-avoidance guarantee for a finite-step NAG trajectory based on an interpolated discrete gradient. 
+
+## 3 The unfitted lattice Green’s function method 
+
+We first summarize the fixed-geometry LGF-BAE discretization of the local-basis difference-potentials method [ 33 ]. The moving-geometry decomposition, the methodological core of this paper, is developed separately in Section 4. 
+
+3.1 Grid and boundary neighborhood 
+
+The free space is embedded in the Cartesian grid hZ2. Grid points are classified as interior 
+
+M + = hZ2 ∩ Ωfree and exterior M − = hZ2 \ M +. With the five-point stencil N 5
+
+> jk
+
+, set N ± =
+
+{N 5 
+
+> jk
+
+: ( xj , y k) ∈ M ±}. The discrete boundary neighborhood is the stencil overlap γ = N + ∩ N −,split as γ+ = γ ∩ M + and γ− = γ \ γ+. Layer densities live on γ−; the induced potential is evaluated on γ+ and throughout M +. This classification (in addition to boundary intersection 4points) is the only geometry-dependent data; the grid is fixed. The square and triangular markers in Figure 2 show the two sides of this discrete boundary neighborhood. 
+
+Figure 2: Classification of Cartesian grid points into γ+ (squares) and γ− (triangles) near an unfitted boundary. 
+
+3.2 Lattice Green’s function 
+
+The lattice Green’s function (LGF) is the fundamental solution of the discrete Laplacian on the infinite grid, and it plays the role for the discrete operator that the free-space kernel −(2 π)−1 log r
+
+plays in classical potential theory. With the (unscaled) five-point operator 
+
+[Au ]( m) = 4 u(m) − u(m + e1) − u(m − e1) − u(m + e2) − u(m − e2), m ∈ Z2, (3.1) 
+
+e1 = (1 , 0) , e2 = (0 , 1) , the LGF G is defined by 
+
+AG = δ0, δ0(m) = 
+
+> {
+
+1, m = (0 , 0) ,
+
+0, m̸ = (0 , 0) . (3.2) Diagonalizing A by the Fourier transform on Z2 gives the formal representation 
+
+> ˜
+
+G(m) = 1(2 π)2  
+
+> ∫π
+> −π
+> ∫π
+> −π
+
+cos( ξ1m1 + ξ2m2)4 − 2 cos ξ1 − 2 cos ξ2
+
+dξ 1 dξ 2, (3.3) whose symbol 4−2 cos ξ1 −2 cos ξ2 vanishes at ξ = 0 . The resulting zero Fourier mode makes (3.3) divergent—a reflection of the fact that A annihilates constants and therefore has no finite-energy inverse on the whole lattice. The method instead uses the normalized kernel 
+
+G(m) = 1(2 π)2  
+
+> ∫π
+> −π
+> ∫π
+> −π
+
+cos( ξ1m1 + ξ2m2) − 14 − 2 cos ξ1 − 2 cos ξ2
+
+dξ 1 dξ 2, (3.4) in which subtracting 1 in the numerator cancels the constant mode and renders the integral convergent [ 12 , 23 ]. The additive constant is fixed by the normalization G(0) = 0 , and this same normalized kernel is used consistently in all layer-potential and boundary operators below. The normalized kernel takes the exact values 
+
+G(0 , 0) = 0 , G(±1, 0) = G(0 , ±1) = − 14 , G(±1, ±1) = − 1 
+
+> π
+
+, (3.5) and is evaluated in two regimes. For small |m| the double integral eq. (3.4) is reduced to a stable one-dimensional integral and evaluated once by quadrature. For large |m| it is replaced by the 5asymptotic expansion [23] 
+
+G(m) = − 12π
+
+> (
+
+log |m| + γE + log 8 2
+
+> )
+
++ cos(4 θ)24 π|m|2 + 25 cos(8 θ) + 18 cos(4 θ)480 π|m|4
+
++ 490 cos(12 θ) + 459 cos(8 θ)2016 π|m|6 + O(|m|−8), θ = atan2( m2, m 1),
+
+(3.6) whose leading term recovers the continuous Green’s function −(2 π)−1 log |m| up to the lattice constant γE + 12 log 8 (γE the Euler–Mascheroni constant), and whose angular corrections encode the O(h2) anisotropy of the five-point stencil. In the implementation, quadrature is used for 
+
+|m| ≤ 30 and the displayed asymptotic formula for |m| > 30 . The switch is an implementation choice; no claim of full-double-precision agreement at the crossover is made without a separate kernel-error study. A single tabulation is reused by every geometry. Two consequences of (3.5) and (3.6) are central to the method. First, unlike the continuous kernel, G is finite at the origin : the discrete layer potentials built from G never produce the singular or near-singular integrands of classical boundary integral equations, so all kernel interactions are exact finite table values and no special-purpose singular quadrature is required. Second, G depends only on the offset m − n between two grid points, so its values are tabulated 
+
+once for every offset vector that can occur within the auxiliary computational box. As the geometry moves, new boundary pairs reuse existing table entries rather than triggering fresh kernel evaluations—the property that makes the per-frame re-solve of Section 4 cheap. 
+
+3.3 Layer potentials and the boundary algebraic relation 
+
+The solution in M + is a discrete single-layer potential supported on γ−,
+
+u(m) = ∑
+
+> n∈γ−
+
+G(m − n) q(n), m ∈ M +, (3.7) which satisfies Au = 0 throughout M + exactly because the sources lie outside. Restricting to the boundary sets gives uγ− = S−q, uγ+ = S+q with S− ∈ R|γ−|×| γ−|, and hence the boundary algebraic relation uγ+ = S+S−1 
+
+> −
+
+uγ− , the discrete analogue of a boundary integral equation. (A double-layer variant with second-kind, mesh-independent conditioning is available [ 33 ]; we use the single-layer kernel, which is always well defined, and report its conditioning in Section 5.) 
+
+3.4 Dirichlet closure by local basis functions 
+
+The physical condition u = g holds on the true boundary Γ, not on grid points. For each γ−
+
+point we select one nearby boundary intersection xi ∈ Γ (the closest grid-line crossing, found by Newton iteration with a bracketed fallback), giving a square set of collocation equations. The implementation selects a 3 × 3 stencil for each intersection and evaluates tensor-product quadratic ( Q2) Lagrange basis functions ϕjk . When a stencil requires points outside the original boundary neighborhood, the trace is extended to those points by a second-order cardinal-direction extrapolation. In operator form,  
+
+> ∑
+> xjk ∈γ
+
+ujk ϕjk (xi) = g(xi) = ⇒ P+uγ+ + P−uγ− = g, (3.8) where P+ and P− include the local collocation and extrapolation maps. Substituting eq. (3.7) yields the square density system 
+
+Bq = ( P+S+ + P−S−) q = g, (3.9) of size |γ−| × | γ−|. Using exactly one intersection per γ− point (rather than a least-squares closure) preserves a square boundary algebraic system with the same number of equations and 6density unknowns. Although the local interpolant is quadratic, the implemented five-point scheme and extrapolation are used as a globally second-order method. The local-basis construction and its treatment of small cuts are inherited from [ 33 ]; no additional small-cut stabilization is introduced here. 
+
+3.5 Interior reconstruction and gradient 
+
+Direct evaluation of eq. (3.7) at every interior point would cost O(|γ−| | M +|). The interior field is instead recovered by the difference-potentials route, which trades this dense sum for a single fast Poisson solve on a regular box. Embed Ωfree in a rectangular auxiliary box Ω0 ⊃ Ωfree and form the grid function that carries the computed boundary-neighborhood trace and vanishes elsewhere, 
+
+v(m) = 
+
+> {
+
+uγ (m), m ∈ γ, 
+
+0, otherwise , (3.10) where uγ = ( uγ+ , u γ− ) is supplied by the layer potential. Solve the auxiliary problem 
+
+[Aw ]( m) = 
+
+> {
+
+0, m ∈ M +,
+
+[Av ]( m), m ∈ M −, w = 0 on ∂Ω0, (3.11) with homogeneous Dirichlet data on the finite auxiliary box. The code diagonalizes the five-point operator by a two-dimensional type-I discrete sine transform; the transform is implemented through FFTs of length 2( Ng +1) in each direction, where Ng denotes the number of grid points in one coordinate direction of the auxiliary box. This is a finite-box Dirichlet inverse. A free-space convolution obtained by padding the physical field is also viable. Then w is discrete-harmonic on 
+
+M + and matches the trace, Tr γ w = uγ (from Difference Potentials Theory [ 28 ]), so w reproduces the interior field at every point of M + in O(N 2 
+
+> g
+
+log Ng) work, independent of the geometry and of |γ−|. This is the same sine-transform solver at every frame, regardless of how the obstacles move. The gradient at interior grid points is formed by second-order centered differences. Because the layer-potential representation supplies values at all points of γ±, the centered stencil is well defined everywhere in M + with no one-sided or least-squares cut-cell reconstruction—a structural advantage for the gradient accuracy. Off-grid gradients are bilinearly interpolated. Near an unfitted boundary, this interpolation can mix nodal gradients from different sides of the mask; the centered nodal stencil therefore does not by itself imply a uniformly second-order off-grid gradient. The overall computational pipeline is summarized by the following operator-level schematic, which emphasizes the structural separation between geometry processing, boundary algebra, and sine-transform reconstruction: Level set Ψ −→ (M +, M −, γ +, γ −)
+
+−→ boundary intersections and P ±
+
+−→ (P +S+ + P −S−)q = g
+
+−→ uγ −→ sine-transform reconstruction −→ u, ∇hu. 
+
+(3.12) 
+
+## 4 Moving-geometry decomposition and block reduction 
+
+Stationary geometry contributes reusable grid, kernel, and reconstruction data, whereas moving obstacles change the boundary neighborhood swept by their level sets. We use two complete re-solve workflows. Algorithm 1 recomputes and solves the full trace system at every geometry. Algorithm 2 works with the density system, separates its unknowns into static and dynamic sets, and reuses one factorization of the invariant static block. Both algorithms produce the same 7discrete Dirichlet solution; they differ in what is assembled and factored when the geometry changes. 
+
+4.1 Algorithm 1: full-trace recomputation 
+
+For the geometry at time t, define the density matrix 
+
+B(t) := P+(t)S+(t) + P−(t)S−(t), B(t)q(t) = g(t). (4.1) The trace unknown y(t) = uγ− (t) = S−(t)q(t) gives the equivalent system 
+
+C(t)y(t) = (P+(t)S+(t)S−1 
+
+> −
+
+(t) + P−(t))y(t) = g(t), C(t) = B(t)S−1 
+
+> −
+
+(t). (4.2) The factor S−1 
+
+> −
+
+(t) acts as a right preconditioner, so C(t) is the better-conditioned system in the present tests. Its construction contains the inverse of a geometry-dependent global layer matrix, however, and therefore does not expose a static subblock that can be reused without additional analysis. Algorithm 1 consequently rebuilds the complete trace system for every frame. 
+
+Algorithm 1 Full-trace recomputation for one geometry. 
+
+Require: Updated obstacle level sets ϕk(·, t ). 
+
+> 1:
+
+Reclassify M ±(t) and γ±(t) and compute the current boundary–grid intersections.  
+
+> 2:
+
+Assemble the interpolation operators P±(t) and layer matrices S±(t). 
+
+> 3:
+
+Form the full trace matrix C(t) in eq. (4.2) and the boundary-data vector g(t). 
+
+> 4:
+
+Solve C(t)y(t) = g(t) and recover q(t) = S−1 
+
+> −
+
+(t)y(t). 
+
+> 5:
+
+Evaluate the layer trace, reconstruct u(t) by the sine-transform difference-potential solve, and form ∇hu(t). 
+
+> 6:
+
+return u(t) and ∇hu(t).This workflow is geometry-general and provides the reference solution in the moving-domain comparisons. Because it assembles S±(t) and C(t) anew, it does not attempt to reuse boundary algebra from the preceding frame. 
+
+4.2 Algorithm 2: cached static–dynamic block update 
+
+To reuse the fixed part of the boundary algebra, partition the current density unknowns using a prescribed envelope of every possible moving obstacle: 
+
+γ−(t) = γ− 
+
+> s
+
+∪ γ− 
+
+> d
+
+(t), γ− 
+
+> s
+
+∩ γ− 
+
+> d
+
+(t) = ∅. (4.3) The static set contains unknowns whose collocation stencils belong only to permanently fixed boundaries, such as the outer boundary and the goal. The dynamic set contains the current γ−
+
+points inside the swept obstacle envelope, so its membership and size may change with t. We assume that the swept envelope does not intersect a fixed-boundary interpolation neighborhood and that the static coordinates and their ordering remain unchanged across frames. With the ordering in eq. (4.3), the density system becomes 
+
+> [
+
+Bss Bsd (t)
+
+Bds (t) Bdd (t)
+
+> ] [
+
+qs
+
+qd
+
+> ]
+
+=
+
+> [
+
+gs
+
+gd(t)
+
+> ]
+
+. (4.4) Here Bss is invariant because both its collocation rows and its density-source columns are attached to fixed boundaries. Eliminating qs gives 
+
+> (
+
+Bdd − Bds B−1ss Bsd 
+
+> )
+
+qd = gd − Bds B−1ss gs, (4.5) 8followed by qs = B−1ss (gs − Bsd qd). The LU factorization of Bss is computed only on the first frame. If ns = |γ− 
+
+> s
+
+| and nd(t) = |γ− 
+
+> d
+
+(t)|, the subsequent dense block construction and solve cost 
+
+O(n2s nd + nsn2d + n3d). (4.6) The dynamic fraction controls the reduction, but the speedup is not a simple cubic factor (n/n d)3
+
+because the dynamic variables remain densely coupled to all static variables. 
+
+Algorithm 2 Cached static–dynamic block update. 
+
+One-time initialization  
+
+> 1:
+
+Tabulate the lattice Green’s function and initialize the sine-transform reconstruction solver.  
+
+> 2:
+
+Prescribe the swept obstacle envelope and the static/dynamic ordering.  
+
+> 3:
+
+On the first frame, cache the static coordinates and collocation stencils; assemble and factor 
+
+Bss .
+
+Update at time t
+
+Require: Updated obstacle level sets ϕk(·, t ). 
+
+> 4:
+
+Rebuild the current classification, intersections, and local collocation data, and verify the static coordinate set.  
+
+> 5:
+
+Assemble Bsd (t), Bds (t), Bdd (t), and the current right-hand side; do not assemble C(t). 
+
+> 6:
+
+Apply the cached LU factors in eq. (4.5), solve for qd(t), and recover qs(t). 
+
+> 7:
+
+Evaluate the layer trace, reconstruct u(t) by the sine-transform difference-potential solve, and form ∇hu(t). 
+
+> 8:
+
+return u(t) and ∇hu(t).The cache/update split used by the implementation is summarized in Table 1: only the right column and the blocks coupled to it are refreshed after initialization. Table 1: Static/dynamic decomposition used by Algorithm 2. The static column is cached once; the dynamic column is refreshed when the obstacle geometry changes. 
+
+Static (precomputed once) Dynamic (recomputed per frame) 
+
+Cartesian grid hZ2 and auxiliary box Boundary classification M ±(t), γ ±(t)
+
+Lattice Green’s function table G(m) Boundary–grid intersections Sine-transform reconstruction solver Moving-boundary interpolation weights Envelope, static coordinates, and ordering Dynamic coordinates inside the envelope Fixed collocation stencils and gs Moving-boundary data gd(t)
+
+Bss and its LU factorization Bsd (t), B ds (t), B dd (t)
+
+4.3 Relationship between the two workflows 
+
+Algorithms 1 and 2 differ only in the boundary solve and its reusable data. Algorithm 1 recomputes the globally preconditioned trace matrix and is used as the full-system reference. Algorithm 2 avoids constructing C(t), reuses the factorization of Bss , and assembles only blocks coupled to the swept obstacle neighborhood. Under the nonsingularity assumptions of Proposition 5.2, the two boundary solutions are algebraically equivalent. The present implementation of Algorithm 2 still rebuilds the full-grid geometry classification, intersections, and local collocation data each frame; the numerical profiling separates this geometry cost from the reduced boundary algebra. 
+
+Remark 4.1 (Receding-horizon use) . Either workflow can serve a sensing-limited agent: solve the field on the currently known free space, advance the agent, update the obstacle level sets from 
+
+9new observations, and solve again. Algorithm 2 is applicable when a fixed envelope of possible geometry changes is available. 
+
+The numerical results below use Algorithm 1 as the full-system reference and Algorithm 2 for cached moving-geometry updates. They test algebraic equivalence, one-time static factorization, and the remaining per-frame geometry cost. 
+
+## 5 Analysis: solvability, convergence, conditioning, complexity 
+
+This section provides the theoretical underpinning for the method developed in Sections 3 and 4. 
+
+5.1 Solvability 
+
+The density system eq. (3.9) couples three operators on the boundary neighborhood: the single-layer matrices S±, defined by uγ± = S±q for the single-layer potential Sq of eq. (3.7), and the sparse local collocation operators P± of eq. (3.8). We make the underlying discrete Dirichlet problem explicit and then reduce solvability of eq. (3.9) to two transparent conditions. 
+
+Definition 5.1 (Discrete interior Dirichlet problem) . Given boundary data φ on γ−, the discrete-harmonic extension is the grid function w on N + := M + ∪ γ− with (Aw )( m) = 0 for m ∈ M +
+
+and w = φ on γ−, where A is the five-point Laplacian. 
+
+Lemma 5.1 (Discrete maximum principle) . If M + is finite, nonempty, and connected in the grid graph, and (Aw )( m) = 0 for all m ∈ M +, then min γ− w ≤ w(m) ≤ max γ− w for every 
+
+m ∈ M +. In particular the discrete interior Dirichlet problem has a unique solution, and w ≡ 0
+
+on N + whenever φ ≡ 0.Proof. For m ∈ M +, (Aw )( m) = 0 reads w(m) = 14 
+
+> ∑
+> |e|=1
+
+w(m + e): each interior value is the average of its four axis-neighbors, which lie in M + ∪ γ−. Hence w admits no strict interior extremum; if the maximum over M + were attained at some m0 ∈ M +, equality in the average forces the four neighbors to share that value, and connectedness in the grid graph propagates it through M + and to the adjacent points of γ−, so the maximum is also attained on γ−; likewise for the minimum. Uniqueness follows by applying the bound to the difference of two solutions, and the square system then also has existence. Thus the five-point interior operator supplies a discrete analogue of the continuous maximum principle: nodal values cannot create a strict interior extremum. This statement does not, by itself, control extrema of the off-grid interpolant or guarantee that a numerically integrated trajectory avoids all discrete critical points. By lemma 5.1 the extension is well defined; let E : Rγ−
+
+→ Rγ+
+
+return its values on γ+, i.e. 
+
+wγ+ = Eφ , and define the Dirichlet collocation operator 
+
+C := P+E + P− ∈ R|γ−|×| γ−|.
+
+Proposition 5.1 (Solvability of the density system) . Assume (H1) each γ− point is assigned exactly one boundary intersection lying on a Cartesian grid edge having that point as an endpoint, as constructed by the edge-based Newton search of Section 3.4, so the collocation system is square, and that M + is finite, nonempty, and connected. Then 
+
+P+S+ + P−S− = C S −,
+
+so the density matrix is nonsingular if and only if both C and S− are. In that case eq. (3.9) 
+
+has a unique solution q, and Sq is the unique grid function that is discrete-harmonic on M +
+
+and whose local Q2 interpolant, including the stated extrapolation, matches the data g at the collocation points. 
+
+10 Proof. For any density q, Sq satisfies A(Sq) = q on γ− and A(Sq) = 0 on M +, since the sources lie in γ− ⊂ M −. Thus Sq restricted to N + is discrete-harmonic on M + with γ−-trace S−q; by the uniqueness in lemma 5.1 it coincides with the extension of S−q, so its γ+-values satisfy S+q =
+
+E S −q. As this holds for every q, S+ = ES −, whence P+S+ + P−S− = ( P+E + P−)S− = CS −.Both factors are square of order |γ−|, so det (CS −) = det C det S−, which gives the equivalence. When both are nonsingular q is unique, and C (S−q) = g exhibits Sq as the discrete-harmonic field whose interpolated trace equals g.
+
+Remark 5.1 (Well-posedness versus representation) . The two factors play different roles. Nonsingularity of C is the genuine well-posedness of the discretized boundary value problem: 
+
+C w γ− = g determines the discrete-harmonic field directly from the imposed data, with no reference to a layer density. Nonsingularity of S− is a property of the single-layer representation :a null density q0 with S−q0 = 0 generates, by lemma 5.1, a potential vanishing on N +, hence a gauge mode contributing nothing to the interior field rather than a defect of the field itself. 
+
+Remark 5.2 (Unisolvence of the collocation closure) . Proposition 5.1 is conditional on nonsin-gularity of C and S−. The local-basis difference-potentials analysis in [ 28 , 33 ] gives the relevant consistency and unisolvence framework. In the present paper these conditions are checked numer-ically through the observed conditioning of the assembled systems; a new uniform lower bound for arbitrary moving cut configurations is not claimed. 
+
+5.2 Consistency and observed convergence 
+
+The interior operator is the standard second-order five-point Laplacian, and the Dirichlet closure eq. (3.8) has second-order interpolation error for smooth data. The corresponding second-order convergence of the potential is established for the underlying local-basis difference-potentials method in [ 33 ]. For the reconstructed gradient, centered differencing of a generic second-order nodal approximation does not by itself imply a second-order maximum-norm estimate. We therefore treat gradient accuracy as a numerical verification target rather than a proved result. The manufactured-solution tests in Section 6.3 show near-second-order bulk convergence for the configurations considered here. 
+
+5.3 Conditioning 
+
+The single-layer density formulation becomes increasingly ill-conditioned as the grid is refined, so its conditioning must be checked. Table 2 reports spectral condition numbers at the midpoint geometry of the translating-circle test. The trace matrix remains well conditioned, whereas S−,
+
+B, and Bss grow with refinement. The reduced density-block Schur complement is substantially better conditioned than the full density matrix, although its condition number also grows. Table 2: Spectral conditioning at the midpoint of the translating-circle trajectory. Here SB =
+
+Bdd − Bds B−1ss Bsd .                                                                     
+
+> ℓN2
+> gnκ2(S−)κ2(B)κ2(C)κ2(Bss )κ2(SB)
+> 531 2117 4.61 ×10 27.16 ×10 22.93 4.78 ×10 22.22 ×10 1
+> 663 2245 1.12 ×10 31.78 ×10 32.35 1.64 ×10 35.13 ×10 1
+> 7127 2500 2.60 ×10 35.02 ×10 32.99 4.05 ×10 31.51 ×10 2
+> 8255 21012 5.89 ×10 32.14 ×10 45.46 1.95 ×10 44.14 ×10 2
+
+The relative Frobenius residual in the independently assembled identity B = CS − is at most 
+
+3.82 × 10 −15 across these levels. The largest observed density-block residual in the moving tests is 1.07 × 10 −14 . These results support the present direct solves through ℓ = 8 , but they also motivate a well-conditioned or iteratively preconditioned block formulation at substantially finer resolutions. 11 5.4 Complexity 
+
+Let n = |γ−| = ns + nd and let Ng denote the number of grid points in one coordinate direction of the auxiliary box. Full dense assembly of the density matrix costs O(n2) kernel-table accesses, a dense matrix–vector product or triangular solve costs O(n2), and a direct factorization costs 
+
+O(n3). The sine-transform reconstruction costs O(N 2 
+
+> g
+
+log Ng) in two dimensions. Because n
+
+scales with boundary length rather than domain area, the boundary algebra is attractive for perimeter-limited geometries, although dense assembly is already the measured bottleneck at the present two-dimensional sizes. After the one-time O(n3s ) factorization of Bss , the Schur construction and solve have the per-frame cost stated in eq. (4.6). The implemented block assembler refreshes O(nsnd + n2d)
+
+entries rather than all O(n2) entries. At larger boundary sizes, hierarchical or fast-multipole compression [ 13 , 14 , 23 ] is a natural route for accelerating both matrix construction and matrix– vector products. Kernel compression and a swept-band geometry update are not implemented in the present work. 
+
+5.5 Cost model for geometry motion 
+
+If an obstacle boundary of perimeter P moves by a distance δ, the grid points whose classification or interpolation stencil can change lie in a swept band of area O(P δ ). On a Cartesian grid, the corresponding geometry update involves O(P δ/h 2) grid points, capped by the size of the boundary neighborhood. This locality applies to classification, intersection finding, and interpolation data. The dense boundary algebra is different: each dynamic unknown interacts with all static unknowns, so a block refresh contains 2nsnd + n2d entries. Under rigid translation, nd and the total boundary size are expected to vary only mildly, but position robustness must be assessed numerically rather than inferred from this count alone. 
+
+Remark 5.3. In three dimensions the boundary unknown count grows with surface area and can reach O(10 4) even for moderate grids. Dense factorization and matrix–vector products then become prohibitive. The static-block reduction remains useful when the dynamic surface is a small fraction of the total boundary, but the cross terms in eq. (4.6) remain. Practical three-dimensional performance will therefore require kernel compression and a local geometry update in addition to the implemented block refresh; these extensions are left for future work. 
+
+5.6 Algebraic equivalence of the block reduction 
+
+Proposition 5.2 (Schur equivalence) . Suppose Bss is nonsingular and define SB = Bdd −
+
+Bds B−1ss Bsd . Then the full block matrix in eq. (4.4) is nonsingular if and only if SB is nonsingular. In that case, solving eq. (4.5) and recovering qs gives exactly the solution of the full system in exact arithmetic. Proof. Suppressing the time argument, block elimination gives the factorization 
+
+> [
+
+Bss Bsd 
+
+Bds Bdd 
+
+> ]
+
+=
+
+> [
+
+I 0
+
+Bds B−1ss I
+
+> ] [
+
+Bss Bsd 
+
+0 SB
+
+> ]
+
+.
+
+The first factor is always nonsingular, and the second is nonsingular exactly when both diagonal blocks are nonsingular. Forward substitution in this factorization yields eq. (4.5) and the stated recovery formula. The same-grid experiments in Section 6.5 test this exact algebraic statement on explicitly specified translating and topology-changing geometries. 12 6 Numerical verification and performance 
+
+We organize the numerical study from discretization accuracy to moving-geometry equivalence and performance. We first assess the convergence properties of the LGF-BAE discretization on two complementary geometries: a circular obstacle without re-entrant corners in the free domain, and a cross-shaped obstacle whose convex corners create re-entrant corners in the surrounding free space. Both cases use the domain [−1, 1] 2 with Dirichlet conditions u = 0 at a small goal region and u = 1 on all other boundaries. Self-convergence is measured against an ℓ = 8 reference solution on nested grids. Errors are reported at common grid points more than 3h from any boundary. Because this exclusion distance shrinks with refinement, the resulting gradient orders should be interpreted as mesh-dependent bulk diagnostics rather than uniform interior estimates. We then specify the translating and topology-changing configurations used to test same-grid agreement, re-solve cost, and component-level timing. 
+
+Algorithm assignment. The smooth-geometry, corner-geometry, manufactured-solution, and subgrid-position tests use Algorithm 1. The moving-circle convergence, same-grid agreement, and profiling tests compare Algorithm 1 with Algorithm 2. All dynamic trajectory figures in Sections 7.3 to 7.5 are generated with Algorithm 2. 
+
+6.1 Smooth geometry: circular obstacle 
+
+The first test places a circular obstacle of radius 0.3 centered at the origin, with a goal disk of radius 0.08 at (−0.6, 0) . The obstacle and goal boundaries are smooth and the free domain has no re-entrant corners. The outer boundary remains the square [−1, 1] 2. We expect second-order potential convergence from the discretization; gradient convergence is assessed numerically. The two representative fields are shown side by side in Figure 3, and Table 3 reports the corresponding bulk self-convergence errors. 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+(a) Smooth disk 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00  
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+(b) Cross-shaped obstacle 
+
+Figure 3: Harmonic potential fields ( ℓ = 7 ). Left: circular obstacle with goal at (−0.6, 0) . Right: cross-shaped obstacle near the origin; the convex obstacle corners correspond to re-entrant corners of the free domain. u = 0 at the goal (green), u = 1 on obstacles and outer boundary. As reported in Table 3, the potential exhibits approximately second-order self-convergence. The gradient differences decrease at approximately first order in this experiment, but those slopes are not discretization-order estimates: they compare two discrete gradients over a mesh-dependent exclusion region. The primary gradient order estimate is therefore the exact-error manufactured-solution test in Section 6.3, which gives orders 1.82 –1.95 on the smooth disk. 13 Table 3: Self-convergence on the smooth disk geometry. Reference: ℓ = 8 (h ≈ 0.009 , 255 × 255 
+
+grid). Bulk L∞ errors. 
+
+ℓ h ∥u − u8∥∞ order ∥∇ u − ∇ u8∥∞ order 5 0.072 1.74 × 10 −2 – 9.23 × 10 −2 –6 0.036 2.50 × 10 −3 2.80 4.64 × 10 −2 0.99 7 0.018 6.03 × 10 −4 2.05 2.37 × 10 −2 0.97 
+
+6.2 Corner geometry: cross-shaped obstacle 
+
+The second test uses a cross-shaped obstacle formed by two perpendicular rectangles. Each convex corner of the obstacle is a re-entrant corner of the free domain with local opening angle 
+
+3π/ 2. A reduction of convergence rate is expected. Table 4: Self-convergence with the cross-shaped obstacle. The data are pre-asymptotic and are not used to estimate the corner-singularity exponent. 
+
+ℓ h ∥u − u8∥∞ order ∥∇ u − ∇ u8∥∞ order 5 0.072 8.93 × 10 −3 – 8.60 × 10 −2 –6 0.036 6.43 × 10 −3 0.47 8.59 × 10 −2 0.00 7 0.018 2.33 × 10 −3 1.46 3.82 × 10 −2 1.17 
+
+At ℓ = 5 the thinner bars are represented by only a few cells, and the observed orders vary substantially across refinement levels in Table 4. They show that the method remains stable and that gradient errors are larger than in the circular case. 
+
+6.3 Manufactured solution verification 
+
+To confirm that the self-convergence rates reflect the true discretization order, we compare against the exact harmonic solution u(x, y ) = ex cos y (∆u = 0 , all derivatives non-zero). Dirichlet data equal to the exact trace are imposed on all boundaries for both the smooth disk and the cross-shaped obstacle. Errors are evaluated directly against the exact solution and exact gradient at the grid points used in each norm. Table 5 reports the bulk errors, while Table 6 resolves the gradient error over the full interior and the first two interior grid layers. Table 5: Manufactured solution convergence on the smooth disk and the cross-shaped obstacle. Both show near-second-order bulk convergence for the potential and gradient. 
+
+Smooth disk Cross-shaped obstacle 
+
+ℓ h ∥u − ue∥∞ o. ∥∇ u − ∇ ue∥∞ o. ∥u − ue∥∞ o. ∥∇ u − ∇ ue∥∞ o. 5 0.072 1.08 × 10 −4 – 1.60 × 10 −3 – 1.31 × 10 −4 – 1.54 × 10 −3 –6 0.036 2.69 × 10 −5 2.01 4.54 × 10 −4 1.82 3.15 × 10 −5 2.06 4.52 × 10 −4 1.77 7 0.018 6.81 × 10 −6 1.98 1.27 × 10 −4 1.84 8.00 × 10 −6 1.98 1.26 × 10 −4 1.84 8 0.009 1.77 × 10 −6 1.95 3.27 × 10 −5 1.95 2.07 × 10 −6 1.95 3.27 × 10 −5 1.95 
+
+The full-interior gradient errors converge at orders 1.85–1.98 in the last three refinements, so the near-second-order result is not an artifact of a boundary exclusion band. The first-two-layer 
+
+L∞ errors converge at the same rates, while their area-weighted L2 errors decrease faster because the physical area of that layer shrinks with h. At ℓ = 8 , the corresponding two-layer potential 
+
+L∞ errors are 2.29 × 10 −7 for the disk and 2.75 × 10 −7 for the cross. We report these regional results without a superconvergence claim. 14 Table 6: Exact Euclidean gradient errors over all interior nodes and the first two interior grid layers. The discrete L2 norm includes the area weight h2; “angle” is the maximum normalized-gradient angle in the two-layer region, in radians.                                                                                                                                                                     
+
+> Geometry ℓL∞
+> all o. L2all o. L∞
+> 2layer o. L22layer o. Angle Disk 52.02 ×10 −3–2.03 ×10 −3–2.02 ×10 −3–1.28 ×10 −3–9.44 ×10 −4
+> 65.38 ×10 −41.91 5.22 ×10 −41.96 5.38 ×10 −41.91 2.38 ×10 −42.43 2.45 ×10 −4
+> 71.41 ×10 −41.93 1.33 ×10 −41.98 1.41 ×10 −41.93 4.33 ×10 −52.46 6.28 ×10 −5
+> 83.63 ×10 −51.96 3.36 ×10 −51.98 3.63 ×10 −51.96 7.79 ×10 −62.47 1.60 ×10 −5
+> Cross 52.01 ×10 −3–2.04 ×10 −3–2.01 ×10 −3–1.25 ×10 −3–1.04 ×10 −3
+> 65.59 ×10 −41.85 5.24 ×10 −41.96 5.59 ×10 −41.85 2.34 ×10 −42.42 3.22 ×10 −4
+> 71.47 ×10 −41.93 1.33 ×10 −41.98 1.47 ×10 −41.93 4.26 ×10 −52.45 8.90 ×10 −5
+> 83.91 ×10 −51.91 3.36 ×10 −51.98 3.91 ×10 −51.91 7.68 ×10 −62.47 2.35 ×10 −5
+
+Both geometries show near-second-order bulk convergence for u and ∇u. The cross-shaped boundary does not reduce the rate for this test because the prescribed exact solution is harmonic and smooth in a neighborhood of the entire computational box. The comparison with Tables 3 and 4 also shows that gradient self-convergence is more sensitive to the choice of comparison region than the exact-error experiment; no general superconvergence claim is made. 
+
+6.4 Block update vs. full trace under motion 
+
+The fourth test verifies that Algorithm 2 preserves the convergence behavior of Algorithm 1. The outer domain is [−1, 1] 2, the goal is the radius-0.05 disk centered at (−0.80 , 0.80) , and a circular obstacle of radius 0.15 moves through five equally spaced centers from (0 .40 , 0.20) 
+
+to (−0.40 , −0.20) ; at each position both algorithms solve the field at ℓ = 5 , 6, 7, 8. The ℓ = 8 
+
+Algorithm 1 solution is the reference, and errors are measured in the bulk as before. Algorithm 2 uses a capsule containing the complete obstacle trajectory, giving a consistent static/dynamic partition at every frame. Its static block is factored once at each refinement level. The paired convergence results are reported in Table 7. Table 7: Self-convergence of Algorithm 1 (F, full trace) and Algorithm 2 (B, block update) for a translating obstacle, averaged over five positions. Direct same-grid differences are summarized in the text. 
+
+ℓ h ∥uF − u8∥∞ ∥uB − u8∥∞ ∥∇ uF − ∇ u8∥∞ ∥∇ uB − ∇ u8∥∞
+
+5 0.072 2.15 × 10 −2 2.15 × 10 −2 1.13 × 10 −1 1.13 × 10 −1
+
+6 0.036 8.05 × 10 −3 8.05 × 10 −3 8.87 × 10 −2 8.87 × 10 −2
+
+7 0.018 1.60 × 10 −3 1.60 × 10 −3 6.02 × 10 −2 6.02 × 10 −2
+
+The paired columns in Table 7 agree to three significant figures at every resolution. The direct same-grid Algorithm 2–Algorithm 1 differences, evaluated separately from the reference-error table, average approximately 10 −10 for u and 10 −9 for ∇u, consistent with Proposition 5.2 up to solver and roundoff error. Least-squares potential orders are 1.88 for both formulations. The much lower gradient slope is not interpreted as an asymptotic order because only three coarse levels are compared and the norm excludes a mesh-dependent 3h boundary band. The nominal static fraction grows from 51% at ℓ = 6 to approximately 90% at ℓ = 7 and ℓ = 8 . The one-time factorization count at every level confirms that these columns were generated with the cached block update. 15 6.5 Same-grid agreement under translation and topology change 
+
+Geometry configurations. Both comparisons use the outer square [−1, 1] 2 and a circular goal of radius 0.05 centered at (−0.80 , 0.80) . In the translation test, one obstacle of radius 0.15 
+
+moves linearly from center (0 .30 , 0.15) to (−0.30 , −0.15) . We sample 21 positions at ℓ = 7 and seven positions at ℓ = 8 , and the dynamic set is prescribed by the capsule swept by this circle. In the topology-change test, the obstacle is the union of two radius-0.22 circles centered at (0 , ±d).The offset d increases from 0 to 0.34 and returns to 0 over 13 frames at ℓ = 7 , changing the union from one merged component to two separated components and back. Its dynamic set lies in the fixed radius-0.56 circular envelope. Thus the geometry, motion schedule, and reusable static boundary are fixed before the two algorithms are compared. At every sampled geometry, Algorithm 1 supplies the reference field and Algorithm 2 supplies the cached block solution. The execution order is rotated between frames to limit timing bias. Algorithm 2 factors Bss once per run; its maximum block residual remains near 10 −14 , and its field agrees with the Algorithm 1 field to about 10 −9. Table 8 reports the same-grid comparisons. Table 8: Same-grid algebraic comparisons for the configurations specified in Section 6.5. Field differences are maximum absolute differences from the Algorithm 1 solution over all tested frames; the residual is for Algorithm 2.                                      
+
+> Case Frames (ns, n d)Algorithm 2 diff. Block residual Translation, ℓ= 7 21 (456 ,44 –46) 1.10 ×10 −96.33 ×10 −15
+> Translation, ℓ= 8 7(920 ,92 –93) 1.01 ×10 −91.07 ×10 −14
+> Merge–split–merge, ℓ= 7 13 (456 ,68 –136) 1.03 ×10 −96.22 ×10 −15
+
+For the topology-change schedule, the dynamic fraction ranges from 13.0% to 23.0%, and the refreshed blocks contain 24.3–40.7% of the full dense entries. A separate diagnostic recomputes every cached static stencil at each frame and confirms its invariance; this diagnostic is excluded from the performance timing. The reduction in dynamic unknowns applies only to the final reduced solve: applying the cached factor to the coupled blocks and forming the Schur complement must also be counted, so no cubic speedup is claimed. Together with the moving-circle convergence test in Section 6.4, these results verify both discretization-level and same-grid agreement of the two algorithms. 
+
+6.6 Subgrid-position robustness 
+
+To assess sensitivity to the relative grid position, a small circular obstacle ( r = 0 .06 ) was translated diagonally through 30 positions over a displacement of 0.015625 ≈ 0.87 h at ℓ = 7 . At each position we recorded |γ−|, the dynamic-set size nd, κ2(S−), and total solve time. Table 9 summarizes the resulting variation. Table 9: Subgrid-position robustness over 30 positions and a diagonal coordinate displacement 
+
+∆x = ∆ y = 0 .015625 ≈ 0.87 h. CV = coefficient of variation.                      
+
+> Quantity Mean Std Min/Max CV
+> |γ−|482.37 0.48 482/483 0.0010
+> nd(dynamic points) 16.37 0.48 16/17 0.0294
+> κ2(S−)2509.05 2.40 2507.21/2512.23 0.0010 Solve time (ms) 214.40 1.49 212.29/219.98 0.0069
+
+In this experiment all coefficients of variation are below 3%, and those of |γ−|, κ2(S−),and time are below 1%. No significant position dependence was observed over this particular 16 subcell displacement; the experiment does not establish grid-position independence for arbitrary geometry or motion. 
+
+6.7 Fixed-bulk convergence and gradient angle error 
+
+Self-convergence experiments typically exclude a mesh-dependent band of width 3h near bound-aries, making comparisons across resolutions less uniform. We repeat the smooth-disk self-convergence test using a fixed physical exclusion distance of 0.08 units from all boundaries. This distance corresponds to approximately nine cells at ℓ = 8 and is held constant across all four resolutions. We additionally report the angular error of the normalized gradient, which controls the descent direction in the harmonic navigation application. The fixed-region potential, gradient-magnitude, and angular errors are reported together in Table 10. Table 10: Fixed-bulk self-convergence (exclusion distance 0.08 units, approximately nine cells at 
+
+ℓ = 8 ). Angular error measures arccos( ̂∇uh ·̂ ∇u8) between normalized gradients.                                    
+
+> ℓh∥u−u8∥∞∥∇ u− ∇ u8∥∞ang. error (max) ang. error (mean) 50.072 1.74 ×10 −29.23 ×10 −20.062 0.015 60.036 2.50 ×10 −34.64 ×10 −20.025 0.006 70.018 4.92 ×10 −41.73 ×10 −20.009 0.003
+
+With a fixed physical exclusion region the potential errors decrease monotonically; the angular gradient error at ℓ = 7 is below 0.6◦ (0.009 rad) in the bulk, confirming that the descent direction is already well resolved at moderate grid sizes. The gradient magnitude error is larger than the directional error, reflecting the well-known sensitivity of |∇ u| near curved boundaries. 
+
+6.8 Re-solve cost and component-level profiling 
+
+We now time the two configurations defined in Section 6.5. The translation benchmark uses the radius-0.15 circle moving from (0 .30 , 0.15) to (−0.30 , −0.15) , with 21 frames at ℓ = 7 and seven frames at ℓ = 8 ; the topology benchmark uses the 13-frame merge–split–merge schedule at 
+
+ℓ = 7 . We benchmark Algorithm 1 and Algorithm 2 at every sampled geometry and rotate their execution order among frames. The steady averages in Table 11 exclude the first frame, where Algorithm 2 initializes and factors Bss .Table 11: Measured steady per-frame times for the two algorithms. “Gain” is the reduction of Algorithm 2 relative to Algorithm 1. Times are in milliseconds.                           
+
+> Case Grid Frames Algorithm 1 Algorithm 2 Gain Translation, ℓ= 7 127 221 165.29 161.41 2.4% Translation, ℓ= 8 255 27392.88 371.39 5.5% Topology change, ℓ= 7 127 213 209.67 204.52 2.5%
+
+For the translating circle, Algorithm 2 reduces the steady mean from 165 .29 ms to 161 .41 ms 
+
+at ℓ = 7 and from 392 .88 ms to 371 .39 ms at ℓ = 8 , corresponding to 2.4% and 5.5% gains. The same-grid field differences for these runs are reported in Table 8. At ℓ = 7 , n = 500 –502 ,
+
+ns = 456 , and nd = 44 –46 ; at ℓ = 8 , the corresponding values are 1012 –1013 , 920 , and 92 –93 .Thus the updated blocks contain only 16.8–17.5% and 17.4–17.5% of the full dense entries, respectively. The static factorization occurs once per run and costs 0.65 ms at ℓ = 7 and 2.74 ms 
+
+at ℓ = 8 . First-frame assembly, which includes Bss , costs 10 .05 ms and 37 .57 ms ; the steady block refresh is substantially smaller. Table 12 separates that steady Algorithm 2 time into geometry, block assembly, Schur solve, layer-trace, and reconstruction components. 17 Table 12: Steady component averages for Algorithm 2, excluding first-frame initialization. Times are in milliseconds.                               
+
+> Case Geometry Block assembly Schur solve Layer trace DST Geometry share Translation, ℓ= 7 153.28 1.30 0.36 3.11 1.01 95.0% Translation, ℓ= 8 342.84 4.68 1.43 14.19 3.51 92.3% Topology change, ℓ= 7 194.37 3.30 0.58 4.21 1.05 95.0%
+
+The component breakdown in Table 12 shows why the algebraic reduction produces only a modest end-to-end gain. In the topology-change test, n varies from 524 to 592 while ns = 456 and 
+
+nd = 68 –136 . Algorithm 2 remains faster than Algorithm 1 even though the refreshed fraction rises to 40.7%. The block update is therefore active and measurable, but its end-to-end benefit is modest because rebuilding the boundary classification, intersections, and local collocation data consumes 93–95% of its total time. The code intentionally does not refactor the static block at each frame. The next performance target is a swept-band geometry update; kernel compression is also needed when the boundary size becomes much larger. 
+
+Remark 6.1. All experiments use the LGF-BAE solver with a second-order five-point Laplacian, the single-layer potential, and Dirichlet boundary conditions. The physical domain is [−1, 1] 2
+
+and the auxiliary finite box adds a padding length l = 0 .15 , giving the grid extent [−1.15 , 1.15] 2.We denote the refinement level by ℓ and the number of interior grid points per coordinate by 
+
+Ng = 2 ℓ − 1. Thus h = 2 .30 /2ℓ, giving h ≈ 0.072 , 0.036 , 0.018 , 0.009 for ℓ = 5 , 6, 7, 8 on grids of size 31 2, 63 2, 127 2, 255 2. The Dirichlet sine transform is implemented by FFTs of length 2( Ng + 1) 
+
+(256 at ℓ = 7 ); this transform length is not a separate free-space padding box. The LGF kernel is tabulated once using near-field quadrature and the far-field expansion in eq. (3.6) , with the code switching at radius 30 grid points. The recorded environment is an Apple-silicon MacBook Pro running Python 3.14.3, NumPy 2.4.6, and SciPy 1.17.1. The recorded machine is a MacBook Pro Mac16,8 with an Apple M4 Pro processor (14 CPU cores) and 48 GB memory. 
+
+## 7 Application: harmonic path planning 
+
+The manufactured-solution tests show near-second-order bulk convergence of both uh and ∇hu,and Algorithms 1 and 2 agree to numerical precision. We next use path planning as an application. The experiments below show what a reliable, gradient-accurate repeated elliptic solver enables, not novelty in harmonic navigation itself. The planner is not proposed as a state-of-the-art robotics planner. It is used as a gradient-sensitive application demonstrating repeated elliptic solves on changing implicit domains. We demonstrate the method on static and dynamic path-planning benchmarks. The static single-path and multi-query scripts compute the field with Algorithm 1, whereas the moving-geometry scripts compute the changing fields with Algorithm 2. Both use the normalized NAG path update described below. Path extraction is a separate post-processing step. 
+
+7.1 Path extraction method 
+
+We use normalized NAG descent as a low-cost path-extraction method: 
+
+yk = xk + β(xk − xk−1), xk+1 = xk − η ∇u(yk)
+
+∥∇ u(yk)∥ , (7.1) with momentum β = 0 .9, requiring one gradient evaluation per step. The static tests use η = h/ 4;the moving tests use the fixed step sizes stated with each experiment because they take 15 agent steps per geometry frame. The static demonstrations apply an additional mask-based endpoint 18 correction when a proposed step enters an obstacle. In every dynamic driver, momentum is retained when the field changes: the gradient is sampled at the look-ahead point yk, but the accepted displacement starts from xk. The moving-geometry implementation performs neither segment-level collision detection nor endpoint projection or step rejection. 
+
+7.2 Single-path planning on static benchmarks 
+
+Figure 4 shows single NAG-descent paths on the two representative geometries introduced in Section 6. The agent follows −∇ u/ ∥∇ u∥ from a specified start to the goal (green). Both paths arrive successfully; the path length reflects the harmonic field’s tendency to take smooth, obstacle-avoiding routes rather than distance-optimal shortcuts. On the cross-shaped obstacle the path curves around the obstacle corners without being explicitly programmed to do so—the Dirichlet condition u = 1 on the obstacle boundary creates a repulsive gradient that naturally steers the agent along the obstacle’s convex hull. 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+(a) Smooth disk ( L = 1 .51 )1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00  
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+(b) Cross-shaped obstacle ( L = 2 .05 )
+
+Figure 4: Single-path planning on the smooth disk and cross-shaped obstacle geometries ( ℓ = 7 ,NAG descent). Both paths arrive; the cross-shaped obstacle induces a natural avoidance maneuver around its corners. A single field solve serves unlimited start positions. Figure 5 shows 50 paths from randomly scattered starts converging to a single goal after one 3.5 s solve. The displayed field cost therefore amortizes to approximately 71 ms per path at 50 queries. The reported per-path extraction cost is 22 ms , giving a total of approximately 93 ms per path; only the field component continues to decrease as the query count grows. 19 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00  
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+> 1 solve (3.5s) 50 paths
+> avg 71ms/path amortized
+
+Figure 5: One field solve serves 50 paths from random starts. The displayed 3.5 s field solve amortizes to approximately 71 ms per path; including the reported 22 ms extraction cost gives approximately 93 ms per path. 
+
+7.3 Dynamic replanning with moving obstacles 
+
+For the single-moving-obstacle experiment, the start and goal are (0 .75 , −0.75) and (−0.80 , 0.80) ,respectively. An obstacle drifts diagonally from (0 .5, 0.5) to (−0.5, −0.5) over 40 obstacle-motion frames; at each frame the field is re-solved with Algorithm 2 (Section 4) and the agent takes 15 normalized NAG steps with β = 0 .9. Three step sizes, η = 0 .0020 , 0.0025 , and 0.0040 , are interpreted as slow, medium, and fast agent speeds, respectively. If an agent has not reached the goal by the end of the obstacle-motion schedule, it continues on the final field; this is why some snapshot indices exceed 40. Figure 7 shows the agent trajectories with one obstacle. The Dirichlet value u = 1 on the obstacle boundary creates a repulsive gradient, and the medium-speed trajectory has the longest reported path. All three agents reach the goal with path lengths 2.40 , 2.92 , and 2.32 for the slow, medium, and fast cases, respectively. The corresponding step counts are 1202, 1166, and 579. The 40 distinct obstacle fields are computed once and reused across the three speed trials. The temporal progression of each speed case is resolved in Figure 6. Because the script does not test segment–obstacle intersections, these runs support a qualitative avoidance demonstration but not a verified zero-collision claim. 
+
+Algorithm used and verification The overview and snapshot figures in this subsection were regenerated with Algorithm 2. The swept circular obstacle is enclosed by a capsule, the invariant Bss block is factored once, and the maximum block residual over the 40 distinct fields is 6.44 × 10 −15 . The representative same-grid comparison in Section 6.5 shows that these block-update fields agree with Algorithm 1 to about 10 −9.A second experiment uses two obstacles on crossing paths. Figures 8 and 9 show the aggregate trajectory and selected frames, respectively. These fields are computed with Algorithm 2; the static block is factored once and the maximum block residual is 6.22 × 10 −15 . With η = 0 .0025 ,the normalized-NAG path reaches the goal in 1222 steps with length 3.05 .20 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 slow frame 1 (a) Slow, snapshot 1 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 slow frame 21 (b) Slow, snapshot 21 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 slow frame 47 (c) Slow, snapshot 47 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 medium frame 1 
+
+(d) Medium, snapshot 1 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 medium frame 21 (e) Medium, snapshot 21 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 medium frame 46 (f) Medium, snapshot 46 (ar-rival) 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 fast frame 1 
+
+(g) Fast, snapshot 1 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 fast frame 21 (h) Fast, snapshot 21 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+1.00 
+
+0.75 
+
+0.50 
+
+0.25 
+
+0.00 
+
+0.25 
+
+0.50 
+
+0.75 
+
+1.00 
+
+B7 fast frame 39 ARRIVED (i) Fast, snapshot 39 (arrival) 
+
+Figure 6: Algorithm 2 with normalized NAG: selected key frames for the single moving-obstacle experiment. Slow (top): continued motion on the final field. Medium (middle): the longest reported detour. Fast (bottom): arrival during the obstacle-motion schedule. 21 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+Moving-Obstacle Harmonic Replanning (Normalized NAG) 
+
+> direct line
+> slow
+> medium
+> fast
+
+Figure 7: Generated with Algorithm 2 and normalized NAG ( β = 0 .9). One moving obstacle and three step sizes. The dashed gray line is the direct path without the obstacle. The medium-speed trajectory (orange) has the longest reported path ( 2.92 vs. 2.32 –2.40 ). Collision-free motion is not programmatically verified. 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+Two Obstacles on Crossing Paths (Block Update + NAG) 
+
+Figure 8: Generated with Algorithm 2 and normalized NAG. Two obstacles on crossing paths. The sampled agent trajectory (red) passes through the changing gap. The script contains no segment-level collision test, so the figure is qualitative. 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+Two Obstacles | frame 1/50 
+
+(a) Frame 1 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+Two Obstacles | frame 21/50 (b) Frame 21 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+
+Two Obstacles | frame 41/50 (c) Frame 41 
+
+Figure 9: Algorithm 2 with normalized NAG: two-obstacle crossing experiment at frames 1, 21, and 41 of the 50-frame schedule. 22 7.4 Deforming geometry and topology change 
+
+The static/dynamic decomposition of Section 4 does not assume rigid motion; it only requires that the boundary is defined by a level set. Figure 10 tests this by having a single obstacle undergo a continuous shape deformation that includes a topology change : two overlapping circles (one connected component) drift apart until they separate into two disconnected obstacles, then merge back. The grid, LGF kernel, and sine-transform solver are unchanged throughout. The displayed trajectory frames were regenerated with Algorithm 2 on a 36-frame radius-0.15 
+
+schedule. Endpoint-excluded separation ramps cross from merged to split without sampling the singular exact-tangency configuration. The static block is factored once and the maximum block residual is 6.11 × 10 −15 . With η = 0 .0040 , normalized NAG reaches the goal in 624 steps with path length 2.50 . The separate 13-frame radius-0.22 comparison in Section 6.5 uses Algorithms 1 and 2: the dynamic count varies from 68 to 136 of 524–592 unknowns, and the Algorithm 2 field differs from Algorithm 1 by at most 1.03 × 10 −9.1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+> merged | separation=0.20 | frame 4/36
+
+(a) Frame 4 (merged) 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00  
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+> SPLIT | separation=0.60 | frame 19/36
+
+(b) Frame 19 (split) 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00  
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+> merged | separation=0.20 | frame 25/36
+
+(c) Frame 25 (merging) 
+
+Figure 10: Algorithm 2 with normalized NAG: topology-change experiment: merged → split →
+
+merging. 
+
+7.5 Appearing obstacle 
+
+A more dramatic test of the method’s reactivity is an obstacle that appears suddenly in the agent’s path, with no prior warning. Figure 11 shows the scenario: the agent follows the free-space harmonic field for 12 frames, at which point a circular obstacle ( r = 0 .18 ) materializes at the origin. The field is re-solved once with the new level set by Algorithm 2; no remeshing is needed. The same Bss factorization is reused before and after appearance, and the two solves have a maximum block residual of 5.77 × 10 −15 . The sampled trajectory transitions from the free-space path (dashed green) to the replanned path (solid red), turns around the newly appeared obstacle, and reaches the goal under normalized NAG with η = 0 .0040 in 680 steps (path length 2.72 vs. 2.14 direct). 23 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00 
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+> free space | frame 1
+
+(a) Frame 1 (free space) 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00  
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+> OBSTACLE APPEARS | frame 12
+
+(b) Frame 12 (obstacle appears) 1.00 0.75 0.50 0.25 0.00 0.25 0.50 0.75 1.00  
+
+> x
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> y
+> replanned path | frame 46
+
+(c) Frame 46 (arrival) 
+
+Figure 11: Algorithm 2 with normalized NAG: appearing-obstacle experiment. The obstacle appears at frame 12, and the agent replans without remeshing. 
+
+## 8 Discussion and extensions 
+
+8.1 Relation to fast marching and sampling-based planners 
+
+Fast marching and Eikonal solvers [ 19 , 29 ] are the natural competitors for single-query workspace path planning. They are usually preferable when the desired object is a shortest-distance field and the main requirement is minimal solve cost. The harmonic field used here solves a different problem: it produces a smooth potential governed by an elliptic boundary value problem, with obstacle repulsion encoded directly through Dirichlet data. This is not a claim that a Laplace solve beats fast marching for a one-shot shortest-path query; fast-marching planners [ 9 ] are natural PDE-based alternatives for that setting. The case for the present method is strongest when the geometry is implicit, when many queries reuse the same computed field, and when the elliptic potential and its gradient are the desired outputs rather than a distance-optimal path. Sampling-based planners [ 8, 16 , 20 ] address a different regime. They remain the appropriate choice in high-dimensional configuration spaces or when kinodynamic constraints are central. Among other field-based constructions, analytic navigation functions [ 27 ] avoid a PDE solve at the cost of star-shaped geometry assumptions, and continuum / dynamic-potential approaches have been used for large-scale crowd simulation [ 32 ]; the present method instead solves the elliptic problem directly on arbitrary implicit geometry. For moving geometry, the present work implements density-block reuse and demonstrates a 2.4–5.5% steady-frame reduction relative to the full trace baseline in the translating-circle tests and a 2.5% reduction through a merge–split– merge topology change with up to 23% dynamic unknowns. The modest end-to-end gain reflects the remaining global geometry update, not repeated factorization of the static block. 
+
+8.2 Where the method is the right tool 
+
+The method targets planar elliptic problems with moving or only partially known implicit geometry, where repeated solves on a fixed grid replace remeshing. It is additionally attractive when many queries share one static geometry and an elliptic field or gradient is required. The present experiments prescribe the geometry; they do not evolve a free boundary from the computed PDE. The principal structural benefit is that the Cartesian grid, Green’s function table, and sine-transform reconstruction operator remain fixed as the geometry moves. Body-fitted alterna-tives may avoid full remeshing through mesh deformation for moderate motion, but topology changes and appearing obstacles remain difficult. The implementation boundary and its timing consequence are documented in Sections 4 and 6.8; the swept-band estimate in Section 5.5 concerns geometry processing, whereas the dense block count concerns algebraic assembly. 24 8.3 Limitations 
+
+• Narrow passages. Harmonic gradients can become weak in long regions feeding narrow channels, and any passage represented by only a few grid cells is sensitive to both field resolution and path-integration parameters. 
+
+• Solve cost. In the cached block-update implementation, full-grid geometry classification, intersection finding, and collocation setup consume 93–95% of the per-frame time. The block refresh itself takes only 1.30 ms at ℓ = 7 and 4.68 ms at ℓ = 8 , while the cached static block is not refactored. The reported timings reflect a pure-Python (NumPy/SciPy) prototype; a swept-band or compiled geometry update is the immediate optimization target. Larger three-dimensional boundary sets would additionally require compressed kernel interactions. 
+
+• Density-system conditioning. The block update is accurate through ℓ = 8 , but κ2(B)
+
+and κ2(Bss ) reach 2.14 × 10 4 and 1.95 × 10 4, respectively. Substantially finer grids will require a well-conditioned block formulation or iterative preconditioning; the trace matrix remains the better-conditioned full-solve baseline. 
+
+• Discrete trajectory guarantee. The nodal maximum principle does not extend au-tomatically to the off-grid interpolated gradient or the finite-step path integrator. The dynamic scripts implement no segment-level collision detection or step rejection. 
+
+• Dimensionality. The present work is restricted to planar domains. The extension to 3D is conceptually direct, but the surface solve becomes the bottleneck; the well-conditioned trace form and kernel compression discussed in Section 6.8 are then essential. 
+
+• Boundary conditions. The current formulation uses Dirichlet data exclusively, as this suffices for harmonic navigation. Neumann or Robin data can in principle be incorporated by replacing the Dirichlet collocation closure with normal-derivative or mixed boundary functionals, while preserving the fixed-grid and static/dynamic organization. The resulting solvability and conditioning, however, require separate analysis. 
+
+## 9 Conclusion 
+
+We have developed an unfitted lattice Green’s function/difference-potentials method for repeated Laplace solves on prescribed moving implicit planar domains. The method uses a fixed Cartesian grid, enforces Dirichlet data at true boundary intersections through local quadratic basis functions, and reconstructs the interior field by a sine-transform difference-potential solve. Geometry-independent data are reused as the boundary moves. The directly assembled density matrix admits a static–dynamic block partition, and the implementation caches and factors its invariant Bss once. Subsequent frames assemble only Bsd ,
+
+Bds , and Bdd , solve the reduced system, and reconstruct the layer trace. On 127 2 and 255 2 grids the result agrees with Algorithm 1 within 1.1 × 10 −9 and reduces steady-frame time by 2.4–5.5% relative to that reference. A merge–split–merge test with 13–23% dynamic unknowns retains a single static factorization, agrees within 1.03 × 10 −9, and reduces time by 2.5% relative to Algorithm 1. The full-grid geometry update remains the dominant cost. Manufactured solutions show near-second-order convergence for both the potential and reconstructed gradient over the full interior and in the first two interior grid layers. Tests on a cross-shaped obstacle show that the method remains stable in the presence of re-entrant corners, although the available refinements are insufficient to verify the theoretical corner singularity rate. Dynamic harmonic navigation demonstrates the fixed-grid solver for translating, deforming, appearing, and topology-changing obstacles. 25 The most immediate next step is a swept-band geometry update that avoids reclassifying the full grid at every frame, together with a sparse full-domain baseline. Extensions to three dimensions will additionally require compressed kernel interactions. Although navigation provides the application here, the same organization applies to other repeated Laplace solves on evolving implicit boundaries. A particularly natural extension is a quasi-static free-boundary problem, in which the harmonic field and interface motion are coupled and each interface update triggers a new Laplace solve. 
+
+## Acknowledgements 
+
+This work was supported in part by the National Natural Science Foundation of China (Grant No. 12401546) and Wenzhou Kean University (Grant No. ISRG2024003). 
+
+## References 
+
+[1] Jason Albright, Yekaterina Epshteyn, and Kyle R Steffen. High-order accurate difference potentials methods for parabolic problems. Applied Numerical Mathematics , 93:87–106, 2015. [2] Yuri Bazilevs, Kenji Takizawa, and Tayfun E Tezduyar. Computational fluid-structure interaction: methods and applications . John Wiley & Sons, 2013. [3] James Bremer and Vladimir Rokhlin. Efficient discretization of Laplace boundary integral equations on polygonal domains. Journal of Computational Physics , 229(7):2507–2525, 2010. [4] Erik Burman, Susanne Claus, Peter Hansbo, Mats G Larson, and André Massing. CutFEM: discretizing geometry and partial differential equations. International Journal for Numerical Methods in Engineering , 104(7):472–501, 2015. [5] Christopher I Connolly and Roderic A Grupen. The applications of harmonic functions to robotics. 
+
+Journal of Robotic Systems , 10(7):931–946, 1993. [6] Christopher I Connolly, J Brian Burns, and Rich Weiss. Path planning using Laplace’s equation. In 
+
+Proceedings of the IEEE International Conference on Robotics and Automation , pages 2102–2106. IEEE, 1990. [7] Jean Donea, Antonio Huerta, J-Ph Ponthot, and Antonio Rodríguez-Ferran. Arbitrary Lagrangian– Eulerian methods. In Erwin Stein, René de Borst, and Thomas J. R. Hughes, editors, Encyclopedia of Computational Mechanics , pages 413–437. Wiley Online Library, 2004. doi: 10.1002/0470091355. ecm009. [8] Jonathan D Gammell, Siddhartha S Srinivasa, and Timothy D Barfoot. Batch informed trees (BIT*): Sampling-based optimal planning via the heuristically guided search of implicit random geometric graphs. In 2015 IEEE International Conference on Robotics and Automation (ICRA) ,pages 3067–3074. IEEE, 2015. [9] Santiago Garrido, Luis Moreno, Mohamed Abderrahim, and Fernando Martin. Path planning for mobile robot navigation using Voronoi diagram and fast marching. In 2006 IEEE/RSJ International Conference on Intelligent Robots and Systems , pages 2376–2381. IEEE, 2006. [10] María Garzon, David Adalsteinsson, Lawrence J. Gray, and James A. Sethian. A coupled level set–boundary integral method for moving boundary simulations. Interfaces and Free Boundaries , 7 (3):277–302, 2005. doi: 10.4171/IFB/125. [11] Frederic Gibou, Ronald Fedkiw, and Stanley Osher. A review of level-set methods and some recent applications. Journal of Computational Physics , 353:82–109, 2018. [12] Adrianna Gillman and Per-Gunnar Martinsson. A fast solver for Poisson problems on infinite regular lattices. Journal of Computational and Applied Mathematics , 258:42–56, 2014. [13] Leslie Greengard and Vladimir Rokhlin. A fast algorithm for particle simulations. Journal of Computational Physics , 73(2):325–348, 1987. [14] Wolfgang Hackbusch. A sparse matrix arithmetic based on H-matrices. part I: Introduction to 
+
+H-matrices. Computing , 62(2):89–108, 1999. doi: 10.1007/s006070050015. [15] Johan Helsing. A fast and stable solver for singular integral equations on piecewise smooth curves. 
+
+SIAM Journal on Scientific Computing , 33(1):153–174, 2011. doi: 10.1137/090779218. 
+
+26 [16] Sertac Karaman and Emilio Frazzoli. Sampling-based algorithms for optimal motion planning. The International Journal of Robotics Research , 30(7):846–894, 2011. [17] Oussama Khatib. Real-time obstacle avoidance for manipulators and mobile robots. The International Journal of Robotics Research , 5(1):90–98, 1986. [18] Jin-Oh Kim and Pradeep Khosla. Real-time obstacle avoidance using harmonic potential functions. 
+
+IEEE Transactions on Robotics and Automation , 8(3):338–349, 1992. doi: 10.1109/70.143350. [19] Ron Kimmel and James A Sethian. Computing geodesic paths on manifolds. Proceedings of the National Academy of Sciences , 95(15):8431–8435, 1998. [20] Steven M LaValle. Planning algorithms . Cambridge university press, 2006. [21] Christoph Lehrenfeld and Maxim Olshanskii. An Eulerian finite element method for PDEs in time-dependent domains. ESAIM: Mathematical Modelling and Numerical Analysis , 53(2):585–614, 2019. [22] Randall J LeVeque and Zhilin Li. The immersed interface method for elliptic equations with discontinuous coefficients and singular sources. SIAM Journal on Numerical Analysis , 31(4):1019– 1044, 1994. [23] Sebastian Liska and Tim Colonius. A parallel fast multipole method for elliptic difference equations. 
+
+Journal of Computational Physics , 278:76–91, 2014. [24] Stanley Osher and James A Sethian. Fronts propagating with curvature-dependent speed: Algorithms based on Hamilton–Jacobi formulations. Journal of Computational Physics , 79(1):12–49, 1988. [25] Charles S Peskin. The immersed boundary method. Acta Numerica , 11:479–517, 2002. [26] Sergey Petropavlovsky, Semyon Tsynkov, and Eli Turkel. Computation of unsteady electromagnetic scattering about 3D complex bodies in free space with high-order difference potentials. Journal of Computational Physics , 498:112705, 2024. [27] Elon Rimon. Exact robot navigation using artificial potential functions . Yale University, 1990. [28] Viktor S Ryaben’Kii. Method of Difference Potentials and its applications , volume 30. Springer Science & Business Media, 2012. [29] James A Sethian. A fast marching level set method for monotonically advancing fronts. Proceedings of the National Academy of Sciences , 93(4):1591–1595, 1996. [30] Alexander Shamanskiy and Bernd Simeon. Mesh moving techniques in fluid-structure interaction: robustness, accumulated distortion and computational efficiency. Computational Mechanics , 67(2): 583–600, 2021. [31] Tayfun E Tezduyar. Finite element methods for flow problems with moving boundaries and interfaces. 
+
+Archives of Computational Methods in Engineering , 8(2):83–130, 2001. [32] Adrien Treuille, Seth Cooper, and Zoran Popović. Continuum crowds. ACM Transactions on Graphics (TOG) , 25(3):1160–1168, 2006. [33] Qing Xia. A geometrically robust unfitted boundary algebraic equation method based on discrete potentials and local basis functions. Journal of Computational Physics , 561:114957, 2026. doi: 10.1016/j.jcp.2026.114957. [34] Wenjun Ying and Craig S Henriquez. A kernel-free boundary integral method for elliptic boundary value problems. Journal of Computational Physics , 227(2):1046–1074, 2007. [35] Wenjun Ying and Wei-Cheng Wang. A kernel-free boundary integral method for implicitly defined surfaces. Journal of Computational Physics , 252:606–624, 2013. [36] Han Zhou and Wenjun Ying. A correction function-based kernel-free boundary integral method for elliptic PDEs with implicitly defined interfaces. Journal of Computational Physics , 496:112545, 2024. [37] Han Zhou, Shuwang Li, and Wenjun Ying. A Cartesian grid-based boundary integral method for moving interface problems, 2026. 
+
+27

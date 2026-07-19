@@ -6,26 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-18
-- 运行时间：2026-07-18 19:57:23 UTC
+- 最新运行日期：2026-07-19
+- 运行时间：2026-07-19 21:14:38 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：1
-- 速读区：0
+- 本次总论文数：2
+- 精读区：0
+- 速读区：2
 
 ### 今日简报（AI）
-今日精读了一篇高分论文，探讨无网格方法如何高效模拟多相Mullins-Sekerka流动。
-该研究的亮点是用单一求解器同时处理三相接触线与90度边界接触，避免了传统网格重建的复杂性。
-建议关注其在材料微结构演化、晶体生长模拟中的应用潜力，后续可拓展到更多复杂几何场景。
-- 详情：[/202607/18/README](/202607/18/README)
+今日速读两篇几何演化新法：贴体网格追踪开曲线与非贴体代数方程处理隐式几何。  
+二者分别用水平集驱动网格变形和静态-动态归约策略，精简处理演化界面。  
+想入门可对比显式追踪与隐式归约的算力边界，再从这两条路深挖。
+- 详情：[/202607/19/README](/202607/19/README)
 
 ### 精读区论文标签
-1. [A Mesh-Free Solver for Multi-Phase Mullins-Sekerka Flow: Triple Junctions and Ninety-Degree Boundary Contact](/202607/18/2607.12759v1-a-mesh-free-solver-for-multi-phase-mullins-sekerka-flow-triple-junctions-and-ninety-degree-boundary-contact)  
-   标签：评分：8.0/10、query:falling-film
-   evidence：开发了一种用于多相界面流动的无网格求解器，基于电荷模拟法
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Body-fitted tracking of 2d open curves with a level set based mesh evolution method](/202607/19/2607.12116v1-body-fitted-tracking-of-2d-open-curves-with-a-level-set-based-mesh-evolution-method)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：水平集与网格演化方法跟踪开曲线，可用于模拟降膜自由表面
+2. [An unfitted boundary algebraic equation method with static-dynamic reduction for evolving implicit geometries](/202607/19/2607.14808v1-an-unfitted-boundary-algebraic-equation-method-with-static-dynamic-reduction-for-evolving-implicit-geometries)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：移动边界与移动界面模拟
 
 
 <div class="dpr-home-promo-card">

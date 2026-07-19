@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-19",
+  "date": "2026-07-19",
+  "generated_at": "2026-07-19T21:14:50",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/19/2607.12116v1-body-fitted-tracking-of-2d-open-curves-with-a-level-set-based-mesh-evolution-method",
+      "section": "quick",
+      "title_en": "Body-fitted tracking of 2d open curves with a level set based mesh evolution method",
+      "authors": "Charles Dapogny",
+      "date": "2026-07-13",
+      "pdf": "https://arxiv.org/pdf/2607.12116v1",
+      "score": "6.0",
+      "evidence": "水平集与网格演化方法跟踪开曲线，可用于模拟降膜自由表面",
+      "tldr": "开放曲线在物理不连续面追踪与工程设计优化中广泛存在，但传统方法难以兼顾几何计算精度与拓扑灵活性。本文提出一种新数值算法，在每次演化迭代中耦合显式网格剖分与基于双辅助标量函数的隐式水平集捕获，实现精确几何/力学计算与大幅度形状演化并存。该方法成功模拟涡层卷起，优化增材制造激光扫描路径，并重建断裂集，为开放曲线跟踪提供了准确且灵活的通用数值框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "This article describes a novel numerical algorithm for tracking the motion of a collection of open curves in two space dimensions. The proposed strategy combines two complementary representations of these curves at each iteration of the evolution process: on the one hand, they are meshed explicitly, as a sub-collection of the entities of a mesh of the total computational domain. Concurrently, using a variant of the Level Set Method, they are captured implicitly as algebraic combinations of the negative, zero and positive subsets of two auxiliary scalar functions, defined on the whole ambient space. This coupling of representations allows to perform accurate geometric or mechanical computations on these curves, while leaving room for large evolution of their shape. After the description of its main numerical ingredients, several applications examples of this methodology are proposed, where it is used to simulate the motion of open physical discontinuities, such as a vortex sheet roll-up, and to optimize the shape of open-ended curves, e.g. with respect to their anisotropic length, with the aim to improve the trajectory of a laser acting on a powder bed in the context of additive manufacturing, or to reconstruct fracture sets.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/19/2607.14808v1-an-unfitted-boundary-algebraic-equation-method-with-static-dynamic-reduction-for-evolving-implicit-geometries",
+      "section": "quick",
+      "title_en": "An unfitted boundary algebraic equation method with static-dynamic reduction for evolving implicit geometries",
+      "authors": "Yizhen Huang, Qing Xia",
+      "date": "2026-07-16",
+      "pdf": "https://arxiv.org/pdf/2607.14808v1",
+      "score": "6.0",
+      "evidence": "移动边界与移动界面模拟",
+      "tldr": "在移动界面模拟、设计等应用中，演化边界域上的重复椭圆求解需频繁重建边界交互，效率受限。本文提出一种静态-动态边界约化的非拟合格子格林函数方法，采用先离散后表示策略，分离静止与运动几何的相互作用，重用不变部分，仅更新变化耦合。该方法避免了边界网格和奇异积分，通过快速正弦变换实现内部场重建，并成功验证了对平移、变形、出现及拓扑变化障碍物的有效更新。",
+      "tags": "query:falling-film",
+      "abstract_en": "Repeated elliptic solves on domains with evolving boundaries arise in moving-interface simulation, design, and reactive navigation. Even when a fixed Cartesian grid avoids remeshing, rebuilding all boundary interactions for every configuration can limit the efficiency of repeated solves. We develop a static--dynamic boundary reduction for an unfitted lattice Green's function method on prescribed moving planar domains. Like boundary integral and boundary element methods, the formulation reduces the problem to boundary-supported unknowns through a Green representation. Its construction, however, reverses the usual order: the Cartesian operator is discretized before the Green representation is formed, rather than representing the continuous problem first and then discretizing the boundary. This discretize-then-represent viewpoint avoids boundary meshes and singular quadrature. The method also separates interactions associated with stationary geometry from those affected by motion, reuses the invariant part throughout a simulation, and updates only couplings involving the changing boundary. Boundary conditions are imposed at true interface intersections, lattice-kernel data are reused, and the interior field is reconstructed by a fast sine-transform solver. The principal contribution is an implemented and validated update strategy for translating, deforming, appearing, and topology-changing obstacles.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
