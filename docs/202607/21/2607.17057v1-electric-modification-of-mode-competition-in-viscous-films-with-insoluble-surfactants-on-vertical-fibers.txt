@@ -1,0 +1,1377 @@
+Title: Electric modification of mode competition in viscous films with insoluble surfactants on vertical fibers
+
+URL Source: https://arxiv.org/pdf/2607.17057v1
+
+Published Time: Tue, 21 Jul 2026 01:04:12 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+# Electric modification of mode competition in viscous films with insoluble surfactants on vertical fibers 
+
+Jun Gao, 1, 2 Xiaocong Yang, 1 Senlin Zhu, 1, ∗ Bingqiang Ji, 1, † and Qingfei Fu 1, 2, ‡
+
+> 1
+
+School of Astronautics, Beihang University, Beijing 100191, PR China 
+
+> 2
+
+Aircraft and Propulsion Laboratory, Ningbo Institute of Technology, Beihang University, Ningbo 315800, PR China 
+
+This study investigates the coupled effects of an insoluble surfactant and a radial electric field on the stability of a viscous liquid film flowing down a vertical fiber. Starting from the governing equations in two dimensions, a reduced model in one dimension is derived using the long wave approximation to describe the coupled evolution of the interface and surfactant transport. Linear stability analysis identifies two distinct unstable modes: the Rayleigh-Plateau mode, which dominates at lower values of the Marangoni number 𝑀𝑎 , and the Marangoni mode, which becomes dominant at higher values of 𝑀𝑎 . The influence of the radial electric field is determined by the position of the outer electrode 𝛽 . When 𝛽 < e, the electric field enhances both instabilities and narrows the stable interval in 𝑀𝑎 between the two modes. When 𝛽 > e, the electric field suppresses both modes and can completely eliminate the unstable region associated with the Marangoni mode even at a relatively small electric Weber number 𝐸 𝑏 . Continuation of the traveling wave solutions further shows that, when 𝛽 < e, the magnitude of the relative interfacial motion 𝐼 𝑅𝑃 , generally increases with 𝐸 𝑏 . By contrast, the intensity of Marangoni convection 𝐼 𝑀 varies only weakly at smaller values of 𝐸 𝑏 and increases appreciably only when the electric field becomes sufficiently strong. Analysis of the stream function and the relative interfacial velocity reveals that the electric stress primarily intensifies the recirculation beneath the wave crest and reshapes the spatial distribution of the relative interfacial velocity. This redistribution modifies the advective transport of surfactant, reorganizes the interfacial concentration field, and thereby alters the Marangoni stress. The essential mechanism through which the surfactant affects film stability is therefore the competition between Marangoni convection and relative interfacial motion, whereas the electric field modifies this competition indirectly by changing the magnitude and spatial distribution of the relative interfacial velocity. 
+
+I. INTRODUCTION 
+
+The study of falling liquid films can be traced back to the classical theory of film condensation proposed by Nusselt [1], in which a liquid film descending along a solid wall was treated as a uniform laminar layer, while fluctuations of the free surface were neglected. This treatment yielded the fundamental solution for falling films and established the theoretical basis for subsequent investigations. Kapitza and Kapitza [2–4] later combined theoretical analysis with experimental observations to reveal how free surface waves emerge and evolve dynamically in liquid films flowing downward along a wall. To clarify the physical origin of film instability, Benjamin [5] conducted the classical linear stability analysis of a liquid film flowing down an inclined plane and demonstrated that the system is susceptible to long wave instability. The analysis showed that a critical Reynolds number exists, 
+
+𝑅𝑒 𝑐 = 54 cot 𝜃 , where 𝜃 denotes the inclination angle of the wall, and that long wave disturbances become unstable once 𝑅𝑒 
+
+exceeds this critical value. Yih [6] subsequently extended the analysis by incorporating surface tension and showed that surface tension suppresses the growth of disturbances with short wavelengths. Although linear stability theory provides an accurate description of the initial amplification of infinitesimal disturbances, its applicability is largely restricted to the early stage of instability, which makes it unsuitable for describing finite amplitude waves and the nonlinear dynamics that arise after prolonged evolution. To overcome this limitation, Benney [7] derived a reduced model for the temporal and spatial evolution of the local film thickness by using the long wave approximation together with lubrication theory, thereby extending the study of falling films from linear instability to nonlinear evolution. In contrast to falling films on inclined planes, which are usually formulated in Cartesian coordinates, films descending along fibers must be described within a cylindrical geometry. Because this geometry introduces azimuthal curvature in addition to axial curvature, the Rayleigh–Plateau (RP) instability becomes another important mechanism governing the evolution of the interface. Building on the relatively mature theory developed for inclined planes, Goren [8] performed an early linear stability analysis of an annular liquid film coating a slender fiber and showed that, for prescribed values of the radius ratio and the Ohnesorge number, a disturbance with a maximum growth rate exists. The corresponding wavelength determines the characteristic spacing between droplets after the film ruptures. Quéré [9] later carried out systematic experiments on liquid films flowing down the exterior of vertical fibers, from which empirical relations connecting the film thickness, the fiber radius, and the capillary length were obtained. These relations were further used to determine whether a liquid film coating a fiber would remain continuous or evolve    
+
+> ∗Author to whom correspondence should be addressed: slzhu@pku.edu.cn
+> †Author to whom correspondence should be addressed: bingqiangji@buaa.edu.cn
+> ‡Author to whom correspondence should be addressed: fuqingfei@buaa.edu.cn arXiv:2607.17057v1 [physics.flu-dyn] 19 Jul 2026
+
+2into a sequence of droplets. Under the assumption that the film thickness is much smaller than the fiber radius, Frenkel [10] derived the first long wave reduced model in cylindrical coordinates in which the local film thickness serves as the primary dependent variable. Chang and Demekhin [11] subsequently solved this model numerically and clarified the mechanism through which secondary waves generated downstream collide and merge, eventually producing large droplets. As emphasized by Kalliadasis and Chang [12], the interfacial dynamics of a film flowing down an inclined plane are governed mainly by axial curvature, whereas a cylindrical geometry introduces azimuthal curvature, which competes with the axial contribution. The relative magnitude of these two curvature effects gives rise to distinct dynamics in the thin film and thick film regimes. It should also be noted that a liquid film descending along the interior wall of a tube is not normally classified as a thick film. Nevertheless, the internal coating problem has attracted extensive theoretical and numerical attention in recent years, as illustrated by the studies of Camassa et al. 
+
+[13, 14]. For thick films flowing along the exterior of fibers, Kliakhandler et al. [15] performed pioneering experiments to investigate the associated unstable dynamics. By observing castor oil descending along a nylon fiber at three different flow rates, three characteristic flow regimes were identified. Regime (𝑎 ) corresponds to a convective state, in which two neighbouring large droplets are separated by a long and nearly flat film. Regime (𝑏 ) corresponds to a Rayleigh–Plateau state, in which droplets descend in a nearly periodic train and form a structure resembling a necklace. Regime (𝑐 ) corresponds to a solitary wave state, in which a single large droplet is followed by a sequence of small capillary ripples. Craster and Matar [16] subsequently introduced traveling wave solutions into the analysis and determined the wave speeds and wavenumbers associated with the three regimes. Except for regime (𝑎 ), however, considerable discrepancies remained between the theoretical or numerical predictions and the experimental measurements. Duprat et al. [17] extended the experiments of Kliakhandler et al. [15] by examining the transition between absolute and convective instability. The resulting analysis established the relationship between the flow rate and the fiber radius at the transition boundary and further demonstrated that all the experimental conditions considered by Kliakhandler 
+
+et al. [15] were located within the absolutely unstable region. Ruyer-Quil et al. [18] later derived a second order reduced model for thick liquid films coating fibers by using a weighted residual formulation. Because inertia and viscous dissipation were retained more consistently, the agreement between traveling wave solutions and experimental measurements was substantially improved. Nevertheless, the capillary ripples observed behind the large droplet in regime (𝑐 ) could not be reproduced accurately. This discrepancy was eventually explained by Ding and Willis [19] through a theory based on relative periodic solutions. The underlying mechanism is associated with persistent nonlinear interactions between neighbouring droplets of different sizes, which cause an otherwise steadily propagating traveling wave to undergo periodic oscillations. The resulting oscillatory state can therefore be represented by a relative periodic orbit. Radial electric fields provide an effective way to manipulate the morphology of liquid films on fibers. Li et al. [20] investigated the axial and azimuthal instabilities of a thin film coating a fiber within a perfectly conducting fluid model, in which surface tension, van der Waals interactions, and Maxwell stresses act simultaneously. The results showed that increasing the applied electric field enhances the growth rate of disturbances while reducing the characteristic wavelength, thereby enabling control over the length scale of microscale and nanoscale structures on cylindrical surfaces. Kishore and Bandyopadhyay [21] further examined the competition between azimuthal curvature and electrostatic stresses, and found that bead-like structures form when the curvature effect is dominant, outward-projecting ridges arise when the electric field dominates, and mixed morphologies containing both beads and ridges appear when the two effects have comparable strengths. The studies discussed above mainly focused on thin liquid films subjected to electric fields, Wray et al. [22, 23] were among the first to extend the problem of radial electric fields to thick films coating the exterior of fibers. Using the leaky dielectric model and the long wave approximation, Wray 
+
+et al. [23] derived a reduced model for the coupled evolution of the interface and the interfacial charge. Their analysis showed that the influence of the electric field on film stability is determined jointly by the conductivity ratio, the permittivity ratio, and the position of the outer electrode. The model also accounts for both the normal and tangential components of the Maxwell stress and therefore provides a general description of the effects of finite charge relaxation. However, the analysis was conducted over a broad range of electrical parameters and was not developed specifically for the castor oil-air experiments of Kliakhandler et al. 
+
+[15]. Because the extremely low conductivity of air gives this system a very large conductivity ratio, its stability characteristics are expected to approach the limit of a perfectly conducting liquid, whereas the effects associated with interfacial charge accumulation and tangential electrical stresses become less pronounced. Motivated by the thick film experiments of Kliakhandler et al. [15], Ding et al. [24] subsequently adopted the limiting assumption of a perfectly conducting liquid and examined the influence of a radial electric field on both the linear stability and nonlinear evolution of the film. Their results showed that the effect of the electric field is controlled by the outer electrode position 𝛽 . The field suppresses the instability when 𝛽 > e but enhances disturbance growth when 𝛽 < e. Analysis of traveling wave solutions further showed that the destabilizing mechanism arises because the electric field strengthens the internal circulation within the droplets. The nonlinear simulations nevertheless indicated that stabilization by the electric field is not robust over the accessible parameter range: a relatively weak field may still generate oscillatory traveling waves or even singular behaviour in which the interface touches the outer electrode, whereas pronounced suppression generally requires a high electric potential, which limits the economic feasibility of this approach in engineering applications. Surfactants can substantially modify free-surface flows because a non-uniform interfacial distribution generates surface-tension gradients and the associated Marangoni stresses. Depending on the base flow and the interfacial transport process, surfactants 3z
+
+> r
+> L
+> a
+> b
+> g
+> Region I
+> Region II
+
+FIG. 1: Electrohydrodynamic flow of a surfactant-laden Newtonian film coating a vertical fiber. may either suppress film instability or introduce additional destabilizing mechanisms. For films on planar or inclined substrates, Marangoni stresses not only modify the classical interfacial mode but may also generate an additional surfactant mode. For example, Halpern and Frenkel [25] showed that insoluble surfactants can destabilize creeping two-layer flow, whereas Blyth and Pozrikidis [26] found that the influence of surfactants on inclined-film flow depends sensitively on both the Reynolds number and the Marangoni number. In core-annular flows, Wei and Rumschitzki [27] and Blyth et al. [28] further demonstrated that the coupling between the base flow and surfactant transport can produce non-monotonic variations in stability. For cylindrical geometries, Nair and Sharma [29] developed a two-dimensional model for a surfactant-laden liquid film flowing over a cylindrical rod and identified both interfacial and surfactant modes through linear stability analysis. Building on the thick-film experiments of Kliakhandler et al. [15], Gao et al. [30] investigated the influence of insoluble surfactants on the stability of thick films flowing down fibers and proposed a competition mechanism between the relative motion at the interface and Marangoni convection. Although an absolutely stable regime was found at intermediate Marangoni numbers, the corresponding stability window was narrow, which restricts the range of surfactants and operating conditions available for stabilization. The limitations of electric fields and surfactants when applied separately raise two closely related questions: whether their combined action can provide a more effective means of regulating film instability, and how electric forcing modifies the compe-tition between relative interfacial motion and Marangoni convection. To address these questions, we consider the axisymmetric flow of a perfectly conducting Newtonian liquid film down a vertical metallic fiber in the presence of an insoluble surfactant and a radial electric field. Section II presents the governing equations in two dimensions, together with the interfacial stress balances and the transport equation for the surfactant. Section III introduces the characteristic scales and derives a reduced model in one dimension using the long wave approximation. Section IV examines the linear stability of the uniform film, with particular atten-tion to the competition and transition between the Rayleigh-Plateau and Marangoni modes, the variation of the neutral stability boundaries, and the departure of the coupled response from linear superposition. Section V analyses the traveling wave solutions and clarifies how electric forcing modifies the competition between Marangoni convection and relative interfacial motion. The principal conclusions are summarised in Section VI.  
+
+> II. PROBLEM FORMULATION.
+
+In this study, we consider the axisymmetric gravity-driven flow of a surfactant-laden Newtonian liquid film coating a vertical cylindrical metal fiber under the influence of an externally imposed electric field, as illustrated in Figure 1. The model is for-mulated in cylindrical coordinates (𝑟 ∗, 𝑧 ∗), where 𝑟 ∗ and 𝑧 ∗ denote the radial and axial coordinates, respectively. Following the idealized electrohydrodynamic framework adopted by Ding et al.[24], the liquid film is treated as perfectly conducting. Under this approximation, the metal fiber and the liquid film form an equipotential region, so that the electric field is confined to the annular gas region between the liquid-gas interface and the outer electrode. The physical domain is divided into two regions. Region I consists of the metal fiber and the conducting liquid film, which share a uniform electric potential. Region II is the annular space between the liquid-film surface and the outer electrode, and is occupied by a dielectric gas whose hydrodynamic contribution is neglected. An insoluble surfactant is distributed along the liquid-gas interface, and its interfacial concentration 4is denoted by Γ∗ (𝑧 ∗, 𝑡 ∗). The surfactant modifies the local surface tension through an equation of state 𝛾 ∗ = 𝛾 ∗ (Γ∗), thereby introducing Marangoni stresses into the interfacial stress balance. Under the electrostatic approximation, magnetic induction effects are neglected, and the electric field in Region II is irrotational. Consequently, the electric potential in Region II satisfies Laplace’s equation: 
+
+𝜙 ∗ 
+
+> 𝑟𝑟
+
++ ( 𝑟 ∗)−1 𝜙 ∗ 
+
+> 𝑟
+
++ 𝜙 ∗ 
+
+> 𝑧𝑧
+
+= 0, (1) where 𝜙 ∗ is the electric potential. Meanwhile, a high electric potential 𝜙 ∗ 
+
+> 0
+
+is applied at the outer electrode at 𝑟 ∗ = 𝑏 ∗, while the fiber is grounded, resulting in the electric potential being zero at the liquid film surface 𝑟 ∗ = 𝑎 ∗ + ℎ∗ (𝑧 ∗, 𝑡 ∗) to ensure no generation of a tangential electric field. Then the Maxwell stress T = 𝜖 [EE − 12 |E|2I] can be obtained by solving the Laplace equation, where 𝜀 0 is the electrical permittivity of the gas, E = −∇ 𝜙 ∗ is the electric intensity, and I is the identity tensor. Subsequently, we begin to establish the governing equations for the liquid film flow in region I. The fluid is assumed to be New-tonian, incompressible, and perfectly conductive, with axisymmetric motion. The continuity equation and momentum equation in cylindrical coordinates are given as follows: 
+
+𝑢 ∗ 
+
+> 𝑟
+
++ ( 𝑟 ∗)−1𝑢 ∗ + 𝑤 ∗ 
+
+> 𝑧
+
+= 0, (2) 
+
+𝜌 ∗ (𝑢 ∗ 
+
+> 𝑡
+
++ 𝑢 ∗𝑢 ∗ 
+
+> 𝑟
+
++ 𝑤 ∗𝑢 ∗
+
+> 𝑧
+
+) = −𝑝 ∗ 
+
+> 𝑟
+
++ 𝜇 ∗ [𝑢 ∗ 
+
+> 𝑟𝑟
+
++ ( 𝑟 ∗)−1𝑢 ∗ 
+
+> 𝑟
+
++ 𝑢 ∗ 
+
+> 𝑧𝑧
+
+− ( 𝑟 ∗)−2𝑢 ∗] , (3) 
+
+𝜌 ∗ (𝑤 ∗ 
+
+> 𝑡
+
++ 𝑢 ∗𝑤 ∗ 
+
+> 𝑟
+
++ 𝑤 ∗𝑤 ∗
+
+> 𝑧
+
+) = −𝑝 ∗ 
+
+> 𝑧
+
++ 𝜇 ∗ [𝑤 ∗ 
+
+> 𝑟𝑟
+
++ ( 𝑟 ∗)−1𝑤 ∗ 
+
+> 𝑟
+
++ 𝑤 ∗
+
+> 𝑧𝑧
+
+] + 𝜌 ∗𝑔 ∗, (4) where 𝑢 ∗ and 𝑤 ∗ stand for the radial and axial velocity of the film, respectively. 𝜌 ∗ is the density of the fluid, while 𝜇 ∗ is the dynamic viscosity, and 𝑔 ∗ is the gravitational acceleration. The no-slip and no-penetration boundary condition is satisfied at the surface of the fiber: 
+
+𝑢 ∗ (𝑎 ∗) = 𝑤 ∗ (𝑎 ∗) = 0. (5) At the gas-liquid interface, where 𝑟 ∗ = 𝑎 ∗ + ℎ∗ (𝑧 ∗, 𝑡 ∗), the kinematic boundary condition and the normal as well as the tangential stress balance must be satisfied: 
+
+𝑢 ∗ = ℎ∗ 
+
+> 𝑡
+
++ 𝑤 ∗ ℎ∗ 
+
+> 𝑧
+
+, (6) 
+
+(Δ∗
+
+> ℎ
+
+)2 (
+
+𝑝 ∗ − 𝑝 ∗
+
+> 𝑔
+
+)
+
+− 2𝜇 ∗ [𝑢 ∗ 
+
+> 𝑟
+
+− ℎ∗
+
+> 𝑧
+
+(𝑤 ∗ 
+
+> 𝑟
+
++ 𝑢 ∗
+
+> 𝑧
+
+) + ( ℎ∗ 
+
+> 𝑧
+
+)2𝑤 ∗
+
+> 𝑧
+
+] + 𝜖 
+
+[ 12
+
+(
+
+1 − ( ℎ∗ 
+
+> 𝑧
+
+)2) ( 
+
+(𝜙 ∗ 
+
+> 𝑟
+
+)2 − ( 𝜙 ∗ 
+
+> 𝑧
+
+)2)
+
+− 2ℎ∗ 
+
+> 𝑧
+
+𝜙 ∗ 
+
+> 𝑟
+
+𝜙 ∗
+
+> 𝑧
+
+]
+
+= 2(Δ∗
+
+> ℎ
+
+)2𝛾 ∗𝜗 ∗, (7) 
+
+2𝜇 ∗ ℎ∗
+
+> 𝑧
+
+(𝑢 ∗ 
+
+> 𝑟
+
+− 𝑤 ∗
+
+> 𝑧
+
+) + [2 − ( Δ∗
+
+> ℎ
+
+)2] 𝜇 ∗ (𝑤 ∗ 
+
+> 𝑟
+
++ 𝑢 ∗
+
+> 𝑧
+
+) = Δ ∗ 
+
+> ℎ
+
+𝛾 ∗ 
+
+> 𝑧
+
+, (8) where 𝜗 ∗ = 12Δ∗
+
+> ℎ
+
+[ 1 
+
+> 𝑎 ∗+ℎ∗
+
+− ℎ∗ 
+
+> 𝑧𝑧
+> (Δ∗
+> ℎ)2
+
+]
+
+is the mean curvature and Δ∗ 
+
+> ℎ
+
+= √1 + ( ℎ∗ 
+
+> 𝑧
+
+)2. Considering the application of a radial electric field, a non-ionic insoluble surfactant is present at the gas-liquid interface of the film in region I, which reduces the surface tension of the liquid. Deformation of the film interface and variations in the interfacial velocity redistribute the insoluble surfactant along the liquid film surface, resulting in a non-uniform concentration field. The associated variation in surface tension generates Marangoni stresses and thereby alters the flow dynamics of the liquid film. The surfactant transport along the deformable interface is governed by the following convection-diffusion equation[30]: 
+
+Γ∗ 
+
+> 𝑡
+
++ 𝑤 ∗Γ∗ 
+
+> 𝑧
+
++ Γ∗
+
+(𝑎 ∗ + ℎ∗)Δ∗
+
+> ℎ
+
+((𝑎 ∗ + ℎ∗)𝑢 ∗
+
+> 𝑡
+
+) 
+
+> 𝑧
+
++ Γ∗𝜗 ∗𝑢 ∗ 
+
+> 𝑛
+
+= 𝐷 ∗
+
+(𝑎 ∗ + ℎ∗)Δ∗
+
+> ℎ
+
+( (𝑎 ∗ + ℎ∗)Γ∗
+
+> 𝑧
+
+Δ∗
+
+> ℎ
+
+)
+
+> 𝑧
+
+, (9) The scalar form used here is obtained by expanding the general vectorial transport equation in the coordinate system adopted in the present study, and the general formulation can be found in [31–33]. Here 𝐷 ∗ is the surface diffusivity, and (𝑢 ∗
+
+> 𝑛
+
+, 𝑢 ∗ 
+
+> 𝑡
+
+) are the normal and tangential components of interfacial velocity, which can be expressed as follows: 
+
+𝑢 ∗ 
+
+> 𝑡
+
+= 𝑤 ∗ + ℎ∗ 
+
+> 𝑧
+
+𝑢 ∗
+
+Δ∗
+
+> ℎ
+
+, 𝑢 ∗ 
+
+> 𝑛
+
+= 𝑢 ∗ − ℎ∗ 
+
+> 𝑧
+
+𝑤 ∗
+
+Δ∗
+
+> ℎ
+
+. (10) To close the system of equations, assuming the fluid to be isothermal, a relation between the surface tension coefficient 𝛾 ∗ and the interfacial surfactant concentration Γ∗ needs to be specified using the Langmuir equation of state [34]: 
+
+𝛾 ∗ = 𝛾 ∗ 
+
+> 0
+
++ 𝑅 ∗𝑇 ∗Γ∗∞ ln 
+
+(
+
+1 − Γ∗
+
+Γ∗∞
+
+)
+
+, (11) 5                                          
+
+> Parameter Description Value Unit
+> 𝜇 ∗Dynamic viscosity 0.423 Pa ·s
+> 𝛾 ∗Surface tension 20 –40 dyn /cm
+> 𝜌 ∗Density 0.961 g/cm 3
+> 𝑔 ∗Gravitational acceleration 9.81 m/s2
+> 𝑇 ∗Thermodynamic temperature 298.15 K
+> 𝑅 ∗Gas constant 8.31 N·m/( K·mol )
+> Γ∗∞Maximum surfactant concentration 10 −10 –10 −9mol /cm 2
+> 𝐷 ∗Surface diffusivity 10 −6–10 −4cm 2/s
+> 𝑎 ∗Fiber radius 0.25 mm
+> 𝑄 ∗Volumetric flow rate 11.5 mm 3/s
+> 𝜙 ∗
+> 0Electric potential 0–3.03 kV
+
+TABLE I: Physical parameters used in the present study [15, 38, 39]. where 𝛾 ∗
+
+> 0
+
+, 𝑅 ∗ and 𝑇 ∗ correspond to surface tension of a clean liquid surface (without surfactant), universal gas constant and ther-modynamic temperature. Equation (1–11) form the dimensional governing system for the two-dimensional electrohydrodynamic flow of a surfactant-laden liquid film coating a vertical fiber. The dimensional parameters are chosen with reference to the experiments of Kliakhandler et al. [15], which provide a classical data set for relatively thick films flowing down vertical fibers. Among the reported cases, the flow rate 𝑄 ∗ = 11 .5 mm 3/s is selected as the reference state. At this flow rate, the Rayleigh-Plateau bead train is regular and well developed, making it suitable for comparison with the traveling wave solutions discussed later. The electric field is formulated under the perfectly conducting liquid assumption used by Ding et al. [24], this assumption is relevant to practical coating liquids based on water mixtures, which usually have relatively high electrical conductivity. Their liquid-gas surface tension, however, is also relatively large. Experiments on films flowing down fibers have shown that large surface tension can promote the loss of axial symmetry of beads on fibers [35]. For this reason, the fluid properties used here are kept the same as those in the experiments of Kliakhandler et al. [15], while the electric field is treated in the same perfectly conducting limit as in Ding et al. [24]. The surfactant-related parameters are chosen from commonly used ranges of maximum surface concentration and surface diffusivity, rather than from one specific surfactant formulation. For oil-based liquids, conventional hydrocarbon surfactants usually have only a limited ability to reduce the oil-air surface tension. Substantial reductions have nevertheless been reported for dioctyl sulfosuccinate sodium salt (AOT), sorbitan monooleate (Span 80), and surfactants containing fluorinated or silicone groups at oil-air or organic-liquid–air interfaces [36, 37]. Using one particular surfactant system would unnecessarily narrow the accessible parameter space. In the present formulation, the surfactant is therefore assumed to be insoluble, with adsorption and desorption neglected on the timescale of the film instability. This assumption isolates the Marangoni effect associated with interfacial transport. The dimensional physical parameters adopted in the present study are summarized in Table I.   
+
+> III. SCALING AND REDUCED MODEL. A. Scaling and dimensionless formulation.
+
+Following Kliakhandler et al. [15], Craster and Matar [16], and Ding et al. [24], the radial length scale is taken to be the outer radius of the undisturbed film, 𝐻 = 𝑎 ∗ + ℎ∗
+
+> 0
+
+, where 𝑎 ∗ is the fiber radius and ℎ∗ 
+
+> 0
+
+is the initial film thickness. Since the imposed control parameter in experiments is typically the volumetric flow rate 𝑄 ∗, ℎ∗ 
+
+> 0
+
+is obtained from the corresponding steady base flow. For a uniform film, whose interface is located at 𝑟 ∗ = 𝑎 ∗ + ℎ∗
+
+> 0
+
+, the base flow reduces to unidirectional Poiseuille-type flow driven by gravity. The axial velocity 𝑤 ∗ (𝑟 ∗) follows from the balance between gravitational forcing and radial viscous diffusion, with no slip at the fiber and zero shear at the free surface. The resulting axial velocity is 
+
+𝑤 ∗ (𝑟 ∗) = 𝜌 ∗𝑔 ∗
+
+4𝜇 ∗
+
+[
+
+2 (𝑎 ∗ + ℎ∗
+
+> 0
+
+)2 ln 
+
+( 𝑟 ∗
+
+𝑎 ∗
+
+)
+
+−
+
+(
+
+(𝑟 ∗)2 − ( 𝑎 ∗)2)]
+
+. (12) The volumetric flow rate is then obtained by integrating this velocity profile over the annular film cross-section that 𝑄 ∗ =
+
+2𝜋 ∫ 𝑎 ∗+ℎ∗ 
+
+> 0
+> 𝑎 ∗
+
+𝑟 ∗𝑤 ∗ (𝑟 ∗) d𝑟 ∗. This yields the relation between the prescribed flow rate 𝑄 ∗ and the initial film thickness ℎ∗
+
+> 0
+
+:
+
+𝑄 ∗ = 𝜋𝜌 ∗𝑔 ∗
+
+8𝜇 ∗
+
+{
+
+4 (ℎ∗ 
+
+> 0
+
++ 𝑎 ∗)4 ln 
+
+( ℎ∗ 
+
+> 0
+
++ 𝑎 ∗
+
+𝑎 ∗
+
+)
+
+− ℎ∗
+
+> 0
+
+[
+
+3 (ℎ∗
+
+> 0
+
+)3 + 12 𝑎 ∗ (ℎ∗
+
+> 0
+
+)2 + 14 ℎ∗ 
+
+> 0
+
+(𝑎 ∗)2 + 4 (𝑎 ∗)3] }
+
+. (13) 6Following the work of Craster and Matar [16], we choose the length L = 𝛾 ∗
+
+> 0
+
+/( 𝜌 ∗𝑔 ∗ 𝐻 ) as the axial characteristic length scale. The remaining non-dimensional parameters are defined as follows: 
+
+𝑟 = 𝑟 ∗
+
+𝐻 , 𝑧 = 𝑧 ∗
+
+L , 𝜙 = 𝜙 ∗
+
+𝜙 ∗
+
+> 0
+
+, 𝛾 = 𝛾 ∗
+
+𝛾 ∗
+
+> 0
+
+, Γ = Γ∗
+
+Γ∗∞
+
+, 𝑤 = 𝑤 ∗
+
+𝑊 ∗ , 𝑢 = 𝑢 ∗
+
+𝜖𝑊 ∗ , 𝑡 = 𝑡 ∗𝑊 ∗
+
+L , 𝑝 = 𝑝 ∗ − 𝑝 ∗
+
+> 𝑔
+
+𝜌 ∗𝑔 ∗L . (14) where 𝜀 = 𝐻 /L , 𝑊 ∗ = 𝜌 ∗𝑔 ∗ 𝐻 2/𝜇 ∗. Substituting the dimensionless variables defined in equation (14) into the original model, the electric potential equation is non-dimensionalized as follows: 
+
+𝜙 𝑟𝑟 + 𝑟 −1 𝜙 𝑟 + 𝜀 2 𝜙 𝑧𝑧 = 0, (15) with 𝜙 = 0 at 𝑟 = 𝛼 + ℎ(𝑧, 𝑡 ) and 𝜙 = 1 at 𝑟 = 𝛽 . Subsequently, the continuity and momentum equations are non-dimensionalized as follows: 
+
+𝑢 𝑟 + 𝑟 −1𝑢 + 𝑤 𝑧 = 0, (16) 
+
+𝜀 4 𝑅𝑒 (𝑢 𝑡 + 𝑢𝑢 𝑟 + 𝑤𝑢 𝑧 ) = −𝑝 𝑟 + 𝜀 2 (
+
+𝑢 𝑟𝑟 + 𝑟 −1𝑢 𝑟 + 𝑢 𝑧𝑧 − 𝑟 −2𝑢 
+
+)
+
+, (17) 
+
+𝜀 2 𝑅𝑒 (𝑤 𝑡 + 𝑢𝑤 𝑟 + 𝑤𝑤 𝑧 ) = 1 − 𝑝 𝑧 +
+
+(
+
+𝑤 𝑟𝑟 + 𝑟 −1𝑤 𝑟 + 𝜀 2𝑤 𝑧𝑧 
+
+)
+
+. (18) The boundary conditions are also written in non-dimensionalized form. At the fiber surface 𝑟 = 𝛼 , the no-slip and no-penetration conditions give: 
+
+𝑢 (𝛼 ) = 𝑤 (𝛼 ) = 0, (19) At the free surface 𝑟 = 𝛼 + ℎ(𝑧, 𝑡 ), the kinematic condition and the normal and tangential stress balances are non-dimensionalized as follows, respectively: 
+
+𝑢 = ℎ𝑡 + 𝑤ℎ 𝑧 , (20) 
+
+Δ2 
+
+> ℎ
+
+𝑝 − 2𝜀 2 [
+
+𝑢 𝑟 − ℎ𝑧 
+
+(
+
+𝑤 𝑟 + 𝜀 2𝑢 𝑧 
+
+)
+
++ 𝜀 2 ℎ2 
+
+> 𝑧
+
+𝑤 𝑧 
+
+]
+
++ 𝐸 𝑏 
+
+[ 12
+
+(
+
+1 − 𝜀 2 ℎ2
+
+> 𝑧
+
+) ( 
+
+𝜙 2 
+
+> 𝑟
+
+− 𝜀 2 𝜙 2
+
+> 𝑧
+
+)
+
+− 2𝜀 2 ℎ𝑧 𝜙 𝑟 𝜙 𝑧 
+
+]
+
+= 2𝜀𝐵𝑜 −1Δ2 
+
+> ℎ
+
+𝛾𝜗, (21) 
+
+2𝜀 2 ℎ𝑧 (𝑢 𝑟 − 𝑤 𝑧 ) + 
+
+(
+
+2 − Δ2
+
+> ℎ
+
+) ( 
+
+𝜀 2𝑢 𝑧 + 𝑤 𝑟 
+
+)
+
+= 𝜀𝐵𝑜 −1Δℎ 𝛾 𝑧 . (22) The convection-diffusion equation for the surfactant concentration is non-dimensionalized in the following manner: 
+
+Γ𝑡 + 𝑤 Γ𝑧 + Γ
+
+(𝛼 + ℎ)Δℎ
+
+[ (𝛼 + ℎ)( 𝑤 + 𝜀 2𝑢ℎ 𝑧 )
+
+Δℎ
+
+]
+
+> 𝑧
+
++ Γ𝜗 𝑢 − 𝑤ℎ 𝑧 
+
+Δℎ
+
+= 1
+
+(𝛼 + ℎ)Δℎ 𝑃𝑒 
+
+[ (𝛼 + ℎ)Γ𝑧 
+
+Δℎ
+
+]
+
+> 𝑧
+
+, (23) and where 𝜗 = 12Δℎ
+
+( 1 
+
+> 𝛼 +ℎ
+
+− 𝜀 2 ℎ𝑧𝑧 
+
+> Δ2
+> ℎ
+
+)
+
+is the non-dimensional mean curvature, and Δℎ = √1 + 𝜀 2 ℎ2 
+
+> 𝑧
+
+. The relationship between the non-dimensional surface tension coefficient and the concentration of surfactant is 
+
+𝛾 = 1 + 𝑀𝑎 ln (1 − Γ). (24) The non-dimensional parameters derived from the governing equations and boundary conditions are presented as follows: 
+
+𝛼 = 𝑎 ∗
+
+𝐻 , 𝛽 = 𝑏 ∗
+
+𝐻 , 𝑃𝑒 = 𝑊 ∗L
+
+𝐷 ∗ , 𝑅𝑒 = 𝜌 ∗𝑊 ∗L
+
+𝜇 ∗ , 𝐵𝑜 = 𝜌 ∗𝑔 ∗ 𝐻 2
+
+𝛾 ∗
+
+> 0
+
+, 𝑀𝑎 = 𝑅 ∗𝑇 ∗Γ∗∞
+
+𝛾 ∗
+
+> 0
+
+, 𝐸 𝑏 = 𝜖𝜀 (𝜙 ∗
+
+> 0
+
+)2
+
+𝜌 ∗𝑔 ∗ 𝐻 3 . (25) The non-dimensional fiber radius is denoted by 𝛼 , a smaller value of 𝛼 corresponds to a thicker liquid film. The non-dimensional radius of the outer electrode is denoted by 𝛽 . The remaining non-dimensional groups are the Péclet number 𝑃𝑒 , Reynolds number 
+
+𝑅𝑒 , Bond number 𝐵𝑜 , Marangoni number 𝑀𝑎 , and electric Weber number 𝐸 𝑏 . In the next section, a reduced model is derived using the long wave approach of Ding et al. [24] and Craster and Matar [16]. The small parameter is 𝜀 = 𝐻 /L , which measures the ratio of the radial length scale of the liquid film to the axial capillary length scale. The Bond number measures the relative 7importance of gravity and capillarity. With the present axial length scale L = 𝛾 ∗
+
+> 0
+
+/( 𝜌 ∗𝑔 ∗ 𝐻 ), one obtains 𝐵𝑜 = 𝐻 /L = 𝜀 . Hence, in the present scaling, the Bond number is fixed by the long wave parameter and is not treated as an independent control parameter. The Péclet number measures the relative strength of convection along the interface and surface diffusion in the surfactant transport. Estimates based on Table I give 𝑃𝑒 ≫ 1, indicating that interfacial convection is much stronger than surface diffusion, and a representative value of 𝑃𝑒 = 10 3 is used in the following calculations. The Reynolds number measures the relative strength of inertia and viscous effects in the liquid film. For the present parameter set, 𝑅𝑒 = [0.09 , 0.19 ], which is of the same order as 
+
+𝜀 . The Marangoni number measures the magnitude of surface tension variations caused by surfactant transport relative to the surface tension of a clean interface. From the ranges of Γ∗∞ and 𝛾 ∗ 
+
+> 0
+
+in Table I, the estimated physical range is 𝑀𝑎 = [0.06 , 1.24 ],showing that 𝑀𝑎 is of order one. Given that the case without surfactants corresponds to 𝑀𝑎 = 0, the parameter range of 𝑀𝑎 
+
+is set as 𝑀𝑎 = [0, 1] in the present study. The electric Weber number measures the strength of the electric forcing relative to gravity. The applied electric potential listed in Table I corresponds to 𝐸 𝑏 = [0, 3], showing that 𝐸 𝑏 is also of order one. Unless otherwise stated, 𝛼 = 0.2856 and 𝜀 = 0.233 which correspond to the flow rate associated with regime 𝑏 in the experiments of Kliakhandler et al. [15], are adopted throughout the following analysis. The main control parameters examined below are 𝑀𝑎 
+
+and 𝐸 𝑏 , which describe the effects of Marangoni stresses and electric stresses on the instability of the coating film.  
+
+> B. Derivation of the one-dimensional model.
+
+By extracting the leading-order term of 𝜀 , the electric potential equation is simplified as follows: 
+
+𝜙 𝑟𝑟 + 𝑟 −1 𝜙 𝑟 = 0, (26) with 𝜙 = 0 at 𝑟 = 𝛼 + ℎ(𝑧, 𝑡 ) and 𝜙 = 1 at 𝑟 = 𝛽 . Thus, the solution of the electric potential equation can be obtained as follows: 
+
+𝜙 = ln (𝛼 + ℎ) − ln 𝑟 
+
+ln (𝛼 + ℎ) − ln 𝛽 . (27) Moreover, the radial momentum equation and normal boundary condition are reduced to: 
+
+𝑝 𝑟 = 0, (28) 
+
+𝑝 + 𝐸 𝑏 
+
+2 𝜙 2 
+
+> 𝑟
+
+= 𝛾 
+
+( 1
+
+𝛼 + ℎ − 𝜀 2 ℎ𝑧𝑧 
+
+)
+
+, (29) which can derive the expression for the pressure as follows: 
+
+𝑝 = − 𝐸 𝑏 
+
+2 [ln (𝛼 + ℎ) − ln 𝛽 ]2 (𝛼 + ℎ)2 + 𝛾 
+
+( 1
+
+𝛼 + ℎ − 𝜀 2 ℎ𝑧𝑧 
+
+)
+
+, (30) where 𝛾 = 1+ 𝑀𝑎 ln (1−Γ). The term 𝜀 2 ℎ𝑧𝑧 in equation (30) is retained because it accounts for the axial curvature contribution to the capillary pressure [16]. Although formally of higher order relative to the leading circumferential curvature contribution, this term is essential for capturing the stabilization of disturbances with relatively short wavelengths. Without this term, the model cannot correctly capture the cutoff wave number of the Rayleigh-Plateau instability. The simplified axial momentum equation, along with the no-slip boundary condition and the tangential stress balance condition, are as follows: 
+
+1 − 𝑝 𝑧 + 𝑤 𝑟𝑟 + 𝑟 −1𝑤 𝑟 = 0, (31) 
+
+𝑤 (𝛼 ) = 0, 𝑤 𝑟 𝑟 =𝛼 +ℎ(𝑧,𝑡 ) = 𝛾 𝑧 . (32) Therefore, by applying boundary condition above to solve the axial momentum equation, the expression for axial velocity is obtained: 
+
+𝑤 = 𝑟 2 − 𝛼 2
+
+4 ( 𝑝 𝑧 − 1) + 
+
+[ (𝛼 + ℎ)2
+
+2 (1 − 𝑝 𝑧 ) + ( 𝛼 + ℎ)𝛾 𝑧 
+
+]
+
+ln 𝑟 𝛼 . (33) The leading-order equations for the continuity equation and kinematic boundary conditions are as follows: 
+
+𝑢 𝑟 + 𝑟 −1𝑢 + 𝑤 𝑧 = 0, (34) 8
+
+𝑢 = ℎ𝑡 + 𝑤ℎ 𝑧 . (35) Combining the continuity equation, the integral form of the kinematic boundary condition is rewritten as follows: 
+
+ℎ𝑡 + ( 𝛼 + ℎ)−1𝑞 𝑧 = 0, (36) where 𝑞 is the flow rate. For notational convenience, the flow rate is written as 
+
+𝑞 = − 𝑝 𝑧 − 14 F ( 𝛼, ℎ ) + G( 𝛼, ℎ )𝛾 𝑧 , (37) with 
+
+F ( 𝛼, ℎ ) = (𝛼 + ℎ)4 ln 
+
+( 𝛼 + ℎ𝛼 
+
+)
+
+− ℎ(2𝛼 + ℎ)( 2𝛼 2 + 6𝛼ℎ + 3ℎ2)
+
+4 , (38) and 
+
+G( 𝛼, ℎ ) = (𝛼 + ℎ)3
+
+2 ln 
+
+( 𝛼 + ℎ𝛼 
+
+)
+
+− ℎ(𝛼 + ℎ)( 2𝛼 + ℎ)
+
+4 . (39) Then the convection-diffusion equation for surfactant concentration can be simplified to the following form: 
+
+Γ𝑡 + ( 𝑤 Γ)𝑧 + Γ𝑢 𝛼 + ℎ = 1
+
+(𝛼 + ℎ)𝑃𝑒 [( 𝛼 + ℎ)Γ𝑧 ]𝑧 . (40) Thus, Eqs. (36)–(40) therefore define the reduced governing system. The pressure is given by Eq. (30), and the axial velocity 
+
+𝑤 at the interface is obtained from Eq. (33) by setting 𝑟 = 𝛼 + ℎ. The radial velocity 𝑢 at the interface can be obtained from the kinematic boundary condition, Eq. (35), or equivalently from the continuity equation Eq. (34). In the following discussion, unless otherwise stated, 𝑢 and 𝑤 denote the velocities evaluated at the interface.  
+
+> IV. LINEAR STABILITY AND MODE COMPETITION.
+
+At the early stage of the flow evolution, the disturbance amplitude remains small compared with the basic flow, allowing the initial evolution of the falling film to be examined using linear stability analysis. The quantities in the basic state are given by: 
+
+
+
+¯𝛾 = 1 + 𝑀𝑎 ln (1 − ¯Γ) , ¯𝑢 = 0, ¯ℎ = 1 − 𝛼, 
+
+¯𝑝 = ¯𝛾 − 𝐸 𝑏 
+
+2(ln 𝛽 )2 , ¯G = ¯𝑤 = 14
+
+(
+
+𝛼 2 − 1 − 2 ln 𝛼 
+
+)
+
+,
+
+¯F = − ln 𝛼 − 14
+
+(
+
+1 − 𝛼 2) ( 
+
+3 − 𝛼 2)
+
+, ¯Γ = 0.4.
+
+(41) Following Gao et al. [30] and Li et al. [38], the initial interfacial concentration of the surfactant ¯Γ is set to 0.4 times the maximum interfacial concentration, which allows the Marangoni effect to be more clearly reflected. It should be noted that surfactants at sufficiently high concentrations may substantially enhance interfacial viscosityYang et al. [40]. The present study focuses primarily on the coupling between Marangoni stresses and the electric field, and the effects of interfacial viscosity are therefore not included in the current model. The physical quantities are then expressed as the sum of a basic state and a small disturbance: 
+
+[𝑢, 𝑤, 𝑝, ℎ, Γ, 𝛾, F , G] = [ ¯𝑢, ¯𝑤, ¯𝑝, ¯ℎ, ¯Γ, ¯𝛾, ¯F , ¯G] + [ ˆ𝑢, ˆ𝑤, ˆ𝑝, ˆℎ, ˆΓ, ˆ𝛾, ˆF , ˆG] 𝑒 𝑖𝑘 (𝑧 −𝑐𝑡 ) + 𝑐.𝑐.. (42) Here, 𝑘 is the wave number and 𝑐 = 𝑐 𝑟 + 𝑖𝑐 𝑖 is the complex wave speed, whose imaginary part 𝑐 𝑖 determines the stability of the disturbance: 𝑐 𝑖 > 0 corresponds to temporal growth and hence an unstable state, whereas 𝑐 𝑖 ≤ 0 indicates that the disturbance does not grow and the system remains stable. The real part 𝑐 𝑟 gives the propagation speed of the disturbance, and 𝑐.𝑐. denotes the complex conjugate. The corresponding disturbance amplitudes are then given by: 
+
+
+
+ˆ𝛾 = 𝑀𝑎 
+
+¯Γ − 1 ˆΓ, ˆF = 8 ¯ 𝑤 ˆℎ, ˆG = ( ¯𝑤 − ln 𝛼 ) ˆℎ
+
+ˆ𝑝 = 𝐸 𝑏 (ln 𝛽 − 1)(ln 𝛽 )3 ˆℎ − ¯𝛾 
+
+(
+
+1 − 𝜀 2 𝑘 2) ˆℎ + ˆ𝛾, 
+
+ˆ𝑤 = −𝑖𝑘 ¯𝑤 ˆ𝑝 − ln 𝛼 ( ˆℎ + 𝑖𝑘 ˆ𝛾 ).
+
+(43) 9The relations above allow all other disturbance quantities to be expressed in terms of ˆℎ and ˆΓ, which can therefore be taken as the independent disturbance amplitudes. Substituting these relations into the linearized equation governing the film thickness and the transport equation for the surfactant gives the following two algebraic equations: 
+
+−𝑖𝑘𝑐 ˆℎ + 2𝑖𝑘 ¯𝑤 ˆℎ + 14 𝑘 2 ¯F ˆ𝑝 − 𝑘 2 ¯𝑤 ˆ𝛾 = 0, (44) 
+
+−𝑖𝑘𝑐 ˆΓ + 𝑖𝑘 ¯𝑤 ˆΓ + 𝑖𝑘 ¯Γ ˆ𝑤 + ¯Γ
+
+(
+
+−𝑖𝑘𝑐 ˆℎ + 𝑖𝑘 ¯𝑤 ˆℎ
+
+)
+
++ 1
+
+𝑃𝑒 𝑘 2 ˆΓ = 0. (45) The disturbance amplitude ˆ𝑢 at the free surface has been eliminated using the linearized kinematic boundary condition, leaving a closed system for ˆℎ and ˆΓ. Requiring this system to admit a nontrivial solution then yields the dispersion relation between the wave number 𝑘 and the complex wave speed 𝑐 . Since the resulting relation is algebraic in 𝑐 , an analytical solution can be derived, although its full expression is too cumbersome to reveal clearly how the physical parameters affect the flow stability, which motivates the following expansion in the long wave limit.  
+
+> A. Asymptotic solution in the long wavelength limit
+
+Following the asymptotic procedure adopted by Gao et al. [30], the wave number is assumed to satisfy 𝑘 ≪ 1, allowing the disturbance amplitudes and the complex wave speed to be expanded as 
+
+( ˆℎ, ˆΓ, 𝑐 
+
+)
+
+=
+
+( ˆℎ0, ˆΓ0, 𝑐 0
+
+)
+
++ 𝑘 
+
+( ˆℎ1, ˆΓ1, 𝑐 1
+
+)
+
++ 𝑂 
+
+(
+
+𝑘 2)
+
+. (46) Since the stability of the system is determined by 𝑐 𝑖 , the coefficients in the expansion of the complex wave speed 𝑐 are determined successively in the long wavelength limit, with the equations at the leading order given by: 
+
+(2 ¯ 𝑤 − 𝑐 0) ˆℎ0 = 0, (47) 
+
+( ¯𝑤 − 𝑐 0) ˆΓ0 + ¯Γ ( ¯𝑤 − 𝑐 0 − ln 𝛼 ) ˆℎ0 = 0. (48) Equations (47) and (48) reveal two distinct disturbance modes. For the mode associated with disturbance in surfactant concentra-tion, ˆℎ0 = 0 and ˆΓ0 ≠ 0, giving 𝑐 0 = ¯𝑤 , which indicates that the disturbance propagates downstream at the interfacial velocity of the basic state. When the interface disturbance is nonzero, ˆℎ0 ≠ 0, the solution becomes ˆΓ0 = −[( ln 𝛼 + ¯𝑤 ) ¯Γ/ ¯𝑤 ] ˆℎ0, and 𝑐 0 = 2 ¯ 𝑤, 
+
+showing that this mode propagates downstream at twice the interfacial velocity of the basic state. These two branches correspond to the Marangoni mode associated with variations in surfactant concentration and the Rayleigh–Plateau mode associated with interface disturbance, in agreement with the results of Gao et al. [30]. Since the solutions at the leading order determine only the propagation speeds of the two modes, their stability must be established from the imaginary part of the complex wave speed obtained at the subsequent orders. The terms at the first order 𝑂 (𝑘 ) in Eqs. (44) and (45) are therefore considered below: 
+
+(𝑐 0 − 2 ¯ 𝑤 ) ˆℎ1 + ˆℎ0𝑐 1 − 𝑖 𝑀𝑎 ¯𝑤 
+
+¯Γ − 1 ˆΓ0 + 𝑖 
+
+4 ¯F
+
+[ 𝐸 𝑏 (ln 𝛽 − 1)(ln 𝛽 )3 ˆℎ0 −
+
+(
+
+1 − 𝜀 2 𝑘 2)
+
+¯𝛾 ˆℎ0 + 𝑀𝑎 
+
+¯Γ − 1 ˆΓ0
+
+]
+
+= 0. (49) 
+
+( ˆΓ0 + ¯Γ ˆℎ0
+
+)
+
+𝑐 1 + ( 𝑐 0 − ¯𝑤 ) ˆΓ1 + ( ln 𝛼 − ¯𝑤 + 𝑐 0) ¯Γ ˆℎ1
+
++ 𝑖 ¯𝑤 ¯Γ
+
+[ 𝐸 𝑏 (ln 𝛽 − 1)(ln 𝛽 )3 ˆℎ0 −
+
+(
+
+1 − 𝜀 2 𝑘 2)
+
+¯𝛾 ˆℎ0 + 𝑀𝑎 
+
+¯Γ − 1 ˆΓ0
+
+]
+
++ 𝑖 ln 𝛼 𝑀𝑎 ¯Γ
+
+¯Γ − 1 ˆΓ0 + 𝑖 𝑃𝑒 ˆΓ0 = 0.
+
+(50) It is worth noting that, unlike the treatment adopted by Gao et al. [30], the axial curvature term is retained when the equations at first order are derived, which is essential for distinguishing the two modes in the subsequent numerical results. As in the leading order system, the equations at first order also admit two solution branches. Substituting the leading order solution for the Rayleigh-Plateau mode associated with interface disturbance directly into Eq. (49) gives the following expression for 𝑐 1:
+
+𝑐 1 = 𝑖 14 ¯𝐹 𝐸 𝑏 (1 − ln 𝛽 )(ln 𝛽 )3
+
+︸ ︷︷ ︸
+
+> Effect of electric stress
+
++ 𝑖 14 ¯𝐹 (1 − 𝜀 2 𝑘 2) ¯𝛾 
+
+︸ ︷︷ ︸
+
+> Effect of capillarity
+
+− 𝑖 
+
+( 14 ¯𝐹 − ¯𝑤 
+
+) 𝑀𝑎 ¯Γ ( ¯𝑤 + ln 𝛼 )
+
+(1 − ¯Γ) ¯𝑤 
+
+︸ ︷︷ ︸
+
+> Effect of Marangoni stress
+
+. (51) 10 The results show that, in the long wavelength limit, the stability of the Rayleigh-Plateau mode is governed jointly by electric stress, capillarity, and Marangoni stress. When 𝐸 𝑏 = 0, the electric field is absent and the present result reduces to that obtained by Gao 
+
+et al. [30]. The influence of electric stress depends on the position of the outer electrode, represented by 𝛽 , with electric stress enhancing the growth of disturbances for 𝛽 < 𝑒 but suppressing it for 𝛽 > 𝑒 , in agreement with the results of Ding et al. [24]. In contrast to electric stress, whose influence changes with 𝛽 , capillarity always promotes instability, whereas Marangoni stress has a stabilizing effect. The stabilizing influence of 𝑀𝑎 arises through two mechanisms: increasing 𝑀𝑎 reduces the surface tension of the basic state, ¯𝛾 , thereby weakening the instability caused by capillarity, while its direct contribution to Marangoni stress further suppresses the growth of disturbances. It is worth noting that, at the present order, the contribution from electric stress appears as an independent additive term and does not directly modify the contributions from capillarity or Marangoni stress. For the second solution branch, substituting the leading order solution of the Marangoni mode associated with the disturbance in surfactant concentration into Eq. (49) yields the first order solution for the interface disturbance: 
+
+ˆℎ1 = 𝑖 ( F
+
+4 ¯ 𝑤 − 1) 𝑀𝑎 ˆΓ0
+
+¯Γ − 1 . (52) Further substitution of the above solution for the interface disturbance at first order into Eq. (50) gives the following expression for 𝑐 1 associated with the Marangoni mode: 
+
+𝑐 1 = − 𝑖 
+
+[
+
+¯𝑤 + ¯F ln 𝛼 
+
+4 ¯ 𝑤 
+
+] 𝑀𝑎 ¯Γ
+
+¯Γ − 1
+
+︸ ︷︷ ︸
+
+> Effect of Marangoni stress
+
+− 𝑖 1
+
+𝑃𝑒 
+
+︸︷︷︸ 
+
+> Effect of surface diffusion
+
+. (53) Equation (53) shows that the Marangoni mode is stable in the long wavelength limit, with its decay rate governed by both Marangoni stress and surface diffusion. Since 𝑃𝑒 measures the relative strength of convection and diffusion along the inter-face, a smaller value of 𝑃𝑒 corresponds to stronger surface diffusion, which increases the magnitude of the negative imaginary part of 𝑐 1 and therefore enhances the stabilization of the disturbance.  
+
+> B. Full solution for arbitrary wavenumbers
+
+Although the asymptotic analysis above reveals the propagation characteristics and stability mechanisms of the two modes in the long wavelength limit, its validity is restricted to 𝑘 ≪ 1 and cannot describe the stability of the system over the entire range of wave numbers, which is therefore examined by solving the full eigenvalue problem in terms of the complex temporal eigenvalue 
+
+𝜆 = 𝜆 𝑟 + 𝑖𝜆 𝑖 , where 𝜆 𝑟 = 𝑘𝑐 𝑖 is the temporal growth rate and 𝜆 𝑖 = −𝑘𝑐 𝑟 is the intrinsic frequency. Accordingly, 𝜆 𝑟 > 0 indicates instability, whereas 𝜆 𝑟 ≤ 0 corresponds to a stable state. To obtain the temporal eigenvalue at arbitrary wave numbers, Eqs.(44) and (45) are solved simultaneously, yielding: 
+
+𝜆 = − (A 1 + A 3 − A 4) ± 
+
+√
+
+(A 1 + A 3 − A 4)2 − 4 (A 1A3 − A 2A4)
+
+2 , (54) where 
+
+
+
+A1 = 𝑖𝑘 ¯𝑤 + 𝑘 2 ( ¯𝑤 + ln 𝛼 ) 𝑀𝑎 ¯Γ
+
+¯Γ − 1 + 𝑘 2
+
+𝑃𝑒 ,
+
+A2 = 𝑖𝑘 ¯𝑤 − 𝑖𝑘 ln 𝛼 + 𝑘 2 ¯𝑤 
+
+[ 𝐸 𝑏 (ln 𝛽 − 1)(ln 𝛽 )3 − ¯𝛾 
+
+(
+
+1 − 𝜀 2 𝑘 2)]
+
+,
+
+A3 = 2𝑖𝑘 ¯𝑤 + 𝑘 2 ¯F
+
+4
+
+[ 𝐸 𝑏 (ln 𝛽 − 1)(ln 𝛽 )3 − ¯𝛾 
+
+(
+
+1 − 𝜀 2 𝑘 2)]
+
+,
+
+A4 = 𝑘 2 ¯F 𝑀𝑎 ¯Γ
+
+4( ¯Γ − 1) .
+
+(55) When 𝐸 𝑏 = 0, the present system reduces to the result obtained by Gao et al. [30]. In the separate limit 𝑀𝑎 = 0, the dispersion relation formally yields two eigenvalues, 𝜆 = −A 1 and 𝜆 = −A 3. The former arises from the surfactant transport equation and becomes decoupled from the interfacial dynamics when the Marangoni effect vanishes, it is therefore excluded from the physically relevant dispersion relation. Consequently, the only physical solution is 𝜆 = −A 3, which is consistent with the result of Ding et al. [24], in this case, whether the electric field stabilizes or destabilizes the system depends on the position of the 11 0 0.2 0.4 0.6 0.8 1
+
+-0.2 -0.1 00.1 0.2 0.3 
+
+FIG. 2: (𝑎 ) The temporal growth rate 𝜔 versus the wavenumber 𝜅 under the combined effects of the Marangoni number 𝑀𝑎 and a radial electric field, with 𝐸 𝑏 = 1 and 𝛽 = 𝑒 0.9. The solid and dashed lines correspond to the RP and Marangoni modes, respectively. (𝑏 ) The temporal growth rate 𝜔 versus 𝑀𝑎 under a radial electric field, with 𝛽 = 𝑒 0.9 and 𝜅 = 1/√2. The solid and dash-dotted lines denote the larger and smaller values of 𝜔 , respectively. outer electrode: the electric field is destabilizing when 𝛽 < 𝑒 , whereas it is stabilizing when 𝛽 > 𝑒 . If 𝐸 𝑏 is further set to zero, the system reduces to the surfactant-free and electrically passive case considered by Craster and Matar [16], for which the most unstable and cutoff 𝑘 𝑚 = 1/( √2𝜀 ), 𝑘 𝑐 = 1/𝜀 , respectively. It should be noted that the wavenumber and temporal growth rate introduced above are nondimensionalized using the capillary length. To facilitate comparison with previous studies, the rescaled quantities 𝜔 = 𝜀𝜆, 𝜅 = 𝜀𝑘 , are adopted throughout the subsequent analysis. To further elucidate the influence of the Marangoni number 𝑀𝑎 on the stability of a thick liquid film subjected to a radial electric field, the temporal growth rates of the system are examined in Figure 2. Figure 2( 𝑎 ) presents the dispersion curves at different values of 𝑀𝑎 for 𝐸 𝑏 = 1 and 𝛽 = 𝑒 0.9 < 𝑒 . In the absence of surfactant, namely when 𝑀𝑎 = 0, only the classical Rayleigh-Plateau (RP) mode exists in the system. Once an insoluble surfactant is introduced, an additional Marangoni mode associated with interfacial transport emerges. The solid and dash-dotted lines represent the RP and Marangoni modes, respectively, in agreement with the results of Gao et al. [30], while the procedure used to distinguish the two modes is provided in Appendix A. As 𝑀𝑎 increases, both the maximum growth rate and the cutoff wavenumber of the RP mode decrease rapidly, demonstrating that the Marangoni effect effectively suppresses the RP instability. At relatively small values of 𝑀𝑎 , the Marangoni mode remains stable. With a further increase in 𝑀𝑎 , however, this mode becomes unstable and eventually replaces the RP mode as the dominant unstable mode. The maximum growth rate of the Marangoni mode first increases and then decreases with 𝑀𝑎 , indicating that the instability induced by surfactant transport responds non-monotonically to the Marangoni effect. Nevertheless, its maximum growth rate remains lower than that of the surfactant-free RP mode, suggesting that the instability associated with the Marangoni mode is comparatively weak. Because both the electric field and the Marangoni effect alter the maximum growth rate and the most unstable wavenumber, the most unstable wavenumber of the reference state without either an electric field or surfactant, 𝜅 = 1/√2
+
+is adopted in the following analysis so that the influence of each mechanism can be examined separately. Figure 2( 𝑏 ) shows the variation of the two temporal eigenvalue branches with 𝑀𝑎 at 𝛽 = 𝑒 0.9. The solid and dash-dotted lines denote the larger and smaller growth rates, respectively, while Re (𝜔 ) represents the real part of the corresponding eigenvalue. When 𝐸 𝑏 < 3, the larger growth rate initially decreases as 𝑀𝑎 increases, becomes negative over an intermediate range of 𝑀𝑎 , and subsequently rises above zero again. By contrast, the smaller growth rate remains negative throughout the parameter range considered. The non-monotonic variation of the upper branch does not represent the simple evolution of a single mode, but instead results from competition and an exchange of dominance between the two modes. At small 𝑀𝑎 , the RP mode is dominant and is progressively suppressed by the Marangoni effect, whereas beyond the turning point, the Marangoni mode gradually becomes the dominant source of instability. Consequently, a finite interval of 𝑀𝑎 exists within which both growth rates are negative, so that the disturbance at the selected wavenumber is completely suppressed. Because the radial electric field is destabilizing when 𝛽 < 𝑒 , increasing 𝐸 𝑏 raises the value of 𝑀𝑎 required to enter the stable regime and progressively narrows the stability window. Notably, the growth rate at the transition from the RP-dominated branch to the Marangoni-dominated branch decreases continuously as 𝐸 𝑏 increases. When 
+
+𝐸 𝑏 = 3, the turning point disappears and both branches become smooth, rather than exhibiting the distinct junction between the RP-dominated and Marangoni-dominated portions observed at lower 𝐸 𝑏 .To further illustrate the influence of the electric field on the stability of the system, Figure 3 presents the dependence of the temporal growth rate on the wavenumber at different values of 𝐸 𝑏 for both 𝛽 < 𝑒 and 𝛽 > 𝑒 . The case 𝑀𝑎 = 0.1 corresponds to a regime dominated by the RP mode, whereas 𝑀𝑎 = 0.7 corresponds to a regime dominated by the Marangoni mode. Figure 3( 𝑎 -12 
+
+FIG. 3: The real temporal growth rate ( 𝜔 ) versus the wavenumber 𝜅 under the effects of 𝐸 𝑏 . (𝑎 ) 𝑀𝑎 = 0.1, 𝛽 = 𝑒 0.9. (𝑏 )
+
+𝑀𝑎 = 0.7, 𝛽 = 𝑒 0.9. (𝑐 ) 𝑀𝑎 = 0.1, 𝛽 = 𝑒 1.1. (𝑑 ) 𝑀𝑎 = 0.7, 𝛽 = 𝑒 1.1.The solid and dash-dotted lines represent the RP mode and the Marangoni mode, respectively. 
+
+𝑏 ) shows the results for 𝛽 < 𝑒 . Regardless of whether the RP mode or the Marangoni mode is dominant, the maximum growth rate, the most unstable wavenumber, and the cutoff wavenumber all increase with 𝐸 𝑏 , demonstrating the destabilizing effect of the electric field. By contrast, for 𝛽 > 𝑒 , as shown in Figure 3( 𝑐 -𝑑 ), the electric field has a stabilizing effect, and the maximum growth rate, the most unstable wavenumber, and the cutoff wavenumber all decrease as 𝐸 𝑏 increases. When 𝐸 𝑏 is sufficiently large, the instability dominated by the Marangoni mode can be completely suppressed, causing the corresponding mode to become stable. In addition, Figure 3 shows that the electric field exerts a pronounced destabilizing or stabilizing influence on the dominant mode, whereas its effect on the subdominant mode is comparatively weak. This behaviour helps explain the gradual separation of the two growth-rate branches at sufficiently large 𝐸 𝑏 in Figure 2( 𝑏 ). Although each growth-rate branch may contain different segments dominated by the RP and Marangoni modes, respectively, the electric field primarily modifies the dominant branch with the larger growth rate. Consequently, the original crossing and connection between the two modes are altered, and the two growth-rate branches eventually become separated. To further reveal the coupling between the electric field and the Marangoni effect, Figure 4 presents the neutral stability boundaries in the 𝑀𝑎 -𝜅 plane at different values of 𝐸 𝑏 . Figure 4( 𝑎 ) corresponds to the case 𝛽 < 𝑒 . In the absence of an electric field, the 𝑀𝑎 -𝜅 plane is divided into three regions: an unstable region dominated by the RP mode at low 𝑀𝑎 , an unstable region dominated by the Marangoni mode at high 𝑀𝑎 , and a stable region lying between and outside the two unstable regions. The symbols ‘U’ and ‘S’ denote the unstable and stable regions, respectively. As 𝐸 𝑏 increases, the two unstable regions expand and gradually approach one another, eventually becoming fully connected at 𝐸 𝑏 = 3. By contrast, when 𝛽 > 𝑒 , as shown in Figure 4( 𝑏 ), the radial electric field compresses both unstable regions. The RP-dominated and Marangoni-dominated unstable regions progressively shrink as 𝐸 𝑏 increases, and the Marangoni-dominated unstable region is completely eliminated at 𝐸 𝑏 = 3.This result suggests that, compared with the approach adopted by Ding et al. [24], in which a strong electric field is applied to suppress the interfacial mode directly, enhancing the Marangoni effect while applying a weaker electric field may provide 13 0 0.5 1 1.5    
+
+> 00.2 0.4 0.6 0.8 1
+> USUS00.5 11.5
+> 00.2 0.4 0.6 0.8 1
+> UUS
+
+FIG. 4: Variation of the neutral stability boundaries with the electric Weber number 𝐸 𝑏 for two outer-electrode positions: (𝑎 )
+
+𝛽 = 𝑒 0.9 and (𝑏 ) 𝛽 = 𝑒 1.1.0 0.5 1 1.5    
+
+> 00.05 0.1 0.15 0.2 0.25 0.3 00.5 11.5
+> -0.02 00.02 0.04 0.06
+
+FIG. 5: Non-additive coupling between the electric field and Marangoni effects: (𝑎 ) the RP mode and (𝑏 ) the Marangoni mode. The magenta dash-dotted lines represent the predictions based on linear superposition. a more practical route to film stabilization with a lower required electric-field strength. It is also noteworthy that, over certain ranges of wavenumber in Figure 4( 𝑎 ), the electric field expands the RP-unstable region much more strongly than it affects the Marangoni-unstable region. The merging of the two unstable regions therefore occurs primarily through the extension of the RP-unstable region towards higher 𝑀𝑎 , causing it to penetrate the region originally dominated by the Marangoni instability, rather than through a comparable expansion of both regions towards one another. Motivated by the observation in Figure 4( 𝑎 ) that the electric field promotes the two unstable modes to markedly different extents over certain ranges of wavenumber, we further examine whether the effects of the electric field and the Marangoni mechanism on film stability can be described by linear superposition. The results are presented in Figure 5, where Figure 5( 𝑎 ) corresponds to the regime dominated by the RP mode, whereas Figure 5( 𝑏 ) corresponds to that dominated by the Marangoni mode. Areference case is first selected, after which the electric field and the Marangoni number are varied separately. The corresponding changes in growth rate relative to the reference state are then added to the reference growth rate to obtain the prediction based on linear superposition. This prediction is subsequently compared with the actual growth rate obtained when the electric field and the Marangoni effect act simultaneously. As shown in Figure 5, regardless of whether the RP mode or the Marangoni mode is dominant, the growth rate predicted by linear superposition is lower than the actual growth rate over certain ranges of wavenumber. This result demonstrates that the electric field and the Marangoni effect do not influence film stability independently, but instead exhibit a pronounced non-additive coupling. A straightforward expectation would be that, although the electric field promotes both the RP and Marangoni instabilities, the associated enhancement of Marangoni convection could further suppress the RP instability, causing the actual growth rate to fall below the prediction based on linear superposition. The opposite trend observed 14 in the calculations therefore indicates that the coupling between the electric field and surfactant transport introduces an additional destabilizing contribution, whose underlying physical mechanism requires further examination.  
+
+> V. NONLINEAR DYNAMICS AND COUPLING MECHANISMS
+
+To address the questions left unresolved by the linear stability analysis and further elucidate the coupling mechanism between the electric field and the Marangoni effect, traveling wave solutions are employed to analyse the nonlinear dynamics of the system, following the approaches of Ding et al. [24], Gao et al. [30]. Before seeking the traveling wave solutions, the established one-dimensional model is first reformulated in the following conservative form: 
+
+𝑠 𝑡 + ( 2𝑞 )𝑧 = 0, (56) 
+
+(√𝑠 Γ) 
+
+> 𝑡
+
++ (√𝑠𝑤 Γ) 
+
+> 𝑧
+
+= 1
+
+𝑃𝑒 
+
+[√𝑠 Γ𝑧 
+
+] 
+
+> 𝑧
+
+, (57) where 𝑠 = (𝛼 + ℎ)2. It can be readily verified that the above equations are conservative under periodic boundary conditions. The remaining variables are rewritten as : 
+
+𝑞 = − 𝑝 𝑧 − 14
+
+[
+
+𝑠 2 ln 
+
+( √𝑠 𝛼 
+
+)
+
+− 𝛼 4 − 4𝛼 2 𝑠 + 3𝑠 2
+
+4
+
+]
+
++ 𝛾 𝑧 
+
+2
+
+[
+
+𝑠 3/2 ln 
+
+( √𝑠 𝛼 
+
+)
+
+−√𝑠 (𝑠 − 𝛼 2)
+
+2
+
+]
+
+, (58) 
+
+𝑝 = 𝐸 𝑏 
+
+2𝑠 [ln (√𝑠 ) − ln 𝛽 ]2 + 𝛾 
+
+[ 1
+
+√𝑠 − 𝜀 2 (√𝑠 )
+
+> 𝑧𝑧
+
+]
+
+, (59) and 
+
+𝑤 = 𝑝 𝑧 − 14
+
+(
+
+𝑠 − 𝛼 2)
+
++
+
+[√𝑠𝛾 𝑧 − 𝑝 𝑧 − 12 𝑠 
+
+]
+
+ln 
+
+( √𝑠 𝛼 
+
+)
+
+, (60) where 𝛾 = 1 + 𝑀𝑎 ln (1 − Γ). Prior to the nonlinear evolution, a small harmonic perturbation is imposed on the interface of the base flow at the initial time: 
+
+𝑠 (𝑧, 0) = [1 + 0.1 sin (𝑘 𝑧 )] 2 , (61) where 𝑘 denotes the selected disturbance wavenumber and is related to the computational-domain length 𝐿 through 𝑘 = 2𝜋 /𝐿 .The governing equations are discretized in space using a Fourier spectral method, which automatically satisfies the periodic boundary conditions. Time integration is performed using an implicit multistep scheme, while the resulting nonlinear algebraic equations are solved through Newton iteration. A total of 256 Fourier collocation points are employed, and the relative error tolerance is set to 10 −10 . Further details of the numerical procedure can be found in Gao et al. [30]. Nonlinear simulations are conducted because traveling wave branches frequently bifurcate near the cutoff wavenumber and may contain spurious solutions that cannot be dynamically realized. Comparison with the nonlinear evolution therefore provides a means of determining whether a traveling wave solution can develop from a finite-amplitude disturbance. Alternatively, the stability of the traveling wave solutions can be analysed directly to identify the stability of the different bifurcation branches [14]. We next introduce the traveling wave coordinate 𝜉 = 𝑧 − 𝑐𝑡 , where 𝑐 denotes the wave speed. Under this coordinate transformation, integrating (56) and (57) once with respect to 𝜉 yields the following forms: 
+
+−𝑐𝑠 + 2𝑞 = 𝑞 0, (62) 
+
+−𝑐 √𝑠 Γ + √𝑠 𝑤 Γ = 1
+
+𝑃𝑒 
+
+√𝑠 Γ𝜉 + 𝑄 0, (63) where 𝑞 0 and 𝑄 0 are integration constants. The unknowns in (62) and (63) comprise the two functions 𝑠 and √𝑠 Γ, together with the wave speed 𝑐 and the integration constants 𝑞 0 and 𝑄 0. Starting from appropriate initial guesses, the corresponding traveling wave solutions can be obtained by solving this nonlinear system. To close the system and remove the translational indeterminacy of the traveling wave solutions, two mass-conservation constraints and one phase condition must also be imposed, thereby yielding a unique converged solution. The additional conditions are given by : 
+
+1
+
+𝐿 
+
+π 𝐿 
+
+> 0
+
+𝑠 d𝜉 = 1, (64) 15 
+
+FIG. 6: traveling wave branches for different electric Weber numbers 𝐸 𝑏 at 𝛽 = 𝑒 0.9 < 𝑒 : (𝑎, 𝑏 ) 𝑀𝑎 = 0.1 and (𝑐, 𝑑 ) 𝑀𝑎 = 0.7.The wave speed 𝑐 and the maximum interfacial radius 𝑟 max = max 𝜉 (𝛼 + ℎ) are plotted against the wavenumber 𝜅 in the left and right panels, respectively. 
+
+1
+
+𝐿 
+
+π 𝐿 
+
+> 0
+
+(√𝑠 Γ) d𝜉 = ¯Γ, (65) 
+
+𝑠 (0) = 1. (66) It should be further noted that the computation of the traveling wave solutions is initiated in the vicinity of the cutoff wavenumber. The initial guess for the interfacial variable 𝑠 is prescribed in the harmonic form given by (61), while the initial guess for Γ is taken as the uniform initial interfacial concentration. The initial estimate of the wave speed 𝑐 is determined from the phase speed in the long-wave limit. Specifically, twice the base-state interfacial velocity is used when the RP mode is dominant, whereas the base-state interfacial velocity is adopted when the Marangoni mode is dominant. The initial values of the integration constants 
+
+𝑞 0 and 𝑄 0 are then evaluated from (62) and (63), respectively. Once an initial traveling wave solution has been obtained near the cutoff wavenumber, the complete solution branch is traced by taking the wavenumber as the continuation parameter and applying a continuation method. To examine separately the influence of the electric field on traveling wave branches in the regimes dominated by the RP mode and the Marangoni mode, 𝑀𝑎 = 0.1 and 𝑀𝑎 = 0.7 are selected as representative conditions. The former lies within the parameter region dominated by the RP mode, whereas the latter corresponds to the region dominated by the Marangoni mode. Only the case 𝛽 < 𝑒 is considered here, for which the radial electric field is destabilizing and is therefore more suitable for investigating the competition and coupling between the electric and Marangoni effects. The case 𝛽 > 𝑒 , in which the electric field has a stabilizing effect, is not considered in the subsequent discussion. 16 As shown in Figure 6( 𝑎, 𝑏 ), when 𝑀𝑎 = 0.1, the nontrivial traveling wave branches bifurcate from the vicinity of the cutoff wavenumber. As 𝐸 𝑏 increases, both the wave speed 𝑐 and the maximum interfacial radius 𝑟 max generally increase at a given wavenumber, indicating that the electric field substantially alters the propagation speed and the amplitude of interfacial defor-mation. In the present calculations, the maximum value of 𝐸 𝑏 is limited to 0.4, which is considerably smaller than the range considered in the linear stability analysis. This is because, even at 𝐸 𝑏 = 0.4, the traveling wave branch undergoes a pronounced secondary turning at small wavenumbers, and the continuation is therefore terminated at this point. Correspondingly, 𝑟 max in Figure 6( 𝑏 ) increases rapidly at small wavenumbers and progressively departs from the regular traveling wave branches obtained under weaker electric fields. Previous studies have shown that such branches may continue towards a touchdown singularity, at which the interface comes into contact with the outer electrode [24]. It should be emphasized that the solutions beyond the turning point cannot be classified as nonphysical solely from the shape of the branch, because some may remain mathematically valid while being dynamically unstable. Simulations of the nonlinear temporal evolution can be used to determine whether these traveling wave solutions can evolve from disturbances of finite amplitude and thereby identify the stable traveling waves that are dynamically realizable. When 𝑀𝑎 = 0.7, the traveling wave branches exhibit characteristics distinct from those found in the region dominated by the RP mode, as shown in Figure 6( 𝑐, 𝑑 ). The wave speed 𝑐 varies nonmonotonically with the wavenumber, rather than increasing continuously as the wavenumber decreases. The maximum interfacial radius 𝑟 max also first increases and then decreases with the wavenumber, showing an overall trend similar to that of the growth rate of the Marangoni mode obtained from the linear stability analysis. As 𝐸 𝑏 increases, both the wave speed and the maximum interfacial radius generally increase over the wavenumber range considered. The electric field therefore also enhances the response of the traveling waves in the region dominated by the Marangoni mode, although the corresponding branch structure differs markedly from that found in the region dominated by the RP mode. These results further show that, at small wavenumbers, traveling wave branches subjected to an electric field are more likely to exhibit turning behaviour and a rapid increase in interfacial amplitude. Since the primary objective of the present study is to compare the effects of electric forcing and Marangoni stresses on traveling wave states, the subsequent analysis is performed at 𝜅 = 1/√2, which is the most unstable wavenumber of the reference state without surfactant or electric forcing. On this basis, 𝑀𝑎 and 𝐸 𝑏 are employed separately as continuation parameters to examine the dependence of the traveling wave solutions on these two control parameters.  
+
+> A. Competition governing the surfactant effect
+
+Gao et al. [30] proposed a competition mechanism between relative interfacial motion and Marangoni convection. The relative interfacial velocity is defined as 𝑐 𝑤 = 𝑐 − 𝑤 , whereas Marangoni convection is characterized by the surface tension gradient 
+
+𝛾 𝜉 . Since both 𝑐 𝑤 and 𝛾 𝜉 vary with the spatial coordinate, the following quantities are introduced to quantify their respective intensities: 
+
+𝐼 RP = − max  
+
+> 𝜉
+
+|𝑐 𝑤 | , 𝐼 M = 1
+
+𝐿 
+
+π 𝐿 
+
+> 0
+
+max (𝛾 𝜉 , 0) d𝜉. (67) The quantity 𝐼 𝑅𝑃 is defined as the negative value of the maximum magnitude of the relative interfacial velocity because, in the traveling wave coordinate system, the liquid moves relative to the wave in the direction opposite to the actual direction of wave propagation. The negative sign of 𝐼 RP therefore indicates the direction of the relative interfacial motion, whereas its intensity should be evaluated using |𝐼 𝑅𝑃 |. For Marangoni convection, 𝛾 𝜉 satisfies periodic boundary conditions, and its signed integral over one period is therefore zero. The intensity 𝐼 𝑀 is consequently defined using the spatial average of the positive part of 𝛾 𝜉 . This definition provides a more direct measure of the ability of the Marangoni stress to transport liquid along the interface. Figure 7 presents the results obtained by continuation in 𝑀𝑎 from the reference solution at 𝑀𝑎 = 0.1. As shown in Figure 7( 𝑎 − 𝑏 ), both the maximum interfacial radius 𝑟 max and the maximum surfactant concentration Γmax decrease as 𝑀𝑎 
+
+increases. It should be noted that the lower limit of this traveling wave branch does not extend to 𝑀𝑎 = 0. As 𝑀𝑎 approaches zero, the ability of the Marangoni stress to regulate the interfacial surfactant distribution becomes progressively weaker. The surfactant is then transported by the base flow and the relative interfacial motion towards the interfacial bulge, resulting in a continuous increase in the local surfactant concentration. When the local concentration approaches the saturation limit permitted by the Langmuir equation of state, the equation becomes singular and the traveling wave solution can no longer be continued. As shown in Figure 7( 𝑐 − 𝑑 ), the intensity of the relative interfacial motion, |𝐼 𝑅𝑃 |, decreases with increasing 𝑀𝑎 , whereas the intensity of Marangoni convection, 𝐼 𝑀 , increases. This trend is consistent with the results of Gao et al. [30]. In the parameter region where the RP mode is dominant, the surfactant acts through two principal mechanisms. First, it reduces the interfacial surface tension and thereby weakens the capillary effect that drives the RP instability. Second, Marangoni convection acts in the direction opposite to the transport induced by the relative interfacial motion and therefore impedes the further accumulation of liquid and surfactant at the interfacial bulge. Consequently, as 𝐼 𝑀 increases, both |𝐼 𝑅𝑃 | and 𝑟 max decrease, indicating that Marangoni convection mainly suppresses the RP instability in this region. To compare the two modes further, the effect of the electric field is temporarily excluded, and the continuation results obtained from the reference solution at 𝑀𝑎 = 0.7 in Figure 8 are examined. As shown in Figure 8( 𝑎, 𝑑 ), in the unstable region where the Marangoni mode is dominant, the increase in the 17 
+
+FIG. 7: Traveling wave branches obtained by continuation in 𝑀𝑎 from the reference state 𝑀𝑎 = 0.1 at 𝜅 = 1/√2 and 
+
+𝛽 = 𝑒 0.9 < 𝑒 for different values of 𝐸 𝑏 : (𝑎 ) maximum interfacial radius 𝑟 max , (𝑏 ) maximum interfacial surfactant concentration 
+
+Γmax , (𝑐 ) intensity of the 𝑐 𝑤 , and (𝑑 ) intensity of Marangoni convection 𝐼 M.amplitude of the interfacial deformation occurs together with the emergence of Marangoni convection and varies with 𝐼 𝑀 . This correspondence indicates that the unstable branch is triggered by Marangoni convection and that its strength is governed primarily by the intensity of that convection. Meanwhile, as shown in Figure 8( 𝑏 ), the interface becomes more rigid at larger values of 
+
+𝑀𝑎 , which suppresses the local accumulation of surfactant at the interfacial bulge. The local concentration therefore does not continue to increase towards the limit of the equation of state, as occurs at smaller values of 𝑀𝑎 . Figure 8( 𝑐 ) also reveals a feature that differs from the behaviour observed in the region where the RP mode is dominant. Within the smaller range of 
+
+𝑀𝑎 in which the Marangoni mode begins to emerge, the intensity of the relative interfacial motion, |𝐼 𝑅𝑃 |, and the intensity of Marangoni convection, 𝐼 𝑀 , increase simultaneously. This occurs because the formation of the Marangoni stress depends on a gradient in the interfacial surfactant concentration, and this gradient must first be established through the transport of surfactant by the relative interfacial motion. The generation of Marangoni convection therefore depends on the relative interfacial motion, which also partly explains why the instability associated with the Marangoni mode is generally weaker than that associated with the RP mode. The essential mechanism through which surfactants affect the stability of the liquid film is the competition between Marangoni convection and relative interfacial motion. When the electric field is introduced, the intensity of the relative interfacial motion, |𝐼 𝑅𝑃 |, increases substantially with 𝐸 𝑏 ,whereas the intensity of Marangoni convection, 𝐼 𝑀 , changes only slightly at smaller values of 𝐸 𝑏 and begins to increase noticeably only when the electric field becomes stronger. Similar trends are observed in the parameter regions where the RP mode and the Marangoni mode are dominant. The results in Figure 7 and Figure 8 therefore show that the electric field consistently tends to enhance the relative interfacial motion, whereas its influence on Marangoni convection remains comparatively weak. This behaviour persists even in the region where the Marangoni mode is dominant. 18 
+
+FIG. 8: Traveling wave branches obtained by continuation in 𝑀𝑎 from the reference solution at 𝑀𝑎 = 0.7, with 𝜅 = 1/√2 and 
+
+𝛽 = 𝑒 0.9 < 𝑒 , for different values of 𝐸 𝑏 : (𝑎 ) maximum interfacial radius 𝑟 max , (𝑏 ) maximum interfacial surfactant concentration 
+
+Γmax , (𝑐 ) intensity of the 𝑐 𝑤 𝐼 RP , and (𝑑 ) intensity of Marangoni convection 𝐼 M. 
+
+> B. Modification of the competition by electric forcing
+
+Since the electric field produces similar trends in the regions dominated by the RP mode and the Marangoni mode, the following discussion focuses on the region dominated by the RP mode. The aim is to clarify the physical mechanism associated with the electric field and to determine how this mechanism couples with the Marangoni effect. Figure 9 shows how the principal characteristics of the traveling wave solutions vary with 𝐸 𝑏 for different values of 𝑀𝑎 . As 𝐸 𝑏 increases, the wave speed 𝑐 , the maximum interfacial radius 𝑟 max , and the magnitude of the relative interfacial motion |𝐼 𝑅𝑃 | all increase substantially. Moreover, the corresponding trends depend only weakly on 𝑀𝑎 . By contrast, the intensity of Marangoni convection 𝐼 𝑀 remains almost unchanged at smaller values of 𝐸 𝑏 and increases appreciably only after the electric field becomes sufficiently strong. These results indicate that the electric field first enhances the relative interfacial motion, whereas the increase in Marangoni convection occurs only after the electric forcing exceeds a certain level. To examine how the electric field modifies the internal flow structure, Figure 10 presents the streamline patterns at 𝑀𝑎 = 0.05 for different values of 𝐸 𝑏 . In the coordinate system moving with the traveling wave, the streamfunction is given by 
+
+𝜙 (𝑟 ) = 𝑝 𝜉 − 116 
+
+(
+
+𝑟 2 − 𝛼 2)2
+
++ 14
+
+[√𝑠 𝛾 𝜉 − 𝑠 
+
+2
+
+(𝑝 𝜉 − 1)] [ 
+
+2𝑟 2 ln 
+
+( 𝑟 𝛼 
+
+)
+
++ 𝛼 2 − 𝑟 2]
+
+− 𝑐 
+
+2
+
+(
+
+𝑟 2 − 𝛼 2)
+
+. (68) As shown in Figure 10, the main effect of the electric field is to strengthen the recirculation within the wave crest, which is consistent with the results of Ding et al. [24]. As 𝐸 𝑏 increases, the region enclosed by the closed streamlines near the crest expands and the internal circulation becomes progressively stronger. The increase in the crest size is accompanied by an increase in the propagation speed, in agreement with the variation of 𝑐 shown in Figure 9( 𝑎 ).To determine how the electric field influences Marangoni convection, Figure 11 presents the total relative interfacial velocity 𝑐 𝑤 at 𝑀𝑎 = 0.1, together with the velocity 19 
+
+FIG. 9: Continuation results obtained by varying the electric Weber number 𝐸 𝑏 in the region dominated by the RP mode for different values of 𝑀𝑎 , with 𝜅 = 1/√2: (𝑎 ) wave speed 𝑐 , (𝑏 ) maximum interfacial radius 𝑟 max , (𝑐 ) intensity of the relative interfacial motion 𝐼 𝑅𝑃 , and (𝑑 ) intensity of Marangoni convection 𝐼 𝑀 .contribution 𝑐 (𝐸 𝑏 ) 
+
+> 𝑤
+
+obtained by retaining only the contribution of the electric stress gradient to 𝑝 𝜉 . As shown in Figure 11( 𝑎 ), the entire distribution of 𝑐 𝑤 shifts towards more negative values as 𝐸 𝑏 increases, which indicates a substantial increase in the magnitude of the relative interfacial motion. However, this overall enhancement does not immediately lead to a corresponding increase in Marangoni convection. The formation of Marangoni convection depends on the nonuniform transport of surfactant along the interface, rather than only on the magnitude of 𝑐 𝑤 . More specifically, the electric field enhances the relative interfacial motion near the wave trough and therefore promotes the transport of surfactant towards the wave crest. At the same time, the circulation near the crest is also strengthened, which causes the surfactant accumulated in this region to be redistributed more rapidly. A competition therefore arises between the transport from the trough towards the crest and the redistribution near the crest. As 𝐸 𝑏 continues to increase, the enhancement of the relative interfacial motion near the trough becomes more pronounced than that near the crest. The difference in transport efficiency between these two regions then becomes sufficiently large to strengthen the interfacial concentration gradient and, consequently, the Marangoni convection. This behaviour also shows that the RP mode and the Marangoni mode depend on the relative interfacial motion in different ways. The intensity of the RP mode is governed mainly by the overall magnitude of 𝑐 𝑤 , whereas the intensity of the Marangoni mode depends more strongly on the difference between the transport efficiencies near the crest and the trough. The electric field can therefore enhance the RP mode substantially even at smaller values of 𝐸 𝑏 , while Marangoni convection increases noticeably only after the spatial difference in surfactant transport becomes sufficiently large. This explains why 𝐼 𝑀 changes only slightly at smaller values of 𝐸 𝑏 but increases rapidly when 𝐸 𝑏 becomes larger, as shown in Figure 9( 𝑑 ). Figure 11( 𝑏 ) further shows the velocity contribution 𝑐 (𝐸 𝑏 ) 
+
+> 𝑤
+
+obtained when only the electric stress gradient is retained. An important feature is that the velocity induced by the electric effect primarily transports fluid towards the wave crest, whereas its direct influence near the trough remains comparatively weak. This result indicates that the enhanced circulation near the crest originates mainly from the local forcing produced by the electric stress gradient. It also explains why the electric field increases both the crest size and the wave speed. In summary, the electric field acts through a 20 
+
+FIG. 10: Streamline patterns of the traveling wave solutions at 𝑀𝑎 = 0.05 for different electric Weber numbers: (𝑎 ) 𝐸 𝑏 = 0,
+
+(𝑏 ) 𝐸 𝑏 = 0.9, and (𝑐 ) 𝐸 𝑏 = 1.
+
+FIG. 11: Distributions of the interfacial relative velocity at 𝑀𝑎 = 0.1: (𝑎 ) the total relative velocity 𝑐 𝑤 for different electric Weber numbers 𝐸 𝑏 , and (𝑏 ) the velocity contribution 𝑐 (𝐸 𝑏 ) 
+
+> 𝑤
+
+obtained by retaining only the effect of the electric stress gradient in 
+
+𝑝 𝑧 .physical mechanism that is distinct from Marangoni convection. The electric stress first strengthens the circulation near the wave crest and thereby increases the wave speed and the intensity of the relative interfacial motion. The electric field does not generate Marangoni convection directly. Instead, it changes the magnitude and spatial distribution of the relative interfacial velocity, which modifies surfactant transport between the crest and the trough and subsequently alters the interfacial concentration gradient and the Marangoni convection. This mechanism also accounts for the positive departure from linear superposition. The surfactant suppresses the RP mode by weakening the relative interfacial motion, whereas the electric stress acts directly to intensify it. The accompanying enhancement of Marangoni convection arises only as a consequence of the electrically modified interfacial motion and surfactant transport, and therefore cannot fully counteract the direct electrical amplification. As a result, the coupled response retains a stronger signature of the electric forcing, and the corresponding growth rate exceeds that predicted by linear superposition.  
+
+> VI. CONCLUSION
+
+This study examines the coupled influence of an insoluble surfactant and a radial electric field on the stability of a viscous liquid film flowing down a vertical fiber. Starting from the governing equations in two dimensions, a reduced model in one dimension is derived using the long wave approximation to describe the evolution of the interface, surfactant transport, Marangoni stresses, and the normal electric stress. Linear stability analysis identifies two distinct disturbance modes: the Rayleigh-Plateau mode, which is associated primarily with interfacial deformation, and the Marangoni mode, which is associated primarily with disturbances in surfactant concentration. Increasing the Marangoni number suppresses the former, but destabilises the latter at sufficiently large values, leaving a finite parameter interval within which both modes remain stable at a prescribed wavenumber. The influence of the radial electric field is determined by the position of the outer electrode 𝛽 . When 𝛽 < 𝑒 , increasing the 21 electric Weber number expands the unstable regions associated with both modes and narrows the stable interval separating them. The eventual connection of the two unstable regions occurs mainly because the region governed by the Rayleigh-Plateau instability extends towards larger Marangoni numbers. When 𝛽 > 𝑒 , the electric field has the opposite effect: both unstable regions contract as the electric Weber number increases, and the region associated with the Marangoni instability can be eliminated entirely. The combined use of a surfactant and an electric field with a stabilising effect may therefore provide a route to film stabilisation at a lower field strength. The electric and Marangoni effects cannot, in general, be represented by simple linear superposition. Over finite ranges of wavenumber, the growth rate obtained when the two mechanisms act simultaneously exceeds the value predicted by adding their separate contributions. Continuation of the traveling wave solutions shows that increasing the electric Weber number gener-ally increases the wave speed, the maximum interfacial radius, and the intensity of the relative interfacial motion. By contrast, Marangoni convection varies only weakly at smaller electric Weber numbers and becomes appreciably stronger only after the electric field reaches a sufficient intensity. Continuation in the Marangoni number further demonstrates that the essential mecha-nism through which the surfactant affects film stability is the competition between Marangoni convection and relative interfacial motion. Analysis of the internal flow reveals the physical origin of this coupling. When 𝛽 < 𝑒 , the electric stress intensifies the recirculation beneath the wave crest and reshapes the spatial distribution of the relative interfacial motion. This redistribution modifies surfactant transport along the interface and reorganises the interfacial concentration field, thereby altering the Marangoni stress. The electric field therefore does not strengthen Marangoni convection directly, but instead modifies the competition between Marangoni convection and relative interfacial motion through its influence on the interfacial velocity field. 
+
+> ACKNOWLEDGMENTS
+
+This research was supported by the National Natural Science Foundation of China (Grant No.12272026, U25A2032, U2341281, 12172317, 12502287, U25A20190), the State Key Laboratory of High-Efficiency Reusable Aerospace Transportation Technology (Grant No. RATT-ZZ04-2025033), the Beijing Natural Science Foundation (Grant No. L248008), the National Key Labora-tory of Aerospace Liquid Propulsion Fund (Grant No. 2024JJ015003), and the Fundamental Research Funds for the Central Universities. 
+
+> Appendix A: mode selection
+
+The purpose of Appendix A is to present a procedure for identifying the two disturbance modes using the asymptotic solutions in the long wave limit. As shown in Figure 2( 𝑎 ), the two eigenvalue branches intersect for certain values of 𝑀𝑎 , whereas (54) and (55) provide only the larger and smaller eigenvalues according to their numerical values. These expressions therefore do not directly reveal the physical identity of each branch. To resolve this ambiguity, the solutions on either side of an intersection are first connected by requiring continuity of both the eigenvalues and their derivatives with respect to the wavenumber, thereby yielding two continuous branches. The propagation speed and growth rate of each branch in the long wave limit are then compared with the corresponding asymptotic solutions, which allows the branches to be identified as the RP mode and the Marangoni mode, respectively. In contrast to the treatment of Gao et al. [30], the axial curvature term is retained in the present asymptotic analysis so that the resulting approximation provides a more accurate description of the stability characteristics at finite wavenumbers. As shown in Figure 12, the asymptotic solutions agree closely with the analytical solutions obtained over the full wavenumber range in the long wave region, confirming the reliability of the proposed procedure for mode identification. 
+
+> Appendix B: Verification of numerical methods
+
+The purpose of this appendix is to validate the numerical method and its implementation in the present study. To this end, the results presented in figures 14( 𝑎, 𝑏 ) of Ding et al. [24] are adopted as a benchmark. The corresponding parameter values are 𝛼 = 0.28 , 𝛽 = e0.9, 𝜀 = 0.23 , and 𝐿 = 1.64 . Within the present formulation, the same problem is recovered by assigning these parameter values and setting 𝑀𝑎 = 0, which removes the contribution of the surfactant. As shown in Figure 13, the present numerical solutions agree closely with the reference results, thereby validating the numerical implementation and the procedure used to compute the traveling wave solutions.  
+
+> REFERENCES
+> [1] W. Nusselt, Die oberflächenkondensation des wasserdampfes, Zeitschrift Vereines Deutsch Ing 60 , 541 (1916).
+
+22 
+
+FIG. 12: Comparison between the asymptotic solutions in the long wave limit and the analytical solutions obtained over the full wavenumber range for the RP and Marangoni modes. 
+
+FIG. 13: Validation of the numerical implementation through comparison with the traveling wave solutions reported by Ding 
+
+et al. [24], with 𝛼 = 0.28 , 𝛽 = e0.9, 𝜀 = 0.23 , 𝐿 = 1.64 , and 𝑀𝑎 = 0.
+
+[2] P. L. Kapitza, Wave flow of thin layers of viscous liquid. part i. free flow, Zhurnal Eksperimentalnoi i Teoreticheskoi Fiziki 18 , 3 (1948). [3] P. L. Kapitza, Wave flow of thin layers of viscous liquids. part ii. fluid flow in the presence of continuous gas flow and heat transfer, Zhurnal Eksperimentalnoi i Teoreticheskoi Fiziki 18 , 19 (1948). [4] P. L. Kapitza and S. P. Kapitza, Wave flow of thin layers of viscous liquids. part iii. experimental research of a wave flow regime, Zhurnal Eksperimentalnoi i Teoreticheskoi Fiziki 19 , 105 (1949). [5] T. B. Benjamin, Wave formation in laminar flow down an inclined plane, Journal of Fluid Mechanics 2, 554 (1957). [6] C. S. Yih, Stability of liquid flow down an inclined plane, The Physics of Fluids 6, 321 (1963). [7] D. Benney, Longwaves on liquid films, Journal of Mathematics and Physics 45 , 150 (1966). [8] S. L. Goren, The instability of an annular thread of fluid, Journal of Fluid Mechanics 12 , 309 (1962). [9] D. Quéré, Thin films flowing on vertical fibers, Europhysics Letters 13 , 721 (1990). [10] A. Frenkel, Nonlinear theory of strongly undulating thin films flowing down vertical cylinders, Europhysics Letters 18 , 583 (1992). [11] H. C. Chang and E. A. Demekhin, Mechanism for drop formation on a coated vertical fibre, Journal of Fluid Mechanics 380 , 233 (1999). [12] S. Kalliadasis and H. C. Chang, Drop formation during coating of vertical fibres, Journal of Fluid Mechanics 261 , 135 (1994). [13] R. Camassa, H. R. Ogrosky, and J. Olander, Viscous film flow coating the interior of a vertical tube. part 1. gravity-driven flow, Journal of Fluid Mechanics 745 , 682 (2014). [14] R. Camassa, J. L. Marzuola, H. R. Ogrosky, and N. Vaughn, Traveling waves for a model of gravity-driven film flows in cylindrical domains, Physica D: Nonlinear Phenomena 333 , 254 (2016). [15] I. Kliakhandler, S. Davis, and S. Bankoff, Viscous beads on vertical fibre, J. Fluid Mech. 429 , 381 (2001). [16] R. V. Craster and O. K. Matar, On viscous beads flowing down a vertical fibre, J. Fluid Mech. 553 , 85 (2006). 23 
+
+[17] C. Duprat, C. Quil, S. Kalliadasis, and F. Dauphiné, Absolute and convective instabilities of a viscous film flowing down a vertical fiber, Phys. Rev. Lett. 98 , 244502 (2007). [18] C. Ruyer-Quil, P. Trevelyan, C. Duprat, F. G. Giorgiutti-Dauphiné, and S. Kalliadasis, Modelling film flows down a fibre, J. Fluid Mech. 
+
+603 , 431 (2008). [19] Z. J. Ding and A. P. Willis, Relative periodic solutions in conducting liquid films flowing down vertical fibres, J. Fluid Mech. 873 , 835 (2019). [20] B. Li, Y. Li, G. K. Xu, and X. Q. Feng, Electric field induced patterning of thin coatings on fiber surfaces, J. Phys.-Condens. Mat. 21 ,445006 (2009). [21] V. A. Kishore and D. Bandyopadhyay, Electric field induced patterning of thin coating on fiber surfaces, J. Phys. Chem. C 116 , 6215 (2012). [22] A. W. Wray, O. Matar, and D. T. Papageorgiou, Non-linear waves in electrified viscous film flow down a vertical cylinder, IMA J. Appl. Math. 77 , 430 (2012). [23] A. W. Wray, D. T. Papageorgiou, and O. Matar, Electrified coating flows on vertical fibres: enhancement or suppression of interfacial dynamics, J. Fluid Mech. 735 , 427 (2013). [24] Z. Ding, J. Xie, T. Wong, and R. Liu, Dynamics of liquid films on vertical fibres in a radial electric field, J. Fluid Mech. 752 , 66 (2014). [25] D. Halpern and A. L. Frenkel, Destabilization of a creeping flow by interfacial surfactant: Linear theory extended to all wavenumbers, Journal of Fluid Mechanics 485 , 191 (2003). [26] M. G. Blyth and C. Pozrikidis, Effect of surfactant on the stability of film flow down an inclined plane, J. Fluid Mech. 521 , 241 (2004). [27] H. H. Wei and D. Rumschitzki, The effects of insoluble surfactants on the linear stability of a core–annular flow, J. Fluid Mech. 541 , 115 (2005). [28] M. G. Blyth, H. Luo, and C. Pozrikidis, Stability of axisymmetric core–annular flow in the presence of an insoluble surfactant, J. Fluid Mech. 548 , 207 (2006). [29] A. Nair and G. Sharma, Stability of surfactant-laden liquid film flow over a cylindrical rod, Phys. Rev. E 102 , 023111 (2020). [30] J. Gao, X. Yang, S. Zhu, Q. Fu, and L. Yang, Dynamics of viscous beads on vertical fibers with insoluble surfactants, Physical Review Fluids 11 , 053901 (2026). [31] H. A. Stone, A simple derivation of the time-dependent convective-diffusion equation for surfactant transport along a deforming interface, Physics of Fluids A: Fluid Dynamics 2, 111 (1990). [32] H. Wong, D. Rumschitzki, and C. Maldarelli, On the surfactant mass balance at a deforming fluid interface, Physics of Fluids 8, 3203 (1996). [33] S. Kas-Danouche, Nonlinear interfacial stability of core-annular film flows in the presence of surfactants , Ph.D. thesis, New Jersey Institute of Technology and Rutgers University (1992). [34] A. Pereira and S. Kalliadasis, Dynamics of a falling film with solutal marangoni effect, Phys. Rev. E 78 , 036312 (2008). [35] C. T. Gabbard and J. B. Bostwick, Asymmetric instability in thin-film flow down a fiber, Physical Review Fluids 6, 034005 (2021). [36] T. Xu, V. Rodriguez-Martinez, S. N. Sahasrabudhe, B. E. Farkas, and S. R. Dungan, Effects of temperature, time and composition on food oil surface tension, Food Biophysics 12 , 88 (2017). [37] H. Sawada, H. Horiuchi, T. Kawase, K. Oharu, H. Nakagawa, and I. Kaneda, Synthesis and applications of silicone oil–soluble fluoroalkyl end-capped cooligomers, Journal of Applied Polymer Science 96 , 1467 (2005). [38] S. Li, Y. Chen, Z. Cheng, and J. Peng, The role of soluble surfactant in the linear instability of a film coating inside a tube, J. Fluid Mech. 
+
+973 , A46 (2023). [39] F. Boulogne, L. Pauchard, and F. Giorgiutti-Dauphiné, Instability and morphology of polymer solutions coating a fibre, Journal of Fluid Mechanics 704 , 232 (2012). [40] X. Yang, J. Gao, H. Sun, Q. Liu, W. Qiao, B. Ji, D. He, and Q. Fu, Nonlinear dynamics analysis of an ionic surfactant-laden thread in a radial electric field, Journal of Fluid Mechanics 1025 , A36 (2025).

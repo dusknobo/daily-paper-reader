@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-21",
+  "date": "2026-07-21",
+  "generated_at": "2026-07-21T21:45:46",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/21/2607.17057v1-electric-modification-of-mode-competition-in-viscous-films-with-insoluble-surfactants-on-vertical-fibers",
+      "section": "deep",
+      "title_en": "Electric modification of mode competition in viscous films with insoluble surfactants on vertical fibers",
+      "authors": "Jun Gao, Xiaocong Yang, Senlin Zhu, Bingqiang Ji, Qingfei Fu",
+      "date": "2026-07-19",
+      "pdf": "https://arxiv.org/pdf/2607.17057v1",
+      "score": "9.0",
+      "evidence": "研究粘性液膜沿垂直纤维流动，即垂直管上的降膜",
+      "tldr": "垂直纤维上含不溶性表面活性剂的粘性液膜，其流动稳定性受Marangoni效应和径向电场耦合影响。基于长波近似，推导出界面与表面活性剂浓度演化的简化一维模型。线性稳定性分析识别出低Ma时主导的Rayleigh-Plateau模式和高Ma时主导的Marangoni模式，二者之间为稳定区间。研究表明，径向电场通过外电极位置β调控模式竞争：β<e时电场增强两种不稳定性并收窄稳定区间；β>e时电场则抑制不稳定性，甚至在较小电韦伯数下消除Marangoni模式。行波解进一步揭示电应力增强波峰再循环，重塑相对界面速度分布，为利用电场调控纤维上液膜破裂提供了机理性认识。",
+      "tags": "query:falling-film",
+      "abstract_en": "This study investigates the coupled effects of an insoluble surfactant and a radial electric field on the stability of a viscous liquid film flowing down a vertical fiber. Starting from the governing equations in two dimensions, a reduced model in one dimension is derived using the long wave approximation to describe the coupled evolution of the interface and surfactant transport. Linear stability analysis identifies two distinct unstable modes: the Rayleigh-Plateau mode, which dominates at lower values of the Marangoni number $Ma$, and the Marangoni mode, which becomes dominant at higher values of $Ma$. The influence of the radial electric field is determined by the position of the outer electrode $β$. When $β<\\mathrm{e}$, the electric field enhances both instabilities and narrows the stable interval in $Ma$ between the two modes. When $β>\\mathrm{e}$, the electric field suppresses both modes and can completely eliminate the unstable region associated with the Marangoni mode even at a relatively small electric Weber number $E_b$. Continuation of the traveling wave solutions further shows that, when $β<\\mathrm{e}$, the magnitude of the relative interfacial motion $I_{RP}$, generally increases with $E_b$. By contrast, the intensity of Marangoni convection $I_{M}$ varies only weakly at smaller values of $E_b$ and increases appreciably only when the electric field becomes sufficiently strong. Analysis of the stream function and the relative interfacial velocity reveals that the electric stress primarily intensifies the recirculation beneath the wave crest and reshapes the spatial distribution of the relative interfacial velocity.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/21/2607.14322v1-interfacial-thermo-fluid-adhesion-dynamics-of-evaporating-capillary-bridges-between-curved-surfaces",
+      "section": "quick",
+      "title_en": "Interfacial-Thermo-Fluid-Adhesion Dynamics of Evaporating Capillary Bridges between Curved Surfaces",
+      "authors": "Arnov Paul, Subhadeep Mondal, Purbarun Dhar",
+      "date": "2026-07-15",
+      "pdf": "https://arxiv.org/pdf/2607.14322v1",
+      "score": "6.0",
+      "evidence": "蒸发传热CFD与界面追踪",
+      "tldr": "在曲面间蒸发毛细桥现象中，基底曲率、润湿性及热导率协同影响界面热流体与附着动力学，但机制不清。本研究开发了全耦合数值方法，采用水平集捕捉平衡弯月面，再利用ALE法精确追踪蒸发界面移动。模拟发现，增加曲率或热导率显著提升蒸发速率，非均匀冷却诱发表面张力梯度驱动热毛细对流并占主导地位；毛细力随曲率增大而减小，其瞬态演化强烈依赖于润湿性。论文在多物理场耦合层面揭示了蒸发毛细附着的行为规律，为微纳尺度液体操控与自组装技术提供了关键理论支撑。",
+      "tags": "query:falling-film",
+      "abstract_en": "We probe the evaporation mechanism, and the associated adhesion dynamics of liquid capillary bridges connecting two curved, solid substrates. The coupled thermo fluid species transport and the transient evolution of capillary adhesion during evaporation are systematically examined. An accurate, fully coupled transient numerical framework is developed, wherein the equilibrium capillary profiles are first determined from level set method. Next, the evaporation is simulated via Arbitrary Lagrangian Eulerian ALE framework to accurately track the moving liquid vapor interface. The combined influence of substrate curvature, surface wettability, and solid thermal conductivity on evaporation and capillary adhesion character is comprehensively analysed. The simulation methodology is robustly validated against published literature for capillary profiles, evaporation rates, and capillary forces, demonstrating good agreement. Our results reveal that the evaporation characteristics of both hydrophilic and superhydrophobic SH liquid bridges are strongly governed by substrate curvature and thermal conductivity, and increasing values pose favourable condition for augmented interfacial mass transfer rate. The innately non uniform vapour flux generates spatially varying evaporative cooling, producing surface tension gradients that drive internal thermo capillary circulation. A non dimensional scaling analysis shows that Marangoni flow dominates buoyancy induced flow throughout. Also, increasing substrate curvature decreases the overall capillary force, owing to the reduced curvatures of the liquid bridge, while the temporal evolution of the adhesion force is strongly influenced by both substrate curvature and wettability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
