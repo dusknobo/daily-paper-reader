@@ -1,0 +1,169 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-23T21:34:55.464787+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.13606v1",
+      "source": "arxiv",
+      "title": "Wetting effects on the dynamics of droplets and bubbles at surfaces",
+      "abstract": "Dynamic wetting plays a fundamental role in the dynamics of droplets and bubbles at solid surfaces by influencing contact line motion and interfacial evolution. In this work, three representative wetting-controlled benchmarks, namely droplet splashing, bubble coalescence at solid surfaces, and bubble dynamics under shear flow, are investigated using a three-dimensional volume-of-fluid framework coupled with a recently developed dynamic wetting model based on contact line velocity reconstruction method [19]. The model is first validated against experimental observations and literature data for droplet splashing and bubble coalescence. It accurately reproduces the transient contact line evolution, splashing morphology, and coalescence dynamics. In particular, dynamic wetting suppresses the premature bubble detachment predicted by static wetting models and yields substantially improved agreement with experimental observations. In shear flow, contact angle hysteresis and contact line dissipation strongly influence bubble deformation, sliding, and detachment. These results demonstrate that accurate treatment of dynamic wetting is essential for predicting wetting-controlled droplets and bubbles involving rapid contact line motion, strong interfacial deformation, and topology changes.",
+      "authors": [
+        "Yifan Han",
+        "Kerstin Eckert",
+        "Gerd Mutschke"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-07-15T08:56:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.13606v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "simulates droplet splashing and bubble coalescence using volume-of-fluid method",
+      "llm_evidence_cn": "使用体积流体法模拟液滴飞溅和气泡聚并",
+      "llm_evidence": "使用体积流体法模拟液滴飞溅和气泡聚并",
+      "canonical_evidence": "使用体积流体法模拟液滴飞溅和气泡聚并",
+      "llm_tldr_en": "This study employs a 3D VOF framework with a dynamic wetting model to simulate droplet splashing, bubble coalescence, and bubble dynamics under shear flow, validating against experiments.",
+      "llm_tldr_cn": "针对动态润湿对液滴和气泡在固体表面动力学的影响，本研究采用三维体积流体（VOF）框架耦合接触线速度重构的动态润湿模型，对液滴飞溅、气泡聚并及剪切流下气泡动力学进行模拟验证。结果准确再现了瞬态接触线演变、飞溅形态和聚并行为，为表面多相流模拟提供了可靠模型。",
+      "llm_tldr": "针对动态润湿对液滴和气泡在固体表面动力学的影响，本研究采用三维体积流体（VOF）框架耦合接触线速度重构的动态润湿模型，对液滴飞溅、气泡聚并及剪切流下气泡动力学进行模拟验证。结果准确再现了瞬态接触线演变、飞溅形态和聚并行为，为表面多相流模拟提供了可靠模型。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.16367v1",
+      "source": "arxiv",
+      "title": "Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces",
+      "abstract": "On flat superhydrophobic surfaces, droplet rebound is well described by a single inertio-capillary time scale, yielding a contact-time that is independent of impact energy. This single-mode response reflects the radial symmetry of flat-plate impacts. We demonstrate that an anisotropic geometric constraint, imposing a fixed spreading length along one axis, breaks this degeneracy and splits the rebound into a reciprocal pair of inertio-capillary modes. The fixed length also couples the contact-time to the Weber-dependent maximum spread, introducing an impact-energy dependence absent on the flat plate. We realize this constraint with grooved substrates, simulated using a non-ideal, entropic, multiple-relaxation-time lattice Boltzmann method and validated against the experiments of Chantelot et al. Extending their blob model from a single transverse scale to the reciprocal pair, we organize both modes through a geometric blob number and relate their time scales to the Weber number and groove width. We show that on non-wetting grooves the reciprocal modes are recovered directly, and explore the effects of finite wall affinity, using competition between the two modes to explain an observed two-branch structure in the contact-time response on mildly wetting, superhydrophobic grooves. Predictions tied to global energy balance reproduce cleanly across all conditions, while those tied to the details of the droplet's spread morphology are approximate but directionally correct. These results show that anisotropic confinement turns contact-time reduction from a question of accelerating a single rebound mode into one of selecting between conjugate inertio-capillary modes.",
+      "authors": [
+        "M. Feinberg",
+        "S. A. Hosseini",
+        "I. Karlin"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-07-17T13:53:11+00:00",
+      "link": "https://arxiv.org/pdf/2607.16367v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "uses lattice Boltzmann method to simulate droplet rebound on grooved superhydrophobic surfaces",
+      "llm_evidence_cn": "使用格子玻尔兹曼方法模拟沟槽超疏水表面液滴反弹",
+      "llm_evidence": "使用格子玻尔兹曼方法模拟沟槽超疏水表面液滴反弹",
+      "canonical_evidence": "使用格子玻尔兹曼方法模拟沟槽超疏水表面液滴反弹",
+      "llm_tldr_en": "This paper investigates droplet rebound on grooved superhydrophobic surfaces using a lattice Boltzmann method, showing anisotropic confinement splits rebound into two inertio-capillary modes.",
+      "llm_tldr_cn": "该研究用格子玻尔兹曼方法模拟沟槽超疏水表面上的液滴反弹，发现各向异性约束使反弹分为两种惯性-毛细模式，接触时间与韦伯数有关，不同于平板上无能量依赖的情形，揭示了约束对液滴动力学的影响。",
+      "llm_tldr": "该研究用格子玻尔兹曼方法模拟沟槽超疏水表面上的液滴反弹，发现各向异性约束使反弹分为两种惯性-毛细模式，接触时间与韦伯数有关，不同于平板上无能量依赖的情形，揭示了约束对液滴动力学的影响。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.20029v1",
+      "source": "arxiv",
+      "title": "Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces",
+      "abstract": "This work extends the Burnett-level discrete Boltzmann model (DBM) from single-component to multicomponent compressible flows under external forces, building on the fundamental framework of the high-precision discrete kinetic method. A high-isotropy 25-discrete-velocity set is adopted to guarantee numerical stability and spatial symmetry, while a rigorous moment-matching strategy is developed to construct the equilibrium distribution function and external force term. Different from the single-component counterpart, the present model intrinsically incorporates interspecies mass diffusion effects and multi-component thermodynamic nonequilibrium behaviors, which are critical for complex compressible multicomponent systems. The Chapman--Enskog expansion verifies that the proposed model can exactly recover the Burnett-level governing equations for forced multicomponent compressible flows in the continuum limit. Five canonical benchmark cases, including multicomponent mass diffusion, compressible Sod shock tube, thermal Couette flow, Kelvin--Helmholtz instability, and Rayleigh--Taylor instability, are systematically performed. Numerical results demonstrate that the developed Burnett-level multicomponent DBM achieves high accuracy and robustness in capturing both hydrodynamic evolution and multicomponent nonequilibrium characteristics under external forces.",
+      "authors": [
+        "Demei Li",
+        "Huilin Lai",
+        "Chuandong Lin",
+        "Suni Chen"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-07-22T11:16:03+00:00",
+      "link": "https://arxiv.org/pdf/2607.20029v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Burnett-level discrete Boltzmann model for compressible multicomponent flows, handles interspecies diffusion",
+      "llm_evidence_cn": "伯内特级离散玻尔兹曼模型用于可压缩多组分流，处理组分间扩散",
+      "llm_evidence": "伯内特级离散玻尔兹曼模型用于可压缩多组分流，处理组分间扩散",
+      "canonical_evidence": "伯内特级离散玻尔兹曼模型用于可压缩多组分流，处理组分间扩散",
+      "llm_tldr_en": "Extends discrete Boltzmann model to compressible multicomponent flows, incorporating interspecies diffusion. Provides a mesoscopic CFD tool for two-phase falling film simulation.",
+      "llm_tldr_cn": "将伯内特级离散玻尔兹曼模型推广到外力作用下的可压缩多组分流，采用25速离散速度集和矩匹配策略，自然地包含组分间质量扩散和多组分热力学非平衡效应。为复杂多组分系统提供高精度介观模拟框架，对降膜两相流具有方法论价值。",
+      "llm_tldr": "将伯内特级离散玻尔兹曼模型推广到外力作用下的可压缩多组分流，采用25速离散速度集和矩匹配策略，自然地包含组分间质量扩散和多组分热力学非平衡效应。为复杂多组分系统提供高精度介观模拟框架，对降膜两相流具有方法论价值。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.20321v1",
+      "source": "arxiv",
+      "title": "Label-Free Finite-Volume-Residual Training of Attention Graph Neural Networks for Coupled Thermo-Fluid Fields",
+      "abstract": "Neural surrogates are widely used in scientific machine learning for fast prediction of three-dimensional (3D) thermo-fluid fields. However, generating training data using conventional numerical solvers often incurs substantial computational and storage costs. We propose to train an attention graph neural network by minimizing the finite-volume method (FVM) residuals of the governing equations. These residuals are evaluated directly on the mesh, requiring no labeled data. We evaluate the trained surrogates against computational fluid dynamics (CFD) references and a data-supervised baseline across four scenarios. On the two steady-state benchmarks, the FVM-loss model achieves an all-field normalized root-mean-square error (nRMSE) of 2.3-2.8%. It demonstrates close agreement with the CFD references, including the buoyancy-energy coupling. On the two parametric transient cases, the FVM-loss model outperforms the supervised baseline in terms of accuracy, while avoiding the data-generation cost entirely. These results indicate that the FVM loss can provide a practical training signal for neural surrogates and reduce the model development cost.",
+      "authors": [
+        "Tianyu Li",
+        "Zhiwei Cao",
+        "Qingang Zhang",
+        "Ruihang Wang",
+        "Binyang Song",
+        "Yonggang Wen"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "cs.LG"
+      ],
+      "published": "2026-07-22T16:07:09+00:00",
+      "link": "https://arxiv.org/pdf/2607.20321v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "trains GNN on FVM residuals for coupled thermo-fluid fields, enabling heat transfer CFD surrogates",
+      "llm_evidence_cn": "基于FVM残差训练图神经网络用于耦合热流场，为传热CFD提供替代模型",
+      "llm_evidence": "基于FVM残差训练图神经网络用于耦合热流场，为传热CFD提供替代模型",
+      "canonical_evidence": "基于FVM残差训练图神经网络用于耦合热流场，为传热CFD提供替代模型",
+      "llm_tldr_en": "Trains attention GNN by minimizing FVM residuals for thermo-fluid fields, avoiding labeled data. Could accelerate falling film heat transfer simulations but not specifically addressed.",
+      "llm_tldr_cn": "提出通过最小化有限体积法残差训练注意力图神经网络，无需标记数据即可预测三维热流场。在稳态基准上精度与全监督相当，为传热CFD提供高效代理，可潜在用于垂直管降膜换热模拟。",
+      "llm_tldr": "提出通过最小化有限体积法残差训练注意力图神经网络，无需标记数据即可预测三维热流场。在稳态基准上精度与全监督相当，为传热CFD提供高效代理，可潜在用于垂直管降膜换热模拟。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "Numerical simulation of heat transfer in vertical falling film heat exchangers",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

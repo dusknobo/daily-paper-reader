@@ -1,0 +1,2718 @@
+Title: Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces
+
+URL Source: https://arxiv.org/pdf/2607.20029v1
+
+Published Time: Thu, 23 Jul 2026 00:46:11 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 
+
+# Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 
+
+Demei Li, 1 Huilin Lai, 1 Chuandong Lin a) ,2, 3 and Suni Chen 1
+
+> 1)
+
+School of Mathematics and Statistics & Key Laboratory of Analytical Mathematics and Applications (Ministry of Education) , Fujian Normal University, 350117 Fuzhou, P. R. China 
+
+> 2)
+
+Sino-French Institute of Nuclear Engineering and Technology, Sun Yat-sen University, Zhuhai 519082, China 
+
+> 3)
+
+State Key Laboratory of Explosion Science and Safety Protection, Beijing Institute of Technology, Beijing 100081, China. 
+
+(Dated: 23 July 2026) 
+
+This work extends the Burnett-level discrete Boltzmann model (DBM) from single-component to multicomponent compressible flows under external forces, building on the fundamental framework of the high-precision discrete kinetic method. A high-isotropy 25-discrete-velocity set is adopted to guarantee numerical stability and spatial symmetry, while a rigorous moment-matching strategy is developed to construct the equilibrium distribution function and external force term. Different from the single-component counterpart, the present model intrinsically incorporates interspecies mass diffusion effects and multi-component thermodynamic nonequilibrium behaviors, which are critical for complex compressible multicomponent systems. The Chapman–Enskog expansion verifies that the proposed model can exactly recover the Burnett-level governing equations for forced multicomponent compressible flows in the continuum limit. Five canonical benchmark cases, including multicomponent mass diffusion, compressible Sod shock tube, thermal Couette flow, Kelvin–Helmholtz instability, and Rayleigh–Taylor instability, are systematically performed. Numerical results demonstrate that the developed Burnett-level multicomponent DBM achieves high accuracy and robustness in capturing both hydrodynamic evolution and multicomponent nonequilibrium characteristics under external forces. 
+
+I. INTRODUCTION 
+
+Compressible multicomponent flows involve the simultaneous evolution of multiple fluid species, accompanied by spatiotem-porally varying density, momentum, and energy fields as well as complex thermodynamic nonequilibrium (TNE) effects. Such flow phenomena are ubiquitous in natural processes and industrial applications, ranging from hypersonic aerodynamics and multispecies gas mixing to microscale transport and multiphase multicomponent systems 1. Differences in thermophysical prop-erties among species, together with interspecies diffusion, heat transfer, and possible chemical reactions, jointly generate highly heterogeneous velocity, temperature, and concentration distributions. Compared with single-component flows, multicompo-nent compressible systems exhibit richer flow physics and more prominent nonequilibrium behaviors 2–4 . Species-dependent variations in density, viscosity, and specific heat lead to distinct hydrodynamic responses under compression, expansion, and high-speed shear, while strongly coupled mass, momentum, and energy transport further complicate the flow dynamics. These inherent complexities pose considerable challenges for high-fidelity numerical modeling 5,6 . Accurate and robust numerical tools for compressible multicomponent nonequilibrium flows are therefore essential for advancing aerospace design, high-pressure energy transport, and multiscale multi-fluid flow research. From the perspective of physical modeling, existing numerical approaches for compressible multispecies flows can be gen-erally categorized into macroscopic, mesoscopic, and microscopic frameworks. Macroscopic methods based on the continuum hypothesis solve multicomponent Euler or Navier–Stokes equations using macroscopic field variables. Nevertheless, they rely on the local thermodynamic equilibrium assumption and tend to lose accuracy in regions with strong flow gradients, where mul-ticomponent coupling and nonequilibrium effects dominate 7. In contrast, microscopic methods such as molecular dynamics can precisely resolve molecular interactions and TNE behaviors, but their prohibitive computational cost restricts their application to small-scale or short-time problems, limiting their feasibility for large-scale engineering simulations 8.As an intermediate bridge between macroscopic continuum solvers and microscopic molecular simulations, mesoscopic ki-netic methods achieve a favorable balance between computational efficiency and physical fidelity. These methods naturally capture nonequilibrium flow characteristics and flexibly handle complex flow configurations, rendering them powerful for in-vestigating shock structures, hydrodynamic instabilities, and multiphase mixing problems 9. As one of the most successful mesoscopic kinetic approaches, the lattice Boltzmann method (LBM) describes fluid evolution via particle distribution functions on discrete lattices, rather than directly solving macroscopic governing equations 10–13 . Over the past decades, the LBM has been extensively extended to turbulence, heat transfer, microfluidics, multiphase interfacial flows, mass transfer, and complex fluid-structure interaction problems 14–34 . Despite these substantial progresses, conventional LBMs are primarily designed to  
+
+> a) linchd3@mail.sysu.edu.cn arXiv:2607.20029v1 [physics.flu-dyn] 22 Jul 2026
+
+Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 2recover Navier–Stokes-level macroscopic equations, which limits their performance in high-Mach-number compressible flows, where accurate resolution of shock structures, high-order energy transport, and strong TNE effects remains challenging 35 .To overcome the inherent limitations of standard LBMs for compressible nonequilibrium flows, the discrete Boltzmann method (DBM) has been developed as a high-fidelity mesoscopic kinetic framework 36,37 . Unlike traditional LBMs that tightly couple time stepping, spatial grids, and discrete particle velocities, the DBM fully decouples these three components and thereby provides superior flexibility for modeling complex unsteady compressible flows 38 . Benefiting from flexible discrete velocity configurations and hierarchical high-order kinetic moment analysis, the DBM is capable of quantitatively characterizing TNE behaviors and capturing fine flow structures in compressible and rarefied flow regimes 39,40 . In recent years, the DBM has devel-oped into a versatile multiscale numerical tool for hydrodynamic instabilities, reactive combustion flows, multiphase systems, and plasma flows, with continuous advances in numerical schemes and physical modeling capabilities 41–50 .To improve the description of strong nonequilibrium effects, various high-order DBM models have been proposed in recent years. Gan et al. developed a BGK-type DBM for Burnett-level compressible flow simulations 51 , while Zhang et al. con-structed elliptical statistical BGK-based Burnett-level DBMs to resolve multi-order TNE effects under varying nonequilibrium intensities 52,53 . Gan et al. further established a systematic multiscale DBM framework bridging continuum and transitional flow regimes 54 . Wang et al. proposed a high-order DBM with external force and interaction source terms for multiphase flow simulations based on Hermite polynomial expansion 55 . Most recently, Chen et al. devised a Burnett-level DBM with a high-symmetry D2V25 discrete velocity set for forced single-component compressible flows, which exactly recovers Burnett-level equations and achieves accurate TNE characterization 56 . Complementarily, Wu et al. developed MRT central-moment DBMs for chemically reactive compressible flows 57 .Despite these significant advances, most existing Burnett-level DBMs are restricted to single-component flow systems and cannot resolve species-specific thermohydrodynamic differences, including species segregation, differential diffusion, and mul-ticomponent nonequilibrium coupling. Such limitations hinder their applications to multi-fluid interfacial instabilities, species mixing, and stratified compressible flows. To address this issue, several efforts have been devoted to developing multicompo-nent DBMs. Early multicomponent DBM variants were designed for reactive and premixed combustion flows 58,59 . Zhang et al. proposed an ellipsoidal statistical BGK-based two-fluid DBM for compressible flows 60 . Lin et al. developed MRT-type multicomponent DBMs with flexible heat ratio and Prandtl number adjustment, which are capable of simulating compressible mixing and hydrodynamic instabilities 61 . Further extensions include split-collision MRT DBMs for reactive nonequilibrium flows and reaction-coupled MRT DBMs for multispecies transport 62,63 . These multicomponent DBMs have been widely applied to investigate RT, KH, and RM instabilities in multi-fluid systems 64–70 .Nevertheless, existing multicomponent DBMs are mostly limited to Navier–Stokes-level accuracy, while high-order Burnett-level multicomponent DBMs that simultaneously account for external forces, interspecies mass diffusion, and multicomponent TNE coupling remain absent. This research gap motivates the present work. Building on our previous single-component Burnett-level DBM for forced compressible flows 56 , this study develops a novel Burnett-level discrete Boltzmann model for compressible multicomponent flows under external forces. The adopted high-symmetry D2V25 discrete velocity structure guarantees excellent numerical isotropy and stability. The present model inherently incorporates interspecies mass diffusion and multicomponent coupled nonequilibrium effects, enabling high-order kinetic modeling of forced compressible multispecies flows. A suite of canonical benchmarks, including multicomponent diffusion, Sod shock tube, thermal Couette flow, Kelvin–Helmholtz instability, and Rayleigh–Taylor instability, are conducted to validate the accuracy, robustness, and physical reliability of the proposed model. The remainder of this paper is organized as follows. Section II elaborates the detailed construction and theoretical deriva-tion of the proposed multicomponent Burnett-level DBM. Section III presents systematic numerical validations and physical discussions. Finally, Section IV summarizes the main conclusions and prospects future research directions.   
+
+> II. DISCRETE BOLTZMANN MODEL A. Discrete Boltzmann equation
+
+The discrete Boltzmann equation for multicomponent flows can be formulated as 58 :
+
+∂ f σ
+
+> i
+
+∂t + vσ 
+
+> i
+
+· ∇ f σ 
+
+> i
+
+= − 1
+
+τσ
+
+  f σ 
+
+> i
+
+− f σ eq 
+
+> i
+
+ + Fσ 
+
+> i
+
+, (1) where σ represents chemical species, t the time, τσ the relaxation time, ∇ the nabla operator, f σ 
+
+> i
+
+( f σ eq  
+
+> i
+
+) the discrete (equilibrium) distribution function, and i (= 1, 2, · · · , N) the index of the discrete velocities vσ 
+
+> i
+
+, with N being the total number of discrete velocities. In the right-hand term of the aforementioned equation, Fσ 
+
+> i
+
+indicates the force term, which is calculated by Eq. (25). Constructing a Burnett-level DBM requires its discrete equilibrium distribution function to satisfy nine prescribed sets of Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 3kinetic moment relations. 
+
+# ∑i f σ eq  
+
+> i
+
+=
+
+ZZ 
+
+f σ eq dvdη, (2) 
+
+# ∑i f σ eq  
+
+> i
+
+vσ 
+
+> iα
+
+=
+
+ZZ 
+
+f σ eq vα dvdη, (3) 
+
+# ∑i f σ eq 
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ =
+
+ZZ 
+
+f σ eq  v2 + η2 dvdη, (4) 
+
+# ∑i f σ eq  
+
+> i
+
+vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+=
+
+ZZ 
+
+f σ eq vα vβ dvdη, (5) 
+
+# ∑i f σ eq 
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 
+
+> iα
+
+=
+
+ZZ 
+
+f σ eq  v2 + η2 vα dvdη, (6) 
+
+# ∑i f σ eq  
+
+> i
+
+vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+vσ 
+
+> iχ
+
+=
+
+ZZ 
+
+f σ eq vα vβ vχ dvdη, (7) 
+
+# ∑i f σ eq 
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+=
+
+ZZ 
+
+f σ eq  v2 + η2 vα vβ dvdη, (8) 
+
+# ∑i f σ eq  
+
+> i
+
+vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+vσ 
+
+> iχ
+
+vσ 
+
+> iγ
+
+=
+
+ZZ 
+
+f σ eq vα vβ vχ vγ dvdη, (9) 
+
+# ∑i f σ eq 
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+vσ 
+
+> iχ
+
+=
+
+ZZ 
+
+f σ eq  v2 + η2 vα vβ vχ dvdη, (10) where ησ 
+
+> i
+
+(ηi) is the (discrete) free parameter, v = |v| and vσ 
+
+> i
+
+= |vσ 
+
+> i
+
+| denote the magnitudes of the continuous and discrete particle velocities, respectively, while vσα and vσ 
+
+> iα
+
+are their components in the α-direction. In the two-dimensional case, the indices α, β ,
+
+χ, and γ each take values of x or y. Additionally, the Maxwellian equilibrium distribution function f σ eq takes the form 59 :
+
+f σ eq = nσ
+
+ mσ
+
+2πkT 
+
+D/2 mσ
+
+2πIσ kT 
+
+1/2
+
+exp 
+
+"
+
+− mσ |v − u|2
+
+2kT − mσ η2
+
+2Iσ kT 
+
+#
+
+, (11) where mσ stands for the molar mass, u the flow velocity, T the mixture temperature, nσ the molar concentration, v the particle velocity, D = 2 the spatial dimension, k = 1 the Boltzmann constant, Iσ the extra degrees of freedom corresponding to molecular vibration and/or rotation, and the symbol η stands for the description of the extra internal energy. Moreover, substituting Eq. (11) into Eqs. (2)-(10) leads to a compact matrix form, 
+
+C · fσ eq = ˆfσ eq , (12) where fσ eq = [ f σ eq 1 , f σ eq 2 , . . . , f σ eq  
+
+> N
+
+]T represents the column matrix formed by discrete equilibrium distribution functions; ˆfσ eq =[ ˆf σ eq 1 , ˆf σ eq 2 , . . . , ˆf σ eq  
+
+> N
+
+]T is the column matrix equilibrium kinetic moments (refer to A). Since in the two-dimensional case, Eqs. (2)-(10) contain N = 25 independent kinetic moments. C refers to a square matrix where all entries depends on the discrete parameters vσ 
+
+> i
+
+and ησ 
+
+> i
+
+(refer to A). When C is invertible, Eq. (12) can be expressed as 71 :
+
+fσ eq = C−1 · ˆfσ eq , (13) where C−1 denotes the inverse matrix associated with C. Note that Eq. (13) provides the way how the discrete equilibrium distribution function is calculated. Similarly, the force term Fσ 
+
+> i
+
+should also satisfy the following nine sets of kinetic moment relations: 
+
+# ∑i Fσ 
+
+> i
+
+=
+
+ZZ 
+
+Fσ dvdη, (14) Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 4
+
+# ∑i Fσ 
+
+> i
+
+vσ 
+
+> iα
+
+=
+
+ZZ 
+
+Fσ vα dvdη, (15) 
+
+# ∑i Fσ
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ =
+
+ZZ 
+
+Fσ  v2 + η2 dvdη, (16) 
+
+# ∑i Fσ 
+
+> i
+
+vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+=
+
+ZZ 
+
+Fσ vα vβ dvdη, (17) 
+
+# ∑i Fσ
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 
+
+> iα
+
+=
+
+ZZ 
+
+Fσ  v2 + η2 vα dvdη, (18) 
+
+# ∑i Fσ 
+
+> i
+
+vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+vσ 
+
+> iχ
+
+=
+
+ZZ 
+
+Fσ vα vβ vχ dvdη, (19) 
+
+# ∑i Fσ
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+=
+
+ZZ 
+
+Fσ  v2 + η2 vα vβ dvdη, (20) 
+
+# ∑i Fσ 
+
+> i
+
+vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+vσ 
+
+> iχ
+
+vσ 
+
+> iγ
+
+=
+
+ZZ 
+
+Fσ vα vβ vχ vγ dvdη, (21) 
+
+# ∑i Fσ
+
+> i
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 
+
+> iα
+
+vσ 
+
+> iβ
+
+vσ 
+
+> iχ
+
+=
+
+ZZ 
+
+Fσ  v2 + η2 vα vβ vχ dvdη, (22) where 
+
+Fσ ≈ − mσ a · (v − uσ )
+
+T f σ eq , (23) which characterizes the variation rate of the distribution function induced by external forces 59 . The nine sets of kinetic moment relations are formulated within a matrix framework 71 :
+
+C · Fσ = ˆFσ , (24) where Fσ = [ Fσ 
+
+> 1
+
+, Fσ 
+
+> 2
+
+, . . . , Fσ 
+
+> N
+
+]T refers to the column matrix of discrete velocity-space force components, ˆFσ = [ ˆFσ 
+
+> 1
+
+, ˆFσ 
+
+> 2
+
+, . . . , ˆFσ 
+
+> N
+
+]T
+
+represents the column matrix for continuous space force items (refer to A). Similarly, Eq. (24) can be expressed as: 
+
+Fσ = C−1 · ˆFσ , (25) when C is invertible. It should be pointed out that Eq. (25) offers the expression of the force term. Furthermore, the molar concentration of component σ , nσ , is given by 
+
+nσ = ∑i f σ 
+
+> i
+
+(26) The mass density of component σ , ρσ , reads 
+
+ρσ = mσ nσ (27) The flow velocity of component σ , uσ , is expressed as 
+
+uσ = ∑i f σ 
+
+> i
+
+vσ
+
+> i
+
+nσ (28) The internal energy density of component σ , Eσ , takes the form 
+
+Eσ = mσ
+
+2 ∑i f σ
+
+> i
+
+ |vσ 
+
+> i
+
+|2 + ( ησ 
+
+> i
+
+)2 (29) Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 5The temperature of component σ , T σ , is formulated as 
+
+T σ = 2Eσ − ρσ |uσ |2
+
+(D + Iσ ) nσ (30) It is clear that the macroscopic quantities evolve as the f σ 
+
+> i
+
+are updated in the process of the discrete Boltzmann equation. The mixing number molar concentration n is defined as 
+
+n = ∑σ nσ . (31) The mixture mass density ρ is given by 
+
+ρ = ∑σ ρσ . (32) The flow velocity u reads 
+
+u = ∑σ ρσ uσ
+
+ρ . (33) The total energy density of the mixture E is expressed as 
+
+E = ∑σ Eσ . (34) The internal energy density Eint takes the form 
+
+Eint = E − 12 ρ |u|2 . (35) The mixture temperature T is formulated as 
+
+T = 2Eint 
+
+∑σ (D + Iσ ) nσ . (36) 
+
+B. Nonequilibrium effects 
+
+Apart from reproducing the conservation equations under the continuum limit, the DBM is capable of extracting essential nonequilibrium information that goes beyond these equations. Specifically, if the discrete equilibrium distribution functions 
+
+f σ eq  
+
+> i
+
+are substituted with the discrete distribution functions f σ 
+
+> i
+
+, Eqs. (2) - (4) remain valid, which individually describe the conservation laws of mass, momentum, and energy. However, in a TNE state, substituting f σ eq  
+
+> i
+
+for f σ 
+
+> i
+
+might break the balance of Eqs. (5) - (10). Discrepancies in high-order kinetic moments solved from f σ 
+
+> i
+
+and equilibrium distribution functions f eq 
+
+> i
+
+essentially quantify how significantly the physical system drifts away from local equilibrium. From a mathematical perspective, the forms describing nonequilibrium features are given below: 
+
+∆σ ∗ 
+
+> 2,αβ
+
+= ∑i f σ neq  
+
+> i
+
+vσ ∗ 
+
+> iα
+
+vσ ∗ 
+
+> iβ
+
+, (37) 
+
+∆σ ∗ 
+
+> 3,1,α
+
+= ∑i f σ neq 
+
+> i
+
+ vσ ∗2 
+
+> i
+
++ ησ 2∗
+
+> i
+
+ vσ 
+
+> iα
+
+, (38) 
+
+∆σ ∗ 
+
+> 3,αβ χ
+
+= ∑i f σ neq  
+
+> i
+
+vσ ∗ 
+
+> iα
+
+vσ ∗ 
+
+> iβ
+
+vσ ∗ 
+
+> iχ
+
+, (39) 
+
+∆σ ∗ 
+
+> 4,2,αβ
+
+= ∑i f σ neq 
+
+> i
+
+ vσ ∗2 
+
+> i
+
++ ησ ∗2
+
+> i
+
+ vσ ∗ 
+
+> iα
+
+vσ ∗ 
+
+> iβ
+
+, (40) 
+
+∆σ ∗ 
+
+> 4,αβ χγ
+
+= ∑i f σ neq 
+
+> i
+
+ vσ 2∗ 
+
+> i
+
++ ησ ∗2
+
+> i
+
+vσ 
+
+> iα
+
+vσ ∗ 
+
+> iβ
+
+vσ ∗ 
+
+> iχ
+
+vσ ∗ 
+
+> iγ
+
+, (41) 
+
+∆σ ∗ 
+
+> 5,3,αβ χ
+
+= ∑i f σ neq 
+
+> i
+
+ vσ 2∗ 
+
+> i
+
++ ησ 2∗
+
+> i
+
+vσ ∗ 
+
+> iα
+
+vσ ∗ 
+
+> iβ
+
+vσ 
+
+> iχ
+
+, (42) where f σ neq  
+
+> i
+
+= f σ 
+
+> i
+
+− f σ eq  
+
+> i
+
+denotes the nonequilibrium part of the discrete distribution function, and vσ ∗ 
+
+> iα
+
+= viα − uα represents the peculiar velocity. The symbols ∆σ ∗ 
+
+> m,n
+
+are the corresponding nonequilibrium moments, where the indices m and n denote the tensor contraction from rank m to rank n. Physically, ∆σ ∗ 
+
+> 2,αβ
+
+characterize the disordered momentum flux (i.e., the viscous effects), while 
+
+∆σ ∗ 
+
+> 3,1,α
+
+and ∆σ ∗ 
+
+> 3,αβ χ
+
+stand for unordered energy flux (i.e., heat conduction). The term ∆σ ∗ 
+
+> 4,2,αβ
+
+characterizes the flux of irregular kinetic energy. The moments ∆σ ∗ 
+
+> 4,αβ χγ
+
+and ∆σ ∗ 
+
+> 5,3,αβ χ
+
+account for higher-order nonequilibrium effects. Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 62
+
+3
+
+4
+
+5
+
+67
+
+8 9
+
+10 
+
+11 
+
+12 
+
+13 
+
+14 15 
+
+16 17 
+
+18 
+
+19 20 
+
+21 
+
+22 
+
+23 24 
+
+25 
+
+1 
+
+> FIG. 1. Sketches of discrete velocities.
+> C. Discretization of velocity
+
+It is widely recognized that cutting down the discrete velocity count helps reduce computational consumption and elevate computational performance. For the system of equations to be solvable, the number of discrete velocities must be at least equal to the number of independent kinetic moments required. The minimal configuration, where these two numbers are equal, can be obtained by the matrix match approach 71 . Actually, in two dimensions, each of the nine sets of kinetic moment relations in Eqs. (2) - (10) and Eqs. (14) - (22) contains 25 independent components. Consequently, The present work employs a total of 
+
+N = 25 discrete velocity directions. Each discrete velocity direction corresponds to one discrete Boltzmann equation that needs to be solved, which makes the matrix mapping strategy the most computationally efficient scheme for DBM. Moreover, numerical stability typically imposes more stringent requirements on the symmetry of the discrete velocity set. Good spatial symmetry helps suppress unphysical anisotropy caused by discretization errors, thereby ensuring a stable and reliable evolution. Therefore, to enhance numerical stability, it is often essential to construct a discrete velocity set with high symmetry, even if it exceeds the minimal requirement. Now, let us construct the discrete velocities, D2V25, with symmetry characteristics. As delineated in Fig. 1, the discrete velocities take the form, 
+
+vσ 
+
+> i
+
+=
+
+
+
+0, i = 1,
+
+cyc : vσ 
+
+> a
+
+(±1, 0) , 2 ≤ i ≤ 5,
+
+vσ 
+
+> a
+
+±√22 , ±√22
+
+!
+
+, 6 ≤ i ≤ 9,
+
+cyc : vσ 
+
+> b
+
+(±1, 0) , 10 ≤ i ≤ 13 ,
+
+vσ 
+
+> c
+
+±√22 , ±√22
+
+!
+
+, 14 ≤ i ≤ 17 ,
+
+cyc : vσ 
+
+> d
+
+±√32 , ±0.5
+
+!
+
+, 18 ≤ i ≤ 25, (43) where vσ 
+
+> a
+
+, vσ 
+
+> b
+
+, vσ 
+
+> c
+
+, and vσ 
+
+> d
+
+are adjustable parameters that control the amplitude of each discrete velocity vector. Additionally, the parameter assignments for ησ 
+
+> i
+
+read ησ 
+
+> 1
+
+= 0, ησ 
+
+> 2≤i≤13
+
+= ησ 
+
+> a
+
+, and ησ 
+
+> 14 ≤i≤25
+
+= ησ 
+
+> b
+
+. The values of ησ 
+
+> a
+
+and ησ 
+
+> b
+
+are also tunable. It should be stressed that the values of |vσ 
+
+> i
+
+| and ησ 
+
+> i
+
+can be adjusted to enhance the numerical stability and computational precision of the DBM. The magnitudes of vi can be set near the values of flow velocity magnitude uσ = |uσ | and acoustic Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 7velocity vσ 
+
+> s
+
+= pγσ T σ /mσ , with the specific heat ratio γσ = ( D + Iσ + 2)/(D + Iσ ). Furthermore, the values of ησ 
+
+> i
+
+should be distributed on both sides of the characteristic value ¯ ησ = pIσ T σ /mσ , i.e., some ησ 
+
+> i
+
+should be less than ¯ ησ and others greater. This is motivated by the requirement to approximate the continuous distribution of the extra internal energy, which according to the equipartition theorem is given by 12 mσ ¯ησ 2 = 12 Iσ T σ . A discrete set of ησ 
+
+> i
+
+values spanning ¯ ησ helps in achieving a more accurate representation of this energy.  
+
+> III. VERIFICATION AND VALIDATION
+
+For demonstrating the performance of the proposed DBM, five benchmark cases are considered. First, a multicomponent diffusion problem is simulated to demonstrate the DBM’s capacity to handle interactions between distinct non-premixed species. Second, the Sod shock tube problem is adopted to verify the applicability of the DBM to compressible flows. Third, thermal Couette flow is carried out to validate the DBM’s adaptability to fluid systems where hydrodynamic behaviors and thermal TNE effects coexist. Fourth, the KH instability is calculated to illustrate the DBM’s performance in depicting fluid flows with complicated interfacial evolutions. Finally, the RT instability further validates the capability of the DBM in simulating complex fluid behaviors under external force fields.  
+
+> A. Multicomponent diffusion
+
+In multicomponent systems, diffusion is a fundamental transport mechanism and the cornerstone of mass transfer, governing molecular mixing, interfacial dynamics, and the approach to thermodynamic equilibrium. Given its critical role in fluid dynam-ics, transport phenomena, and combustion, any reliable multicomponent DBM must first be validated against classical diffusion laws to ensure physical fidelity. We simulate the multicomponent diffusion with the following initial conditions: 
+
+(  nA, nB, nC 
+
+> L
+
+= ( 0.1, 0.6, 0.3) ,
+
+ nA, nB, nC 
+
+> R
+
+= ( 0.6, 0.3, 0.1) ,where the symbol L labels the left zone ( −0.02 ≤ x ≤ 0.00), and R indicates the right region (0 .00 < x ≤ 0.02). Labels A, B,and C are assigned to three kinds of independent chemical species, with the molar mass normalized to mσ = 1 for mathematical convenience. The velocity and temperature of this system are u = 0 and T = 1. For the x-direction, second-order extrapolation is adopted to impose boundary constraints, whereas periodic boundary treatments are utilized along the y-direction. Based on Fick’s law of diffusion, the analytical formula for species concentrations under isothermal diffusion conditions is presented below 72 :
+
+nσ = nσ 
+
+> L
+
++ nσ
+
+> R
+
+2 − nσ 
+
+> L
+
+− nσ
+
+> R
+
+2 erf 
+
+ x
+
+√4Θt
+
+
+
+,where erf represents the complementary error term, and Θ = 0.001 denotes the diffusivity. As a preliminary step, a grid independence study is carried out to guarantee the credibility of numerical outcomes. To achieve this goal, four simulations are performed under different mesh configurations. Specifically, the horizontal grid resolution is set to Nx = 10, 20, 40, and 80, respectively, with the vertical grid consistently set to Ny = 1. The time step ∆t = 1 × 10 −5, and the relaxation time τA = τB = τC = 1.0 × 10 −3.Figure 2 displays the concentration profile of species B. The green, purple, blue, and red dashed lines correspond to simula-tions with four different mesh resolutions, and the solid line stands for the theoretical solution. It is evident that the numerical solutions converge toward the theoretical solution as the grid density increases, with discrepancies between simulations of sim-ilar resolutions diminishing for finer meshes. Notably, the solutions for Nx = 40 and Nx = 80 are almost identical, and both are quite close to the theory prediction. To balance numerical accuracy and computational efficiency, a horizontal grid resolution of 
+
+Nx = 80 is employed in the subsequent simulations. Figure 3 illustrates the concentration distributions of components A, B, and C along the x-direction during the diffusion process. Circles and squares correspond to the numerical results at t = 0.01 and t = 0.05, respectively, and the solid curves correspond to the theoretical solutions. Green, red, and blue are used to distinguish components A, B, and C, respectively. An obvious consistency can be observed between the DBM numerical outputs and theoretical solutions over the whole diffusion development process, confirming the capability of the DBM to faithfully capture multicomponent diffusion dynamics. Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 8-0.02 -0.01 0.00 0.01 0.02 0.30 0.35 0.40 0.45 0.50 0.55 0.60 nBxThe o r y
+
+Nx= 8 0
+
+Nx= 4 0
+
+Nx= 2 0
+
+Nx= 1 0
+
+FIG. 2. Grid independence study: horizontal concentration profiles of species B concentration at t = 0.05. The solid curves match the theoretical prediction, and dashed profiles illustrate numerical outputs obtained on various grid resolutions. -0.02 -0.01 0.00 0.01 0.02 0.1 0.2 0.3 0.4 0.5 0.6 The o r y
+
+The o r y
+
+The o r y
+
+t=0 . 0 1 ( M A )
+
+t=0 . 0 1 ( M B )
+
+t=0 . 0 1 ( M C )
+
+t
+
+=0.05
+
+(
+
+M
+
+> A
+
+)
+
+t
+
+=0.05
+
+(
+
+M
+
+> B
+
+)
+
+t
+
+=0.05
+
+(
+
+M
+
+> C
+
+)
+
+> MoleFraction
+
+# x
+
+FIG. 3. Multicomponent diffusion process: concentration profiles of species A, B, and C at t = 0.01 and t = 0.05. The symbols correspond to the numerical outcomes produced with the DBM simulations, and the solid lines denote the theoretical solutions. 
+
+B. Sod shock tube 
+
+The Sod shock tube configuration serves as a standard test case for studying shock wave dynamics. The configuration consists of a sealed tube containing a compressible gas initially partitioned by a pressure discontinuity. Upon release, this discontinuity evolves into a flow featuring fundamental structures including a shock front, a rarefaction wave, and a contact discontinuity. The presence of these well-defined flow features makes the problem ideal for validating the accuracy and stability of numerical Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 9models. Unlike traditional single-component models, the present DBM is capable of simulating multicomponent systems with distinct molecular properties. To demonstrate its effectiveness for high-speed compressible flows, we compute the Sod shock tube with the following initial conditions: 
+
+(  nA, nB, nC, p 
+
+> L
+
+= ( 1, 0, 0, 1) ,
+
+ nA, nB, nC, p 
+
+> R
+
+= ( 0, 0.05 , 0.075 , 0.1) ,where the L and R correspond to the prescribed initial macroscopic quantities in the left zone spanning ( −1.0 ≤ x ≤ 0.0) and the right region covering (0 .0 < x ≤ 1.0), separately. The two regions are initialized in a resting state, where the flow velocity satisfies u = 0. The molar masses of the three species are set as mA = mB = mC = 1. Based on the relations ρσ = mσ nσ
+
+and T = p/ ∑σ nσ , the corresponding initial conditions yield (ρL, ρR) = ( 1.0, 0.125 ) and (TL, TR) = ( 1.0, 0.8). The grid is 
+
+Nx × Ny = 2000 × 1, the spatial step ∆x = ∆y = 1.0 × 10 −3, the time step ∆t = 1.0 × 10 −5, and the relaxation time τA = τB =
+
+τC = 1.0 × 10 −5. Furthermore, the computational domain employs inflow and outflow boundaries in the x-direction, together with periodic boundaries in the y-direction. -1.0 -0.5 0.0 0.5 1.0 0.0 0.2 0.4 0.6 0.8 1.0 -1.0 -0.5 0.0 0.5 1.0 0.0 0.2 0.4 0.6 0.8 1.0 -1.0 -0.5 0.0 0.5 1.0 0.0 0.2 0.4 0.6 0.8 1.0 -1.0 -0.5 0.0 0.5 1.0 0.7 0.8 0.9 1.0 1.1 1.2 (a) 
+
+# x                      
+
+> DBM
+> Riemannsolution
+> DBM
+> Riemannsolution
+
+# (b)
+
+> p
+
+# x                      
+
+> DBM
+> Riemannsolution
+> DBM
+> Riemannsolution
+
+# (c)
+
+> u
+> x
+
+# x
+
+# (d)
+
+> 
+
+# x   
+
+> FIG. 4. Distributions of density (a), pressure (b), horizontal velocity (c), and temperature (d) for the Sod shock tube at t=0.4
+
+Figure 4(a) - (d) illustrate spatial distributions of density, pressure, x-direction velocity and temperature for the Sod shock tube when t = 0.4. Discrete markers stand for numerical data from the DBM, while continuous solid curves correspond to Riemann solutions. During the evolution, three characteristic structures can be clearly identified: the rarefaction wave propagating left-ward, the contact discontinuity associated with jumps in density and temperature, and the shock front on the right characterized by steep gradients. The close agreement between numerical and Riemann results demonstrates the capability of the DBM in accurately resolving discontinuities and capturing the essential wave patterns of the Sod tube problem. Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 10  
+
+> C. Thermal Couette flow
+
+Thermal Couette flow serves as a classic fluid dynamic case, featuring laminar flow trapped between two parallel plates that travel at separate velocities. In this flow, adjacent fluid layers slide relative to one another, resulting in a linear velocity profile across the channel. Due to these features, thermal Couette flow is widely employed as a benchmark for evaluating numerical methods applied to viscous and thermal flow problems. In this work, the simulation of thermal Couette flow is conducted with three objectives: to confirm the adaptability of the DBM across different values of the specific heat ratio, to illustrate its ability to capture nonequilibrium behaviors under hydrodynamic and thermodynamic constraints, and to validate the performance of the DBM when applied to premixed compressible fluid species. The initial setup is as follows: a premixed flow composed of species A, B, and C is enclosed by two unbounded parallel plates that maintain a fixed gap height H = 0.1. The initial species concentrations are set as (nA, nB, nC) = ( 0.1, 0.3, 0.6), with uniform molar mass mσ = m0 = 1, temperature T σ = T0 = 1, and initial velocity u = 0 across all species. The top plate slides tangentially with a fixed velocity u0 = 0.1, while the bottom plate keeps static. Given the uniform flow distribution along the x-direction, this physical setup can be simplified into a one-dimensional model. The computational grid is configured with dimensions Nx × Ny =
+
+1 × 200, the spatial step is set as ∆x = ∆y = 5.0 × 10 −4, and the relaxation time τA = τB = τC = 1.0 × 10 −3. Additionally, a nonequilibrium extrapolation method is applied at the upper and lower walls, and periodic conditions are implemented along the lateral boundaries on two sides. The theoretical expression for the horizontal velocity spatial variation takes the subsequent form 73,74 .
+
+ux = yH u0 + 2
+
+π u0
+
+> ∞
+
+# ∑
+
+> n=1
+
+ (−1)n
+
+n exp 
+
+
+
+−n2 π2μt
+
+ρH2
+
+
+
+sin 
+
+ nπyH
+
+
+
+,
+
+where μ = τ/ρT indicates the dynamic viscosity. Upon reaching steady-state conditions, the spatial temperature variation across the y-direction can be analytically expressed via the following expression 73,74 :
+
+T = T0 + u20
+
+2cp
+
+yH
+
+
+
+1 − yH
+
+
+
+,
+
+where cp = γ/(γ − 1) denotes the isobaric specific heat and each species owns the same specific heat ratio γσ = γ.0.00 0.02 0.04 0.06 0.08 0.10 0.00 0.02 0.04 0.06 0.08 0.10 0.00 0.02 0.04 0.06 0.08 0.10 -6 -5 -4 -3 -2 -1 0yuxy t  = 0.1  t  = 0.3  t  = 1.0  t  = 4.5  Theory (a) (b) 10 3∆σ∗ 2 , x y
+
+t=0 . 1
+
+t=0 . 3
+
+t=1 . 0
+
+t=4 . 5
+
+The o r y       
+
+> FIG. 5. Vertical distribution of the horizontal speed uxand ∆σ∗
+> 2,xy under diverse time stages of Couette flow development. The symbols correspond to numerical outcomes of the DBM framework, and solid lines reflect the theoretical results.
+
+Figure 5 displays the vertical distribution curves of the horizontal velocity ux (a) and the nonequilibrium quantities ∆σ ∗ 
+
+> 2,xy
+
+of species σ = A (b) in the thermal Couette flow with a fixed specific heat ratio γ = 7/5 at selected time instants t = 0.1, 0 .3, 1 .0, and 4.5, respectively. The discrete symbols correspond to results from the DBM, and the solid curves represent the corresponding theoretical solutions. The theoretical solution of ∆σ ∗ 
+
+> 2,xy
+
+is obtainable through the Chapman–Enskog analysis, and the specific Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 11 expressions are given as follows: 
+
+∆σ ∗ 
+
+> 2,xy
+
+= − nσ
+
+τσ
+
+ uσ 
+
+> x
+
+− ux
+
+ + ux
+
+ uσ 
+
+> y
+
+− uy
+
+ +  uσ 
+
+> x
+
+− ux
+
+  uσ 
+
+> y
+
+− uy
+
+
+
+− ρσ T σ τσ
+
+(mσ )2
+
+
+
+∂xuσ 
+
+> y
+
++ ∂yuσ
+
+> x
+
+
+
++ nσ  uσ 
+
+> x
+
+− ux
+
+  uσ 
+
+> y
+
+− uy
+
+.
+
+As depicted, the numerical results agree well with theoretical predictions across all measured time instants. These results verify that the DBM can faithfully capture fluid hydrodynamic evolutions and characterize relevant nonequilibrium behaviors. 0.00 0.02 0.04 0.06 0.08 0.10 1.0000 1.0001 1.0002 1.0003 1.0004 γ= 7 / 5
+
+γ= 9 / 7
+
+γ= 1 1 / 9
+
+The o r y
+
+> T
+
+# y         
+
+> FIG. 6. Vertical spatial profiles of temperature within steady-state Couette flow under various specific heat ratios γ=7/5, γ=9/7, and
+> γ=11 /9, respectively.
+
+Figure 6 displays the steady state temperature distributions in thermal Couette flow. Numerical results for various specific heat ratios of γ = 7/5, 9 /7, and 11 /9 are represented by triangles, squares, and circles, respectively, and the corresponding theoretical solutions are indicated by solid lines. Excellent agreement is observed between the simulated and theoretical profiles across all values of γ, confirming the capability of the DBM to accurately model flows with varying specific heat ratios.  
+
+> D. Kelvin–Helmholtz instability
+
+The KH instability, induced by velocity shear across fluid interfaces, is a typical interfacial instability commonly encountered in nature phenomena and engineering applications. To validate the capability of the present DBM in capturing interfacial dynamics and complex flow evolution, the numerical simulation of the KH instability is performed. Figure 7 illustrates the original computational layout of the three-component fluid system. A square calculation domain with identical horizontal and vertical dimensions (Lx = Ly = 1) is established, which falls into three segmented regions along the 
+
+x-direction: 0 < x ≤ x1, x1 < x ≤ x2, and x2 < x ≤ Lx. The interface separating the left and central subdomains is placed at 
+
+x1 = 0.3Lx, while the boundary between the central and right segments is set at x2 = 0.7Lx. The initial configuration consists of species A, B, and C occupying the left, central, and right subdomains in sequence. The flow velocity is set as u = uxex + uyey,with ux = 0. Densities and temperatures are uniform ( nL = nM = nR, TL = TM = TR), thereby ensuring uniform pressure ( pL =
+
+pM = pR) across the interfaces according to pσ = nσ T σ . To initiate the roll-up dynamics of the KH instability, a cosine-shaped perturbation is imposed on the two interfaces: 
+
+w = w0 cos 
+
+ 4πyLy
+
+
+
+,
+
+where w0 = Lx/200 is the amplitude. To maintain smoothness at the interfaces, the concentrations and velocities are initially set Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 12 Mu
+
+# An CnBn
+
+# L RMT TT= =
+
+# L RMp pp= =
+
+# RuLu
+
+FIG. 7. Original computational layout of the KH instability employed in the present simulations. 
+
+with continuous profiles: 
+
+nA = nL
+
+2 − nL
+
+2 tanh 
+
+ x − x1 + wWn
+
+
+
+,
+
+nC = nR
+
+2 − nR
+
+2 tanh 
+
+ x − x2 + wWn
+
+
+
+,
+
+nB = nM − nA − nC,and 
+
+uy =
+
+
+
+uL + uM
+
+2 − uL − uM
+
+2 tanh 
+
+ x − x1 + wWu
+
+
+
+, 0 < x ≤ Lx
+
+2 ,
+
+uM + uR
+
+2 − uM − uR
+
+2 tanh 
+
+ x − x2 + wWu
+
+
+
+, Lx
+
+2 < x ≤ Lx,
+
+where Wn and Wu correspond to the widths of the concentration and velocity transition layers in sequence, and (uL, uM , uR) = (0.5, −0.5, 0.5).Furthermore, the mesh grid is Nx × Ny = 500 × 500, the spatial step ∆x = ∆y = 1.0 × 10 −3, the time step ∆t = 2.0 × 10 −5, the relaxation time τA = τB = τC = 2.0 × 10 −4, and the molar masses are mA = 1, mB = 1.5, and mC = 2 in sequence. Additionally, two types of boundary constraints are implemented as follows: the specular reflection scheme for the x-direction, and periodic conditions across the y-direction. Figure 8 depicts the spatial contours of species B throughout the development of miscible KH instability at several representa-tive time instants. Initially, the interface exhibits small-amplitude perturbations; as the system evolves, the shear flow amplifies these disturbances, and the concentration transition layer broadens due to molecular diffusion. The interface progressively de-forms, transitioning from a smooth, regular shape to a more irregular and complex configuration. Midway through the evolution, pairs of vortices form, with the central fluid penetrating into neighboring regions. At later times, the vortices grow continuously, leading to the emergence of billow-like structures and increasingly convoluted interfaces. Eventually, the fluid motion becomes chaotic, and the KH instability drives substantial mixing between the diverse fluid species. Overall, the observed dynamics are in good agreement with previously reported KH instability scenarios 62 , demonstrating that the proposed model well characterizes the nonlinear interfacial evolution processes. 
+
+E. Rayleigh–Taylor instability 
+
+Rayleigh–Taylor (RT) instability is a typical multi-material interfacial instability. When the density gradient opposes the ef-fective pressure gradient, small perturbations at the fluid interface amplify continuously and evolve over time. Compared with Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 13 t= 0.5 t= 0.0  t= 1.0  t= 1.5 
+
+# t= 2.5 t= 2.0  t= 3.0  t= 3.5   
+
+> FIG. 8. Evolution of the molar fraction of species Bduring the KH instability at various time instants. The contour scale ranges from blue (0) to red (1).
+
+single-component flows, RT instability in multicomponent media exhibits far richer and more complex dynamics. It is governed not only by external body forces such as gravity, but also by critical physical effects: interspecies mass diffusion, intercomponent viscosity contrasts, and cross-interface mass transport. Under a constant external force field, mechanical equilibrium is desta-bilized when a denser fluid overlays a lighter one. Interfacial perturbations grow progressively, eventually forming nonlinear, interpenetrating “bubble-spike” structures, alongside interpenetration and dynamic mixing of distinct components. To validate the ability of the multicomponent DBM to simulate multi-material interfacial instabilities, species mixing, and complex flow dynamics under external forcing, we perform numerical calculations of compressible RT instability in this part. The calculation region for the two-component RT simulation is a rectangle with length Lx = 0.05 and height Ly = 0.2. The computational domain consists of two individual regions separated by a central perturbed interface. Component A occupies the upper region with a particle mass mA = 2.0, while component B is distributed in the lower region with mB = 1.0. A gravitational field a = ( 0, ay) is imposed on the entire system, with ay = −2.0. In the static equilibrium state with ∇p = ρa, the initial concentrations are configured as: 
+
+
+
+nA = pm
+
+Tu
+
+exp 
+
+ −aymA
+
+Tu
+
+(ym − y)
+
+
+
+, nB = 0, y > ym,
+
+nB = pm
+
+Td
+
+exp 
+
+ −aymB
+
+Tu
+
+(ym − y)
+
+
+
+, nA = 0, y < ym,
+
+where pm = 4.0 is defined as the pressure located on the material interface, and the position of the perturbed interface is expressed as ym = Ly/2 + Ly/50 cos (πx/Lx). For thermal initial conditions, the entire computational domain is initialized with a uniform temperature field: T = 1.0. Furthermore, the mesh grid is Nx × Ny = 256 × 1024, the time step ∆t = 2.5 × 10 −6, and the relaxation time τσ = 3.5 × 10 −5. Furthermore, the specular reflection boundary condition is imposed along the x- and y-direction boundaries. Figure 9 illustrates the evolution of density contours for the RT instability of component B at successive time instants: t = 0.00, 0.25, 0 .50, 0 .75, 1 .00, 1 .25, 1 .50, 1 .75, 2 .00, and 2 .25, respectively. At the start of the simulation ( t = 0.00), the flow field is in hydrostatic equilibrium. The interface separating the light and dense fluids bears a predefined small-amplitude cosine perturbation, accompanied by a smooth density distribution and distinct stratification. For 0 .25 ≤ t ≤ 0.50, the interfacial perturbation begins to evolve slowly. Diffusive effects slightly broaden the density transition layer; the perturbation amplitude Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 14 t= 0.00  t= 0.75  t= 1.00 t= 0.25  t= 0.50 
+
+# t= 1.25  t= 2.00  t= 2.25 t= 1.50  t= 1.75 
+
+4.2  7.8 6.0  
+
+> FIG. 9. Density contours during the RT instability development for component B.
+
+increases exponentially, while the interface retains a regular sinusoidal profile. After t = 0.75, the instability enters a rapid growth phase. Dense fluid descends to form spike structures, whereas the light fluid rises to develop bubble-like configurations, inducing severe asymmetric deformation of the fluid interface. Within 1 .00 ≤ t ≤ 1.50, intensified interfacial shear excites the KH instability, which gradually rolls up the spike tails and yields characteristic mushroom-shaped structures. At late times (1 .75 ≤ t ≤ 2.25), fluid mixing is substantially enhanced. The mushroom structures undergo further elongation, and the density field exhibits multi-scale turbulent mixing features. The entire evolutionary process agrees well with the classical growth regime of RT instability. The above numerical results fully verify the reliability of the DBM for simulating fluid systems featuring complex structures under external body forces. Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 15  
+
+> IV. CONCLUSIONS
+
+In this work, a high-order Burnett-level multicomponent discrete Boltzmann model (DBM) is developed for compressible multicomponent flows under external body forces, which constitutes a substantial extension of our previously proposed single-component forced DBM framework. The model adopts a well-designed D2V25 discrete velocity set with excellent spatial isotropy and numerical stability. Both the discrete equilibrium distribution function and external force term are rigorously constructed via a precise moment-matching strategy, which satisfies 25 independent kinetic moment relations and ensures rigor-ous consistency between mesoscopic kinetic descriptions and macroscopic hydrodynamic governing laws. Theoretical analysis demonstrates that the proposed model can exactly recover the Burnett-level governing equations of forced compressible multi-component flows in the continuum limit. Beyond macroscopic hydrodynamic behaviors, the present DBM inherently captures interspecies mass diffusion and coupled multicomponent thermodynamic nonequilibrium (TNE) effects, which are inaccessible to conventional Navier–Stokes-level models and single-component DBMs. Five canonical benchmark cases are systematically performed to fully validate the physical reliability, numerical accuracy, and robustness of the developed model. The multicomponent diffusion test verifies the model’s capability of resolving mutual mass transport and species mixing behaviors between different fluid components. The Sod shock tube case confirms the model’s competence in capturing typical discontinuities and high-gradient flow structures in compressible flows. The thermal Couette flow simulation validates the model’s ability to simultaneously reproduce hydrodynamic evolution and TNE responses under temperature-gradient conditions. The Kelvin–Helmholtz instability benchmark demonstrates the model’s robustness in resolving intricate interfacial deformation, mixing, and instability development in multicomponent fluid mixtures. The Rayleigh–Taylor instability test further verifies the model’s effectiveness in simulating external-force-driven multicomponent interfacial flows and complex flow field evolution. Collectively, all numerical validations illustrate that the proposed Burnett-level multicomponent DBM provides a reliable and versatile numerical tool for modeling forced compressible multicomponent nonequilibrium flows. This study fills the research gap in high-order kinetic modeling for compressible multicomponent systems with external forces, and effectively extends the application scope of high-precision Burnett-level DBMs from single-component to practical multi-fluid flow scenarios. In future work, the model can be further extended to reactive multicomponent flows, turbulent mixing problems, and multiscale nonequilibrium flow systems to broaden its applicability in complex engineering and physical flow problems. 
+
+> ACKNOWLEDGMENTS
+
+This work is supported by National Natural Science Foundation of China (under Grant Nos. U2242214, 12572341), Natural Science Foundation of Fujian Province (Grant No. 2026J001415), Guangdong Basic and Applied Basic Research Foundation (Grant No. 2024A1515010927), Humanities and Social Science Foundation of the Ministry of Education in China (Grant No. 24YJCZH163). This work is supported by the opening project of State Key Laboratory of Explosion Science and Safety Protection (Beijing Institute of Technology). The opening project number is KFJJ26-17M. 
+
+> DATA AVAILABILITY
+
+The data that support the findings of this study are available from the corresponding author upon reasonable request. 
+
+> Appendix A
+
+For the square matrix C shown in Eq. 12, its specific expression is given below. 
+
+C =
+
+
+
+C11 C12 · · · C1N
+
+C21 C22 · · · C2N
+
+... ... . . . ...
+
+CN1 CN2 · · · CNN 
+
+ , (A1) with elements C1i = 1, C2i = vσ
+
+> ix
+
+, C3i = vσ
+
+> iy
+
+, C4i = vσ 2 
+
+> i
+
++ ησ 2 
+
+> i
+
+, C5i = vσ 2 
+
+> ix
+
+, C6i = vσ
+
+> ix
+
+vσ
+
+> iy
+
+, C7i = vσ 2 
+
+> iy
+
+, C8i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ
+
+> ix
+
+,
+
+C9i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ
+
+> iy
+
+, C10 i = vσ 3 
+
+> ix
+
+, C11 i = vσ 2 
+
+> ix
+
+vσ
+
+> iy
+
+, C12 i = vσ
+
+> ix
+
+vσ 2 
+
+> iy
+
+, C13 i = vσ 3 
+
+> iy
+
+, C14 i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 2 
+
+> ix
+
+, C15 i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ
+
+> ix
+
+vσ
+
+> iy
+
+,
+
+C16 i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 2 
+
+> iy
+
+, C17 i = vσ 4 
+
+> ix
+
+, C18 i = vσ 3 
+
+> ix
+
+vσ
+
+> iy
+
+, C19 i = vσ 2 
+
+> ix
+
+vσ 2 
+
+> iy
+
+, C20 i = vσ
+
+> ix
+
+vσ 3 
+
+> iy
+
+, C21 i = vσ 4 
+
+> iy
+
+, C22 i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 3 
+
+> ix
+
+, C23 i =
+
+ vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 2 
+
+> ix
+
+vσ
+
+> iy
+
+, C24 i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ
+
+> ix
+
+vσ 2 
+
+> iy
+
+, C25 i =  vσ 2 
+
+> i
+
++ ησ 2
+
+> i
+
+ vσ 3 
+
+> iy
+
+. The inverse matrix C−1 can be computed using MAT-LAB. Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 16 The column matrix of equilibrium kinetic moments ˆfσ eq in Eq. (12) takes the form, 
+
+ˆfσ eq = [ ˆf σ eq 1 , ˆf σ eq 2 , . . . , ˆf σ eq  
+
+> N
+
+]T, (A2) with elements ˆf σ eq 1 = nσ , ˆf σ eq 2 = nσ ux, ˆf σ eq 3 = nσ uy, ˆf σ eq 4 = nσ
+
+ D + Iσ T /mσ + u2
+
+
+
+, ˆf σ eq 5 = nσ
+
+
+
+T /mσ + u2
+
+> x
+
+
+
+, ˆf σ eq 6 =
+
+nσ uxuy, ˆf σ eq 7 = nσ
+
+
+
+T /mσ + u2
+
+> y
+
+
+
+, ˆf σ eq 8 = nσ ux
+
+ D + Iσ + 2T /mσ + u2
+
+
+
+, ˆf σ eq 9 = nσ uy
+
+ D + Iσ + 2T /mσ + u2
+
+
+
+, ˆf σ eq 10 =
+
+3nσ uxT /mσ + nσ u3 
+
+> x
+
+, ˆ f σ eq 11 = nσ uyT /mσ + nσ u2 
+
+> x
+
+uy, ˆ f σ eq 12 = nσ uxT /mσ + nσ u2 
+
+> y
+
+ux, ˆ f σ eq 13 = 3nσ uyT /mσ + nσ u3 
+
+> y
+
+, ˆ f σ eq 14 = nσ
+
+ D +
+
+Iσ + 2T /mσ + u2
+
+
+
++ nσ u2
+
+> x
+
+ D + Iσ + 4T /mσ + u2
+
+
+
+, ˆf σ eq 15 = nσ uxuy
+
+ D + Iσ + 4T /mσ + u2
+
+
+
+, ˆf σ eq 16 = nσ
+
+ D + Iσ +
+
+2T /mσ + u2
+
+
+
++ nσ u2
+
+> y
+
+ D + Iσ + 4T /mσ + u2
+
+
+
+, ˆ f σ eq 17 = 6nσ u2 
+
+> x
+
+T /mσ + nσ u4 
+
+> x
+
++ 3nσ T 2/m2σ , ˆ f σ eq 18 = 3nσ uxuyT /mσ + nσ u3 
+
+> x
+
+uy,ˆf σ eq 19 = nσ  u2 
+
+> x
+
++ u2
+
+> y
+
+T /mσ + nσ u2 
+
+> y
+
+u2 
+
+> x
+
++ nσ T 2/m2σ , ˆ f σ eq 20 = 3nσ uxuyT /mσ + nσ u3 
+
+> y
+
+ux, ˆ f σ eq 21 = 6nσ u2 
+
+> y
+
+T /mσ + nσ u4 
+
+> y
+
++ 3nσ T 2/m2σ ,ˆf σ eq 22 = 3nσ uxT /mσ
+
+ D + Iσ + 4T /mσ + u2
+
+
+
++ nσ u3
+
+> x
+
+ D + Iσ + 6T /mσ + u2
+
+
+
+, ˆf σ eq 23 = nσ uyT /mσ
+
+ D + Iσ + 4T /mσ +
+
+u2
+
+
+
++ nσ uyu2
+
+> x
+
+ D + Iσ + 6T /mσ + u2
+
+
+
+, ˆf σ eq 24 = nσ uxT /mσ
+
+ D + Iσ + 4T /mσ + u2
+
+
+
++ nσ uxu2
+
+> y
+
+ D + Iσ + 6T /mσ + u2
+
+
+
+,ˆf σ eq 25 = 3nσ uyT /mσ
+
+ D + Iσ + 4T /mσ + u2
+
+
+
++ nσ u3
+
+> y
+
+ D + Iσ + 6T /mσ + u2
+
+
+
+.The column matrix of the force term ˆFσ in Eq. (24) takes the form, 
+
+ˆFσ = [ ˆFσ 
+
+> 1
+
+, ˆFσ 
+
+> 2
+
+, . . . , ˆFσ 
+
+> N
+
+]T, (A3) with elements ˆF1 = 0, ˆF2 = nσ ax, ˆF3 = nσ ay, ˆF4 = 2nσ uσ 
+
+> x
+
+ax + 2nσ uσ 
+
+> y
+
+ay, ˆF5 = 2nσ uσ 
+
+> x
+
+ax, ˆF6 = 2nσ uσ 
+
+> x
+
+ay + 2nσ uσ 
+
+> y
+
+ax, ˆF7 =
+
+2nσ uσ 
+
+> y
+
+ay, ˆF8 = 3nσ axuσ 2 
+
+> x
+
++ nσ axuσ 2 
+
+> y
+
++ nσ ax
+
+ D + Iσ + 2T /mσ + 2nσ ayuσ 
+
+> x
+
+uσ 
+
+> y
+
+, ˆF9 = 2nσ axuσ 
+
+> x
+
+uσ 
+
+> y
+
++ 3nσ ayuσ 2 
+
+> y
+
++ nσ ayuσ 2 
+
+> x
+
++
+
+nσ ay
+
+ D + Iσ + 2T /mσ , ˆF10 = 3nσ ax
+
+ uσ 2 
+
+> x
+
++ T /mσ , ˆF11 = 2nσ axuσ 
+
+> x
+
+uσ 
+
+> y
+
++ nσ ay
+
+ uσ 2 
+
+> x
+
++ T /mσ , ˆF12 = nσ ax
+
+ uσ 2 
+
+> y
+
++ T /mσ  +
+
+2nσ ayuσ 
+
+> x
+
+uσ 
+
+> y
+
+, ˆF13 = 3nσ ay
+
+ uσ 2 
+
+> y
+
++ T /mσ , ˆF14 = 2nσ uσ 
+
+> x
+
+ax
+
+
+
+2uσ 2 
+
+> x
+
++ uσ 2 
+
+> y
+
++  D + Iσ + 5T /mσ
+
+
+
++ 2nσ ayuσ
+
+> y
+
+ uσ 2 
+
+> x
+
++ T /mσ , ˆF15 =
+
+nσ uσ 
+
+> y
+
+ax
+
+
+
+3uσ 2 
+
+> x
+
++ uσ 2 
+
+> y
+
++  D + Iσ + 4T /mσ
+
+
+
++ nσ ayuσ
+
+> x
+
+
+
+uσ 2 
+
+> x
+
++ 3uσ 2 
+
+> y
+
++  D + Iσ + 4T /mσ
+
+
+
+, ˆ F16 = 2nσ uσ 
+
+> y
+
+ay
+
+
+
+2uσ 2 
+
+> y
+
++ uσ 2 
+
+> x
+
++  D +
+
+Iσ + 5T /mσ
+
+
+
++ 2nσ axuσ
+
+> x
+
+ uσ 2 
+
+> y
+
++ T /mσ , ˆF17 = 4nσ axuσ
+
+> x
+
+ uσ 2 
+
+> x
+
++ T /mσ , ˆF18 = 3nσ axuσ 2 
+
+> x
+
+uy + nσ ayuσ 3 
+
+> x
+
++ 3nσ uσ 
+
+> y
+
+axT /mσ +
+
+3nσ uσ 
+
+> x
+
+ayT /mσ , ˆF19 = 2nσ ayuσ
+
+> y
+
+ uσ 2 
+
+> x
+
++ T /mσ  + 2nσ axuσ
+
+> x
+
+ uσ 2 
+
+> y
+
++ T /mσ , ˆF20 = 3nσ ayuσ 2 
+
+> y
+
+uσ 
+
+> x
+
++ nσ axuσ 3 
+
+> y
+
++ 3nσ uσ 
+
+> x
+
+ayT /mσ +
+
+3nσ uσ 
+
+> y
+
+axT /mσ , ˆF21 = 4nσ ayuσ
+
+> y
+
+ uσ 2 
+
+> y
+
++ T /mσ , ˆF22 = 5nσ axuσ 4 
+
+> x
+
++ 3nσ axuσ 2
+
+> x
+
+ D + Iσ + 9T /mσ + 3nσ ax
+
+
+
+uσ 2 
+
+> y
+
++  D + Iσ +
+
+4T /mσ
+
+
+
+T /mσ + 3nσ axuσ 2 
+
+> x
+
+uσ 2 
+
+> y
+
++ 2nσ ayuxuy
+
+ uσ 2 
+
+> x
+
++ 3T /mσ , ˆF23 = nσ ayuσ 4 
+
+> x
+
++ 4nσ axuσ 3 
+
+> x
+
+uσ 
+
+> y
+
++ nσ ayuσ 2
+
+> x
+
+
+
+3uσ 2 
+
+> y
+
++  D + Iσ +
+
+7T /mσ
+
+
+
++ 2nσ axuxuσ
+
+> y
+
+
+
+uσ 2 
+
+> y
+
++  D + Iσ + 7T /mσ
+
+
+
++ nσ ay
+
+
+
+3uσ 2 
+
+> y
+
++  D + Iσ + 4T σ 2/mσ 2
+
+
+
+, ˆF24 = nσ axuσ 4 
+
+> y
+
++ 4nσ ayuσ 3 
+
+> y
+
+uσ 
+
+> x
+
++
+
+nσ axuσ 2
+
+> y
+
+
+
+3uσ 2 
+
+> x
+
++  D + Iσ + 7T /mσ
+
+
+
++ 2nσ ayuσ 
+
+> x
+
+uσ
+
+> y
+
+
+
+uσ 2 
+
+> x
+
++  D + Iσ + 7T /mσ
+
+
+
++ nσ ax
+
+
+
+3uσ 2 
+
+> x
+
++  D + Iσ + 4T σ 2/mσ 2
+
+
+
+, ˆ F25 =
+
+5nσ ayuσ 4 
+
+> y
+
++ 3nσ ayuσ 2
+
+> y
+
+ D + Iσ + 9T /mσ + 3nσ ay
+
+
+
+uσ 2 
+
+> x
+
++  D + Iσ + 4T /mσ
+
+
+
+T /mσ + 3nσ ayuσ 2 
+
+> y
+
+uσ 2 
+
+> x
+
++ 2nσ axuσ 
+
+> y
+
+uσ
+
+> x
+
+ uσ 2 
+
+> y
+
++
+
+3T /mσ .
+
+> 1
+
+P. K. Kundu, I. Cohen, D. R. Dowling, and J. Capecelatro, Fluid mechanics (Elsevier, 2024). 
+
+> 2
+
+H. Collis, D. A. Bezgin, S. Mirjalili, and A. Mani, “A robust four-equation model for compressible multi-phase multi-component flows satisfying interface equilibrium and phase-immiscibility conditions,” J. Comput. Phys. 558 , 114827 (2026). 
+
+> 3
+
+L. Cueto-Felgueroso, A. Soage, and L. F. Ayala, “Fugacity-based diffuse-interface model of multicomponent multiphase flow,” Comput. Methods Appl. Mech. Eng. 445 , 118171 (2025). 
+
+> 4
+
+J. N. Guo, Y. H. Zheng, Y. Wang, J. Z. Cao, M. H. Lyu, P. Li, and F. Xie, “Chemical states of typical radionuclides during air ingress accidents in HTR-PM,” Nucl. Eng. Des. 453 , 114899 (2026). 
+
+> 5
+
+C. Zhang, L. F. Wang, W. H. Ye, J. F. Wu, Z. J. Shen, and I. Menshov, “Mathematical modeling of transport phenomena in compressible multicomponent flows,” J. Comput. Phys. 472 , 111628 (2023). 
+
+> 6
+
+E. M. Adebayo, P. Tsoutsanis, and K. W. Jenkins, “A review of diffuse interface-capturing methods for compressible multiphase flows,” Fluids 10 , 93 (2025). Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 17 
+
+> 7
+
+S. T. Parete-Koon, C. R. Smith, T. L. Papatheodore, and O. E. B. Messer, “A review of direct numerical simulations of astrophysical detonations and their implications,” Front. Phys. 8, 189–198 (2013). 
+
+> 8
+
+Q. Mao, M. Feng, X. Jiang, Y. Ren, K. H. Luo, and A. C. T. van Duin, “Classical and reactive molecular dynamics: Principles and applications in combustion and energy systems,” Prog. Energy Combust. Sci. 97 , 101084 (2023). 
+
+> 9
+
+G. DiIlio, D. Chiappini, G. Falcucci, and S. Succi, “Progress in mesoscale methods for fluid dynamics simulation,” Phil. Trans. R. Soc. A 379 , 20200393 (2021). 
+
+> 10
+
+S. Succi, The lattice Boltzmann equation: for fluid dynamics and beyond (Oxford university press, 2001). 
+
+> 11
+
+Z. L. Guo and C. Shu, Lattice Boltzmann method and its application in engineering , Vol. 3 (World Scientific, 2013). 
+
+> 12
+
+T. Krüger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, and E. M. Viggen, The lattice Boltzmann method , Vol. 10 (Springer, 2017). 
+
+> 13
+
+Z. L. Guo, C. G. Zheng, and B. C. Shi, “Discrete lattice effects on the forcing term in the lattice Boltzmann method,” Phys. Rev. E 65 , 046308 (2002). 
+
+> 14
+
+C. K. Aidun and J. R. Clausen, “Lattice-Boltzmann method for complex flows,” Annu. Rev. Fluid Mech. 42 , 439–472 (2010). 
+
+> 15
+
+Y. Wei, Y. Li, Z. Wang, H. Yang, Z. Zhu, Y. Qian, and K. Luo, “Small-scale fluctuation and scaling law of mixing in three-dimensional rotating turbulent Rayleigh–Taylor instability,” Phys. Rev. E 105 , 015103 (2022). 
+
+> 16
+
+B. Liu, C. H. Zhang, Q. Lou, and H. Liang, “Lattice Boltzmann study of three-dimensional immiscible Rayleigh–Taylor instability in turbulent mixing stage,” Front. Phys. 17 , 1–12 (2022). 
+
+> 17
+
+W. L, Y. Z. Jin, Z. D. Wang, H. Xu, and Y. K. Wei, “Spatial temporal evolution characteristics of marine propeller wakes based on lattice Boltzmann method-large eddy simulation,” Phys. Fluids 38 , 044102 (2026). 
+
+> 18
+
+D. Zhang, S. F. Li, and Y. Li, “Lattice Boltzmann simulation of three phase reactive flow in random porous media at pore-scale,” Appl. Therm. Eng. 194 ,117140 (2021). 
+
+> 19
+
+Q. Li, Y. Yu, and S. Tang, “Multiphase lattice Boltzmann method and its applications in phase-change heat transfer,” Chinese Sci. Bull. 65 , 1677–1693 (2020). 
+
+> 20
+
+R. X. Li, L. L. Fei, K. H. Luo, H. Liang, X. T. Zhang, D. Derome, and J. Carmeliet, “Coupled phase-field lattice Boltzmann method and discrete element method for gas–liquid–solid multiphase flows,” Phys. Fluids 37 , 053322 (2025). 
+
+> 21
+
+C. J. Zhan, H. Liang, Z. H. Chai, and B. C. Shi, “Phase-field-based lattice Boltzmann method for the transport of insoluble surfactant in two-phase flows,” Phys. Rev. E 112 , 035303 (2025). 
+
+> 22
+
+H. Liang, W. Y. Liu, Y. Li, and Y. K. Wei, “A thermal lattice Boltzmann model for evaporating multiphase flows,” Phys. Fluids 36 , 032101 (2024). 
+
+> 23
+
+H. Liang, T. Y. Guo, and Z. H. Chai, “A lattice Boltzmann model for wall-bounded two-phase flows with insoluble surfactant,” Eng. Comput. 42 , 98 (2026). 
+
+> 24
+
+B. H. Chen, C. J. Zhan, Z. H. Chai, and B. H. Shi, “Phase-field-based lattice Boltzmann method for interfacial heat or mass transfer with the liquid–vapor phase or volume change,” Int. J. Heat Mass Transf. 255 , 127732 (2026). 
+
+> 25
+
+Z. H. Qiao, X. M. Xu, X. G. Yang, and Y. Z. Zhang, “A unified variational framework and lattice Boltzmann method for non-isothermal two-phase flows with phase transitions and wetting effects,” J. Fluid Mech. 1029 , A30 (2026). 
+
+> 26
+
+F. Zhao, Z. D. Wang, Y. K. Wei, and Z. C. Zhu, “Investigation of flow and heat transfer characteristics around two tandem and side-by-side cylinders using double-distribution lattice Boltzmann method,” Numer. Heat Transfer, A: Appl. 87 , 2372701 (2026). 
+
+> 27
+
+J. Wu, D. Sun, Z. Chai, and D. Sun, “A lattice Boltzmann phase-field model for duplex oxide growth and flow-induced corrosion of T91 steel in lead-bismuth eutectic,” Corros. Sci. 256 , 113132 (2025). 
+
+> 28
+
+Q. Li, Z. Chai, and B. Shi, “Lattice Boltzmann model for a class of viscous wave equation,” Adv. Appl. Math. Mech 17 , 440–453 (2025). 
+
+> 29
+
+A. Yu, S. W. Chen, Y. T. Zhou, L. Wang, H. Z. Yuan, and S. Shu, “An improved lattice Boltzmann method with a novel conservative boundary scheme for viscoelastic fluid flows,” J. Comput. Phys. 550 , 114667 (2026). 
+
+> 30
+
+J. X. Huang, C. J. Zhan, Z. H. Chai, and C. S. Huang, “A diffuse-interface method for the containerless freezing of three-phase flows in complex geometries,” Journal of Computational Physics 562 , 115037 (2026). 
+
+> 31
+
+Y. Chen, Z. H. Chai, and B. C. Shi, “A general fourth-order mesoscopic multiple-relaxation-time lattice Boltzmann model and its macroscopic finite-difference scheme for two-dimensional diffusion equations,” J. Comput. Phys. 509 , 113045 (2024). 
+
+> 32
+
+Y. X. Song, L. M. Yang, Y. J. Du, Y. Xiao, and C. Shu, “Double distribution function-based lattice Boltzmann flux solver for simulation of compressible viscous flows,” Phys. Fluids 36 , 066102 (2024). 
+
+> 33
+
+C. J. Qin, D. K. Sun, W. Chen, and Z. H. Chai, “Discrete kinetic scheme modeling of anisotropic crystal growth in the presence of thermal convection,” Appl. Math. Model. 152 , 116574 (2026). 
+
+> 34
+
+F. F. Qin, J. L. Zhao, L. L. Fei, G. Wang, Y. L. Feng, and K. L. Luo, “Lattice Boltzmann modelling of droplet impact and splashing at high Reynolds and Weber numbers,” J. Fluid Mech. 1028 , A20 (2026). 
+
+> 35
+
+Y. B. Gan, A. G. Xu, G. Zhang, and Y. Yang, “Lattice BGK kinetic model for high-speed compressible flows: Hydrodynamic and nonequilibrium behaviors,” Europhys. Lett. 103 , 24003 (2013). 
+
+> 36
+
+A. G. Xu, D. J. Zhang, and Y. B. Gan, “Advances in the kinetics of heat and mass transfer in near-continuous complex flows,” Front. Phys. 19 , 42500 (2024). 
+
+> 37
+
+Y. Ji, C. D. Lin, and K. H. Luo, “A three-dimensional discrete Boltzmann model for steady and unsteady detonation,” J. Comput. Phys. 455 , 111002 (2022). 
+
+> 38
+
+C. D. Lin, X. P. Sun, X. L. Su, H. L. Lai, and X. Fang, “A discrete Boltzmann model with symmetric velocity discretization for compressible flow,” Chin. Phys. B 32 , 110503 (2023). 
+
+> 39
+
+Y. M. Shan, A. G. Xu, L. F. Wang, and Y. D. Zhang, “Nonequilibrium kinetics effects in Richtmyer–Meshkov instability and reshock processes,” Commun. Theor. Phys. 75 , 115601 (2023). 
+
+> 40
+
+Y. B. Gan, A. G. Xu, G. C. Zhang, C. D. Lin, H. L. Lai, and Z. P. Liu, “Nonequilibrium and morphological characterizations of Kelvin-Helmholtz instability in compressible flows,” Front. Phys. 14 , 43602 (2019). 
+
+> 41
+
+J. Chen, A. G. Xu, D. W. Chen, Y. D. Zhang, and Z. H. Chen, “Discrete Boltzmann modeling of Rayleigh-Taylor instability: Effects of interfacial tension, viscosity, and heat conductivity,” Phys. Rev. E 106 , 015102 (2022). 
+
+> 42
+
+Y. F. Li, H. L. Lai, C. D. Lin, and D. M. Li, “Influence of the tangential velocity on the compressible Kelvin-Helmholtz instability with nonequilibrium effects,” Front. Phys. 17 , 63500 (2022). 
+
+> 43
+
+H. L. Lai, D. M. Li, C. D. Lin, L. Chen, H. Y. Ye, and J. J. Zhu, “Investigation of effects of initial interface conditions on the two-dimensional single-mode compressible Rayleigh–Taylor instability: Based on the discrete Boltzmann method,” Comput. Fluids 277 , 106289 (2024). 
+
+> 44
+
+H. Xu, C. D. Lin, and H. L. Lai, “Influence of phase difference and amplitude ratio on Kelvin–Helmholtz instability with dual-mode interface perturbations,” Phys. Fluids 37 , 016132 (2025). 
+
+> 45
+
+X. L. Su and C. D. Lin, “Nonequilibrium effects of reactive flow based on gas kinetic theory,” Commun. Theor. Phys. 74 , 035604 (2022). 
+
+> 46
+
+H. W. Li, A. G. Xu, G. Zhang, and Y. M. Shan, “Rayleigh-Taylor instability under multi-mode perturbation: Discrete Boltzmann modeling with tracers,” Commun. Theor. Phys. 74 , 115601 (2022). 
+
+> 47
+
+J. H. Song, L. Miao, F. Chen, Y. B. Gan, and A. G. Xu, “Discrete Boltzmann modeling of Kelvin–Helmholtz instability in plasma,” Phys. Fluids 37 , 036137 (2025). Discrete Boltzmann model at Burnett level for compressible multicomponent flows under external forces 18 
+
+> 48
+
+C. D. Lin, X. L. Su, L. L. Fei, and K. H. Luo, “Central-moment-based discrete Boltzmann modeling of compressible flows,” Int. J. Mod. Phys. C 37 , 2650039 (2026). 
+
+> 49
+
+C. D. Lin and C. Shu, “A flux solver based on discrete Boltzmann method and its application to compressible flows,” Commun. Nonlinear Sci. Numer. Simul. 
+
+159 , 109905 (2026). 
+
+> 50
+
+D. J. Zhang, A. G. Xu, J. H. Song, Y. B. Gan, Y. D. Zhang, and Y. J. Li, “Specific-heat ratio effects on the interaction between shock wave and heavy-cylindrical bubble: Based on discrete Boltzmann method,” Comput. Fluids 265 , 106021 (2023). 
+
+> 51
+
+Y. B. Gan, A. G. Xu, G. J. Zhang, Y. D. Zhang, and S. Succi, “Discrete Boltzmann trans-scale modeling of high-speed compressible flows,” Phys. Rev. E 97 ,053312 (2018). 
+
+> 52
+
+Y. D. Zhang, A. G. Xu, G. C. Zhang, Z. H. Chen, and P. Wang, “Discrete ellipsoidal statistical BGK model and Burnett equations,” Front. Phys. 13 , 135101 (2018). 
+
+> 53
+
+D. J. Zhang, A. G. Xu, Y. D. Zhang, Y. B. Gan, and Y. J. Li, “Discrete Boltzmann modeling of high-speed compressible flows with various depths of non-equilibrium,” Phys. Fluids 34 , 8701003 (2022). 
+
+> 54
+
+Y. B. Gan, A. G. Xu, H. L. Lai, W. Li, G. L. Sun, and S. Succi, “Discrete Boltzmann multi-scale modelling of non-equilibrium multiphase flows,” J. Fluid Mech 951 , 844 (2022). 
+
+> 55
+
+S. E. Wang, C. D. Lin, W. W. Yan, X. L. Su, and L. C. Yang, “High-order modeling of multiphase flows: Based on discrete Boltzmann method,” Comput. Fluids 265 , 106009 (2023). 
+
+> 56
+
+S. N. Chen, C. D. Lin, D. M. Li, and H. L. Lai, “Burnett-level discrete Boltzmann modeling of compressible flows under force,” Phys. Fluids 37 , 056114 (2025). 
+
+> 57
+
+Q. B. Wu, C. D. Lin, and H. L. Lai, “Burnett-level multi-relaxation-time central-moment discrete Boltzmann modeling of reactive flows,” Combust. Flame 
+
+282 , 114481 (2025). 
+
+> 58
+
+C. D. Lin, A. G. Xu, G. C. Zhang, and Y. J. Li, “Double-distribution-function discrete Boltzmann model for combustion,” Combust. Flame 164 , 137–151 (2016). 
+
+> 59
+
+C. D. Lin, A. G. Xu, G. C. Zhang, K. H. Luo, and Y. Li, “Discrete Boltzmann modeling of Rayleigh-Taylor instability in two-component compressible flows,” Phys. Rev. E 96 , 053305 (2017). 
+
+> 60
+
+D. J. Zhang, A. G. Xu, Y. D. Zhang, and Y. J. Li, “Two-fluid discrete Boltzmann model for compressible flows: Based on ellipsoidal statistical Bhatnagar-Gross-Krook,” Phys. Fluids 32 , 126110 (2020). 
+
+> 61
+
+C. D. Lin, K. H. Luo, A. G. Xu, Y. B. Gan, and H. L. Lai, “Multiple-relaxation-time discrete Boltzmann modeling of multicomponent mixture with nonequi-librium effects,” Phys. Rev. E 103 , 013305 (2021). 
+
+> 62
+
+C. D. Lin, K. H. Luo, and H. L. Lai, “Discrete Boltzmann model with split collision for nonequilibrium reactive flows,” Commun. Theor. Phys. 76 , 085602 (2024). 
+
+> 63
+
+W. H. Huang, C. D. Lin, X. L. Su, and J. Li, “Discrete Boltzmann method with chemical reactive mechanism for reacting flows,” Appl. Therm. Eng. 178 ,128524 (2025). 
+
+> 64
+
+H. L. Lai, H. Xu, C. D. Lin, H. L. Liu, D. M. Li, and B. L. Chen, “Kinetic study of compressible Rayleigh–Taylor instability with time-varying acceleration,” Phys. Fluids 37 , 084106 (2025). 
+
+> 65
+
+Y. F. Li and C. D. Lin, “Kinetic investigation of Kelvin–Helmholtz instability with nonequilibrium effects in a force field,” Phys. Fluids A 36 , 116140 (2024). 
+
+> 66
+
+H. L. Lai, Y. F. Li, and C. D. Lin, “Compressible Kelvin–Helmholtz instability with nonequilibrium effect under external force,” Phys. Fluids 37 , 076138 (2025). 
+
+> 67
+
+Y. F. Li and C. D. Lin, “Variable density stratification of Kelvin–Helmholtz instability in a force field,” Theor. Comput. Fluid Dyn. 39 , 48 (2025). 
+
+> 68
+
+H. L. Lai, H. Xu, C. D. Lin, and D. M. Li, “Influence of relaxation time on the two-dimensional Kelvin–Helmholtz instability under dual-mode perturbations,” J. Fluid Mech. 1030 , A13 (2026). 
+
+> 69
+
+L. Y. Lian, C. D. Lin, D. M. Li, and H. L. Lai, “Investigating the effect of relaxation time on Richtmyer–Meshkov instability under reshock impact: a two-component discrete Boltzmann method study,” Commun.Theor. Phys. 77 , 085602 (2025). 
+
+> 70
+
+H. L. Lai, C. D. Lin, D. M. Li, T. Yang, Y. B. Gan, L. Y. Lian, and A. G. Xu, “Effects of reflection distance on Richtmyer-Meshkov instability in the reshock process: A discrete Boltzmann study,” Acta Mech. Sin. 42 , 325378 (2026). 
+
+> 71
+
+C. D. Lin and K. H. Luo, “Discrete Boltzmann modeling of unsteady reactive flows with nonequilibrium effects,” Phys. Rev. E 99 , 012142 (2019). 
+
+> 72
+
+R. B. Bird, “Transport phenomena,” Appl. Mech. Rev. 55 , R1–R4 (2002). 
+
+> 73
+
+G. K. Batchelor, An Introduction to Fluid Dynamics (Cambridge University Press, Cambridge, 2000). 
+
+> 74
+
+M. Watari and M. Tsutahara, “Two-dimensional thermal model of the finite-difference lattice Boltzmann method with high spatial isotropy,” Phys. Rev. E 67 ,036306 (2003). 
+
+> 75
+
+Y. Mahmoudi, N. Karimi, R. Deiterding, and S. Emami, “Hydrodynamic instabilities in gaseous detonations: comparison of Euler, Navier–Stokes, and large-eddy simulation,” J. Propuls. Power 30 , 384–396 (2014).

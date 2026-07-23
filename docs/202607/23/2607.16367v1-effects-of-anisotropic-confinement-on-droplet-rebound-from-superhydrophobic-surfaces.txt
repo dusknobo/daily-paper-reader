@@ -1,0 +1,920 @@
+Title: Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces
+
+URL Source: https://arxiv.org/pdf/2607.16367v1
+
+Published Time: Tue, 21 Jul 2026 00:06:52 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 
+
+# Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 
+
+M. Feinberg, 1 S.A. Hosseini, 1 and I.V. Karlin 1
+
+Department of Mechanical and Process Engineering, ETH Zurich, 8092 Zurich, Switzerland a) 
+
+(*Electronic mail: mfeinberg@ethz.ch) (Dated: 21 July 2026) 
+
+On flat superhydrophobic surfaces, droplet rebound is well described by a single inertio-capillary time scale, yielding a contact-time that is independent of impact energy. 1,2 This single-mode response reflects the radial symmetry of flat-plate impacts. We demonstrate that an anisotropic geometric constraint, imposing a fixed spreading length along one axis, breaks this degeneracy and splits the rebound into a reciprocal pair of inertio-capillary modes. The fixed length also couples the contact-time to the Weber-dependent maximum spread, introducing an impact-energy dependence absent on the flat plate. We realize this constraint with grooved substrates, simulated using a non-ideal, entropic, multiple-relaxation-time lattice Boltzmann method and validated against the experiments of Chantelot et al. 3 Extending their blob model from a single transverse scale to the reciprocal pair, we organize both modes through a geometric blob number and relate their time scales to the Weber number and groove width. We show that on non-wetting grooves the reciprocal modes are recovered directly, and explore the effects of finite wall affinity, using competition between the two modes to explain an observed two-branch structure in the contact-time response on mildly wetting, superhydrophobic grooves. Predictions tied to global energy balance reproduce cleanly across all conditions, while those tied to the details of the droplet’s spread morphology are approximate but directionally correct. These results show that anisotropic confinement turns contact-time reduction from a question of accelerating a single rebound mode into one of selecting between conjugate inertio-capillary modes. 
+
+I. INTRODUCTION 
+
+The ability of superhydrophobic surfaces (SHSs) to repel and shed impacting droplets has been widely studied due to applications in industrial processes such as spray coat-ing, self-cleaning, and anti-icing. 1,4–8 Of particular interest is the duration of droplet–surface contact, which character-izes rebound dynamics and becomes especially consequen-tial in applications such as anti-icing, where minimizing con-tact can reduce heat transfer, nucleation, and freezing on cold substrates. 2,9 These considerations have motivated extensive study of droplet-impact dynamics on SHSs, including both the physical mechanisms governing rebound and surface-design strategies for reducing contact-time. When the wettability of the surface is sufficiently low, droplet impacts undergo a process of spreading, recoil, and takeoff analogous to the motion of a frictionless mass–spring system. 1,10 Consistent with this analogy, the contact-time, de-fined as the interval between impact and detachment, is ap-proximately independent of the initial impact energy, com-monly expressed through the Weber number We = ρlU20 R0/γ,which measures the ratio of inertial to surface-energy scales. Here ρl is the liquid density, γ is the surface tension coeffi-cient, and U0 and R0 are the initial droplet velocity and radius, respectively. Instead, like the oscillation period of a mass–spring system, the contact-time is set by the square root of the ratio between an effective inertia and a capillary restoring stiffness: the droplet mass and surface tension. Consequently τc scales with the quantity τ0 = ( ρl R30/γ)1/2, known as the inertio-capillary 
+
+> a) https://ckg.ethz.ch.
+
+time. 1,10 The analogy to a single oscillator holds because the impact is radially symmetric: all in-plane spreading directions are equivalent, so the rebound is governed by one spread-ing–retraction coordinate, whose time scale τ0 is independent of direction. This behavior matches the scaling law derived by Rayleigh for an oscillating drop, although the leading coeffi-cient differs due to the asymmetries and dissipation imposed by the presence of the wall. Experimental studies of drops im-pacting SHSs have found that τc ≈ (2.6±0.2)τ0, which differs from the Rayleigh prediction τc = π/√2 τ0 ≈ 2.22 τ0.1,2 
+
+As in the mass–spring analogy, the oscillation amplitude remains dependent on the initial energy. For droplet impact, this appears in the maximum spreading radius Rmax , which increases with Weber number according to 
+
+Rmax 
+
+R0
+
+∝ We 1/4, (1) in the inertial-capillary limit of negligible viscous dissipation, where Re → ∞ and the Ohnesorge number Oh = √We /Re is vanishing, Oh → 0. 10,11 
+
+Numerous studies have shown that surface textures can be used to reduce the contact-time of impacting droplets. 2,3,9,12 
+
+This reduction is typically achieved by reshaping the droplet during spreading and recoil. For example, ridges and fibers can divide the liquid into distinct lobes, each of which under-goes its own spreading and retraction process. The contact-time is then set by the inertio-capillary time of the largest lobe, rather than that of the full droplet, giving a reduction propor-tional to (mb/m0)1/2, where mb and m0 are the masses of the largest lobe and the original droplet, respectively. 13 
+
+This interpretation was generalized by Chantelot et al. 3
+
+through the “blob model,” in which the spread droplet is treated as a collection of effective sub-volumes even when arXiv:2607.16367v1 [physics.flu-dyn] 17 Jul 2026 Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 2distinct lobes are not visually separated. In this framework, the mass mb of the sub-volume controlling rebound is esti-mated from a characteristic spreading length. This approach has been shown to successfully describe phenomena such as ring bouncing, where a defect pierces the spreading film and causes the droplet to retract outward from a central hole, short-ening the retraction distance, and allowing lift-off in a ring-like configuration. 3 More generally, it provides a way to con-nect surface-induced changes in droplet morphology to re-duced contact-time. This sub-volume interpretation has also received indirect support from recent studies of flat-surface impacts, where additional oscillation time scales have been linked to distinguishable droplet sub-volumes. 14 
+
+A grooved substrate provides a simple controllable way to impose an anisotropic constraint on an impacting drop: it fixes a characteristic length in one direction while leaving the drop free to spread along the other. On this basis it was initially proposed as an experimental validation of the blob model. 3
+
+Unlike the defect in the case of ring bouncing, which sub-divides the spreading droplet into various ratios, the groove width remains fixed even as the maximum spreading of the droplet increases. One consequence of this is loss of Weber independence, as has been observed in the experimental data. 3
+
+A second is that the groove breaks the radial symmetry of the rebound, allowing separate spreading–retraction behaviors along the axis of the groove and normal to it. A fixed trans-verse length should therefore do more than reduce the contact-time: by lifting the directional degeneracy of the flat-plate re-bound, it should split the single inertio-capillary mode into two modes with distinct time scales. Which mode governs the observable contact-time is not necessarily fixed, but in-stead may be selected by the impact conditions. The groove geometry therefore provides a controlled setting in which to examine the general effects of anisotropy and fixed spreading lengths on droplet dynamics. We study this using a lattice Boltzmann method for two-phase flows at high density ratio, as a fully resolved realization of the impact dynamics. This article is organized as follows. In Sec. II, we briefly describe the lattice Boltzmann method used to simulate droplet–surface interactions, with emphasis on the wetting boundary condition, viscosity interpolation, and other model choices relevant to the present study. In Sec. III, we describe the simulation setup and numerical fluid properties. Sec. IV presents a comparison of simulation re-sults using the present method, with experimental data from Ref. 3 for wetting and non-wetting boundaries. In Sec. V A we present a more detailed picture of groove-induced droplet dynamics, and introduce new scaling laws developed from idealized lumped-parameter arguments that extend the blob model from a single transverse mode to a reciprocal pair of transverse and axial modes. We recast these modes, defined in reference to a geometric blob number, so that the relevant time scales may be inferred from the imposed Weber number and groove width. This is followed by simulations illustrating and corroborating these scaling laws for non-wetting cases in Sec. V B. Finally, in Sec. V C we investigate the effects of fi-nite wall affinity on the same scaling phenomena, including a mode-selection transition that the two-mode framework is used to interpret.  
+
+> II. METHODS
+
+The simulations were performed with an entropic, multiple-relaxation-time (MRT) lattice Boltzmann method for two-phase flows at high density ratio, built on a free-energy for-mulation. The scheme, its grounding in kinetic theory, and benchmarks of its thermodynamic consistency for Navier– Stokes–Korteweg dynamics are described in Refs. 15 and 16. The fluid is represented by discrete populations fi on a standard D3Q27 lattice with D = 3 dimensions, and 
+
+Q = 27 velocities ci, (i = 1, . . . , Q) which are defined ci =(cix , ciy , ciz ), ciα ∈ {− 1, 0, 1}. The discrete populations evolve according to 
+
+fi(r + ciδt, t + δt) =  1 − ω
+
+> 2
+
+ fi(r,t) + ω 
+
+> 2
+
+f mirr  
+
+> i
+
+(r,t)+ ( f ⋆ 
+
+> i
+
+− f eq  
+
+> i
+
+), (2) where δt is the time step size. Here, f eq  
+
+> i
+
+is a product-form equilibrium, employed for its improved representation of third-order moments, and f ⋆ 
+
+> i
+
+an extended equilibrium used to introduce the non-ideal forcing. The precise precise form of the mirror population f mirr  
+
+> i
+
+encodes the entropic MRT colli-sion, with a central Hermite moment partitioning, and higher-order moments relaxed at a rate fixed by entropy maximiza-tion. Full definitions of f eq  
+
+> i
+
+, f ⋆ 
+
+> i
+
+, and f mirr  
+
+> i
+
+follow Refs. 16. The relaxation rate ω sets the kinematic viscosity ν through 
+
+ω = δt 
+
+> ρν
+> P0
+
++ δt
+
+> 2
+
+, (3) with P0 = ρς 2 the ideal-gas reference pressure carried in the equilibrium and ς = δ r/√3 δt the lattice speed of sound. As only the ideal-gas pressure is retained in the equilib-rium, non-ideal thermodynamics and capillarity enter through a body force F applied at the population level as the source term ( f ⋆ 
+
+> i
+
+− f eq  
+
+> i
+
+) according to the exact-difference method of Kupershtokh. 17 Non-ideal thermodynamics are modeled us-ing the van der Waals equation of state 
+
+P = ρRT 
+
+1 − bρ − aρ2, a = 27 64 
+
+R2T 2
+
+> c
+
+Pc
+
+, b = 18
+
+RT c
+
+Pc
+
+, (4) where a and b are fixed by the critical state (ρc, Tc, Pc). The non-ideal contribution is introduced as a force ∇(P − P0),which is recast through a pseudo-potential ψ using the iden-tity ∇φ = 2√φ ∇√φ :
+
+ψ =
+
+(√P − P0, P > P0,
+
+√P0 − P, P ≤ P0, (5) which reduces gradient magnitudes and hence the discretiza-tion error in the pressure-gradient evaluation. Combining this with the diffuse-interface Korteweg contribution gives the body force 
+
+F =
+
+( 2ψ∇ψ − κρ ∇∇ 2ρ, P > P0,
+
+−2ψ∇ψ − κρ ∇∇ 2ρ, P ≤ P0, (6) Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 3where the capillarity coefficient κ provides independent con-trol of the surface tension. All spatial derivatives are evaluated by finite differences. To mirror the large viscosity contrast between phases in experimental droplet–surface interactions, a phase-dependent viscosity is used. Here, and throughout, subscripts l and v
+
+denote the liquid and vapor phases, so that ρl , ρv, νl and νv
+
+are the phase-specific densities and kinematic viscosities. A phase indicator αvisc (ρ) = ( ρ − ρv)/(ρl − ρv), linear in the lo-cal density, is defined and clamped to αvisc ∈ [0, 1]. The local viscosity is interpolated harmonically, 1
+
+ν(αvisc ) =
+
+" αvisc 
+
+νl
+
+2
+
++
+
+ 1 − αvisc 
+
+νv
+
+2#1/2
+
+, (7) with a fixed ratio νv/νl = 15 throughout. Wetting is imposed by assigning a fictitious density ρw ∈
+
+[ρv, ρl ] to solid nodes. 15,18,19 Through the non-local evalua-tion of the Korteweg force, this wall density modifies the cap-illary forcing in adjacent fluid nodes and thereby sets the wall affinity. The lower limit ρw = ρv gives a fully non-wetting wall ( θc = 180 ◦), while increasing ρw increases the affinity, with the limit ρw → ρl corresponding to the hydrophilic limit in this parameterization. Wetting conditions are reported be-low by their measured static contact angle θc. The no-slip/no-penetration condition at the solid boundary is enforced using a standard halfway bounce-back boundary treatment. 20  
+
+> III. SIMULATION SETUP
+
+A series of simulations were performed for droplets impact-ing flat plates and grooved substrates of varying groove width. In all cases the computational domain was a rectangular prism with the origin at the nominal point of impact. The droplet was initialized with velocity u = ( 0, 0, −U0), so that impact occurred along the negative z-direction onto a solid substrate at z = 0. A zero-gradient condition was imposed at the upper boundary and periodic conditions in the remaining directions. For grooved substrates, the groove axis was aligned with the 
+
+y-direction, the groove width is denoted by W , and the groove height was fixed at H/R0 = 4/3. The precise value of H is not essential, provided it is sufficient to properly constrain trans-verse spreading. Domain sizes were parameterized by the initial droplet ra-dius R0 and chosen to prevent droplet–boundary interaction over the course of the collision. The base grooved-substrate domain was 4 R0 × 8R0 × 4R0, as illustrated in Fig. 1, with the longer dimension along the groove axis. Flat-plate impacts used 8 R0 × 8R0 × 6R0, and selected runs for assessing post-detachment oscillations used an enlarged 6 R0 × 10 R0 × 10 R0
+
+domain to accommodate axial elongation and several uncon-strained oscillation periods. All simulations used R0 = 64 δ r,and were typically terminated once the droplet had fully de-tached from the substrate. Contact was identified by tracking the lowest point at which the density exceeded the mean liq-uid–vapor density and comparing its distance from the wall with a threshold based on the diffuse-interface width. For     
+
+> FIG. 1. Simulation domain for a grooved substrate with W/R0=2.5.
+
+cases involving temporary detachment and reattachment, par-ticularly under non-wetting conditions, the contact-time was defined as the interval between first and final contact. The fluid properties were set in non-dimensional lattice units, tuned to provide the desired density ratio and inter-face representation. A density ratio of ρl /ρv ≈ 600 was tar-geted for agreement with the experiments of Ref. 3. From Maxwell’s construction, the corresponding reduced temper-ature was found to be T /Tc = 0.3936. The van der Waals parameters a and b were then selected to give a converged interface of minimal width consistent with stability, accurate coexistence densities, and low spurious currents. The result-ing constants are listed in Tab. I. The gradients entering the Korteweg force in Eq. (6) are poorly resolved when the diffuse interface spans only a few grid nodes. In this regime, third-order errors in the pressure-gradient discretization produce an additional numerical con-tribution to the surface tension. To offset this excess numeri-cal surface tension, we employ a negative capillary coefficient, 
+
+κ = −0.0025, which lowers the measured surface tension and permits a thinner stable interface representation. The thinner interface increases the accessible Weber number by delaying artificial breakup in highly stretched lamellae, where oppos-ing diffuse interfaces can overlap once the film thickness be-comes comparable to the interface breadth. The resulting sur-face tension coefficient is measured from the Laplace pressure of static liquid columns, giving γ ≈ 0.0704. Details of these measurements and validation of the surface tension behavior of the model are presented in Appendix A. Two solid boundary conditions were employed. The first is fully non-wetting ( ρw = ρv, θc ≈ 180 ◦), used as an approx-imation of the heated, Leidenfrost-like boundary in the ex-periments of Ref. 3. The second is a partially wetting super-hydrophobic condition ( ρw = 0.695, θc = 165 ◦ ± 3◦). These static contact angles were measured from simulations of a liq-uid column confined between two parallel solid walls, as de-scribed in Appendix B. For each geometry, simulations were run over a range of Weber numbers by varying the impact velocity U0 while hold-Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 4                              
+
+> Parameter Symbol Value Specific gas constant R1.0 Attraction parameter a0.00908 Excluded-volume parameter b0.0952 Capillarity coefficient κ−0.0025 Kinematic viscosity (liquid) νl0.025 Kinematic viscosity (vapor) νv0.375 Reduced temperature T/Tc0.3936 Density (liquid) ρl9.088 Density (vapor) ρv0.015 Density (wall) ρw{0, 0.695} Surface tension γ0.0704 TABLE I. Fluid constants used in the simulations. All values are in non-dimensional lattice units. The wall density ρwshows the two values used for wetting and non-wetting boundary treatments. γis a measured, not imposed, quantity as described in Appendix A.
+
+ing νl , γ, and R0 fixed. The Ohnesorge number is fixed at Oh = √We /Re = 0.036 across all series, so that variations re-flect changes in impact inertia alone. The simulated value is greater than is typical for millimetric water drops, but within the inertio-capillary regime, as confirmed by the recovery of the canonical τc ≈ 2.6τ0 on the flat plate in Sec. IV.  
+
+> IV. COMPARISON WITH EXPERIMENTAL RESULTS
+
+The experiments of Ref. 3 employed two repellent sur-faces. The first was a silicon wafer coated with hydrophobic nanobeads, giving a static contact angle of 166 ◦ ± 4◦; we re-fer to this, hereafter, as the superhydrophobic surface (SHS). The second was a brass plate heated to 350 ◦C, hot enough to sustain a Leidenfrost vapor layer beneath the impacting drop; we refer to this as the Leidenfrost surface. These cases are represented in the simulations by the two boundary treat-ments introduced in Sec. III. The SHS is modeled using the partially wetting boundary condition, with measured contact angle θc ≈ 165 ◦, in close agreement with experiment. The Leidenfrost surface is modeled using the fully non-wetting condition, ρw = ρv and θc ≈ 180 ◦, which approximates the geometric separation produced by the vapor layer but does not include thermal effects. To assess the suitability of the numerical scheme for the present application, contact-times were measured over a range of Weber numbers for three configurations reported in Ref. 3: a flat SHS, a flat Leidenfrost surface, and a Leidenfrost groove of width W /R0 = 2.37. No wetting-groove case was reported experimentally. Chantelot et al. state that “water impact-ing [an SHS] groove pins along the edges, which artificially modifies and/or scatters the contact-time,” and therefore re-stricted their grooved-substrate measurements to the Leiden-frost surface. 3 Contact-time results are presented in Fig. 2, and a qualitative comparison of the droplet evolution for the groove case is shown in Fig. 3. For the flat SHS surface, the simulated contact-time aver-ages 2 .63 τ0 across We ∈ [3.7, 22 .7] with no systematic de-pendence on the Weber number. This is in close agreement with the experimental average of 2 .56 τ0 and consistent with the value (2.6 ± 0.2)τ0 accepted in the literature. 1–3 The re-covery of both the Weber-independent scaling and the correct pre-factor confirms that the wetting boundary condition re-produces the canonical inertio-capillary behavior expected on a superhydrophobic surface. For the flat Leidenfrost surface, the experiments in Ref. 3 show a reduced, Weber-independent contact-time, with mean value τc ≈ 2.41 τ0. The simulations reproduce the We-ber invariance but predict a stronger reduction, giving τc ≈
+
+2.19 τ0, close to Rayleigh’s inviscid free-oscillation time 
+
+π/√2 τ0 ≈ 2.22 τ0. Thus, the simulations capture the qualita-tive Leidenfrost-like signature of reduced, Weber-independent contact-time, but moderately under-predict the wall influence observed experimentally. The most likely source of this discrepancy is that the Lei-denfrost effect is not merely a passive non-wetting boundary condition, but a thermally sustained vapor layer with coupled heat, mass, pressure, and flow fields. The present isothermal boundary treatment mimics the geometric separation associ-ated with a vapor layer, but cannot capture these coupled dy-namics. One alternative source of discrepancy was tested di-rectly: the experimental Bond number Bo = ∆ρgR 20/γ, which describes the ratio of gravitational to capillary forces, is small but non-negligible at Bo ≈ 0.354. If gravity influenced the drop’s adherence to the surface, it could in principle prolong the contact-time independent of any inertial effect. A simu-lation repeated with a corresponding gravitational force im-posed produced no meaningful change in contact-time, ruling out gravity as the significant source of the offset. For the groove geometry, simulations recover quantitative agreement with experiment, closely matching both the mag-nitude and trend of τc across We ∈ [3.7, 26 .4]. The same 
+
+θc ≈ 180 ◦ boundary that under-predicts contact-time on a flat Leidenfrost surface therefore produces improved accuracy in the groove configuration, with the largest discrepancies con-fined to low Weber numbers. The implication is that contact-time in the two geometries is controlled by different physics. On a flat surface, devia-tions from Rayleigh-like free oscillation arise from the sus-tained tangential interaction between the spreading liquid and the substrate, so the measured contact-time remains sensitive to wetting, slip, friction, and vapor-film dynamics. In the groove, by contrast, the dominant time scale is set by the in-ertial redirection of liquid by the groove walls and the sub-sequent transverse recoil. It is therefore less sensitive to the detailed droplet–substrate contact physics. Accordingly, the non-wetting boundary is sufficient for the regime considered here. Wetting effects in the groove geometry are considered in more detail in Sec. V C.  
+
+> V. GROOVE–DROPLET DYNAMICS
+
+To characterize the droplet–groove interaction, we track the droplet extents, surface area, and directional kinetic energies, 
+
+Kα = 12
+
+> Z
+> V
+
+ρl u2 
+
+> α
+
+dV , (8) Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 50 10 20 30 40 
+
+We 
+
+1.01.52.02.53.0
+
+> τc/τ0
+
+Flat (SHS)  
+
+> Chantelot et al .
+> Simulation
+
+0 10 20 30 40 
+
+We 
+
+Flat (Leidenfrost)  
+
+> Chantelot et al .
+> Simulation
+
+0 10 20 30 40 
+
+We 
+
+Groove (Leidenfrost)  
+
+> Chantelot et al .
+> Simulation
+
+FIG. 2. Comparison of simulation and experimental contact-times from Ref. 3 across three configurations. Faded markers are experiments, and saturated markers simulations. Left : droplets impacting a flat superhydrophobic surface (nanobead-coated silicon wafer in experiment, 
+
+θc ≈ 165 ◦ in simulation). The dashed line marks the literature value τc = 2.6 τ0.1–3 Center : droplets impacting a flat Leidenfrost surface (brass at 350 ◦C in experiment, θc = 180 ◦ in simulation). The dotted line marks the Rayleigh free-oscillation limit (π/√2) τ0 ≈ 2.22 τ0. Right :droplets impacting a Leidenfrost groove of width W /R0 = 2.37 (brass at 350 ◦C in experiment, θc = 180 ◦ in simulation). 
+
+FIG. 3. Droplet impact at We ≈ 20 .1 in a groove of W /R0 = 2.37; (top) Experimental images reproduced from Ref. 3 with permission from the Royal Society of Chemistry; (bottom) corresponding simulation results at the nearest output time. 
+
+where V is the droplet volume, α ∈ { x, y, z}, and ∑α Kα is the total droplet kinetic energy. Representative time histories for a droplet at We = 11 .3 impacting a W /R0 = 2.5 groove are shown in Fig. 4, with letters marking key moments. The interaction with the groove, the shaded region in Fig. 4, proceeds through three stages. First, the droplet undergoes ax-isymmetric spreading from initial contact at (a) until the liq-uid reaches the groove walls at (c). The duration of this stage depends on both Weber number and groove width: higher-We impacts spread faster, while wider grooves require farther spreading before wall contact. Because wall contact interrupts the outward motion before a full inertio-capillary oscillation is completed, the wall-contact-time is set by the spreading ve-locity rather than by an amplitude-independent oscillation pe-riod. In the flat-plate limit, W /R0 → ∞, or low energy limit We → 0, the walls are never reached and Weber-independent rebound is recovered. The second stage is characterized by groove-induced anisotropic spreading. Once the transverse motion is arrested, kinetic energy is redirected from the transverse to the axial direction. This stage extends approximately from the first peak in Kx at (b), which marks the strongest transverse spread-ing motion, to the second peak in Kx at (f), which marks the moment of peak transverse recoil. Within this interval, the droplet reaches its maximum surface area Smax at (e), and its maximum axial spreading motion, as measured by a peak in 
+
+Ky at (d). The third stage is the departure stage, beginning with rapid Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 610 −3
+
+10 −2
+
+10 −1
+
+10 0       
+
+> Kα /K0
+> (a) (b) (c) (d) (e) (f) (g) (h) (i)
+> Kx
+> Ky
+> Kz
+
+1234
+
+> `α /R0
+> `x
+> `y
+> `z
+
+1 2 3
+
+t/τ0
+
+1.01.21.41.6
+
+> S/S0
+
+FIG. 4. Evolution of a droplet with We = 11 .4 interacting with a groove of width W /R0 = 2.5. Directions subscripted as α ∈ { x, y, z}
+
+refer to the transverse, axial, and vertical directions respectively. The gray shaded region corresponds to the time interval in which the droplet is in contact with the groove. (top) Directional kinetic en-ergies Kα /K0, (middle) droplet extents ℓα /R0 = ( αmax − αmin )/R0,and (bottom) droplet surface area. Marked events are: (a) first contact with the groove; (b) first peak in Kx, corresponding to the strongest transverse spreading motion; (c) first contact with the groove walls; (d) first peak in Ky, corresponding to the strongest ax-ial spreading motion; (e) maximum surface area Smax , where ℓmax is measured; (f) transverse rebound, identified by the second peak in 
+
+Kx; (g) droplet release; (h) peak axial length of the droplet; (i) axial recoil, identified by the second peak in Ky.
+
+transverse recoil at (f) and ending with lift-off from the groove at (g). The droplet reaches its maximum axial extent at (h). This is not in general coincident with (g), and depends on We-ber number, however, the droplet typically departs the groove in an axially extended configuration. Finally, a second peak in Ky occurs at (i) corresponding to rapid axial recoil, which occurs after the droplet has departed the groove. 
+
+A. Droplet-groove scaling laws 
+
+The central observation of the blob model of Chantelot et al. 3 is that, for a droplet rebounding from a groove, the trans-verse spreading and retraction of the droplet determines the contact-time. The model therefore decomposes the droplet so that the largest effective blob is defined as having a maxi-mum spreading length equal to the groove-imposed transverse length scale W . At maximum spread, the droplet is approxi-mated as a rectangular prism of width W , axial length ℓmax ,and thickness h, with mass conservation requiring W ℓmax h ∼
+
+R30. Here ℓmax is the axial length of the droplet at the moment of maximum surface area, marked (e) in Fig. 4, not the maxi-mum axial extension (h). This prismatic volume is decomposed into N = ℓmax /W
+
+roughly isotropic blobs distributed along the groove axis. Each blob has mass mb = m0/N, where m0 is the initial droplet mass. Applying inertio-capillary scaling to the effective blob gives 
+
+τ⊥
+
+τ0
+
+∼
+
+ mb
+
+m0
+
+1/2
+
+=
+
+ W
+
+ℓmax 
+
+1/2
+
+= N−1/2, (9) where τ⊥ is the time scale associated with transverse spread-ing and retraction. In the original blob-model interpretation, this transverse time scale controls the contact-time, τc ∼ τ⊥.This scaling has been observed in experimental data for a sin-gle groove width. 3
+
+However, the transverse mode τ⊥ is not the only groove-imposed time scale. As can be seen in the kinetic-energy de-composition in Fig. 4, the spreading and retraction dynamics in the directions perpendicular and parallel to the groove are decoupled. The transverse mode controls retraction from the groove walls, while a second, longer time scale governs axial recoil of the elongated droplet. We denote this axial mode by 
+
+τ∥.A scaling for τ∥ may be derived by analogy with Taylor– Culick retraction. 21,22 For a film of thickness h, the free edge retracts at the capillary-inertial velocity 
+
+VTC =
+
+s
+
+2γρl h . (10) Taking the relevant axial length scale to be ℓmax gives 
+
+τ∥ ∼ ℓmax 
+
+VTC 
+
+. (11) Substituting h ∼ R30/(W ℓmax ) and dropping factors of order unity yields 
+
+τ∥ ∼
+
+ ρl R30
+
+γ
+
+ℓmax 
+
+W
+
+1/2
+
+= τ0
+
+ ℓmax 
+
+W
+
+1/2
+
+, (12) and consequently 
+
+τ∥
+
+τ0
+
+∼ N1/2. (13) Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 7The groove therefore imposes a pair of inversely scaling inertio-capillary modes, 
+
+τ⊥τ∥ ∼ τ20 , (14) which replace the single degenerate rebound time scale of the flat-plate interaction. Although originally defined for free liquid sheets, the Taylor–Culick relation has been applied previously to the recoil of spread films and lamellae in droplet-impact problems. 2,8,23 It follows from a thin-film force balance and is best justified at higher Weber numbers, where the droplet most convincingly approximates an extended sheet between the groove walls. An alternative derivation, presented in Ap-pendix C, based on capillary-driven inertial recoil gives the same scaling up to O(1) constants, without relying on the spe-cific Taylor–Culick rim-retraction mechanism. The agreement of these two arguments adds further support for Eq. (13). To express the blob number in terms of imposed parame-ters, the measured length ℓmax may be related to W and We. We assume that, to leading order, the groove redistributes the spreading anisotropically, while the overall conversion of im-pact kinetic energy into capillary energy, which sets the max-imum spread, is left unchanged. The flat-plate spreading law in Eq. (1) may therefore be used to estimate the spread sur-face area. A droplet impacting a flat plate forms, at maxi-mum spread, a geometry analogous to a flattened disk of ra-dius Rmax . The surface area is therefore dominated by the two large faces, which implies Smax ∼ R2max . Combined with the radius law Rmax /R0 ∼ We 1/4 of Eq. (1) we can write 
+
+Smax 
+
+R20
+
+∼
+
+ Rmax 
+
+R0
+
+2
+
+∼ We 1/2. (15) We note that this scaling, derived from flat-plate arguments, carries no groove-width dependence. Adopting it for the groove geometry therefore assumes that confinement reshapes the spread without affecting the global conversion of kinetic to capillary energy that sets Smax . This is a strong assumption — narrower grooves impose more rapid transverse arrest, and there is no fundamental reason to expect this to leave the to-tal spread area unaffected. We adopt the assumption to make progress, and return to it in Sec. VI when interpreting the re-sulting scaling laws against the data. For the rectangular blob geometry, the same thin-film ap-proximation, valid while h ≪ W, ℓ max , gives 
+
+Smax ∼ W ℓmax , (16) and consequently 
+
+ℓmax 
+
+R0
+
+∼ R0
+
+W We 1/2. (17) The blob number can therefore be expressed in terms of the imposed parameters as 
+
+N ∼ We 1/2
+
+(W /R0)2 . (18) Combining Eq. (18) with Eqs. (9) and (13) gives the twin scal-ing predictions 
+
+τ⊥
+
+τ0
+
+∝ W /R0
+
+We 1/4 , (19) and 
+
+τ∥
+
+τ0
+
+∝ We 1/4
+
+W /R0
+
+. (20) Comparison with Eq. (1) implies a geometric interpretation of Eqs. (19) and (20). The transverse and axial time scales are controlled by the ratio between the groove width W and the natural flat-plate spreading radius Rmax , up to constants and the approximations used in the geometric closure. Thus the two modes vary inversely with the extent to which the groove impinges upon the droplet’s otherwise free spreading. Although the blob-model scalings should lose quantitative accuracy as N → 1, the approach to the flat-plate limit is ex-pected to be continuous, with τ⊥ and τ∥ merging as groove-imposed effects vanish. This suggests comparable prefac-tors for the two modal scalings, so that τ⊥ < τ∥ for N > 1— an ordering confirmed by simulations in Sec. V B. Be-cause lift-off is caused by in-plane recoil redirecting into ver-tical momentum, the idealized inertio-capillary picture pre-dicts that the faster transverse retraction governs lift-off, giv-ing τc ∼ τ⊥ ∝ W We −1/4. 
+
+> B. Droplet impacts on non-wetting grooves
+
+To test the predictions of Eqs. (9), (13) and (19), sim-ulations were run for grooves with dimensions W /R0 ∈{2.25 , 2.37 , 2.5, 2.75 , 3.0} across We ∈ [3, 30 ] using the non-wetting boundary condition. Simulations produced consistent qualitative trends: contact-time decreases monotonically with both Weber number and groove width. The widest groove at its lowest Weber number, W /R0 = 3.0 and We = 3.8, satu-rates to the flat-plate contact-time, with the droplet only barely reaching the groove walls. We begin by testing Eq. (9), since it follows directly from the blob decomposition. Using N = ℓmax /W , with ℓmax mea-sured at the moment of maximum surface area, we plot τc/τ0
+
+against N−1/2 in Fig. 5. Data from all five groove widths col-lapse onto a linear trend in N−1/2, confirming the scaling pre-dicted by Eq. (9) when the droplet is sufficiently constrained by the groove. The collapse begins to deteriorate only as N
+
+approaches unity, with a visible departure near N ≈ 1.2, or equivalently N−1/2 ≈ 0.91. Below this threshold, the data de-part toward the flat-plate contact-time. This deviation is ex-pected: when ℓmax is only slightly larger than W , the spread droplet cannot be reliably partitioned into multiple roughly isotropic blobs, and the rectangular-prism geometry assumed in deriving Eqs. (9) and (13) is not realized. The droplet there-fore behaves increasingly like an unconstrained flat-plate im-pact. We use this observed departure from linearity, rather than an a priori cutoff, to define the in-regime data set as 
+
+N > 1.2. Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 80.7 0.8 0.9 1.0
+
+N−1/2
+
+1.01.21.41.61.82.02.2               
+
+> τc/τ0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+
+FIG. 5. Groove contact-times as a function of N−1/2, where N =
+
+ℓmax /W . Data from all five groove widths collapse onto a common linear trend at sufficiently large N, but depart from this scaling as 
+
+N → 1, where ℓmax becomes comparable to W and the groove walls no longer strongly constrain the dynamics. Faded data points are those excluded from the least squares fit (dashed black line), and the dotted line marks the threshold N = 1.2, below which data is excluded here, and in subsequent fits. 
+
+Having confirmed the measured-N scaling of Eq. (9), we next test the imposed-parameter form of Eq. (19), which ex-presses the contact-time in terms of W /R0 and We alone. We fit the data using 
+
+τc
+
+τ0
+
+= b +C (W /R0)p We −1/4. (21) The fit is performed on the in-regime data ( N > 1.2) by un-weighted least squares. At fixed p, the model is linear in 
+
+(C, b), so the inner fit reduces to a standard linear regression on the scaling variable (W /R0)p We −1/4. The exponent p is then chosen to minimize the residual sum of squares using a bounded Brent optimization method. We obtain C = 0.44, 
+
+b = 0.45, and p = 1.51, with RMSE = 0.02 and R2 = 0.98. Collapsed data and fit are shown in Fig. 6. Per-width contact-time data and curves are shown in Fig. 7. The We −1/4 dependence is well reproduced across all in-regime groove widths. Groove width dependence is mono-tonic and systematic; however, the fitted exponent is signifi-cantly larger than the linear dependence predicted by Eq. (19). Repeating the fit with each groove width removed in turn gives 
+
+p between 1 .45 and 1 .68, with the four narrower omissions clustered between 1 .45 and 1 .53 and the shift to 1 .68 corre-sponding to removal of the widest groove. The data therefore support the qualitative conclusion that the effective groove-width dependence is super-linear, while placing only loose bounds on the precise exponent. To identify the source of the super-linear groove-width de-pendency, we examine the geometric scalings used to elimi-nate N, namely those for Smax and ℓmax . The maximum sur-face area, shown in Fig. 8, retains the predicted We 1/2 depen-dence at fixed groove width, but also exhibits an additional 1.5 2.0 2.5 3.0 3.5
+
+(W /R)pWe −1/4
+
+1.01.21.41.61.82.02.2               
+
+> τc/τ0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+
+FIG. 6. contact-time τc/τ0 versus the scaling variable 
+
+(W /R0)p We −1/4 for all five groove widths, plotted on a sin-gle axis to assess the collapse predicted by Eq. (21). The solid line shows the fit obtained from in-regime data ( N > 1.20), with 
+
+C = 0.44, b = 0.45, p = 1.51. Faded markers indicate excluded data, in which the droplet behavior is transitioning towards the flat-plate limit. 0 5 10 15 20 25 30 
+
+We 
+
+1.00 1.25 1.50 1.75 2.00 2.25 2.50                
+
+> τc/τ0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+
+FIG. 7. contact-time τc/τ0 as a function of Weber number for each groove width, with dashed curves showing the per-width prediction of the fitted correlation Eq. (21). The We −1/4 dependence is well reproduced across all groove widths within the regime of validity of the fit. Faded markers indicate data with N < 1.20, excluded from the fit, in which the droplet behavior is transitioning towards the flat-plate limit (marked with a dotted grey line). 
+
+groove-width dependence not contained in Eq. (15). We quan-tify this using 
+
+Smax 
+
+S0
+
+= b +C (W /R0)p We 1/2, (22) fit on the same in-regime data set. The resulting coefficients, 
+
+C = 0.11, b = 0.76, and p = 0.94, give RMSE = 0.01 and 
+
+R2 = 0.99. Thus the inertio-capillary We 1/2 scaling is well reproduced, but with a geometry-dependent prefactor. Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 95 10 15 20 25 
+
+We                                 
+
+> 1.21.41.61.82.02.22.4
+> Smax /S0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+> FIG. 8. Maximum droplet surface area as a function of We for each groove width. Dashed curves show least-squares fits of Eq. (22), giv-ing C=0.11, b=0.76, p=0.94, RMSE =0.01, and R2=0.99. The data retain the predicted We 1/2dependence, but with an addi-tional groove-width dependence. Faded markers indicate data with
+> N<1.20, excluded from the fit.
+
+The maximum spread length shows the same separation be-tween Weber-number and groove-width effects. Per-groove least-squares fits proportional to We 1/2 are excellent across all five widths, with minimum R2 = 0.9992, confirming the pre-dicted Weber-number dependence at fixed W /R0. The groove-width dependence, however, does not collapse onto a single power law over the full range studied. The three narrowest grooves are approximately described by a power law in W /R0,but with an exponent closer to p = −1.63 than the predicted 
+
+p = −1, while the two widest grooves give nearly coincident values of ℓmax despite continued growth in Smax . The geomet-ric data therefore preserve the inertio-capillary Weber-number scaling, but not the groove-width dependence implied by the geometric closure employed in the derivations of Sec. V A. Three results therefore emerge with different degrees of ro-bustness. First, the blob-decomposition scaling τc/τ0 ∼ N−1/2
+
+of Eq. (9) is supported directly by Fig. 5: data from all five groove widths collapse onto a single trend when plot-ted against the measured value of N = ℓmax /W . Second, the Weber-number dependence τc/τ0 ∼ We −1/4 is supported by the imposed-parameter fit in Fig. 6, consistent with the inertio-capillary energy-conversion argument underlying the model. Third, the groove-width dependence is directionally correct and systematically ordered: at fixed We, wider grooves pro-duce shorter contact-times, as predicted by Eq. (19). This monotonic ordering is non-trivial, and it shows that W re-mains the ordering parameter, although the magnitude of its influence is under-predicted. The same pattern appears in the maximum-surface-area and maximum-spread-length data: the We 1/2 scaling is reproduced cleanly, while the groove-width dependence is more complex. We defer further interpretation of the width-exponent discrepancy to Sec. VI, noting here that the error stems from the geometric closure, and does not affect the measured-N collapse. 5 10 15 20 25 
+
+We                          
+
+> 2.53.03.54.04.55.0
+> `max /R0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+> FIG. 9. Comparison of ℓmax simulation data with least-square fits of the form We 1/2as predicted by Eq. (17). All grooves show good agreement individually, although the groove-width ordering differs from the predictions of Eq. (17). In particular the ℓmax values for the two widest grooves are nearly coincident. Faded markers indicate data with N<1.20, excluded from the fits.
+
+The companion prediction Eq. (13) for axial retraction is more difficult to test cleanly. One issue is that there is no analogue of the contact-time with sharply defined impact and takeoff events that can be used to define τ∥ unambiguously. The most reliable proxy is the time between the first and sec-ond peaks in the axial kinetic energy component Ky, marked (d) and (i) in Fig. 4, which correspond approximately to peak axial expansion and recoil, and therefore to τ∥/2. Even this measure is imperfect, since the precise extrema of the axial mode may be obscured by higher-order oscillations and har-monics excited during impact. In addition, once the droplet detaches from the groove, and the geometric distinction be-tween axial and transverse directions is no longer imposed by the boundary, the post-detachment oscillation relaxes toward the radially symmetric Rayleigh modes of a free drop, pre-venting reliable measurement over multiple periods. Another issue is that the usable measurement window is narrow. At the low-Weber-number, wide-groove end, the data approach the previously identified weak-confinement limit, N < 1.2, where the blob construction is no longer reliable. At the high-Weber-number, narrow-groove end, Rayleigh–Plateau breakup of the elongated droplet can terminate the oscillation before the sec-ond peak in Ky occurs. Despite these caveats, τ∥ shows a clear dependence on N,with an approximately linear trend in N1/2 consistent with Eq. (13). The measured τ∥ increases monotonically with both We and N for each groove geometry, and varies by roughly a factor of two across all measurable, in-regime sim-ulations. The fit is shown in Fig. 10. Although the prefactor is not tightly constrained, the predicted functional form is sup-ported. The axial-mode data therefore provide a complementary test of the blob model. Imprinted by the confinement of the groove, this time scale depends on the same blob number NEffects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 10 1.10 1.15 1.20 1.25 
+
+N1/2
+
+2.02.53.03.54.04.55.05.5               
+
+> τ‖/τ0
+> W/R=2.25
+> W/R=2.37
+> W/R=2.5
+> W/R=2.75
+> W/R=3
+
+FIG. 10. Axial-mode period τ∥/τ0, estimated by doubling the in-terval between successive peaks in the axial kinetic energy compo-nent Ky, as a function of N1/2. The dashed black line shows a linear fit. The dotted grey line indicates the N = 1.2 lower-bound for the blob model, and the faded markers below this are excluded from the least squares fit. The data are consistent with the N1/2 scaling pre-dicted by Eq. (13). Data are restricted at high Weber numbers be-cause Rayleigh–Plateau breakup terminates the oscillation before a second peak can be measured. 
+
+that controls the contact-time, and varies oppositely from τ⊥.It is therefore distinct from a free-drop Rayleigh oscillation, which would be independent of N, and which the measured 
+
+τ∥ exceeds across all cases. Thus both Eq. (9) and Eq. (13), together with their reciprocal relation Eq. (14), are reflected in the simulations despite the greater uncertainty in extracting the axial mode. 
+
+C. Droplet impacts on a wetting groove 
+
+All groove simulations discussed so far used the fully non-wetting boundary condition, θc = 180 ◦. To probe the effect of finite surface affinity, we repeat the study of Sec. V B for the same groove widths, W /R0 ∈ { 2.25 , 2.37 , 2.5, 2.75 , 3.0},using the calibrated wetting boundary condition of Sec. III, for which the static contact angle is θc ≈ 165 ◦. The Weber-number range is extended slightly at the upper end to We ∈
+
+[3, 38 ].The resulting contact-times are shown in Fig. 11. Two changes relative to the non-wetting grooves are apparent. First, finite wall affinity increases the contact-time over the full Weber-number range. This is consistent with the flat-plate calibration in Sec. IV, where changing from θc = 180 ◦
+
+to θc ≈ 165 ◦ increases the contact-time from τc/τ0 ≈ 2.19 to 
+
+τc/τ0 ≈ 2.6. Second, the response is no longer monotonic. For each groove width, τc first increases with We, reaches a groove-dependent threshold We ⋆, then drops sharply onto a second branch that decreases with We, similar to the non-wetting trend but shifted to larger contact-times. We fit only this post-transition branch, We > We ⋆, using 0 10 20 30 40 
+
+We 
+
+1.01.52.02.53.03.5               
+
+> τc/τ0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+
+FIG. 11. contact-time as a function of Weber number for wetting grooves. The data separate into two branches divided by a groove-width-dependent transition Weber number We ⋆. Dashed curves show a least-squares fit to the post-transition branch, We > We ⋆, and faded markers indicate data excluded from the fit. The dotted gray line is the τc/τ0 = 2.6 flat plate limit. 0.6 0.8 1.0
+
+(W /R)pWe −1/4
+
+1.01.52.02.53.03.5               
+
+> τc/τ0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+
+FIG. 12. Contact-time τc/τ0 plotted against (W /R0)p We −1/4 for the wetting-groove cases. Post-transition impacts, We > We ⋆, collapse onto a common trend, whereas pre-transition impacts follow a dis-tinct branch. Faded markers indicate data points exlcluded from the least squares fit. 
+
+the same procedure and functional form as in Sec. V B. The resulting parameters are C = 3.80, b = −0.68, and p = 0.46 with RMSE = 0.04 and R2 = 0.95. The data collapse onto an approximately linear trend in (W /R0)p We −1/4, as shown in Fig. 12. The fitted width exponent is much smaller than in the non-wetting case, where p ≈ 1.51. Thus wettability affects not only the contact-time offset, but also the apparent groove-width dependence of the fast branch, reducing the exponent by approximately one power of W /R0.The wetting-groove data therefore introduce two issues that must be explained: the reduction of the groove-width expo-Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 11 0.7 0.8 0.9
+
+N−1/2                    
+
+> 1.52.02.53.03.5
+> τc/τ0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+> FIG. 13. Post-transition wetting data, We >We ⋆, plotted against
+> N−1/2. Like the non-wetting data in Fig. 5, the wetting data are ap-proximately linear for each groove width, however they do not col-lapse onto a single line, with the curves offset from one another or-dered by groove width. This indicates an additional groove-width de-pendence associated with finite wall affinity. The transition between the axial and transverse branches also does not occur at a single value of N, indicating that droplet deformation alone is not sufficient to determine the mode selection. Faded markers indicate data on the low-We number branch, not under consideration.
+
+nent from super-linear to sub-linear, and the appearance of a sharp transition between a low-Weber-number branch with in-creasing contact-time and a high-Weber-number branch with decreasing contact-time.  
+
+> 1. The groove-width exponent
+
+For the wetting boundary cases, the change in the fitted groove-width exponent is already apparent in the measured-N
+
+representation. As shown in Fig. 13, the data for each groove width retain an approximately linear dependence on N−1/2,but no longer collapse onto a common line. The per-width fits have similar slopes but also systematic offsets, indicating that a residual dependence on W , not accounted for by the ideal-ized blob model, remains. This differs fundamentally from the non-wetting case. There, the measured-N collapse was successful, and the anomalous fitted exponent p ≈ 1.51 in Eq. (21) arose from the geometric closure of Eq. (18) used to eliminate N in favor of the imposed parameters W and We. Under finite wall affinity, the deviation appears at the earlier step. The additional width dependence is therefore not purely an artifact of the limited geometric representation, but reflects a wetting-sensitive con-tribution to the rebound dynamics. A plausible origin is the interaction between the liquid and the groove walls during retraction and detachment. Contact-line motion and liquid–solid affinity which resists separation from the groove walls both provide additional pathways for dissipation. These effects depend on the evolving liquid–solid contact geometry and can therefore introduce an explicit de-pendence on W that is not contained in the inertio-capillary blob model. The persistence of this residual width dependence does not imply a breakdown of the leading Weber-number scaling. Fits of Smax and ℓmax in the wetting cases show the same qualita-tive behavior as in Sec. V B: the predicted We 1/2 dependence is retained at fixed groove width, while the prefactors remain width dependent. Wetting therefore alters the morphology-and wall-interaction-sensitive dependence on W without sub-stantially changing the global inertio-capillary dependence on We.  
+
+> 2. The mode-selection transition
+
+Investigation of the evolution of the droplet shape during rebound offers insight into the appearance of two branches in Figs. 11 and 12. As in the non-wetting case, the groove stretches the droplet axially, so that it detaches in an elon-gated configuration. Capillarity then drives an axial recoil as the droplet rises, which volume conservation dictates is ac-companied by a radial expansion in the transverse–vertical plane, about the droplet’s rising axis. This evolution is shown in Fig. 14. At low Weber numbers, i.e. We < We ⋆, this transverse– axial expansion occurs before the droplet has risen far from the groove, or even fully detached. The vertical expansion therefore either prolongs or re-establishes contact. In this regime, τc is governed by the slow axial mode τc ∼ τ∥ which scales according to Eq. (20), thus increasing with Weber num-ber. For We > We ⋆, the droplet rises rapidly enough that the transverse–vertical expansion, at its maximum extent, no longer reaches the substrate. The contact-time is then set by the faster transverse recoil τc ∼ τ⊥ described by Eq. (19), giv-ing the decreasing branch observed at larger Weber number, and a sharp transition between the two. The resulting mode-selection picture is summarized schematically in Fig. 15. To quantify the cross-over point, we model the transition as a race between the droplet’s rebound from the substrate and its axial recoil. The relevant quantities are the rebound velocity 
+
+Ur, the axial time scale τ∥, and the characteristic vertical ex-tent Rv reached during the transverse–vertical expansion. We employ the scalings 
+
+Ur ∼ We 1/2, (23a) 
+
+τ∥/τ0 ∼ N1/2, (23b) 
+
+Rv/R0 ∼ We 1/4, (23c) which imply the following assumptions. First, Eq. (23a) as-sumes that the rebound velocity remains proportional to the impact velocity, Ur = eU 0, with restitution factor e = O(1).Eq. (23b) follows the axial-mode scaling derived in Sec. V A. Finally with Eq. (23c) we propose that the transverse–vertical expansion after axial collapse follows the same energy-limited scaling as the maximum spreading radius on a flat plate. The transition is then controlled by the ratio of the rebound speed Ur to the distance the droplet must clear Rv and the time Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 12 
+
+FIG. 14. Evolution of a droplet with initial Weber number We = 15 .1 rebounding from a groove with W /R0 = 2.5 as seen from the top (top), side (middle) and end (bottom). This case lies slightly below We ⋆, thus the contact-time is controlled by the axial mode τ∥. (i) The droplet retracts transversely and rising from the groove surface. (ii) The droplet temporarily departs the surface while contracting axially. (iii) 
+
+Subsequent radial expansion in the transverse–vertical plane re-establishes contact with the groove bottom and walls. (iv) The droplet begins to separate a second time, forming a liquid neck near the departure point. (v) The droplet fully detaches from the groove bottom. In lower We cases, the full separation and re-attachment evident here does not occur, although the mechanism of prolonged contact-time is the same. The necking visible in (iv) is caused by wetting affinity between the liquid phase and groove surface, and is therefore absent in the non-wetting cases. 1 N⋆
+
+τ∥ ∼ N1/2
+
+τ⊥ ∼ N−1/2
+
+N
+
+> τc/τ0
+
+FIG. 15. Schematic illustration of the mode-selection transition for fixed groove width. At N = 1, the groove does not constrain the droplet and the axial and transverse time scales coincide. For inter-mediate N, the slow axial mode controls the measured contact-time. At N⋆, which depends on W /R0, the controlling mode switches from the axial mode to the transverse recoil mode. 
+
+it has to do so τ∥:
+
+χ ≡ Ur
+
+Rv/τ∥
+
+∼ We 1/4N1/2 ∼ We 1/2
+
+W /R0
+
+, (24) where the final relation follows from Eq. (18). Re-contact is suppressed, and the fast transverse mode controls the contact-time, once χ exceeds a constant threshold χ⋆. For a constant value of χ = χ⋆, Eq. (24) may be rearranged to give We ⋆ ∝ (W /R0)2. (25) In Fig. 16, plotting τc against χ separates the two regimes, with the transition occurring near χ⋆ ≈ 1.61. The Weber-number sampling is not fine enough to determine We ⋆ ac-curately for each groove width, so Eq. (25) cannot be tested quantitatively here. However, the observed regime separation is consistent with the proposed scaling. An approximation of 1.0 1.5 2.0 2.5
+
+χ
+
+1.52.02.53.03.5               
+
+> τc/τ0
+> W/R0=2.25
+> W/R0=2.37
+> W/R0=2.5
+> W/R0=2.75
+> W/R0=3.0
+
+FIG. 16. Contact-time plotted against the mode-selection parameter 
+
+χ ∼ (W /R0)−1 We 1/2. The two regimes separate near χ⋆ ≈ 1.61. 
+
+We ⋆, based on the value of χ⋆ mentioned above, is compared with the observed data in Fig. 17, and found to be consistent. Finally, we note that the existence of a distinct low-We branch receives some support from Ref. 3, which, as men-tioned in Sec. IV, reports that contact-time measurements on wetting grooves were sufficiently scattered to motivate a change of experimental protocol. On the slow branch, contact-time is sensitive to the rebound velocity, so that under exper-imental noise it could plausibly present as scatter. The ap-pearance of such protocol-disrupting behavior for a wetting boundary, over the reported range of Weber numbers, is con-sistent with the present simulations. Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 13 0 10 20 30 40 
+
+We                
+
+> 2.25 2.50 2.75 3.00
+> W /R0
+> tc∼τ⊥
+> tc∼τ‖
+> We ?
+> FIG. 17. Comparison of simulation data with the estimated transi-tion Weber number We ⋆. Impacts with responses on the slow branch associated with τ∥are marked with red triangles; those associated with the fast branch τ⊥are blue circles. The dashed black line is the transition criterion predicted by We ⋆= ( χ⋆W/R0)2with χ⋆=1.61 from Fig. 16. The transition criterion cleanly partitions the data.
+> VI. DISCUSSION
+
+Several qualifications are required in interpreting the sim-ulation results presented here. The first concerns the de-gree of agreement that should be expected from an idealized inertio-capillary model. The blob model interprets a three-dimensional, dissipative droplet motion through an idealized one-dimensional mass–spring analogy, retaining only a small number of effective geometric and inertial degrees of freedom. In simulations, however, impact energy is also distributed into higher-order oscillations, internal circulation, viscous dissi-pation, interfacial deformation, and, in some cases, capillary breakup. These effects are outside the blob model description, and consequently exact collapse onto the predicted scalings cannot be expected. Finite wall affinity introduces additional sources of deviation through contact-line motion and liquid– solid adhesion. This is consistent with the larger scatter and reduced fit quality observed for wetting groove impacts. The numerical data should therefore be interpreted as corroborat-ing the scaling laws derived from physical arguments, rather than as an exact validation of the idealized model. The second qualification concerns the quantitative resolu-tion of the scaling analysis. The accessible parameter range is limited by the finite physical window in which the groove-imposed blob description remains applicable. Low-Weber-number impacts on wide grooves approach the flat-plate limit, while high-Weber-number impacts on narrow grooves pro-duce elongated, thinned droplets susceptible to Rayleigh– Plateau breakup. The current data set spans five groove widths 
+
+W /R0 ∈ [2.25 , 3.0] over a relatively narrow band. This is suf-ficient to identify systematic trends but limits the precision with which exponents, prefactors, and crossover points can be determined. The transition from a super-linear width de-pendence for contact-time in the non-wetting case to a sub-linear dependence in the wetting case is therefore interpreted as robust, whereas the numerical value of the exponent dif-ference should be regarded as indicative rather than definitive. A similar interpretation should be made for the width depen-dency exponents applied to the surface area and spread length scalings in Sec. V B — both deviate meaningfully from the predicted behavior, but the exact relationship is not well es-tablished. The results in Secs. V B and V C reveal a consistent hier-archy in the predictive accuracy of the model. Across both wetting and non-wetting cases, the Weber-number exponents of Smax , ℓmax , and τc are reproduced cleanly, whereas their dependence on W /R0 is captured only approximately. The groove-width trends remain directionally correct, but the fit-ted exponents differ from the idealized predictions. While the wetting case appears to introduce new, groove-width depen-dent dynamics, the deviations in the non-wetting case stem from inaccuracy of the geometric closure in representing the spread morphology of the droplet. This inaccuracy stems from a core limitation of the blob model: the form of the spread droplet is insufficiently con-strained. The model assumes that at the point of maximum spreading, the droplet roughly takes on the form of a rect-angular prism, defined by four variables W , ℓmax , h, and 
+
+Smax . However, the relationship between these variables is constrained by only two relationships: volume conservation 
+
+V ∼ W h ℓmax , and the area closure Smax ∼ W ℓmax . To elimi-nate the remaining freedom, the imposed-parameter scalings of Sec. V A propose the simplest closure: the inertio-capillary result Smax ∼ We 1/2 of Eq. (15). What survives this simplifica-tion is anything determined by global energy balance. What does not survive are predictions requiring a commitment to how large Smax is, and how it is distributed across the geo-metric features. The droplet during impact is free to adjust the maximum surface area, as well as redistribute it by ad-justing h and ℓmax , not to mention deviate from the prismatic assumption on spread morphology altogether. Even the width 
+
+W is not truly fixed, as the droplet in some cases may spread vertically up the sides of the groove walls as seen in Fig. 4. However, the simplified geometric closure adopted in Eq. (15) succeeds in providing a directionally correct, although not ex-act, scaling for the effect of groove width. The difficulties in interpreting the simulation data described above, prevent us from drawing any further quantitative con-clusions about how wetting modifies the contact-time scaling, although several features of the data seem suggestive. In par-ticular, the fast branch appears to collapse linearly with χ in Fig. 16, which implies a τc/τ0 ∼ We −1/2 relationship. This change in energy scaling does not necessarily contradict the robustness of the inertio-capillary picture across the two wet-ting conditions just described. Finite wall affinity may mod-ify release dynamics while leaving the core energy exchange intact. The wetting data, however, exhibit appreciable scat-ter, and the two branch structure reduces the number of ap-plicable points. Consequently, a clear adjudication between a We −1/2 and We −1/4 form is not possible. Additionally, as only a single wetting condition has been investigated, any ob-served dependency cannot be extrapolated beyond the partic-ular boundary condition studied. Most importantly, though, there is no a priori reason to expect the effects introduced Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 14 by finite wall affinity to follow simple power laws in W or We. The inertio-capillary blob model is based on an ideal-ized reversible exchange between kinetic and surface energy, whereas wall affinity introduces geometry-dependent dissipa-tive processes. In many cases, dissipative boundary effects added to otherwise inertial flow models introduce new sensi-tivities that cannot be captured by the same low-dimensional scaling structures. The present data do not cleanly distinguish between a modified scaling law and a lower-order correction to the blob-model dynamics. We therefore report these trends as observations, noting that systematic interpretation would require data spanning a range of contact angles. The robustness of the maximum surface area scaling, and inertio-capillary energy exchange, motivates the form of χ,through the approximation Rv/R0 ∼ We 1/4 in Eq. (23c). This estimate is adopted by analogy with the flat-plate maximum-spread radius in Eq. (1), which also underlies the area scaling in Eq. (15), rather than being derived directly from the axial-collapse dynamics. The vertical re-expansion following axial recoil need not, in principle, share the same exponent as the primary transverse spread. However, estimating its magni-tude using the same inertio-capillary length scale is consistent with the view that rebound remains organized by continued exchange between kinetic and surface energy. The collapse of the transition near a single value χ⋆ ≈ 1.61 in Fig. 16 sup-ports this approximation. If the We 1/4 length-scale estimate were substantially inappropriate, residual groove-width order-ing would be expected near the transition, which is not evident in the present data. Finally, the numerical value of χ⋆ should be regarded as specific to the boundary condition studied here. Since only one wetting boundary condition was tested, the dependence of χ⋆ on contact angle cannot be determined from the present data, although the expected direction of the effect can be in-ferred. As wall affinity vanishes, the dissipative reduction of the rebound velocity Ur should weaken, shifting the transi-tion to lower χ. Consistent with this interpretation, the non-wetting simulations in Sec. V B exhibit a single monotonic branch over the corresponding range of χ, with no mode-selection transition. Thus any non-wetting threshold appears to lie below the Weber-number range sampled here. An examination of the limiting behavior of χ suggests that a resolvable value in the non-wetting limit may not exist. From Eq. (24) and Eq. (18), we can state that 
+
+χ4
+
+N2 ∼ We . (26) As the problem definition requires N ≥ 1, small values of 
+
+χ imply vanishing Weber number, where the pure inertio-capillary assumption becomes invalid for a real droplet as vis-cous effects increasingly dominate. Thus, in the limit of van-ishing wall affinity, χ⋆ may be outside the range of validity of the present mode-selection model, although this cannot be resolved without additional low-We simulations.  
+
+> VII. CONCLUSIONS
+
+A non-ideal, entropic, multi-relaxation-time lattice Boltz-mann method was used to study droplet impacts on superhy-drophobic grooves. Following validation against experimental measurements for superhydrophobic surfaces and non-wetting Leidenfrost grooves, simulations were used to examine how groove geometry breaks the radial symmetry of rebound and separates the impact into transverse and axial dynamics. The principal contribution is an extension of the blob model of Ref. 3 to a two-mode description of droplet–groove im-pact. The groove imposes reciprocal transverse and axial inertio-capillary time scales, described by Eqs. (9) and (13) and related by Eq. (14). Simulations across five groove widths with non-wetting boundaries confirm this framework: contact-times collapse onto the predicted transverse scaling of Eq. (9), and the complementary axial mode, though harder to extract, follows its anticipated trend. For imposed-parameter scaling proposed in Eq. (19), the predicted Weber number de-pendence is recovered, but the groove-width dependency is found to be super-linear. This is attributable to limitation of the rectangular-prism closure in describing the geometry of the true, spread droplet. Extending the study to finite surface affinity reveals a non-monotonic, two-branch contact-time response: contact-time increases with Weber number on the low-We branch, de-creases on the high-We branch, and switches sharply at a groove-width-dependent We ⋆. The two-mode model receives further support from its use in interpreting this behavior, with the two branches each associated with one of the two pri-mary modes. The transition between branches is modeled as a competition between wetting-slowed rebound and axial recoil, with the resulting groove-width-dependent transition points collapse onto the single mode-selection parameter χ of Eq. (24). Predictions tied to global energy balance are shown to be reproduced cleanly across both wetting and non-wetting cases. Predictions tied more directly to droplet morphology are shown to be directionally correct, although quantitatively inexact. The reasons for this are explored in Sec. VI. The main result is therefore a unified interpretation of groove-mediated rebound in terms of two inversely related inertio-capillary modes. The simulations support the central physical picture: groove geometry breaks the degeneracy of flat-plate rebound, imposes distinct transverse and axial time scales, and allows the observable contact-time to be controlled through mode selection. This distinguishes anisotropic con-finement from strategies that primarily shorten an existing rebound pathway by reducing the active mass or retraction length. The fixed transverse length therefore changes not only the rebound time, but the selection mechanism that determines it. These findings clarify how geometric confinement and wetting effects modify droplet rebound on superhydrophobic surfaces, with implications for textured surfaces used in anti-icing, self-cleaning, and droplet transport. Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 15 
+
+> ACKNOWLEDGMENTS
+
+This work was supported by European Research Council (ERC) Advanced Grant No. 834763-PonD and by the Swiss National Science Foundation (SNSF) Grant 200021-228065. Computational resources at the Swiss National Super Com-puting Center (CSCS) were provided under Grants No. s1286 and s1327. 
+
+> AUTHOR DECLARATIONS
+
+Conflict of Interest 
+
+The authors have no conflicts to disclose. 
+
+Ethical approval 
+
+The work presented here by the authors did not require ethics approval or consent to participate. 
+
+Author Contributions M. Feinberg : Conceptualization (equal); Formal analysis (lead); Investigation (lead); Methodology (supporting); Soft-ware (lead); Visualization (lead); Writing – original draft (lead); Writing – review & editing (equal). S. A. Hos-seini : Conceptualization (equal); Formal analysis (support-ing); Methodology (lead); Software (supporting); Supervision (equal); Writing – review & editing (equal). I. V. Karlin :Conceptualization (equal); Funding acquisition (lead); Project administration (lead); Resources (lead); Supervision (equal); Writing – review & editing (equal). 
+
+Data availability 
+
+The data that support the findings of this study are available from the corresponding author upon reasonable request.  
+
+> Appendix A: Measurement of surface tension
+
+Although the surface tension coefficient γ does not appear explicitly as an input to the LB evolution equation, it is re-quired to evaluate both the inertio-capillary time scale and the Weber number. It was therefore measured from the Laplace pressure of static liquid columns with known curvature, 
+
+∆P = γ
+
+Re
+
+, (A1) where ∆P is the pressure jump across the interface, and Re is the equimolar radius defined by the Gibbs dividing surface. 24 
+
+Simulations were performed for cylindrical liquid columns of several initial radii using the same thermodynamic state and transport properties as in the impact simulations. After con-vergence of the density field, ∆P was computed using Eq. (4) from bulk liquid and vapor densities, while Re was evaluated from 
+
+Re =
+
+s R ∞ 
+
+> 0
+
+2(ρ(r) − ρv) r dr 
+
+(ρl − ρv) . (A2) Both quantities are subject to numerical uncertainties: ∆P
+
+is sensitive to the choice of bulk sampling points, particularly 0.024 0.028 0.032 0.036 
+
+1/Re    
+
+> 0.0018 0.0020 0.0022 0.0024 0.0026
+> ∆P
+> 45 40 35 30
+> R0
+> FIG. 18. Pressure jump as a function of inverse equimolar radius for static liquid columns at T/Tc=0.3936. The dashed line is a least-squares fit, whose slope gives the surface tension.
+
+in the liquid phase, where the repulsive denominator 1 − bρ in Eq. (4) makes the pressure response stiff, so that small varia-tions in ρ can produce appreciable changes in P. Meanwhile, 
+
+Re is affected by the imperfect representation of a curved in-terface on a Cartesian lattice, and consequently the value de-pends on the exact measurement approach. 25 
+
+The effective surface tension was obtained from a least-squares fit of ∆P against 1 /Re across the four column sim-ulations, with the fitted slope identified as γ. This gives 
+
+γ ≈ 0.0704. The recovered linear dependence confirms that the model reproduces the expected relation between pressure jump and curvature; see Fig. 18. Variations in γ arising from alternative measurement choices do not affect the scaling be-haviors discussed in the main text, nor appreciably alter con-clusions drawn from comparison with the experimental data. The converged density ratio is ρl /ρv ≈ 578, slightly below the target value of 600 due primarily to vapor-phase drift asso-ciated with the under-resolved diffuse interface. The interface width is w = 4.56 δ r, measured as 
+
+w = ρl − ρv
+
+max |∇ρ| . (A3) This small departure from the Maxwell-construction predic-tion is not expected to affect the impact dynamics considered here. Spurious currents are weak, non-physical velocities which arise near curved interfaces due to small discretization errors in the balance between thermodynamic pressure gradients and capillary forces. They are a practically unavoidable feature of diffuse interface methods, and it is necessary to ensure scale separation between these spurious velocities and the charac-teristic velocities of the flow. To assess these, we measure the peak velocity in the smallest converged liquid column, which has a curvature comparable to that of the three-dimensional droplet. The peak spurious-current magnitude observed is 
+
+|uspurious | ≈ 1.5×10 −3, roughly a factor of fourteen below the slowest impact velocity used in this study. Additionally, peak Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 16     
+
+> FIG. 19. Left: density field around a static droplet. Right: velocity magnitude of the corresponding spurious currents.
+
+spurious velocities occur in the vapor phase, further reducing their dynamical influence given the high density ratio. 
+
+> Appendix B: Wetting boundary condition
+
+The fictitious, wall-density wetting BC employed requires calibration of αw to the desired contact angle. Characteriza-tion of this boundary condition with the present free-energy formulation has been reported in Ref. 15, so here we restrict attention to the two operating points used in the impact simu-lations: ρw = 0.695 for the wetting (high-contact-angle SHS) case, and ρw = ρv = 0.015 for the Leidenfrost (non-wetting) case. Contact angle is assessed from simulations of a liquid col-umn between two flat boundaries. After equilibration, θc may be estimated either from the pressure jump across the interface using the Young–Laplace relation 
+
+∆P = 2γ cos θc
+
+H , (B1) where H is the channel height, or by direct measurement of the density field. The pressure-based estimate is sensitive to small errors in the measured bulk densities as discussed in Appendix A, which are amplified when converting ∆P to θc
+
+near the wetting limits. We therefore use direct density-field measurements for calibration, fitting circular arcs to the free interfaces while varying the threshold density and corner ex-clusion to estimate uncertainty. This gives θc = 165 ◦ ± 3◦
+
+for ρw = 0.695. For ρw = ρv, the droplet does not attach to the substrate, consistent with a fully non-wetting condi-tion, θc ≈ 180 ◦. The two configurations are shown in Fig. 20, where the different wetting behavior is visually apparent. 
+
+> Appendix C: Robustness of the axial-mode scaling
+
+The Taylor–Culick derivation of Sec. V A provides a spe-cific mechanism for the axial retraction: a capillary force withdraws a rim of increasing mass at the constant Taylor– Culick velocity. To demonstrate the robustness of the N1/2
+
+scaling to modeling assumptions, we offer an alternative pic-ture: a capillary force retracts a constant fraction of the droplet’s mass back toward its center at constant acceleration.                
+
+> FIG. 20. Converged density fields for a 2D static droplet on a flat substrate at the two operating points. Top: ρw=ρv=0.015, giving
+> θc≈180 ◦with no substrate attachment. Bottom: ρw=0.695, giving
+> θc≈165 ◦.
+
+Combining Newton’s second law with the classical kine-matic equation x − x0 = 12 at 2, gives us a generic expression for the time-scale of dynamics dominated by constant accel-eration 
+
+t =
+
+ m(x − x0)
+
+F
+
+1/2
+
+. (C1) We proceed by assuming the mass of the droplet’s end experi-encing this acceleration is proportional to the total mass of the droplet m ∼ ρl R30, and that the length scale of the retraction 
+
+(x − x0) ∼ ℓmax .The capillary force driving the recoil can be derived from multiple modeling assumptions. It can be found from the gra-dient of the surface energy ( Fγ = −γ dA /dy ), from line ten-sion acting along the perimeter where free surfaces meet the prismatic end-cap of the spread droplet, or from the Young– Laplace pressure integrated over the curved rim that real re-coiling ends form. The three derivations yield the same scal-ing form if the spread droplet is assumed to have a rectangular prismatic form, 
+
+Fγ ∼ γ W, (C2) differing only in the leading O(1) prefactor. For example, if we assume that the acceleration comes from the force of the upper and lower surfaces pulling on the end cap, then Fγ =
+
+2 γ W , with contributions from the remaining two sides of the end-cap neglected because h ≪ W .Inserting our scaling laws for Fγ , m, and x−x0 into Eq. (C1) results in 
+
+τ∥ ∼
+
+ ρR30
+
+γ
+
+ℓmax 
+
+W
+
+1/2
+
+= τ0
+
+ ℓmax 
+
+W
+
+1/2
+
+= τ0 N1/2, (C3) recovering the same N1/2 scaling arrived at by Taylor–Culick in Sec. V. The reason for the agreement is that both arguments respect the same set of underlying assumptions: Effects of anisotropic confinement on droplet rebound from superhydrophobic surfaces 17 (i) the relevant inertial mass scales with the droplet mass, (ii) the retraction proceeds over a length proportional to the maximum spreading length of the droplet, (iii) the retraction is driven by a capillary force, which takes the form Fγ ∼ γL, where L is a length scale characteris-tic of the recoiling end, (iv) the characteristic length L is set by the groove width W .Assumption (i) is explicit in the present derivation, but is implied by the rate of mass accretion in the Taylor–Culick ar-gument. Assumptions (i) and (ii) commit to the inertia and the recoil distance scaling with the droplet rather than with some sub-structure of it. Assumption (iii) reflects the dimensions of surface tension as force per unit length. Assumption (iv) requires the most justification. It is ar-rived at from the core geometric premise of the blob model of the droplet-groove interaction: that the droplet flattens out into a rectangular prismatic form at the moment of maximum spreading. This places a clear validity window on the scaling. When the droplet has not spread sufficiently for ℓmax to sig-nificantly exceed W , whether because the groove is too wide or because the impact energy is too low, the recoiling end is not prismatic and W is not preferentially the dominant length scale of the force. In this regime the droplet’s behavior ap-proaches that of an unrestrained impact on a flat surface, and the N1/2 scaling should not be expected to hold. The agreement between the two derivations demonstrates that the N1/2 exponent is not an artifact of the Taylor–Culick mechanism or of any particular kinematic idealization: it fol-lows from assumptions (i)–(iv), which both derivations share. The scaling should therefore be expected to hold wherever those four assumptions hold, and to break down in the wide-groove, low-Weber regime where the spread droplet has not formed the requisite rectangular prismatic shape and assump-tion (iv) is violated. 
+
+> 1
+
+D. Richard, C. Clanet, and D. Quéré, “Contact time of a bouncing drop,” Nature 417 , 811–811 (2002), number: 6891. 
+
+> 2
+
+J. C. Bird, R. Dhiman, H.-M. Kwon, and K. K. Varanasi, “Reducing the contact time of a bouncing drop,” Nature 503 , 385–388 (2013). 
+
+> 3
+
+P. Chantelot, A. M. Moqaddam, A. Gauthier, S. S. Chikatamarla, C. Clanet, I. V. Karlin, and D. Quéré, “Water ring-bouncing on repellent singularities,” Soft Matter 14 , 2227–2233 (2018). 
+
+> 4
+
+R. Blossey, “Self-cleaning surfaces — virtual realities,” Nature Materials 2,301–306 (2003). 
+
+> 5
+
+M. J. Kreder, J. Alvarenga, P. Kim, and J. Aizenberg, “Design of anti-icing surfaces: smooth, textured or slippery?” Nature Reviews Materials 1,15003 (2016). 
+
+> 6
+
+J. Lv, Y. Song, L. Jiang, and J. Wang, “Bio-inspired strategies for anti-icing,” ACS nano 8, 3152–3169 (2014). 
+
+> 7
+
+H. A. Stone, “Ice-Phobic Surfaces That Are Wet,” ACS Nano 6, 6536–6540 (2012). 
+
+> 8
+
+S. Wildeman, C. W. Visser, C. Sun, and D. Lohse, “On the spreading of impacting drops,” Journal of Fluid Mechanics 805 , 636–655 (2016). 
+
+> 9
+
+Y. Liu, L. Moevius, X. Xu, T. Qian, J. M. Yeomans, and Z. Wang, “Pan-cake bouncing on superhydrophobic surfaces,” Nature Physics 10 , 515–519 (2014). 
+
+> 10
+
+K. Okumura, F. Chevy, D. Richard, D. Quéré, and C. Clanet, “Water spring: A model for bouncing drops,” Europhysics Letters 62 , 237 (2003). 
+
+> 11
+
+C. Clanet, C. Béguin, D. Richard, and D. Quéré, “Maximal deformation of an impacting drop,” Journal of Fluid Mechanics 517 , 199–208 (2004), aDS Bibcode: 2004JFM...517..199C. 
+
+> 12
+
+Z. Wang, C. Lopez, A. Hirsa, and N. Koratkar, “Impact dynamics and rebound of water droplets on superhydrophobic carbon nanotube arrays,” Applied Physics Letters 91 , 023105 (2007). 
+
+> 13
+
+A. Gauthier, S. Symon, C. Clanet, and D. Quéré, “Water impacting on superhydrophobic macrotextures,” Nature Communications 6, 8001 (2015). 
+
+> 14
+
+Y. Liu, S. A. Hosseini, C. Liu, M. Feinberg, B. Dorschner, Z. Wang, and I. Karlin, “Transition time of a bouncing drop,” Physical Review Fluids 10 ,013602 (2025). 
+
+> 15
+
+S. Hosseini, B. Dorschner, and I. Karlin, “Towards a consistent lattice Boltzmann model for two-phase fluids,” Journal of Fluid Mechanics 953 ,A4 (2022). 
+
+> 16
+
+S. A. Hosseini, B. Dorschner, and I. V. Karlin, “Entropic multi-relaxation-time lattice Boltzmann model for large density ratio two-phase flows,” (2022), arXiv:2201.12404 [physics]. 
+
+> 17
+
+A. Kupershtokh, “New method of incorporating a body force term into the lattice Boltzmann equation,” in Proceedings of the 5th International EHD Workshop (Poitiers-France, 2004) pp. 241–246. 
+
+> 18
+
+R. Benzi, L. Biferale, M. Sbragaglia, S. Succi, and F. Toschi, “Mesoscopic modeling of a two-phase flow in the presence of boundaries: The contact angle,” Physical Review E 74 , 021509 (2006). 
+
+> 19
+
+M. Sbragaglia, R. Benzi, L. Biferale, S. Succi, and F. Toschi, “Surface Roughness-Hydrophobicity Coupling in Microchannel and Nanochannel Flows,” Physical Review Letters 97 , 204503 (2006). 
+
+> 20
+
+T. Krüger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, and E. M. Viggen, The Lattice Boltzmann Method: Principles and Practice , Graduate Texts in Physics (Springer International Publishing, Cham, 2017). 
+
+> 21
+
+G. I. Taylor, “The dynamics of thin sheets of fluid. III. Disintegration of fluid sheets,” Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences 253 , 313–321 (1959). 
+
+> 22
+
+F. E. C. Culick, “Comments on a Ruptured Soap Film,” Journal of Applied Physics 31 , 1128–1129 (1960). 
+
+> 23
+
+C. Josserand and S. T. Thoroddsen, “Drop Impact on a Solid Surface,” An-nual Review of Fluid Mechanics 48 , 365–391 (2016). 
+
+> 24
+
+J. W. Gibbs, “On the equilibrium of heterogeneous substances,” American Journal of Science s3-16 , 441–458 (1878). 
+
+> 25
+
+S. A. Hosseini and I. V. Karlin, “Lattice Boltzmann for non-ideal fluids: Fundamentals and Practice,” Physics Reports Lattice Boltzmann for non-ideal fluids: Fundamentals and Practice, 1030 , 1–137 (2023).
