@@ -1,0 +1,1173 @@
+Title: An SPH model with physically prescribed parameters for droplet dynamics on complex surfaces
+
+URL Source: https://arxiv.org/pdf/2607.16670v1
+
+Published Time: Tue, 21 Jul 2026 00:28:05 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+AN SPH MODEL WITH PHYSICALLY PRESCRIBED PARAMETERS FOR DROPLET DYNAMICS ON COMPLEX SURFACES ∗
+
+ZHONGHUA QIAO † , YIFAN WEI ‡ , AND XIANMIN XU §
+
+Abstract. Numerical simulation of droplet dynamics on complex surfaces with varying wetta-bility is of great significance to both engineering applications and fundamental research. However, existing numerical methods still face challenges in accurately capturing interfacial interactions while preserving physical consistency and computational efficiency. In this work, a physically grounded and efficient smoothed particle hydrodynamics (SPH) model is developed for droplet dynamics sim-ulation. To reduce computational cost, a single-phase droplet modeling strategy is employed. At the interface, long-range interactions are approximated using the SPH kernel function, whereas short-range interactions are represented through pressure. Based on this treatment, an explicit relationship between the intermolecular potential energy and the macroscopic surface tension coefficient is further established, thereby reducing reliance on empirical parameter calibration. The proposed method is first validated through static wetting simulations, where the equilibrium contact angles agree well with the Young–Dupr´ e equation. Further simulations of wetting and droplet impact demonstrate that the method is capable of capturing complex dynamic wetting behaviors. 
+
+Key words. Smoothed particle hydrodynamics; droplet dynamics; surface tension; wettability; complex surfaces. 
+
+MSC codes. 76M28, 76D45, 65M99, 76T10. 
+
+1. Introduction. Droplet dynamics has attracted sustained attention due to its broad relevance to both engineering applications and fundamental science. Rep-resentative examples include inkjet printing [29, 10], aircraft anti-icing and de-icing [11, 30, 24], agricultural spraying [18, 27], and microfluidic systems [16, 9]. In these processes, droplet behavior is governed by the interplay of inertia, viscosity, surface tension, and solid–liquid interactions, leading to complex dynamic phenomena such as spreading, receding, rebounding, and splashing [12]. Nevertheless, understanding and accurately predicting interfacial interaction forces, particularly those associated with surface tension and wettability, remain major challenges in the study of droplet dynamics. Numerical methods have significantly advanced the simulation and understanding of droplet dynamics. Among them, traditional mesh-based approaches have played a central role in multiphase flow modeling and have yielded many important results. For instance, a geometric Volume-of-Fluid-based framework was proposed for multi-component phase change and validated for non-isothermal two-phase flows through a series of benchmark tests [4]. Similarly, a thermodynamically consistent lattice Boltz-mann method was developed for non-isothermal two-phase flows with liquid–vapour 
+
+> ∗
+
+Submitted to the editors DATE. 
+
+Funding: This work is supported by the CAS AMSS-PolyU Joint Laboratory of Applied Mathematics (No. JLFS/P-501/24). The first author was partially supported by the Hong Kong Research Grants Council GRF grant 15305624 and NSFC/RGC Joint Research Scheme (No. N PolyU5145/24). The second author was partially supported by the Hong Kong Polytechnic Uni-versity Postdoctoral Research Fund 1-W30N. 
+
+> †
+
+Department of Applied Mathematics, The Hong Kong Polytechnic University, Hung Hom, Kowloon, Hong Kong (zhonghua.qiao@polyu.edu.hk). 
+
+> ‡
+
+Corresponding author. Department of Applied Mathematics, The Hong Kong Polytechnic Uni-versity, Hung Hom, Kowloon, Hong Kong (yi-fan.wei@polyu.edu.hk). 
+
+> §
+
+NCMIS & LSEC,Institute of Computational Mathematics and Scientific/Engineering Comput-ing, Academy of Mathematics and Systems Science, Beijing 100190, PR China (xmxu@lsec.cc.ac.cn). 1arXiv:2607.16670v1 [physics.flu-dyn] 18 Jul 2026 2 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+phase change and wetting effects [19]. High-order mesh-based formulations have also been developed for compressible multiphase flows; for instance, Qin et al. [20] pro-posed a TENO scheme within the lattice Boltzmann flux solver framework, combined with a level-set-based interface-tracking method to resolve phase interfaces. However, droplet dynamics often involves large interfacial deformation, moving contact lines, topological changes, and repeated contact or collision events [7], which pose signifi-cant challenges to mesh-based methods in terms of interface accuracy and the treat-ment of complex boundary evolution. In many cases, additional interface-capturing or interface-tracking techniques are required, further increasing the algorithmic com-plexity. In contrast, smoothed particle hydrodynamics (SPH), as a fully Lagrangian meshfree method, has shown great potential for droplet dynamics simulation [13]. Owing to its particle-based discretization, SPH can naturally handle large deforma-tion, free-surface motion, and complex interfacial evolution without suffering from mesh entanglement, making it a particularly attractive approach for droplet impact and other interfacial flow problems. Considerable efforts have been devoted to modeling interfacial interaction forces in SPH, as these forces are essential for accurately representing surface tension and wettability. Existing SPH treatments can generally be classified into two main cate-gories. The first is the continuum surface force (CSF) approach, originally proposed by Brackbill et al. [3], in which surface tension is transformed into an equivalent volumetric force, thereby enabling interfacial effects to be incorporated within a con-tinuum framework. In fact, this approach has been widely adopted in SPH simulations of multiphase and free-surface flows. For example, Vergnaud et al. [26] introduced several important improvements for single-phase SPH simulations that are applicable to different SPH schemes. However, the CSF approach relies strongly on the accurate evaluation of local interface normals and curvature, which can become challenging in the presence of large deformations, complex interface evolution, or insufficient par-ticle resolution. As a result, its robustness may be compromised in certain droplet dynamics problems. By contrast, the particle–particle interaction force (PIF) approach, which consti-tutes the second category, describes interfacial effects through pairwise forces between particles and thus provides a more direct representation of microscopic attractive and repulsive interactions. This characteristic makes it particularly attractive for model-ing physical processes near interfaces and solid boundaries. For instance, Kordilla et al. [8] employed this approach to simulate droplet and film flows over a wide range of contact angles and Reynolds numbers on rock surfaces, with only the liquid and solid phases discretized by SPH particles. Nevertheless, a major limitation of early PIF-based SPH models was that the interaction-force parameters had to be calibrated empirically against the surface tension and static contact angle [6]. Tartakovsky and Panchenko [23] proposed a revised pairwise-force SPH formulation and derived ex-plicit relationships between the interaction-force parameters and the surface tension and static contact angle for two- and three-phase flows in bounded domains. Despite this improvement, the method may still induce an additional virial pressure away from the interface, and its performance remains dependent on the specific functional form adopted for the pairwise interaction force. Therefore, the development of a more robust SPH model with fewer artificial parameters remains highly desirable. To overcome the limitations of existing SPH approaches in modeling interfacial interactions, this work develops a physically grounded SPH framework for droplet dy-namics from a microscopic perspective. The proposed method adopts a single-phase strategy to enhance computational efficiency, represents long-range interfacial inter-SPH MODEL FOR DROPLET DYNAMICS 3actions using the SPH kernel function, and incorporates short-range interactions into the pressure term. Furthermore, an explicit relationship between the intermolecular potential energy and the macroscopic surface tension coefficient is derived, which re-duces the need for empirical parameter calibration. Overall, the proposed framework offers a physically consistent, robust, and efficient approach for simulating droplet dynamics on complex surfaces. The main contributions are summarized as follows: 
+
+• A single-phase SPH strategy is developed to improve the computational effi-ciency of droplet dynamics simulations. 
+
+• A physically grounded interfacial interaction model is proposed to describe both long-range and short-range effects with reduced empirical parameter dependence. 
+
+• Comprehensive wetting and impact simulations are performed to validate the proposed method and demonstrate its ability to capture complex dynamic wetting behaviors. The remainder of this paper is organized as follows. Section 2 introduces the fundamentals of the SPH methodology. Section 3 presents a reformulation of the Young–Dupr´ e equation. Section 4 describes the governing equations and their SPH discretization. Section 5 provides several numerical examples and validation studies to demonstrate the accuracy and effectiveness of the proposed method. Finally, Section 6 summarizes the main conclusions of this work. 
+
+2. Foundations of SPH Methodology. By the defining property of the Dirac delta function, one has (2.1) f (x) = 
+
+Z
+
+> Ω
+
+f (x′)δ(x − x′) d x′.
+
+Here, δ denotes the Dirac delta function, which satisfies 
+
+δ(x − x′) = 0 for x̸ = x′,
+
+Z
+
+> Ω
+
+δ(x − x′) d x′ = 1 .
+
+In the SPH framework, the Dirac delta function δ(x−x′) is replaced by a smooth-ing kernel function W (x−x′, h ), where h denotes the kernel support radius (or smooth-ing length). Similar to the Dirac delta function, the kernel function W (x, h ) has nonzero contribution only within a bounded support domain. Let ∥ · ∥ denote the Euclidean norm. In general, the kernel function is required to satisfy the following properties: 
+
+• Normalization condition : R 
+
+> Ω
+
+W (x, h ) d x = 1; 
+
+• Symmetry property : W (x, h ) = W (−x, h ); 
+
+• Compact support condition : W (x, h ) = 0 , for ∥x∥ ≥ h. 
+
+The kernel approximation (also referred to as the integral approximation ) of a scalar field f (x) can be defined by (2.2) fI (x) := 
+
+Z
+
+> Ω
+
+f (x′)W (x − x′, h ) d x′ ≈ f (x).
+
+Introducing the normalized distance 
+
+q = |x − x′|
+
+h ,
+
+we consider two widely used kernel functions. 4 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+1. Cubic Spline Kernel [13]: 
+
+W cs (q, h ) = 
+
+
+
+σcs [1 − 6q2(1 − q)] , 0 ≤ q ≤ 12 ,σcs [2(1 − q)3], 12 < q ≤ 1,
+
+0, q > 1,
+
+(2.3) where σcs = 8 
+
+> πh 3
+
+in three dimensions. 2. Wendland Quintic Kernel [5]: 
+
+W wq (q, h ) = 
+
+(σwq (1 − q)4(4 q + 1) , 0 ≤ q ≤ 1,
+
+0, q > 1,
+
+(2.4) where σwq = 21 2πh 3 in three dimensions. The Wendland quintic kernel is often regarded as a favorable choice in terms of both computational accuracy and efficiency, since it provides relatively high-order interpolation while maintain-ing a computational cost comparable to that of lower-order kernels. Following Eq. (2.2), an approximation to the derivatives of a function can be derived by applying integration by parts: (2.5) [Dβ f ]I (x) = −
+
+Z
+
+> Ω
+
+f (x′)Dβ 
+
+> x′
+
+W (x − x′, h ) d x′,
+
+where β is a multi-index representing the order of differentiation. By discretizing the kernel approximation, one obtains the particle approximation 
+
+for scalar fields and for the divergence of vector fields: 
+
+⟨f ⟩i = X
+
+> j
+
+mj
+
+ρj
+
+fj W wq  
+
+> ij
+
+,(2.6) 
+
+⟨∇ · f ⟩i = − X
+
+> j
+
+mj
+
+ρj
+
+fj · ∇ j W wq  
+
+> ij
+
+,(2.7) where fj := f (xj ), W wq  
+
+> ij
+
+:= W wq (xi − xj , h ), and ∇j W wq  
+
+> ij
+
+:= ∇xj W wq (xi − xj , h ). Here, i denotes the target particle at which the approximation is evaluated, while j
+
+denotes the neighboring particles located within the kernel support. The quantity 
+
+mj /ρ j approximates the volume associated with particle j.In practical implementations, modified forms of Eq. (2.7) are typically employed. In particular, when a derivative term is multiplied or divided by the density, it can be reformulated and incorporated into the summation operator. To this end, we make use of the following two identities [13]: [ρ∇ · f ]( x) = ∇ · (ρf )( x) − f (x) · ∇ ρ(x),(2.8)  ∇fρ
+
+
+
+(x) = ∇
+
+ fρ
+
+
+
+(x) + f (x)
+
+ρ2(x) ∇ρ(x).(2.9) Combining these identities with Eq. (2.7), we obtain the following commonly used SPH discretizations for velocity and pressure: 
+
+⟨ρ∇ · u⟩i = − X
+
+> j
+
+mj uij · ∇ iW wq  
+
+> ij
+
+,(2.10) 
+
+ ∇pρ
+
+
+
+> i
+
+= X
+
+> j
+
+mj
+
+pi
+
+ρ2
+
+> i
+
++ pj
+
+ρ2
+
+> j
+
+!
+
+∇iW wq  
+
+> ij
+
+.(2.11) SPH MODEL FOR DROPLET DYNAMICS 5Here, uij := ui − uj . A widely used SPH discretization of the viscous term was proposed by Morris et al. [17], namely, 
+
+ μρ ∇2u
+
+
+
+> i
+
+= X
+
+> j
+
+mj (μi + μj )
+
+ρiρj
+
+xij · ∇ iW wq 
+
+> ij
+
+|xij |2 + (0 .01 h)2 uij .(2.12) 
+
+3. Reformulation of Young–Dupr´ e Equation. The Young–Dupr´ e relation is a fundamental result in surface science that establishes a quantitative connection between the thermodynamic work of adhesion and key macroscopic wetting proper-ties, in particular the equilibrium contact angle. It provides a theoretical criterion for characterizing the wetting behavior of a liquid on a solid surface and for determining whether partial or complete wetting occurs. However, the work of adhesion is not the most convenient quantity for direct implementation in SPH-based numerical simula-tions. Therefore, to facilitate numerical treatment and offer an alternative physical interpretation of contact-angle behavior, the Young–Dupr´ e relation is reformulated here in terms of intermolecular potential energy. 
+
+3.1. Interfacial Energy. Consider a system of particles located at positions 
+
+ri. The pairwise interaction between particles i and j is described by the two-body potential ϕ(|ri − rj |). The total interaction energy is (3.1) E = X
+
+> i<j
+
+ϕ(|ri − rj |) = 12
+
+X
+
+> i
+
+X 
+
+> j̸=i
+
+ϕ(|ri − rj |),
+
+where the factor 1 /2 removes the double counting of particle pairs. To rewrite this expression in continuum form, we introduce the microscopic num-ber density (3.2) n(r) := X
+
+> i
+
+δ(r − ri).
+
+Using (3.2), the double integral generates the full double sum, (3.3) 
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+n(r)n(r′)ϕ(|r − r′|) dr dr′ = X
+
+> i
+
+X
+
+> j
+
+ϕ(|ri − rj |),
+
+including the diagonal self-interaction terms i = j, whose total contribution is (3.4) X
+
+> i
+
+ϕ(0) = ϕ(0) 
+
+Z
+
+> Ω
+
+n(r) dr.
+
+Therefore, subtracting the self-interaction terms and dividing by 2 to remove double counting, we obtain (3.5) E = 12
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+n(r)n(r′)ϕ(|r − r′|) dr dr′ − ϕ(0) 2
+
+Z
+
+> Ω
+
+n(r) dr.
+
+Substituting (3.2) into (3.5) gives 
+
+E = 12
+
+X
+
+> i
+
+X
+
+> j
+
+Z
+
+> Ω
+
+Z
+
+> Ω
+
+δ(r − ri)δ(r′ − rj )ϕ(|r − r′|) dr dr′ − 12
+
+X
+
+> i
+
+ϕ(0) = 12
+
+X
+
+> i
+
+X
+
+> j
+
+ϕ(|ri − rj |) − 12
+
+X
+
+> i
+
+ϕ(0) = 12
+
+X
+
+> i
+
+X 
+
+> j̸=i
+
+ϕ(|ri − rj |),(3.6) 6 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+which coincides with (3.1). Hence, (3.1) and (3.5) are equivalent. For interfacial problems, however, the relevant energetic quantity is no longer the bulk interaction energy, but rather the interaction energy across two adjacent phases. We therefore consider the cross-interaction energy 
+
+Esurf =
+
+Z
+
+> Ω1
+
+Z
+
+> Ω2
+
+n(r)n(r′)ϕ(|r − r′|) dr′ dr.
+
+For analytical convenience, we assume that the two phases are separated by a planar interface and define Ω1 := Q × (0 , ∞), Ω2 := R2 × (−∞ , 0) ,
+
+where Q ⊂ R2 denotes the interfacial region in the lateral directions. Under this assumption, the interface is flat and has area |Q|. Then, the interfacial potential energy density associated with the interaction potential ϕ(·) is defined as 
+
+eϕ := Esurf 
+
+|Q| = 1
+
+|Q|
+
+Z
+
+> Q×(0 ,∞)
+
+Z
+
+> R2×(−∞ ,0)
+
+n(r)n(r′)ϕ(|r − r′|) dr′ dr.(3.7) In contrast to the interfacial energy density, the quantity eϕ represents a potential-energy contribution and is therefore not necessarily positive. In particular, eϕ < 0whenever ϕ(r) < 0 for all r > 0. We now examine the relationship between the interfacial energy density and the interfacial potential function. In particular, the surface energy density is determined by the first absolute moment of the kernel. More precisely, the following theorem holds. 
+
+Theorem 3.1 (Moment representation of the surface energy density). Let ¯ϕ :[0 , ∞) → R be measurable, and assume that all integrals below are finite. For any bounded measurable set Q ⊂ R2, define 
+
+JQ[ ¯ϕ] := 1
+
+|Q|
+
+Z
+
+> Q×(0 ,∞)
+
+Z
+
+> R2×(−∞ ,0)
+
+¯ϕ(|r − r′|) dr′ dr.(3.8) 
+
+Then 
+
+JQ[ ¯ϕ] = π
+
+Z ∞
+
+> 0
+
+r3 ¯ϕ(r) dr = 14 M1[ ¯ϕ],(3.9) 
+
+where 
+
+M1[ ¯ϕ] := 
+
+Z
+
+> R3
+
+|ˆr| ¯ϕ(|ˆr|) dˆr
+
+is the first absolute moment of ¯ϕ. In particular, JQ[ ¯ϕ] is independent of Q.Proof. Write 
+
+r = ( y, z ), r′ = ( y′, z ′),
+
+with y, y′ ∈ R2, z > 0, and z′ < 0. Then (3.8) can be rewritten as 
+
+JQ[ ¯ϕ] = 1
+
+|Q|
+
+Z
+
+> Q
+
+Z ∞
+
+> 0
+
+Z
+
+> R2
+
+Z 0
+
+> −∞
+
+¯ϕ |(y − y′, z − z′)| dz ′ dy′ dz d y.(3.10) Since the integrand depends on y and y′ only through their difference, let 
+
+η = y − y′.SPH MODEL FOR DROPLET DYNAMICS 7For each fixed y ∈ Q, this is a translation in R2, so dy′ = dη. Therefore, one has 
+
+JQ[ ¯ϕ] = 1
+
+|Q|
+
+Z
+
+> Q
+
+Z ∞
+
+> 0
+
+Z 0
+
+> −∞
+
+Z
+
+> R2
+
+¯ϕ |(η, z − z′)| dη dz ′ dz d y
+
+=
+
+Z ∞
+
+> 0
+
+Z 0
+
+> −∞
+
+Z
+
+> R2
+
+¯ϕ |(η, z − z′)| dη dz ′ dz, (3.11) which already shows that JQ[ ¯ϕ] does not depend on Q.Next, introduce the change of variables 
+
+t = z − z′, s = z′,
+
+so that z = t + s, z′ = s, and the Jacobian is 1. The domain {z > 0, z ′ < 0} becomes 
+
+{t > 0, −t < s < 0}, which yields 
+
+JQ[ ¯ϕ] = 
+
+Z ∞
+
+> 0
+
+Z 0
+
+> −t
+
+Z
+
+> R2
+
+¯ϕ |(η, t )| dη ds dt =
+
+Z ∞
+
+> 0
+
+Z
+
+> R2
+
+t ¯ϕ |(η, t )| dη dt. 
+
+Now write ˆ r = ( η, t ) ∈ R3, so that ρ3 = t. Then, one has 
+
+JQ[ ¯ϕ] = 
+
+Z 
+
+> {ˆr∈R3:ρ3>0}
+
+ρ3 ¯ϕ(|ˆr|) dˆr.
+
+Using spherical coordinates in the upper half-space, 
+
+ρ3 = r cos θ, dˆr = r2 sin θ dr dθ dψ, 
+
+with θ ∈ [0 , π/ 2] and ¯ϕ ∈ [0 , 2π], we obtain 
+
+JQ[ ¯ϕ] = 
+
+Z ∞
+
+> 0
+
+Z 2π
+
+> 0
+
+Z π/ 20
+
+r cos θ ¯ϕ(r) r2 sin θ dθ dψ dr 
+
+=
+
+Z 2π
+
+> 0
+
+dψ 
+
+ Z π/ 20
+
+sin θ cos θ dθ 
+
+! Z ∞
+
+> 0
+
+r3 ¯ϕ(r) dr = π
+
+Z ∞
+
+> 0
+
+r3 ¯ϕ(r) dr. (3.12) Note that 
+
+M1[ ¯ϕ] = 
+
+Z
+
+> R3
+
+|ˆr| ¯ϕ(|ˆr|) dˆr = 4 π
+
+Z ∞
+
+> 0
+
+r3 ¯ϕ(r) dr. (3.13) Combining (3.12) and (3.13), we obtain 
+
+JQ[ ¯ϕ] = 14 M1[ ¯ϕ],
+
+which proves (3.9). This completes the proof. To obtain an explicit expression, we assume that the number density is piecewise constant in the two phases, i.e., 
+
+n(r) = n1 for r ∈ Ω1, n(r) = n2 for r ∈ Ω2.
+
+This assumption is reasonable for the present setting, as each phase is taken to be homogeneous away from the interface and the density variation across the interface 8 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+is neglected at the level of the continuum description. Then, by Theorem 3.1, the interfacial potential energy density associated with the interaction potential ϕ can be expressed as 
+
+eϕ = 1
+
+|Q|
+
+Z
+
+> Q×(0 ,∞)
+
+Z
+
+> R2×(−∞ ,0)
+
+n1n2 ϕ(|r − r′|) dr′ dr
+
+= n1n2 JQ[ϕ] = 14 M1[n1n2ϕ].(3.14) In particular, for a planar interface, the interfacial potential energy density admits an explicit representation in terms of the first absolute moment of the interaction kernel. Equivalently, it is completely determined by the quantity 
+
+Z
+
+> R3
+
+|ˆr| n1n2ϕ(|ˆr|) dˆr.
+
+Remark 3.2. While Theorem 3.1 assumes an infinite planar interface to derive the explicit parameter mapping, in practical SPH simulations, the localized support of the smoothing kernel Rcho ensures that the planar approximation holds asymptotically away from the contact line, where the local interface curvature radius is much larger than Rcho .
+
+3.2. Contact Angle Analysis. The equilibrium configuration at a three-phase contact line is governed by the Neumann triangle condition, which requires the vector sum of the interfacial tension forces to vanish: (3.15) ⃗ γ 12 +⃗γ 23 +⃗γ 13 =⃗ 0,
+
+where ⃗γ ij denotes the interfacial tension vector acting along the interface between phases i and j, and γij = |⃗γ ij | is its Euclidean norm. ⃗γ 12 ⃗γ 13 ⃗γ 23 
+
+O
+
+Phase 1 Phase 2 Phase 3 liquid gas solid 
+
+θC
+
+γsg γsl 
+
+γlg  
+
+> Fig. 1 .Schematic illustrations of the Neumann triangle condition (left) and Young’s equation (right).
+
+As illustrated in the left panel of Fig. 1, the three interfacial tension vectors form a closed triangle, indicating local mechanical equilibrium at the contact point. The corresponding contact angles θ1, θ2, and θ3 are therefore determined by the relative magnitudes of the interfacial tensions. Resolving Eq. (3.15) into horizontal and vertical components gives 
+
+γ12 = γ13 cos( π − θ1) + γ23 cos( π − θ2),(3.16) 0 = γ13 sin( π − θ1) − γ23 sin( π − θ2).(3.17) SPH MODEL FOR DROPLET DYNAMICS 9When one of the three phases is replaced by a rigid solid, as shown in the right panel of Fig. 1, the Neumann construction reduces to Young’s equation, (3.18) γsg = γsl + γlg cos θC,
+
+where γsg , γsl , and γlg are the solid–gas, solid–liquid, and liquid–gas interfacial ten-sions, respectively, and θC is the equilibrium contact angle. To connect the equilibrium contact angle with interfacial energetics, we introduce the work of adhesion. Consider a virtual cleavage surface in a homogeneous liquid. The work required to separate the liquid across this surface per unit area equals twice the liquid surface tension, 
+
+Wll = 2 γl.(3.19) For two dissimilar phases, the Dupr´ e relation [6] reads (3.20) W12 = γ1 + γ2 − γ12 ,
+
+where γ1 and γ2 are the surface tensions of the two phases, γ12 is the interfacial tension, and W12 is the work of adhesion per unit area. Neglecting adsorption at the solid–gas and liquid–gas interfaces, we take γs ≈ γsg 
+
+and γl ≈ γlg . Combining Young’s equation with the Dupr´ e relation gives 
+
+γsg = γsl + γlg cos θC
+
+= ( γs + γl − Wsl ) + γlg cos θC
+
+≈ γsg + γlg − Wsl + γlg cos θC,
+
+and hence (3.21) Wsl = γlg (1 + cos θC).
+
+This is the Young–Dupr´ e relation [6, 25], or equivalently, cos θC = Wsl 
+
+γlg 
+
+− 1.(3.22) To relate the contact angle to microscopic interactions, let ϕsl (r) denote the liquid–solid pair potential, and assume constant number densities nl and ns in the liquid and solid phases. Taking the fully separated state as the zero of energy and using the interfacial potential energy density defined in (3.7), we have 
+
+Wsl = −eϕsl , Wll = 2 γlg = −eϕll .(3.23) Combining Eqs. (3.22), (3.23), and (3.14), we obtain cos θC = 2M1[nlnsϕsl ]
+
+M1[nlnlϕll ] − 1.(3.24) Equation (3.24) links the macroscopic contact angle to the microscopic liquid– solid interaction through the first moment of the interaction potential. Once the intermolecular potential and phase densities are specified, the contact angle can be estimated quantitatively. 10 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+4. Governing Equations and SPH Discretization. Classical SPH methods can effectively capture the pressure and viscous terms in the Navier–Stokes equa-tions. However, modeling droplet motion under different wettability conditions re-quires a more careful treatment of interfacial effects, particularly surface tension and liquid–solid adhesion. To this end, we introduce kernel-based pairwise potentials to characterize intermolecular interactions, so that the continuum formulation recovers the correct interfacial energy. This section presents the resulting model and its SPH discretization. 
+
+4.1. Governing Equations. Let ϕll (r) denote the liquid–liquid pair potential, where r = |x − y|, and let nl and ns denote the number densities of the liquid and solid phases, respectively. The pairwise contribution to the liquid–liquid interaction force density at position x due to a liquid particle located at y is defined by (4.1) f pll (x, y) = −∇ x
+
+n2 
+
+> l
+
+ϕll (|x − y|) .
+
+Accordingly, the total liquid–liquid interaction force density acting on the fluid at x
+
+is given by (4.2) fll (x) = 
+
+Z
+
+> Ω
+
+−∇ x
+
+n2 
+
+> l
+
+ϕll (|x − y|) dy,
+
+where Ω denotes the liquid domain. Similarly, let ϕls (r) denote the liquid–solid pair potential. Then the total adhesive force density exerted by the solid phase on the liquid at x is expressed as (4.3) fls (x) = 
+
+Z
+
+> Ωs
+
+−∇ x [nlnsϕls (|x − y|)] dy,
+
+where Ω s denotes the solid domain. Although ϕll is introduced at the microscopic scale, its macroscopic effect corre-sponds to surface tension. Specifically, it satisfies 
+
+M1[n2 
+
+> l
+
+ϕll ] = −8γl,(4.4) which follows from (3.19), (3.23), and Theorem 3.1. Similarly, note that the work of adhesion at the liquid–solid interface is denoted by Wsl , then 
+
+M1[nlnsϕls ] = −4Wsl .(4.5) The droplet dynamics are governed by the Lagrangian forms of the continuity and momentum equations, together with an equation of state and the particle kinematic relation: 
+
+dρ dt = −ρ∇ · u, ∀x ∈ Ω,(4.6) 
+
+p = c2ρ0
+
+k
+
+" ρρ0
+
+k
+
+− 1
+
+#
+
+, ∀x ∈ Ω,(4.7) 
+
+ρ du
+
+dt = −∇ p + μ∆u + ρg + fll (x) + fls (x), ∀x ∈ Ω,(4.8) 
+
+dx
+
+dt = u, ∀x ∈ Ω.(4.9) SPH MODEL FOR DROPLET DYNAMICS 11 Here, ρ, p, and u denote the density, pressure, and velocity, respectively; μ is the dynamic viscosity; g is the gravitational acceleration; c is the artificial speed of sound; 
+
+ρ0 is the reference density; and k is the exponent in the equation of state. At the solid–liquid interface, a pressure boundary condition with a hydrostatic correction accounting for gravity is imposed, namely, 
+
+∂p ∂n = ρg · n, ∀x ∈ ∂Ωs.
+
+This boundary condition also helps prevent fluid particles from penetrating the solid boundary. 
+
+4.2. Nonlocal Interaction and SPH Discretization. To facilitate numerical implementation, the microscopic interaction n2 
+
+> l
+
+ϕll is replaced by an effective kernel-based cohesion potential of the form Φll (r; Rcho ) := C(Rcho ) W (r; Rcho ),
+
+where W (r; Rcho ) is a smoothing kernel with support radius Rcho , and C(Rcho ) is a coefficient to be determined. The effective potential is required to preserve the interfacial energy density, i.e., 
+
+eϕll = 14 M1[n1n2ϕll ] = 14 M1[Φ ll (r; Rcho )] .
+
+This condition uniquely determines C(Rcho ), yielding (4.10) Φll (r; Rcho ) = − 8γl
+
+M1[W (·; Rcho )] W (r; Rcho ).
+
+Hence, Φ ll preserves the first absolute moment and thus the interfacial energy per unit area. In the present work, the cubic spline kernel is adopted to model the nonlocal interactions. We denote 
+
+W cs  
+
+> Rcho
+
+(r) := W cs (r; Rcho ),
+
+with first absolute moment 
+
+M1[W cs  
+
+> Rcho
+
+] := 
+
+Z
+
+> R3
+
+|r| W cs (r; Rcho ) dr.
+
+Let x and y be the positions of two finite-sized particle clusters. The effective liquid–liquid interaction potential is defined as (4.11) Φll (|x − y|; Rcho ) := − 8γl
+
+M1[W cs  
+
+> Rcho
+
+] W cs (x − y; Rcho ),
+
+where γl is the liquid surface tension coefficient. The corresponding pairwise liquid– liquid interaction force density is obtained from the negative gradient of the potential: (4.12) ˆf pll (x, y) = −∇ xΦll (|x − y|; Rcho ) = 8γl
+
+M1[W cs  
+
+> Rcho
+
+] ∇xW cs (x − y; Rcho ).
+
+Integrating the pairwise interaction over the liquid domain gives the SPH kernel approximation of the total liquid–liquid interaction force density: (4.13) ˆfll (x) = 8γl
+
+M1[W cs  
+
+> Rcho
+
+]
+
+Z
+
+> Ω
+
+∇xW cs (x − y; Rcho ) dy,12 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+where Ω denotes the liquid domain. Similarly, the liquid–solid adhesive force density is approximated by (4.14) ˆfls (x) = 4Wsl 
+
+M1[W cs  
+
+> Rcho
+
+]
+
+Z
+
+> Ωs
+
+∇xW cs (x − y; Rcho ) dy,
+
+where Ω s denotes the solid domain and Wsl is the work of adhesion between the liquid and solid phases. Applying the SPH discretization to (4.13) and (4.14) leads to the following semi-discrete formulation. Let Nf and Ns denote the numbers of fluid and solid particles, respectively. For each fluid particle i ∈ { 1, . . . , N f }, we solve 
+
+dρ i
+
+dt = 
+
+> Nf+Ns
+
+X
+
+> j=1
+
+mj uij · ∇ iW wq  
+
+> ij
+
+, pi = c2ρ0
+
+k
+
+" ρi
+
+ρ0
+
+k
+
+− 1
+
+#
+
+,(4.15) 
+
+dui
+
+dt = − 
+
+> Nf+Ns
+
+X
+
+> j=1
+
+mj
+
+pi
+
+ρ2
+
+> i
+
++ pj
+
+ρ2
+
+> j
+
++ Π art 
+
+> ij
+
+!
+
+∇iW wq 
+
+> ij
+
++ 8γl
+
+M1[W cs  
+
+> Rcho
+
+]
+
+> Nf
+
+X
+
+> j=1
+
+mj
+
+ρiρj
+
+∇iW cs ,R cho  
+
+> ij
+
++ 4Wsl 
+
+M1[W cs  
+
+> Rcho
+
+]
+
+> Ns
+
+X
+
+> k=1
+
+mk
+
+ρiρk
+
+∇iW cs ,R cho 
+
+> ik
+
++
+
+> Nf
+
+X
+
+> j=1
+
+mj (μi + μj )
+
+ρiρj
+
+xij · ∇ iW wq 
+
+> ij
+
+|xij |2 + 0 .01 h2
+
+> ij
+
+uij + gi,(4.16) 
+
+dxi
+
+dt = ui − ϵ
+
+> Nf
+
+X
+
+> j=1
+
+mj
+
+uij 
+
+¯ρij 
+
+W wq  
+
+> ij
+
+.(4.17) Here, ϵ = 0 .5 [14], uij = ui − uj , ¯ ρij = ( ρi + ρj )/2, and xij = xi − xj . The artificial viscosity Π art  
+
+> ij
+
+is taken in the Monaghan form [15]: Πart  
+
+> ab
+
+=
+
+
+
+−αc μ ab 
+
+¯ρab 
+
+, uab · xab < 0,
+
+0, uab · xab ≥ 0,μab = h uab · xab 
+
+|xab |2 + 0 .01 h2 .(4.18) Here, α is the artificial viscosity coefficient and c is the numerical speed of sound. In the momentum equation, the second and third terms on the right-hand side correspond to the liquid–liquid cohesive force and the liquid–solid adhesive force, respectively, while the other terms represent pressure, viscous diffusion, and gravity. At the solid–liquid interface, the pressure of a solid particle is evaluated from its neighboring fluid particles using a kernel-weighted interpolation with a hydrostatic correction [1]: 
+
+pk =
+
+PNf 
+
+> i
+
+piW wq  
+
+> ki
+
++ g · PNf 
+
+> i
+
+ρixki W wq 
+
+> ki
+
+PNf 
+
+> i
+
+W wq 
+
+> ki
+
+,(4.19) where k and i denote the solid and fluid particles, respectively, and xki = xk −xi. The second term in the numerator accounts for the hydrostatic pressure variation induced by gravity and improves the pressure approximation near the solid boundary. Since the SPH equations are integrated explicitly in time, the time step is re-stricted by the CFL condition. In this work, it is chosen as ∆t = 0 .1 hc ,(4.20) SPH MODEL FOR DROPLET DYNAMICS 13             
+
+> σ216σ2σ3σ
+> −101
+> U(r)→0 as r→ ∞
+> r/σ
+> U (r)/ε
+> Fig. 2 .Schematic of the Lennard–Jones potential. In the present model, the attractive tail from the potential minimum to the far field is approximated by the effective kernel-based cohesion potential.
+
+where h is the smoothing length. The parameter c in the equation of state denotes the numerical speed of sound and is chosen to satisfy 
+
+c ≥ max(1 m /s, 10 Umax ) ,
+
+where Umax is the characteristic maximum fluid velocity. To establish a simple relation between the liquid–solid interaction strength and the equilibrium contact angle, we introduce the dimensionless adhesion coefficient (4.21) αadh := Wsl 
+
+2γl
+
+.
+
+Substituting this definition into Eq. (3.22) gives (4.22) cos θC = 2 αadh − 1.
+
+This relation shows that the cosine of the equilibrium contact angle depends linearly on the adhesion coefficient αadh .
+
+Remark 4.1. In realistic fluid–fluid interactions, the intermolecular force typically comprises both a long-range attractive component and a short-range repulsive compo-nent, with the latter preventing particles from approaching each other at excessively small distances. Their combined effect gives rise to a potential profile qualitatively similar to the Lennard–Jones potential (see Fig. 2). In the present model, the SPH kernel W (r, h ) is used to approximate the attractive tail of the interaction potential, i.e., the portion extending from the potential minimum toward the far field (see the blue solid line). By contrast, the short-range repulsive component acts only over a much smaller length scale and is represented by the pressure term in the present for-mulation. Because its contribution to the first absolute moment is negligible, it is not included in the present calibration. 
+
+5. Numerical Verification. In this section, several representative numerical examples are presented to validate the theoretical results and demonstrate the scal-ability of the proposed model. All numerical simulations were performed using the PySPH library [21]. The validation videos and the corresponding source code are publicly available at DOI: 10.5281/zenodo.21404140. 14 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+5.1. Validation of the Contact-Angle Relation and Equilibrium Droplet Shapes. To validate the theoretical relation between the adhesion coefficient and the equilibrium contact angle, we perform a series of static droplet simulations under zero gravity. The parameters are set to Rcho = 0 .20 mm , h = 0 .11 mm and an average particle spacing of ∆ x = 0 .05 mm. For each prescribed value of αadh , the equilibrium droplet profile is measured and the corresponding contact angle is extracted. Figure 3 compares the simulation results, expressed in terms of cos( θC ), with the theoretical prediction (4.22). Overall, the numerical results follow the theoretical linear relation closely over the range of αadh considered. A least-squares fit to the numerical data yields cos( θC ) = 2 .081 αadh − 1.104 ,
+
+which is in good agreement with the theoretical slope and intercept in (4.22). To further quantify the agreement, the coefficient of determination R2, the adjusted 
+
+R2, the root-mean-square error (RMSE), and the mean absolute error (MAE) are evaluated. The results are summarized in Table 1. The fact that the R2 values are close to 1, together with the small error metrics, indicates that the numerical simulations agree closely with the theoretical relation for the contact angle. 0 0.2 0.4 0.6 0.8 1
+
+−1
+
+−0.500.51
+
+αadh 
+
+> cos( θC )
+
+Theoretical equation Numerical simulation Least-squares fitted line  
+
+> Fig. 3 .Comparison between the theoretical contact-angle relation, the least-squares fitted line, and the transformed numerical data.
+> Table 1
+> Comparison of fitting quality between the least-squares fitted line and the theoretical equation.
+
+Metric Least-squares fitted line Theoretical equation Equation cos( θC ) = 2 .081 αadh − 1.104 cos( θC ) = 2 αadh − 1
+
+R2 0.989701 0.975918 Adjusted R2 0.987641 0.971102 RMSE 5.789650 × 10 −2 8.853183 × 10 −2
+
+MAE 5.372844 × 10 −2 7.040487 × 10 −2
+
+To gain a more intuitive understanding of the simulated contact angles, we further investigate the equilibrium shapes of droplets on a solid substrate. Figure 4 shows SPH MODEL FOR DROPLET DYNAMICS 15 three representative equilibrium droplet configurations corresponding to different wet-ting regimes. When Wsl = (1 + √3/2) γl, the equilibrium contact angle is θC = π/ 6, representing a strongly hydrophilic surface; see Fig. 4(a). When Wsl = γl, one ob-tains θC = π/ 2, corresponding to a neutral wetting state, as shown in Fig. 4(b). When 
+
+Wsl = (1 − √3/2) γl, the equilibrium contact angle becomes θC = 5 π/ 6, indicating a hydrophobic surface; see Fig. 4(c). These results demonstrate that the proposed model can reproduce a broad range of prescribed equilibrium contact angles by tuning the liquid–solid work of adhesion. 
+
+(a) Wsl = (1 + √3/2) γl (b) Wsl = γl (c) Wsl = (1 − √3/2) γl          
+
+> Fig. 4 .Equilibrium droplet shapes for different values of the liquid–solid work of adhesion Wsl .The corresponding contact angles are (a) θC=π/ 6, (b) θC=π/ 2, and (c) θC= 5 π/ 6.
+
+The capability of the present model to capture equilibrium morphologies governed by inter-liquid adhesion is further demonstrated in Fig. 5. Two droplets of identical size and equal surface tension, γl1 = γl2 , are considered under different values of the adhesion work Wl1l2 between the two liquid phases. For this symmetric configuration, Eqs. (3.16)–(3.17) simplify to cos θeq = Wl1l2
+
+2γl1
+
+− 1,(5.1) where θeq denotes the equilibrium contact angle. 
+
+(a) Wl1l2 = γl1 (b) Wl1l2 = 2 γl1       
+
+> Fig. 5 .Equilibrium shapes of two droplets of the same size under different liquid–liquid adhesion energies. The corresponding contact angles are (a) θC= 2 π/ 3and (b) θC=π/ 2.
+
+As shown in Fig. 5, when Wl1l2 = γl1 , the equilibrium contact angle is θeq = 2 π/ 3, and the two droplets appear as adjoining caps larger than hemispheres. When the adhesion work is increased to Wl1l2 = 2 γl1 , the equilibrium contact angle decreases to θeq = π/ 2, and the droplets each take on a hemispherical shape, merging into a smooth and rounded overall configuration. This comparison indicates that stronger adhesion between the two liquid phases enhances their mutual affinity and reduces the 16 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+equilibrium contact angle. The good agreement between the theoretical relation and the simulated droplet profiles confirms that the present model accurately captures the role of inter-liquid adhesion in determining the equilibrium morphology. 
+
+5.2. Nonsteady Confirmation of Tanner’s Law at the Complete Wetting Limit. To verify Tanner’s Law numerically, we simulated the spontaneous spreading of a droplet on a perfectly wetting solid surface. For this extreme state of adhesion where αadh = 1, the strong solid-liquid attraction yields a hydrophilic surface with a contact angle of θ = 0. Figure 6 presents the temporal evolution of the spreading radius R on a log-log scale, with time t measured in milliseconds and diameter in millimeters. According to Tanner’s law, in the capillary regime where viscous forces dominate inertia, the spreading radius should follow the power-law relationship R(t) ∝
+
+t1/10 [22, 28]. To test this prediction, the numerical data were fitted using the function (5.2) R(t) = 2 × (t − tmin )0.1,
+
+where tmin is a time-offset parameter introduced to account for the finite onset time of the Tanner-regime spreading. 10 1 10 2
+
+t tmin (ms)     
+
+> 2.4 × 10 0
+> 2.6 × 10 0
+> 2.8 × 10 0
+> 3 × 10 0
+> 3.2 × 10 0
+> Radius (mm)
+> Radius
+> Tanner: 2( ttmin )0.1
+> Fig. 6 .Log-log plot of droplet spreading radius as a function of time with tmin = 15 ms.
+
+As shown in Fig. 6, the numerical results (represented by solid symbols) remain close to the fitted curve (dashed line) over nearly two decades in time, from approxi-mately 10 ms to 1000 ms. The fitted exponent of 0 .1 agrees well with the theoretical exponent predicted by Tanner’s law. These results suggest that the numerical model captures the main features of contact-line dynamics and is consistent with Tanner’s law in the droplet-spreading regime. 
+
+5.3. Numerical Verification of Rolling Droplet Rebound. To further val-idate the capability of the proposed SPH model in predicting complex droplet–surface interactions, we simulate the recently reported rolling droplet rebound on a patterned wettability (PW) surface [31]. In this newly identified rebound mode, the droplet rolls rapidly along the substrate during recoil, leading to an apparent rebound an-gle approaching zero, which represents the theoretical lower limit of droplet rebound SPH MODEL FOR DROPLET DYNAMICS 17 angles. Owing to the coexistence of superhydrophilic and superhydrophobic regions, this phenomenon involves strong wettability contrast, contact-line pinning, asymmet-ric capillary retraction, and directional momentum redistribution, thereby providing a stringent test for the present model. The PW surface consists of a superhydrophilic (SHL) arc integrated onto a su-perhydrophobic (SHB) substrate. The SHL region exhibits an equilibrium contact angle below 3 ◦, whereas the SHB background has a contact angle of approximately 158 ◦. As shown in Fig. 7, the SHL arc has a line width of L = 200 μm, an opening angle of α = π/ 5, and a radius of R = 2 .5 mm. This radius is chosen to be close to the maximum spreading radius of the impacting droplet, such that the receding liquid rim remains pinned by the SHL arc during recoil and is therefore subjected to enhanced adhesive resistance.  
+
+> Fig. 7 .Schematic and microscopic characterization of PW surface. The surface consists of a SHL arc embedded in a SHB background.
+
+The droplet impact condition is characterized by the Weber number, (5.3) W e = ρv 20 R0
+
+γ ,
+
+where ρ, v0, R0, and γ denote the liquid density, impact velocity, initial droplet radius, and surface tension, respectively. In the present case, a water droplet with W e = 32 .8impacts the PW surface. After impact, the droplet spreads rapidly and reaches its maximum lateral extension at approximately t = 2 .2 ms, after which the liquid film begins to retract and peel off from the substrate. Figure 8 compares the experimentally observed impact sequence with the cor-responding numerical results. The first and second rows display the experimental snapshots, while the third and fourth rows show the simulated droplet evolution at the same representative instants. The second and fourth rows provide the correspond-ing side views along the y-direction. The numerical model successfully captures the main stages of the process, including rapid spreading, contact-line pinning along the SHL arc, asymmetric retraction, and the subsequent rolling rebound. In particular, the predicted droplet shapes, interfacial deformations, and overall rebound dynamics agree closely with the experimental observations. These results demonstrate that the proposed numerical approach can accurately capture the coupled effects of surface-tension-driven flow, wettability heterogeneity, and dynamic contact-line motion on patterned substrates. The good agreement between experiment and simulation further confirms the robustness of the present method for resolving highly transient droplet impact and rebound phenomena on chemically heterogeneous surfaces. 
+
+5.4. Numerical Verification of Coalescence-Induced Droplet Jumping. 
+
+To validate the capability of the present model in reproducing transient capillary-18 Z. H. QIAO, Y. F. WEI AND X. M. XU  
+
+> Fig. 8 .Comparison between experimental observation and numerical simulation of droplet impact and rolling rebound on a patterned wettability surface.
+
+driven dynamics, we simulate the coalescence of two unequal droplets on a flat sub-strate [2]. In this case, a mobile droplet with a diameter of 270 μm approaches a stationary droplet with a diameter of 200 μm. Upon contact, the two droplets co-alesce into a single larger droplet. Although the coalescence is initiated primarily along the substrate plane, the merged droplet subsequently accelerates in the out-of-plane direction and lifts off from the surface with a jumping velocity of approximately 0.14 m /s.  
+
+> Fig. 9 .Simulation of coalescence-induced jumping of two droplets on a flat substrate.
+
+Figure 9 presents the simulated coalescence sequence, where the color contours SPH MODEL FOR DROPLET DYNAMICS 19 denote the vertical velocity component vz . The simulation captures the rapid forma-tion and expansion of the liquid bridge immediately after contact, followed by the retraction of the merged droplet into a more compact shape. During this process, the total interfacial area decreases, leading to the release of excess surface energy. This released energy is partially converted into kinetic energy, which generates a net upward momentum and ultimately causes the droplet to detach from the substrate. The predicted evolution reproduces the key physical features of coalescence in-duced jumping, including bridge growth, capillary retraction, and vertical ejection. The distribution of vz further confirms that the dominant post-coalescence motion is oriented normal to the surface. These results demonstrate that the present method is capable of accurately resolving fast interfacial deformation and energy conversion during droplet coalescence, thereby providing reliable predictions for dynamic wetting phenomena on solid surfaces. 
+
+6. Conclusion. In this work, a physically grounded SPH model has been de-veloped for the simulation of dynamic droplet behaviors. The proposed method es-tablishes an explicit relationship between the intermolecular potential energy and the surface tension coefficient. This relation enables the microscopic-force modeling of interfacial tension at the liquid–gas interface and adhesion at the liquid–solid in-terface. In addition, the pressure of solid particles at the solid–liquid interface is evaluated from neighboring fluid particles using a kernel-weighted interpolation with a hydrostatic correction. Together with a single-phase modeling strategy, these fea-tures provide an efficient and physically consistent approach for droplet dynamics simulation. The proposed framework has been assessed through representative droplet wet-ting and impact problems. The results show that it can accurately reproduce the principal features of droplet dynamics, including spreading, recoiling, and interfacial deformation, with satisfactory agreement with reference solutions. The simulations also demonstrate the good robustness and efficiency of the method in handling inter-facial interactions and solid-boundary effects. Overall, the present work provides an accurate, robust, and efficient SPH approach for dynamic droplet simulations on complex surfaces. It also offers a useful basis for future studies of more complex wetting, impact, and multiphase interfacial flow problems.                 
+
+> REFERENCES [1] S. Adami, X. Y. Hu, and N. A. Adams ,A generalized wall boundary condition for smoothed particle hydrodynamics , J. Comput. Phys., 231 (2012), pp. 7057–7075. [2] J. B. Boreyko and C.-H. Chen ,Self-propelled dropwise condensate on superhydrophobic sur-faces , Phys. Rev. Lett., 103 (2009), p. 184501. [3] J. U. Brackbill, D. B. Kothe, and C. Zemach ,A continuum method for modeling surface tension , J. Comput. Phys., 100 (1992), pp. 335–354. [4] E. Cipriano, A. Frassoldati, T. Faravelli, S. Popinet, A. Cuoci, et al. ,Multicompo-nent droplet evaporation in a geometric volume-of-fluid framework , J. Comput. Phys., 507 (2024), p. 112955. [5] M. Gomez-Gesteira, B. D. Rogers, R. A. Dalrymple, and A. J. C. Crespo ,State-of-the-art of classical SPH for free-surface flows , J. Hydraul. Res., 48 (2010), pp. 6–27. [6] R. J. Good ,Contact angle, wetting, and adhesion: a critical review , J. Adhes. Sci. Technol., 6 (1992), pp. 1269–1302. [7] Y. Jiao, Y. Zhu, Z. Wang, X. Hu, Y. Guo, J. Ji, and K. Liu ,Effect of the surface peak-valley features on droplet splash dynamics , Phys. Fluids, 35 (2023), p. 082107. [8] J. Kordilla, A. M. Tartakovsky, and T. Geyer ,A smoothed particle hydrodynamics model
+
+20 Z. H. QIAO, Y. F. WEI AND X. M. XU 
+
+for droplet and film flow on smooth and rough fracture surfaces , Adv. Water Resour., 59 (2013), pp. 1–14. [9] N. M. Kovalchuk and M. J. H. Simmons , Review of the role of surfactant dynamics in drop microfluidics , Adv. Colloid Interface Sci., 312 (2023), p. 102844. [10] D. Lohse , Fundamental fluid dynamics challenges in inkjet printing , Annu. Rev. Fluid Mech., 54 (2022), pp. 349–382. [11] C. Long, X. Jinghang, L. Xichun, L. Zhanqiang, W. Bing, S. Qinghua, C. Yukui, W. Yi, G. Xiangyu, and L. Chunlong , Micro/nano manufacturing aircraft surface with anti-icing and deicing performances: an overview , Nanotechnol. Rev., 12 (2023), p. 20230105. [12] A. Mohammad Karim , Physics of droplet impact on various substrates and its current ad-vancements in interfacial science: a review , J. Appl. Phys., 133 (2023), p. 030701. [13] J. J. Monaghan , Smoothed Particle Hydrodynamics , Annu. Rev. Astron. Astrophys., 30 (1992), pp. 543–574. [14] J. J. Monaghan , Simulating free surface flows with SPH , J. Comput. Phys., 110 (1994), pp. 399–406. [15] J. J. Monaghan , Smoothed particle hydrodynamics , Rep. Progr. Phys., 68 (2005), pp. 1703– 1759. [16] T. Moragues, D. Arguijo, T. Beneyton, C. Modavi, K. Simutis, A. R. Abate, J.-C. Baret, A. J. DeMello, D. Densmore, and A. D. Griffiths , Droplet-based microfluidics ,Nat. Rev. Methods Primers, 3 (2023), p. 32. [17] J. P. Morris, P. J. Fox, and Y. Zhu , Modeling low Reynolds number incompressible flows using SPH , J. Comput. Phys., 136 (1997), pp. 214–226. [18] S. Privitera, G. Manetto, S. Pascuzzi, D. Pessina, and E. Cerruto , Drop size measure-ment techniques for agricultural sprays: a state-of-the-art review , Agronomy, 13 (2023), p. 678. [19] Z. Qiao, X. Xu, X. Yang, and Y. Zhang , A unified variational framework and lattice Boltz-mann method for non-isothermal two-phase flows with phase transitions and wetting ef-fects , J. Fluid Mech., 1029 (2026), p. A30. [20] J. Qin, J. Wu, and Q. Qin , A high-order TENO scheme for compressible multi-phase flows using lattice Boltzmann flux solver framework , Adv. Appl. Math. Mech., 19 (2026), pp. 95– 114, https://doi.org/10.4208/aamm.OA-2025-0012. [21] P. Ramachandran, A. Bhosale, K. Puri, P. Negi, A. Muta, A. Dinesh, D. Menon, R. Govind, S. Sanka, A. S. Sebastian, A. Sen, R. Kaushik, A. Kumar, V. Kurap-ati, M. Patil, D. Tavker, P. Pandey, C. Kaushik, A. Dutt, and A. Agarwal , PySPH: A python-based framework for smoothed particle hydrodynamics , ACM Trans. Math. Soft-ware, 47 (2021), pp. 1–38, https://doi.org/10.1145/3460773. [22] L. H. Tanner , The spreading of silicone oil drops on horizontal surfaces , J. Phys. D: Appl. Phys., 12 (1979), pp. 1473–1484. [23] A. M. Tartakovsky and A. Panchenko , Pairwise force smoothed particle hydrodynamics model for multiphase flow: surface tension and contact line dynamics , J. Comput. Phys., 305 (2016), pp. 1119–1146. [24] Y. Tian and L. Jiang , Wetting: intrinsically robust hydrophobicity , Nat. Mater., 12 (2013), pp. 291–292. [25] C. J. van Oss , The apolar and polar properties of liquid water and other condensed-phase materials , in Interface Sci. Technol., vol. 16, Elsevier, 2008, pp. 13–30. [26] A. Vergnaud, G. Oger, D. Le Touz´ e, M. DeLeffe, and L. Chiron , C-CSF: Accurate, robust and efficient surface tension and contact angle models for single-phase flows using SPH , Comput. Methods Appl. Mech. Engrg., 389 (2022), p. 114292. [27] B. Wang, J. Wang, C. Yu, S. Luo, J. Peng, N. Li, T. Wang, L. Jiang, Z. Dong, and Y. Wang , Sustained agricultural spraying: from leaf wettability to dynamic droplet impact behavior , Global Challenges, 7 (2023), p. 2300007. [28] Z. Wang, G. Karapetsas, P. Valluri, and C. Inoue , Role of volatility and thermal properties in droplet spreading: a generalisation to Tanner’s law , J. Fluid Mech., 987 (2024), p. A15. [29] H. Wijshoff , Drop dynamics in the inkjet printing process , Curr. Opin. Colloid Interface Sci., 36 (2018), pp. 20–27. [30] L. Yang, Y. Li, D. Huan, Y. Yang, J. Wang, and C. Zhu , An icephobic coating for aircraft anti-icing system , J. Mater. Sci., 58 (2023), pp. 16322–16335. [31] Z. Zhao, W. Li, X. Hu, Q. Deng, Y. Zhang, S. Jiang, P. Sun, H. Zhu, H. Li, S. Shi, et al. ,
+
+The limit of droplet rebound angle , Nat. Commun., 16 (2025), p. 5684.

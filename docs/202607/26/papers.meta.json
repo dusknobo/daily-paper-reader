@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-26",
+  "date": "2026-07-26",
+  "generated_at": "2026-07-26T20:00:38",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/26/2607.16670v1-an-sph-model-with-physically-prescribed-parameters-for-droplet-dynamics-on-complex-surfaces",
+      "section": "quick",
+      "title_en": "An SPH model with physically prescribed parameters for droplet dynamics on complex surfaces",
+      "authors": "Zhonghua Qiao, Yifan Wei, Xianmin Xu",
+      "date": "2026-07-18",
+      "pdf": "https://arxiv.org/pdf/2607.16670v1",
+      "score": "7.0",
+      "evidence": "用于复杂表面液滴动力学的SPH模型，一种处理界面相互作用的物理参数化多相流CFD方法。",
+      "tldr": "液滴在具有微结构或化学异质性的复杂表面上的动态行为，是微流控、喷墨打印、自清洁涂层等工程领域的核心问题，但现有数值方法难以同时保证界面作用描述的物理准确性和计算效率。本文提出一种物理参数可显式给定的单相光滑粒子流体动力学（SPH）模型：采用SPH核函数近似长程分子作用，将短程作用归入压力项，由此推导出分子间势能与宏观表面张力的显式关系，从而无需依赖经验参数即可再现宏观润湿特性。静态润湿模拟的平衡接触角与Young–Dupré方程高度吻合，动态润湿及液滴撞击模拟成功捕捉铺展、回缩等复杂动态润湿行为。该模型显著降低了经验依赖，兼顾了物理保真度与计算效率，为复杂表面液滴动力学的第一性原理模拟提供了可靠框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "Numerical simulation of droplet dynamics on complex surfaces with varying wettability is of great significance to both engineering applications and fundamental research. However, existing numerical methods still face challenges in accurately capturing interfacial interactions while preserving physical consistency and computational efficiency. In this work, a physically grounded and efficient smoothed particle hydrodynamics (SPH) model is developed for droplet dynamics simulation. To reduce computational cost, a single-phase droplet modeling strategy is employed. At the interface, long-range interactions are approximated using the SPH kernel function, whereas short-range interactions are represented through pressure. Based on this treatment, an explicit relationship between the intermolecular potential energy and the macroscopic surface tension coefficient is further established, thereby reducing reliance on empirical parameter calibration. The proposed method is first validated through static wetting simulations, where the equilibrium contact angles agree well with the Young--Dupré equation. Further simulations of wetting and droplet impact demonstrate that the method is capable of capturing complex dynamic wetting behaviors.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
