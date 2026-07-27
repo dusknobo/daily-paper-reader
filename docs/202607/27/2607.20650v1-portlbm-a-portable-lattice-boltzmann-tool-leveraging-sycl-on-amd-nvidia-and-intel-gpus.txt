@@ -1,0 +1,227 @@
+Title: PortLBM: A Portable Lattice Boltzmann Tool Leveraging SYCL on AMD, NVIDIA, and Intel GPUs
+
+URL Source: https://arxiv.org/pdf/2607.20650v1
+
+Published Time: Fri, 24 Jul 2026 00:14:51 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# PortLBM: A Portable Lattice Boltzmann Tool Leveraging SYCL on AMD, NVIDIA, and Intel GPUs 
+
+Alexander Strack [0000 −0002 −9939 −9044] , Marcel Graf [0009 −0007 −6308 −1329] ,Alexander Van Craen [0000 −0002 −3336 −7226] , and Dirk Pflüger [0000 −0002 −4360 −0212] 
+
+Institute of Parallel and Distributed Systems, University of Stuttgart, 70569 Stuttgart, Germany 
+
+{alexander.strack, alexander.van-craen, dirk.pflueger}@ipvs.uni-stuttgart.de st172528@stud.uni-stuttgart.de 
+
+Abstract. The lattice Boltzmann method (LBM) is a well-established approach for simulating fluid flows at the mesoscopic scale. With the stagnation of Moore’s law, high-performance computing has shifted to-ward GPU accelerators, necessitating programming models that ensure both portability and efficiency across diverse hardware platforms. We present PortLBM, an extensible portable LBM framework built on SYCL that integrates cross-platform GPU support with interactive real-time visualization. PortLBM supports diverse simulation scenarios rang-ing from Kármán vortex streets and wing flows to porous media, and is designed for easy extension with new algorithms and backends. As part of a performance portability study, we evaluate PortLBM on contempo-rary GPU architectures from NVIDIA, AMD, and Intel, examining the impact of three data layouts (stream, bundle, and collision) and four algorithmic variants on simulation throughput. Our results show that no single configuration achieves optimal perfor-mance across all GPU vendors, confirming the need for system-specific tuning. The stream layout maximizes bandwidth and performs best on the contemporary NVIDIA and Intel GPUs, while the bundle layout im-proves cache efficiency and excels on the AMD GPU. Two-lattice schemes achieve higher throughput while one-lattice schemes are preferable under memory constraints. Our work underscores the necessity for adaptable, portable LBM software in increasingly heterogeneous computing envi-ronments. 
+
+Keywords: Lattice Boltzmann, SYCL, Portability, Heterogeneous Sys-tems, GPU Programming, Real-time Visualization. 
+
+## 1 Introduction 
+
+Fluid flow simulations are central to many engineering and scientific applications, and the lattice Boltzmann method (LBM) is a popular mesoscopic alternative arXiv:2607.20650v1 [cs.DC] 22 Jul 2026 2 A. Strack et al. 
+
+to traditional Navier–Stokes solvers. As single-core scaling under Moore’s law has slowed, GPU acceleration has become the dominant source of performance gains, producing a heterogeneous hardware landscape built by multiple vendors that requires programming models facilitating portable yet efficient implemen-tations. Various frameworks have been developed for this purpose, including OpenACC [27], OpenCL [25], Kokkos [6], and SYCL [13]. We choose SYCL for PortLBM due to its single-source ISO C ++ programming model, royalty-free open standard, and broad vendor support across Intel, AMD, and NVIDIA hard-ware through mature implementations such as DPC ++ and AdaptiveCpp. Unlike Kokkos, SYCL aligns more closely with standard C ++ idioms and provides na-tive portability for Intel GPU architectures. The same PortLBM source compiles and runs unmodified across all three vendors, though achieving consistently high performance still requires the system-specific tuning we study in this work. Regarding LBM, several factors influence performance across different archi-tectures. These include the collision operator, data layout, propagation scheme, and parallelization approach. For the collision operator, the BGK operator [3] is widely used. The second and third factors are investigated for CPUs in the work of Mattila et al. [20]. The authors compare four CPU-based LBM algorithms across three data layouts. Motivated by this comparison, we explore the suit-ability of the three data layouts proposed in [20] for modern GPU hardware. Furthermore, we implement four portable LBM algorithms targeting GPUs, each focusing on a different optimization aspect, ranging from implementation complexity to memory consumption and performance, in our newly developed PortLBM tool, which also provides real-time visualization capabilities for non-stationary phenomena. Specifically, the main contributions of this work include: 
+
+– PortLBM: a portable, extensible LBM tool leveraging SYCL with integrated real-time visualization, supporting diverse simulation scenarios, and designed for straightforward extension with new algorithms and backends. 
+
+– The first application and evaluation of the Mattila et al. data layout tax-onomy [20] to modern GPU hardware, combining throughput benchmarks with hardware-counter profiling and theoretical kernel analysis. 
+
+– A cross-vendor performance portability study of four LBM algorithms across three data layouts (stream, bundle, collision) on contemporary NVIDIA, AMD, and Intel GPUs. PortLBM supports classical CFD benchmarks, including Hagen-Poiseuille flow and Kármán vortex streets around circular, square, and plate obstacles, as well as complex real-world cases such as wing flows at adjustable angles of attack, alternating obstacles, and porous media. Figure 1 illustrates two representative examples. The remainder of this work is structured as follows. In Section 2, we cover related work on portable LBM implementations. Section 3 introduces the the-oretical background and the four algorithms. In Section 4, we describe the im-plementation of PortLBM and its software stack. In Section 5, we present and analyze the performance evaluation and profiling results. Section 6 concludes with a summary and future work directions. PortLBM 3 
+
+> (a) Vortex street around an obstacle (b) Wing flow at non-zero angle of attack
+
+Fig. 1: Representative simulation scenarios supported by PortLBM. 
+
+## 2 Related Work 
+
+Large LBM software projects such as Palabos [15], OpenLB [14], and waL-Berla [11] have, at the time of writing, not yet fully ported their code base to portable programming models. However, several smaller LBM projects have explored cross-platform programming models, which we review below. In [4], an existing D3Q15 solver using the Zou and He boundary condi-tions [28] is expanded with support for OpenACC. Similarly, the authors of [5] use OpenACC to accelerate a special D2Q37 model based on a Structure of Ar-rays (SoA) data layout and a two-step algorithm. In [16], the Harvey codebase is ported to GPUs using CUDA and OpenACC. Follow-up work added SYCL support to Harvey [19]. The closest work to PortLBM is miniLB [8], which also builds on SYCL and supports similar scenarios (driven cavity, Kármán vortex street, Hagen-Poiseuille flow, Taylor-Green vortices). MiniLB uses the compressible D2Q9 model and im-plements a two-lattice algorithm with a SoA data layout, writing output to VTK files. In contrast, PortLBM uses the incompressible D2Q9I model [28], supports three data layouts, reduces memory consumption with one-lattice variants, pro-vides real-time visualization, and determines work-group size at runtime rather than compile time. Another notable LBM code is the OpenCL-based FluidX3D library. Flu-idX3D features low-precision lattice storage [18] and advanced streaming pat-terns [17]. The authors of [26] present LBM-scalay, which relies on Kokkos. LBM-scalay supports a variety of lattice decompositions and uses a clustered SoA data layout. In [9], the OpenLBMflow library is ported to SYCL and Kokkos. None of the aforementioned works provides a comparative analysis of the impact of different data layouts proposed in [20] on algorithmic performance, an evaluation whose relevance grows as architectures diverge across vendors. 
+
+## 3 Methods 
+
+In this section, we cover the LBM foundations, the three data layouts described in [20], and the four algorithms implemented in PortLBM. 4 A. Strack et al. 
+
+3.1 Lattice Boltzmann Method 
+
+The lattice Boltzmann equation (LBE), which underlies the LBM, is derived from the continuous Boltzmann equation via a Gauss-Hermite quadrature discretiza-tion of the velocity space [24]. With the commonly used BGK relaxation [3] operator, the LBE can be formulated as 
+
+fi(r + ci, t + 1) = fi(r, t ) − 1
+
+τ [fi(r, t ) − f eq i (r, t )] , (1) for i = 0 , . . . , m −1 with the position vector r, the relaxation time τ , and timestep 
+
+∆t = 1 in lattice units, using the elementary velocities C = {c0, . . . , cm−1} ⊂ {− 1, 0, 1}n.We use the D 2Q9I model, which is specifically designed for incompressible fluids [28]. The equilibrium distribution values f eq i are given by 
+
+f eq i = wi
+
+
+
+ρ + 3 v · ci + 92 (v · ci)2 − 32 v2
+
+
+
+(2) with the velocity v = P 
+
+> i
+
+fi · ci, pressure p = c2 
+
+> s
+
+· ρ · ρ0, and weights w4 = 49 ,
+
+w1, w 3, w 5, w 7 = 19 , w0, w 2, w 6, w 8 = 136 .For boundary treatment, PortLBM computes the equilibrium distribution via Dirichlet or Neumann conditions at the inlet, an adapted Zou and He con-dition [28] at the outlet, and a halfway bounce-back scheme for fluid-solid inter-actions. 
+
+3.2 Data layouts 
+
+The particle distribution values associated with each lattice node must be stored in a data structure. Mattila et al. [20] introduced three principal data layout strategies: stream, collision, and bundle. The stream layout organizes the distri-bution values as an SoA (compare Figure 2a). This layout is particularly advan-tageous for the streaming step, as it enables threads processing consecutive nodes to access memory coalesced. In contrast, the collision layout adopts an Array of Structures (AoS) approach (see Figure 2b). The collision layout is well-suited for operations focused on individual nodes due to its superior cache efficiency. The bundle layout represents a hybrid strategy by organizing data into an SoAoS (see Figure 2c). It provides a middle ground between the bandwidth-focused stream layout and the cache-efficient collision layout. 
+
+3.3 Algorithms 
+
+Algorithms are derived by dividing Equation 1 into a streaming and a collision step: 
+
+fi(r + ci, t + 1) 
+
+| {z } 
+
+> streaming step
+
+= fi(r, t ) − 1
+
+τ [fi(r, t ) − f eq i (r, t )] 
+
+| {z } 
+
+> collision step
+
+. (3) PortLBM 5            
+
+> ↙↓. . . ↗
+> node 0 . . . node N node 0 . . . node N . . . node 0 . . . node N
+
+(a) Stream layout (SoA) node 0 . . . node N   
+
+> ↙ ↓ ↘ ← ◦ → ↖ ↑ ↗ . . . ↙ ↓ ↘ ← ◦ → ↖ ↑ ↗
+
+(b) Collision layout (AoS) Bundle 1 Bundle 2 Bundle 3 node 0 . . . node N node 0 . . . node N node 0 . . . node N         
+
+> ↙ ↓ ↘ . . . ↙ ↓ ↘ ← ◦ → . . . ← ◦ → ↖ ↑ ↗ . . . ↖ ↑ ↗
+
+(c) Bundle layout (SoAoS) 
+
+Fig. 2: Three supported data layouts in PortLBM proposed by [20]. There is a clear data dependency between the two steps, as each lattice node depends on the distribution values from its neighboring nodes’ previous time steps. In the literature, there are two main algorithmic approaches to handling this data dependency. The two-step approach iterates over the lattice twice. In contrast, the two-lattice approach uses a single combined embarrassingly parallel stream and collision step but relies on two lattices. Classical streaming schemes are one-step pull and one-step push, where a node either pulls all required distribution values from neighboring nodes or pushes its own values to them. Several more advanced streaming schemes have been proposed. Current state-of-the-art approaches include the AA [2], the Es-oteric Twist [10], and the Esoteric Pull [17] schemes. For PortLBM, we start with the basic two-lattice approach, which relies on the one-step pull streaming scheme. Each node pulls all incoming distribution values from its neighbors, combines the streaming and collision steps, and writes the result to a second, destination lattice. Because the source lattice remains constant throughout a time step, all nodes are fully independent, eliminating the need for synchronization or buffering. The simplest way of parallelizing the resulting algorithm using SYCL is the 
+
+sycl::range kernel. In this case, the work-group decomposition is entirely han-dled by the SYCL runtime, requiring no programmer knowledge of the underly-ing hardware. The resulting algorithm is inherently portable and can be launched on any SYCL-compatible device without modification. We refer to this algorithm as Linear Pull Two-Lattice (LPTL). Apart from linear range -based kernels, SYCL also supports explicit work-group decompositions with nd_range kernels. In this variant, the domain is treated as a two-dimensional grid and decomposed into equally shaped subdo-mains, each mapped to one work group. Padding is applied so that the domain extents align with the work-group size, enabling coalesced memory accesses and giving the programmer direct control over work-group shape and size. Since this algorithm still relies on the one-step pull scheme, we refer to it as Non-linear Pull Two-Lattice (NPTL). Both LPTL and NPTL require two full lattices in global memory. To reduce memory consumption, our third variant avoids permanently allocating a second lattice. Instead, each work item buffers all incoming distribution values for its node in SYCL private memory. A local barrier then ensures that all work items 6 A. Strack et al. 
+
+within the work group have finished reading from the shared lattice before any writes occur, preventing data races within a work group. Across work groups, a compact buffer grid of additional nodes is woven into the domain to hold distribution values at the boundaries of adjacent subdomains. This decouples subdomains without requiring global synchronization, keeping the total memory overhead well below that of a full second lattice. We refer to this algorithm as 
+
+Non-linear Pull One-Lattice (NPOL). The fourth variant replaces the pull streaming scheme with the swap 
+
+scheme [21]. Rather than copying incoming values from neighbors, each node actively exchanges its distribution value with the opposite value of the neighbor in each of the four positive directions. In-flight values are buffered in SYCL local memory for exchanges within a work group. The same buffer grid used in NPOL handles cross-subdomain interactions. We refer to this algorithm as Non-linear Swap One-Lattice (NSOL). The four algorithms thus target distinct optimization aspects: simplicity (LPTL), peak throughput (NPTL), memory footprint (NPOL), and propaga-tion scheme (NSOL). 
+
+## 4 Implementation Details and Software Stack 
+
+The PortLBM tool was designed to remain agnostic to the specific underlying LBM implementation. Its GUI operates on instances of an abstract algorithm handler, which provides the central point of interaction between the simulation core and the visualization layer. An abstract base class AlgorithmHandler de-fines the essential functionality for initializing and controlling simulations, as well as for accessing macroscopic observables. SYCL integration is realized through the specialized class SYCLAlgorithmHandler , which internally manages a simu-lation algorithm bound to a particular simulation object. Generally, PortLBM is designed to allow for easy extension, such as new algorithms or additional computation backends. Importantly, the visualization framework itself interacts only with the generated simulation results, while remaining agnostic to internal data structures and implementation details. PortLBM organizes the domain into equally sized work groups. The user has two options at runtime. Firstly, a reliable automatic decomposition is available, where the SYCL runtime chooses the work-group size: the domain is treated as a one-dimensional array iterated over in a linear sycl::range<1> kernel. Secondly, a manual decomposition into a regular grid of subdomains of equal size and shape can be specified. This is realized with the help of sycl::nd_range<2> 
+
+kernels. PortLBM accepts a desired work-group size and selects a subdomain arrangement that minimizes the interface between them. The choice of algorithm (LPTL, NPTL, NPOL, or NSOL) and data layout (stream, collision, or bundle) is likewise a runtime setting, specified via the algorithm and dataLayout fields of a JSON configuration file that is parsed at startup. These settings, along with the work-group size, relaxation time, domain size, and scenario, can also be changed interactively from the GUI without recompilation. PortLBM 7                                                    
+
+> CPU Dual AMD EPYC 9274F Cores 48 All-core boost 3.1GHz L1 cache 64 KB / core L2 cache 1MB / core RAM 384 GB DDR5 FP64 3.11 TFLOPS Bandwidth 460 .8GB /s
+> GPU NVIDIA A30 AMD Instinct MI210 Intel Arc B580 Compute Units 56 SMs 104 CUs 20 Xe Cores L1 cache 192 KB / SM 16 KB / CU 256 KB / Xe Core L2 cache 24 MB 8MB 18 MB VRAM 24 GB HBM2e 64 GB HBM2e 12 GB GDDR6 FP64 5.16 TFLOPS 22 .63 TFLOPS 1.71 TFLOPS Bandwidth 933 .1GB /s1640 GB /s456 .0GB /s
+
+Table 1: Hardware specifications of CPU and GPUs. SYCL (pronounced sickle ) is a royalty-free, cross-platform programming model that lets developers write host and device code in standard ISO C ++ within a single-source model [13]. PortLBM is compiled with AdaptiveCpp (formerly hipSYCL) [1], which interfaces with native hardware runtimes and supports NVIDIA, AMD, and Intel GPUs. DPC ++ [23] is Intel’s open-source LLVM-based SYCL implementation and extends the standard with Intel-specific features. Dear ImGui [7] is a lightweight, self-contained C ++ GUI library supporting multiple rendering backends (DirectX12, Vulkan, OpenGL). PortLBM uses it together with ImPlot [22] for interactive, real-time plotting of macroscopic ob-servables. Both libraries were adapted to meet PortLBM’s specific requirements. 
+
+## 5 Results 
+
+Hardware specifications are listed in Table 1. We report lattice updates per sec-ond (LUPS) as the primary throughput metric. Performance benchmarks (Sec-tion 5.1) use the Hagen-Poiseuille scenario with 10 runs per configuration in double precision. We report the median across these runs, with error bars in Figures 3 and 4 spanning the minimum to maximum observed value. The do-main sizes are 16000 × 8000 on the A30 and MI210, and 16000 × 4000 on the B580. PortLBM was compiled with AdaptiveCpp, and the GUI was disabled dur-ing benchmarking. Profiling runs (Section 5.2) use a thin vertical plate obstacle (Kármán vortex street). Obstacle and wing scenarios showed no notable perfor-mance difference compared to plain Hagen-Poiseuille, while a porous medium with randomly distributed solid nodes reduced throughput by 46% on the A30 and 55% on the MI210 due to reduced coalescing and increased bounce-back operations. Extended work-group size comparisons are available in the accom-panying thesis [12]. 
+
+5.1 Performance 
+
+In Figure 3, we present the LUPS performance using the best algorithm and work-group size for the three different data layouts. On the reference AMD CPU, the bundle layout yielded the best performance. The AMD CPU achieves 8 A. Strack et al. 
+
+1.5 GLUPS. For the A30 and B580 GPUs with 4.16 GLUPS and 3.76 GLUPS, re-spectively, the stream layout yields the best performance. On the AMD GPU, in contrast, the bundle layout yields the best performance, achieving 5.12 GLUPS. The collision layout is not competitive on the A30 ( 1.73 GLUPS) and MI210 (2.71 GLUPS). On the B580, however, it achieves 2.82 GLUPS, outperform-ing the bundle layout. This is owing to the B580’s largest L1 cache per com-pute unit ( 256 KB/Xe Core vs. 192 KB/SM on the A30 and 16 KB/CU on the MI210), which enables better reuse of cached distribution values. To fur-ther investigate the performance behavior, we evaluated the practical memory bandwidth of the three GPUs using an OpenCL-Benchmark 1. For coalesced read/write, the benchmark yields memory bandwidths of 807 .33 /914 .99 GB/s for the A30, 967 .57 /975 .28 GB/s for the MI210, and 584 .93 /474 .28 GB/s for the B580. In contrast, for misaligned read/write, it yields memory bandwidths of 653 .27 /80 .72 GB/s for the A30, 1301 .06 /634 .08 GB/s for the MI210, and 
+
+893 .07 /398 .42 GB/s for the B580. These results explain the comparable perfor-mance of the A30 and MI210 GPUs when using the stream layout optimized for coalesced memory accesses. Furthermore, they help clarify the superior per-formance of the bundle layout on the AMD GPU. Note that B580 results use a smaller domain ( 16000 × 4000 ) and that its measured bandwidth exceeds the official specification. Although this is consistent with reference values from the OpenCL-Benchmark authors, it should be treated as indicative rather than di-rectly comparable to the A30 and MI210 results. The actual performance gap between the four algorithms for their respective optimal data layouts and work-group sizes is shown in Figure 4. For all systems except the B580 GPU, which performs best if the SYCL runtime decomposes the domain, the NPTL algorithm yields the best performance. The performance improvements of the NPTL algorithm over the LPTL algorithm are 4.1% on the MI210 GPU, 0.5% on the A30 GPU, and 11 .5% on the CPU. On the B580 GPU, we observe a 15 .6% decrease in performance. The NPOL algorithm outperforms the NSOL algorithm by 8% on other systems and up to 46% on the MI210 GPU. This performance delta is caused by the additional overhead introduced by a more complex streaming step and larger buffers, which make the NSOL algorithm not a viable option on our test hardware. 
+
+5.2 Profiling 
+
+Table 2 presents profiling results on the A30 GPU. LPTL with the stream layout achieves the highest bandwidth ( 82% of peak) and best FLOPS, though only 14% 
+
+of peak compute. NPTL improves cache hit rate and occupancy by operating on a regular work-group grid, at the cost of marginally lower bandwidth. The two buffering algorithms (NPOL, NSOL) exhibit reduced occupancy and a zero L1 cache hit rate for the stream layout, because all distribution values must be loaded fresh on each update. This result also explains the B580 performance drop for these algorithms (Figure 4), as the large L1 cache goes unused.   
+
+> 1https://github.com/ProjectPhysX/OpenCL-Benchmark Last accessed: 2026-07-22
+
+PortLBM 9MI210 A30 B580 Dual 9274F   
+
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> GLUPs
+> collision stream bundle
+
+Fig. 3: Lattice update performance of the best algorithm and work-group size for the three different data lay-outs on each system using double pre-cision. NPTL LPTL NPOL NSOL 
+
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> GLUPs
+> MI210 (bundle)
+> A30 (stream)
+> B580 (stream)
+> Dual 9274F (bundle)
+
+Fig. 4: Lattice update performance comparison of the four different LBM algorithms using the best data layout and work-group size. Across the three NPTL data layouts, the stream variant achieves nearly twice the FLOPS and bandwidth of the bundle variant. In contrast, the bundle vari-ant yields significantly higher cache hit rates through its SoAoS structure. The collision variant maximizes cache reuse, but its reduced effective bandwidth dom-inates, leading to the lowest throughput. In Table 2, the NSOL memory request count shows two values: total requests and, in parentheses, requests to SYCL local memory. With the profiled values, we can analyze the efficiency of our kernels. Take the combined stream and collision kernel of the NPTL algorithm. It contains 9·8 B+1 B = 73 B worth of reading and (9+4) ·8 B = 104 B worth of writing per lattice update, such that it has a code balance of 177 B/LUP. Given the specs of Table 1 we would expect a theoretical maximum of 933 .1 GB/s   
+
+> 177 B/LUP
+
+≈ 5.27 GLUPS for the A30 GPU. Taking the actual measured bandwidth, we should observe a performance of 730 .38 GB/s   
+
+> 177 B/LUP
+
+≈ 4.13 GLUPS. The measured performance of 4.16 GLUPS is within this range and may be slightly higher, as it also involves more lightweight boundary treatment kernels, indicating an efficient implementation in PortLBM. Repeating this code balance roofline for the AMD GPU, we obtain a theoret-ical maximum of 1640 GB/s   
+
+> 177 B/LUP
+
+≈ 9.27 GLUPS for the MI210. The best measured performance on the MI210, 5.12 GLUPS with the bundle layout, corresponds to an effective bandwidth of 5.12 GLUPS × 177 B/LUP ≈ 906 .2 GB/s. This gap relative to the specified peak bandwidth quantifies the bandwidth the bundle layout trades away for cache locality. Because our benchmarks indicate the B580’s official bandwidth specification is under-reported, we omit a roofline analysis for that GPU. 10 A. Strack et al.                                                  
+
+> Algorithm (Layout) GFLOPS (FP64) Memory bandwidth (in GB/s) Memory requests (in millions) Arithmetic intensity L1 cache hit rate L2 cache hit rate Occupancy
+> (limit)
+> Optimum 5161 933 .1N/A N/A 100% 100% 100%
+> NPTL (stream) 670 .87 730 .38 92 .36 0.92 14 .41% 71 .63% 63 .13%
+> (75%)
+> NPTL (bundle) 345 .37 377 .82 92 .36 0.91 64 .04% 78 .92% 60 .34%
+> (75%)
+> NPTL (collision) 196 .48 241 .19 91 .98 0.82 75 .11% 86 .73% 62 .32%
+> (75%)
+> LPTL (stream) 707 .9769 .93 91 .96 0.92 8.78% 71 .03% 59 .97%
+> (75%)
+> NPOL (stream) 513 .14 572 .20 99 .98 0.90 0% 69 .42% 45 .90%
+> (50%)
+> NSOL (stream) 479 .32 543 .69 99 .74 (26 .40) 0.88 0% 68 .65% 43 .20%
+> (50%)
+
+Table 2: Profiling results for the combined stream and collision kernel using the optimal work-group size per algorithm on an NVIDIA A30 GPU. 
+
+## 6 Conclusion and Outlook 
+
+In this work, we presented PortLBM, a novel portable LBM tool built on SYCL. PortLBM supports a wide range of application scenarios and provides real-time visualization without additional software. For PortLBM, we implemented three data layouts and four LBM algorithms, enabling system-specific performance tuning across different hardware platforms. We performed an extensive perfor-mance evaluation and profiled multiple PortLBM configurations to assess how the insights of Mattila et al. [20] translate to contemporary GPU architectures. Our results show that there is no one-size-fits-all configuration for performance-portable LBM code, as architectural designs (in particular, cache hierarchies and memory bandwidth) vary significantly across GPU vendors. Specifically, the choice of data layout strongly influences performance. The stream layout maximizes memory bandwidth but exhibits suboptimal cache uti-lization. On both the NVIDIA and Intel GPUs, this layout provides the best overall performance. In contrast, the bundle layout improves cache efficiency at the expense of bandwidth, making it the most effective layout on the AMD GPU tested here, a result driven by the specific cache design rather than a general AMD trait. Consistent with [20], the bundle layout delivers the highest per-formance on our reference CPU, although the performance differences are less significant than on the GPUs. Regarding algorithmic variants, the two-lattice algorithms implemented in PortLBM represent a trade-off: the linear variant is simple and efficient, whereas the non-linear variant achieves slightly higher performance and allows manual optimization of the domain decomposition via specifying the SYCL work-group size. The one-lattice variants, which rely on local buffering of distribution values, exhibit lower throughput but are advantageous when memory is constrained. The swapping streaming scheme, taking advantage of work-group shared memory, does not yield any performance improvements. PortLBM 11 
+
+Future work targets multi-GPU support with MPI integration and extension to three-dimensional problems. Further directions include advanced streaming schemes (AA, Esoteric Twist), comparative studies across SYCL toolchains, and energy and performance modeling. 
+
+Reproducibility The PortLBM tool is open source under the MIT license and is available on GitHub. 2 The software versions to reproduce the results presented in this work are: Clang 18.1.3, AdaptiveCpp v24.10, Dear ImGui v1.91.1, and ImPlot v0.17. 
+
+AI Usage Disclosure Generative artificial intelligence (AI) tools, including Gram-marly, ChatGPT, and Claude, were employed to enhance the clarity, grammar, and overall coherence of the manuscript. All technical content, data analyses, and research findings were conceived and developed independently by the authors. AI-assisted out-puts were carefully reviewed, verified, and edited by the authors to ensure factual accuracy, interpretive rigor, and scholarly integrity. The final manuscript reflects the authors’ original intellectual contributions and analytical work. 
+
+## References 
+
+1. Alpay, A., Soproni, B., Wünsche, H., et al.: Exploring the possibility of a hipsycl-based implementation of oneapi. In: IWOCL ’22. ACM, New York, NY, USA (2022) 2. Bailey, P., Myre, J., Walsh, S.D., et al.: Accelerating lattice boltzmann fluid flow simulations using graphics processors. In: 2009 ICPP. pp. 550–557 (2009) 3. Bhatnagar, P.L., Gross, E.P., Krook, M.: A model for collision processes in gases. i. small amplitude processes in charged and neutral one-component systems. Phys. Rev. 94 , 511–525 (May 1954) 4. Blair, S., Albing, C., Grund, A., et al.: Accelerating an mpi lattice boltzmann code using openacc. In: WACCPD ’15. ACM, New York, NY, USA (2015) 5. Calore, E., Gabbana, A., Kraus, J., et al.: Performance and portability of accel-erated lattice boltzmann applications with openacc. Concurrency Comput. Pract. Exper. 28 (12), 3485–3502 (2016) 6. Carter Edwards, H., Trott, C.R., Sunderland, D.: Kokkos: Enabling manycore per-formance portability through polymorphic memory access patterns. J. Parallel Dis-trib. Comput. 74 (12), 3202–3216 (2014) 7. Cornut, O.: Dear ImGui. https://github.com/ocornut/imgui (2014), version 1.91.1, Last accessed: 2026-07-22 8. Cosenza, B., Crisci, L., Amati, G., et al.: minilb: Benchmarking lattice boltzmann simulations on amd, intel, and nvidia gpus. Future Gener. Comput. Syst. 175 ,108032 (2026) 9. Ding, Y., Xu, C., Qiu, H., et al.: Evaluating performance portabil-ity of sycl and kokkos: A case study on lbm simulations. In: 2023 ISPA/BDCloud/SocialCom/SustainCom. pp. 328–335 (2023) 10. Geier, M., Schönherr, M.: Esoteric twist: An efficient in-place streaming algorith-mus for the lattice boltzmann method on massively parallel hardware. Computa-tion 5(2) (2017)  
+
+> 2
+
+https://github.com/SC-SGS/PortLBM Last accessed: 2026-07-22 12 A. Strack et al. 11. Godenschwager, C., Schornbaum, F., Bauer, M., et al.: A framework for hybrid parallel flow simulations with a trillion cells in complex geometries. In: SC ’13. ACM, New York, NY, USA (2013) 12. Graf, M.: Real-time visualized and GPU-accelerated lattice Boltzmann simulations. University of Stuttgart (April 2025) 13. Group, K.: Sycl 2020 specification. https://registry.khronos.org/SYCL/specs/ sycl-2020/html/sycl-2020.html (2021), last accessed: 2026-07-22 14. Krause, M.J., Kummerländer, A., Avis, S.J., et al.: Openlb—open source lattice boltzmann code. Comput. Math. Appl. 81 , 258–288 (2021) 15. Latt, J., Malaspinas, O., Kontaxakis, D., et al.: Palabos: Parallel lattice boltzmann solver. Comput. Math. Appl. 81 , 334–350 (2021) 16. Lee, S., Gounley, J., Randles, A., et al.: Performance portability study for mas-sively parallel computational fluid dynamics application on scalable heterogeneous architectures. J. Parallel Distrib. Comput. 129 , 1–13 (2019) 17. Lehmann, M.: Esoteric pull and esoteric push: Two simple in-place streaming schemes for the lattice boltzmann method on gpus. Computation 10 (6) (2022) 18. Lehmann, M., Krause, M.J., Amati, G., et al.: Accuracy and performance of the lattice boltzmann method with 64-bit, 32-bit, and customized 16-bit number for-mats. Phys. Rev. E 106 , 015308 (Jul 2022) 19. Martin, A., Liu, G., Ladd, W., et al.: Performance evaluation of heterogeneous gpu programming frameworks for hemodynamic simulations. In: SC-W ’23. p. 1126–1137. ACM, New York, NY, USA (2023) 20. Mattila, K., Hyväluoma, J., Timonen, J., et al.: Comparison of implementations of the lattice-boltzmann method. Comput. Math. Appl. 55 (7), 1514–1524 (2008) 21. Mattila, K., Hyväluoma, J., Rossi, T., et al.: An efficient swap algorithm for the lattice boltzmann method. Comput. Phys. Commun. 176 (3), 200–210 (2007) 22. Pezent, E.: ImPlot. https://github.com/epezent/implot/ (2020), last accessed: 2026-07-22 23. Reinders, J., Ashbaugh, B., Brodman, J., et al.: Data Parallel C++: Master-ing DPC++ for Programming of Heterogeneous Systems using C++ and SYCL. Apress (2021) 24. Schiller, U.D.: Thermal fluctuations and boundary conditions in the lattice Boltz-mann method. Ph.D. thesis, Johannes Gutenberg-Universität Mainz, Mainz (2008) 25. Stone, J.E., Gohara, D., Shi, G.: Opencl: A parallel programming standard for heterogeneous computing systems. Comput. Sci. Eng. 12 (3), 66–73 (2010) 26. Verdier, W., Kestener, P., Cartalade, A.: Performance portability of lattice boltz-mann methods for two-phase flows with phase change. Comput. Methods Appl. Mech. Eng. 370 , 113266 (2020) 27. Wienke, S., Springer, P., Terboven, C., et al.: Openacc — first experiences with real-world applications. In: Euro-Par 2012 Parallel Processing. pp. 859–870. Springer, Berlin, Heidelberg (2012) 28. Zou, Q., Hou, S., Chen, S., et al.: A improved incompressible lattice boltzmann model for time-independent flows. J. Stat. Phys. 81 (1), 35–48 (Oct 1995)

@@ -6,26 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-26
-- 运行时间：2026-07-26 20:00:29 UTC
+- 最新运行日期：2026-07-27
+- 运行时间：2026-07-27 20:56:46 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：2
 - 精读区：0
-- 速读区：1
+- 速读区：2
 
 ### 今日简报（AI）
-今日速读了一篇关于液滴动力学数值模拟的研究，该模型在复杂表面问题上有了新突破。  
-论文提出了一种物理参数明确定义的SPH方法，能更真实地模拟复杂表面上的液滴行为。  
-建议关注该方法在微流控或涂层工艺中的应用改进，可结合实验数据做进一步验证。
-- 详情：[/202607/26/README](/202607/26/README)
+今天速读了两篇关于计算物理方法的论文，分别聚焦三相接触线动力学和跨GPU平台的可移植LBM工具。  
+值得留意的方向是：用相场模型追踪液滴湿润过程的数学极限，以及一套能在不同显卡上跑格子玻尔兹曼仿真的统一框架。  
+如果你对多物理场模拟或GPU编程感兴趣，可以快速浏览这两篇的思路，再决定是否深入。
+- 详情：[/202607/27/README](/202607/27/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [An SPH model with physically prescribed parameters for droplet dynamics on complex surfaces](/202607/26/2607.16670v1-an-sph-model-with-physically-prescribed-parameters-for-droplet-dynamics-on-complex-surfaces)  
-   标签：评分：7.0/10、query:falling-film
-   evidence：用于复杂表面液滴动力学的SPH模型，一种处理界面相互作用的物理参数化多相流CFD方法。
+1. [Phase-Field Models, Sharp Interface Limits, and Numerical Schemes for Contact Line Dynamics](/202607/27/2607.17410v1-phase-field-models-sharp-interface-limits-and-numerical-schemes-for-contact-line-dynamics)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：接触线动力学的相场方法，两相流CFD
+2. [PortLBM: A Portable Lattice Boltzmann Tool Leveraging SYCL on AMD, NVIDIA, and Intel GPUs](/202607/27/2607.20650v1-portlbm-a-portable-lattice-boltzmann-tool-leveraging-sycl-on-amd-nvidia-and-intel-gpus)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：便携式LBM框架可用于GPU加速流体模拟，适用于两相流模拟包括降膜。
 
 
 <div class="dpr-home-promo-card">

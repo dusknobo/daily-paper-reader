@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-27",
+  "date": "2026-07-27",
+  "generated_at": "2026-07-27T20:56:56",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/27/2607.17410v1-phase-field-models-sharp-interface-limits-and-numerical-schemes-for-contact-line-dynamics",
+      "section": "quick",
+      "title_en": "Phase-Field Models, Sharp Interface Limits, and Numerical Schemes for Contact Line Dynamics",
+      "authors": "Guosheng Fu, Yuan Gao, Jian-Guo Liu",
+      "date": "2026-07-19",
+      "pdf": "https://arxiv.org/pdf/2607.17410v1",
+      "score": "6.0",
+      "evidence": "接触线动力学的相场方法，两相流CFD",
+      "tldr": "接触线运动因无滑移流体力学应力奇异性而难以连续建模，相场模型通过薄过渡层正则化但需建立与尖锐极限的严格联系。本研究用匹配渐近展开和梯度流结构统一分析Allen-Cahn与Cahn-Hilliard两相场模型，恢复其尖锐界面极限并证明两者均收敛于同一能量耗散演化。该结果为接触线动力学提供了单一变分原理的阐释，并开发了能量稳定的数值格式。",
+      "tags": "query:falling-film",
+      "abstract_en": "We study phase-field and sharp-interface models for contact line dynamics of a liquid droplet on a solid substrate within a unified variational framework. The motion of the contact line, where liquid, gas, and solid phases meet, poses a fundamental difficulty in continuum modeling due to the classical stress singularity of no-slip hydrodynamics. Phase-field models regularize this singularity by introducing a thin transition layer of thickness and encoding interfacial effects through a Ginzburg-Landau free energy augmented by a wall energy on the substrate. Starting from the total free energy $E = E_b + E_w$, we analyze two phase-field models: the Allen-Cahn equation and the Cahn-Hilliard equation. Using matched asymptotic expansions as $δ\\to 0$, we recover their corresponding sharp interface limits. In the Allen-Cahn case, the limit yields motion by mean curvature with a contact line law driven by deviations of the dynamic contact angle from Young's angle. In the Cahn-Hilliard case, the limit leads to a Mullins-Sekerka problem with the same form of contact line dynamics. A central result of this work is the identification of consistent gradient-flow structures across both models. The Allen-Cahn dynamics correspond to an $L^2$-gradient flow, while the Cahn-Hilliard dynamics correspond to an $H^{-1}$-gradient flow, and both converge to sharp-interface evolutions that preserve the same energy-dissipation structure. This provides a unified interpretation of contact line motion as a consequence of a single variational principle. Finally, we develop energy-stable numerical schemes based on the minimizing movement principle and establish discrete energy dissipation and well-posedness of the fully discrete problem. Numerical examples confirm that both schemes relax toward the same stationary sharp interface solution while their dynamics reflect the different dissipation mechanisms.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/27/2607.20650v1-portlbm-a-portable-lattice-boltzmann-tool-leveraging-sycl-on-amd-nvidia-and-intel-gpus",
+      "section": "quick",
+      "title_en": "PortLBM: A Portable Lattice Boltzmann Tool Leveraging SYCL on AMD, NVIDIA, and Intel GPUs",
+      "authors": "Alexander Strack, Marcel Graf, Alexander Van Craen, Dirk Pflüger",
+      "date": "2026-07-22",
+      "pdf": "https://arxiv.org/pdf/2607.20650v1",
+      "score": "6.0",
+      "evidence": "便携式LBM框架可用于GPU加速流体模拟，适用于两相流模拟包括降膜。",
+      "tldr": "随着摩尔定律放缓，GPU加速成为高性能流体模拟的主流，但不同厂商GPU的编程模型差异带来可移植性挑战。我们提出PortLBM，一个基于SYCL的可扩展格子Boltzmann方法框架，集成交互式实时可视化并支持多种流动场景。在NVIDIA、AMD和Intel GPU上的性能评估显示，无单一配置最优：流布局最大化带宽在NVIDIA/Intel上占优，束布局提升缓存效率在AMD上更佳；双格子方案吞吐高，内存受限时单格子更优。该工作为异构计算环境提供了适应性便携LBM工具及系统特定调优依据。",
+      "tags": "query:falling-film",
+      "abstract_en": "The lattice Boltzmann method (LBM) is a well-established approach for simulating fluid flows at the mesoscopic scale. With the stagnation of Moore's law, high-performance computing has shifted toward GPU accelerators, necessitating programming models that ensure both portability and efficiency across diverse hardware platforms.   We present PortLBM, an extensible portable LBM framework built on SYCL that integrates cross-platform GPU support with interactive real-time visualization. PortLBM supports diverse simulation scenarios ranging from Kármán vortex streets and wing flows to porous media, and is designed for easy extension with new algorithms and backends. As part of a performance portability study, we evaluate PortLBM on contemporary GPU architectures from NVIDIA, AMD, and Intel, examining the impact of three data layouts (stream, bundle, and collision) and four algorithmic variants on simulation throughput.   Our results show that no single configuration achieves optimal performance across all GPU vendors, confirming the need for system-specific tuning. The stream layout maximizes bandwidth and performs best on the contemporary NVIDIA and Intel GPUs, while the bundle layout improves cache efficiency and excels on the AMD GPU. Two-lattice schemes achieve higher throughput while one-lattice schemes are preferable under memory constraints. Our work underscores the necessity for adaptable, portable LBM software in increasingly heterogeneous computing environments.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

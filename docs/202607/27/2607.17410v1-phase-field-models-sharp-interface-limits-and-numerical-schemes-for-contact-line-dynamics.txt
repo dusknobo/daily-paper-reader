@@ -1,0 +1,2182 @@
+Title: Phase-Field Models, Sharp Interface Limits, and Numerical Schemes for Contact Line Dynamics
+
+URL Source: https://arxiv.org/pdf/2607.17410v1
+
+Published Time: Tue, 21 Jul 2026 01:18:40 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+PHASE-FIELD MODELS, SHARP INTERFACE LIMITS, AND NUMERICAL SCHEMES FOR CONTACT LINE DYNAMICS 
+
+GUOSHENG FU 
+
+Department of Applied and Computational Mathematics and Statistics, University of Notre Dame, Notre Dame, IN 46556 
+
+YUAN GAO 
+
+Department of Mathematics, Purdue University, West Lafayette, IN 47906 
+
+JIAN-GUO LIU 
+
+Department of Mathematics and Department of Physics, Duke University, Durham, NC 27708 
+
+Abstract. We study phase-field and sharp-interface models for contact line dynamics of a liquid droplet on a solid substrate within a unified variational framework. The motion of the contact line, where liquid, gas, and solid phases meet, presents a fundamental difficulty in continuum modeling due to the classical stress singularity associated with no-slip hydrodynamics. Phase-field models regularize this singularity by introducing a thin transition layer of thickness δ and encoding interfacial effects through a Ginzburg–Landau free energy augmented by a wall energy on the substrate. Starting from the total free energy E = Eb +Ew , we analyze two prototypical phase-field models: the Allen–Cahn equation and the Cahn–Hilliard equation. Using matched asymptotic expansions as δ → 0, we recover their corresponding sharp-interface limits. In the Allen–Cahn case, the limit yields motion by mean curvature with a contact line law driven by deviations of the dynamic contact angle θCL from Young’s angle θY . In the Cahn–Hilliard case, the limit leads to a Mullins–Sekerka problem with the same form of contact line dynamics. A central result of this work is the identification of consistent gradient-flow structures across both models. The Allen–Cahn dynamics correspond to an L2-gradient flow, while the Cahn–Hilliard dynamics correspond to an H−1-gradient flow, and both converge to sharp-interface evolutions that preserve the same energy–dissipation structure. This provides a unified interpretation of contact line motion as a consequence of a single variational principle. Finally, we develop energy-stable numerical schemes based on the minimizing movement principle and establish discrete energy dissipation and well-posedness of the fully discrete problem. The numerical examples confirm that the Allen–Cahn and Cahn–Hilliard schemes both relax toward the same stationary sharp interface solution while their dynamics reflect the different dissipation mechanism. 
+
+E-mail addresses : gfu@nd.edu, gao662@purdue.edu, jian-guo.liu@duke.edu .
+
+Key words and phrases. Onsager’s principle, Interface and free boundary, Asymptotic analysis, Triple junction. 
+
+1arXiv:2607.17410v1 [math.AP] 19 Jul 2026 2 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+Contents 
+
+1. Introduction 32. Free Energies: Phase-Field and Sharp Interface Models 52.1. Phase-field free energy 52.2. Sharp interface free energy and its first variation 73. Allen–Cahn Model: Phase-Field and Sharp-Interface 11 3.1. Phase-field Allen–Cahn model 12 3.2. Sharp-interface limit of the Allen–Cahn model 13 3.3. Variational structure for the sharp-interface system from Allen–Cahn 15 4. Cahn–Hilliard Model: Phase-Field and Sharp-Interface 15 4.1. Phase-field Cahn–Hilliard model 16 4.2. Sharp-interface limit of the Cahn–Hilliard system 17 4.3. Variational formulation of the Mullins–Sekerka problem 20 5. Numerical Schemes and Results 21 5.1. Minimizing movement (JKO) scheme 21 5.2. Finite element discretization 23 5.3. Implementation details and linear system solvers 25 5.4. Numerical examples 25 6. Conclusion 31 Acknowledgments 31 Declarations 31 Data Availibility 31 References 31 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 3
+
+1. Introduction 
+
+The motion of a liquid droplet on a solid substrate is a classical problem in fluid mechanics and materials science, with applications ranging from coating flows and inkjet printing to microfluidics. A central difficulty lies in the motion of the contact line — the curve where the liquid–gas interface (capillary surface) meets the solid surface. The three surface tensions provide the leading driving force for the geometric motion of droplets; however, the mechanisms and accurate modeling of the competing dynamics between the moving capillary surface and the no-slip or moving contact line condition are not yet fully understood. Classical hydrodynamic description for droplets with no-slip boundary conditions predict a non-integrable stress singularity at a moving contact line [7]. To remove this singularity, many different hydrodynamic models with Navier slip boundary condition are proposed to described the contact line moving consistent with microscopic slip mechanism, c.f., [26, 15]. As a regularization model without hydrodynamic computations, phase-field models provide a natural resolution of this difficulty by replacing the sharp liquid–gas interface with a thin transition layer of thickness δ > 0, described by an order parameter ϕ ∈ [−1, 1]. The two pure phases correspond to ϕ = ±1, while the interface is represented by a smooth transition between these values. Interfacial and wetting effects are encoded through a total free energy of the form 
+
+E(ϕ) = Eb(ϕ) + Ew(ϕ),
+
+where Eb is a Ginzburg–Landau bulk energy and Ew is a wall energy defined on the substrate Γ. This formulation naturally incorporates surface tension coefficients σLG , σSL , and σSG , and provides a variational framework for deriving the governing equations. Phase-field models for moving contact lines have been extensively studied. Jacqmin [8] derived a thermodynamically consistent formulation of the Cahn–Hilliard/Navier–Stokes system with bound-ary conditions that incorporate fluid–solid interactions. Qian, Wang, and Sheng [26] proposed a generalized Navier boundary condition based on molecular dynamics considerations, providing a continuum description consistent with microscopic slip mechanisms. Sharp-interface limits of phase-field models coupled with hydrodynamics have been analyzed, for example, by Yue and Feng [25, 27], clarifying the role of diffusion and interfacial thickness in regularizing contact line motion. In the absence of bulk hydrodynamics, Allen–Cahn and Cahn–Hilliard phase-field models for contact line motion were studied by Xu and coauthors [12, 16]. The sharp interface dynamics were derived via asymptotic expansion for the phase-field models in various settings; see, for instance, [16, 17, 11]. Gao and Liu [13, 14] provided a rigorous derivation of the contact line dynamics and established the gradient-flow structure of the corresponding sharp interface model. Phase-field models are especially convenient for handling geometric changes of droplets, including merging and splitting where phase transitions happen. Compared with phase-field models, sharp-interface models are more capable of accurately capturing the contact line speed and the mechanism of competing triple surface tensions at the contact line. The objective of this work is to establish a unified and consistent connection between phase-field models and their sharp-interface limits for contact line dynamics. In particular, we analyze Allen–Cahn and Cahn–Hilliard phase-field models for contact line dynamics and derive their sharp-interface limits, recovering sharp descriptions of contact line mechanism. We employ the Onsager variational principle and gradient-flow structure to unify all the dynamics, and address the relation between phase-field parameters, such as the interface thickness δ and mobility coefficients, and macroscopic quantities including surface tensions 4 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+and contact line mobility. This allows one to use the numerically and geometrically tractable phase-field models while accurately recovering sharp descriptions of various physical phenomena in contact line dynamics. We consider two fundamental phase-field models. The Allen–Cahn model describes non-conservative dynamics driven by an L2-gradient flow of the energy E(ϕ), supplemented by a Lagrange multi-plier enforcing a volume constraint. The Cahn–Hilliard model, in contrast, describes conservative dynamics corresponding to an H−1-gradient flow, in which mass conservation is built into the evo-lution. In both cases, the boundary condition on Γ arises from the first variation of the wall energy 
+
+Ew and incorporates the effect of fluid–solid interactions. A key aspect of our analysis is the derivation of the sharp-interface limits as δ → 0 using matched asymptotic expansions. In this limit, the diffuse interface converges to a sharp capillary surface St
+
+separating the liquid and gas phases, and the bulk free energy converges to the classical surface energy σLG |St|. The wall energy similarly reduces to ( σSL − σSG )|Dt|, where Dt ⊂ Γ is the wetted region. The resulting sharp-interface energy is 
+
+E(St) = σLG |St| + ( σSL − σSG )|Dt|.
+
+The first variation expressed in terms of the normal velocity V of capillary surface and contact line velocity vCL can be written as (1.1) dE
+
+dt = σLG 
+
+Z
+
+> St
+
+HV dH2 + σLG 
+
+Z
+
+> ∂D t
+
+(cos θCL − cos θY ) vCL dH1.
+
+To determine the motion of the droplet with V and vCL , we identify a consistent variational structure across both phase-field models and their sharp-interface limits. At the phase-field level, both the Allen–Cahn and Cahn–Hilliard equations are derived from the Onsager variational principle, which balances the rate of energy decrease with a dissipation func-tional. In the sharp-interface limit, this structure is preserved: the Allen–Cahn model corresponds to an L2-gradient flow of E(St), while the Cahn–Hilliard model corresponds to an H−1-type gradient flow associated with the Mullins–Sekerka dynamics. For the Allen–Cahn model, the sharp-interface limit yields motion by mean curvature in the bulk, with normal velocity V satisfying 
+
+ξV = −σLG H − Λ,
+
+together with a contact line law relating the contact line velocity vCL to the deviation of the dynamic contact angle θCL from Young’s angle θY
+
+ζv CL = σLG (cos θY − cos θCL ).
+
+For the Cahn–Hilliard model, the limit leads to a Mullins–Sekerka problem, in which the chemical potential is harmonic in each phase and the interface velocity is determined by the jump of its normal derivative, while the same form of contact line law is retained on ∂D t.Our derivation demonstrates that the phase-field and sharp-interface descriptions are fully con-sistent at the level of energetic variational formulation. An important geometric feature of the problem is the relation between the normal velocity V
+
+of the interface and the contact line velocity vCL along the substrate. These are related by the kinematic identity 
+
+V = vCL sin θCL ,
+
+which reflects the attachment of the interface to the substrate. This relation plays a crucial role in connecting the phase-field formulation with the sharp-interface description. This is actually a necessary condition to derive the sharp-interface with correct contact line motion vCL . In particular, PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 5
+
+it explains the appearance of geometric factors such as sin θCL in intermediate formulations and ensures that all derived contact line laws are physically equivalent. The attachment of the droplets on the substrate is assumed as a kinematic condition in the sharp interface description. However, the conditions in the phase-field description to ensure the droplet attached on the substrate during dynamics is still unknown. Finally, we develop numerical schemes that preserve the variational structure of the models. Using a minimizing movement formulation, we construct fully discrete schemes based on H1-conforming finite elements and prove discrete energy dissipation. Under a constraint for time step, the variational problem becomes convex, and thus it is implemented by the corresponding Euler-Lagrange equation. We also introduce a convex-splitting scheme that is unconditionally stable. These results provide a robust computational framework consistent with the underlying analysis. The numerical examples confirm that the Allen–Cahn and Cahn–Hilliard schemes relax toward the same stationary sharp interface spherical cap solution, while their dynamic paths to equilibrium reflect the different bulk dissipation. The remainder of the paper is organized as follows. Section 2 introduces the phase-field and sharp-interface free energies and their first variations. Sections 3 and 4 analyze the Allen–Cahn and Cahn–Hilliard models, respectively, together with their sharp-interface limits. Section 5 presents the numerical schemes and their stability properties. 2. Free Energies: Phase-Field and Sharp Interface Models 
+
+In this section, we first introduce the total free energies governing contact line dynamics in both the phase-field and sharp-interface settings. The total energy in the phase-field model consists of a bulk energy with a Ginzburg–Landau potential and a wall energy encoding the preference between the bistable states. For the small parameter δ, we review the Γ-convergence result for the phase-field energy, which yields the limiting sharp-interface energy representing the surface energy of the droplet. Finally, we compute the first variations of both energies. In particular, the first variation of the sharp-interface energy is expressed as a dual pairing of unbalanced force and velocity on both the capillary surface and the contact line; see Theorem 2.3. 2.1. Phase-field free energy. Let Ω ⊂ R3 be a bounded Lipschitz domain representing the container occupied by a two-phase fluid. The solid substrate is identified with the flat portion Γ := {(x, y, z ) ∈ ∂Ω : z = 0 }.
+
+The phase-field variable ϕ : Ω × [0 , ∞) → [−1, 1] encodes the local composition of the fluid: ϕ = 1 corresponds to the gas phase, and ϕ = −1 corresponds to the liquid phase. Across the liquid–gas interface, ϕ varies smoothly over a thin transition layer of width δ > 0. 
+
+Bulk energy. The bulk free energy is defined in terms of the double-well Ginzburg–Landau potential (2.1) F (ϕ) = 14 (ϕ2 − 1) 2,
+
+which has global minima at ϕ = ±1, corresponding to the two pure phases. Throughout this paper, σLG , σSG , and σSL denote the liquid–gas, solid–gas, and solid–liquid surface tension coefficients, respectively, and are assumed to be positive constants. The interface thickness parameter δ > 0 will later be sent to zero in the sharp-interface limit. The bulk energy functional is given by (2.2) Eb(ϕ) := 3√24 σLG 
+
+Z
+
+> Ω
+
+ δ
+
+2 |∇ ϕ|2 + 1
+
+δ F (ϕ)
+
+
+
+d3x, 6 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+where the far-field boundary condition on ∂Ω \ Γ is taken to be either ∂nϕ = 0 or ϕ = 1. The prefactor 3√24 is the normalization constant arising from the classical Γ-convergence result of Modica [19]. As δ → 0, (2.3) Γ- lim 
+
+> δ→0
+
+3√24 σLG 
+
+Z
+
+> Ω
+
+ δ
+
+2 |∇ ϕ|2 + 1
+
+δ F (ϕ)
+
+
+
+= σLG |St|,
+
+where |St| denotes the two-dimensional Hausdorff measure of the sharp liquid–gas interface St.Thus, in the sharp-interface limit, the diffuse bulk energy converges to the classical surface energy of the capillary interface. 
+
+Wall energy on the substrate. To model fluid–solid interactions on the substrate Γ, we adopt the wall energy density proposed by Jacqmin [8]: (2.4) fw(ϕ) = ϕ3 − 3ϕ
+
+4 + 12 .
+
+This function satisfies 
+
+fw(1) = 0 , fw(−1) = 1 ,
+
+so that the gas and liquid phases correspond to the two limiting values of the wall energy density. Its derivative is (2.5) f ′
+
+> w
+
+(ϕ) = 34 (ϕ2 − 1) ,
+
+which vanishes at ϕ = ±1. The associated wall energy functional is (2.6) Ew(ϕ) := ( σSL − σSG )
+
+Z
+
+> Γ
+
+fw(ϕ) d 2x. 
+
+In the sharp-interface limit δ → 0, the phase-field approaches ϕ ≈ 1 in the gas region and ϕ ≈ − 1in the liquid region. Assume that the sharp interface St meets the substrate Γ, and let Dt ⊂ Γdenote the wetting region occupied by liquid on the substrate. Its boundary ∂D t is the contact line. Since fw(1) = 0 and fw(−1) = 1, the wall energy formally approximates the substrate surface energy in the sharp-interface model: (2.7) Ew(ϕ) ≈ (σSL − σSG )|Dt|,
+
+where |Dt| denotes the two-dimensional Lebesgue measure of Dt on the substrate. 
+
+Total phase-field free energy and its first variation. The total free energy of the phase-field system is the sum of the bulk and wall contributions: (2.8) E = Eb + Ew.
+
+To derive the governing equations, we compute its first variation. For any test function ˜ϕ ∈ H1(Ω), integration by parts yields ddε ε=0 
+
+E(ϕ + ε ˜ϕ) = 3√24 σLG 
+
+Z
+
+> Ω
+
+ 1
+
+δ F ′(ϕ) − δ∆ϕ
+
+
+
+˜ϕ d3x
+
++ 3√24 σLG δ
+
+Z
+
+> Γ
+
+∂nϕ ˜ϕ d2x
+
++ ( σSL − σSG )
+
+Z
+
+> Γ
+
+f ′
+
+> w
+
+(ϕ) ˜ϕ d2x. (2.9) PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 7
+
+Here ∂nϕ = −∂z ϕ denotes the outward normal derivative on Γ = {z = 0 }, with the normal pointing into the solid substrate. 2.2. Sharp interface free energy and its first variation. We clarify the notation and conven-tions used throughout. The interface St is assumed to be a C2 embedded surface with boundary ∂S t = ∂D t. The unit vector n denotes the outward normal to St, pointing from liquid to gas. The quantity V := X · n
+
+is the scalar normal velocity of St induced by a velocity field X. The scalar mean curvature 
+
+H is defined following the convention that a sphere of radius R with outward unit normal has 
+
+H = 2 /R > 0. At a contact point p on ∂S t = ∂D t, let τ be the positively oriented unit tangent vector, let nCL 
+
+be the outward unit normal to ∂D t within the substrate Γ, and let b be the outward unit co-normal to ∂S t within the tangent plane TpSt. The contact angle θCL ∈ (0 , π ) is defined by (2.10) b · nCL = cos θCL .
+
+Young’s angle θY is determined by Young’s law (2.11) cos θY = σSG − σSL 
+
+σLG 
+
+.
+
+If the contact line moves on the substrate with normal speed vCL in the direction nCL , then the attachment condition implies (2.12) V |∂S t = vCL sin θCL .bnncl 
+
+θCL 
+
+(a) Acute contact angle 
+
+b n
+
+ncl 
+
+θCL 
+
+(b) Obtuse contact angle 
+
+Figure 1. Contact line geometry for acute and obtuse contact angles θCL , measured inside the liquid region between the substrate Γ and the tangent to the interface St.The orange vector ncl is the outward unit normal to ∂D t within the substrate Γ. The red vector b is the outward unit co-normal to ∂S t within the tangent plane 
+
+TpSt. The green vector n is the outward unit normal to St, pointing from the liquid to the gas phase. Combining the liquid–gas surface energy with the solid wetting contribution, the sharp-interface total energy is (2.13) E(St) = σLG |St| + ( σSL − σSG )|Dt|.
+
+We now give a derivation of the first variation formula using the language of rectifiable varifolds. This makes precise the decomposition into bulk mean-curvature and contact-line contributions. 8 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+Varifold setup. Let V be a 2-dimensional rectifiable varifold in R3 with weight measure ∥V∥ . For any vector field X ∈ C1 
+
+> c
+
+(R3; R3), the first variation of V is defined by (2.14) δV(X) := 
+
+Z
+
+> R3×G(2 ,3)
+
+div S X(x) d V(x, S ),
+
+where div S X(x) denotes the tangential divergence of X with respect to the plane S ∈ G(2 , 3). Equivalently, when V is rectifiable, one has the representation (2.15) δV(X) = 
+
+Z
+
+div S X d∥V∥ .
+
+We refer to [2, Sec. 3], [23, Sec. 8.1], and [18, Ch. 17] for these definitions and properties. In the present smooth setting, let 
+
+Vt = v(St, 1) denote the multiplicity-one rectifiable varifold associated with a C2 surface St, i.e. the density function satisfies θ ≡ 1. Then (2.16) ∥V t∥ = H2⌞St, δVt(X) = 
+
+Z
+
+> St
+
+div St X dH2.
+
+This formula is standard; however, for completeness, we give the following two lemmas to make the computations more explicit and transparent. The first lemma gives an intuitive computation in the smooth setting using a perturbed flow map. The second lemma explicitly computes the interior and boundary contributions in the first variation. To make (2.16) more intuitive, it is useful to interpret X as generating a deformation of space. Let {Φε}|ε|<ε 0 be the flow of diffeomorphisms associated with X, defined by (2.17) ddε Φε(x) = X(Φ ε(x)) , Φ0(x) = x. 
+
+The map Φ ε transports both the surface and its tangent planes, and the first variation δV(X)measures the first-order change of the mass of the varifold under this deformation. In this sense, 
+
+δV(X) can be interpreted as the directional derivative of area in the direction of X.
+
+Lemma 2.1. In this smooth setting, we have the identity 
+
+(2.18) δVt(X) = ddε ε=0 
+
+|Sε|,
+
+where Sε := Φ ε(St).Proof. By the area formula, (2.19) |Sε| =
+
+Z
+
+> St
+
+JSt Φε(x) d H2(x),
+
+where JSt Φε(x) is the tangential Jacobian of Φ ε along St, given by (2.20) JSt Φε(x) = 
+
+q
+
+det  ⟨DΦε(x) τi, D Φε(x)τj )⟩,
+
+for any orthonormal basis {τ1, τ 2} of TxSt.Since Φ ε(x) = x + εX (x) + o(ε), we have 
+
+DΦε(x) = I + ε DX (x) + o(ε),PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 9
+
+and thus 
+
+DΦε(x)τi = τi + ε DX (x)τi + o(ε).
+
+Consequently, 
+
+⟨DΦετi, D Φετj ⟩ = δij + ε ⟨DXτ i, τ j ⟩ + ⟨τi, DXτ j ⟩ + o(ε).
+
+Using det( I + εA ) = 1 + ε tr( A) + o(ε), (2.20) becomes 
+
+JSt Φε(x) = 1 + ε
+
+> 2
+
+X
+
+> i=1
+
+⟨DX (x)τi, τ i⟩ + o(ε).
+
+Hence, (2.21) ddε ε=0 
+
+JSt Φε(x) = 
+
+> 2
+
+X
+
+> i=1
+
+⟨DX (x)τi, τ i⟩ =: div St X(x).
+
+Differentiating (2.19) and using (2.21), we obtain ddε ε=0 
+
+|Sε| =
+
+Z
+
+> St
+
+div St X dH2.
+
+Therefore, 
+
+δVt(X) = ddε ε=0 
+
+|Sε|.
+
+□
+
+This shows that, in the smooth setting, the abstract varifold first variation coincides with the classical first variation of surface area under the flow generated by X.Because St has a boundary, δVt contains both an interior curvature term and a boundary term. We first give the precise formula. 
+
+Lemma 2.2. The first variation of the varifold V is 
+
+(2.22) ddt |St| = δVt(X) = 
+
+Z
+
+> St
+
+HV dH2 +
+
+Z
+
+> ∂S t
+
+b · X dH1,
+
+where b is the outward unit co-normal to ∂S t within T S t.
+
+Below, we derive this formula using the decomposition of the vector field X. Thus, the rate of change of area decomposes into a bulk term governed by mean curvature and a boundary term governed by the motion of the contact line. 
+
+Proof of Lemma 2.2. For clarity, let us derive (2.22) by decomposing X into normal and tangential parts. Write (2.23) X = ( X · n)n + X⊤, X⊤ ∈ T S t.
+
+Then div S X = div S
+
+ (X · n)n + div S X⊤.
+
+Hence (2.24) δVt(X) = 
+
+Z
+
+> St
+
+div S
+
+ (X · n)n dH2 +
+
+Z
+
+> St
+
+div S X⊤ dH2.10 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+Normal part. Let f := X · n. Since n is normal to St, one has the standard identity div S (f n ) = f div S n. 
+
+Under our convention div S n = H, hence (2.25) 
+
+Z
+
+> St
+
+div S
+
+ (X · n)n dH2 =
+
+Z
+
+> St
+
+H(X · n) d H2 =
+
+Z
+
+> St
+
+HV dH2.
+
+Tangential part. Since X⊤ is tangent to St, the surface divergence theorem gives (2.26) 
+
+Z
+
+> St
+
+div S X⊤ dH2 =
+
+Z
+
+> ∂S t
+
+X⊤ · b dH1 =
+
+Z
+
+> ∂S t
+
+X · b dH1,
+
+because b ∈ T S t.Combining (2.24), (2.25), and (2.26), we obtain (2.22). □
+
+First variation of the total energy. We now combine the above lemmas to compute the variation of total energy (2.13). 
+
+Theorem 2.3 (First variation of total energy) . Let 
+
+E(St) = σLG |St| + ( σSL − σSG )|Dt|.
+
+Then 
+
+(2.27) dE
+
+dt = σLG 
+
+Z
+
+> St
+
+HV dH2 + σLG 
+
+Z
+
+> ∂D t
+
+(cos θCL − cos θY ) vCL dH1.
+
+Proof. First, differentiate (2.13): (2.28) dE
+
+dt = σLG 
+
+ddt |St| + ( σSL − σSG ) ddt |Dt|.
+
+Second, we express the boundary term in terms of the contact line speed. Using Lemma 2.2, we now compute b · X on ∂S t in terms of the contact line velocity. Because the substrate is fixed, admissible variations must satisfy (2.29) X(x) ∈ TxΓ for x ∈ ∂S t.
+
+Therefore, the contact line moves within Γ, and its instantaneous velocity is (2.30) X|∂S t = vCL nCL + w τ 
+
+for some tangential reparametrization speed w along the contact line. Since b ⊥ τ , only the nCL -component contributes: (2.31) b · X = vCL b · nCL .
+
+By the definition (2.10) of θCL ,(2.32) b · X = vCL cos θCL .
+
+Substituting into (2.22) yields (2.33) ddt |St| =
+
+Z
+
+> St
+
+HV dH2 +
+
+Z
+
+> ∂S t
+
+cos θCL vCL dH1.
+
+Third, we compute the variation of the wetting area |Dt| by differentiating the substrate term 
+
+|Dt|.PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 11 
+
+Since Dt ⊂ Γ is a moving domain on the fixed surface Γ, transported by the boundary speed 
+
+vCL nCL , the transport theorem on the surface Γ gives (2.34) ddt |Dt| =
+
+Z
+
+> ∂D t
+
+vCL dH1.
+
+This is the 2-dimensional Reynolds transport formula on the substrate. Finally, combining (2.33) and (2.34), dE
+
+dt = σLG 
+
+Z 
+
+> St
+
+HV dH2 +
+
+Z
+
+> ∂D t
+
+cos θCL vCL dH1
+
+
+
++ ( σSL − σSG )
+
+Z
+
+> ∂D t
+
+vCL dH1
+
+= σLG 
+
+Z
+
+> St
+
+HV dH2 +
+
+Z
+
+> ∂D t
+
+
+
+σLG cos θCL + σSL − σSG 
+
+
+
+vCL dH1.(2.35) By Young’s law (2.11), 
+
+σSL − σSG = −σLG cos θY .
+
+Hence 
+
+σLG cos θCL + σSL − σSG = σLG (cos θCL − cos θY ).
+
+Therefore dE
+
+dt = σLG 
+
+Z
+
+> St
+
+HV dH2 + σLG 
+
+Z
+
+> ∂D t
+
+(cos θCL − cos θY )vCL dH1.
+
+This is (2.27). □
+
+Remark 2.4. The formula 
+
+dE
+
+dt = σLG 
+
+Z
+
+> St
+
+HV dH2 + σLG 
+
+Z
+
+> ∂D t
+
+(cos θCL − cos θY )vCL dH1
+
+contains two contributions: the bulk mean-curvature term 
+
+σLG 
+
+Z
+
+> St
+
+HV dH2,
+
+which is the first variation of area in the interior, and the contact-line term 
+
+σLG 
+
+Z
+
+> ∂D t
+
+(cos θCL − cos θY )vCL dH1,
+
+which represents the uncompensated Young force and vanishes when θCL = θY . Thus the first variation splits into an interior mean-curvature contribution and a boundary wetting contribution. 
+
+3. Allen–Cahn Model: Phase-Field and Sharp-Interface 
+
+In this section, we introduce a conservative phase-field Allen–Cahn model by specifying a qua-dratic dissipation functional together with a global volume constraint. We then derive the corre-sponding sharp-interface limit through formal asymptotic analysis. The limiting sharp-interface model is governed by mean curvature flow coupled with contact line dynamics, which recovers the accurate contact line speed mechanism. We also give the variational structure of the sharp-interface model. 12 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+3.1. Phase-field Allen–Cahn model. To describe dissipative dynamics, we introduce the dissi-pation functional (3.1) DAC (u, u |Γ) = 3√24
+
+ξδ 
+
+2
+
+Z
+
+> Ω
+
+u2 d3x + 3√24
+
+ζδ 
+
+2
+
+Z
+
+> Γ
+
+(u|Γ)2 d2x, 
+
+where u = ∂tϕ and u|Γ = ∂tϕ|Γ are the bulk and surface rates of change, respectively. We keep the prefactor 3√24 as in the definition of the free energy (2.2) for both phase-field models. The friction coefficients ξ, ζ > 0 are associated with the bulk and substrate dissipation. The factors of δ ensure that the dissipation functional has a finite sharp-interface limit. The L2 Allen–Cahn dynamics do not conserve the spatial average of ϕ. To describe a droplet with prescribed liquid volume, we impose the global constraint 
+
+Z
+
+> Ω
+
+ϕ d3x = |Ω| − 2 Vol ,
+
+where Vol is the prescribed liquid volume. Equivalently, the rate satisfies R 
+
+> Ω
+
+∂tϕ d3x = 0, and we introduce a scalar Lagrange multiplier Λ for this constraint in the Onsager principle. Taking the direction ˜ϕ = ∂tϕ in the first variation (2.9), and adding the constraint term, gives the constrained energy rate ddt E(ϕ(t)) − 3√24 Λ
+
+Z
+
+> Ω
+
+∂tϕ d3x = 3√24 σLG 
+
+Z
+
+> Ω
+
+ 1
+
+δ F ′(ϕ) − δ∆ϕ
+
+
+
+∂tϕ d3x
+
++ 3√24 σLG δ
+
+Z
+
+> Γ
+
+∂nϕ ∂ tϕ d2x
+
++ ( σSL − σSG )
+
+Z
+
+> Γ
+
+f ′
+
+> w
+
+(ϕ)∂tϕ d2x − 3√24 Λ
+
+Z
+
+> Ω
+
+∂tϕ d3x. (3.2) The phase-field evolution is determined by the constrained Onsager variational principle: (3.3) min 
+
+> ∂tϕ, ∂ tϕ|Γ
+
+"
+
+ddt E(ϕ(t)) − 3√24 Λ
+
+Z
+
+> Ω
+
+∂tϕ d3x + DAC (∂tϕ, ∂ tϕ|Γ)
+
+#
+
+.
+
+Taking variations of (3.3) with respect to ∂tϕ and ∂tϕ|Γ, with the energy-rate terms given by (3.2), gives the first two equations below. The multiplier Λ is chosen so that variation of the associated constrained Lagrangian with respect to Λ gives R 
+
+> Ω
+
+∂tϕ d3x = 0, which together with the initial condition R 
+
+> Ω
+
+ϕ(·, 0) d 3x = |Ω| − 2 Vol gives the last equation: (3.4) 
+
+
+
+ξδ ∂ tϕ = σLG 
+
+
+
+δ∆ϕ − 1
+
+δ F ′(ϕ)
+
+
+
++ Λ , in Ω ,ζδ ∂ tϕ = −σLG δ ∂ nϕ − (σSL − σSG ) 43√2 f ′
+
+> w
+
+(ϕ), on Γ ,
+
+Z
+
+> Ω
+
+ϕ d3x = |Ω| − 2 Vol .
+
+The first equation is the Allen–Cahn equation with a global Lagrange multiplier Λ enforcing mass conservation. The second is a dynamic boundary condition derived from the wall energy. The third is the integrated form of the conservation law determined by the initial volume. PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 13 
+
+3.2. Sharp-interface limit of the Allen–Cahn model. We carry out a matched asymptotic expansion, assuming a single connected moving interface St with interface thickness δ ≪ 1. For both the asymptotic analysis and the gradient-flow structure of the sharp-interface model, we assume that the sharp interface is attached to the substrate. This is a kinematic condition in the derivation. 3.2.1. Inner profile and motion by mean curvature. In the inner region near St, we introduce the signed distance function d(x, t ) to St, defined so that d > 0 in the gas phase and d < 0 in the liquid phase. We seek an ansatz ϕ(x, t ) ≈ Φ( d(x, t )/δ ), where Φ : R → [−1, 1] is the one-dimensional transition profile. The signed distance function satisfies the following properties on St, where d = 0: 
+
+∇d = n, 
+
+where n is the unit normal to St pointing from liquid to gas. Moreover, 
+
+∂td = −V. 
+
+Indeed, if d(x(t), t ) = 0 on the evolving surface St, then 
+
+∂td + ∇d · ˙x(t) = ∂td + V = 0 ,
+
+where V is the outward normal velocity of St. Finally, ∆d = H, 
+
+where H is the mean curvature of St with our convention H = 2 /R > 0 for a sphere of radius R.With r = d/δ , the chain rule gives the leading-order approximations 
+
+∂tϕ ≈ 1
+
+δ Φ′(r)∂td = − 1
+
+δ Φ′(r)V, (3.5) 
+
+∇ϕ ≈ 1
+
+δ Φ′(r)∇d = 1
+
+δ Φ′(r)n, (3.6) ∆ϕ ≈ 1
+
+δ2 Φ′′ (r)|∇ d|2 + 1
+
+δ Φ′(r)∆ d = 1
+
+δ2 Φ′′ (r) + 1
+
+δ Φ′(r)H. (3.7) Substituting into the first equation of (3.4) and collecting terms: 
+
+ξΦ′V = −σLG 
+
+ Φ′′ − F ′(Φ) 
+
+δ + Φ ′H
+
+
+
+− Λ.O(δ−1) balance (leading order): 
+
+(3.8) Φ′′ − F ′(Φ) = 0 , r ∈ R.
+
+Solving the profile equation. Multiply (3.8) by Φ ′ and integrate: (3.9) 12 (Φ ′)2 = F (Φ) + C. 
+
+The boundary conditions Φ( ±∞ ) = ±1 with F (±1) = 0 force C = 0. Hence Φ′ = 1
+
+√2 (1 − Φ2),
+
+which is a separable ODE. Separating variables: 
+
+Z Φ0
+
+dϕ ′
+
+1 − (ϕ′)2 = r
+
+√2 ,14 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+giving the unique monotone solution (3.10) Φ( r) = tanh 
+
+ r
+
+√2
+
+
+
+.
+
+Near the interface, ϕ(x, t ) ≈ tanh  d(x, t )/(√2 δ).
+
+O(1) balance (sub-leading order): Projecting the O(1) equation onto the translational mode Φ′, and absorbing the resulting constant factor and sign into the spatially constant multiplier, gives the motion by mean curvature :(3.11) ξV = −σLG H + Λ .
+
+The Lagrange multiplier Λ enforces global mass conservation and plays the role of a spatially constant chemical potential. 3.2.2. Recovery of the contact line velocity. We now derive the contact line law from the boundary condition in (3.4). Near the contact line, we again use ϕ ≈ Φ( d(x, t )/δ ). The boundary condition on Γ becomes 
+
+ζΦ′∂td = −σLG Φ′∂nd − (σSL − σSG ) 43√2 f ′
+
+> w
+
+(Φ) .
+
+Using (2.5), we have 43√2 f ′
+
+> w
+
+(Φ) = 1√2 (Φ 2 − 1) = −Φ′. Since ∂nd = −∂z d on Γ, the equation simplifies to 
+
+ζΦ′∂td = σLG Φ′∂z d + ( σSL − σSG )Φ ′.
+
+Dividing through by Φ ′ > 0: (3.12) ζ∂ td = σLG ∂z d + σSL − σSG .
+
+On the substrate Γ, the outward normal of Ω points into the solid, so ∂nd = −∂z d. Since ∇d = n
+
+points from liquid to gas and makes angle θCL with ˆ z, we have (3.13) ∂z d = ˆ z · ∇ d = ˆ z · n = cos θCL .
+
+Here θCL is the dynamic contact angle (inner angle between St and Γ). The time derivative ∂td on the substrate at the contact point Z(t) = ( x(t), y (t), 0) ∈ ∂D t can be related to the contact line speed by differentiating d(Z(t), t ) ≡ 0: (3.14) ∂td|∂D t + ∇d · ˙Z = 0 .
+
+Since ˙Z = vCL nCL lies in Γ and ∇d·nCL = sin θCL at the contact point, this gives ∂td|∂D t = −∇ d· ˙Z =
+
+−vCL sin θCL .Substituting (3.13) and ∂td = −vCL sin θCL into (3.12), and using Young’s equation: (3.15) ζv CL = σLG (cos θY − cos θCL )sin θCL 
+
+.
+
+Remark 3.1. The physically natural form of the contact line law is 
+
+(3.16) ζv CL = σLG (cos θY − cos θCL ),
+
+where ζ is the contact line friction coefficient. In the phase-field derivation, the evolution law is first obtained in terms of the normal velocity 
+
+V = −∂td. Using the geometric relation V = vCL sin θCL leads to an equivalent expression involving a factor 1/ sin θCL . Equivalently, the factor sin θCL can be absorbed into the effective contact-line friction coefficient, and does not represent a distinct physical mechanism. PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 15 
+
+After absorbing the factor sin θCL into the effective contact-line friction coefficient, still denoted by ζ, the sharp-interface model obtained as the sharp-interface limit of the Allen–Cahn model (3.4) is (3.17) 
+
+
+
+ξV = −σLG H + Λ , on St,ζv CL = σLG (cos θY − cos θCL ), on ∂D t,
+
+|ΩL(t)| = Vol ,∂S t = ∂D t.
+
+We impose that the capillary surface is attached to the substrate, ∂S t = ∂D t. This is a kinematic condition used in the derivation. 3.3. Variational structure for the sharp-interface system from Allen–Cahn. The sharp-interface system (3.17) can be derived directly as an L2-gradient flow of the energy E(St) with respect to the dissipation functional (3.18) DAC = ξ
+
+2
+
+Z
+
+> St
+
+V 2 dH2 + ζ
+
+2
+
+Z
+
+> ∂D t
+
+v2 
+
+> CL
+
+dH1.
+
+Indeed, minimizing dE 
+
+> dt
+
++ DAC over V and vCL , and using Theorem 2.3 after including the volume constraint, immediately yields (3.17). In the graph representation h(x, y, t ), ( x, y ) ∈ Dt, the sharp-interface model with volume con-straint is [5] (3.19) 
+
+
+
+ξ ∂th
+
+p1 + |∇ h|2 = σLG ∇ · ∇h
+
+p1 + |∇ h|2
+
+!
+
+− Λ, on Dt,h = 0 , on ∂D t,ζv CL = σLG cos θY − 1
+
+p1 + |∇ h|2
+
+!
+
+, on ∂D t,
+
+Z
+
+> Dt
+
+h dx dy = Vol .
+
+We refer to [6] for the detailed derivation in the graph representation. 4. Cahn–Hilliard Model: Phase-Field and Sharp-Interface 
+
+In this section, we introduce the phase-field Cahn–Hilliard model through an H−1 bulk dissipa-tion mechanism coupled with the same substrate dissipation as in the Allen–Cahn model. We then derive its sharp-interface limit by formal asymptotic analysis. The substrate dynamics are the same as in the Allen–Cahn case because the leading-order inner profile is again the solution (3.10). The capillary surface dynamics, however, differ from those of the Allen–Cahn model: instead of local motion by mean curvature, the Cahn–Hilliard model yields the nonlocal Mullins–Sekerka evolution (4.5), first derived by Pego [21]. We also present the variational structures of both the phase-field model and the sharp-interface Mullins–Sekerka model with contact line dynamics. 16 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+4.1. Phase-field Cahn–Hilliard model. We consider the same free energy functional E = Eb +
+
+Ew as defined in Section 2.1. In contrast to the Allen–Cahn case, no explicit Lagrange multiplier is introduced here, since mass conservation is built into the Cahn–Hilliard dynamics through the bulk H−1 metric. We impose the far-field boundary condition ∂nϕ = 0 or ϕ = 1 on ∂Ω \ Γ. To reflect this conservation law, we introduce the dissipation functional (4.1) DCH (u, u |Γ) = 3√24
+
+ξ
+
+2
+
+Z
+
+> Ω
+
+u(−∆N )−1u d3x + 3√24
+
+ζδ 
+
+2
+
+Z
+
+> Γ
+
+(u|Γ)2 d2x, 
+
+where u = ∂tϕ, and ( −∆N )−1 denotes the inverse Neumann Laplacian acting on mean-zero func-tions. The first term in (4.1) induces an H−1(Ω) metric in the bulk, which enforces mass conservation, while the second term is the L2(Γ) dissipation localized at the substrate. Recalling the first variation of the free energy from (2.9), we have ddt E(ϕ(t)) = 3√24 σLG 
+
+Z
+
+> Ω
+
+ 1
+
+δ F ′(ϕ) − δ∆ϕ
+
+
+
+∂tϕ d3x
+
++ 3√24 σLG δ
+
+Z
+
+> Γ
+
+∂nϕ ∂ tϕ d2x
+
++ ( σSL − σSG )
+
+Z
+
+> Γ
+
+f ′
+
+> w
+
+(ϕ) ∂tϕ d2x. 
+
+Via the Onsager variational principle, the evolution of ϕ is determined by minimizing the sum of the energy rate and the dissipation functional: (4.2) min 
+
+> ∂tϕ, ∂ tϕ|Γ
+
+ ddt E(ϕ(t)) + DCH (∂tϕ, ∂ tϕ|Γ)
+
+
+
+.
+
+Proposition 4.1 (Cahn–Hilliard system with contact line dynamics) . The Onsager variational principle yields the following system: 
+
+(4.3) 
+
+
+
+ξ ∂ tϕ = ∆ μ, μ = −σLG δ∆ϕ + σLG 
+
+δ F ′(ϕ), in Ω,ζδ ∂ tϕ = −σLG δ ∂ nϕ − (σSL − σSG ) 43√2 f ′
+
+> w
+
+(ϕ), on Γ,∂nϕ = 0 on ∂Ω \ Γ, ∂nμ = 0 on ∂Ω.
+
+Proof. We take first variations of (4.2) with respect to the bulk rate u = ∂tϕ and the substrate rate 
+
+u|Γ = ∂tϕ|Γ. Since the Cahn–Hilliard rate has zero mean, let ψ = ( −∆N )−1u, so that −∆ψ = u
+
+with homogeneous Neumann boundary condition and zero mean. Variation with respect to u gives 3√24
+
+
+
+σLG 
+
+ 1
+
+δ F ′(ϕ) − δ∆ϕ
+
+
+
++ ξψ 
+
+
+
+= 0 .
+
+With (4.4) μ = −σLG δ∆ϕ + σLG 
+
+δ F ′(ϕ),
+
+this stationarity condition is μ + ξψ = 0. Applying ∆ and using −∆ψ = ∂tϕ yields 
+
+ξ ∂ tϕ = ∆ μ. PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 17 
+
+The variation with respect to ∂tϕ|Γ balances the boundary part of the energy rate with the substrate dissipation, giving 
+
+ζδ ∂ tϕ = −σLG δ ∂ nϕ − (σSL − σSG ) 43√2 f ′
+
+> w
+
+(ϕ).
+
+The remaining conditions are the natural boundary conditions associated with the variational formulation. □
+
+Integrating the bulk equation over Ω, we obtain 
+
+ξ ddt
+
+Z
+
+> Ω
+
+ϕ d3x =
+
+Z
+
+> Ω
+
+∆μ d3x =
+
+Z
+
+> ∂Ω
+
+∂nμ d2x = 0 ,
+
+using the Neumann boundary condition ∂nμ = 0. Thus the Cahn–Hilliard dynamics conserve the total mass. The system (4.3) can be interpreted as follows. The bulk equation 
+
+∂tϕ = 1
+
+ξ ∆μ
+
+describes diffusion driven by gradients of the chemical potential. The chemical potential μ contains both interfacial effects through ∆ ϕ and bulk thermodynamic effects through F ′(ϕ). The boundary condition on Γ models contact-line relaxation caused by an imbalance of surface tensions. 4.2. Sharp-interface limit of the Cahn–Hilliard system. We now derive the sharp-interface limit from the Cahn–Hilliard system (4.3). This asymptotic analysis follows the classical result of Pego [21]. We present the formal derivation and clarify the intermediate steps. We assume a well-prepared initial condition so that a diffuse interface of thickness O(δ) persists for short times. 
+
+Theorem 4.2 (Mullins–Sekerka limit) . In the limit δ → 0, the Cahn–Hilliard system converges formally to the Mullins–Sekerka problem 
+
+(4.5) 
+
+
+
+∆μ = 0 , in ΩG(t) and ΩL(t),∂nμ = 0 , on ∂Ω,μL = μG = −√23 σLG H, on St,
+
+2ξV = ∂nμL − ∂nμG, on St,
+
+where the chemical potential is harmonic in each bulk phase, and the Gibbs–Thomson relation 
+
+μL = μG = − 
+
+> √23
+
+σLG H holds on the interface. The mean curvature H is defined so that a sphere of radius R with outward unit normal has H = 2 /R > 0. The normal derivatives in the velocity law are taken in the direction n pointing from liquid to gas. 
+
+Remark 4.3. Formula (4.5) agrees with equation (1.4) in [1] after the change of variable v = −μ.The sign difference from equations (2.6) and (5.12) in [21] comes from the definition of the normal velocity V .Proof. First, using asymptotic expansion, we compute the outer expansion in the bulk regions. Away from the interface, we expand 
+
+ϕ = ϕ0 + δϕ 1 + · · · , μ = μ0 + δμ 1 + · · · .
+
+The singular term in the chemical potential forces the well-prepared outer states into the wells of the potential: 
+
+ϕ0 = ±1.18 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+Substituting into (4.3), we obtain ∆μ0 = 0 ,
+
+so μ0 is harmonic in each phase. This means the bulk dynamics are quasi-static diffusion, with all nontrivial dynamics localized at the interface. Next, we compute the inner expansion in the interfacial layer. Near the interface St, we introduce the signed distance function d(x, t ) and the stretched variable 
+
+r = d(x, t )
+
+δ .
+
+We seek an inner approximation 
+
+ϕ(x, t ) ≈ Φ( r),
+
+where Φ is the transition profile. Recall the geometric identities on St give (4.6) ∇d = n, ∂td = −V, ∆d = H. 
+
+Thus, 
+
+∂tϕ ≈ − 1
+
+δ Φ′(r)V, (4.7) 
+
+∇ϕ ≈ 1
+
+δ Φ′(r)n, (4.8) ∆ϕ ≈ 1
+
+δ2 Φ′′ (r) + 1
+
+δ Φ′(r)H. (4.9) The chemical potential (4.4) becomes (4.10) μ ≈ − σLG 
+
+ 1
+
+δ (Φ ′′ − F ′(Φ)) + Φ ′H
+
+
+
+.O(δ−1) balance (leading order): At order O(δ−1) in the chemical potential, we obtain (4.11) Φ′′ − F ′(Φ) = 0 ,
+
+whose unique monotone solution is Φ( r) = tanh 
+
+ r
+
+√2
+
+
+
+.O(1) balance (sub-leading order): 
+
+At the next order, 
+
+ϕ(x, t ) ≈ Φ( r) + δU 1(r),
+
+and we obtain a linearized problem for U1(r): (4.12) LU1 = f (r), L = −∂rr + F ′′ (Φ) , f (r) = HΦ′(r) + μ0
+
+σLG 
+
+.
+
+From (4.11), we have LΦ′ = 0. Solvability for (4.12) requires 
+
+Z ∞−∞ 
+
+f (r)Φ ′(r) dr = 0 ,
+
+which gives 
+
+H
+
+Z ∞−∞ 
+
+(Φ ′)2dr + μ0
+
+σLG 
+
+Z ∞−∞ 
+
+Φ′dr = 0 .PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 19 
+
+Using Z ∞−∞ 
+
+Φ′dr = 2 ,
+
+Z ∞−∞ 
+
+(Φ ′)2dr = 2√23 ,
+
+we conclude (4.13) μ0 = −√23 σLG H. 
+
+Thus curvature shifts the chemical potential, producing the Gibbs–Thomson effect. Interface velocity law. The Cahn–Hilliard equation reads 
+
+∂tϕ = 1
+
+ξ ∆μ. 
+
+In the inner region, 
+
+∂tϕ ≈ − 1
+
+δ Φ′(r)V, ∆μ ≈ ∂nn μ. 
+
+Integrating the equation ξ∂ tϕ = ∆ μ across a thin tubular neighborhood from the liquid side to the gas side gives 
+
+ξ
+
+Z ∞−∞ 
+
+
+
+− 1
+
+δ Φ′(r)V
+
+
+
+δ dr = ∂nμG − ∂nμL.
+
+Since R ∞−∞ Φ′ dr = 2, we obtain (4.14) 2ξV = ∂nμL − ∂nμG.
+
+This means the interface moves by diffusive flux imbalance across it. 
+
+□
+
+4.2.1. Contact line dynamics. The analysis near the contact line follows the same structure as in the Allen–Cahn case in Section 3.2.2. The boundary condition reduces to 
+
+ζv CL = σLG (cos θY − cos θCL )sin θCL 
+
+, on ∂D t.
+
+As in Remark 3.1, absorbing the factor sin θCL into ζ gives 
+
+ζv CL = σLG (cos θY − cos θCL ), on ∂D t.
+
+4.2.2. The Mullins–Sekerka problem with contact line dynamics. Based on the preceding asymp-totic analysis and the contact-line calculation, we summarize the sharp-interface Mullins–Sekerka problem with moving contact line: (4.15) 
+
+
+
+∆μG = 0 , in Ω G(t),
+
+∆μL = 0 , in Ω L(t),∂nμ = 0 , on ∂Ω,μL = μG = −√23 σLG H, on St,
+
+2ξV = ∂nμL − ∂nμG, on St,ζv CL = σLG (cos θY − cos θCL ), on ∂D t,∂S t = ∂D t.
+
+We impose that the capillary surface is attached to the substrate, ∂S t = ∂D t.20 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+The contact-line equation describes the motion of ∂D t, where vCL is the contact line velocity and 
+
+θCL is the dynamic contact angle. It reflects the balance between capillary forces and contact-line dissipation. 4.3. Variational formulation of the Mullins–Sekerka problem. We now present a variational interpretation of the Mullins–Sekerka dynamics coupled with the moving contact line. Recall that the rate of change of the free energy is given by (4.16) dE
+
+dt = σLG 
+
+Z
+
+> St
+
+HV dH2 + σLG 
+
+Z
+
+> ∂D t
+
+(cos θCL − cos θY ) vCL dH1.
+
+We next define the dissipation functional through an auxiliary problem for μ. For a given interface St and normal velocity V , we introduce a chemical potential μ defined on Ω G(t) ∪ ΩL(t)as the solution to (4.17) 
+
+
+
+∆μ = 0 , in Ω G(t) ∪ ΩL(t),∂nμ = 0 , on ∂Ω,∂nμL − ∂nμG = 2 ξV, on St,
+
+[μ] = 0 , on St.
+
+Define the dissipation functional associated with the Mullins–Sekerka dynamics as (4.18) DMS = β
+
+2
+
+Z
+
+> ΩG(t)∪ΩL(t)
+
+|∇ μ|2 dx + ζ
+
+2
+
+Z
+
+> ∂D t
+
+v2 
+
+> CL
+
+dH1,
+
+where the mobility constant β is to be determined. The first term represents H−1-type bulk diffusion dissipation in terms of the chemical potential μ, while the second term accounts for dissipation localized at the contact line. Below, we represent the H−1-type bulk dissipation as a dual pairing of the chemical potential and the normal velocity, where μ is solved from (4.17). Using Green’s identity, ∆ μ = 0, and the transmission conditions, we obtain (4.19) 
+
+Z
+
+> ΩG(t)∪ΩL(t)
+
+|∇ μ|2 dx =
+
+Z
+
+> St
+
+(μL∂nμL − μG∂nμG) d H2 = 2 ξ
+
+Z
+
+> St
+
+μV dH2.
+
+This identity connects the bulk dissipation to the interfacial motion. We determine the evolution by minimizing the functional dE
+
+dt + DMS 
+
+with respect to the interface velocity V and the contact line velocity vCL . Taking variations in V
+
+and vCL yields (4.20) σLG H = −2ξβμ, on St,ζv CL = σLG (cos θY − cos θCL ), on ∂D t.
+
+Finally, we choose the mobility in the dissipation functional to recover the same coefficients as in the sharp-interface limit of the Cahn–Hilliard model. Choosing 
+
+β = 32√2 ξ
+
+recovers the Gibbs–Thomson relation 
+
+μ = −√23 σLG H. PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 21 
+
+Combining (4.17) and (4.20) yields the full sharp-interface Mullins–Sekerka system with moving contact line (4.15). 5. Numerical Schemes and Results 
+
+We now construct numerical schemes that preserve the variational structure of the phase-field models. Recall from Section 2.1 that the total free energy is (5.1) E(ϕ) = Eb(ϕ) + Ew(ϕ) = 3√24 σLG 
+
+Z
+
+> Ω
+
+ δ
+
+2 |∇ ϕ|2 + 1
+
+δ F (ϕ)
+
+
+
+d3x + ( σSL − σSG )
+
+Z
+
+> Γ
+
+fw(ϕ) d 2x. 
+
+To handle numerical values of ϕ outside [ −1, 1], we use the following C2 extension of the wall energy density in (5.1): (5.2) fw(ϕ) = 
+
+
+
+34 (ϕ − 1) 2, ϕ > 1,ϕ3 − 3ϕ
+
+4 + 12 , −1 ≤ ϕ ≤ 1,
+
+1 − 34 (ϕ + 1) 2, ϕ < −1.
+
+This extension agrees with (2.4) on [ −1, 1] and satisfies |f ′′ 
+
+> w
+
+(ϕ)| ≤ 3/2 for all ϕ ∈ R. The double-well potential needs no analogous extension, since F (ϕ) = 14 (ϕ2 − 1) 2 is already defined on all of R and satisfies F ′′ (ϕ) ≥ − 1. The discretization is introduced in two steps. We first apply a minimizing movement scheme in time using (5.1) and the Onsager dissipation functionals from Sections 3 and 4. We then discretize the resulting variational problems in space by conforming finite elements. Thus the Allen–Cahn scheme is the minimizing movement scheme for (3.3), while the Cahn–Hilliard scheme is the mini-mizing movement scheme for (4.2). 5.1. Minimizing movement (JKO) scheme. Let tn = n∆t. Given ϕn−1, the Allen–Cahn update is obtained by minimizing the free energy plus the time-discrete Allen–Cahn dissipation: (5.3) ϕn = argmin ϕ∈H1(Ω) R    
+
+> Ωϕd3x=R
+> Ωϕn−1d3x
+
+
+
+E(ϕ) + ∆ t DAC 
+
+ ϕ − ϕn−1
+
+∆t , ϕ − ϕn−1
+
+∆t Γ
+
+ 
+
+.
+
+The constraint is the time-discrete form of the conservative Allen–Cahn volume constraint. If the initial data satisfy R 
+
+> Ω
+
+ϕ0 d3x = |Ω| − 2 Vol, then (5.3) preserves this value at every time step. The Cahn–Hilliard minimizing movement step is (5.4) ϕn = argmin ϕ∈H1(Ω) 
+
+
+
+E(ϕ) + ∆ t DCH 
+
+ ϕ − ϕn−1
+
+∆t , ϕ − ϕn−1
+
+∆t Γ
+
+ 
+
+.
+
+Theorem 5.1 (Energy stability and conditional well-posedness) . The minimizers of (5.3) and 
+
+(5.4) , whenever they exist, satisfy 
+
+E(ϕn) + ∆ t DAC 
+
+ ϕn − ϕn−1
+
+∆t , ϕn − ϕn−1
+
+∆t Γ
+
+
+
+≤ E(ϕn−1)(5.5) 
+
+E(ϕn) + ∆ t DCH 
+
+ ϕn − ϕn−1
+
+∆t , ϕn − ϕn−1
+
+∆t Γ
+
+
+
+≤ E(ϕn−1).(5.6) 22 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+In addition, consider the Allen–Cahn minimizing movement restricted to a finite-dimensional space, with the same mass constraint as in (5.3) . With the extended wall energy density (5.2) , if 
+
+(5.7) ∆t ≤ min 
+
+ ξδ 2
+
+σLG 
+
+, ζδ 
+
+√2|σSL − σSG |
+
+
+
+,
+
+with the second restriction omitted when σSL = σSG , then the Allen–Cahn objective is strictly convex on the admissible affine space. Consequently the discrete Allen–Cahn minimizing movement has a unique minimizer. Similarly, the finite-dimensional Cahn–Hilliard minimizing movement, with the H−1 term acting on mean-zero increments, is strictly convex on the admissible affine space if 
+
+(5.8) ∆t < min 
+
+ 4ξδ 3
+
+σLG 
+
+, ζδ 
+
+√2|σSL − σSG |
+
+
+
+,
+
+again omitting the second restriction when σSL = σSG . Consequently the discrete Cahn–Hilliard minimizing movement has a unique minimizer. Proof. For the energy laws, the previous state ϕn−1 belongs to the admissible class of each mini-mizing movement. Evaluating the objective at ϕn−1 gives the right-hand side, and minimality gives (5.5) and (5.6). Next we justify the convexity assertion for the Allen–Cahn step. Let 
+
+JAC (ϕ; ϕn−1) := E(ϕ) + ∆ t DAC 
+
+ ϕ − ϕn−1
+
+∆t , ϕ − ϕn−1
+
+∆t Γ
+
+
+
+,
+
+restricted to the finite-dimensional space. For an admissible variation vh satisfying ( vh, 1) Ω = 0, its second variation is 
+
+J′′ 
+
+> AC
+
+(ϕ; ϕn−1)[ vh, v h] = 3√24 σLG δ∥∇ vh∥2
+
+> L2(Ω)
+
++ 3√24
+
+Z
+
+> Ω
+
+ σLG 
+
+δ F ′′ (ϕ) + ξδ 
+
+∆t
+
+
+
+v2 
+
+> h
+
+d3x
+
++
+
+Z
+
+> Γ
+
+"
+
+(σSL − σSG )f ′′ 
+
+> w
+
+(ϕ) + 3√24
+
+ζδ 
+
+∆t
+
+#
+
+v2 
+
+> h
+
+d2x. 
+
+Since F ′′ (ϕ) = 3 ϕ2 − 1 ≥ − 1 and the extended wall energy satisfies |f ′′ 
+
+> w
+
+| ≤ 3/2, the bulk and bound-ary zeroth-order coefficients are nonnegative under (5.7). The remaining gradient term is strictly positive for every nonzero admissible variation, because the mass constraint excludes nonzero con-stants. Hence JAC is strictly convex on the admissible affine space. Coercivity follows from the quartic bulk energy, the gradient term, and the quadratic movement cost. Therefore the finite-dimensional constrained minimization problem has a unique minimizer by the direct method. For the Cahn–Hilliard step, the only new point is the bulk metric. For a mean-zero admissible variation vh, the bulk part of the second variation is bounded from below by 3√24
+
+
+
+σLG δ∥∇ vh∥2 
+
+> L2(Ω)
+
+− σLG 
+
+δ ∥vh∥2 
+
+> L2(Ω)
+
++ ξ
+
+∆t ∥vh∥2 
+
+> H−1
+> N(Ω)
+
+
+
+.
+
+Using the standard Neumann interpolation estimate ∥vh∥2 
+
+> L2(Ω)
+
+≤ ∥∇ vh∥L2(Ω) ∥vh∥H−1 
+
+> N(Ω)
+
+, this lower bound is positive for every nonzero vh if ∆ t < 4ξδ 3/σ LG . The boundary part is nonnegative under the same wall restriction as above, because |f ′′ 
+
+> w
+
+| ≤ 3/2. Thus the Cahn–Hilliard objective is strictly convex. Coercivity and finite-dimensional compactness then give existence, and strict convexity gives uniqueness. □PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 23 
+
+Remark 5.2 (Convex-splitting variant) . An unconditionally solvable variant is obtained by replac-ing E(ϕ) in the minimizing movement objectives by a convex-splitting linearization Ecs (ϕ; ϕn−1).For the double-well potential, write 
+
+F (ϕ) = Fc(ϕ) + Fe(ϕ), Fc(ϕ) = 14 ϕ4 + 14 , Fe(ϕ) = − 12 ϕ2.
+
+The concave part is then replaced by its tangent at the previous time step: 
+
+F (ϕ) ⇝ Fc(ϕ) + Fe(ϕn−1) + F ′
+
+> e
+
+(ϕn−1)( ϕ − ϕn−1).
+
+For the wall energy, one may apply the same idea to g(ϕ) = ( σSL − σSG )fw(ϕ). Since |f ′′ 
+
+> w
+
+| ≤ 3/2,choose LΓ ≥ 32 |σSL − σSG | and write 
+
+g(ϕ) = 
+
+
+
+g(ϕ) + LΓ
+
+2 ϕ2
+
+
+
+− LΓ
+
+2 ϕ2.
+
+Linearizing the last concave quadratic gives a functional Ecs (ϕ; ϕn−1) that is convex in ϕ and agrees with E(ϕ) at ϕ = ϕn−1. The corresponding finite-dimensional minimizing movement objective is therefore strictly convex for every ∆t > 0, because the quadratic movement term and the gradient term exclude nonzero null directions on the admissible mass class. Hence the convex-split scheme has a unique minimizer without a time-step restriction. In the computations reported below, how-ever, we use the minimizing movement schemes with the original energy E(ϕ).
+
+5.2. Finite element discretization. Let Th be a shape-regular mesh of Ω that resolves the sub-strate Γ. For the two-dimensional computations below, we use a uniform rectangular mesh and the 
+
+H1-conforming tensor-product finite element space 
+
+Vh = {vh ∈ C0(Ω) : vh|K ∈ Qk(K) for K ∈ T h} ⊂ H1(Ω) ,
+
+where Qk(K) is the space of polynomials of degree at most k in each variable on the element K. The three-dimensional computations use the analogous tensor-product space on hexahedral elements. We also define the mean-zero subspace 
+
+Vh, 0 := {vh ∈ Vh : ( vh, 1) Ω = 0 }.
+
+We write ( u, v )Ω = R 
+
+> Ω
+
+uv dx and ⟨u, v ⟩Γ = R 
+
+> Γ
+
+uv ds. The finite element energy Eh is obtained by restricting the original energy E to Vh and evaluating the integrals by the quadrature used in the computation. For a finite element rate rh ∈ Vh, set 
+
+DAC ,h (rh, r h|Γ) = 3√24
+
+ ξδ 
+
+2 ∥rh∥2 
+
+> L2(Ω)
+
++ ζδ 
+
+2 ∥rh∥2
+
+> L2(Γ)
+
+
+
+.
+
+The finite element Allen–Cahn minimizing movement is (5.9) ϕnh = argmin ϕh∈Vh 
+
+> (ϕh,1) Ω=( ϕn−1
+> h,1) Ω
+
+(
+
+Eh(ϕh) + ∆ t DAC ,h 
+
+ϕh − ϕn−1
+
+> h
+
+∆t , ϕh − ϕn−1
+
+> h
+
+∆t Γ
+
+!) 
+
+.24 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+Introducing the Lagrange multiplier Λ nh ∈ R and using the definitions of Eh and DAC ,h , we obtain the following discrete Euler–Lagrange equations: find ( ϕnh, Λnh) ∈ Vh × R such that 
+
+ξδ (ϕnh − ϕn−1 
+
+> h
+
+)∆t , ψ h
+
+!
+
+> Ω
+
++ σLG δ(∇ϕnh, ∇ψh)Ω +
+
+ σLG 
+
+δ F ′(ϕnh), ψ h
+
+
+
+> Ω
+
+− (Λ nh, ψ h)Ω
+
++
+
+* ζδ (ϕnh − ϕn−1 
+
+> h
+
+)∆t + 43√2 (σSL − σSG )f ′
+
+> w
+
+(ϕnh), ψ h
+
++
+
+> Γ
+
+= 0 , ∀ψh ∈ Vh,(5.10a) (ϕnh, 1) Ω = ( ϕn−1 
+
+> h
+
+, 1) Ω.(5.10b) This is a backward-Euler variational discretization of (3.4). In particular, the boundary contribu-tion in (5.10a) is the weak form of the dynamic boundary condition 
+
+ζδ ϕnh − ϕn−1
+
+> h
+
+∆t = −σLG δ ∂ nϕnh − 43√2 (σSL − σSG )f ′
+
+> w
+
+(ϕnh) on Γ .
+
+For the Cahn–Hilliard scheme, define the discrete Neumann H−1 norm for mean-zero rh ∈ Vh, 0
+
+by (5.11) 
+
+∥rh∥2 
+
+> H−1
+> N,h (Ω)
+
+:= ( ∇wh, ∇wh)Ω, where wh ∈ Vh, 0 solves ( ∇wh, ∇ηh)Ω = ( rh, η h)Ω, ∀ηh ∈ Vh, 0.
+
+The finite element Cahn–Hilliard dissipation is obtained from (4.1) by replacing the Neumann inverse with the discrete Neumann inverse: for rh ∈ Vh, 0,
+
+DCH ,h (rh, r h|Γ) = 3√24
+
+ ξ
+
+2 ∥rh∥2 
+
+> H−1
+> N,h (Ω)
+
++ ζδ 
+
+2 ∥rh∥2
+
+> L2(Γ)
+
+
+
+.
+
+The discrete Cahn–Hilliard minimizing movement is (5.12) ϕnh = argmin ϕh∈Vh
+
+(
+
+Eh(ϕh) + ∆ t DCH ,h 
+
+ϕh − ϕn−1
+
+> h
+
+∆t , ϕh − ϕn−1
+
+> h
+
+∆t Γ
+
+!) 
+
+.
+
+The dissipation is finite only when ϕh − ϕn−1 
+
+> h
+
+∈ Vh, 0, so the mass constraint is implicit in the H−1
+
+> N,h
+
+metric. Introducing the chemical potential gives the mixed Euler–Lagrange form: find ( ϕnh, μ nh) ∈
+
+Vh × Vh such that 
+
+ξ(ϕnh − ϕn−1 
+
+> h
+
+)∆t , η h
+
+!
+
+> Ω
+
++ ( ∇μnh, ∇ηh)Ω = 0 , ∀ηh ∈ Vh,(5.13a) 
+
+− (μnh, ψ h)Ω + σLG δ(∇ϕnh, ∇ψh)Ω +
+
+ σLG 
+
+δ F ′(ϕnh), ψ h
+
+
+
+> Ω
+
++
+
+* ζδ (ϕnh − ϕn−1 
+
+> h
+
+)∆t + 43√2 (σSL − σSG )f ′
+
+> w
+
+(ϕnh), ψ h
+
++
+
+> Γ
+
+= 0 , ∀ψh ∈ Vh.(5.13b) The fully discrete schemes inherit the variational properties of the minimizing movements in Theorem 5.1. In particular, exact minimizers of (5.9) and (5.12) satisfy the corresponding discrete energy inequalities with E, DAC , and DCH replaced by Eh, DAC ,h , and DCH ,h . The Allen–Cahn scheme conserves mass by the constraint (5.10b), while the Cahn–Hilliard scheme conserves mass by taking ηh = 1 in (5.13a). The same finite-dimensional convexity argument gives conditional uniqueness under the time-step restrictions (5.7) and (5.8). PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 25 
+
+5.3. Implementation details and linear system solvers. The computations below were carried out with an MFEM implementation [3] of the fully discrete schemes (5.10) and (5.13). For the Allen– Cahn model, the code is written with MPI support and is used in both two and three dimensions. This is possible because the linearized Allen–Cahn system admits a relatively scalable solver. The Cahn–Hilliard model leads to a mixed system for ϕh and μh, whose linearized system is much harder to precondition. In the computations reported here, the Cahn–Hilliard solver is therefore used only in two dimensions, and only in serial, with a UMFPACK direct solver. We leave the development of a scalable Cahn–Hilliard solver for future work. For the Allen–Cahn scheme, the nonlinear residual in (5.10a)–(5.10b) is assembled directly, in-cluding the scalar Lagrange multiplier for the mass constraint. At each Newton step, let A be the phase-field Jacobian with respect to ϕh, let m be the assembled mass vector, and let Rϕ and Rc be the phase-field and constraint residuals. Instead of solving the full indefinite augmented system, we eliminate the scalar multiplier by a one-dimensional Schur complement. The code solves 
+
+Au = −Rϕ, Aq = m, 
+
+and then sets 
+
+δΛ = −Rc − mT umT q , δϕ = u + δΛ q. 
+
+Thus each Newton iteration requires two solves with the same phase-field Jacobian. These solves are performed by a preconditioned GMRES solver with the hypre BoomerAMG [9] preconditioner. The AMG preconditioner is cached across linear solves and time steps. It is rebuilt at the first solve, after a rejected time step, or if the GMRES iteration count is larger than 30. For the current Cahn–Hilliard solver, Newton linearization of (5.13a)–(5.13b) gives a coupled two-by-two block system for the increments ( δϕ, δμ ). This linearized system is solved using the direct UMFPACK solver. This gives a reliable serial implementation for the two-dimensional tests below. Since this direct solver is not scalable, we do not report three-dimensional Cahn–Hilliard computations here. Both solvers use the same adaptive time-stepping safeguards. We start with a target time step size ∆ t. If Newton fails to converge for a given time step size ∆ t, the trial state is discarded and the step is reduced by half to ∆ t/ 2, down to the minimum allowed step size ∆ tmin . After an accepted shortened step, the next proposed step is increased by at most a factor of two until the target step size is recovered. The Newton tolerance is 10 −10 with at most 20 iterations per time step. 5.4. Numerical examples. We now illustrate the fully discrete schemes with two wetting and dewetting tests. The examples are chosen to test the two features emphasized in the analysis: recovery of the Young-angle equilibrium determined by the wall energy, and the different transient behavior induced by the L2 and H−1 bulk metrics. Unless otherwise stated, we set σLG = 1, 
+
+ξ = ζ = 1, and σSL − σSG = −σLG cos θY , so that the prescribed parameter θY is the Young angle in (2.11). 5.4.1. Two-dimensional wetting and dewetting. The two-dimensional test uses a homogeneous pla-nar substrate, for which the sharp-interface equilibrium is a circular cap with contact angle θY .By symmetry, the computation is carried out on the half-domain Ω = [0 , 1] × [0 , 1] with sub-strate Γ = [0 , 1] × { 0} and a natural symmetry condition on {0} × [0 , 1]. The initial liquid region is the rectangle [0 , 0.5] × [0 , 0.25], corresponding to the right half of the full rectangular droplet [−0.5, 0.5] × [0 , 0.25]. The spatial discretization uses a uniform 128 × 128 rectangular mesh, so that h = 1 /128, with polynomial degree k = 1; the diffuse-interface thickness is δ = 0 .01. Both 26 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 
+
+the Allen–Cahn and Cahn–Hilliard computations use the target time step ∆ t = 0 .01. The initial state is deliberately far from equilibrium: its corners generate bulk curvature relaxation, while the contact line adjusts to the Young angle imposed by the wall energy. For each model, we monitor the discrete free-energy decay rate 
+
+rnE = E(ϕn−1
+
+h ) − E(ϕnh)∆t
+
+and stop at the first step for which rnE < 10 −7. The first three interface panels compare the two models at the common physical times t = 0 .02, 0 .2, and 1 .0. The last panel compares the terminal states after the stopping criterion has been reached. For θY = 45 ◦, the terminal times are t = 3 .44 for Allen–Cahn and t = 3 .30 for Cahn–Hilliard; for θY = 135 ◦, they are t = 2 .39 and t = 2 .22, respectively. Figures 2 and 3 compare the zero level sets of the two phase-field solutions with the exact sharp-interface circular cap of the same area and Young angle. The acute case spreads along the substrate, while the obtuse case retracts from the initial rectangular footprint. In both cases, the late-time interfaces are close to the circular-cap equilibrium. The Allen–Cahn and Cahn–Hilliard transients are not identical, but their difference decreases as the common equilibrium is approached. 0.0 0.2 0.4 0.6 0.8                       
+
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> t= 0.02
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> t= 0.20
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> t= 1.00
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> final: AC t= 3.44, CH t= 3.30
+> AC CH stationary sharp interface initial profile
+
+Figure 2. Two-dimensional wetting for θY = 45 ◦. The solid blue curve is the Allen–Cahn zero level set, the dashed orange curve is the Cahn–Hilliard zero level set, the solid black curve is the stationary sharp-interface circular cap, and the solid red curve is the initial profile. The last panel compares the terminal states at 
+
+t = 3 .44 for Allen–Cahn and t = 3 .30 for Cahn–Hilliard. 0.0 0.2 0.4 0.6 0.8                       
+
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> t= 0.02
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> t= 0.20
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> t= 1.00
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> final: AC t= 2.39, CH t= 2.22
+> AC CH stationary sharp interface initial profile
+
+Figure 3. Two-dimensional dewetting for θY = 135 ◦. The line conventions are the same as in Figure 2. The droplet retracts from the initial rectangular footprint and approaches the obtuse circular-cap equilibrium. The last panel compares the terminal states at t = 2 .39 for Allen–Cahn and t = 2 .22 for Cahn–Hilliard. PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 27 
+
+The corresponding energy histories are shown in Figure 4. The first row gives the wetting case, and the second row gives the dewetting case; within each row, the left panel shows the total free energy and the right panel shows the decay rate on a logarithmic scale. In both contact-angle regimes, the energy decreases rapidly during the initial corner smoothing and contact-line adjustment, and then levels off as the cap becomes nearly stationary. The dotted line marks the threshold 10 −7 used to choose the terminal states. The Cahn–Hilliard curve follows the same energetic trend, with small differences in the transient decay rate caused by the H−1 bulk metric. 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5                                
+
+> time
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> E( nh )
+> Y= 45 : total energy
+> AC
+> CH
+> 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5
+> time
+> 10 6
+> 10 4
+> 10 2
+> 10 0
+> 10 2
+> (En 1 En)/  t
+> Y= 45 : energy decay rate
+> AC
+> CH
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> time
+> 1.0
+> 1.2
+> 1.4
+> E( nh )
+> Y= 135 : total energy
+> AC
+> CH
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> time
+> 10 6
+> 10 4
+> 10 2
+> 10 0
+> 10 2
+> (En 1 En)/  t
+> Y= 135 : energy decay rate
+> AC
+> CH
+
+Figure 4. Discrete free-energy histories for the two-dimensional wetting and dewet-ting tests. The first row corresponds to θY = 45 ◦, and the second row corre-sponds to θY = 135 ◦. The left column shows E(ϕnh), and the right column shows (E(ϕn−1
+
+h ) − E(ϕnh)) /∆t on a logarithmic scale. The dotted line indicates the thresh-old 10 −7 used to select the terminal states. Mass conservation is shown in Figure 5. We plot the drift ( ϕnh − ϕ0
+
+h, 1) Ω rather than the absolute mass, since the latter is visually indistinguishable from a constant on the scale of the computation. The drift remains at the level of roundoff and nonlinear solver tolerance in all four runs. For Allen– Cahn, conservation follows from the scalar constraint (5.10b); for Cahn–Hilliard, it follows from (5.13a) by testing with the constant function. 28 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5                                
+
+> time
+> 1
+> 0
+> 1
+> ( nh 0
+> h , 1)
+> 1e 13 AC, Y= 45
+> 0.0 0.5 1.0 1.5 2.0 2.5 3.0
+> time
+> 2
+> 1
+> 0
+> 1
+> 2
+> ( nh 0
+> h , 1)
+> 1e 14 CH, Y= 45
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> time
+> 1
+> 0
+> 1
+> ( nh 0
+> h , 1)
+> 1e 13 AC, Y= 135
+> 0.0 0.5 1.0 1.5 2.0
+> time
+> 1
+> 0
+> 1
+> ( nh 0
+> h , 1)
+> 1e 14 CH, Y= 135
+
+Figure 5. Discrete mass conservation for the four two-dimensional runs. Each panel shows the drift of the conserved quantity ( ϕnh, 1) Ω from its initial value. 5.4.2. Three-dimensional wetting and dewetting. We next use the same setup in three dimensions. Because the equilibrium droplet is axisymmetric, the computation is carried out on the quarter domain Ω = [0 , 1] 3, with symmetry conditions on the planes x = 0 and y = 0 and the substrate on 
+
+z = 0. The initial liquid region is the rectangular block [0 , 0.5] × [0 , 0.5] × [0 , 0.25], corresponding to a full liquid volume 0 .25 after reflection across the symmetry planes. Equivalently, the conserved phase-field mass on the quarter domain is ( ϕ0
+
+> h
+
+, 1) Ω = 0 .875. The spatial discretization uses a uniform 128 × 128 × 128 mesh with k = 1, the diffuse-interface thickness is δ = 0 .01, and the target time step is ∆ t = 0 .01. We stop the simulation when the discrete energy decay rate falls below 10 −7.For a homogeneous substrate, the sharp-interface equilibrium in three dimensions is a spherical cap with the prescribed Young angle and the same liquid volume. We therefore compare the numerical zero level set with this exact cap. Figure 6 shows the y = 0 cross-section for θY = 45 ◦.As in the two-dimensional wetting case, the initially rectangular droplet spreads along the substrate and relaxes toward the spherical-cap profile. The final time is t = 2 .69, at which point the energy-decay stopping criterion is reached. PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 29 0.0 0.2 0.4 0.6 0.8                   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 0.02
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 0.20
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 1.00
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 2.69
+> AC initial profile stationary sharp interface
+
+Figure 6. Three-dimensional Allen–Cahn wetting for θY = 45 ◦. The figure shows the y = 0 cross-section on the simulated quarter domain. The solid blue curve is the numerical zero level set, the solid red curve is the initial profile, and the solid black curve is the stationary sharp-interface spherical cap with the same liquid volume and Young angle. Figure 7 shows the corresponding dewetting computation for θY = 135 ◦. The same initial block is used, but the wall energy now favors a much smaller wetted area. The droplet retracts from the initial footprint and develops the overhanging profile expected for an obtuse Young angle. The snapshots show the same qualitative behavior as in the two-dimensional dewetting test. The final time is t = 2 .80, at which point the energy-decay stopping criterion is reached. In both three-dimensional cases, the numerical zero level set is visibly slightly inside the sharp-interface curve. This is consistent with the finite diffuse-interface thickness δ = 0 .01 used in the computation. 0.0 0.2 0.4 0.6 0.8                   
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 0.02
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 0.20
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 1.00
+> 0.0 0.2 0.4 0.6 0.8
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> t= 2.80
+> AC initial profile stationary sharp interface
+
+Figure 7. Three-dimensional Allen–Cahn dewetting for θY = 135 ◦. The figure shows the y = 0 cross-section on the simulated quarter domain. The line conventions are the same as in Figure 6. The energy histories are shown in Figure 8. For both contact angles, the free energy decreases rapidly during the initial relaxation and then settles into a slow decay. Both runs reach the threshold 10 −7. The trend is consistent with the two-dimensional tests: the variational structure drives monotone relaxation toward the cap selected by Young’s law. 30 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 0.0 0.5 1.0 1.5 2.0 2.5                              
+
+> time
+> 0.20
+> 0.22
+> 0.24
+> 0.26
+> E( nh )
+> Y= 45 : free energy
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> time
+> 10 6
+> 10 4
+> 10 2
+> 10 0
+> 10 2
+> (En 1 En)/  t
+> Y= 45 : energy decay rate
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> time
+> 0.450
+> 0.475
+> 0.500
+> 0.525
+> 0.550
+> 0.575
+> 0.600
+> E( nh )
+> Y= 135 : free energy
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> time
+> 10 6
+> 10 4
+> 10 2
+> 10 0
+> 10 2
+> (En 1 En)/  t
+> Y= 135 : energy decay rate
+
+Figure 8. Discrete free-energy histories for the three-dimensional Allen–Cahn wet-ting and dewetting tests. The first row corresponds to θY = 45 ◦, and the second row corresponds to θY = 135 ◦. The left column shows E(ϕnh), and the right column shows ( E(ϕn−1
+
+h ) − E(ϕnh)) /∆t on a logarithmic scale. The dotted line indicates the stopping threshold 10 −7.The same comparison can also be displayed by reflecting the computed interface across the two symmetry planes. Figure 9 plots the reconstructed zero level sets together with the exact spherical caps. The left panel uses the terminal wetting state for θY = 45 ◦, and the right panel uses the terminal dewetting state for θY = 135 ◦. These surfaces provide a direct three-dimensional analogue of the two-dimensional sharp-interface comparisons. 0.8 0.6 0.4 0.2 0.0 0.2 0.4 0.6 0.8 0.8                     
+
+> 0.6
+> 0.4
+> 0.2
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> final: Y= 45 ,t= 2.69
+> 0.8 0.6 0.4 0.2 0.0 0.2 0.4 0.6 0.8 0.8
+> 0.6
+> 0.4
+> 0.2
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> final: Y= 135 ,t= 2.80
+> AC stationary sharp interface
+
+Figure 9. Three-dimensional reconstructed interfaces. The blue surfaces are the Allen–Cahn zero level sets after reflection across the symmetry planes, and the gray surfaces are the corresponding sharp-interface spherical caps with the same liquid volume. The left panel shows the terminal wetting state ( θY = 45 ◦); the right panel shows the terminal dewetting state ( θY = 135 ◦). PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS 31 
+
+6. Conclusion 
+
+In this paper, we studied Allen–Cahn and Cahn–Hilliard phase-field models for contact line dynamics and their sharp interface limit from a unified Onsager’s variational point of view. Starting from the same bulk and wall free energy, both models encode the relaxation of the capillary interface and the motion of the contact line through an energy-dissipation structure. The two models differ in the bulk metric: Allen–Cahn uses a volume-constrained L2 dissipation metric, while Cahn–Hilliard uses an H−1 metric. This difference changes the transient evolution of the sharp interface, but not the stationary profile selected by the free energy. The matched asymptotic analysis shows that both phase field models recover sharp interface contact line dynamics as δ → 0. For the Allen–Cahn model, the limiting interface evolves by mean curvature together with the contact line law driven by the deviation from Young’s angle. For the Cahn–Hilliard model, the limiting bulk problem is of Mullins–Sekerka type, with the same contact line relaxation law on the substrate. The geometric relation between the interface normal velocity and the contact line velocity is essential in matching the diffuse and sharp formulations. We also derived minimizing-movement finite element schemes for both models. The numerical tests confirm the main qualitative picture: the Allen–Cahn and Cahn–Hilliard schemes relax toward the same stationary sharp interface spherical cap solution, while their paths to equilibrium reflect the different bulk dissipation. In the wetting and dewetting tests, both models converges to the stationary profile with monotone energy decay. 
+
+Acknowledgments 
+
+G. Fu was partially supported by NSF DMS-2410740. Y. Gao was partially supported by NSF DMS-2204288 and CAREER award DMS-2440651. This work was partially completed while J.-G. Liu was in residence at the Simons Laufer Mathematical Sciences Institute in Berkeley, California, during the Fall 2025 semester. 
+
+Declarations 
+
+The authors have no conflict of interest. 
+
+Data Availibility 
+
+All data generated or analysed during this study are included in this article and are available in the data repository at https://github.com/gridfunction/mfem-contact-line-dynamics. 
+
+References                  
+
+> [1] N. D. Alikakos, P. W. Bates, and X. Chen, Convergence of the Cahn–Hilliard equation to the Hele–Shaw model ,Arch. Ration. Mech. Anal. 128 (1994), 165–205. [2] W. K. Allard, On the first variation of a varifold , Ann. of Math. (2) 95 (1972), 417–491. [3] R. Anderson, J. Andrej, A. Barker, J. Bramwell, J.-S. Camier, J. Cerveny, V. Dobrev, Y. Dudouit, A. Fisher, T. Kolev, W. Pazner, M. Stowell, V. Tomov, I. Akkerman, J. Dahm, D. Medina, and S. Zampini, MFEM: a modular finite element methods library , Comput. Math. Appl. 81 (2021), 42–74. [4] X. Chen, X. Wang, and X. Xu, Analysis of the Cahn–Hilliard equation with a relaxation boundary condition modeling the contact angle dynamics , Arch. Ration. Mech. Anal. 213 (2014), no. 1, 1–24. [5] Y. Gao and J.-G. Liu, Surfactant-dependent contact angle dynamics and the sharp-interface limit , SIAM J. Appl. Math. 81 (2021), no. 3, 811–838. [6] Y. Gao and J.-G. Liu, A gradient flow approach to relaxation for the capillary surface problem , (2021), preprint. 32 PHASE-FIELD MODELS AND SHARP INTERFACE LIMITS FOR CONTACT LINE DYNAMICS
+
+[7] C. Huh and L. E. Scriven, Hydrodynamic model of steady movement of a solid/liquid/fluid contact line , J. Colloid Interface Sci. 35 (1971), 85–101. [8] D. Jacqmin, Contact-line dynamics of a diffuse fluid interface , J. Fluid Mech. 402 (2000), 57–88. [9] V. E. Henson and U. M. Yang, BoomerAMG: a parallel algebraic multigrid solver and preconditioner , Appl. Numer. Math. 41 (2002), no. 1, 155–177. [10] R. Jordan, D. Kinderlehrer, and F. Otto, The variational formulation of the Fokker–Planck equation , SIAM J. Math. Anal. 29 (1998), no. 1, 1–17. [11] J. Lu and X. Xu, Sharp interface limit of the Cahn–Hilliard model for moving contact lines , J. Nonlinear Sci. 31 
+
+(2021), no. 2, Paper No. 25. [12] X. Xu, Y. Di, and H. Yu, Sharp-interface limits of a phase-field model with a generalized Navier slip boundary condition for moving contact lines , J. Fluid Mech. 849 (2018), 805–833. [13] Y. Gao and J.-G. Liu, Gradient flow formulation and second order numerical method for motion by mean cur-vature and contact line dynamics on rough surface , Interfaces Free Bound. 23 (2021), 103–158. [14] Y. Gao and J.-G. Liu, Projection method for droplet dynamics on groove-textured surface with merging and splitting , SIAM J. Sci. Comput. 44 (2022), B310–B338. [15] W. Ren, D. Hu, and W. E, Continuum models for the contact line problem , Phys. Fluids 22 (2010), 102103. [16] X. Chen, X. Wang, and X. Xu, Analysis of the Cahn–Hilliard equation with a relaxation boundary condition modeling the contact angle dynamics , Arch. Ration. Mech. Anal. 213 (2014), 1–24. [17] S. Lu and X. Xu, An efficient diffusion generated motion method for wetting dynamics , J. Comput. Phys. 441 
+
+(2021), 110476. [18] F. Maggi, Sets of Finite Perimeter and Geometric Variational Problems , Cambridge Univ. Press, 2012. [19] L. Modica, The gradient theory of phase transitions and the minimal interface criterion , Arch. Ration. Mech. Anal. 98 (1987), no. 2, 123–142. [20] B. Niethammer and F. Otto, Ostwald ripening: the screening length revisited , Calc. Var. Partial Differential Equations 13 (2001), no. 1, 33–68. [21] R. L. Pego, Front migration in the nonlinear Cahn–Hilliard equation , Proc. Roy. Soc. London Ser. A 422 (1989), no. 1863, 261–278. [22] T. Z. Qian, X.-P. Wang, and P. Sheng, A variational approach to moving contact line hydrodynamics , J. Fluid Mech. 564 (2006), 333–360. [23] L. Simon, Lectures on Geometric Measure Theory , Proc. Centre Math. Anal. ANU, Vol. 3, 1983. [24] X. Xu and X.-P. Wang, Analysis of wetting and contact angle hysteresis on chemically heterogeneous surfaces ,SIAM J. Appl. Math. 71 (2011), no. 5, 1753–1779. [25] P. Yue and J. J. Feng, Sharp interface limit of the Cahn–Hilliard model for moving contact lines , J. Fluid Mech. 
+
+645 (2010), 279–294. [26] T. Qian, X.-P. Wang, and P. Sheng, A variational approach to moving contact line hydrodynamics , J. Fluid Mech. 564 (2006), 333–360. [27] P. Yue and J. J. Feng, Wall energy relaxation in the Cahn–Hilliard model for moving contact lines , Phys. Fluids 
+
+23 (2011), 012106.

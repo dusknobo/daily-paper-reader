@@ -1,0 +1,93 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-27T20:55:01.736161+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.17410v1",
+      "source": "arxiv",
+      "title": "Phase-Field Models, Sharp Interface Limits, and Numerical Schemes for Contact Line Dynamics",
+      "abstract": "We study phase-field and sharp-interface models for contact line dynamics of a liquid droplet on a solid substrate within a unified variational framework. The motion of the contact line, where liquid, gas, and solid phases meet, poses a fundamental difficulty in continuum modeling due to the classical stress singularity of no-slip hydrodynamics. Phase-field models regularize this singularity by introducing a thin transition layer of thickness and encoding interfacial effects through a Ginzburg-Landau free energy augmented by a wall energy on the substrate. Starting from the total free energy $E = E_b + E_w$, we analyze two phase-field models: the Allen-Cahn equation and the Cahn-Hilliard equation. Using matched asymptotic expansions as $δ\\to 0$, we recover their corresponding sharp interface limits. In the Allen-Cahn case, the limit yields motion by mean curvature with a contact line law driven by deviations of the dynamic contact angle from Young's angle. In the Cahn-Hilliard case, the limit leads to a Mullins-Sekerka problem with the same form of contact line dynamics. A central result of this work is the identification of consistent gradient-flow structures across both models. The Allen-Cahn dynamics correspond to an $L^2$-gradient flow, while the Cahn-Hilliard dynamics correspond to an $H^{-1}$-gradient flow, and both converge to sharp-interface evolutions that preserve the same energy-dissipation structure. This provides a unified interpretation of contact line motion as a consequence of a single variational principle. Finally, we develop energy-stable numerical schemes based on the minimizing movement principle and establish discrete energy dissipation and well-posedness of the fully discrete problem. Numerical examples confirm that both schemes relax toward the same stationary sharp interface solution while their dynamics reflect the different dissipation mechanisms.",
+      "authors": [
+        "Guosheng Fu",
+        "Yuan Gao",
+        "Jian-Guo Liu"
+      ],
+      "primary_category": "math.AP",
+      "categories": [
+        "math.AP"
+      ],
+      "published": "2026-07-19T21:08:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.17410v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "phase-field method for contact line dynamics, two-phase flow CFD",
+      "llm_evidence_cn": "接触线动力学的相场方法，两相流CFD",
+      "llm_evidence": "接触线动力学的相场方法，两相流CFD",
+      "canonical_evidence": "接触线动力学的相场方法，两相流CFD",
+      "llm_tldr_en": "This paper develops phase-field models and numerical schemes for contact line dynamics, providing a framework directly applicable to multiphase flow simulations including falling film wetting.",
+      "llm_tldr_cn": "该文针对液滴接触线动力学奇性问题，在统一变分框架下研究了相场和锐界面模型。通过匹配渐近展开得到模型极限，并设计了数值格式。为降膜流动中的润湿和三相接触线模拟提供了直接可用的计算方法。",
+      "llm_tldr": "该文针对液滴接触线动力学奇性问题，在统一变分框架下研究了相场和锐界面模型。通过匹配渐近展开得到模型极限，并设计了数值格式。为降膜流动中的润湿和三相接触线模拟提供了直接可用的计算方法。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.20650v1",
+      "source": "arxiv",
+      "title": "PortLBM: A Portable Lattice Boltzmann Tool Leveraging SYCL on AMD, NVIDIA, and Intel GPUs",
+      "abstract": "The lattice Boltzmann method (LBM) is a well-established approach for simulating fluid flows at the mesoscopic scale. With the stagnation of Moore's law, high-performance computing has shifted toward GPU accelerators, necessitating programming models that ensure both portability and efficiency across diverse hardware platforms.   We present PortLBM, an extensible portable LBM framework built on SYCL that integrates cross-platform GPU support with interactive real-time visualization. PortLBM supports diverse simulation scenarios ranging from Kármán vortex streets and wing flows to porous media, and is designed for easy extension with new algorithms and backends. As part of a performance portability study, we evaluate PortLBM on contemporary GPU architectures from NVIDIA, AMD, and Intel, examining the impact of three data layouts (stream, bundle, and collision) and four algorithmic variants on simulation throughput.   Our results show that no single configuration achieves optimal performance across all GPU vendors, confirming the need for system-specific tuning. The stream layout maximizes bandwidth and performs best on the contemporary NVIDIA and Intel GPUs, while the bundle layout improves cache efficiency and excels on the AMD GPU. Two-lattice schemes achieve higher throughput while one-lattice schemes are preferable under memory constraints. Our work underscores the necessity for adaptable, portable LBM software in increasingly heterogeneous computing environments.",
+      "authors": [
+        "Alexander Strack",
+        "Marcel Graf",
+        "Alexander Van Craen",
+        "Dirk Pflüger"
+      ],
+      "primary_category": "cs.DC",
+      "categories": [
+        "cs.DC",
+        "cs.PF"
+      ],
+      "published": "2026-07-22T18:21:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.20650v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Portable LBM framework for GPU-accelerated fluid simulations, applicable to two-phase flow simulation including falling film.",
+      "llm_evidence_cn": "便携式LBM框架可用于GPU加速流体模拟，适用于两相流模拟包括降膜。",
+      "llm_evidence": "便携式LBM框架可用于GPU加速流体模拟，适用于两相流模拟包括降膜。",
+      "canonical_evidence": "便携式LBM框架可用于GPU加速流体模拟，适用于两相流模拟包括降膜。",
+      "llm_tldr_en": "PortLBM is an extensible SYCL-based LBM tool with real-time visualization, supporting cross-platform GPU acceleration and diverse flow scenarios, enabling efficient two-phase simulations.",
+      "llm_tldr_cn": "针对高性能计算向GPU加速器转移的趋势，开发了基于SYCL的便携式LBM框架PortLBM，整合了跨平台GPU支持与实时交互可视化。该框架支持从卡门涡街到机翼绕流、多孔介质等多种模拟场景，易于扩展新算法和后端，在多种GPU上实现了性能可移植性，为两相流CFD提供了高效工具。",
+      "llm_tldr": "针对高性能计算向GPU加速器转移的趋势，开发了基于SYCL的便携式LBM框架PortLBM，整合了跨平台GPU支持与实时交互可视化。该框架支持从卡门涡街到机翼绕流、多孔介质等多种模拟场景，易于扩展新算法和后端，在多种GPU上实现了性能可移植性，为两相流CFD提供了高效工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
