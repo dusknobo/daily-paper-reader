@@ -6,29 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-27
-- 运行时间：2026-07-27 20:56:46 UTC
+- 最新运行日期：2026-07-28
+- 运行时间：2026-07-28 21:38:09 UTC
 - 运行状态：成功
 - 本次总论文数：2
 - 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今天速读了两篇关于计算物理方法的论文，分别聚焦三相接触线动力学和跨GPU平台的可移植LBM工具。  
-值得留意的方向是：用相场模型追踪液滴湿润过程的数学极限，以及一套能在不同显卡上跑格子玻尔兹曼仿真的统一框架。  
-如果你对多物理场模拟或GPU编程感兴趣，可以快速浏览这两篇的思路，再决定是否深入。
-- 详情：[/202607/27/README](/202607/27/README)
+速读两篇计算声学与热流场前沿研究，均获7分。  
+空化声学扰动方程框架为水下噪声提供源解析新思路，残余训练图神经网络则实现热流耦合场的免标签快速预测。  
+若对多物理场融合AI感兴趣，可优先着眼上述工作开源代码与物理约束设计。
+- 详情：[/202607/28/README](/202607/28/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Phase-Field Models, Sharp Interface Limits, and Numerical Schemes for Contact Line Dynamics](/202607/27/2607.17410v1-phase-field-models-sharp-interface-limits-and-numerical-schemes-for-contact-line-dynamics)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：接触线动力学的相场方法，两相流CFD
-2. [PortLBM: A Portable Lattice Boltzmann Tool Leveraging SYCL on AMD, NVIDIA, and Intel GPUs](/202607/27/2607.20650v1-portlbm-a-portable-lattice-boltzmann-tool-leveraging-sycl-on-amd-nvidia-and-intel-gpus)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：便携式LBM框架可用于GPU加速流体模拟，适用于两相流模拟包括降膜。
+1. [Cavitation Acoustic Perturbation Equations: A Computational Framework for Source-Resolved Multiphase Hydroacoustics](/202607/28/2607.19567v1-cavitation-acoustic-perturbation-equations-a-computational-framework-for-source-resolved-multiphase-hydroacoustics)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：包含蒸气质量传输的多相空化流计算框架
+2. [Label-Free Finite-Volume-Residual Training of Attention Graph Neural Networks for Coupled Thermo-Fluid Fields](/202607/28/2607.20321v2-label-free-finite-volume-residual-training-of-attention-graph-neural-networks-for-coupled-thermo-fluid-fields)  
+   标签：评分：7.0/10、query:falling-film
+   evidence：使用FVM残差训练热流场神经代理，无需标签数据，可应用于降膜换热CFD
 
 
 <div class="dpr-home-promo-card">
