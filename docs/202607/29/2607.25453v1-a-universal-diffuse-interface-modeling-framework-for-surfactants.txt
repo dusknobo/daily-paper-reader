@@ -1,0 +1,563 @@
+Title: A universal diffuse interface modeling framework for surfactants
+
+URL Source: https://arxiv.org/pdf/2607.25453v1
+
+Published Time: Wed, 29 Jul 2026 00:42:25 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# A universal diffuse interface modeling framework for surfactants 
+
+Shahab Mirjalili a, ∗, Mathieu Bignolles b
+
+> aFLOW, Department of Engineering Mechanics, KTH Royal Institute of Technology, SE-10044 Stockholm, Sweden
+> bBordeaux Polytechnic Institute, 33400 Talence, France
+
+Abstract 
+
+We propose a universal diffuse-interface modeling framework for surfactant transport in two-phase flows, applicable to all solubility scenarios and to any conservative phase field method. The foundation of our framework is a general three-scalar non-equilibrium model governing the surfactant concentrations in each bulk phase and at the interface, which builds on our prior consistent scalar transport framework and is locally and globally conservative, leakage-free, Galilean-invariant, and reduction-consistent. Assuming ther-mochemical equilibrium, we derive two one-scalar models: one for a surfactant in full equilibrium between both bulk phases and the interface, and one for a surfactant confined to a single bulk phase and the interface. All models are coupled to the Navier-Stokes equations through a surface tension force that incorporates the Marangoni stress arising from non-uniform interfacial surfactant distributions. While diffuse-interface sur-factant models have been developed for the Cahn-Hilliard equation and, more recently, for the conservative Allen-Cahn (CAC) equation, existing models for CAC address only the insoluble and single-phase-soluble cases, leaving the general scenario of partial solubility in both bulk phases unaddressed; furthermore, these models lack Galilean invariance and reduction consistency, and are not applicable beyond the CAC set-ting. The framework is validated against analytical solutions in one-dimensional transport tests, assessed for convergence in two-dimensional advection-diffusion simulations, and demonstrated in fully-coupled drop-in-shear flow simulations covering insoluble, soluble, and partially-soluble surfactant scenarios. 
+
+Keywords: surfactants, phase field, diffuse interface, scalar transport, conservative Allen–Cahn equation, Marangoni flow 
+
+1. Introduction 
+
+Surfactants are amphiphilic molecules that preferentially adsorb at fluid-fluid interfaces, where they reduce the local surface tension and, when distributed non-uniformly, give rise to tangentially directed Marangoni stresses that drive flow along the interface [1]. These properties make surfactants central to a broad range of industrial and environmental processes, including emulsification and foam stabilization, enhanced oil recovery, microfluidic drop manipulation, drug delivery, and pulmonary mechanics. The com-plexity of surfactant-laden flows is compounded by the wide range of solubility scenarios a given system may exhibit: depending on its molecular structure, a surfactant may be practically insoluble in the bulk phases, soluble in one of them, or partially soluble in both, with the equilibrium partitioning governed by the partition coefficient [1]. Accurately capturing these dynamics in numerical simulations requires resolving the coupled processes of bulk advection-diffusion within each phase, adsorption and desorption between the bulk and the interface, advection and diffusion along the interface, and the feedback of the non-uniform surface tension onto the momentum balance through Marangoni stresses. Computational approaches developed for this problem span a wide range of interface-capturing frameworks, including volume-of-fluid methods [2, 3],     
+
+> ∗Corresponding author
+> Email addresses: msey@kth.se (Shahab Mirjalili), mbignolles@enseirb-matmeca.fr (Mathieu Bignolles) arXiv:2607.25453v1 [physics.flu-dyn] 28 Jul 2026
+
+front-tracking methods [4], and level-set approaches [5], as well as diffuse-interface methods based on the Cahn-Hilliard equation [6, 7, 8] and the conservative Allen-Cahn equation [9, 10]. Phase field methods have emerged as a popular alternative to sharp-interface approaches for simulat-ing two-phase flows [11, 12], and their diffuse representation of the interface is particularly well-suited to surfactant modeling: the smooth volumetric transition region naturally accommodates bulk and interfa-cial concentration fields defined throughout the domain, without the need for explicit surface tracking or reconstruction even during topology changes such as drop breakup and coalescence. Among phase field models, the Cahn-Hilliard (CH) equation has historically been the primary vehicle for surfactant transport because its thermodynamic free energy formulation provides a natural basis for deriving thermodynamically consistent surfactant models [8, 13]. However, the CH equation is a fourth-order PDE, and its solutions are known to suffer from unphysical coarsening of flow features, artificial shrinkage of drops and bubbles, and a lack of bounded solutions for the phase field variable [14, 12]. These difficulties have motivated the development of the conservative Allen-Cahn (CAC) equation [15], a second-order conservative PDE that avoids the coarsening and shrinkage issues of CH, admits provably bounded solutions [16], and requires lower spatio-temporal resolution than CH for equivalent accuracy [17, 16]. A further practical advantage is that the CAC equation with ϵ = ∆ x ensures the interface is always resolved on any uniform mesh by construction, eliminating the need for the block-structured adaptive mesh refinement that CH-based solvers typically require to track the interface efficiently [7]. The CAC equation, however, lacks a thermodynamic free energy, which means that the derivation strategy used to extend CH to surfactant transport does not carry over directly, and constructing consistent, general surfactant models for CAC has remained an open problem. An alternative approach that does not rely on a thermodynamic free energy was established by Teigen et al. [6, 7], who derived volumetric transport equations for bulk and interfacial concentrations by directly reformulating the sharp-interface surfactant equations using a smoothed Dirac delta function to represent the interface. This geometric approach does not depend on the specific form of the phase field equations and is therefore not limited to the CH setting. More recently, Jain derived surfactant transport models for the CAC equation, inspired by the geometric approach of Teigen et al. but arriving at a distinct formulation that is equivalent to theirs only when the phase field is at equilibrium, first for the insoluble case [9] and subsequently for a surfactant soluble in one bulk phase [10]; the general scenario in which the surfactant is partially soluble in both phases remains unaddressed. Furthermore, these models lack Galilean invariance and reduction consistency, and are specific to the CAC equation, making them inapplicable to other conservative phase field methods. In this work, we extend the consistent scalar transport framework of [18, 19] to surfactant transport. The foundation is a general three-scalar non-equilibrium model governing the surfactant concentrations in each bulk phase and at the interface, applicable to all solubility scenarios, including insoluble, soluble in one phase, and partially soluble in both phases, and to any conservative phase field method. The model is locally and globally conservative, leakage-free, positivity-preserving, and symmetric with respect to the two phases, and is consistent in the sense of [19]: it is Galilean-invariant through the inclusion of the phase field correction flux ⃗ R in the transport equations, and reduction-consistent, recovering single-phase scalar transport for an artificial interface and the non-surfactant interphase transfer model of [19] in the appropriate limit. Assuming thermochemical equilibrium, we derive two one-scalar models, each governing a single concentration field: one for a surfactant in full equilibrium between both bulk phases and the interface, and one for a surfactant confined to a single bulk phase and the interface. The surfactant transport models are coupled to the Navier-Stokes equations through a surface tension force that incorporates both the normal capillary term and the Marangoni stress arising from tangential gradients of the surface tension coefficient, which depends on the local interfacial surfactant concentration through a nonlinear equation of state. In the following, we present the surfactant transport models in Section 2, beginning with the general three-scalar non-equilibrium model and proceeding to the two one-scalar equilibrium reductions and the coupling to the Navier-Stokes equations. The numerical discretization is described in Section 3. Sec-tion 4 presents numerical tests, including one-dimensional transport tests against analytical solutions, two-dimensional advection-diffusion tests with convergence studies, and fully-coupled drop-in-shear simulations 2covering insoluble, soluble, and partially-soluble surfactant scenarios. We summarize our findings in Sec-tion 5. 
+
+2. Models 
+
+Phase field methods have emerged as a popular option to capture the evolution of interfacial two-phase flows [11, 20]. Conservative phase field equations are the most suitable option, which can be written as 
+
+∂ϕ ∂t + ∇ · (⃗uϕ ) = ∇ · ⃗ R, (1) where ϕ is the phase field variable, which can be considered the volume fraction of one of the phases. Without loss of generality we refer to this phase as phase 1, so the volume fraction of phase 1 and 2 are given by 
+
+ϕ = ϕ1 and ϕ2 = 1 − ϕ1, respectively. The specific form of ⃗ R determines the phase field method of choice, but the proposed models in this work for surfactant transport are broadly applicable to any conservative phase field equation, including the Cahn-Hilliard equation [21, 22], the conservative Allen-Cahn equation (also known as the conservative diffuse interface method) and its variants [15, 16, 17]. In the numerical tests of Section 4, we demonstrate the framework exclusively in the CAC setting, as this is the phase field method underlying our solver [18, 19]; the extension to other conservative phase field methods is straightforward. For the CAC equation, ⃗ R = γ(ϵ∇ϕ − ϕ(1 − ϕ)⃗n), where ⃗n = ∇ϕ/ |∇ ϕ| is the interface normal, ϵ is the interface thickness parameter, and γ is a parameter controlling the strength of the sharpening and diffusion terms [15, 16]. 
+
+2.1. General three-scalar surfactant model 
+
+We extend the two-scalar scalar transport models introduced in [18, 19] to surfactant transport. There-fore, similar to those models, the concentration of the surfactant in the bulks of phase 1 and 2 per total volume, are denoted by c1 and c2, respectively. To account for surfactants, we introduce an additional vari-able, the interfacial surfactant concentration per total volume, denoted by s. The interface is converted to a volumetric representation by a smoothened Dirac function that indicates the interface, δ. This is similar to previous work in the literature [6, 7, 9, 10]. Throughout the one-dimensional and two-dimensional tests in this work we use δ = ϕ1ϕ2/ϵ ; the flow-coupled tests in Section 4.3 use δ = 6 ϕ21ϕ22/ϵ to match the convention of [7]. Corresponding to cp and s which are concentrations per total volume in phase p = 1 , 2, and the interface, respectively, the phasic concentrations ˜cp = cp/ϕ p, defined as the concentration of the surfactant in phase p per unit volume of phase p, and the specific interfacial concentration of the surfactant, ˜s = s/δ 
+
+are important field variables that are used in flux calculation. We propose the following general three-scalar transport model for c1, c2, and s, which is applicable to transport of surfactants in any two-phase setting (e.g., insoluble, soluble in both phases, soluble in one phase): 
+
+∂c 1
+
+∂t + ∇ · (⃗uc 1) = ∇ · (D1ϕ1∇( c1
+
+ϕ1
+
+)) + ∇ · (⃗R c1
+
+ϕ1
+
+) + J21 + Js1δ, (2) 
+
+∂c 2
+
+∂t + ∇ · (⃗uc 2) = ∇ · (D2ϕ2∇( c2
+
+ϕ2
+
+)) + ∇ · (−⃗R c2
+
+ϕ2
+
+) + J12 + Js2δ, (3) 
+
+∂s ∂t + ∇ · (⃗us ) = ∇ · (D sδ∇( sδ )) + J1sδ + J2sδ (4) As derived in [18], the transfer term from phase 2 to phase 1 is given by 
+
+J12 = AD m(Keq c2ϕ1 − c1ϕ2) − Dm∇ϕ1 · ∇ (c1 + Keq c2), (5) where the mixed diffusivity is 
+
+Dm = D1D2
+
+Keq D1ϕ2 + D2ϕ1
+
+. (6) 3At chemical equilibrium, a jump in concentration is enforced across the interface, specified by the partition coefficient, Keq ,
+
+Keq = ( ˜c1
+
+˜c2
+
+)eq . (7) The transfer term from phase 1 to phase 2 is J12 = −J21 , which can be confirmed by inspection if one switches the numbering of the two phases. The transfer term from the bulk of phase p = 1 , 2 to the interface is Jps δ, where 
+
+Jps = ra,p 
+
+cp
+
+ϕp
+
+(˜ s∞ − sδ ) − rd,p 
+
+sδ . (8) The adsorption and desorption coefficients between the bulks of phase p and the interface are ra,p and rd,p 
+
+respectively. Moreover, the saturation interfacial concentration is denoted by ˜s∞. Naturally, the transfer term from the interface to the bulk of phase p is Jsp δ = −Jps δ. Surfactant transport equilibrium with zero transfer and diffusion fluxes can only be achieved if 
+
+rd,p 
+
+ra,p 
+
+= Kpq 
+
+rd,q 
+
+ra,q 
+
+. (9) The proposed three-scalar model satisfies several important properties. It is locally and globally con-servative: summing the three transport equations, the inter-phase transfer terms cancel pairwise, since 
+
+J12 = −J21 , J1s = −Js1, and J2s = −Js2, so that the total surfactant amount c1 + c2 + s is conserved in a closed domain. The model is also universal with respect to the solubility scenario. The insoluble case is recovered by setting Dp = ra,p = rd,p = 0 for both phases, leaving only the interfacial equation for s active. A surfactant soluble only in phase p follows from Dq = ra,q = rd,q = 0 for the insoluble phase q̸ = p. In the non-surfactant limit ( ra,p = rd,p = 0 , s = 0 ), the equations for c1 and c2 reduce exactly to the interphase transfer model of [19], establishing reduction consistency with the scalar transport framework this work extends. The case of an artificial interface in a single-phase flow, examined in Section 4, recovers single-phase scalar transport exactly. By construction, the model inherits the leakage-free property of [18, 19]: in the absence of physical adsorption and desorption, the phase-weighted diffusion terms prevent unphysical transfer of surfactant across the interface even for large inter-phase concentration contrasts. Positivity of 
+
+c1, c2, and s is likewise expected to be preserved, following the same structural reasoning as in [18, 19]. The model is also agnostic to the specific conservative phase field method employed: ϕ1, ϕ2,⃗ R, and δ
+
+appear in the surfactant transport equations, while their evolution is determined by whichever conservative phase field equation is adopted (Eq. (1)). This makes the framework applicable without modification to the Cahn-Hilliard equation [21, 22], the conservative Allen-Cahn equation [15, 16, 17], and any other conservative formulation. The consistent inclusion of the phase field correction flux ⃗ R in the scalar transport equations, following [19], also ensures Galilean invariance; the solver described in Section 3 preserves these properties at the discrete level. The three-scalar model introduced in this section can be used for simulating the transport of surfactants in any setting (e.g., liquid-liquid, liquid-gas), including when the interfaces have not achieved thermochemical equilibrium. As demonstrated in [18] for the case of passive scalar transport in two-phase systems, a one-scalar transport model can be derived by assuming thermochemical equilibrium. In the following, we will make such equilibrium assumptions to derive one-scalar models for surfactant transport. 
+
+2.2. One-scalar model for surfactant soluble in both phases (full equilibrium) 
+
+We derive a one-scalar model for surfactant transport by assuming chemical equilibrium, which means that not only is Eq. (7) satisfied, resulting in Jpq = 0 , but Jps = 0 for any value of p and q. The one-scalar equation governing surfactant concentration, c, is 
+
+∂c ∂t + ∇ · (⃗uc ) = ∇ · (D eff ∇( cb
+
+Keff 
+
+)) + ∇ · (⃗R(Keq − 1) cb
+
+Keff 
+
+) + ∇ · (Dsδ∇( c − cb
+
+δ )) , (10) 4where 
+
+Deff = D1Keq ϕ1 + D2ϕ2, (11) and 
+
+Keff = Keq ϕ1 + ϕ2, (12) are the effective mixture diffusivity and Henry coefficient, respectively. In Eq. (10), cb is the concentration in the bulk, given by 
+
+cb = −f + pf 2 + 4 ra, 1rd, 1Keq Keff c
+
+2ra, 1Keq 
+
+, (13) where 
+
+f = rd, 1Keff + ra, 1Keq ˜s∞δ − ra, 1Keq c. (14) 
+
+2.3. One-scalar model for surfactant soluble in one phase (confined scalar) 
+
+A common scenario is when the surfactant is insoluble or practically insoluble in one of the phases. Then, it is only reasonable to assume equilibrium between the surfactant concentration in the bulk of the soluble phase and the interface. Without loss of generality, let us assume that the soluble phase is phase 1. Then, the following one-scalar model can be derived to solve for the surfactant concentration confined to phase 1
+
+and the interface, c,
+
+∂c ∂t + ∇ · (⃗uc ) = ∇ · (D 1ϕ1∇( c1
+
+ϕ1
+
+)) + ∇ · (⃗R c1
+
+ϕ1
+
+) + ∇ · (Dsδ∇( c − c1
+
+δ )) , (15) where c1 is the concentration in the bulk of phase 1 per total volume, given by 
+
+c1 = −f + pf 2 + 4 ra, 1rd, 1ϕ1c
+
+2ra, 1
+
+, (16) where 
+
+f = rd, 1ϕ1 + ra, 1 ˜s∞δ − ra, 1c. (17) 
+
+2.4. Coupling to Navier-Stokes 
+
+These equations are coupled to the Navier-Stokes equation, 
+
+∂(ρ⃗ u)
+
+∂t + ∇ · 
+
+h
+
+(ρ⃗ u −⃗ S) ⊗⃗u
+
+i
+
+= −∇ P + ∇ · μ(∇⃗u + ∇ T⃗u)  +⃗ F ST . (18) In Eq. (18), P is the pressure field, ρ is the density field computed via 
+
+ρ = Σ pρpϕp, (19) 
+
+μ is the fluid viscosity, computed via 
+
+μ = Σ pμpϕp, (20) and ⃗ S is the mass-momentum consistency correction flux, given by ⃗S = Σ pρp⃗ Rp, (21) The surface tension force in Eq.(18), ⃗ F ST is modeled by augmenting the CSF surface tension formulation with the Marangoni term, ⃗FST = σκ ∇ϕ1 + δ∇sσ, (22) where σ is the surface tension coefficient, computed via 
+
+σ = σ0(1 + M a ln(1 − ˜s
+
+˜s∞
+
+)) , (23) 5where ∇s = ( I −⃗n ⊗⃗n)∇ is the surface gradient operator and κ is the curvature computed using normal vector, 
+
+κ = −∇ · ⃗n. (24) The normal vector is computed via ⃗n = ∇ϕ1
+
+|∇ ϕ1| . (25) The first term in Eq. (22) is the continuum surface force (CSF) formulation of the normal surface tension force [23], while the second term, δ∇sσ, is the Marangoni stress arising from tangential gradients in surface tension along the interface. The surface tension coefficient σ depends on the local interfacial surfactant concentration ˜s = s/δ through the equation of state above: regions of elevated surfactant loading experience locally reduced σ, which drives tangential Marangoni flow toward regions of higher surface tension. When the surfactant distribution is spatially uniform, ∇sσ = 0 and Eq. (22) reduces to the standard two-phase surface tension formulation. The surfactant transport equations of Section 2.1 and the Navier-Stokes system (Eqs. (18)–(22)) are therefore two-way coupled: the flow advects and redistributes the surfactant distribution, and the resulting non-uniform σ feeds back into the momentum balance through the Marangoni term. 
+
+2.5. Model selection 
+
+The choice of model depends on both the physical solubility scenario and the degree to which the system is near thermochemical equilibrium. The solubility scenario is a property of the surfactant chemistry and the phase pair, characterized by the hydrophilic-lipophilic balance (HLB) and the partition coefficient Keq 
+
+[1]. For gas-liquid systems, the gas phase does not dissolve surfactant in practice, so the surfactant is effectively confined to the liquid phase and the interface; the confined one-scalar model or the insoluble limit (ra,p = rd,p = 0 ) are the appropriate choices. For liquid-liquid systems, the solubility scenario depends on 
+
+Keq . Surfactants with low HLB are lipophilic and partition strongly into the oil phase ( Keq ≫ 1), making them effectively confined there; surfactants with high HLB are hydrophilic and partition into the water phase (Keq ≪ 1). In both cases, the confined one-scalar model is appropriate. Surfactants with intermediate HLB values, such as those used in foaming and wetting applications, exhibit significant solubility in both phases and require the partially soluble three-scalar model or its full-equilibrium reduction [1]. The choice between the three-scalar and one-scalar models is governed by the degree of departure from thermochemical equilibrium, characterized by the Biot number Bi = rd,p / ˙γ (or an equivalent ratio of the adsorption/desorption timescale to the relevant flow timescale). When Bi ≫ 1, exchange between the bulk and the interface is fast relative to the flow, the system remains near equilibrium, and the one-scalar reduction is appropriate. When Bi ∼ O(1) or Bi ≪ 1, the exchange kinetics are comparable to or slower than the flow timescale, and the three-scalar model is necessary to capture the transient non-equilibrium dynamics. The numerical tests of Section 4 illustrate these distinctions in both one-dimensional transport and fully-coupled flow settings. 
+
+3. Computational approach 
+
+We use a fourth-order Runge-Kutta (RK4) explicit scheme for time integration. At each time step, the phase field equation, Eq. (1), is integrated to update ϕ, and the surfactant transport equations are integrated to update c1, c2, and s. These are coupled to the momentum equation, Eq. (18), through the density, viscosity, and surface tension force, which are updated from ϕ and ˜s at each stage. In space, we use a second-order central finite difference discretization on a standard staggered Cartesian grid, in which velocity components and all fluxes are stored on their respective cell faces, while pressure, density, viscosity, the phase field variable, and all concentration fields are stored at cell centers. The surfactant transport equations are discretized using the same stencils as the scalar transport framework of [18], to which the adsorption, desorption, and interfacial diffusion terms are added. The implementation is three-dimensional and parallelized using MPI. 64. Numerical tests 
+
+In this section, we assess the accuracy and convergence properties of the proposed surfactant transport models through a hierarchy of test cases. We first validate the three-scalar model and its one-scalar reductions against analytical solutions for one-dimensional surfactant transport in Section 4.1, covering partially soluble, single-phase-soluble, and insoluble scenarios, as well as the artificial-interface limit. Convergence in two-dimensional problems is assessed in Section 4.2. Finally, Section 4.3 presents fully-coupled drop-in-shear flow simulations covering insoluble, single-phase-soluble, and partially-soluble surfactants, demonstrating the framework’s ability to capture Marangoni-driven deformation and bulk-interface exchange. Although the model and solver are formulated and implemented in three dimensions, all tests presented here are one-or two-dimensional; the lower-dimensional setting is sufficient for the purposes of model verification and validation. As noted in Section 2, all tests use the CAC equation as the underlying phase field method. All values reported are in non-dimensional form. 
+
+4.1. One-dimensional surfactant transport tests 
+
+All one-dimensional tests are performed on a static domain x ∈ [−1, 1] with Nx = 129 uniformly spaced cells ( ∆x = 1 /64 ). The conservative Allen–Cahn equation is used with ϵ = ∆ x and γ = 1 . Phase 1 occupies a drop of diameter 0.5 centered at the origin, described by the hyperbolic tangent profile ϕ(x, 0) =  
+
+> 12
+
+(1 + tanh x+0 .25 2ϵ ) − 12 (1 + tanh x−0.25 2ϵ ). The velocity is zero in all cases, periodic boundary conditions are applied, and the parameter A in J12 is set to 1000 . In each test, the three-scalar model is run alongside the applicable one-scalar model(s) to assess the accuracy of the equilibrium reduction. 
+
+4.1.1. Partially soluble surfactant 
+
+Phase 1 Phase 2 Interface Initial conditions (t = 0 )
+
+˜c1 = 2 .5 ˜c2 = 0 .8 ˜s = 0 
+
+Surfactants parameters 
+
+D1 = 1 .0, ra1 = 3 .0,
+
+rd1 = 1 .0
+
+D2 = 1 .0, ra2 = 1 .0,
+
+rd2 = 13
+
+Ds = 0 .2, ˜s∞ = 1 .0   
+
+> Table 1: Simulation parameters for the test in Section 4.1.1. The partition coefficient is Keq =rd, 1ra, 2/(ra, 1rd, 2) = 1 .
+
+The simulation parameters are listed in Table 1. The system is initialized far from equilibrium with 
+
+c1(x, 0) = 2 .5ϕ, c2(x, 0) = 0 .8(1 − ϕ), and s(x, 0) = 0 , and integrated to t = 5 . Figure 1(a) shows the temporal evolution of c1, c2, and s alongside the phase field profile ϕ: starting from the initial out-of-equilibrium state, the concentration fields relax toward equilibrium and s builds up from zero as the surfactant adsorbs to the interface. At equilibrium, setting Jps = 0 in Eq. (8) yields the Langmuir isotherm, 
+
+˜seq (˜ cp) = ra,p ˜s∞ ˜cp/(rd,p + ra,p ˜cp); panel (b) confirms that the numerical s at t = 5 agrees with both seq (˜ c1)
+
+and seq (˜ c2), as required by thermochemical consistency. In panel (c), the total surfactant c1 +c2 +s from the three-scalar model is compared against the full-equilibrium one-scalar model cos at multiple time instants; the two converge as equilibrium is approached. The relative L1 error between the two models, plotted in panel (d), decays with time, confirming that the three-scalar model converges to the equilibrium prediction of the one-scalar model as the system approaches equilibrium. 7(a) (b)  
+
+> (c) (d)
+
+Figure 1: One-dimensional transport for a surfactant soluble in both phases (parameters in Table 1): (a) profiles of c1, c2,
+
+s, and ϕ at multiple time instants from the three-scalar model, (b) interfacial concentration s at t = 5 compared against the equilibrium Langmuir profiles seq (˜ c1) and seq (˜ c2), (c) total concentration c1 + c2 + s from the three-scalar model overlaid with the full-equilibrium one-scalar model cos at multiple times, and (d) relative L1 error between the two models as a function of time. 
+
+4.1.2. Partially soluble surfactant with large diffusivity ratio 
+
+Phase 1 Phase 2 Interface Initial conditions (at 
+
+t = 0 )
+
+˜c1 = 2 .0 ˜c2 = 0 ˜s = 0 .3
+
+Surfactants parameters 
+
+D1 = 1 .0, ra1 = 3 .0,
+
+rd1 = 1 .0
+
+D2 = 10 −6, ra2 = 10 −6,
+
+rd2 = 10 −6
+
+> 3
+
+Ds = 0 .2, ˜s∞ = 1 .0
+
+Table 2: Simulation parameters for the test in Section 4.1.2. The partition coefficient is Keq = 1 .
+
+The simulation parameters are listed in Table 2. This test examines the case in which the surfactant is partially soluble in both phases but with a large diffusivity ratio D1/D 2 = 10 6. The adsorption and desorption rates in phase 2 are scaled proportionally so that Keq = 1 is preserved. The system is initialized with c1(x, 0) = 2 .0ϕ, c2(x, 0) = 0 , and s(x, 0) = 0 .3 δ, and run to t = 5 . Figure 2(a) shows the time 8evolution of the concentrations: surfactant in phase 1 redistributes and adsorbs to the interface, while phase 2 remains nearly depleted throughout because its diffusivity is too low for significant bulk transport. Panel (b) compares the total c1 + c2 + s at t = 5 from the three-scalar model against both one-scalar models. The full-equilibrium model cos,eqbm substantially over-predicts the concentration in phase 2, as it enforces equilibrium between both bulk phases regardless of their transport timescales. The three-scalar result is in close agreement with the confined model cos,conf , which assumes equilibrium only between phase 1 and the interface. Panel (c) confirms this quantitatively: the L1 difference between the three-scalar and confined models remains small throughout the simulation, while that between the three-scalar and full-equilibrium models is large.                          
+
+> (a) (b) (c)
+> Figure 2: One-dimensional transport for a surfactant soluble in both phases with a large diffusivity ratio D1/D 2= 10 6
+> (parameters in Table 2): (a) profiles of c1,c2,s, and ϕat multiple time instants from the three-scalar model, (b) total concentration c1+c2+sat t= 5 compared against the full-equilibrium one-scalar model cos,eqbm and the confined one-scalar model cos,conf , and (c) relative L1errors of the two one-scalar models as functions of time.
+
+4.1.3. Surfactant soluble in one phase 
+
+Phase 1 Phase 2 Interface Initial conditions (at 
+
+t = 0 )
+
+˜c1 = 2 .0 ˜c2 = 0 ˜s = 1 .5
+
+Surfactants parameters 
+
+D1 = 0 .5, ra1 = 3 .0,
+
+rd1 = 2 .0
+
+D2 = 0 , ra2 = 0 , rd2 = 0 Ds = 0 .5, ˜s∞ = 1      
+
+> Table 3: Simulation parameters for the test in Section 4.1.3. Phase 2 is inert ( D2=ra2=rd2= 0 ).
+
+The simulation parameters are listed in Table 3. This test covers the case in which the surfactant is insoluble in phase 2, so that D2 = ra, 2 = rd, 2 = 0 . The system is initialized with c1(x, 0) = 2 .0ϕ,
+
+c2(x, 0) = 0 , and s(x, 0) = 1 .5 δ, and integrated to t = 5 . Since phase 2 plays no role in the surfactant dynamics, the confined one-scalar model is the appropriate equilibrium reduction for this scenario: if an equilibrium assumption is to be made, it must be restricted to phase 1 and the interface. Figure 3(a) shows the time evolution of c1 and s as the system evolves: the initial interfacial concentration gradually equilibrates with the bulk of phase 1 through adsorption and desorption. Panel (b) compares the total 
+
+c1 + c2 + s at t = 5 from the three-scalar model against both one-scalar models. The full-equilibrium model cos,eqbm substantially over-predicts the surfactant concentration, as it incorrectly enforces equilibrium with phase 2, which has no transport activity. The three-scalar result is in close agreement with the confined model cos,conf . Panel (c) confirms this quantitatively: the L1 difference between the three-scalar and confined models decays with time as equilibrium is approached, while that between the three-scalar and full-equilibrium models remains large. Notably, the agreement between the three-scalar and confined models is better here than in Section 4.1.2, where the confined assumption was only an approximation (phase 2 was active but slow); here, with D2 = ra, 2 = rd, 2 = 0 , the confined assumption is exactly satisfied by construction. 9(a) (b) (c)                    
+
+> Figure 3: One-dimensional transport for a surfactant soluble only in phase 1 (parameters in Table 3): (a) profiles of c1,s,and ϕat multiple time instants from the three-scalar model, (b) total concentration c1+c2+sat t= 5 compared against the full-equilibrium one-scalar model cos,eqbm and the confined one-scalar model cos,conf , and (c) relative L1differences between the three-scalar model and each one-scalar model as functions of time.
+
+4.1.4. Artificial interface in a single phase system 
+
+Phase 1 Phase 2 Interface Initial conditions (at 
+
+t = 0 )
+
+˜c1 = 5 e−4x2
+
+˜c2 = 5 e−4x2
+
+˜s = 0 
+
+Surfactants parameters 
+
+D1 = 1 .0, ra1 = 0 ,
+
+rd1 = 0 
+
+D2 = 1 .0, ra2 = 0 ,
+
+rd2 = 0 
+
+Ds = 0 , ˜s∞ = 0        
+
+> Table 4: Simulation parameters for the test in Section 4.1.4. No adsorption or desorption occurs ( ra,p =rd,p = 0 ) and the interface is passive ( Ds=s∞= 0 ).
+
+The simulation parameters are listed in Table 4. This test verifies the reduction consistency of the three-scalar model in the limit of an artificial interface embedded in a single-phase flow. With ra,p = rd,p =
+
+Ds = s∞ = 0 , the interface plays no physical role: surfactant neither adsorbs to nor desorbs from it, and s
+
+remains identically zero. The model should therefore closely recover single-phase scalar diffusion, with the combined field c1 + c2 evolving according to a standard diffusion equation. The system is initialized with a Gaussian profile split across the phase field: c1(x, 0) = 5 e−4x2
+
+ϕ and c2(x, 0) = 5 e−4x2
+
+(1 − ϕ), so that the total c1 + c2 = 5 e−4x2
+
+is a smooth Gaussian. The simulation is run to t = 2 . Figure 4(a) shows the evolution of c1 and c2 in the three-scalar model: each field diffuses within its respective domain and the sum 
+
+c1 + c2 spreads as a standard diffusion profile. Panel (b) compares c1 + c2 + s from the three-scalar model against the equivalent single-phase one-scalar computation cos , showing very good agreement. Panel (c) shows the relative L1 difference between the two models as a function of time; it remains small throughout, confirming the reduction consistency of the three-scalar model in the artificial interface limit. The small remaining difference arises because the phase-weighted diffusion terms and correction fluxes ⃗ R act on c1 and 
+
+c2 individually; when summed, both contribute residuals proportional to (˜ c1 − ˜c2), multiplied by ∇ϕ and ⃗ R,respectively, which are confined to the O(ϵ) interface region. These residuals therefore vanish both as ϵ → 0
+
+and at equilibrium, where ˜c1 = ˜ c2 since Keq = 1 , consistent with the findings of [18]. 10 (a) (b) (c)                
+
+> Figure 4: One-dimensional transport in the artificial interface limit (parameters in Table 4): (a) profiles of c1,c2, and ϕ
+> at multiple time instants from the three-scalar model, (b) total concentration c1+c2+scompared against the equivalent single-phase one-scalar result cos at multiple times, and (c) relative L1error between the three-scalar and one-scalar models as a function of time.
+
+4.2. Two-dimensional surfactant transport tests 
+
+These tests use a circular drop in a periodic square domain, centered at the center of the domain at 
+
+t = 0 . As in Section 4.1, the CAC equation is used with ϵ = ∆ x and γ = 1 .
+
+4.2.1. Partially soluble surfactant 
+
+Phase 1 Phase 2 Interface Initial conditions (at 
+
+t = 0 )
+
+˜c1 = 2 .5 ˜c2 = 0 .8 ˜s = 0 
+
+Surfactants parameters 
+
+D1 = 1 .0, ra1 = 3 .0,
+
+rd1 = 1 .0
+
+D2 = 1 .0, ra2 = 1 .0,
+
+rd2 = 13
+
+Ds = 0 .2, ˜s∞ = 1 .0  
+
+> Table 5: Simulation parameters for the test in Section 4.2.1. The partition coefficient is Keq = 1 .
+
+The simulation parameters are listed in Table 5, which match those of the one-dimensional test in Section 4.1.1. The drop has radius R = 0 .2 in a [0 , 1] 2 periodic domain. The drop is advected with uniform velocity ⃗u = ˆ e x while diffusion, adsorption, and desorption simultaneously drive the system toward the Langmuir equilibrium. The accuracy of the numerical solution is quantified at t = 2 by the relative L2
+
+errors of c1 and s with respect to their equilibrium values c1,eq and seq . These equilibrium references are evaluated locally using the numerical ˜c2 = c2/ϕ 2 field at t = 2 : seq is obtained from the Langmuir isotherm (Eq. (8) with Jps = 0 , as in Section 4.1.1) and c1,eq = Keq ˜c2 ϕ1. The errors are defined as 
+
+EL2 (q) = ∥q − qeq ∥2
+
+∥qeq ∥2
+
+, q ∈ { c1, s }. (26) Table 6 reports the errors at four grid spacings, and Figure 5 plots them as a function of ∆x. Both c1 and s
+
+show approximately first-order convergence with mesh refinement, consistent with the ϵ = ∆ x scaling of the interface thickness. Figure 6 plots the root-mean-square difference between the three-scalar and one-scalar model predictions as the mesh is refined, defined as 
+
+ERMSE =
+
+vuut 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+[( c1 + c2 + s)i − ci
+
+> os
+
+]2; (27) the two models converge to the same solution as the mesh is refined. Figure 7 shows the evolution of the total concentration c1 + c2 + s at representative time instants. 11 Grid spacing c1 error (×10 −5) s error (×10 −3)
+
+1/25 14.9 6.06 
+
+1/50 5.64 3.02 
+
+1/100 2.09 1.49 
+
+1/200 1.08 0.77 
+
+Table 6: Relative L2 errors for c1 and s at t = 2 for the test in Section 4.2.1.  
+
+> (a) (b)
+
+Figure 5: Relative L2 errors as functions of grid spacing at t = 2 for the two-dimensional partially soluble test (Section 4.2.1): (a) error in c1 and (b) error in s. Dashed lines indicate first- and second-order reference slopes. 
+
+Figure 6: Root-mean-square difference ERMSE (Eq. (27)) between the three-scalar and one-scalar model predictions as a function of grid spacing at t = 2 (Section 4.2.1). 
+
+12 (a) t = 0 s (b) t = 0.0125 s   
+
+> (c) t = 0.1 s (d) t = 0.26 s
+> (e) t = 1 s (f) t = 2 s
+
+Figure 7: Evolution of the total concentration c1 + c2 + s at times t = 0 , 0.0125 , 0.0975 , 0.26 , 1, and 2 for the two-dimensional partially soluble test (parameters in Table 5). 
+
+13 4.2.2. Insoluble surfactant 
+
+Phase 1 Phase 2 Interface Initial conditions (at 
+
+t = 0 )
+
+˜c1 = 0 ˜c2 = 0 ˜s0(θ)
+
+Surfactants parameters 
+
+D1 = 0 , ra1 = 0 ,
+
+rd1 = 0 
+
+D2 = 0 , ra2 = 0 , rd2 = 0 Ds = 1 .0, ˜s∞ = 1 .0     
+
+> Table 7: Simulation parameters for the test in Section 4.2.2. The surfactant is insoluble ( Dp=ra,p =rd,p = 0 ).
+
+The simulation parameters are listed in Table 7. This test follows the setup of [9], using a drop of radius 
+
+R = 1 in a [0 , 4] 2 periodic domain. The surfactant is insoluble and confined to the interface, with the initial specific interfacial concentration given by 
+
+˜s0(θ) = 12 (1 − cos θ), (28) where θ is the polar angle measured around the drop. The velocity is zero; the drop is stationary and the surfactant evolves solely by diffusion on the circular interface. The analytical solution is 
+
+˜sana (θ, t ) = 12
+
+
+
+1 − e−Dst/R 2
+
+cos θ
+
+
+
+, (29) where R = 1 is the drop radius, with the cos θ mode decaying toward the uniform distribution ˜s = 1 /2
+
+with time constant R2/D s = 1 [9]. Figure 8 shows ˜s as a function of θ at times t = 0 , 0.25 , 0.5, 0.75 ,and 1, compared against Eq. (29), for grids of 100 × 100 and 200 × 200 . The numerical solution is in close agreement with the analytical prediction at both resolutions and shows improved accuracy compared to the results reported in Fig. 6 of [9] at equivalent resolution. Figure 9 shows the corresponding two-dimensional fields of s at t = 0 and t = 1 for both resolutions. 
+
+4.3. Flow-coupled tests 
+
+These tests follow the setup of Section 5 of [7] for a surfactant-laden drop in a two-dimensional shear flow. A circular drop of radius R = 1 is placed at the center of a domain [−6, 6] × [−2, 2] subject to the background shear ⃗u = ( ˙ γy, 0) with ˙γ = 1 , imposed through Dirichlet boundary conditions at the top and bottom walls and periodic conditions in the streamwise direction. Both phases have equal density and viscosity; the capillary number is Ca = μ ˙γ/σ 0 = 0 .5 and the Reynolds number is Re = ρ ˙γR 2/μ = 1 .0. As noted in Section 2.1, these tests use δ = 6 ϕ21ϕ22/ϵ to match [7]. All simulations use a uniform 384 × 128 mesh with ϵ = ∆ x; no adaptive refinement is required, in contrast to the block-structured adaptive solver of [7]. The dependence of surface tension on the specific interfacial concentration ˜s is governed by the Langmuir equation of state [7], 
+
+σ(˜ s) = 1 + β ln(1 − ω˜s), (30) with elasticity number β = 0 .3 and dimensionless surfactant coverage ω = ˜ s0/˜s∞ = 0 .5, where ˜s0 = 1 is the initial uniform surface concentration and ˜s∞ = 1 /ω = 2 is the saturation concentration. The surface Peclet number P e s = ˙ γR 2/D s = 10 is held fixed. For the soluble tests, the Biot number Bi = rd,p / ˙γ measures the ratio of the desorption rate to the shear rate, and the bulk Peclet number P e = ˙ γR 2/D p measures the ratio of convective to diffusive transport in the bulk. The adsorption number k = ra,p ˜cp,e /r d,p , where ˜cp,e 
+
+is the initial equilibrium bulk concentration in the soluble phase, is fixed by requiring Jps = 0 at t = 0 ,yielding k = ω/ (1 − ω) = 1 . The adsorption depth h = ˜ s0/(R ˜cp,e ) measures the ratio of interfacial to bulk surfactant capacity; it is determined by the Langmuir equilibrium as h = ra,p ˜s∞(1 − ω)/(rd,p R) = 0 .5,consistent with [7]. Results are presented at t = 0 , 4, and 8. The three solubility scenarios examined here correspond to qualitatively different physical settings, as discussed in Section 2.5: the insoluble case represents a surfactant with negligible bulk solubility ( Bi = 0 ); the single-phase-soluble case is representative 14 (a) ∆x = 1 /100   
+
+> (b) ∆x= 1 /200
+
+Legend: 
+
+— Numerical t = 0 
+
+• Analytical t = 0 
+
+— Numerical t = 0 .25 
+
+• Analytical t = 0 .25 
+
+— Numerical t = 0 .5
+
+• Analytical t = 0 .5
+
+— Numerical t = 0 .75 
+
+• Analytical t = 0 .75 
+
+— Numerical t = 1 
+
+• Analytical t = 1           
+
+> Figure 8: Specific interfacial concentration ˜sas a function of polar angle θat five time instants, compared against the analytical solution Eq. (29) (parameters in Table 7), at grid spacings (a) ∆x= 1 /100 and (b) ∆x= 1 /200 .
+
+of a gas-liquid system or a liquid-liquid system with a strongly hydrophilic or lipophilic surfactant, where one phase does not participate in bulk transport; and the partially soluble case represents a liquid-liquid system with a surfactant of intermediate HLB, soluble in both phases. 15 (a) ∆x = 1 /100 , t = 0 (b) ∆x = 1 /100 , t = 1          
+
+> (c) ∆x= 1 /200 ,t= 0 (d) ∆x= 1 /200 ,t= 1
+
+Figure 9: Two-dimensional field of s for the insoluble surfactant test (Section 4.2.2) at t = 0 and t = 1 , for grid spacings 
+
+∆x = 1 /100 (a,b) and ∆x = 1 /200 (c,d). 
+
+16 4.3.1. Insoluble surfactant 
+
+Figure 10 compares a clean drop with an insoluble surfactant-covered drop ( Dp = ra,p = rd,p = 0 )at t = 0 , 4, and 8, reproducing the reference result of [7]. The surfactant-laden drop undergoes larger elongation and rotates faster than the clean drop, owing to the lower mean surface tension. As the drop deforms, the shear-induced surface circulation sweeps surfactant toward the tips of the elongating drop, where it accumulates and locally reduces σ, leaving the equatorial region with relatively higher σ. The resulting Marangoni stresses, directed from the tips (lower σ) toward the equatorial region (higher σ), oppose the surface circulation and partially retard the elongation. Our results are in good agreement with those reported in Fig. 7 of [7].       
+
+> Figure 10: Drop shapes at t= 0 ,4, and 8for a clean drop (blue) and an insoluble surfactant-covered drop (magenta), following the setup of [7].
+
+4.3.2. Surfactant soluble in the outer phase 
+
+We next consider a surfactant soluble only in the outer phase (phase 2), with D1 = ra, 1 = rd, 1 = 0 ,following Section 5.2 of [7]. Figures 11 and 12 show the effect of varying the Biot number (at fixed P e = 1 )and the bulk Peclet number (at fixed Bi = 1 ), respectively, with solid lines for the three-scalar model and dashed lines for the confined one-scalar model. Because the confined one-scalar model assumes instantaneous equilibrium between the interface and the bulk, the Biot number, which controls the rate of adsorption and desorption, drops out of its governing equations entirely. As a result, all one-scalar predictions in Figure 11 collapse onto a single curve regardless of 
+
+Bi ; this curve represents the limit of infinitely fast exchange and is therefore closest to the three-scalar result at the largest Bi , where exchange is fastest. The bulk Peclet number, by contrast, controls bulk diffusion, which is retained in the one-scalar model; the one-scalar predictions in Figure 12 therefore do depend on 
+
+P e , and the one-scalar and three-scalar models are in good agreement at each P e value, confirming that the equilibrium assumption is well-suited to this regime. The Biot number governs the rate of exchange between the interface and the outer bulk relative to the shear rate. For small Bi , exchange is slow, the surface concentration remains non-uniform, and strong Marangoni stresses retard elongation. As Bi increases, faster adsorption and desorption drive ˜s toward a more spatially uniform distribution, Marangoni stresses weaken, and the drop deformation increases, progressively approaching the equilibrium prediction. The bulk Peclet number has the opposite effect: decreasing P e corresponds to stronger bulk diffusion, which more rapidly homogenizes the bulk concentration 17 adjacent to the interface, promoting surfactant exchange and driving ˜s toward uniformity. At large P e , bulk transport is slow and the surface concentration gradients persist, sustaining significant Marangoni stresses. These trends are in good agreement with the results reported in Figs. 9–12 of [7].                                         
+
+> (a) (b)
+> Figure 11: Drop shapes at t= 0 ,4, and 8for a surfactant soluble in the outer phase (Section 4.3.2), varying the Biot number at fixed P e = 1 : insoluble (magenta), Bi = 0 .1(blue), Bi = 1 (red), Bi = 10 (green). Solid lines: three-scalar model; dashed lines: confined one-scalar model. (b) Close-up of the drop tip at t= 8 .
+> (a) (b)
+> Figure 12: Drop shapes at t= 0 ,4, and 8for a surfactant soluble in the outer phase (Section 4.3.2), varying the bulk Peclet number at fixed Bi = 1 : insoluble (magenta), P e = 0 .1(blue), P e = 1 (red), P e = 10 (green). Solid lines: three-scalar model; dashed lines: confined one-scalar model. (b) Close-up of the drop tip at t= 8 .
+
+4.3.3. Surfactant partially soluble in both phases 
+
+We now consider the partially soluble case, in which the surfactant exchanges with both the outer phase 2 and the drop interior (phase 1). This scenario has no counterpart in [7] and represents the novel contribution of this section. The surfactant properties in both phases are taken to be identical: D1 = D2, ra, 1 = ra, 2,and rd, 1 = rd, 2, so that the partition coefficient is Keq = 1 . No one-scalar model results are shown: unlike Section 4.3.2, there is no reference solution against which to assess the accuracy of the equilibrium reduction, and the focus here is a physics comparison between the partially soluble and single-phase-soluble cases rather than model validation. Figures 13 and 14 show the effect of varying Bi (at fixed P e = 1 ) and P e (at fixed 
+
+Bi = 1 ), respectively, with the insoluble result (magenta) included as a reference. The key difference from the single-phase-soluble case is that the drop interior now provides an additional exchange pathway for the surfactant. When a concentration gradient develops along the interface under shear, the surfactant can redistribute not only by desorbing into the outer bulk but also by transferring into and diffusing through the drop interior. This additional pathway further homogenizes ˜s along the interface, reducing Marangoni stresses compared to the single-phase-soluble case at the same Bi and P e ,and leading to greater drop elongation. A striking consequence of this enhanced homogenization is that the results for different Bi and P e values collapse nearly onto each other: with two exchange pathways active 18 simultaneously, the surface concentration is driven toward uniformity even at moderate Bi and P e , leaving little sensitivity to the individual parameter values. The dominant effect is the contrast with the insoluble case, which exhibits significantly less elongation due to the absence of any bulk exchange.                                        
+
+> (a) (b)
+> Figure 13: Drop shapes at t= 0 ,4, and 8for a partially soluble surfactant (Section 4.3.3), varying the Biot number at fixed
+> P e = 1 : insoluble (magenta), Bi = 0 .1(blue), Bi = 1 (red), Bi = 10 (green). (b) Close-up of the drop tip at t= 8 .
+> (a) (b)
+> Figure 14: Drop shapes at t= 0 ,4, and 8for a partially soluble surfactant (Section 4.3.3), varying the bulk Peclet number at fixed Bi = 1 : insoluble (magenta), P e = 0 .1(blue), P e = 1 (red), P e = 10 (green). (b) Close-up of the drop tip at t= 8 .
+
+5. Summary 
+
+We proposed a universal diffuse-interface modeling framework for surfactant transport in two-phase flows, applicable to all solubility scenarios and to any conservative phase field method. The foundation of the framework is a general three-scalar non-equilibrium model governing the surfactant concentrations in each bulk phase, c1 and c2, and at the interface, s. The model is locally and globally conservative, with the inter-phase transfer terms canceling pairwise so that the total surfactant amount c1 + c2 + s is conserved in a closed domain. It is leakage-free, inheriting the property established in [18, 19]: in the absence of physical adsorption and desorption, surfactant does not cross the interface unphysically even for large inter-phase concentration contrasts. The consistent inclusion of the phase field correction flux ⃗ R ensures Galilean invariance, and the model is reduction-consistent: in the non-surfactant limit it recovers the interphase transfer model of [18], and in the limit of an artificial interface in a single-phase flow it recovers single-phase scalar transport. The framework is agnostic to the specific conservative phase field method employed, being applicable without modification to the Cahn-Hilliard equation, the conservative Allen-Cahn equation, and any other conservative formulation. Assuming thermochemical equilibrium, we derived two one-scalar models from the three-scalar system: a full-equilibrium model for a surfactant in simultaneous equilibrium between both bulk phases and the 19 interface, and a confined model for a surfactant in equilibrium between a single bulk phase and the interface. The three-scalar and one-scalar models are coupled to the Navier-Stokes equations through a surface tension force incorporating both the normal capillary term and the tangential Marangoni stress arising from non-uniform interfacial surfactant distributions. We assessed the proposed models through a hierarchy of numerical tests. One-dimensional transport tests against analytical solutions confirmed that the three-scalar model accurately captures partially soluble, single-phase-soluble, and insoluble surfactant dynamics, and that it converges to the appropriate one-scalar equilibrium reduction as the system approaches thermochemical equilibrium. The confined one-scalar model was shown to be the appropriate reduction when one phase does not participate in transport, while the full-equilibrium model over-predicts surfactant concentrations in that regime. In the artificial-interface limit, the three-scalar model closely recovers single-phase scalar diffusion, with the small remaining difference vanishing both as ϵ → 0 and at equilibrium. Two-dimensional advection-diffusion tests demonstrated convergence with mesh refinement for the soluble case, and agreement with an analytical solution for the insoluble case. Fully-coupled drop-in-shear flow simulations are in good agreement with the insoluble and single-phase-soluble results of [7]; the partially soluble case, for which no reference exists in the literature, is presented as a novel demonstration of the framework. For a surfactant soluble in the outer phase, we showed that the Biot number drops out of the confined one-scalar model — all one-scalar predictions collapse onto a single curve — while the three-scalar model captures the full Bi-dependence; the equilibrium reduction is approached only at large Bi . The partially soluble case, in which the surfactant exchanges with both the outer bulk and the drop interior, represents the novel contribution of this section: the additional exchange pathway further homogenizes the interfacial surfactant distribution, reduces Marangoni stresses, and leads to greater drop elongation compared to the single-phase-soluble case at equivalent parameter values. 
+
+Acknowledgments 
+
+We acknowledge start-up funding from KTH Royal Institute of Technology and the Swedish e-science Research Center. 
+
+References 
+
+[1] P.-G. de Gennes, F. Brochard-Wyart, D. Quéré, Capillarity and Wetting Phenomena: Drops, Bubbles, Pearls, Waves, Springer, New York, 2003. [2] A. J. James, J. Lowengrub, A surfactant-conserving volume-of-fluid method for interfacial flows with insoluble surfactant, Journal of Computational Physics 201 (2004) 685–722. [3] I. Seric, S. Afkhami, L. Kondic, Direct numerical simulation of variable surface tension flows using a Volume-of-Fluid method, Journal of Computational Physics 352 (2018) 615–636. [4] M. Muradoglu, G. Tryggvason, Simulations of soluble surfactants in 3d multiphase flow, Journal of Computational Physics 274 (2014) 737–757. [5] S. Khatri, A.-K. Tornberg, A numerical method for two phase flows with insoluble surfactants, Com-puters & Fluids 49 (2011) 150–165. [6] K. E. Teigen, X. Li, J. Lowengrub, F. Wang, A. Voigt, A diffuse-interface approach for modeling transport, diffusion and adsorption/desorption of material quantities on a deformable interface, Com-munications in Mathematical Sciences 4 (7) (2009) 1009–1037. [7] K. E. Teigen, P. Song, J. Lowengrub, A. Voigt, A diffuse-interface method for two-phase flows with soluble surfactants, Journal of Computational Physics 230 (2) (2011) 375–393. [8] G. Soligo, A. Roccon, A. Soldati, Mass-conservation-improved phase field methods for turbulent mul-tiphase flow simulation, Acta Mechanica 230 (2) (2019) 683–696. 20 [9] S. S. Jain, A model for transport of interface-confined scalars and insoluble surfactants in two-phase flows, Journal of Computational Physics 515 (2024) 113277. [10] S. S. Jain, A model for transport of soluble surfactants in two-phase flows, arXiv preprint arXiv:2510.10857. [11] S. Mirjalili, S. S. Jain, M. Dodd, Interface-capturing methods for two-phase flows: An overview and recent developments, Center for Turbulence Research Annual Research Briefs (2017) 117–135. [12] S. Mirjalili, C. B. Ivey, A. Mani, Comparison between the diffuse interface and volume of fluid methods for simulating two-phase flows, International Journal of Multiphase Flow 116 (2019) 221–238. [13] G. Zhu, J. Kou, B. Yao, Y.-s. Wu, J. Yao, S. Sun, Thermodynamically consistent modelling of two-phase flows with moving contact line and soluble surfactants, Journal of Fluid Mechanics 879 (2019) 327–359. [14] P. Yue, C. Zhou, J. J. Feng, Spontaneous shrinkage of drops and mass conservation in phase-field simulations, Journal of Computational Physics 223 (2007) 1–9. [15] P.-H. Chiu, Y.-T. Lin, A conservative phase field method for solving incompressible two-phase flows, Journal of Computational Physics 230 (1) (2011) 185–204. [16] S. Mirjalili, C. B. Ivey, A. Mani, A conservative diffuse interface method for two-phase flows with provable boundedness properties, Journal of Computational Physics 401 (2020) 109006. [17] S. S. Jain, Accurate conservative phase-field method for simulation of two-phase flows, Journal of Computational Physics 469 (2022) 111529. [18] S. Mirjalili, S. S. Jain, A. Mani, A computational model for interfacial heat and mass transfer in two-phase flows using a phase field method, International Journal of Heat and Mass Transfer 197 (2022) 123326. [19] S. Mirjalili, M. Khanwale, A. Mani, Consistent modeling of scalar transport in multiphase flows using conservative phase field methods. [20] M. Garcia-Villalba, T. Colonius, O. Desjardins, D. Lucas, A. Mani, D. Marchisio, O. K. Matar, F. Pi-cano, S. Zaleski, Numerical methods for multiphase flows, International Journal of Multiphase Flow (2025) 105285. [21] J. W. Cahn, J. E. Hilliard, Free energy of a nonuniform system. i. interfacial free energy, The Journal of Chemical Physics 28 (2) (1958) 258–267. [22] M. A. Khanwale, A. D. Lofquist, H. Sundar, J. A. Rossmanith, B. Ganapathysubramanian, Simulating two-phase flows with thermodynamically consistent energy stable Cahn-Hilliard Navier-Stokes equations on parallel adaptive octree based meshes, J. Comput. Phys. 419 (2020) 109674. [23] S. Mirjalili, M. A. Khanwale, A. Mani, Assessment of an energy-based surface tension model for sim-ulation of two-phase flows using second-order phase field methods, Journal of Computational Physics 474 (2023) 111795. 21

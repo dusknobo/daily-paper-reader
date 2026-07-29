@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-29",
+  "date": "2026-07-29",
+  "generated_at": "2026-07-29T21:24:53",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/29/2607.21388v2-two-phase-source-and-reaction-coefficient-stefan-type-problems",
+      "section": "quick",
+      "title_en": "Two-phase source and reaction coefficient Stefan type problems",
+      "authors": "Targyn A. Nauryz",
+      "date": "2026-07-23",
+      "pdf": "https://arxiv.org/pdf/2607.21388v2",
+      "score": "6.0",
+      "evidence": "相变换热的反斯蒂芬问题，与蒸发相关",
+      "tldr": "针对两相Stefan问题中未知时间依赖源和反应系数的识别挑战，本文通过变换将自由边界转化为固定域，利用Fourier谱展开重建系数，推导出Volterra积分方程和指数变换分别处理源和反应系数。模型的两个移动边界提供足够的Stefan条件，无需过度确定数据。在适当假设下，理论上建立了弱解和强解的存在性、唯一性与正则性；数值算例验证了方法对噪声的鲁棒性。该框架为两相相变过程热参数识别提供了严格的理论基础。",
+      "tags": "query:falling-film",
+      "abstract_en": "This paper investigates inverse two-phase Stefan-type problems for parabolic heat equations with unknown time-dependent source and reaction coefficients. Suitable transformations reduce the original free-boundary problems to equivalent equations on fixed spatial domains, and Fourier spectral expansions are used to derive reconstruction formulas for the unknown coefficients. In the first formulation, the source coefficients are identified from integral, pointwise, and nonlocal additional data, leading to Volterra integral equations. In the second formulation, an exponential transformation is applied to recover the reaction coefficients. A principal advantage of the model with two moving boundaries is that each boundary provides its own Stefan condition which sufficient to determine the two unknown time-dependent coefficients without additional overdetermination conditions. Under appropriate assumptions the existence, uniqueness, boundedness and regularity of weak and strong solutions are established. Illustrative examples confirm the applicability of the reconstruction procedure and show that the coefficients remain stable under the noisy data. The proposed approach provides a rigorous base for identifying time-dependent thermal parameters in two-phase phase-change processes.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/29/2607.25444v1-accurate-wetting-dynamics-via-a-conservative-allen-cahn-based-lattice-boltzmann-approach-for-multiphase-flows",
+      "section": "quick",
+      "title_en": "Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows",
+      "authors": "Paolo Bello, Luca Mander, Marco Lauricella, Gianmarco Guglielmo, Michele La Rocca, Andrea Montessori",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25444v1",
+      "score": "6.0",
+      "evidence": "提出多相流LBM的润湿边界条件，可直接用于降膜流动模拟",
+      "tldr": "针对多相流湿润动力学，提出基于保守Allen-Cahn相场和格子玻尔兹曼方法的局部几何湿润边界条件。通过幽灵节点重建壁面法向与施主流体外推，实现接触角局部施加，配合全局体积校正保证质量守恒。验证表明模型准确恢复平衡接触角、铺展指数和最大变形标度律，并成功模拟液滴通过尖锐孔口的捕获-释放-破裂转变，为复杂几何湿润控制流动提供精确可扩展框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this work we propose a local geometric wetting boundary condition for a conservative Allen--Cahn-based lattice Boltzmann framework. The prescribed contact angle is imposed through ghost phase-field values constructed from a locally reconstructed wall normal and a donor-fluid extrapolation. The ghost-node wetting update is local, geometrically consistent, and compatible with thread-safe large-scale implementations, while phase-field mass is controlled through a separate global volume correction. Validation includes static contact-angle tests, short-time droplet spreading, impact on a hydrophobic surface, and gravity-driven motion through a sharp-edged orifice. The simulations recover the imposed equilibrium angles, reproduce contact-angle-dependent spreading exponents between approximately 1/2 and 1/4, and follow the classical W e1/4 maximum-deformation scaling. The model also captures the transition between capture, release, and release with breakup. The proposed approach provides an accurate and scalable framework for wetting-controlled flows in complex geometries.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/29/2607.25453v1-a-universal-diffuse-interface-modeling-framework-for-surfactants",
+      "section": "quick",
+      "title_en": "A universal diffuse interface modeling framework for surfactants",
+      "authors": "Shahab Mirjalili, Mathieu Bignolles",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25453v1",
+      "score": "6.0",
+      "evidence": "两相流中表面活性剂输运的通用扩散界面模型",
+      "tldr": "表面活性剂在两相界面的传输对流动和界面动力学影响显著，但现有弥散界面模型局限于特定相场方程，仅能处理不溶或单相可溶情形，缺乏覆盖部分可溶的一般框架。本文提出通用三标量非平衡建模框架，适用于所有溶解度场景和任何保守相场方法，确保守恒性、伽利略不变性等，并在热化学平衡下导出了两个单标量简化模型，耦合Navier-Stokes方程以包含马兰戈尼效应。通过解析解、二维对流扩散及液滴剪切流模拟，验证了模型对不溶、可溶和部分可溶场景的准确性。该框架填补了弥散界面方法在部分可溶领域的空白，为任意保守相场方法提供了统一的建模工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "We propose a universal diffuse-interface modeling framework for surfactant transport in two-phase flows, applicable to all solubility scenarios and to any conservative phase field method. The foundation of our framework is a general three-scalar non-equilibrium model governing the surfactant concentrations in each bulk phase and at the interface, which builds on our prior consistent scalar transport framework and is locally and globally conservative, leakage-free, Galilean-invariant, and reduction-consistent. Assuming thermochemical equilibrium, we derive two one-scalar models: one for a surfactant in full equilibrium between both bulk phases and the interface, and one for a surfactant confined to a single bulk phase and the interface. All models are coupled to the Navier-Stokes equations through a surface tension force that incorporates the Marangoni stress arising from non-uniform interfacial surfactant distributions. While diffuse-interface surfactant models have been developed for the Cahn-Hilliard equation and, more recently, for the conservative Allen-Cahn (CAC) equation, existing models for CAC address only the insoluble and single-phase-soluble cases, leaving the general scenario of partial solubility in both bulk phases unaddressed; furthermore, these models lack Galilean invariance and reduction consistency, and are not applicable beyond the CAC setting. The framework is validated against analytical solutions in one-dimensional transport tests, assessed for convergence in two-dimensional advection-diffusion simulations, and demonstrated in fully-coupled drop-in-shear flow simulations covering insoluble, soluble, and partially-soluble surfactant scenarios.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,130 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-29T21:21:14.035628+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 3,
+    "quick_skim_target": 11,
+    "quick_selected": 3
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.21388v2",
+      "source": "arxiv",
+      "title": "Two-phase source and reaction coefficient Stefan type problems",
+      "abstract": "This paper investigates inverse two-phase Stefan-type problems for parabolic heat equations with unknown time-dependent source and reaction coefficients. Suitable transformations reduce the original free-boundary problems to equivalent equations on fixed spatial domains, and Fourier spectral expansions are used to derive reconstruction formulas for the unknown coefficients. In the first formulation, the source coefficients are identified from integral, pointwise, and nonlocal additional data, leading to Volterra integral equations. In the second formulation, an exponential transformation is applied to recover the reaction coefficients. A principal advantage of the model with two moving boundaries is that each boundary provides its own Stefan condition which sufficient to determine the two unknown time-dependent coefficients without additional overdetermination conditions. Under appropriate assumptions the existence, uniqueness, boundedness and regularity of weak and strong solutions are established. Illustrative examples confirm the applicability of the reconstruction procedure and show that the coefficients remain stable under the noisy data. The proposed approach provides a rigorous base for identifying time-dependent thermal parameters in two-phase phase-change processes.",
+      "authors": [
+        "Targyn A. Nauryz"
+      ],
+      "primary_category": "math-ph",
+      "categories": [
+        "math-ph",
+        "math.AP",
+        "math.SP"
+      ],
+      "published": "2026-07-23T14:49:39+00:00",
+      "link": "https://arxiv.org/pdf/2607.21388v2",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Inverse Stefan problems for phase-change heat transfer, related to evaporation",
+      "llm_evidence_cn": "相变换热的反斯蒂芬问题，与蒸发相关",
+      "llm_evidence": "相变换热的反斯蒂芬问题，与蒸发相关",
+      "canonical_evidence": "相变换热的反斯蒂芬问题，与蒸发相关",
+      "llm_tldr_en": "Solves inverse two-phase Stefan problems with unknown source/reaction coefficients for phase-change heat conduction, providing a mathematical framework potentially applicable to falling film evaporation modeling.",
+      "llm_tldr_cn": "针对两相斯蒂芬型移动边界问题，研究具有时间依赖源项和反应系数的反问题。通过合适变换将自由边界问题转换为固定域上的方程，并利用傅里叶谱展开推导出未知系数的重构公式。该方法利用每个边界提供的额外斯蒂芬条件，为蒸发、凝固等相变传热过程提供了参数辨识的数学框架，对降膜蒸发建模中膜内传热系数确定具有参考价值。",
+      "llm_tldr": "针对两相斯蒂芬型移动边界问题，研究具有时间依赖源项和反应系数的反问题。通过合适变换将自由边界问题转换为固定域上的方程，并利用傅里叶谱展开推导出未知系数的重构公式。该方法利用每个边界提供的额外斯蒂芬条件，为蒸发、凝固等相变传热过程提供了参数辨识的数学框架，对降膜蒸发建模中膜内传热系数确定具有参考价值。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "Falling film evaporation and heat transfer in vertical tubes CFD",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25444v1",
+      "source": "arxiv",
+      "title": "Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows",
+      "abstract": "In this work we propose a local geometric wetting boundary condition for a conservative Allen--Cahn-based lattice Boltzmann framework. The prescribed contact angle is imposed through ghost phase-field values constructed from a locally reconstructed wall normal and a donor-fluid extrapolation. The ghost-node wetting update is local, geometrically consistent, and compatible with thread-safe large-scale implementations, while phase-field mass is controlled through a separate global volume correction. Validation includes static contact-angle tests, short-time droplet spreading, impact on a hydrophobic surface, and gravity-driven motion through a sharp-edged orifice. The simulations recover the imposed equilibrium angles, reproduce contact-angle-dependent spreading exponents between approximately 1/2 and 1/4, and follow the classical W e1/4 maximum-deformation scaling. The model also captures the transition between capture, release, and release with breakup. The proposed approach provides an accurate and scalable framework for wetting-controlled flows in complex geometries.",
+      "authors": [
+        "Paolo Bello",
+        "Luca Mander",
+        "Marco Lauricella",
+        "Gianmarco Guglielmo",
+        "Michele La Rocca",
+        "Andrea Montessori"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-07-28T08:34:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.25444v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Proposes a wetting boundary condition for multiphase LBM, directly applicable to film flow simulation",
+      "llm_evidence_cn": "提出多相流LBM的润湿边界条件，可直接用于降膜流动模拟",
+      "llm_evidence": "提出多相流LBM的润湿边界条件，可直接用于降膜流动模拟",
+      "canonical_evidence": "提出多相流LBM的润湿边界条件，可直接用于降膜流动模拟",
+      "llm_tldr_en": "Develops a local geometric wetting boundary condition for a conservative Allen-Cahn LBM, validated for spreading, impact, and flow through an orifice, enabling accurate multiphase simulations with contact lines.",
+      "llm_tldr_cn": "提出了一种局部几何润湿边界条件，用于守恒Allen-Cahn格子Boltzmann框架，验证了铺展、冲击和孔口流动，可精确模拟带接触线的多相流，为降膜CFD提供使能方法。",
+      "llm_tldr": "提出了一种局部几何润湿边界条件，用于守恒Allen-Cahn格子Boltzmann框架，验证了铺展、冲击和孔口流动，可精确模拟带接触线的多相流，为降膜CFD提供使能方法。",
+      "llm_tags": [
+        "query:falling-film:composite"
+      ],
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD.",
+      "matched_requirement_id": "req-composite-falling-film",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.25453v1",
+      "source": "arxiv",
+      "title": "A universal diffuse interface modeling framework for surfactants",
+      "abstract": "We propose a universal diffuse-interface modeling framework for surfactant transport in two-phase flows, applicable to all solubility scenarios and to any conservative phase field method. The foundation of our framework is a general three-scalar non-equilibrium model governing the surfactant concentrations in each bulk phase and at the interface, which builds on our prior consistent scalar transport framework and is locally and globally conservative, leakage-free, Galilean-invariant, and reduction-consistent. Assuming thermochemical equilibrium, we derive two one-scalar models: one for a surfactant in full equilibrium between both bulk phases and the interface, and one for a surfactant confined to a single bulk phase and the interface. All models are coupled to the Navier-Stokes equations through a surface tension force that incorporates the Marangoni stress arising from non-uniform interfacial surfactant distributions. While diffuse-interface surfactant models have been developed for the Cahn-Hilliard equation and, more recently, for the conservative Allen-Cahn (CAC) equation, existing models for CAC address only the insoluble and single-phase-soluble cases, leaving the general scenario of partial solubility in both bulk phases unaddressed; furthermore, these models lack Galilean invariance and reduction consistency, and are not applicable beyond the CAC setting. The framework is validated against analytical solutions in one-dimensional transport tests, assessed for convergence in two-dimensional advection-diffusion simulations, and demonstrated in fully-coupled drop-in-shear flow simulations covering insoluble, soluble, and partially-soluble surfactant scenarios.",
+      "authors": [
+        "Shahab Mirjalili",
+        "Mathieu Bignolles"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-07-28T08:43:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.25453v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Universal diffuse-interface model for surfactant transport in two-phase flows",
+      "llm_evidence_cn": "两相流中表面活性剂输运的通用扩散界面模型",
+      "llm_evidence": "两相流中表面活性剂输运的通用扩散界面模型",
+      "canonical_evidence": "两相流中表面活性剂输运的通用扩散界面模型",
+      "llm_tldr_en": "Proposes a universal diffuse-interface framework for surfactant transport in two-phase flows, ensuring conservation and Galilean invariance, and derives equilibrium models, providing a transferable method for two-phase flow simulations including falling film scenarios.",
+      "llm_tldr_cn": "针对两相流模拟中表面活性剂输运的建模挑战，提出一种适用于所有溶解度场景和任意保守相场方法的通用扩散界面框架。该框架基于三标量非平衡模型，保证局部和全局守恒、无泄漏和伽利略不变性，并推导出两种单标量平衡模型。这些模型可耦合到相场方程中，为降膜等两相流问题的数值模拟提供了高精度、物理一致的表面活性剂建模工具，有望提升相界面动力学预测的准确性。",
+      "llm_tldr": "针对两相流模拟中表面活性剂输运的建模挑战，提出一种适用于所有溶解度场景和任意保守相场方法的通用扩散界面框架。该框架基于三标量非平衡模型，保证局部和全局守恒、无泄漏和伽利略不变性，并推导出两种单标量平衡模型。这些模型可耦合到相场方程中，为降膜等两相流问题的数值模拟提供了高精度、物理一致的表面活性剂建模工具，有望提升相界面动力学预测的准确性。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

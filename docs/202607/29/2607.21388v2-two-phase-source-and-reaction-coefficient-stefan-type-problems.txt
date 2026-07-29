@@ -1,0 +1,5063 @@
+Title: Two-phase source and reaction coefficient Stefan type problems
+
+URL Source: https://arxiv.org/pdf/2607.21388v2
+
+Published Time: Mon, 27 Jul 2026 00:58:48 GMT
+
+Number of Pages: 42
+
+Markdown Content:
+# Two-phase source and reaction coefficient Stefan type problems 
+
+Targyn A. Nauryz 1,2,3
+
+> 1International School of Economics, Kazakh-British Technical University, Almaty, Kazakhstan,
+> 2Institute of Mathematics and Mathematical Modeling, Almaty, Kazakhstan,
+> 3School of Digital Technologies, Narxoz University, Almaty, Kazakhstan Email: targyn.nauryz@gmail.com
+
+Abstract 
+
+This paper investigates inverse two-phase Stefan-type problems for parabolic heat equa-tions with unknown time-dependent source and reaction coefficients. Suitable transforma-tions reduce the original free-boundary problems to equivalent equations on fixed spatial domains, and Fourier spectral expansions are used to derive reconstruction formulas for the unknown coefficients. In the first formulation, the source coefficients are identified from integral, pointwise, and nonlocal additional data, leading to Volterra integral equa-tions. In the second formulation, an exponential transformation is applied to recover the reaction coefficients. A principal advantage of the model with two moving boundaries is that each boundary provides its own Stefan condition which sufficient to determine the two unknown time-dependent coefficients without additional overdetermination conditions. Under appropriate assumptions the existence, uniqueness, boundedness and regularity of weak and strong solutions are established. Illustrative examples confirm the applicabil-ity of the reconstruction procedure and show that the coefficients remain stable under the noisy data. The proposed approach provides a rigorous base for identifying time-dependent thermal parameters in two-phase phase-change processes. 
+
+Keywords: Inverse Stefan problem, parabolic equation, time-dependent coefficient, spectral expansion, Volterra integral equation, Tikhonov regularization, generalized cross-validation 
+
+1. Introduction 
+
+Free-boundary problems for parabolic equations arise naturally in the mathematical description of phase transitions, combustion, melting, solidification, thermal energy stor-age, and other processes in which the spatial region occupied by a phase changes with time. In such models, the temperature field is governed by a heat equation in each phase, while the motion of the interface is determined by an energy-balance condition involving the latent heat. Classical investigations of Stefan-type and free-boundary heat problems established the mathematical foundations for the analysis of temperature distributions and moving interfaces under different boundary and initial conditions CarVaz (1995), Sher (1971). Evolution equations posed in domains with moving boundaries have also been arXiv:2607.21388v2 [math-ph] 24 Jul 2026 studied for other physical systems, including elastic beams and strings with moving end-points ClaRinRod (2003), RinIShih (2004). General analytical tools for parabolic partial differential equations and their weak formulations can be found in Evan (2010). In many practical applications, some physical characteristics of the thermal process cannot be measured directly and must be recovered from indirect observations. This leads to inverse problems in which an unknown source intensity, reaction coefficient, boundary flux, or control parameter is reconstructed simultaneously with the state variable. Inverse coefficient problems for parabolic equations have been considered using additional integral data, singla data observations, boundary measurements, and nonlocal conditions Cannarsa (2010), Cannon (1991), CannonRun (1991), HazLesIsm (2019), KerIsm (2015). General theoretical and computational aspects of inverse problems for parabolic equations and their applications are discussed in Ivanchov (2003), Lesnic (2022). Related developments include multidimensional inverse Cauchy problems for evolution equations KarOzaSur (2020), in-verse source identification for subelliptic heat equations IsmOzaSur (2024), and inverse source problems for fractional diffusion equations with nonlocal boundary conditions Der-Sad (2024). Spectral methods provide an effective framework for constructing solutions of inverse parabolic problems. After expanding the solution with respect to the eigenfunctions of an associated elliptic operator, the original partial differential equation can be reduced to a system of ordinary differential equations for the Fourier coefficients. The convergence and regularity of the resulting series depend on suitable estimates for the eigenvalues and eigenfunctions of the corresponding spectral problem Chen (2021), Gol’dman (1970). Spectral techniques are also widely used in inverse and imaging problems in which the qualitative behavior of eigenstates plays an essential role Chow (2021). Together with energy estimates, Bessel-type inequalities, and Gronwall-type arguments Dragomir (2022), this approach allows one to derive reconstruction formulas and establish the existence, uniqueness, and stability of the recovered coefficients. Inverse Stefan problems are more complicated than inverse problems posed on fixed domains because the unknown temperature fields are coupled through a moving interface. The geometry of each phase changes with time, the transformed equations contain variable coefficients and transport terms, and the interface conditions connect the temperature gra-dients in both phases. Moreover, the recovery of an unknown time-dependent coefficient generally requires additional information ensuring that the inverse problem is not underde-termined. Such information may be prescribed in the form of an integral overdetermination condition, a temperature measurement at an interior point, a nonlocal observation, or a boundary heat-flux relation. A recent study considered inverse Stefan problems for determining a time-dependent source coefficient and an unknown heat-flux function in a one-phase setting NauKhum (2025). The present work extends the approach of NauKhum (2025) to a genuinely two-phase Stefan problem. This extension is nontrivial because two temperature fields must be determined in two time-dependent subdomains, and the unknown temporal coefficients in the two phases are coupled through the temperature continuity and Stefan flux-balance conditions at the moving interface. Consequently, the present analysis requires separate 2transformations of both moving subdomains, two spectral representations, coupled recon-struction relations, and additional estimates ensuring the convergence and regularity of the solutions in both phases. Two inverse two-phase Stefan-type formulations are investigated. In the first formu-lation, the material occupies a fixed one-dimensional body divided by a moving interface into two phases. The governing heat equations contain unknown time-dependent source coefficients R1(t) and R2(t). Nonhomogeneous boundary conditions are first reduced to homogeneous ones, and each moving subdomain is transformed onto the fixed interval 
+
+(0 , 1) . The transformed temperature functions are then represented by Fourier series as-sociated with the Dirichlet Sturm–Liouville problem. To recover the source coefficients, three different types of additional information are considered: an integral overdetermina-tion condition, a single interior observation, and a nonlocal integral condition. In each case, the reconstruction relation is reduced to a Volterra integral equation. The second formulation concerns a two-phase Stefan-type problem with Neumann boundary conditions and two moving boundaries. The governing equations contain un-known reaction-type coefficients P1(t) and P2(t). An exponential substitution is used to remove these coefficients from the differential equations, after which the transformed prob-lems are solved on fixed spatial intervals. The unknown coefficients are subsequently recon-structed from the corresponding temporal factors. An important feature of this formulation is that the Stefan conditions imposed at the moving boundaries contain sufficient informa-tion to determine the unknown coefficients. Therefore, no separate integral, pointwise, or nonlocal overdetermination condition is required for their recovery. The main contributions of the present paper can be summarized as follows. First, one-phase inverse Stefan analysis developed in NauKhum (2025) is extended to a coupled two-phase configuration. Second, suitable changes of variables are introduced to transform the moving-boundary problems into equivalent parabolic systems on fixed domains. Third, spectral representations of the temperature fields and explicit reconstruction relations for the unknown source and reaction coefficients are derived. Fourth, the resulting inverse rela-tions are formulated as Volterra integral equations, and sufficient regularity, compatibility and nondegeneracy conditions are established for their solvability. Fifth, the absolute and uniform convergence of the spectral series is justified using integration by parts, Cauchy-Schwarz and Bessel inequalities, and Gronwall-type estimates. These results lead to the existence and uniqueness of weak and strong solutions for the transformed problems and, consequently, for the original moving-boundary systems. Finally, illustrative examples and numerical experiments are presented to demonstrate the reconstruction of the unknown coefficients and to examine their behavior under noisy data. The structure of the paper is organized as follows. Section 2 introduces the first inverse two-phase Stefan problem and transforms it from moving subdomains to fixed spatial inter-vals. Section 3 develops the spectral representation and studies the recovery of the source coefficients from integral, single and nonlocal additional data. The existence, uniqueness, convergence, and regularity properties of the solutions are also established. Numerical and analytical examples for the first formulation are presented in the subsequent sections. The second inverse Stefan-type formulation with two moving boundaries and unknown reaction 3coefficients is then investigated, followed by numerical illustrations of the coefficient recon-struction. The final section summarizes the principal conclusions and possible directions for further research. 
+
+2. The source coefficient Stefan type problem with one moving boundary 
+
+We consider the domains Ω1 = (0 , s (t)) × (0 , T ) and Ω2 = ( s(t), d ) × (0 , T ) where 
+
+T > 0 is given arbitrary fixed time interest. An objective of the work is to determine weak solution pairs (u1, R 1) and (u2, R 2) of the following thermal system: 
+
+
+
+∂u 1
+
+∂t − a21
+
+∂2u1
+
+∂x 2 = R1(t)f1(x, t ), (x, t ) ∈ Ω1
+
+∂u 2
+
+∂t − a22
+
+∂2u2
+
+∂x 2 = R2(t)f2(x, t ), (x, t ) ∈ Ω2,u1(x, 0) = φ1(x), s(0) = s0, ∀x ∈ [0 , s (0)] ,u2(x, 0) = φ2(x), s(0) = s0, ∀x ∈ [s(0) , d ],u1(0 , t ) = g1(t), ∀t ∈ [0 , T ],u1(s(t), t ) = u∗, ∀t ∈ [0 , T ],u2(s(t), t ) = u∗, ∀t ∈ [0 , T ],
+
+−k1
+
+∂u 1
+
+∂x x=s(t)
+
+= −k2
+
+∂u 2
+
+∂x x=s(t)
+
++ Ls ′(t), ∀t ∈ [0 , T ],u2(d, t ) = g2(t), ∀t ∈ [0 , T ].
+
+(1) where a21, a 22 > 0 are thermal diffusivity for each phase, φi(x), g i(t), i = 1 , 2 are given positive functions, s0, d are given positive constants, u∗ is a phase change temperature, 
+
+s(t) is a moving boundary describing phase change interface and L is a latent heat of fusion, ki, i = 1 , 2 is a thermal conductivity of each phase. Introducing a transformations 
+
+v1(x, t ) = u1(x, t ) − g1(t) − u∗ − g1(t)
+
+s(t) x, (x, t ) ∈ Ω1, (2) 
+
+v2(x, t ) = u2(x, t ) − u∗ − g2(t) − u∗
+
+d − s(t) (x − s(t)) , (x, t ) ∈ Ω2, (3) 4the problem (1) can be represented as following form: 
+
+
+
+∂v 1
+
+∂t − a21
+
+∂2v1
+
+∂x 2 = R1(t)h1(x, t ), (x, t ) ∈ Ω1,∂v 2
+
+∂t − a22
+
+∂2v2
+
+∂x 2 = R2(t)h2(x, t ), (x, t ) ∈ Ω2,v1(x, t ) = ψ1(x), s(0) = s0, ∀x ∈ [0 , s (0)] ,v2(x, t ) = ψ2(x), s(0) = s0, ∀x ∈ [s(0) , d ],v1(0 , t ) = v1(s(t), t ) = 0 , ∀t ∈ [0 , T ],v2(s(t), t ) = v2(d, t ) = 0 , ∀t ∈ [0 , T ],
+
+−k1
+
+∂v 1
+
+∂x x=s(t)
+
+= −k2
+
+∂v 2
+
+∂x x=s(t)
+
++ χ(t) + Ls ′(t), ∀t ∈ [0 , T ],
+
+(4) where χ(t) = k1 u∗−g1(t) 
+
+> s(t)
+
+− k2 g2(t)−u∗ 
+
+> d−s(t)
+
+and 
+
+h1(x, t ) = f1(x, t ) − g1(t)
+
+R1(t) + g′
+
+> 1
+
+(t)s(t) + s′(t)( u∗ − g1(t)) 
+
+s2(t)R1(t) , (5) 
+
+h2(x, t ) = f2(x, t ) − g′
+
+> 2
+
+(t)( d − s(t)) + s′(t)( g2(t) − u∗)
+
+R2(t)( d − s(t)) 2 (x − s(t)) + g2(t) − u∗
+
+R2(t)( d − s(t)) s(t), (6) 
+
+ψ1(x) = φ1(x) − g1(0) − u∗ − g1(0) 
+
+s(0) x, ψ2(x) = φ2(x) − u∗ − g2(0) − u∗
+
+d − s(0) (x − s(0)) . (7) Considering the change of variable for transformation the domains Ω1 and Ω2 with moving boundary to the fixed domain Ω = (0 , 1) × (0 , T ), that is 
+
+v1(x, t ) = V1(ξ1, t ), V1 : Ω 1 −→ Ω, (x, t ) 7 → (ξ1, t ) = 
+
+ xs(t), t 
+
+
+
+, (8) 
+
+v2(x, t ) = V2(ξ2, t ), V2 : Ω 2 −→ Ω, (x, t ) 7 → (ξ2, t ) = 
+
+x − s(t)
+
+d − s(t) , t 
+
+
+
+. (9) We need to note that V1 ∈ C2,1(Ω) and V2 ∈ C2,1(Ω) , then by inverse function definition 
+
+V −11 ∈ C2,1(Ω 1) and V −12 ∈ C2,1(Ω 2).Applying transformation functions (8) and (9), the problem (4) reduced to 
+
+
+
+∂V 1
+
+∂t − b1(ξ1, t )∂V 1
+
+∂ξ 1
+
+− a1(t)∂2V1
+
+∂ξ 21
+
+= R1(t)F1(ξ1, t ), (ξ1, t ) ∈ Ω,∂V 2
+
+∂t − b2(ξ2, t )∂V 2
+
+∂ξ 2
+
+− a2(t)∂2V2
+
+∂ξ 22
+
+= R2(t)F2(ξ2, t ), (ξ2, t ) ∈ Ω,V1(ξ1, 0) = Φ 1(ξ1), ∀ξ1 ∈ [0 , 1] ,V2(ξ2, 0) = Φ 2(ξ2), ∀ξ2 ∈ [0 , 1] ,V1(0 , t ) = V1(1 , t ) = 0 , ∀t ∈ [0 , T ],V2(0 , t ) = V2(1 , t ) = 0 , ∀t ∈ [0 , T ],
+
+− k1
+
+s(t)
+
+∂V 1
+
+∂ξ 1 ξ1=1 
+
+= − k2
+
+d − s(t)
+
+∂V 2
+
+∂ξ 2 ξ2=0 
+
++ χ(t) + Ls ′(t), ∀t ∈ [0 , T ].
+
+(10) 5where F1(ξ1, t ) = h1(ξ1s(t), t ), F2(ξ2, t ) = h2(ξ2(d − s(t)) + s(t), t ), Φ1(ξ1) = ψ1(ξ1s(0)) ,
+
+Φ2(ξ2) = ψ2(ξ2(d − s(0)) + s(0)) , b1(ξ1, t ) = ξ1s′(t) 
+
+> s(t)
+
+, b2(ξ2, t ) = s′(t)( ξ2−1)  
+
+> d−s(t)
+
+, a1(t) = a21 
+
+> s2(t)
+
+and 
+
+a2(t) = a22 
+
+> (d−s(t)) 2
+
+. By definition of inverse functions we have 
+
+Fi(ξi, t ) = hi(V −1 
+
+> i
+
+(ξi, t )) = hi(x, t ), i = 1 , 2.Vi(ξi, t ) = vi(V −1 
+
+> i
+
+(ξi, t )) = vi(x, t ), i = 1 , 2.
+
+A primary objective of our study is to present weak solution of the problem (10) with given single observation point, overdetermined integral condition and non-local data for the first phase of body. We need to verify existence and uniqueness of the problem (10) which consequently implies the existence and uniqueness of the problem (4) and (1). Additionally, we are interested to show existence and uniqueness of the global and weak solutions of the problem (10). 
+
+3. Weak formulation of the solution 
+
+For convenience, we have also used (( ·)) , (·) to denote the scalar product and || · || , | · | 
+
+the norms in H10(0 , 1) and L2(0 , 1) , respectively. Introducing a spectral problem to the problem (10): 
+
+(
+
+−ϕ′′  
+
+> i
+
+(ξi) = λiϕi(ξi), ξi ∈ (0 , 1) ,ϕi(0) = ϕi(1) = 0 , (11) where i = 1 , 2 for each phases. Thus, (11) gives us the eigenvalue and eigenfunction 
+
+ϕi,n (ξ) = √2 sin 
+
+p λnξi
+
+
+
+, λn = n2π2, n ∈ N, i = 1 , 2. (12) 
+
+Definition 1. A function Vi ∈ C([0 , T ], L 2(0 , 1)) ∩ C((0 , T ]; H20(0 , 1)) ∩ C1((0 , T ]; L2(0 , 1)) ,where i = 1 , 2 is called weak solution of the problem (10) if it satisfies 
+
+∂V i
+
+∂t , ϕ i,n 
+
+
+
+> L2(0 ,1)
+
+−
+
+
+
+bi(ξi, t )∂V i
+
+∂ξ i
+
+, ϕ i,n 
+
+
+
+> L2(0 ,1)
+
+−ai(t)
+
+∂2Vi
+
+∂ξ 2
+
+> i
+
+, ϕ i,n 
+
+
+
+> L2(0 ,1)
+
+= Ri(t) ( Fi(ξi, t ), ϕ i,n )L2(0 ,1) 
+
+(13) 
+
+with initial condition 
+
+(Vi(ξi, 0) , ϕ i,n )L2(0 ,1) = (Φ i(ξi), ϕ i,n ) , ∀ξi ∈ [0 , 1] (14) 
+
+where n ∈ N, ϕi,n is defined by (11) and b1(ξ1, t ) = ξ1s′(t) 
+
+> s(t)
+
+, b2(ξ2, t ) = (1 −ξ2)s′(t) 
+
+> d−s(t)
+
+, a1(t) = a21 
+
+> s2(t)
+
+,
+
+a2(t) = a22 
+
+> (d−s(t)) 2
+
+.
+
+Consequently we have the next definition. 6Definition 2. The functions u1 ∈ C([0 , T ], L 2(0 , s (t))) ∩C((0 , T ]; H20(0 , s (t))) ∩C1((0 , T ]; L2(0 , s (t))) 
+
+and u2 ∈ C([0 , T ], L 2(s(t), d )) ∩ C((0 , T ]; H20(s(t), d )) ∩ C1((0 , T ]; L2(s(t), d )) are said to be weak solution of the problem (1) such that the change of variable functions v1 (x, t ) = 
+
+V1
+
+ xs(t) , x 
+
+
+
+and v2 (x, t ) = V2
+
+x−s(t) 
+
+> d−s(t)
+
+, t 
+
+
+
+implies temperature solutions of the problem (1) 
+
+by 
+
+u1(x, t ) = V1
+
+ xs(t), t 
+
+
+
++ g1(t) + u∗ − g1(t)
+
+s(t) x, ∀(x, t ) ∈ Ω1,u2(x, t ) = V2
+
+x − s(t)
+
+d − s(t) , t 
+
+
+
++ u∗ + g2(t) − u∗
+
+d − s(t) (x − s(t)) , ∀(x, t ) ∈ Ω2,
+
+using (2) and (3) ,3.1. Integral overdetermination condition. 
+
+Let us now show the existence and uniqueness of a pair of functions (u1, R 1) and (u2, R 2)
+
+such that R(t) ∈ C[0 , T ], and u1 and u2 are weak solution the problem (1) satisfying conditions s(t)Z
+
+> 0
+
+u1(x, t )dx = ω(t), t ∈ [0 , T ], (15) 
+
+−k1
+
+∂u 1
+
+∂x x=s(t)
+
+= −k2
+
+∂u 2
+
+∂x x=s(t)
+
++ Ls ′(t), t ∈ [0 , T ], (16) where ω(t) and s(t) are given function. Consequently, for the problem (10) the conditions (15) and (16) takes the form: 
+
+> 1
+
+Z
+
+> 0
+
+V1(ξ1, t )dξ 1 = ω(t)
+
+s(t) − g1(t) + u∗ − g1(t)2 , t ∈ [0 , T ], (17) 
+
+− k1
+
+s(t)
+
+∂V 1
+
+∂ξ 1 ξ1=1 
+
+= − k2
+
+d − s(t)
+
+∂V 2
+
+∂ξ 2 ξ2=0 
+
++ k1
+
+u∗ − g1(t)
+
+s(t) − k2
+
+g2(t) − u∗
+
+d − s(t) + Ls ′(t), t ∈ [0 , T ],
+
+(18) in which the solution pairs (V1, R 1), (V2, R 2) have to be determined. Let {ϕi,n (ξi)}∞ 
+
+> n=1
+
+be orthonormal eigenfunction set of the spectral problem (11). The weak solution of the problem (10) is sought in the form 
+
+Vi(ξi, t ) = 
+
+> ∞
+
+X
+
+> n=1
+
+Vi,n (t)ϕi,n (ξi), (19) where (Vi, ϕ i,n )L2(0 ,1) = Vi,n (t) for i = 1 , 2 and n ∈ N.Substituting (19) into equation (13) and using definition of ϕi,n defined by (12), and introducing equalities 
+
+∂V i
+
+∂t , ϕ i,n 
+
+
+
+> L2(0 ,1)
+
+= ddt (Vi,n , ϕ i,n )L2(0 ,1) = V ′
+
+> i,n
+
+(t), i = 1 , 2, n ∈ N,
+
+7(Vi, ϕ i,n )H20(0 ,1) = −λi,n (Vi, ϕ i,n )L2(0 ,1) = −λnVi,n (t), i = 1 , 2, n ∈ N
+
+(Fi, ϕ i,n )L2(0 ,1) = Fi,n (t), i = 1 , 2, n ∈ N,
+
+then we obtain 
+
+
+
+V ′
+
+> 1,n
+
+(t) + ( a1(t)λn − b1(t)) V1,n (t) = R1(t)F1,n (t), n ∈ N, t ∈ [0 , T ],V ′
+
+> 2,n
+
+(t) + ( a2(t)λn − b2(t)) V2,n (t) = R2(t)F2,n (t), n ∈ N, t ∈ [0 , T ],V1,n (0) = Φ 1,n , n ∈ N,V2,n (0) = Φ 2,n , n ∈ N,
+
+(20) where bi(t) =  bi(ξi, t )ϕ′
+
+> i,n
+
+, ϕ i,n (ξi) 
+
+> L2(0 ,1)
+
+and Φi,n = (Φ i(ξi), ϕ i,n (ξi)) L2(0 ,1) , i = 1 , 2.One can easily estimate that the solution of the problem (20) has the following form 
+
+Vi,n (t) = Φ i,n e− R t    
+
+> 0(ai(τ)λn−bi(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+Ri(τ )Fi,n (τ )e− R tτ (ai(z)λn−bi(z)) dz dτ, (21) where i = 1 , 2 and n ∈ N, then setting (21) into equation (19), we can verify that solution of the problem (10) 
+
+Vi(ξi, t ) = √2
+
+> ∞
+
+X
+
+> n=1
+
+Φi,n e− R t   
+
+> 0(ai(τ)λn−bi(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+Ri(τ )Fi,n (τ )e− R tτ (ai(z)λn−bi(z)) dz dτ 
+
+!
+
+sin 
+
+p λnξi
+
+
+
+, i = 1 , 2.
+
+(22) which represents the time-dependent behavior of a physical system governed by a partial differential equation, expressed as a series expansion of eigenfunctions in space and time-dependent coefficients. Differentiating both sides of (17) respect to t and applying definition (22), we can present the equation 
+
+√2
+
+> ∞
+
+X
+
+> n=1
+
+"
+
+(b1(t) − a1(t)λn)Φ 1,n e− R t   
+
+> 0(a1(τ)λn−b1(τ)) dτ
+
++ ( b1(t) − a1(t)λn)
+
+Z t
+
+> 0
+
+R1(τ )F1,n e− R tτ (a1(z)λn−b1(z)) dz dτ + R1(t)F1,n (t)
+
+# Z 10
+
+sin 
+
+p λnξ1
+
+
+
+dξ 1
+
+= ω′(t)s(t) − s′(t)ω(t)
+
+s2(t) − g′
+
+> 1
+
+(t) + g′
+
+> 1
+
+(t)2 ,
+
+(23) taking into account R 10 sin  √λnξ1
+
+ dξ 1 = 2√λn when n is odd, otherwise integral equals to 8zero, then we can determine the solution of the function R1(t)
+
+R1(t) = 12√2 ∞P
+
+> n=1
+> F1,2n−1
+
+√λ2n−1
+
+"
+
+ω′(t)s(t) − s′(t)ω(t)
+
+s2(t) − 12g′
+
+> 1
+
+(t)+ 2 √2a1(t)
+
+> ∞
+
+X
+
+> n=1
+
+pλ2n−1Φ1,2n−1e− R t   
+
+> 0(a1(τ)λ2n−1−b1(τ)) dτ
+
+− 2√2b1(t)
+
+> ∞
+
+X
+
+> n=1
+
+1
+
+pλ2n−1
+
+Φ1,2n−1e− R t   
+
+> 0(a1(τ)λ2n−1−b1(τ)) dτ
+
++ 2 √2a1(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+pλ2n−1F1,2n−1(τ )e− R τ t(a1(z)λ2n−1−b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
+− 2√2b1(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+1
+
+pλ2n−1
+
+F1,2n−1(τ )e− R tτ (a1(z)λ2n−1−b1(z)) dτ 
+
+!
+
+R1(τ )dτ 
+
+#
+
+.
+
+(24) The equation (18) can be represented in the form 
+
+√2k2
+
+d − s(t)
+
+> ∞
+
+X
+
+> n=1
+
+"pλnΦ2,n e− R t    
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+pλnR2(τ )F2,n (τ )e− R tτ (a2(z)λn−b2(z)) dz dτ 
+
+#
+
+=
+
+√2k1
+
+s(t)
+
+> ∞
+
+X
+
+> n=1
+
+"
+
+(−1) npλnΦ1,n e− R t   
+
+> 0(a1(τ)λn−b1(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+(−1) npλnR1(τ )F1,n (τ )e− R tτ (a1(z)λn−b1(z)) dz dτ 
+
+#
+
++ k1
+
+u∗ − g1(t)
+
+s(t) − k2
+
+g2(t) − u∗
+
+d − s(t) + Ls ′(t),
+
+(25) To determine R2(t), we need to carefully analyze the equation provided. The term R2(t)
+
+appears in an integral, so finding it requires isolating and solving for R2(t) in the context of the equation. Differentiating both sides of the equation with respect to time t is a valid approach to isolate R2(t), especially because the integral terms involve dependencies on t.Then we can estimate the solution R2(t) that is 9R2(t) = 1
+
+> ∞
+
+P
+
+> n=1
+
+√λnF2,n (t)
+
+"
+
+a2(t)
+
+> ∞
+
+X
+
+> n=1
+
+λ2,n 
+
+pλnΦ2,n e− R t   
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
+−
+
+
+
+b2(t) + s′(t)
+
+d − s(t)
+
+ ∞X
+
+> n=1
+
+pλnΦ2,n e− R t   
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
++ a2(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+λn
+
+pλnF2,n (τ )e− R tτ (a2(z)λn−b2(z)) dz 
+
+!
+
+R2(τ )dτ 
+
+−
+
+
+
+b2(t) + s′(t)
+
+d − s(t)
+
+ Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+pλnF2,n (τ )e− R tτ (a2(z)λn−b2(z)) dz 
+
+!
+
+R2(τ )dτ 
+
++
+
+k1(d − s(t)) 
+
+k2s(t) b1(t) − k1s′(t)( d − s(t)) 
+
+k2s2(t)
+
+ ∞X
+
+> n=1
+
+(−1) npλnΦ1,n e− R t   
+
+> 0(a1(τ)λn−b1(τ)) dτ
+
++
+
+k1(d − s(t)) 
+
+k2s(t) b1(t) − k1s′(t)( d − s(t)) 
+
+k2s2(t)
+
+
+
+×
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+(−1) npλnF1,n (τ )e− R tτ (a1(z)λn−b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
+− k1(d − s(t)) 
+
+k2s(t) a1(t)
+
+> ∞
+
+X
+
+> n=1
+
+(−1) nλn
+
+pλ1,n Φ1,n e− R t   
+
+> 0(a1(τ)λn−b1(τ)) dτ
+
+− k1(d − s(t)) 
+
+k2s(t) a1(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+(−1) nλn
+
+pλnF1,n (τ )e− R tτ (a1(z)λn−b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
++ k1(d − s(t)) 
+
+k2s(t) R1(t)
+
+> ∞
+
+X
+
+> n=1
+
+(−1) npλnF1,n (t) − k1(d − s(t)) 
+
+√2k2s2(t) (g′
+
+> 1
+
+(t)s(t) + s′(t)( u∗ − g1(t))) 
+
+− g′
+
+> 2
+
+(t)( d − s(t)) + s′(t)( g2(t) − u∗)
+
+√2( d − s(t)) + L(d − s(t)) 
+
+√2k2
+
+s′′ (t)
+
+#
+
+.
+
+(26) Applying integration by parts, Caushy-Schwarz and classical Bessel inequalities we can present the following preliminary results which help us to prove uniform convergence of (24) and (26). 
+
+Lemma 1. If Φ1 ∈ C4[0 , 1] and F1(ξ, t ) ∈ C([0 , T ]; L2(0 , 1)) such that Φ1(0) = Φ 1(1) = Φ′
+
+> 1
+
+(0) = Φ ′
+
+> 1
+
+(1) = Φ ′′  
+
+> 1
+
+(0) = Φ ′′  
+
+> 1
+
+(1) = Φ ′′′  
+
+> 1
+
+(0) = Φ ′′′  
+
+> 1
+
+(1) = 0 , F1(0 , t ) = F1(1 , t ) = F ′
+
+> 1
+
+(0 , t ) = 
+
+F ′
+
+> 1
+
+(1 , t ) = F ′′  
+
+> 1
+
+(0 , t ) = F ′′  
+
+> 1
+
+(1 , t ) = 0 and 0 < s m < s (t) < s M , where s(t) ∈ C2[0 , T ], then following assumptions hold for all t ∈ [0 , T ] that are 
+
+> ∞
+
+X
+
+> n=1
+
+pλnΦ1,n e− R t    
+
+> 0(a1(τ)λn−b1(τ)) dτ
+
+≤ c1|| Φ1|| C4[0 ,1] , (27) 10 ∞X
+
+> n=1
+
+1
+
+pλ2n−1
+
+Φ1,2n−1e− R t    
+
+> 0(a1(τ)λ2n−1−b1(τ)) dτ
+
+≤ c2|| Φ1|| C4[0 ,1] , (28) 
+
+> ∞
+
+X
+
+> n=1
+
+pλnF1,n (τ )e− R tτ (a1(z)λn−b1(z)) dz ≤ c3|| F1|| C([0 ,T ],L 2(0 ,1)) , (29) 
+
+> ∞
+
+X
+
+> n=1
+
+1
+
+pλ2n−1
+
+F1,2n−1(τ )e− R tτ (a1(z)λ2n−1−b2(z)) dz ≤ c4|| F1|| C([0 ,T ]; L2(0 ,1)) (30) 
+
+> ∞
+
+X
+
+> n=1
+
+λn
+
+pλnΦ1,n e− R t    
+
+> 0(a1(τ)λn−b1(τ)) dτ
+
+≤ c5|| Φ1|| C4[0 ,1] , (31) 
+
+> ∞
+
+X
+
+> n=1
+
+λn
+
+pλnF1,n (τ )e− R tτ (a1(z)λn−b1(z)) dz ≤ c6|| F1|| C([0 ,T ]; L2(0 ,1)) , (32) 
+
+> ∞
+
+X
+
+> n=1
+
+pλnF1,n (t) ≤ c7|| F1|| C([0 ,T ]; L2(0 ,1)) ,
+
+> ∞
+
+X
+
+> n=1
+
+1
+
+pλ2n−1
+
+F1,2n−1(t) ≤ c8|| F1|| C([0 ,T ]; L2(0 ,1)) 
+
+(33) 
+
+for some positive constants ci, i = 1 , 2, 3, .., 8, where Φ1,n = R 10 Φ1(ξ1)ϕ1,n (ξ1)dξ 1 and 
+
+F1,n (t) = R 10 F1(ξ1, t )ϕ1,n (ξ1)dξ 1.Proof. The proof studied widely in NauKhum (2025). Assuming that 0 < a 1m < a 1(τ ) <a1M and || b1(τ )|| C[0 ,T ] < b 1M By integration by parts four times, Cauchy-Schwartz and Bessel inequality we can provide 
+
+> ∞
+
+X
+
+> n=1
+
+pλn|Φ1,n e− R t    
+
+> 0(a1(τ)λn−b1(τ)) dτ
+
+| ≤ C2
+
+> ∞
+
+X
+
+> n=1
+
+ 1
+
+|λn|
+
+1/2 ∞X
+
+> n=1
+
+λnΦ1,n e−a1mλn
+
+!1/2
+
+≤ C2
+
+> ∞
+
+X
+
+> n=1
+
+ 1
+
+|λn|
+
+1/2 ∞X
+
+> n=1
+
+λnΦ1,n 
+
+!1/2
+
+≤ C|| Φ′′′ 
+
+> 1,n
+
+|| L2(0 ,1) ≤ C|| Φ1,n || C4[0 ,1] .
+
+Others can be proved analogously. 
+
+Lemma 2. If Φ2 ∈ C4[0 , 1] and F2(ξ, t ) ∈ C([0 , T ]; L2(0 , 1)) such that Φ2(0) = Φ 2(1) = Φ′
+
+> 2
+
+(0) = Φ ′
+
+> 2
+
+(1) = Φ ′′  
+
+> 2
+
+(0) = Φ ′′  
+
+> 2
+
+(1) = Φ ′′′  
+
+> 2
+
+(0) = Φ ′′′  
+
+> 2
+
+(1) = 0 , F2(0 , t ) = F2(1 , t ) = F ′
+
+> 2
+
+(0 , t ) = 
+
+F ′
+
+> 2
+
+(1 , t ) = F ′′  
+
+> 2
+
+(0 , t ) = F ′′  
+
+> 2
+
+(1 , t ) = 0 and 0 < s m < s (t) < s M , where s(t) ∈ C2[0 , T ], then following assumptions hold for all t ∈ [0 , T ] that are 
+
+> ∞
+
+X
+
+> n=1
+
+pλnΦ2e− R t    
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
+≤ c9|| Φ2|| C4[0 ,1] , (34) 
+
+> ∞
+
+X
+
+> n=1
+
+λn
+
+pλnΦ2,n e− R t    
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
+≤ c10 || Φ2|| C4[0 ,1] , (35) 11 ∞X
+
+> n=1
+
+pλnF2,n (τ )eR tτ (a2(z)λn−b2(z)) dz ≤ c11 || F2|| C([0 ,T ]; L2(0 ,1)) , (36) 
+
+> ∞
+
+X
+
+> n=1
+
+λn
+
+pλnF2,n (τ )eR tτ (a2(z)λn−b2(z)) dz ≤ c12 || F2|| C([0 ,T ]; L2(0 ,1)) , (37) 
+
+> ∞
+
+X
+
+> n=1
+
+pλnF2,n (t) ≤ c13 || F2|| C([0 ,T ]; L2(0 ,1)) , (38) 
+
+for some positive constants ci, i = 9 , 10 , ..., 13 , where Φ2,n = R 10 Φ2(ξ2)ϕ2,n (ξ2)dξ 2 and 
+
+F2,n (t) = R 10 F2(ξ2, t )ϕ2,n (ξ2)dξ 2.Proof. We can verify these inequalities by similar approach in the Lemma 1. 
+
+Lemma 3. Assume there exists positive constants aim , aiM , biM and Mi such that 0 <aim < ai(t) < aiM and || bi(t)|| < biM for all t ∈ [0 , T ], and Ri(t) ∈ C[0 , T ] with 
+
+|| Ri(t)|| C[0 ,T ] ≤ Mi, and assumptions in Lemma 1 and Lemma 2 hold, namely Φi,n ∈ C4[0 , 1] 
+
+and Fi,n (t) ∈ C([0 , T ]; L2(0 , 1)) together with the compatibility conditions. Then the series 
+
+(22) converges absolutely and uniformly on [0 , 1] ×[0 , T ], and there exists a constant C > 0,independent of (ξi, t ), such that 
+
+sup 
+
+> 0≤t≤T
+
+|| Vi(·, t )|| L2(0 ,1) + sup 
+
+> 0≤t≤T
+
+|| Vi(·, t )|| H10(0 ,1) + sup 
+
+> 0≤t≤T
+
+|| Vi,t (·, t )|| L2(0 ,1) 
+
+≤ C  || Φi|| C4[0 ,1] + || Ri(t)|| C[0 ,T ]|| Fi|| C([0 ,T ]; L2(0 ,1)) 
+
+ .
+
+(39) 
+
+Proof. At first, let us prove the boundedness of the time-depended coefficients Ri(t) which defined by (24) and (27), and we can rewrite them in the integral form as 
+
+Ri(t) = Gi(t) + 
+
+Z t
+
+> 0
+
+Ki(τ, t )Ri(τ )dτ. 
+
+Assuming assumptions in Lemma 1 and Lemma 2 hold and let consider that Gi(t) ∈ C[0 , T ],
+
+K(τ, t ) ∈ C([0 , T ] × [0 , T ]) are bounded |Gi(t)| ≤ MGi , |K(τ, t )| ≤ MKi respectively, then we have 
+
+|Ri(t)| ≤ MGi + MKi
+
+Z t
+
+> 0
+
+|Ri(τ )|dτ. 
+
+Applying Gronwall’s inequality gives 
+
+|Ri(t)| ≤ MGi eMKi t ≤ MGi eMKi T , t ∈ [0 , T ].
+
+Hence, || Ri(t)|| C[0 ,T ] ≤ Mi := MCi eMKi T which proves that Ri(t) is uniformly bounded on 
+
+[0 , T ].Since |ϕi,n (ξi)| ≤ √2, then for the Fourier series (19) we have |Vi(ξi, t )| ≤ √2 ∞P
+
+> n=1
+
+|Vi,n (t)|.Furthermore, || Vi(·, t )|| 2 
+
+> L2(0 ,1)
+
+≤ ∞P
+
+> n=1
+
+|Vi,n (t)|2, then by Parseval’s identity. Applying the 12 estimates of Lemmas 1 and 2 yields 
+
+sup 
+
+> 0≤t≤T
+
+|| Vi(·, t )|| L2(0 ,1) ≤ C1
+
+ || Φi|| C4[0 ,1] + || Ri(t)|| C[0 ,T ]|| Fi|| C([0 ,T ]; L2(0 ,1)) 
+
+ .
+
+Similarly, || Vi(·, t )|| 2 
+
+> H10(0 ,1)
+
+≤ ∞P
+
+> n=1
+
+λ2
+
+> n
+
+|Vi,n (t)|2 and Lemmas 1 and 2 guarantee that 
+
+sup 
+
+> 0≤t≤T
+
+|| Vi(·, t )|| H10(0 ,1) ≤ C2
+
+ || Φi|| C4[0 ,1] + || Ri(t)|| C[0 ,T ]|| Fi|| C([0 ,T ]; L2(0 ,1)) 
+
+ .
+
+Now, if we take V ′
+
+> i,n
+
+(t) = −(ai(t)λn − b1(t)) Vi,n (t) + Ri(t)Fi,n (t) and using (x + y + z)2 ≤
+
+3( x2 + y2 + z2), it implies 
+
+|| Vi,t (·, t )|| 2 
+
+> L2(0 ,1)
+
+≤
+
+> ∞
+
+X
+
+> n=1
+
+|V ′
+
+> i,n
+
+(t)|2 ≤ 3a2 
+
+> i
+
+(t)
+
+> ∞
+
+X
+
+> n=1
+
+λ2
+
+> n
+
+|Vi,n (t)|2+3 b21(t)
+
+> ∞
+
+X
+
+> n=1
+
+|Vi,n (t)|2+3 |R2 
+
+> i
+
+(t)|
+
+> ∞
+
+X
+
+> n=1
+
+|Fi,n (t)|2
+
+Again, by Lemmas 1 and 2 together with all previous results, assuming 0 < a im < a i(t) <aiM and |bi(t)| < b iM for all t ∈ [0 , T ], we deduce that 
+
+sup 
+
+> 0≤t≤T
+
+|| Vi,t (·, t )|| L2(0 ,1) ≤ C3
+
+ || Φi|| C4[0 ,1] + || Ri(t)|| C[0 ,T ]|| Fi|| C([0 ,T ]; L2(0 ,1)) 
+
+ .
+
+Finally, we obtain the following the main result. 
+
+Theorem 1. Suppose we have the following assumptions for the given function (i) Φi ∈ C4[0 , 1] with Φ(j) 
+
+> i
+
+(0) = Φ (j) 
+
+> i
+
+(1) = 0 where j = 0 , 1, .., 4 and Φi, 1 > 0, Φi,n ≥ 0
+
+where i = 1 , 2, n ∈ N;(ii) Fi ∈ C(Ω) and Fi(·, t ) ∈ C3[0 , 1] such that F (j) 
+
+> i
+
+(0 , t ) = F (j) 
+
+> i
+
+(1 , t ) = 0 where j =0, 1, 2, 3. Fi, 1(t) > 0 and Fi,n (t) ≥ 0 for all t ∈ [0 , T ], where i = 1 , 2;(iii) gi(t) ∈ C1[0 , T ] with 0 < g im < g i(t) < g iM and 0 < g im ′ < g ′
+
+> i
+
+(t) < g iM ′ where 
+
+giM , g iM ′ > 0 and i = 1 , 2;(iv) s(t) ∈ C2[0 , T ] such that s(0) = s0 and s(t)̸ = d̸ = 0 , s(t) > 0 for ∀t ∈ [0 , T ] and 
+
+0 < s m < s (t) < s M , 0 < s m′ < s ′(t) < s M ′ for sm, s m′ , s M , s M ′ > 0;(v) ω ∈ C1[0 , T ] with ω(t)̸ = 0 for all t ∈ [0 , T ] such that ω(0) = R 10 V1(ξ1, t )dξ 1 + g1(0) + 
+
+u∗ − g1(0) 2 , 0 < ω m < ω (t) < ω M and 0 < ω m′ < ω ′(t) < ω M ′ where ωm, ω M , ω m′ and 
+
+ωM ′ are positive real numbers; (vi) ai(t), b i(t) ∈ C[0 , T ] such that 0 < a im < min  
+
+> t∈[0 ,T ]
+
+|ai(t)| and |bi(t)| ≤ biM where i = 1 , 2,
+
+13 and the inequalities of Lemmas 1 and 2 hold, then problem (10) has a unique solution pair 
+
+(Vi, R i) where i = 1 , 2.Proof. The proof can be shown by similar approach in Lemma 2 from NauKhum (2025) that there exist the weak solutions V1(ξ1, t ) and V2(ξ2, t ) to the problem (10) for any 
+
+Ri(t) ∈ C[0 , T ], i = 1 , 2. Additionally, we can easily conclude that R1(t) and R2(t) are continuously differentiable employing uniform convergency of the series in Lemmas 1 and 2 and assumptions (i)-(vi). 
+
+Remark 1. If there exist the unique solutions pair of the problem (10), thus the problem (1) has the unique solution pairs (u1, R 1) with ω ∈ C1[0 , T ] such that ω(0) = 
+
+R s(0) 0 u1(x, t )dx and (u2, R 2).
+
+3.2. Single observation data. 
+
+Now we choose a point q ∈ (0 , s (t)) such that eigenfunction ϕ1,n (q) which is solution of the spectral problem (11) for the first phase is bounded for all n ∈ N and ϕ1,n (q)̸ = 0 for some n0 ∈ N. We take Nq as maximal subset of N that is ϕ1,n (q)̸ = 0 for ∀n ∈ Nq and we use this point as observation point for 
+
+u1(q, t ) = p(t), (40) where p(t) ∈ C1[0 , T ] is a given function, such that p(t)̸ = 0 for ∀t ∈ [0 , T ], where we need to restoring the time-dependent coefficient R1(t) of source function to the first phase of the problem (1). Applying transformation (2) we can rewrite condition (40) in the form 
+
+v1(q, t ) = p(t) − g1(t) − u∗ − g1(t)
+
+s(t) q (41) and function (8) gives us 
+
+V1
+
+ qs(t), t 
+
+
+
+= p(t) − g1(t) − u∗ − g1(t)
+
+s(t) q. (42) Using definition of the function V1(ξ1, t ) defined by (22) and condition (42) we obtain 
+
+> ∞
+
+X
+
+> n=1
+
+
+
+Φ1,n e− R t    
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+R1(τ )F1,n (τ )e− R tτ (a1(z)λ1,n −b1(z)) dz dτ 
+
+
+
+ϕ1,n 
+
+ qs(t)
+
+
+
+= p(t) − g1(t) − u∗ − g1(t)
+
+s(t) q. 
+
+(43) 14 Differentiating both sides of (43) respect to t, we get 
+
+> ∞
+
+X
+
+> n=1
+
+(b1(t) − a1(t)λ1,n )Φ 1,n e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++ ( b1(t) − a1(t)λ1,n )
+
+Z t
+
+> 0
+
+R1(τ )F1,n (τ )e− R tτ (a1(z)λ1,n −b1(z)) dz dτ 
+
++ R1(t)F1,n (t)
+
+!
+
+ϕ1,n 
+
+ qs(t)
+
+
+
+− qs ′(t)
+
+s2(t)
+
+> ∞
+
+X
+
+> n=1
+
+pλ1,n Φ1,n e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+pλ1,n R1(τ )F1,n (τ )e− R tτ (a1(z)λ1,n −b1(z)) dz 
+
+!
+
+ϕ′
+
+> 1,n
+
+ qs(t)
+
+
+
+= p′(t) − g′
+
+> 1
+
+(t) + g′
+
+> 1
+
+(t)s(t) + 2 s′(t)( u∗ − g1(t)) 
+
+s3(t) q, 
+
+(44) it implies that solution function for R1(t) takes the form 
+
+R1(t) = 1
+
+> ∞
+
+P
+
+> n=1
+
+F1,n (t)ϕ1,n 
+
+ qs(t)
+
+"
+
+a1(t)
+
+> ∞
+
+X
+
+> n=1
+
+λ1,n Φ1,n ϕ1,n 
+
+ qs(t)
+
+
+
+e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
+− b1(t)
+
+> ∞
+
+X
+
+> n=1
+
+Φ1,n ϕ1,n 
+
+ qs(t)
+
+
+
+e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++ a1(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+λ1,n F1,n (τ )ϕ1,n 
+
+ qs(t)
+
+
+
+e− R tτ (a1(z)λ1,n −b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
+− b1(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+F1,n (τ )ϕ1,n 
+
+ qs(t)
+
+
+
+e− R tτ (a1(z)λ1,n −b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
++ qs ′(t)
+
+s2(t)
+
+> ∞
+
+X
+
+> n=1
+
+pλ1,n Φ1,n ϕ′
+
+> 1,n
+
+ qs(t)
+
+
+
+e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++ qs ′(t)
+
+s2(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+pλ1,n F1,n (τ )ϕ′
+
+> 1,n
+
+ qs(t)
+
+
+
+e− R tτ (a1(z)λ1,n −b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
++ p′(t) − g′
+
+> 1
+
+(t) + g′
+
+> 1
+
+(t)s(t) − s′(t)( u∗ − g1(t)) 
+
+s2(t)
+
+#
+
+(45) To provide the existence and uniqueness of the solution of the problem (10) with condition of single data, we need to add the following assumptions: (vii) Φ1 ∈ C4[0 , 1] with Φ1,n ϕ1,n 
+
+ qs(t)
+
+
+
+≥ 0 for any n ∈ Nq, ∀t ∈ [0 , T ] and Φ1,n 0 ϕ1,n 0
+
+ qs(t)
+
+
+
+>
+
+0 for some n0 ∈ Nq and ∀t ∈ [0 , T ];15 (viii) F1(ξ1, t ) ∈ C([0 , 1] × [0 , T ]) with F1,n (t)ϕ1,n 
+
+ qs(t)
+
+
+
+≥ 0 for ∀t ∈ [0 , T ] and for any 
+
+n ∈ Nq;(ix) p(t) ∈ C1[0 , T ] with p(t)̸ = 0 and p(0) = Φ 1(q) + g1(0) + u∗−g1(0)  
+
+> s2(0)
+
+q, and 0 < p m <p(t) < p M where pm, p M > 0,then we can verify the following theorem. 
+
+Theorem 2. Assuming conditions in Theorem 1 and conditions (vi)-(ix) hold, then there exists a unique weak solution pairs (V1, R 1) with p(t) ∈ C1[0 , T ] and (V2, R 2) which defined by (22) , (26) and (45) to the the problem (10) .
+
+The proof can be established similarly as in Lemma 2 from NauKhum (2025) and the function R1(t) is continuously differentiable if the series P∞ 
+
+> n=1
+
+Φ1,n e− R t    
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
+ϕ1,n (q)
+
+is uniformly convergent as |a1(t)| > m1 > 0, |b1(t)| ≤ M2 for any t ∈ [t0, T ] and 
+
+ϕ1,n 
+
+ qs(t)
+
+
+
+≤ M3 for some Mi = const > 0 and ∀t ∈ [0 , T ] where i = 1 , 2, 3. Then it implies that majorant series M P∞ 
+
+> n=1
+
+|Φ1,n | and M P∞ 
+
+> n=1
+
+λ1,n |Φ1,n | are convergent. 
+
+3.3. Non-local data. 
+
+Now let us consider inverse problem of finding solution pair (u1, R 1) for the first phase such that R1(t) ∈ C[0 , T ] with non-local data 
+
+Z s(t)0
+
+ω(x)u1(x, t )dx = h(t), t ∈ [0 , T ], (46) where ω(x) and h(t) are given functions such that ω(x) ∈ L2(0 , s (t)) and h(t) ∈ C1[0 , T ].Applying transformation (2), the condition (46) takes the form 
+
+Z s(t)0
+
+ω(x)v1(x, t )dx + g1(t)
+
+Z s(t)0
+
+ω(x)dx + u∗ − g1(t)
+
+s(t)
+
+Z s(t)0
+
+xω (x)dx = h(t). (47) Hence, using the change of variable with function (8), it becomes 
+
+Z 10
+
+ω(ξ1)V1(ξ1, t )dξ 1 = h(t)
+
+s(t) − g1(t)
+
+Z 10
+
+ω(ξ1)dξ 1 − u∗ − g1(t)
+
+s(t)
+
+Z 10
+
+ξ1ω(ξ1)dξ 1. (48) Substituting the solution function V1(ξ1, t ) of the problem (10) defined by (22) into (48) we obtain 
+
+> ∞
+
+X
+
+> n=1
+
+Φ1,n e− R t    
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+R1(τ )F1,n (τ )e− R tτ (a1(z)λ1,n −b1(z)) dz 
+
+! Z 10
+
+ω(ξ1)ϕ1,n (ξ1)dξ 1
+
+= h(t)
+
+s(t) − g1(t)
+
+Z 10
+
+ω(ξ1)dξ 1 − u∗ − g1(t)
+
+s(t)
+
+Z 10
+
+ξ1ω(ξ1)dξ 1
+
+(49) 16 To this end, differentiating both sides of (49) respect to t, we have 
+
+> ∞
+
+X
+
+> n=1
+
+(b1(t) − a1(t)λ1,n )Φ 1,n e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++ ( b1(t) − a1(t)λ1,n )
+
+Z t
+
+> 0
+
+R1(τ )F1,n (τ )e− R tτ (a1(z)λ1,n −b1(z)) dz + R1(t)F1,n (t)
+
+! Z 10
+
+ω(ξ1)ϕ1,n (ξ1)dξ 1
+
+= h′(t)s(t) − h(t)s′(t)
+
+s2(t) − g′
+
+> 1
+
+(t)
+
+Z 10
+
+ω(ξ1)dξ 1 + g′
+
+> 1
+
+(t)s(t) + s′(t)( u∗ − g1(t)) 
+
+s2(t)
+
+Z 10
+
+ξ1ω(ξ1)dξ 1,
+
+(50) taking into account that (ω(ξ1), ϕ 1,n (ξ1)) L2(0 ,1) = R 10 ω(ξ1)ϕ1,n (ξ1)dξ 1 = ω1,n , one can easily determine the solution function R1(t)
+
+R1(t) = 1
+
+P∞ 
+
+> n=1
+
+F1,n ω1,n 
+
+"
+
+a1(t)
+
+> ∞
+
+X
+
+> n=1
+
+λ1,n Φ1,n ω1,n e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
+− b1(t)
+
+> ∞
+
+X
+
+> n=1
+
+Φ1,n ω1,n e− R t   
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
++ a1(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+λ1,n F1,n (τ )ω1,n e− R tτ (a1(z)λ1,n −b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
+− b1(t)
+
+Z t
+
+> 0
+> ∞
+
+X
+
+> n=1
+
+F1,n (τ )ω1,n e− R tτ (a1(z)λ1,n −b1(z)) dz 
+
+!
+
+R1(τ )dτ 
+
++ h′(t)s(t) − h(t)s′(t)
+
+s2(t) − g′
+
+> 1
+
+(t)
+
+Z 10
+
+ω(ξ1)dξ 1 + g′
+
+> 1
+
+(t)s(t) + s′(t)( u∗ − g1(t)) 
+
+s2(t)
+
+Z 10
+
+ξ1ω(ξ1)dξ 1
+
+#
+
+.
+
+(51) We have ω(ξ1) ∈ L2(0 , 1) and assuming that C1 := R 10 ω(ξ1)dξ 1 and C2 := R 10 ξ1ω(ξ1)dξ 1 in (51) and P∞ 
+
+> n=1
+
+|ω1,n | ≤ C3, then by Cauchy-Schwartz and Bessel inequalities and inequal-ities in Lemma 1 and Lemma 2 we have 
+
+> ∞
+
+X
+
+> n=1
+
+λnΦ1,n ω1,n e− R t    
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
+≤ K1
+
+> ∞
+
+X
+
+> n=1
+
+|λnΦ1,n |2
+
+!1/2 ∞X
+
+> n=1
+
+|ω1,n |2
+
+!1/2
+
+≤ M1|| Φ1,n || C4[0 ,1] ,
+
+> ∞
+
+X
+
+> n=1
+
+λnF1,n (τ )ω1,n e− R t    
+
+> 0(a1(τ)λ1,n −b1(τ)) dτ
+
+≤ K1
+
+> ∞
+
+X
+
+> n=1
+
+|λnF1,n (τ )|2
+
+!1/2 ∞X
+
+> n=1
+
+|ω1,n |2
+
+!1/2
+
+≤ M2|| F1,n || C([0 ,T ]; L2(0 ,1) ,
+
+are uniformly convergent, where K1 = C3ebM T . Hence, integral solution (51) has a unique continuous solution. Finally, we have the following main result. 17 Theorem 3. Let assumptions in Theorem 1, the statements (vi)-(ix) and the following conditions 1. ω(ξ1) ∈ L2(0 , 1) and R 10 ω(ξ1)ϕ1,n (ξ1)dξ 1 = ω1,n , and P∞ 
+
+> n=1
+
+|ω1,n | ≤ C3;2. h(t) ∈ C1[0 , T ] with h(t)̸ = 0 for ∀t ∈ [0 , T ] and h(0) = R 10 ω(ξ1)Φ 1(ξ1)dξ 1 +
+
+g1(0) R 10 ω(ξ1)dξ 1 − u∗ − g1(0) 
+
+s(0) 
+
+R 10 ξ1ω(ξ1)dξ 1 where g1(0) ̸ = 0 and s(0) = s0.Then, there exists a unique solution pair of function (V1, R 1) to the first phase of the problem (10) .Proof. The proof can be shown by analogously in Lemma 2 from NauKhum (2025) that there exist the weak solution V1(ξ1, t ) to the first phase of the problem (10) for any R1(t) ∈
+
+C[0 , T ]. It implies that R1(t) is continuously differentiable employing uniform convergency of the series in Lemmas 1 and 2, assumptions in Theorem 1, (vi)-(viii) mentioned in the section 3.1 and conditions in Theorem 3. 
+
+Remark 2. If there exist the unique solutions pair (V1, R 1) of the problem (10), thus the problem (1) has the unique solution pairs (u1, R 1) with h(x) ∈ L2(0 , s (t)) such that 
+
+h(0) = R s(0) 0 h(x)u1(x, t )dx .
+
+Example 1. Let us consider the following inverse problem in the domains Ω1 =(0 , π (t + 1)) and Ω2 = ( π(t + 1) , d ) with suitable choice of heat sources f1(x, t ), f 2(x, t ),with given boundary functions g1(t), g2(t) and with initial functions φ1(x), φ2(x) for determining pairs (u1(x, t ), R 1(t)) and (u2(x, t ), R 2(t)) :
+
+
+
+∂tu1 − a21∂xx u1 = R1(t)f1(x, t ), (x, t ) ∈ Ω1,∂tu2 − a22∂xx u2 = R2(t)f2(x, t ), (x, t ) ∈ Ω2,u1(x, 0) = √2 sin( x) + 1 + u∗ − 1
+
+π x, s(0) = π, ∀x ∈ [0 , π ],u2(x, 0) = √2 sin x − π 
+
+> dπ
+
+− 1
+
+!
+
++ u∗ + 1 − u∗
+
+d − π (x − π), s(0) = π, ∀x ∈ [π, d ],u1(0 , t ) = t + 1 , ∀t ∈ [0 , T ],u1(π(t + 1) , t ) = u∗, ∀t ∈ [0 , T ],u2(π(t + 1) , t ) = u∗, ∀t ∈ [0 , T ],
+
+−k1∂xu1(π(t + 1) , t ) = −k2∂xu2(π(t + 1) , t ) + Lπ, ∀t ∈ [0 , T ],u2(d, t ) = t2 + 1 , ∀t ∈ [0 , T ],
+
+(52) where 
+
+f1(x, t ) = p2( t + 1) e a21tt+1 sin 
+
+ xt + 1 
+
+
+
++ π(t + 1) 2 − u∗xπ(t + 1) 2R1(t) ,
+
+18 f2(x, t ) = 
+
+s
+
+2( d − π)
+
+d − π(t + 1) e a22π2t 
+
+> (d−π)( d−π(t+1))
+
+sin x − π(t + 1)  
+
+> dπ
+
+− t − 1
+
+!
+
++ 2t(d − π) + π(1 − u∗) − πt 2
+
+R2(t)( d − π(t + 1)) 2 (x − π(t + 1)) − π(t2 + 1 − u∗)
+
+R2(t)( d − π(t + 1)) .
+
+(53) with integral overdetermination condition 
+
+Z π(t+1) 0
+
+u1(x, t )dx = π(t + 1) 2. (54) Introducing transformations 
+
+v1(x, t ) = u1(x, t ) − (t + 1) − u∗ − (t + 1) 
+
+π(t + 1) x, (55) 
+
+v2(x, t ) = u2(x, t ) − u∗ − t2 + 1 − u∗
+
+d − π(t + 1) (x − π(t + 1)) , (56) the problem (52) changes to the following form: 
+
+
+
+∂tv1 − a21∂xx v1 = R1(t)p2( t + 1) e a21tt+1 sin   xt+1 
+
+ , (x, t ) ∈ Ω1,∂tv2 − a22∂xx v2 = R2(t)
+
+q 2( d−π) 
+
+> d−π(t+1)
+
+e a22π2t 
+
+> (d−π)( d−π(t+1))
+
+sin 
+
+x−π(t+1)  
+
+> dπ−t−1
+
+
+
+, (x, t ) ∈ Ω1,v1(x, 0) = √2 sin( x), s(0) = π, ∀x ∈ [0 , π ],v2(x, 0) = √2 sin 
+
+ x−π 
+
+> dπ−1
+
+
+
+, s(0) = π, ∀x ∈ [π, d ],v1(0 , t ) = v1(π(t + 1) , t ) = 0 , ∀t ∈ [0 , T ],v2(π(t + 1) , t ) = v2(d, t ) = 0 , ∀t ∈ [0 , T ],
+
+−k1∂xv1(π(t + 1) , t ) = −k2∂xv2(π(t + 1) , t ) + χ(t) + Lπ, ∀t ∈ [0 , T ].
+
+(57) where χ(x) = k1 u∗−t−1 
+
+> π(t+1)
+
+− k2 t2+1 −u∗ 
+
+> d−π(t+1)
+
+with integral overdetermination condition 
+
+Z π(t+1) 0
+
+v1(x, t )dx = t + 1 − u∗
+
+2 π(t + 1) .
+
+Considering the fixed domain Ω = (0 , 1) × (0 , T ) and applying the change of variables 
+
+v1(x, t ) = V1(ξ1, t ), ξ1 = xπ(t + 1) 
+
+v2(x, t ) = V2(ξ2, t ), ξ2 = x − π(t + 1) 
+
+d − π(t + 1) ,
+
+19 we can easily rewrite the problem (57) in the following form: 
+
+
+
+∂V 1
+
+∂t − b1(ξ1, t )∂V 1
+
+∂ξ 1
+
+− a1(t)∂2V1
+
+∂ξ 1
+
+= R1(t)p2( t + 1) e a21tt+1 sin( πξ 1), (ξ1, t ) ∈ Ω,∂V 2
+
+∂t − b2(ξ2, t )∂V 2
+
+∂ξ 2
+
+− a2(t)∂2V2
+
+∂ξ 2
+
+= R2(t)
+
+q2( d−π(t+1))  
+
+> d−π
+
+e a22π2t 
+
+> (d−π)( d−π(t+1))
+
+sin( πξ 2), (ξ2, t ) ∈ Ω,V1(ξ1, 0) = √2 sin( πξ 1), ξ1 ∈ [0 , 1] ,V2(ξ2, 0) = √2 sin( πξ 2), ξ2 ∈ [0 , 1] ,V1(0 , t ) = V1(1 , t ) = 0 , t ∈ [0 , T ],V2(0 , t ) = V2(1 , t ) = 0 , t ∈ [0 , t ],
+
+− k1
+
+π(t + 1) 
+
+∂V 1
+
+∂ξ 1 ξ1=1 
+
+= − k2
+
+d − π(t + 1) 
+
+∂V 2
+
+∂ξ 2 ξ2=0 
+
++ χ(t) + Lπ, t ∈ [0 , T ].
+
+(58) where a1(t) = a21 
+
+> π2(t+1) 2
+
+, a2(t) = a22 
+
+> (d−π(t+1)) 2
+
+, b1(t) = − 12( t+1) , b2(t) = − 12( d−π(t+1)) and χ(t) = 
+
+k1 u∗−(t+1)  
+
+> π(t+1)
+
+− k2 t2+1 −u∗ 
+
+> d−π(t+1)
+
+with overdetermination condition 
+
+Z 10
+
+V1(ξ1, t )dξ 1 = t + 1 − u∗
+
+2 .
+
+Suppose that eigenvalue and orthonormal eigenfunction to the problem (11) defined by (12), then one can easily estimate that Φ1,1 = 1 , F1,1(t) = √t + 1 e a21tt+1 , Φ2,1 = 1 ,
+
+F2,1(t) = 
+
+qd−π(t+1)  
+
+> d−π
+
+e a22π2t 
+
+> (d−π)( d−π(t+1))
+
+and Φ1,n = Φ 2,n = F1,n (t) = F2,n (t) = 0 for all n > 1.Finally, the solution pairs (V1, R 1) and (V2, R 2) to the problem (58) can be defined as following form: 
+
+V1(ξ1, t ) = e− a21tt+1 
+
+√t + 1 
+
+
+
+1 + 
+
+Z t
+
+> 0
+
+R1(τ )dτ 
+
+
+
+sin( πξ 1), (59) where 
+
+R1(t) = e a21tt+1 
+
+π√t + 1 4 + π(t + 1 − u∗)8√t + 1 + a21
+
+(t + 1) 2
+
+
+
+(60) and 
+
+V2(ξ2, t ) = 
+
+rd − π(t + 1) 
+
+d − π e− a22π2t
+
+> (d−π)( d−π(t+1))
+
+
+
+1 + 
+
+Z t
+
+> 0
+
+R2(τ )dτ 
+
+
+
+sin ( πξ 2) , (61) where 
+
+R2(t) = 
+
+ a22π2
+
+(d − π(t + 1)) 2 − a21
+
+(t + 1) 2
+
+ p d − π(t + 1) (t + 1) 3/2 − k1
+
+p(d − π)( d − π(t + 1)) 
+
+k2π(t + 1) 3/2 R1
+
+− k1
+
+√d − π(2 π(t + 1) − 3d)2k2π(t + 1) 5/2
+
+!
+
+e a22π2t  
+
+> (d−π)( d−π(t+1)) −a21tt+1
+
+
+
+1 + 
+
+Z t
+
+> 0
+
+R1(τ )dτ 
+
+
+
++ χ′(t).
+
+(62) 20 4. Global existence of the solution 
+
+Now, we attempt show the global existence and uniqueness from the solution of the cylindrical Problem (10) which implies in the existence and uniqueness of the solution of the noncylindrical Problem (4), since they are equivalent. 
+
+Theorem 4. Let suppose sm, sm′ , sM and sM ′ are positive real numbers such that s(t) ∈
+
+C2(0 , T ), s′(t) ∈ L∞(0 , 1) with 0 < s m < s (t) < s M , sm′ < s ′(t) < s M ′ and s′(t) ∈ L∞(0 , T )
+
+for all t ∈ [0 , T ]. Moreover, initial datas Φi0 ∈ H10(0 , 1) and Fi(ξi, t ) ∈ L1(0 , T, L 2(Ω)) ∩
+
+L2(0 , T, L 2(0 , 1)) , for the uniquely reconstructed coefficients Ri(t) obtained in Theorem 1, 2, and Theorem 3, problem (10) possesses a unique strong solution pair (V1, V 2) of the problem (10) , that is, 
+
+∂V i
+
+∂t − ai(t)∂2Vi
+
+∂ξ 2 − b(ξi, t )∂V i
+
+∂ξ = Ri(t)Fi(ξi, t ), where i = 1 , 2 in L2(0 , T ; L2(0 , 1)) ,
+
+which satisfy the following statements for both i = 1 , 2:a) Vi ∈ L2(0 , T ; H10(0 , 1) ∩ H2(0 , 1)) ∩ L∞(0 , T ; H10(0 , 1)) ,b) ∂tVi ∈ L2(0 , T ; L2(0 , 1)) ,c) Ri(t) ∈ C[0 , T ], Ri(t) > 0 and 0 < m i < R i(t) < M i with mi, M i > 0 for all t ≥ 0.Proof. Existence. Let T > 0 and define the subspace Xm spanned by {ϕ1, ϕ 2, ..., ϕ m},where ϕj with j = 1 , 2, 3, ...m are assumed to be eigenvectors of the space H10(0 , 1) that is the solution of the spectral problem (11). Thus, we can deduce that if Vi,m ∈ Xm where 
+
+i = 1 , 2, then it can be written as linear combination of the eigenvectors ϕm belonging to 
+
+Xm such that 
+
+Vi,m (ξi, t ) = 
+
+> m
+
+X
+
+> j=1
+
+Vi,j,m (t)ϕj (ξi), i = 1 , 2,
+
+where Vi,j,m is the solution of the system of ordinary differential equation with boundary condition as follows 
+
+(  V ′
+
+> i,m
+
+, ϕ  − ai(t)
+
+∂2Vi,m 
+
+> ∂ξ 2
+> i
+
+, ϕ 
+
+
+
+−
+
+
+
+b(ξi, t )∂V i,m  
+
+> ∂ξ i
+
+, ϕ 
+
+
+
+= Ri(t) ( Fi(ξi, t ), ϕ ) , ∀ϕ ∈ Xm,Vi,m (0) = Φ i,m → Φi, in H10(Ω) (63) where V ′ 
+
+> i,m
+
+= ∂V i,m  
+
+> ∂t
+
+. The system (63) has local solution in the interval (0 , T m), by Caratheodory Theorem. To extend the local solution to the interval (0 , T ) independent of m the following a priori estimate is needed: Case 1. If ϕ = Vi,m where i = 1 , 2, then equation in the system (63) takes the form 
+
+ V ′
+
+> i,m
+
+, V i,m 
+
+ − ai(t)
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+, V i,m 
+
+
+
+−
+
+
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+, V i,m 
+
+
+
+= Ri(t) ( Fi(ξi, t ), V i,m ) .
+
+21 The first term gives us 
+
+ V ′
+
+> i,m
+
+, V i,m 
+
+ =
+
+Z 10
+
+∂V i,m 
+
+∂t Vi,m dξ i =
+
+Z 10
+
+ddt 
+
+12Vi,m 
+
+2
+
+dξ i = 12
+
+ddt 
+
+Z 10
+
+V 2
+
+> i,m
+
+dξ i = 12
+
+ddt |Vi,m |2 
+
+> L2(0 ,1)
+
+.
+
+By integration by parts and boundary conditions in (10), we estimate the following 
+
+ai(t)
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+, V i,m 
+
+
+
+= −ai(t)
+
+Z 10
+
+∂V i,m 
+
+∂ξ i
+
+2
+
+dξ i = −ai(t)|| Vi,m || 2
+
+> H10(0 ,1)
+
+and analogously for the third term we get 
+
+
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+, V i,m 
+
+
+
+=
+
+Z 10
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+Vi,m dξ i = − s′(t)2s(t)
+
+Z 10
+
+V 2
+
+> i,m
+
+dξ i = − s′(t)2s(t) |Vi,m |2 
+
+> L2(0 ,1)
+
+.
+
+Applying these estimations and Holder inequality, we can provide the following in-equality 
+
+12
+
+ddt |Vi,m |2
+
+> L2(0 ,1)
+
++ai(t)|| Vi,m || 2
+
+> H10(0 ,1)
+
++ s′(t)2s(t) |Vi,m |2 
+
+> L2(0 ,1)
+
+≤ 12Ri(t)
+
+
+
+|Fi|2 
+
+> L2(0 ,1)
+
++ |Vi,m |2
+
+> L2(0 ,1)
+
+
+
+.
+
+Integrating over [0 , t ) with t ∈ [0 , T m) and assuming 0 < s m < s (t) < s M , sm′ <s′(t) < s M ′ , |ai(t)| < N i and (c) hold, then again by integration by parts we have 
+
+|Vi,m |2
+
+> L2(0 ,1)
+
++
+
+Z t
+
+> 0
+
+|| Vi,m || 2
+
+> H10(0 ,1)
+
+dτ ≤ 12c1
+
+|Vi,m (0) |2
+
+> L2(0 ,1)
+
++c2
+
+c1
+
+|Fi|L2(0 ,1) 2+ c3
+
+c1
+
+Z T
+
+> 0
+
+|Vi,m |2
+
+> L2(0 ,1)
+
+dτ, 
+
+where c1 = min {12 , N i}, c2 = Mi 
+
+> 2
+
+and c3 = Mi 
+
+> 2
+
++ sM ′ 
+
+> 2sm
+
+. Then according to the Gronwall’s inequality we can deduce that 
+
+Vi,m is bounded in L∞(0 , T ; L2(0 , 1)) and Vi,m is bounded in L2(0 , T ; H10(0 , 1)) .
+
+Case 2. If we take ϕ = V ′ 
+
+> i,m
+
+= ddt Vi,m where i = 1 , 2, then the system (63) becomes 
+
+ V ′
+
+> i,m
+
+, V ′
+
+> i,m
+
+ − ai(t)
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+, V ′
+
+> i,m
+
+
+
+−
+
+
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+, V ′
+
+> i,m
+
+
+
+= Ri(t)  Fi(ξi, t ), V ′
+
+> i,m
+
+ ,
+
+for all V ′ 
+
+> i,m
+
+∈ Xm. Therefore, for the all terms on the left-hand side of this identity we have the following verifications 
+
+ V ′
+
+> i,m
+
+, V ′
+
+> i,m
+
+ =
+
+Z 10
+
+dV i,m 
+
+dt 
+
+2
+
+dξ i = |V ′
+
+> i,m
+
+|2
+
+> L2(0 ,1)
+
+,ai(t)
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+, V ′
+
+> i,m
+
+
+
+= ai(t)
+
+Z 10
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+dV i,m 
+
+dt dξ i = ai(t) ddt 
+
+Z 10
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+Vi,m dξ i
+
+22 = −ai(t)2
+
+ddt 
+
+Z 10
+
+∂V i,m 
+
+∂ξ i
+
+2
+
+dξ i = −ai(t)2
+
+ddt || Vi,m || 2
+
+> H10(0 ,1)
+
+,
+
+and 
+
+
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+, V ′
+
+> i,m
+
+
+
+=
+
+Z 10
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+V ′
+
+> i,m
+
+dξ i = −s′(t)
+
+s(t)
+
+Z 10
+
+V ′
+
+> i,m
+
+Vi,m dξ i
+
+−
+
+Z 10
+
+b(ξi, t )∂V i,m ′
+
+∂ξ i
+
+Vi,m dξ i = − s′(t)2s(t)
+
+ddt 
+
+Z 10
+
+V 2
+
+> i,m
+
+dξ i = − s′(t)2s(t)
+
+ddt |Vi,m |2
+
+> L2(0 ,1)
+
+,
+
+analogously as previous case 1, respect to Holder inequality we obtain 
+
+
+
+1 − 12Ri(t)
+
+
+
+|V ′
+
+> i,m
+
+|2
+
+> L2(0 ,1)
+
++ai(t)2
+
+ddt || Vi,m || 2
+
+> H10(0 ,1)
+
++ s′(t)2s(t)
+
+ddt |Vi,m |2 
+
+> L2(0 ,1)
+
+≤ Ri(t)2 |Fi|2
+
+> L2(0 ,1)
+
+.
+
+Hence, employing integrating on [0 , t ) with t ∈ [0 , T m) and according to integration by part we have 
+
+Z t
+
+> 0
+
+|Vi,m |2
+
+> L2(0 ,1)
+
+dτ + || Vi,m (t)|| 2 
+
+> H10(0 ,1)
+
++ |Vi,m (t)|2
+
+> L2(0 ,1)
+
+≤ c5
+
+c4
+
+|| Vi,m (0) || 2 
+
+> H10(0 ,1)
+
++ c6
+
+c4
+
+|Vi,m (0) |2 
+
+> L2(0 ,1)
+
++ c2
+
+c4
+
+|Fi|2
+
+> L2(0 ,1)
+
+,
+
+where c5 = Ni 
+
+> 2
+
+, c6 = sM ′ 
+
+> 2sm
+
+T and c4 = min {1 − mi 
+
+> 2
+
+, Ni 
+
+> 2
+
+, sM ′ 
+
+> 2sm
+
+}. Thus, Gronwall’s Lemma guarantees that 
+
+Vi,m is bounded in L∞(0 , T, H10(0 , 1)) , V ′ 
+
+> i,m
+
+is bounded in L2(0 , T, L 2(0 , 1)) .
+
+Case 3. Assume that ϕ = −∂2Vi,m 
+
+> ∂ξ 2
+> i
+
+, then we can rewrite equation in the system (63) as follows 
+
+−
+
+
+
+V ′
+
+> i,m
+
+, ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+
+
++ ai(t)
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+, ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+
+
++
+
+
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+, ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+
+
+= −Ri(t)
+
+
+
+Fi(ξi, t ), ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+
+
+.
+
+For each term of the left-hand side by integration by parts we can provide the fol-lowing evaluations 
+
+
+
+V ′
+
+> i,m
+
+, ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+
+
+=
+
+Z 10
+
+V ′
+
+> i,m
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+dξ i = −
+
+Z 10
+
+∂V ′
+
+> i,m
+
+∂ξ i
+
+∂V i,m 
+
+∂ξ i
+
+dξ i = −12
+
+ddt 
+
+Z 10
+
+∂V i,m 
+
+∂ξ i
+
+2
+
+dξ i
+
+= −12
+
+ddt || Vi,m || 2
+
+> H10(0 ,1)
+
+,
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+, ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+
+
+=
+
+Z 10
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+2
+
+dξ i = ∂2Vi,m 
+
+∂ξ 2
+
+> i
+> 2
+> L2(0 ,1)
+
+,
+
+23 
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+, ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+
+
+=
+
+Z 10
+
+b(ξi, t )∂V i,m 
+
+∂ξ i
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+dξ i = − s′(t)2s(t)
+
+Z 10
+
+∂V i,m 
+
+∂ξ i
+
+2
+
+dξ i
+
+= − s′(t)2s(t)|| Vi,m || 2
+
+> H10(0 ,1)
+
+.
+
+Then, by Holder inequality we have 
+
+12
+
+ddt || Vi,m || 2 
+
+> H10(0 ,1)
+
++ ai(t) ∂2Vi,m 
+
+∂ξ 2
+
+> i
+> 2
+> L2(0 ,1)
+
+− s′(t)2s(t)|| Vi,m || 2
+
+> H10(0 ,1)
+
+≤ 12Ri(t)|Fi|2 
+
+> L2(0 ,1)
+
++ 12Ri(t) ∂2Vi,m 
+
+∂ξ 2
+
+> i
+> 2
+> L2(0 ,1)
+
+.
+
+Thus, similarly as previous cases assuming all conditions hold, we establish the fol-lowing result 
+
+|| Vi,m (t)|| 2 
+
+> H10(0 ,1)
+
++
+
+Z t
+
+> 0
+
+∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+dτ ≤ c2
+
+c7
+
+|Fi|2 
+
+> L2(0 ,1)
+
++ c6
+
+c7
+
+Z T
+
+> 0
+
+|| Vi,m || 2
+
+> H10(0 ,1)
+
+dτ, 
+
+where c2, c6 are mentioned in previous cases and c7 = min {12 , N i − Mi 
+
+> 2
+
+}. Hence, respect to Gronwall’s inequality we conclude that 
+
+Vi,m is bounded in L∞(0 , T, H10(0 , 1)) , ∂2Vi,m 
+
+∂ξ 2
+
+> i
+
+is bounded in L2(0 , T, L 2(0 , 1)) .
+
+Uniqueness. Suppose that the problem admits two global strong solution pairs 
+
+(V (1)  
+
+> i,m
+
+, R (1)  
+
+> i
+
+) and (V (2)  
+
+> i,m
+
+, R (2)  
+
+> i
+
+) i = 1 , 2
+
+corresponding to the same initial, boundary, and overdetermination data. Let us define 
+
+Wi,m (ξi, t ) = V (1)  
+
+> i,m
+
+(ξi, t ) − V (2)  
+
+> i,m
+
+(ξi, t ) and ρi(t) = R(1)  
+
+> i
+
+(t) − R(2)  
+
+> i
+
+(t).
+
+Subtracting the two nonhomogeneous equations gives 
+
+∂W i,m 
+
+∂t − b(ξi, t )∂W i,m 
+
+∂ξ i
+
+− ai(t)∂2Wi,m 
+
+∂ξ 2
+
+> i
+
+= ρi(t)Fi(ξi, t ) (64) and assume that heat source coefficient from overdetermination conditions can be deter-mined in the Volterra integral form 
+
+Ri(t) = Gi(t) + 
+
+Z t
+
+> 0
+
+Ki(t, τ )Ri(τ )dτ, i = 1 , 2
+
+where Gi(t) and Ki(t, τ ) are continuous and bounded functions in [0 , T ], substracting R(1) 
+
+> i
+
+and R(2)  
+
+> i
+
+, it which implies 
+
+ρi(t) = 
+
+Z t
+
+> 0
+
+Ki(t, τ )ρi(τ )dτ. (65) 24 If we assume that |Ki(t, τ )| < C i holds, then it follows that |ρi(t)| ≤ Ci
+
+R t 
+
+> 0
+
+|ρi(τ )|dτ. By Gronwall’s inequality, we obtain that ρi(t) ≡ 0 for t ∈ [0 , T ]. Therefore, R(1)  
+
+> i
+
+(t) = R(2)  
+
+> i
+
+(t).Thus, the differenial equation is also nonhomogeneous unless ρi = 0 . Multiplying both sides (64) by Wi,m and integrate over (0 , 1) :
+
+Z 10
+
+∂W i,m 
+
+∂t Wi,m dξ i −
+
+Z 10
+
+b(ξi, t )∂W i,m 
+
+∂ξ i
+
+Wi,m dξ i − ai(t)
+
+Z 10
+
+∂2Wi,m 
+
+∂ξ 2
+
+> i
+
+Wi,m dξ i
+
+= ρi(t)
+
+Z 10
+
+Fi(ξi, t )Wi,m dξ i.
+
+Again, for the each term of the left-hand side we have 
+
+Z 10
+
+∂W i,m 
+
+∂t Wi,m dξ i = 12
+
+ddt || Wi,m (t)|| 2
+
+> L2(0 ,1)
+
+, −ai(t)
+
+Z 10
+
+∂2Wi,m 
+
+∂ξ 2
+
+> i
+
+Wi,m dξ i = ai(t) ∂W i,m 
+
+∂ξ i
+
+(t)
+
+> 2
+> L2(0 ,1)
+
+,
+
+Z 10
+
+b(ξi, t )∂W i,m 
+
+∂ξ i
+
+Wi,m dξ i = 12
+
+Z 10
+
+∂b ∂ξ i
+
+W 2
+
+> i,m
+
+dξ i.
+
+The right-hand side is estimated by Cauchy–Schwarz and Young inequalities: 
+
+|ρi(t)( Fi, W i,m )L2(0 ,1) | ≤ | ρi(t)||| Fi(t)|| L2(0 ,1) || Wi,m (t)|| L2(0 ,1) 
+
+≤ 12|ρi(t)|2|| Fi|| 2 
+
+> L2(0 ,1)
+
++ 12|| Wi,m (t)|| 2
+
+> L2(0 ,1)
+
+.
+
+Moreover, Z 10
+
+∂b ∂ξ i
+
+|Wi,m |2dξ i ≤ ∂b ∂ξ i
+
+(·, t ) L∞(0 ,1) 
+
+|| Wi,m || 2
+
+> L2(0 ,1)
+
+.
+
+Substitution all these estimations into (64) gives the energy identity 
+
+ddt || Wi,m (t)|| 2 
+
+> L2(0 ,1)
+
++ 2 ai(t) ∂W i,m 
+
+∂ξ i
+
+(t)
+
+> 2
+> L2(0 ,1)
+
+≤ 1 + ∂b ∂ξ i
+
+(·, t ) L∞(0 ,1) 
+
+!
+
+|| Wi,m (t)|| 2
+
+> L2(0 ,1)
+
++|ρi(t)||| Fi(t)|| 2
+
+> L2(0 ,1)
+
+.
+
+As it is shown that ρi(t) ≡ 0, by integrating over [0 , t ) with t ∈ [0 , T ), we can obtain the next estimation 
+
+|| Wi,m (t)|| 2 
+
+> L2(0 ,1)
+
++ 2 Ni
+
+Z T
+
+> 0
+
+∂W i,m 
+
+∂ξ i
+
+(τ )
+
+> 2
+> L2(0 ,1)
+
+dτ ≤ C0
+
+Z T
+
+> 0
+
+|| Wi,m (t)|| 2
+
+> L2(0 ,1)
+
+, where C0 = 1 + ∂b ∂ξ i (·, t ) L∞(0 ,1) 
+
+. Hence, by Gronwall’s inequality we can conclude that 
+
+|| Wi,m (t)|| 2 
+
+> L2(0 ,1)
+
+≡ 0, which leads to Wi,m = 0 and V (1)  
+
+> i,m
+
+= V (2)  
+
+> i,m
+
+.25 Consequently, we obtain the next result. 
+
+Theorem 5. Let suppose s0, sm, sm′ , sM and sM ′ are positive real numbers such that 
+
+s(t) ∈ C2(0 , T ) and s(0) = s0 with 0 < s m < s (t) < s M , sm′ < s ′(t) < s M ′ and 
+
+s′(t) ∈ L∞(0 , T ) for all t ∈ [0 , T ]. Moreover, initial datas φi0 ∈ H10(0 , s 0), heat sources 
+
+f1(x, t ) ∈ L1(0 , T, L 2(0 , s (t))) ∩ L2(0 , T, L 2(0 , s (t))) and f2(x, t ) ∈ L1(0 , T, L 2(s(t), d )) ∩
+
+L2(0 , T, L 2(s(t), d )) given, for the uniquely reconstructed coefficients Ri(t) obtained in The-orem 1, 2, and Theorem 3, problem (10) possesses a unique strong solution pair (u1, u 2) of the problem (4) , that is, 
+
+∂u 1
+
+∂t − a1
+
+∂2u1
+
+∂x 2 = R1(t)f1(x, t ), in L2(0 , T, L 2(0 , s (t))) ,∂u 2
+
+∂t − a2
+
+∂2u2
+
+∂x 2 = R2(t)f2(x, t ), in L2(0 , T, L 2(s(t), d )) ,
+
+which satisfy the following conditions: a) u1 ∈ L∞(0 , T ; H10(0 , s (t)) ∩ H2(0 , s (t))) and u2 ∈ L∞(0 , T ; H10 (s(t), d ) ∩ H2(s(t), d )) ,b) ∂tu1 ∈ L2(0 , T ; L2(0 , s (t))) and ∂tu2 ∈ L2(0 , T ; L2(s(t), d )) ,c) Ri(t) ∈ C[0 , T ], Ri(t) > 0 with i = 1 , 2 for all t ≥ 0 and 0 < m i < R i(t) < M i with 
+
+mi, M i > 0.
+
+5. The reaction coefficient Stefan type problem with two moving boundaries 
+
+In this section, we introduce the new domain Ω3 = ( s(t), r (t)) × (0 , T ] and consider the inverse two-phase Stefan type problem with Neumann condition and two moving bound-aries, determining the functions u1(x, t ), u2(x, t ) and restoring the time-dependent coeffi-cient of the reaction terms P1(t), P2(t) in each phase such that 
+
+ 
+
+> ∂u 1
+> ∂t
+
+= a21 ∂2u1 
+
+> ∂x 2
+
++ P1(t)u1(x, t ) + f1(x, t ), (x, t ) ∈ Ω1, 
+
+> ∂u 2
+> ∂t
+
+= a22 ∂2u2 
+
+> ∂x 2
+
++ P2(t)u2(x, t ) + f2(x, t ), (x, t ) ∈ Ω3,u1(x, 0) = φ1(x), s(0) = s0, ∀x ∈ [0 , s (0)] ,u2(x, 0) = φ2(x), r(0) = r0, ∀x ∈ [s(0) , r (0)] ,
+
+−k1 ∂u 1 
+
+> ∂x
+
+(0 , t ) = g1(t), ∀t ∈ [0 , T ],u1(s(t), t ) = u2(s(t), t ) = u∗, ∀t ∈ [0 , T ],
+
+−k1 ∂u 1 
+
+> ∂x
+
+(s(t), t ) = −k2 ∂u 2 
+
+> ∂x
+
+(s(t), t ) + Ls ′(t), ∀t ∈ [0 , T ],u2(r(t), t ) = g2(t), ∀t ∈ [0 , T ],
+
+−k2 ∂u 2 
+
+> ∂x
+
+(r(t), t ) = Lr ′(t), ∀t ∈ [0 , T ],
+
+(66) where fi(x, t ), gi(t) and φi(x) with i = 1 , 2 are given functions, a2 
+
+> i
+
+, ki with i = 1 , 2, u∗ and 
+
+L are known fixed constants, and s0, r 0 are positive given real numbers. 26 One advantage of problem (66), compared with problem (1) in the previous section, is that no additional overdetermination condition is required to determine the time-dependent coefficients. In the present formulation, the two Stefan conditions, namely the seventh and ninth conditions in (66), provide the necessary relations for estimating both coefficients. Now we introduce the following substitutions which help us to reduce the problem (66) to the similar form of the problem (1), which are 
+
+v1(x, t ) = R1(t)u1(x, t ), R1(t) = exp 
+
+
+
+−
+
+Z t
+
+> 0
+
+P1(τ )dτ 
+
+
+
+, (67) 
+
+v2(x, t ) = R2(t)u2(x, t ), R2(t) = exp 
+
+
+
+−
+
+Z t
+
+> 0
+
+P2(τ )dτ 
+
+
+
+. (68) Then problem (66) takes the form 
+
+ 
+
+> ∂v 1
+> ∂t
+
+= a21 ∂2v1 
+
+> ∂x 2
+
++ R1(t)f1(x, t ), (x, t ) ∈ Ω1, 
+
+> ∂v 2
+> ∂t
+
+= a22 ∂2v2 
+
+> ∂x 2
+
++ R2(t)f2(x, t ), (x, t ) ∈ Ω3,v1(x, 0) = φ1(x), s(0) = s0, ∀x ∈ [0 , s (0)] ,v2(x, 0) = φ2(x), r(0) = r0, ∀x ∈ [s(0) , r (0)] ,
+
+−k1 ∂v 1 
+
+> ∂x
+
+(0 , t ) = R1(t)g1(t), ∀t ∈ [0 , T ],v1(s(t), t ) = R1(t)u∗, ∀t ∈ [0 , T ],v2(s(t), t ) = R2(t)u∗, ∀t ∈ [0 , T ],
+
+− k1 
+
+> R1(t)
+> ∂v 1
+> ∂x
+
+(s(t), t ) = − k2 
+
+> R2(t)
+> ∂v 2
+> ∂x
+
+(s(t), t ) + Ls ′(t), ∀t ∈ [0 , T ],v2(r(t), t ) = R2(t)g2(t), ∀t ∈ [0 , T ],
+
+−k2 ∂v 2 
+
+> ∂x
+
+(r(t), t ) = LR 2(t)r′(t), ∀t ∈ [0 , T ],
+
+(69) where the pairs (u1, R 1) and (u2, R 2) have to be determined, then solution pair (u1, P 1)
+
+and (u2, P 2) to the considered original problem (66) can be estimated in the following form 
+
+ui(x, t ) = vi(x, t )
+
+Ri(t) , Pi(t) = −R′
+
+> i
+
+(t)
+
+Ri(t), i = 1 , 2. (70) Next, we apply the following change of variable for the purpose of the spectral approach to solve the original problem (66) such that 
+
+y1(x, t ) = v1(x, t ) − R1(t)u∗ + 1
+
+k1
+
+R1(t)g1(t)( x − s(t)) , (71) 
+
+y2(x, t ) = v2(x, t ) − R2(t)u∗
+
+s(t) − r(t)(x − r(t)) − R2(t)g2(t)
+
+r(t) − s(t)(x − s(t)) . (72) 27 Hence, we present the problem (66) as the following form 
+
+ 
+
+> ∂y 1
+> ∂t
+
+= a21 
+
+> ∂2y1
+> ∂x 2
+
++ R1(t)h1(x, t ), (x, t ) ∈ Ω1, 
+
+> ∂y 2
+> ∂t
+
+= a22 
+
+> ∂2y2
+> ∂x 2
+
++ R2(t)h2(x, t ), (x, t ) ∈ Ω3,y1(x, 0) = ψ1(x), s(0) = s0, ∀x ∈ [0 , s (0)] ,y2(x, 0) = ψ2(x), r(0) = r0, ∀x ∈ [s(0) , r (0)] ,
+
+−k1 ∂y 1 
+
+> ∂x
+
+(0 , t ) = 0 , ∀t ∈ [0 , T ],y1(s(t), t ) = y2(s(t), t ) = y2(r(t), t ) = 0 , ∀t ∈ [0 , T ],
+
+− k1 
+
+> R1(t)
+> ∂y 1
+> ∂x
+
+(s(t), t ) = − k2 
+
+> R2(t)
+> ∂y 2
+> ∂x
+
+(s(t), t ) + k2(g2(t)−u∗) 
+
+> s(t)−r(t)
+
+− g1(t) + Ls ′(t), ∀t ∈ [0 , T ],
+
+−k2 ∂y 2 
+
+> ∂x
+
+(r(t), t ) = R2(t)
+
+k2(u∗−g2(t))  
+
+> s(t)−r(t)
+
++ Lr ′(t)
+
+
+
+, ∀t ∈ [0 , T ],
+
+(73) where 
+
+h1(x, t ) = f1(x, t ) + 1
+
+k1
+
+R′
+
+> 1
+
+(t)
+
+R1(t)g1(t) + g′
+
+> 1
+
+(t)
+
+
+
+(x − s(t)) − R′
+
+> 1
+
+(t)u∗
+
+R1(t) − 1
+
+k1
+
+g1(t)s′(t), (74) 
+
+h2(x, t ) = f2(x, t ) − R′
+
+> 2
+
+(t)u∗(s(t) − r(t)) − R2(t)u∗(s′(t) − r′(t)) 
+
+R2(t)( s(t) − r(t)) 2 (x − r(t)) 
+
+− (R′
+
+> 2
+
+(t)g2(t) + R2(t)g′
+
+> 2
+
+(t))( r(t − s(t))) − R2(t)g2(t)( r′(t) − s′(t)) 
+
+R2(t)( r(t) − s(t)) 2 (x − s(t)) + u∗r′(t)
+
+s(t) − r(t) + g2(t)s′(t)
+
+r(t) − s(t),
+
+(75) 
+
+ψ1(x) = φ1(x) − u∗ + 1
+
+k1
+
+g1(0)( x − s0), g1(0) > 0, (76) 
+
+ψ2(x) = φ2(x) − u∗(x − r0)
+
+s0 − r0
+
+− g2(0)( x − s0)
+
+r0 − s0
+
+, g2(0) > 0. (77) The next step for spectral approach we need to study the problem in the fixed domain 
+
+Ω = (0 , 1) × (0 , T ], then in the system of mapping (8) and (9), only (9) can be rewritten as follows 
+
+V2 : Ω 2 → Ω, (x, t ) 7 → (ξ2, t ) = 
+
+ x − s(t)
+
+r(t) − s(t), t 
+
+
+
+, (78) where function V2 ∈ C2,1(Ω) and V −12 ∈ C2,1(Ω 2). Therefore, the problem (73) can be 28 reduced to the form 
+
+ 
+
+> ∂V 1
+> ∂t
+
+− b(ξ1, t )∂V 1 
+
+> ∂ξ 1
+
+− a1(t)∂2V1
+
+> ∂ξ 21
+
+= R1(t)F1(ξ1, t ), (ξ1, t ) ∈ Ω, 
+
+> ∂V 2
+> ∂t
+
+− b(ξ2, t )∂V 2 
+
+> ∂ξ 3
+
+− a2(t)∂2V2
+
+> ∂ξ 23
+
+= R2(t)F2(ξ2, t ), (ξ2, t ) ∈ Ω,V1(ξ1, 0) = Ψ 1(ξ1), ∀ξ1 ∈ [0 , 1] ,V2(ξ2, 0) = Φ 2(ξ2), ∀ξ2 ∈ [0 , 1] , 
+
+> ∂V 1
+> ∂ξ 1
+
+(0 , t ) = 0 , ∀t ∈ [0 , T ],V1(1 , t ) = V2(0 , t ) = V2(1 , t ) = 0 , ∀t ∈ [0 , T ],
+
+− k1 
+
+> R1(t)s(t)
+> ∂V 1
+> ∂ξ 1
+
+(1 , t ) = − k2 
+
+> R2(t)( r(t)−s(t))
+> ∂V 2
+> ∂ξ 2
+
+(0 , t ) + k2(g2(t)−u∗) 
+
+> s(t)−r(t)
+
+− g1(t) + Ls ′(t), ∀t ∈ [0 , T ],
+
+−k2 ∂V 2 
+
+> ∂ξ 2
+
+(1 , t ) = R2(t)( r(t) − s(t)) 
+
+k2(u∗−g2(t))  
+
+> s(t)−r(t)
+
++ Lr ′(t)
+
+
+
+, ∀t ∈ [0 , T ],
+
+(79) where a1(t) = a21 
+
+> s2(t)
+
+, a2(t) = a22 
+
+> (r(t)−s(t)) 2
+
+, b(ξi, t ) = ξ1s′(t) 
+
+> s(t)
+
+, b(ξ2, t ) = s′(t)( r(t)−s(t))+( x−s(t))( r′(t)−s′(t)) (r(t)−s(t)) 2 ,
+
+F1(ξ1, t ) = h1(ξ1s(t), t ), F2(ξ2, t ) = h2(ξ2(r(t) − s(t)) + s(t), t ), Ψ1(ξ1) = ψ1(ξ1s(t)) and 
+
+Φ2(ξ2) = ψ2(ξ2(r(t) − s(t)) + s(t)) where hi, ψi with i = 1 , 2 are defined by (74),(75),(76) and (77). Next, we consider the spectral problem for the first phase V1(ξ!, t ):
+
+(
+
+−w′′ 
+
+> 1,n
+
+(ξ1) = eλnw1,n (ξ1), 0 < ξ 1 < 1,w′
+
+> 1,n
+
+(0) = w1,n (1) = 0 , (80) which gives the following eigenvalue and orthonormal eigenfunction 
+
+w1,n (ξ1) = √2 cos 
+
+q eλnξ1
+
+
+
+, i = 1 , 2, eλn = (2 n − 1) 2π2
+
+4 , n = 1 , 2, 3, ... . (81) For the second phase V2(ξ2, t ), we consider the same spectral problem (11) as in previous section which gives the orthonormal eigenfunction ϕ2,n (ξ2) and eigenvalue λn defined by (12). Then assuming that {w1,n (ξ1)}∞ 
+
+> n=1
+
+and {ϕ2,n (ξ2)}∞ 
+
+> n=1
+
+be orthonormal sets on L2(0 , 1) ,then analogously as in previous Section 1, according to (19) we set that weak solution of the problem (79) can be presented as 
+
+V1,n (ξ1) = 
+
+> ∞
+
+X
+
+> n=1
+
+Ψ1,n e− R t    
+
+> 0(a1(τ)eλn−b1(τ)) dτ
+
++
+
+> t
+
+Z
+
+> 0
+
+R1(τ )F1,n (τ )e− R tτ (a1(z)eλn−b1(z)) dz dτ 
+
+!
+
+w1,n (ξ1),
+
+(82) 
+
+V2,n (ξ2) = 
+
+> ∞
+
+X
+
+> n=1
+
+Φ2,n e− R t    
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
++
+
+> t
+
+Z
+
+> 0
+
+R2(τ )F2,n (τ )e− R tτ (a2(z)λn−b2(z)) dz dτ 
+
+!
+
+ϕ2,n (ξ2)
+
+(83) where b1(t) = ( b(ξ1, t )w′
+
+> 1,n
+
+, w 1,n )L2(0 ,1) , b2(t) = ( b(ξ2, t )ϕ′
+
+> 2,n
+
+, ϕ 2,n )L2(0 ,1) , Ψ1,n = (Ψ 1(ξ1), w 1,n (ξ1)) L2(0 ,1) ,
+
+Φ2,n = (Φ 2(ξ2), ϕ 2,n (ξ2)) L2(0 ,1) , F1,n (t) = ( F1(ξ1, t ), w 1,n (ξ1)) and F2,n (t) = ( F2(ξ2, t ), ϕ 2,n (ξ2)) ,where w1,n is defined by (81) and ϕ2,n is given by (12). 29 From the system of the last two conditions in the system (79) one can determine the time-dependent coefficients R1(t) and R2(t) dependent to each others, such that 
+
+R1(t) = 
+
+√2k1
+
+s(t)
+
+> ∞
+
+X
+
+> n=1
+
+(−1) n
+
+qeλnΨ1,n e− R t   
+
+> 0(a1(τ)eλn−b1(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+R1(τ )( −1) n
+
+qeλnF1,n (τ )e− R tτ (a1(z)eλn−b1(z)) dz dτ 
+
+!
+
+×
+
+"
+
+−√2k2
+
+R2(t)( r(t) − s(t)) 
+
+> ∞
+
+X
+
+> n=1
+
+√λnΦ2,n e− R t   
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+R2(τ )pλnF2,n (τ )e− R tτ (a2(z)λn−b2(z)) dz dτ 
+
+!
+
++ k2(g2(t) − u∗)
+
+s(t) − r(t) − g1(t) + Ls ′(t)
+
+#−1
+
+(84) where 
+
+R2(t) = −√2k2
+
+Lr ′(t)( r(t) − s(t)) + k2(g2(t) − u∗)
+
+> ∞
+
+X
+
+> n=1
+
+(−1) npλnΦ2,n e− R t   
+
+> 0(a2(τ)λn−b2(τ)) dτ
+
++
+
+Z t
+
+> 0
+
+R2(τ )( −1) npλnF2,n (τ )e− R tτ (a2(z)λn−b2(z)) dz dτ 
+
+!
+
+.
+
+(85) The proof of the existence and uniqueness of the solutions (82), (83), (84) and (85) of the problem (79) are similar as in previous Section 1 which can be established by the following results. 
+
+Theorem 6. Assume the inequalities in Lemma 1, Lemma 2 and (i)-(iv) in Theorem 1 are hold. Moreover, if the following conditions (H1) r(t) ∈ C2[0 , T ] such that r(0) = r0, r(t) > s (t) for ∀t ∈ [0 , T ] and 0 < r m < r (t) <rM , 0 < r m′ < r ′(t) < r M ′ for rM , r M ′ positive constants; (H2) r′(t) ∈ L∞(0 , T )
+
+are satisfied, then there exists a unique weak solution pairs (Vi, R i) where i = 1 , 2 to the problem (79) .Proof. It can be implemented analogously as in study NauKhum (2025). 
+
+Definition 3. A pair of functions  (u1, P 1), (u2, P 2) is called a weak solution of problem 
+
+(67) if there exist functions Ri ∈ C1([0 , T ]) , R i(t) > 0, R i(0) = 1 , i = 1 , 2, such that 
+
+30 Pi(t) = −R′ 
+
+> i(t)
+> Ri(t)
+
+, i = 1 , 2 and the transformed functions vi(x, t ) = Ri(t)ui(x, t ), i = 1 , 2,
+
+after the transformations 
+
+y1(x, t ) = v1(x, t ) − R1(t)u∗ + 1
+
+k1
+
+R1(t)g1(t)( x − s(t)) ,y2(x, t ) = v2(x, t ) − R2(t)u∗
+
+s(t) − r(t)(x − r(t)) − R2(t)g2(t)
+
+r(t) − s(t)(x − s(t)) ,
+
+and 
+
+V1(ξ1, t ) = y1(s(t)ξ1, t ), V2(ξ2, t ) = y2
+
+ s(t) + ( r(t) − s(t)) ξ2, t ,
+
+satisfy 
+
+Vi ∈ C([0 , T ]; L2(0 , 1)) ∩ C((0 , T ]; H10(0 , 1)) ∩ C1((0 , T ]; L2(0 , 1)) , i = 1 , 2.
+
+Finally, the original temperature functions 
+
+u1 ∈ C([0 , T ], L 2(0 , s (t))) ∩ C((0 , T ]; H20(0 , s (t))) ∩ C1((0 , T ]; L2(0 , s (t))) ,u2 ∈ C([0 , T ], L 2(s(t), r (t))) ∩ C((0 , T ]; H20(s(t), r (t))) ∩ C1((0 , T ]; L2(s(t), r (t))) 
+
+are recovered by 
+
+u1(x, t ) = 1
+
+R1(t)V1
+
+ xs(t), t 
+
+
+
++ u∗ − g1(t)
+
+k1
+
+(x − s(t)) , 0 < x < s (t),
+
+and 
+
+u2(x, t ) = 1
+
+R2(t)V2
+
+ x − s(t)
+
+r(t) − s(t), t 
+
+
+
++ u∗(x − r(t)) 
+
+s(t) − r(t) + g2(t)( x − s(t)) 
+
+r(t) − s(t) , s(t) < x < r (t).
+
+Example 2. Let us consider the inverse Stefan type two-phase problem with suit-able source functions and initial functions, and the domain with two moving boundaries 
+
+Ω1 = (0 , π √t + 1) × (0 , T ] and Ω2 = ( π√t + 1 , 2π√t + 1) × (0 , T ] in which the pairs 
+
+(u1(x, t ), P 1(t)) and (u2(x, t ), P 2(t)) have to be determined, such that 
+
+ 
+
+> ∂u 1
+> ∂t
+
+= a21 ∂2u1 
+
+> ∂x 2
+
++ P1(t)u1(x, t ) + √2( t + 1) − a21+1 4 cos 
+
+ x
+
+> 2√t+1
+
+
+
+, (x, t ) ∈ Ω1, 
+
+> ∂u 2
+> ∂t
+
+= a22 ∂2u2 
+
+> ∂x 2
+
++ P2(t)u2(x, t ) + √2( t + 1) −(a22+1 /4) sin 
+
+x−π√t+1 √t+1 
+
+
+
+, (x, t ) ∈ Ω2,u1(x, 0) = √2 cos  x
+
+> 2
+
+ , ∀x ∈ [0 , π ],u2(x, 0) = √2 sin ( x − π) , ∀x ∈ [π, 2π],
+
+−k1 ∂u 1 
+
+> ∂x
+
+(0 , t ) = 0 , ∀t ∈ [0 , T ],u1(π√t + 1 , t ) = u2(π√t + 1 , t ) = 0 , ∀t ∈ [0 , T ],
+
+−k1 ∂u 1 
+
+> ∂x
+
+(π√t + 1 , t ) = −k2 ∂u 2 
+
+> ∂x
+
+(π√t + 1 , t ) + Lπ  
+
+> 2√t+1
+
+, ∀t ∈ [0 , T ],u2(2 π√t + 1 , t ) = 0 , ∀t ∈ [0 , T ],
+
+−k2 ∂u 2 
+
+> ∂x
+
+(2 π√t + 1 , t ) = Lπ √t+1 , ∀t ∈ [0 , T ].
+
+(86) 31 Applying the substitutions (67) and (68), the problem (86) can be reduced to the inverse problem where the pairs (v1(x, t ), R 1(t)) and (v2(x, t ), R 2(t)) have to be restored which can be presented in the following form 
+
+ 
+
+> ∂v 1
+> ∂t
+
+= a21 ∂2v1 
+
+> ∂x 2
+
++ R1(t)√2( t + 1) − a21+1 4 cos 
+
+ x
+
+> 2√t+1
+
+
+
+, (x, t ) ∈ Ω1, 
+
+> ∂v 2
+> ∂t
+
+= a22 ∂2v2 
+
+> ∂x 2
+
++ R2(t)√2( t + 1) −(a22+1 /4) sin 
+
+x−π√t+1 √t+1 
+
+
+
+, (x, t ) ∈ Ω2,v1(x, 0) = √2 cos  x
+
+> 2
+
+ , ∀x ∈ [0 , π ],v2(x, 0) = √2 sin ( x − π) , ∀x ∈ [π, 2π],
+
+−k1 ∂v 1 
+
+> ∂x
+
+(0 , t ) = 0 , ∀t ∈ [0 , T ],v1(π√t + 1 , t ) = v2(π√t + 1 , t ) = 0 , ∀t ∈ [0 , T ],
+
+− k1 
+
+> R1(t)
+> ∂v 1
+> ∂x
+
+(π√t + 1 , t ) = − k2 
+
+> R2(t)
+> ∂u 2
+> ∂x
+
+(π√t + 1 , t ) + Lπ  
+
+> 2√t+1
+
+, ∀t ∈ [0 , T ],v2(2 π√t + 1 , t ) = 0 , ∀t ∈ [0 , T ],
+
+−k2 ∂v 2 
+
+> ∂x
+
+(2 π√t + 1 , t ) = R2(t) Lπ √t+1 . ∀t ∈ [0 , T ].
+
+(87) Next, introducing the fixed domain Ω = (0 , 1) ×(0 , T ] and employing the change of variables 
+
+v1(x, t ) = V1(ξ1, t ), ξ1 = xπ(t + 1) , (ξ1, t ) ∈ Ω, (88) 
+
+v2(x, t ) = V2(ξ2, t ), ξ2 = x − π(t + 1) 
+
+π(t + 1) , (ξ2, t ) ∈ Ω, (89) then problem (87) takes the form 
+
+ 
+
+> ∂V 1
+> ∂t
+
+− ξ1 
+
+> 2( t+1)
+> ∂V 1
+> ∂ξ 1
+
+− a21
+
+> π2(t+1)
+> ∂2V1
+> ∂ξ 21
+
+= R1(t)√2( t + 1) − a21+1 4 cos  π 
+
+> 2
+
+ξ1
+
+ , (ξ1, t ) ∈ Ω, 
+
+> ∂V 2
+> ∂t
+
+− 1+ ξ2 
+
+> t+1
+> ∂V 2
+> ∂ξ 2
+
+− a22
+
+> π2(t+1) 2
+> ∂2V2
+> ∂ξ 22
+
+= R2(t)√2( t + 1) −(a22+1 /4) sin ( πξ 2) , (ξ2, t ) ∈ Ω,V1(ξ1, 0) = √2 cos  π 
+
+> 2
+
+ξ1
+
+ , ∀ξ1 ∈ [0 , 1] ,V2(ξ2, 0) = √2 sin ( πξ 2) , ∀ξ2 ∈ [0 , 1] ,
+
+−k1 ∂V 1 
+
+> ∂ξ 1
+
+(0 , t ) = 0 , ∀t ∈ [0 , T ],V1(1 , t ) = V2(0 , t ) = V2(1 , t ) = 0 , ∀t ∈ [0 , T ],
+
+− k1 
+
+> R1(t)
+> ∂V 1
+> ∂ξ 1
+
+(1 , t ) = − k2 
+
+> R2(t)
+> ∂V 2
+> ∂ξ 2
+
+(0 , t ) + Lπ 2 
+
+> 2
+
+, ∀t ∈ [0 , T ],
+
+−k2 ∂V 2 
+
+> ∂ξ 2
+
+(1 , t ) = R2(t)Lπ 2, ∀t ∈ [0 , T ].
+
+(90) According to the spectral problems (11) and (80) the orthonormal eigenfunctions are 
+
+w1,n (ξ1) = √2 cos 
+
+(2 n−1) π 
+
+> 2
+
+ξ1
+
+
+
+and ϕ2,n (ξ2) = √2 sin ( nπξ 2) where n ∈ N. Therefore, we get (Ψ 1(ξ1), w 1,n (ξ1)) L2(0 ,1) = 0 , (Φ 2(ξ2), ϕ 2,n (ξ)) L2(0 ,1) = 0 when n̸ = 0 . Thus, Ψ1,1 = 1 
+
+and Ψ2,1 = 1 when n = 1 . Analogously, F1,n (t) = F2,n (t) = 0 when n̸ = 1 , otherwise 
+
+F1,1(t) = ( t + 1) − a21+1 4 and F2,1(t) = ( t + 1) −(a22+1 /4) . Hence, the solution functions V1(ξ1, t )
+
+and V2(ξ2, t ) takes the form 
+
+V1(ξ1, t ) = V1,1(t)w1,1(ξ1), V2(ξ2, t ) = V2,1(t)ϕ2,1(ξ2). (91) 32 Taking into account 
+
+ ξ1
+
+> 2( t+1) w′
+> 1,1,w 1,1
+
+
+
+> L2(0 ,1)
+
+=
+
+ 1+ ξ2 
+
+> 2( t+1)
+
+ϕ′
+
+> 1,1
+
+, ϕ 1,1
+
+
+
+> L2(0 ,1)
+
+= − 14( t+1) , then V1,1(t)
+
+and V2,1(t) are the solution of the problems governing with linear differential equations such that (
+
+V ′
+
+> 1,1
+
+(t) + a21+1 4( t+1) V1,1(t) = R1(t)( t + 1) − a21+1 4 ,V1,1(0) = 1 , (92) 
+
+(
+
+V ′
+
+> 2,1
+
+(t) + a22+1 /4 
+
+> t+1
+
+V2,1(t) = R2(t)( t + 1) −(a22+1 /4) ,V2,1(0) = 1 . (93) Thus, from (91) we can obtain the exact solution of the problem (90) that are 
+
+V1(ξ1, t ) = √2( t + 1) − a21+1 4
+
+
+
+1 + 
+
+Z t
+
+> 0
+
+R1(τ )dτ 
+
+
+
+cos 
+
+π
+
+2 ξ1
+
+
+
+(94) 
+
+V2(ξ2, t ) = √2( t + 1) −(a22+ 14 )
+
+
+
+1 + 
+
+Z t
+
+> 0
+
+R2(τ )dτ 
+
+
+
+sin( πξ 2). (95) Then, from the system of two conditions in (90), it can be estimated that the time-dependent coefficients which independent to each others and defined by Volterra integral equations, such that 
+
+R1(t) = 
+
+√2k1
+
+Lπ (t + 1) − a21+1 4
+
+
+
+1 + 
+
+Z t
+
+> 0
+
+R1(τ )dτ 
+
+
+
+, (96) 
+
+R2(t) = 
+
+√2k2
+
+Lπ (t + 1) −(a22+1 /4) 
+
+
+
+1 + 
+
+Z t
+
+> 0
+
+R2(τ )dτ 
+
+
+
+. (97) Hence, the explicit solutions of the integral equations (96) and (97) are 
+
+R1(t) = 
+
+√2k1
+
+Lπ (t + 1) − a21+1 4 exp 4√2k1
+
+Lπ (3 − a21)
+
+
+
+(t + 1) 3−a214 − 1
+
+!
+
+, (98) 
+
+R2(t) = 
+
+√2k2
+
+Lπ (t + 1) −(a22+ 14 ) exp 4√2k2
+
+Lπ (3 − 4a22)
+
+
+
+(t + 1) 3−4a224 − 1
+
+!
+
+. (99) By making backward substitution to (70), the solution of the original problem (86) can be presented as 
+
+u1(x, t ) = 1
+
+R1(t)V1
+
+ xπ(t + 1) , t 
+
+
+
+, u2(x, t ) = 1
+
+R2(t)V2
+
+x − π(t + 1) 
+
+π(t + 1) , t 
+
+
+
+(100) where V1 and V2 defined by (94) and (95), and applying (70) we can determine coefficients 
+
+Pi(t) = −R′ 
+
+> i(t)
+> Ri(t)
+
+with i = 1 , 2, where R1(t) and R2(t) are given by (100) and (99). To construct the graphical formulation of the time-dependent coefficients with noisy data measurement for testing solution, we attempt to follow the steps: 33 1. To check the time-depended coefficients’ sensitivity to noisy data measurement, we add relative noise level to the Stefan condition 
+
+−k2
+
+∂u δ
+
+> 2
+
+∂x (r(t), t ) = Lr ′(t) + O(0 , σ 2),
+
+where r(t) = 2 π√t + 1 and O(0 , σ 2) represents the normal distribution with mean zero and standard deviation σ = δ × max   
+
+> (r(t),t ),t ∈[0 ,T ]
+> ∂u 2
+> ∂x
+
+(r(t), t ) , and δ denotes relative (in percentage) noise levels. 2. Fix the final time T > 0 and the number of time steps N ≥ 2. Define h = TN and 
+
+tn = nh, n = 0 , 1, . . . , N. 
+
+3. Setting k1 = k2 = π√2 and a1 = a2 = L = 1 we get max   
+
+> (2 π√t+1 ,t ),t ∈[0 ,T ]
+> ∂u 2
+> ∂x
+
+(2 π√t + 1 , t ) =
+
+q 2  
+
+> T+1
+
+, which implies σ = δ
+
+q 2  
+
+> T+1
+
+, then we need to define 
+
+Aδ
+
+> 1
+
+(t) = k1π
+
+√2
+
+Lπ 2
+
+2 − π√t + 1 O(0 , σ 2)
+
+
+
+(t + 1) − a21+1 4 ,Aδ
+
+> 2
+
+(t) = 
+
+√2k2πLπ 2 + π√t + 1 O(0 , σ 2)(t + 1) −(a22+ 14 )
+
+4. Introduce the auxiliary functions Yi(t) = 1 + R t 
+
+> 0
+
+Ri(τ ) dτ . As Y ′ 
+
+> i
+
+(t) = Ri(t), we consider initial value problems Y ′ 
+
+> 1
+
+(t) = Aδ
+
+> 1
+
+(t)Y1(t) and Y ′ 
+
+> 2
+
+(t) = Aδ
+
+> 2
+
+(t)Y2(t) with initial conditions Yi(0) = 1 .5. Set the initial values Y1,0 = Y2,0 = 1 .6. For n = 0 , 1, . . . , N − 1, define F δ 
+
+> 1
+
+(t, Y 1) = Aδ
+
+> 1
+
+(t)Y1(t) and F δ 
+
+> 2
+
+(t, Y 2) = Aδ
+
+> 2
+
+(t)Y2(t).For each i = 1 , 2, calculate the RK4 stages 
+
+Ki, 1 = F δi (tn, Y i,n ),Ki, 2 = F δi
+
+
+
+tn + h
+
+2 , Y i,n + h
+
+2 Ki, 1
+
+
+
+,Ki, 3 = F δi
+
+
+
+tn + h
+
+2 , Y i,n + h
+
+2 Ki, 2
+
+
+
+,Ki, 4 = F δi (tn + h, Y i,n + hK i, 3) .
+
+7. Update Yi,n +1 = Yi,n + h 
+
+> 6
+
+(Ki, 1 + 2 Ki, 2 + 2 Ki, 3 + Ki, 4).8. Recover the numerical approximations of Rδ 
+
+> 1
+
+and Rδ
+
+> 2
+
+: Rδ 
+
+> 1,n
+
+= Aδ
+
+> 1
+
+(tn)Y1,n and Rδ 
+
+> 2,n
+
+=
+
+Aδ
+
+> 2
+
+(tn)Y2,n .
+
+9. Approximate the derivatives at the interior nodes by the second-order central dif-ference formula (Rδi,n )′ ≈ Rδi,n +1 −Rδi,n −1 
+
+> 2h
+
+, n = 1 , . . . , N − 1. At the left endpoint use 
+
+Rδi, 0 ≈ −3Rδi, 0+4 Rδi, 1−Rδi, 2 
+
+> 2h
+
+and at the right endpoint use (Rδi,N )′ ≈ 3Rδi,N −4Rδi,N −1+Rδi,N −2 
+
+> 2h
+
+.34 10. Calculate P δ 
+
+> 1,n
+
+= −(Rδ
+
+> 1,n )′
+> Rδ
+> 1,n
+
+, and P δ 
+
+> 2,n
+
+= −(Rδ
+
+> 2,n )′
+> Rδ
+> 2,n
+
+.
+
+11. To stabilize the reconstruction of Pi(t) for i = 1 , 2, we add Tikhonov regularization. Since Pi(t) = − ddt ln Ri(t), at first we regularize gδi (t) = ln Rδi (t) by solving 
+
+gδi,α = argmin g{|| g − gδi || 22 + αi|| D2g|| 22},
+
+where || D2g|| 22 = PN −1
+
+> n=1
+
+ gn−1−2gn+gn+1 
+
+> h2
+
+2, then calculate P δi,α (t) = −D1gδi,α (t) which is more stable than directly differentiating the oscillatory Rδi , where D1 differentiates the regularized logarithmic function and αi > 0 is the Tikhonov regularization param-eter selected automatically by generalized cross-validation αi = argmin α> 0 GCV i(α)
+
+where GCV i(α) = 1   
+
+> N+1 || (I−Hα)gδi|| 22
+
+(1− tr (Hα )  
+
+> N+1
+
+)2 and Hα = ( I + αD T 
+
+> 2
+
+D2)−1.
+
+Figure 1: Reconstruction of unregulated R1(t) for different noise levels δ = 1% , 2% , 5% and N = 100 .
+
+Figure 1 presents the reconstruction of the auxiliary coefficient R1(t) for noise levels 
+
+δ = 1% , 2% , 5% , using N = 100 time steps. The noise is introduced through the Stefan boundary measurement, after which Rδ
+
+> 1
+
+(t) is reconstructed through the auxiliary initial-value problem solved numerically by the RK4 scheme. The numerical curves show very good agreement with the exact solution. For δ = 1% , the noisy reconstruction is almost indistinguishable from the exact curve, while only small deviations appear for δ = 2% .At δ = 5% , the perturbations become more visible, particularly toward larger values of t,35 where R1(t) itself has increased substantially. Nevertheless, the reconstruction retains the correct increasing behavior and remains concentrated around the exact solution. Figure 2 gives the corresponding results for R2(t). Unlike R1(t), the exact R2(t) de-creases over the considered time interval. Again, the approximations obtained with 1% and 2% noise follow the exact solution very closely, whereas the 5% case displays more no-ticeable local fluctuations. An important observation is that the reconstruction procedure performs well for coefficients having qualitatively different dynamics: R1(t) is increasing whereas R2(t) is decreasing. Hence, the method is not restricted to a particular mono-tonic behavior of the unknown temporal factor. Furthermore, the noisy Rδ
+
+> 2
+
+(t) remains positive in the numerical experiment, which is important for the subsequent logarithmic representation used to recover P2(t).         
+
+> Figure 2: Reconstruction of unregulated R2(t)for different noise levels δ= 1% ,2% ,5% and N= 100 .
+
+Figure 3 is particularly important because it reveals the principal numerical difficulty of the inverse reaction-coefficient problem. Although Figures 1 and 2 show that Rδ
+
+> 1
+
+(t) and 
+
+Rδ
+
+> 2
+
+(t) can be reconstructed accurately, the directly reconstructed P δ 
+
+> 1
+
+(t) and P δ 
+
+> 2
+
+(t) exhibit strong oscillations even for the relatively small noise level δ = 2% . Differentiation is well known to amplify high-frequency perturbations. Consequently, small pointwise fluctuations in Rδi (t), which are almost visually negligible in Figures 1 and 2, become large fluctuations after differentiation. Figure 3 illustrates this effect very clearly: the noisy values fluctuate substantially above and below the exact curves, while the underlying exact P1(t) and P2(t)
+
+are smooth. Therefore, Figure 3 identifies the main instability mechanism of the numerical 36 inverse problem. The unstable behavior does not primarily originate from reconstruction of Ri(t); rather, it is introduced during the differentiation required to recover Pi(t). This observation provides the numerical motivation for introducing Tikhonov regularization.          
+
+> Figure 3: Reconstruction of unregulated P1(t)and P2(t)at noise level δ= 2% and N= 100 .
+
+Figure 4 demonstrates the principal improvement of the proposed numerical recon-struction. Instead of directly differentiating Rδi (t), the method first introduces gδi (t) = ln Rδi (t) and determines a regularized approximation by solving gδi,α = argmin g{|| g − gδi || 22 +
+
+αi|| D2g|| 22}. The reaction coefficient is subsequently calculated as P δi,α (t) = −D1gi,α (t).Thus, the second-derivative penalty suppresses rapid artificial oscillations before numeri-cal differentiation is performed. The paper uses generalized cross-validation to determine αi
+
+automatically. In contrast with Figure 3, the reconstructed curves in Figure 4 are smooth and remain close to the exact coefficients for all three noise levels δ = 1% , 2% , 5% .In particular, the regularized P1(t) preserves the increasing behavior of the exact negative coefficient, whereas P2(t) correctly preserves its positive decreasing behavior. Even at 5% noise, the global temporal structure of both coefficients is recovered successfully. Reg-ularization therefore transforms an unstable differentiation problem into a numerically stable reconstruction problem. Consequently, Figure 4 demonstrates not merely a visually smoother approximation but a substantial stabilization of the inverse reconstruction. The price of regularization is a small smoothing bias, most visible close to the endpoints, but this bias is considerably smaller than the large variance and oscillations observed without regularization. Figure 5 provides a quantitative assessment of the regularized reconstructions through the absolute errors |P δi,α (t) − Pi(t)| with i = 1 , 2. For both coefficients, the error gener-ally increases as the noise level changes from 1% to 2% and then to 5%. However, the errors remain bounded throughout the entire time interval. From the displayed results, even for δ = 5% , the largest error is approximately 4.5 × 10 −2 for P1(t) and approxi-mately 1.5 × 10 −2 for P2(t). The larger errors close to the endpoints are also consistent with the numerical procedure. Derivative estimation is inherently less accurate near the boundaries, where centered finite differences cannot be applied in the same manner as at interior points. Moreover, smoothing methods frequently exhibit some boundary bias. The 37 Figure 4: Reconstruction of regulated P1(t) and P2(t) at different noise levels δ = 1% , 2% , 5% with  
+
+> N= 100 .
+
+important result is therefore not that the reconstruction becomes completely independent of measurement noise, but rather that the effect of noise remains controlled and quan-titatively bounded after regularization. Figure 5 consequently supplies direct numerical evidence of stability with respect to perturbations in the Stefan data. It also shows that 
+
+P2(t) is reconstructed with a smaller absolute error than P1(t) for this particular numerical example, indicating that the two reaction coefficients may have different sensitivities to the same level of boundary perturbation.            
+
+> Figure 5: Absolute errors of regularized P1(t)and P2(t)at different noise levels δ= 1% ,2% ,5% with
+> N= 100 .
+
+Figure 6 demonstrates how generalized cross-validation determines the regularization parameters α1 and α2. The selected parameter corresponds to the minimum of each GCV curve. A clear and physically meaningful tendency is observed: the optimal regularization parameter increases with increasing noise level. More highly contaminated data there-fore require stronger smoothing. This behavior is exactly what should be expected from a well-balanced regularization procedure. The fact that α1 and α2 are different is also 38 Figure 6: Generalized cross-validation (GCV) curves for selection α1 and α2 to reconstruct the regularized           
+
+> P1(t)and P2(t)at different noise levels δ= 1% ,2% ,5% with N= 100 .
+
+significant. It shows that GCV adapts independently to the numerical sensitivity and scale of each phase instead of imposing the same arbitrary smoothing parameter on both coefficients. Figure 6 therefore adds an important methodological contribution: the regu-larization parameter does not need to be manually chosen. The GCV criterion provides a reproducible and data-driven mechanism for selecting the amount of regularization, reduc-ing subjectivity and avoiding both under-regularization, which leaves noise in the solution, and over-regularization, which would excessively distort the true coefficient. 
+
+6. Conclusion 
+
+In this paper, we investigated inverse two-phase Stefan type problems for heat equations with time-dependent source and reaction coefficients. The main objective was to determine the temperature distributions in two phases together with unknown temporal coefficients appearing in the governing parabolic equations. The mathematical models were formu-lated in domains with moving boundaries, and suitable transformations were introduced to reduce the original free-boundary problems to equivalent problems on a fixed spatial interval. For the first problem, the original two-phase Stefan problem was transformed into a system of parabolic equations with homogeneous boundary conditions on the fixed domain 
+
+(0 , 1) . Using the eigenfunctions of the corresponding Sturm–Liouville problem, the weak solution was represented in the form of a Fourier series. Three types of additional informa-tion were considered: an integral overdetermination condition, a single observation point, and a non-local condition. For each case, reconstruction formulas for the unknown time-dependent source coefficients were obtained. These formulas were reduced to Volterra inte-gral equations, which allowed us to establish the existence and uniqueness of the recovered coefficients under appropriate regularity, compatibility, and non-degeneracy assumptions. Furthermore, the convergence of the spectral series was justified by using integration by parts, the Cauchy–Schwarz inequality, Bessel-type estimates, and Gronwall’s inequality. 39 These estimates ensured the boundedness of the reconstructed coefficients and the corre-sponding weak solutions. As a consequence, the existence and uniqueness of weak and strong solutions were established for the transformed problem, and therefore also for the original two-phase Stefan problem. In the second formulation, we considered a two-phase Stefan type problem with Neu-mann boundary conditions and two moving boundaries. In this case, the unknown co-efficients appeared as reaction terms Pi(t)ui(x, t ). By introducing the transformation 
+
+Ri(t) = exp 
+
+
+
+− R t 
+
+> 0
+
+Pi(τ ), dτ 
+
+
+
+, i = 1 , 2, the original inverse reaction-coefficient problem was reduced to an inverse source-coefficient problem. The Stefan conditions at the moving boundaries provided the necessary relations for determining the auxiliary functions R1(t)
+
+and R2(t). Once these functions were recovered, the original reaction coefficients were uniquely reconstructed by Pi(t) = −R′ 
+
+> i(t)
+> Ri(t)
+
+, i = 1 , 2. Thus, the second problem showed that the free-boundary conditions themselves can serve as sufficient information for recovering the unknown time-dependent coefficients, without imposing additional overdetermination conditions. An illustrative example was also provided to demonstrate the applicability of the pro-posed approach. The example confirmed that the spectral method leads to explicit rep-resentations of the transformed temperature functions and to integral equations for the unknown coefficients. The results of this work contribute to the theory of inverse Stefan problems by combin-ing fixed-domain transformations, spectral decompositions, and Volterra integral equation techniques. The obtained existence, uniqueness, and regularity results provide a rigorous analytical basis for identifying time-dependent coefficients in phase-change heat trans-fer models. Future research may focus on numerical reconstruction algorithms, stability estimates with respect to noisy data, and extensions to nonlinear thermal coefficients, multidimensional geometries, and more general boundary conditions. 
+
+Acknowledgments 
+
+The research is supported by the Science Committee of the Ministry of Science and Higher Education of the Republic of Kazakhstan. (Grant No. AP32722175). 
+
+Conflict of interest 
+
+The authors declares no conflict of interest. 
+
+Funding 
+
+The research is supported by the Science Committee of the Ministry of Science and Higher Education of the Republic of Kazakhstan. (Grant No. AP32722175). 
+
+Ethical approval 
+
+This work don’t need the approval from any ethics committees. 
+
+Availability of data and materials 
+
+Data sharing is not applicable to this article as no datasets were generated or analysed during the current study. 
+
+Author Contributions Statement Targyn Nauryz: Conceptualization, Methodology, Supervision, Writing – original draft, writing - review and editing. 40 References 
+
+[Chen(2021)] H. Chen and H.-G. Chen. Estimates of Dirichlet eigenvalues for a class of sub-elliptic operators , Proc. London Math. Soc., 122 (2021), 808–847. [CarVaz(1995)] L. A. Caffarelli, J. L. V ´azquez. A free-boundary problem for the heat equa-tion arising in flame propagation , Transactions of the American Mathematical Society, 
+
+347(2) (1995), 411—441. [ClaRinRod(2003)] H. R. Clark, M. A. Rincon, R. D. Rodrigues. Beam Equation with weak-internal damping in domain with moving Boundary , Applied Numerical Mathematics, 
+
+47(2) (2003), 139–157. [RinIShih(2004)] M. A. Rincon, I-Shih Liu. Existence and Uniqueness of solutions of elastic string with moving ends , Mathematical Methods in the Applied Sciences. 27 (2004), 1641–1655. [Sher(1971)] B. Sherman. General one-phase Stefan problem and free-boundary problems for the heat equation with Cauchy data prescribed on the free boundary . SIAM J. Appl. Math., 20(4) (1971), 555—570. [Chow(2021)] Y. T. Chow, et al. Surface-localized transmission eigenstates, super-resolution imaging, and pseudo surface plasmon modes , SIAM J. Imaging Sci., 14 (2021), 946-975. [Cannarsa(2010)] P. Cannarsa, J. Tort, M. Yamamoto. Determination of source terms in a degenerate parabolic equation , Inverse Problems, 26(10) (2010), 105003. [Cannon(1991)] J. R. Cannon, Y. Lin, S. Wang. Determination of a control parameter in a parabolic partial differential equation , J. Aust. Math. Soc. Ser. B, 33 (1991), 149-163. [CannonRun(1991)] J. R. Cannon, W. Rundell. Recovering a time dependent coefficient in a parabolic differential equation , J. Math. Anal. Appl., 160 (1991), 572-582 [Gol’dman(1970)] M. L. Gol’dman. Estimates of the eigenfunctions of Laplace’s operator in certain domains , Differ. Uravn., 6 (1970), 2030-2040. [HazLesIsm(2019)] A. Hazanee, D. Lesnic, M. I. Ismailov, N. B. Kerimov. Inverse time-dependent source problems for the heat equation with nonlocal boundary conditions , Ap-plied Mathematics and Computation, 346 (2019), 800-815. [Ivanchov(2003)] M. Ivanchov. Inverse Problems for Equations of Parabolic Type , Math. Stud. Monogr. Ser., 10 VNTL Publishers, Lviv, 2003. [KarOzaSur(2020)] M. Karazym, T. Ozawa, D. Suragan. Multidimensional inverse Cauchy problems for evolution equations , Inverse Probl. Sci. En., 28 (2020), 1582-1590 [Lesnic(2022)] D. Lesnic. Inverse Problems with Applications in Science and Engineering ,CRC Press, Boca Raton, FL, 2022. 41 [IsmOzaSur(2024)] M. I. Ismailov, T. Ozawa, D. Suragan. Inverse problems of identifying the time-dependent source coefficient for subelliptic heat equations , Inverse Problems and Imaging, 18(4) (2024), pp.813-823. [Evan(2010)] L. C. Evans, Partial Differential equation , AMS, Providence, 2010. [Dragomir(2022)] S. S. Dragomir, Some Gronwall Type Inequalities and Applications ,RGMIA Monographs, Victoria University, Australia, 2002. [KerIsm(2015)] N.B. Kerimov, M. I. Ismailov, Direct and inverse problems for the heat equation with a dynamic-type boundary condition , IMA Journal of Applied Mathematics, 
+
+80(5) (2015), pp. 1519–1533, [DerSad(2024)] B. Derbissaly, M. Sadybekov, Inverse source problem for multi-term time-fractional di usion equation with nonlocal boundary conditions , AIMS Mathematics, 9(4) 
+
+(2024), pp. 9969-9988. [NauKhum(2025)] T.A. Nauryz, Kh. Jabbarkhanov. Inverse Stefan problems of determining the time-dependent source coefficient and heat flux function , (2025), arXiv:2501.11332. 42
