@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-30",
+  "date": "2026-07-30",
+  "generated_at": "2026-07-30T21:42:13",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/30/2607.25444v1-accurate-wetting-dynamics-via-a-conservative-allen-cahn-based-lattice-boltzmann-approach-for-multiphase-flows",
+      "section": "deep",
+      "title_en": "Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows",
+      "authors": "Paolo Bello, Luca Mander, Marco Lauricella, Gianmarco Guglielmo, Michele La Rocca, Andrea Montessori",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25444v1",
+      "score": "8.0",
+      "evidence": "提出了一种具有精确润湿边界条件的保守Allen-Cahn格子玻尔兹曼多相流方法，与降膜模拟相关",
+      "tldr": "针对多相流中润湿动力学的精确模拟，提出基于保守Allen-Cahn方程的格子Boltzmann局部几何润湿边界条件。该方法利用ghost节点局部重建壁面法线，通过供体流体外推确定相场值，并结合全局体积校正保持质量守恒。数值实验验证了静态接触角、液滴铺展、撞击疏水表面及重力驱动通过孔口等多种场景，准确恢复平衡角，复现接触角相关的铺展指数（约1/2至1/4）和经典We^{1/4}标度律，并成功预测捕获、释放与断裂的转变。该工作为复杂几何下的润湿控制流动提供了精确且可扩展的模拟框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this work we propose a local geometric wetting boundary condition for a conservative Allen--Cahn-based lattice Boltzmann framework. The prescribed contact angle is imposed through ghost phase-field values constructed from a locally reconstructed wall normal and a donor-fluid extrapolation. The ghost-node wetting update is local, geometrically consistent, and compatible with thread-safe large-scale implementations, while phase-field mass is controlled through a separate global volume correction. Validation includes static contact-angle tests, short-time droplet spreading, impact on a hydrophobic surface, and gravity-driven motion through a sharp-edged orifice. The simulations recover the imposed equilibrium angles, reproduce contact-angle-dependent spreading exponents between approximately 1/2 and 1/4, and follow the classical W e1/4 maximum-deformation scaling. The model also captures the transition between capture, release, and release with breakup. The proposed approach provides an accurate and scalable framework for wetting-controlled flows in complex geometries.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

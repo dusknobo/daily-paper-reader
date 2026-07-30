@@ -1,0 +1,1204 @@
+Title: Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows
+
+URL Source: https://arxiv.org/pdf/2607.25444v1
+
+Published Time: Wed, 29 Jul 2026 00:41:38 GMT
+
+Number of Pages: 34
+
+Markdown Content:
+Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows 
+
+Paolo Bello, 1 Luca Mander, 1 Marco Lauricella, 2 Gianmarco Guglielmo, 2 Michele La Rocca, 1 and Andrea Montessori 1, a) 1) Department of Civil, Computer Science and Aeronautical Technologies Engineering, Roma Tre University, Via Vito Volterra, 00146 Rome, Italy 
+
+> 2)
+
+Istituto per le Applicazioni del Calcolo, Consiglio Nazionale delle Ricerche, Via dei Taurini 19, 00185 Rome, Italy 
+
+(Dated: 29 July 2026) 
+
+In this work we propose a local geometric wetting boundary condition for a con-servative Allen–Cahn-based lattice Boltzmann framework. The prescribed contact angle is imposed through ghost phase-field values constructed from a locally recon-structed wall normal and a donor-fluid extrapolation. The ghost-node wetting up-date is local, geometrically consistent, and compatible with thread-safe large-scale implementations, while phase-field mass is controlled through a separate global vol-ume correction. Validation includes static contact-angle tests, short-time droplet spreading, impact on a hydrophobic surface, and gravity-driven motion through a sharp-edged orifice. The simulations recover the imposed equilibrium angles, repro-duce contact-angle-dependent spreading exponents between approximately 1 /2 and 1/4, and follow the classical W e 1/4 maximum-deformation scaling. The model also captures the transition between capture, release, and release with breakup. The pro-posed approach provides an accurate and scalable framework for wetting-controlled flows in complex geometries. 
+
+> a) Electronic mail: andrea.montessori@uniroma3.it
+
+1arXiv:2607.25444v1 [physics.flu-dyn] 28 Jul 2026 I. INTRODUCTION 
+
+Wetting is one of the key mechanisms through which solid boundaries control the dynam-ics of multiphase flows 1–3 . The affinity between a fluid interface and a solid surface governs the pathways by which droplets spread or retract, liquids invade or bypass pore throats, and menisci remain pinned, depin, fragment, or pass through geometric constrictions 4. These processes are central to a broad range of natural and technological systems, including coat-ing and printing 5, microfluidics 6,7 , emulsification 8, enhanced oil recovery 9,10 , groundwater remediation 11 , geological carbon storage, and reactive transport in porous and fractured media 12 . In all these configurations, the macroscopic flow response is strongly affected by contact-line motion and by the local balance between capillary, viscous, inertial, and gravi-tational forces at solid boundaries. A predictive numerical description of wetting-controlled multiphase flows is therefore challenging for at least three reasons. First, the contact angle must be imposed accurately at the diffuse-interface level while recovering the desired macroscopic wetting behavior. Sec-ond, the method must remain reliable when interfaces undergo large deformations, interact with sharp edges, or move across complex solid geometries. Third, the wetting formulation should be compatible with conservative interface transport, variable material properties, and massively parallel implementations, since realistic three-dimensional applications often involve large domains, highly irregular solid boundaries, and long-time interface evolution. Diffuse-interface and phase-field methods provide a natural framework for this class of problems, since the interface is represented by a continuous order parameter, which takes approximately constant values in the bulk phases and varies smoothly across a thin interfa-cial region. This description allows topological changes, interface deformation, and capillary forces to be treated without explicit interface reconstruction 13 . In particular, conservative Allen–Cahn (CAC) formulations have attracted increasing attention because they retain the interface-capturing capability of diffuse-interface methods while improving mass conserva-tion and controlling the interface thickness through a second-order spatial operator 14,15 .When coupled to lattice Boltzmann methods, CAC formulations provide a flexible and efficient framework for simulating multiphase flows with complex boundaries, local forcing, and large density or viscosity contrasts 16–20 , while retaining a lower computational complex-ity than formulations based on the fourth-order Cahn–Hilliard equation 21,22 .2However, imposing wettability in CAC formulations remains non-trivial because the second-order phase-field equation requires a single boundary condition for the order parameter 23,24 .At an impermeable wall, conservation requires the phase-field flux to satisfy a no-flux con-dition, whereas a prescribed contact angle is commonly enforced through an inhomogeneous Neumann condition derived either from a wall-energy formulation or from the local interface geometry 23,25,26 . Except for neutral wetting, these two conditions are not generally equiva-lent. Consequently, although the CAC equation remains conservative in the bulk, the wall treatment may introduce a small gain or loss of phase-field mass when the available bound-ary condition is used to impose wettability. An additional compatibility mechanism, such as a source term, a Lagrange multiplier, or a conservative volume-redistribution procedure, may therefore be required 23,24 .A second challenge concerns the geometrical realization of wetting boundary conditions beyond simple planar walls. Schemes formulated for a prescribed Cartesian wall direction may become ambiguous on voxelized solids and near corners or sharp edges, where the local wall orientation must be reconstructed from the surrounding fluid–solid geometry. Existing approaches address this problem either by reconstructing ghost or virtual phase-field values from the local interface profile 27 , or by imposing the order-parameter gradient directly at fluid boundary nodes through compact local stencils 28 . A robust wetting formulation should therefore combine compatibility with phase-field mass conservation, a local reconstruction of the wall geometry, and an implementation suitable for large-scale lattice Boltzmann sim-ulations. In this work, building on geometric contact-angle formulations for diffuse-interface methods 25,29 and ghost-value reconstruction strategies developed for phase-field lattice Boltzmann models 27 , we develop and validate a local geometric wetting boundary con-dition for the conservative Allen–Cahn-based lattice Boltzmann framework introduced in Ref. 16 . The local wall normal is reconstructed from the fluid–solid occupancy, a donor fluid node is selected according to its alignment with this normal, and the phase field is extrapolated along the corresponding donor-to-solid lattice direction so that the prescribed contact angle is satisfied. In contrast to ghost-value reconstructions based on the local hyperbolic-tangent interface profile 23 , the proposed construction relies directly on the local voxelized geometry. Compared with direct-gradient schemes 28 , it retains a local and ex-plicit ghost-node formulation, while phase-field mass is controlled through a separate global 3constraint whose correction is redistributed over the diffuse-interface region. The accuracy and robustness of the method are assessed through four complementary benchmarks of increasing complexity. Static droplets on a flat wall test the recovery of the prescribed equilibrium contact angle over a broad range of wettabilities. Short-time spread-ing then examines the contact-angle-dependent inertial–capillary dynamics, while droplet impact on a hydrophobic surface tests the wetting treatment under finite-velocity impact and large deformation over a range of Weber numbers. Finally, gravity-driven droplet motion through a sharp-edged orifice is compared with experimental regime maps. This last con-figuration provides a stringent test of the combined effects of wetting, contact-line motion, edge pinning, confinement, large deformation, and breakup. 
+
+II. METHODS A. Coupled recursive-regularized thread-safe lattice Boltzmann and finite-difference MUSCL scheme for the Navier–Stokes–conservative Allen–Cahn equations 
+
+The hydrodynamics of the two-component system is solved using a thread-safe lat-tice Boltzmann (LB) method implemented in accLB 17,30 , coupled to an interface-capturing phase-field solver. The numerical framework combines a variable-density, variable-viscosity LB formulation for the Navier–Stokes equations with a conservative Allen–Cahn equation for the evolution of the phase field. The LB solver is designed to satisfy two main re-quirements. First, the update remains fully local on shared-memory architectures, such as GPUs, thereby avoiding race conditions during the streaming–collision step. Second, nu-merical stability at low viscosities is improved through a third-order recursive regularization of the non-equilibrium moments 31 .
+
+Hydrodynamic limit. In the low-Mach- and small-Knudsen-number limits, the dis-crete kinetic formulation recovers the variable-density, variable-viscosity Navier–Stokes equations 32,33 
+
+∂tρ + ∇ · (ρu) = 0 , (1) 
+
+∂t(ρu) + ∇ · (ρu ⊗ u) = −∇ p + ∇ · ρν  ∇u + ( ∇u)T  + Fσ + Fext . (2) 4Here ρ denotes the mixture density, u the velocity, ν the kinematic viscosity, and p the hydrodynamic pressure. The term Fσ is the capillary force density associated with the diffuse interface, while Fext accounts for possible external body forces. 
+
+Discrete kinetic equation and thread-safe update. We use a q-speed lattice stencil, specif-ically D3Q27 in the present implementation, with discrete velocities {ci}q−1 
+
+> i=0
+
+, quadrature weights {wi}, and lattice time step ∆ t = 1. The LB evolution equation reads 34 
+
+fi(x + ci, t + 1) = fi(x, t ) + ω [f eq  
+
+> i
+
+(x, t ) − fi(x, t )] + Si(x, t ), (3) where fi are the discrete populations, ω is the relaxation frequency, and Si is the discrete forcing term 35 . The kinematic viscosity is related to ω by 
+
+ν = c2
+
+> s
+
+ 1
+
+ω − 12
+
+
+
+, (4) where cs is the lattice sound speed 36 .Following the thread-safe formulation 16,37 , both the equilibrium and non-equilibrium com-ponents of the distribution function are reconstructed from local macroscopic quantities through the Hermite expansions detailed below. Therefore, each lattice node can be up-dated independently, without concurrent read/write access to neighboring populations. This single-pass streaming–collision strategy avoids memory race conditions and is well suited to shared-memory parallel architectures, including GPU accelerators. 
+
+Macroscopic fields. We adopt the incompressible-pressure formulation 33 , in which the zeroth kinetic moment provides a dimensionless pressure-like variable p∗. The physical pressure is defined as 
+
+p = ρc 2 
+
+> s
+
+p∗. (5) The macroscopic fields are recovered as 
+
+p∗(x, t ) = X
+
+> i
+
+fi(x, t ), (6) 
+
+u(x, t ) = X
+
+> i
+
+fi(x, t )ci + 12
+
+X
+
+> i
+
+Si(x, t )ci. (7) The density ρ and viscosity ν are spatially varying quantities determined by the phase field through mixture laws. 
+
+Mixture properties and relaxation frequency. The local material properties are prescribed as functions of the phase field ϕ ∈ [0 , 1], with ϕ = 0 denoting the gas phase and ϕ = 1 the 5liquid phase. The density is interpolated as 
+
+ρ(ϕ) = ρg + ( ρℓ − ρg) ϕ, (8) while the dynamic viscosity is interpolated linearly as 32 
+
+μ(ϕ) = μg + ( μℓ − μg) ϕ. (9) The kinematic viscosity follows from ν(ϕ) = μ(ϕ)/ρ (ϕ). The relaxation frequency is therefore local and reads 
+
+ω(ϕ) = 
+
+12 + ν(ϕ)
+
+c2
+
+> s
+
+−1
+
+, τ (ϕ) = ω(ϕ)−1. (10) The same density field is used consistently in the pressure relation p = ρc 2 
+
+> s
+
+p∗.
+
+Third-order equilibrium. The equilibrium populations are constructed from a third-order Hermite expansion in Mach number 31,38,39 :
+
+f eq  
+
+> i
+
+= wi
+
+"
+
+p∗ + ci · u
+
+c2
+
+> s
+
++ H(2)  
+
+> i
+
+: ( u ⊗ u)2c4
+
+> s
+
++ H(3) 
+
+> i
+
+... ( u ⊗ u ⊗ u)6c6
+
+> s
+
+#
+
+, (11) where “:” denotes double contraction between second-order tensors and “ ...” denotes triple contraction between third-order tensors. The second- and third-order Hermite tensors are 
+
+H(2)  
+
+> i
+
+= ci ⊗ ci − c2 
+
+> s
+
+I, (12) 
+
+H(3)  
+
+> i
+
+= ci ⊗ ci ⊗ ci − c2 
+
+> s
+
+S (ci ⊗ I) , (13) with I the identity tensor and S(·) denoting the unnormalized sum over the three distinct index permutations. 
+
+Recursive regularization of non-equilibrium populations. The populations are decomposed as 
+
+fi = f eq  
+
+> i
+
++ f neq  
+
+> i
+
+,
+
+and the non-equilibrium contribution is reconstructed up to third order as 
+
+f neq  
+
+> i
+
+= wi
+
+"
+
+H(2)  
+
+> i
+
+: A(2) neq 
+
+2c4
+
+> s
+
++ H(3) 
+
+> i
+
+...A(3) neq 
+
+6c6
+
+> s
+
+#
+
+, (14) where A(2) neq is the symmetric second-order non-equilibrium moment, while A(3) neq is obtained by Hermite recursivity 40 . At the Navier–Stokes level, the second-order non-equilibrium moment can be expressed in gradient form as 
+
+A(2) neq = −c2
+
+> s
+
+ω
+
+∇(u) + ∇(u)T  , (15) 6and the third-order tensor is reconstructed recursively as 
+
+A(3) neq = S  u ⊗ A(2) neq 
+
+ . (16) The regularization can thus be interpreted as a projection of f neq  
+
+> i
+
+onto the Hermite subspace spanned by moments up to third order. This filters higher-order ghost modes and improves robustness in low-viscosity and high-Reynolds-number regimes. 
+
+Forcing scheme and multiphase force decomposition. Body forces are incorporated through the Guo forcing scheme 35 ,
+
+Si = wi
+
+ci − u
+
+c2
+
+> s
+
++ (ci · u)
+
+c4
+
+> s
+
+ci
+
+
+
+· F, (17) and are implemented consistently with trapezoidal time integration by shifting the equilib-rium populations, equivalently using f eq  
+
+> i
+
+← f eq  
+
+> i
+
+− 12 Si in the collision step. For multiphase flows with strong density and viscosity variations, the total force is de-composed as 33 
+
+F = Fσ + Fp + Fν + Fext . (18) The capillary force is written in chemical-potential form 41 ,
+
+Fσ = μϕ∇ϕ, (19) where μϕ is the chemical potential associated with the phase field and defined as, μϕ =4β(ϕ − ϕl)( ϕ − ϕg)( ϕ − ϕ0) − κϕ∂2
+
+> α
+
+ϕ, where β = 12 σ/δ and κϕ = 3 σδ/ 241 .Since the pressure is defined as p = ρc 2 
+
+> s
+
+p∗, its gradient can be decomposed as 
+
+∇p = ρc 2 
+
+> s
+
+∇p∗ + p∗c2 
+
+> s
+
+∇ρ. 
+
+The first contribution is embedded in the equilibrium populations, whereas the second is introduced explicitly through the correction force 
+
+Fp = −p∗c2 
+
+> s
+
+∇ρ. (20) To recover the variable-coefficient viscous operator in Eq. (2), an additional correction pro-portional to ∇ρ is included by exploiting the relation between the second-order kinetic moment and the deviatoric stress 42 . In compact tensor form, this correction reads 
+
+Fν = −νω c2
+
+> s
+
+"X
+
+> i
+
+(fi − f eq  
+
+> i
+
+) ( ci ⊗ ci)
+
+#
+
+· ∇ ρ, (21) 7where “ ·” denotes contraction of the second-order tensor with the vector ∇ρ.
+
+Discrete derivatives. Gradients and Laplacians of scalar fields, such as ρ, ϕ, and μϕ, are evaluated using isotropic lattice-consistent finite-difference stencils 43,44 :
+
+∇Ψ( x) = 1
+
+c2
+
+> s
+
+X
+
+> i
+
+wiΨ( x + ci)ci, (22) 
+
+∇2Ψ( x) = 2
+
+c2
+
+> s
+
+X
+
+> i̸=0
+
+wiΨ( x + ci) − (1 − w0)Ψ( x)
+
+!
+
+, (23) where Ψ denotes a generic scalar field. 
+
+1. MUSCL scheme discretization for the conservative Allen–Cahn equation 
+
+Conservative Allen–Cahn equation. The interface is represented by a phase field ϕ ∈ [0 , 1], with ϕ = 1 corresponding to the liquid phase and ϕ = 0 to the gas phase. The diffuse interface is conventionally located at ϕ0 = 1 /2. Following our previous work 16 , the evolution of ϕ is governed by the CAC equation 45 :
+
+∂ϕ ∂t + u · ∇ ϕ = D∇2ϕ − κ∇ · [ϕ(1 − ϕ)n] , (24) where D is a constant interface diffusivity and n is the interface normal, 
+
+n = ∇ϕ
+
+|∇ ϕ|. (25) The last term in Eq. (24) is a compressive, anti-diffusive flux that counteracts numerical diffusion and maintains a smooth but sharp hyperbolic-tangent-like interface profile across a prescribed thickness δ. The compression strength is related to the diffusivity through 
+
+κ = 4Dδ , (26) so that the interface remains close to the target thickness during the simulation. 
+
+Conservative flux form. For numerical robustness and improved conservation at the discrete level, the advective contribution is written in conservative form. Introducing the advective flux 
+
+Fa = uϕ, 
+
+Eq. (24) is advanced in the form 
+
+∂ϕ ∂t + ∇ · (uϕ) = D∇2ϕ − κ∇ · [ϕ(1 − ϕ)n] , (27) 8which allows the transport of ϕ to be discretized through a flux-difference update. 
+
+Discrete update in lattice units. At a fluid node ( i, j, k ), the discrete update is written as 
+
+ϕn+1  
+
+> ijk
+
+= ϕnijk − (∇h · Fa)ijk + D(∇2
+
+> h
+
+ϕ)ijk + Scomp  
+
+> ijk
+
+, (28) where ∇h denotes the discrete Cartesian operators and Scomp is the discrete form of the compressive term 
+
+−κ∇ · [ϕ(1 − ϕ)n] .
+
+A double-buffering strategy is used for the phase field, and the update is applied only to fluid nodes, while solid nodes are excluded from the evolution step. 
+
+3D MUSCL–TVD minmod conservative advection for ϕ
+
+Face fluxes and discrete divergence. Assuming unit lattice spacing, ∆ x = ∆ y = ∆ z = 1, the discrete divergence of the advective flux is computed as (∇h · Fa)ijk =
+
+
+
+F xi+ 12 ,j,k − F xi− 12 ,j,k 
+
+
+
++
+
+
+
+F yi,j + 12 ,k − F yi,j − 12 ,k 
+
+
+
++
+
+
+
+F zi,j,k + 12
+
+− F zi,j,k − 12
+
+
+
+, (29) where the face fluxes are 
+
+F xi+ 12 ,j,k = ui+ 12 ,j,k ϕup   
+
+> i+12,j,k
+
+, F yi,j + 12 ,k = vi,j + 12 ,k ϕup   
+
+> i,j +12,k
+
+, F zi,j,k + 12
+
+= wi,j,k + 12
+
+ϕup  
+
+> i,j,k +12
+
+. (30) The face-centered velocities are obtained by arithmetic interpolation of neighboring cell-centered values; for example, 
+
+ui+ 12 ,j,k = 12 (ui,j,k + ui+1 ,j,k ) ,
+
+with analogous expressions for v and w.
+
+MUSCL reconstruction with minmod limiter. The upwind value ϕup at each face is com-puted through a MUSCL piecewise-linear reconstruction limited by the minmod function, which ensures the TVD property. Along the x direction, the limited slope at cell ( i, j, k ) is 
+
+sxi,j,k = minmod ( ϕi,j,k − ϕi−1,j,k , ϕ i+1 ,j,k − ϕi,j,k ) , (31) with minmod( a, b ) = 
+
+
+
+0, ab ≤ 0,
+
+sign( a) min( |a|, |b|), ab > 0.
+
+(32) 9The left and right reconstructed states at the face i + 12 are 
+
+ϕLi+ 12 ,j,k = ϕi,j,k + 12sxi,j,k , ϕRi+ 12 ,j,k = ϕi+1 ,j,k − 12sxi+1 ,j,k , (33) and the upwind state is selected as 
+
+ϕup    
+
+> i+12,j,k
+
+=
+
+
+
+ϕLi+ 12 ,j,k , ui+ 12 ,j,k ≥ 0,ϕRi+ 12 ,j,k , ui+ 12 ,j,k < 0.
+
+(34) The same reconstruction and upwind selection are applied in the y and z directions by replacing ( i, u ) with ( j, v ) and ( k, w ), respectively. The resulting scheme is second-order accurate in smooth regions, while reverting locally to first order near sharp gradients, thereby suppressing spurious oscillations at the interface. 
+
+Stencil requirements and boundary handling. The computation of the minmod slopes at neighboring cells requires access to phase-field values up to two grid points away in each coordinate direction. Two buffer layers are therefore used in each direction. In periodic domains, these layers are filled by wrap-around; otherwise, they are populated consistently with the imposed boundary conditions. 
+
+Discrete compressive term and isotropic divergence 
+
+The compressive contribution in Eq. (24) is written as the divergence of the compressive flux 
+
+Fc = ϕ(1 − ϕ)n.
+
+Its discrete divergence is evaluated using an isotropic D3Q27-based stencil that combines axis, face-diagonal, and body-diagonal contributions with weights ( p1, p 2, p 3). Denoting by 
+
+a = ( ax, a y, a z )the discrete compressive vector field, or equivalently the discrete representation of Fc, the source term is computed as 
+
+Scomp  
+
+> ijk
+
+= −κ(∇h · a)ijk , (35) where κ is the sharpening coefficient. The use of an isotropic stencil reduces grid-orientation errors and yields a compressive contribution consistent with the discrete operators used in the LB solver. 10 B. Implementation of the contact angle in the conservative Allen-Cahn equation model 
+
+The multiphase solver advances the phase-field variable ϕ ∈ [0 , 1] through a conservative Allen–Cahn equation. Wetting at solid boundaries is imposed by assigning ghost values of ϕ inside the solid region. These ghost values enter the finite-difference stencils of the Allen–Cahn operator at wall-adjacent fluid nodes and enforce the prescribed contact angle in a purely geometric manner. Let Ω f and Ω s denote the fluid and solid regions, respectively, and let xs ∈ Ωs be a solid node adjacent to the fluid. The local geometry of the wall is reconstructed from the set of lattice links connecting xs to neighboring fluid nodes. Let cq be the discrete lattice vectors and define 
+
+Nf (xs) = {q : xs + cq ∈ Ωf } .
+
+An unnormalized local wall normal is obtained as 
+
+enw(xs) = X 
+
+> q∈N f(xs)
+
+wq (−cq), (36) where the weights depend on the lattice-link length, 
+
+wq =
+
+
+
+1, |cq|2 = 1 ,
+
+1/2, |cq|2 = 2 ,
+
+1/3, |cq|2 = 3 .
+
+(37) The unit wall normal is then 
+
+nw = enw
+
+|enw|. (38) With this convention, nw points locally from the neighboring fluid region towards the solid node. If |enw| is smaller than a prescribed tolerance, the node is skipped. A donor fluid node xf is then selected among the neighboring fluid nodes. The donor is chosen as the fluid node most closely aligned with the reconstructed wall normal. For each admissible lattice link, the alignment score is 
+
+Sq = (−cq) · nw
+
+|cq| . (39) 11 The selected donor corresponds to 
+
+q⋆ = arg max 
+
+> q∈D (xs)
+
+Sq, (40) where D(xs) is the set of admissible donor links. In practice, wall-adjacent fluid nodes are considered first; if no such node is available, the search is extended to all neighboring fluid nodes. The donor-to-solid displacement vector is therefore 
+
+rf s = xs − xf = −cq⋆ . (41) At the donor node, the phase-field value is denoted by 
+
+ϕf = ϕ(xf ),
+
+and the local gradient is reconstructed as 
+
+∇ϕf = ∇ϕ(xf ).
+
+The component of the gradient tangent to the reconstructed wall is obtained by removing the wall-normal projection: 
+
+∇∥ϕf = ∇ϕf − (∇ϕf · nw) nw. (42) The prescribed contact angle is imposed by requiring the corrected gradient to form the desired angle with the wall normal. The angle used internally is 
+
+θc = π − θ, (43) where θ is the prescribed physical contact angle. The corresponding wall-normal derivative is 
+
+∂nw ϕ = − ∇∥ϕf cot θc. (44) Equivalently, the corrected gradient satisfying the geometric wetting condition is 
+
+∇ϕc = ∇∥ϕf + ( ∂nw ϕ) nw. (45) For limiting values of the contact angle, the cotangent is regularized by replacing it with a large finite value when | sin θc| falls below a small numerical tolerance. 12 The ghost value inside the solid node is finally obtained by a first-order extrapolation from the donor fluid node along the selected donor-to-solid direction: 
+
+ϕg = ϕf + λs ∇ϕc · rf s . (46) The coefficient 
+
+λs =
+
+q
+
+4ϕf (1 − ϕf ), ϕf = ϕ(xf ), (47) acts as an interfacial localization factor. It is equal to one at the center of the diffuse interface, ϕf = 1 /2, and vanishes in the bulk phases, ϕf = 0 or ϕf = 1. The wetting correction is therefore concentrated in the contact-line region and does not modify ghost values far from the interface. The resulting ghost-node update is summarized in the following pseudo-code:  
+
+> 1:
+
+for all solid nodes xs ∈ Ωs adjacent to the fluid do  
+
+> 2:
+
+Identify the neighboring fluid links 
+
+Nf (xs) = {q : xs + cq ∈ Ωf , cq̸ = 0} 
+
+> 3:
+
+if Nf (xs) = ∅ then  
+
+> 4:
+
+skip the node  
+
+> 5:
+
+end if  
+
+> 6:
+
+Reconstruct the unnormalized wall normal 
+
+enw = P  
+
+> q∈N f(xs)
+
+wq(−cq) 
+
+> 7:
+
+Normalize it as 
+
+nw = enw/|enw| 
+
+> 8:
+
+For each admissible donor link, compute the alignment score 
+
+Sq = (−cq) · nw
+
+/|cq| 
+
+> 9:
+
+Select the donor link 
+
+q⋆ = arg max q∈D (xs) Sq 
+
+> 10:
+
+Define the donor fluid node and donor-to-solid displacement 
+
+xf = xs + cq⋆ , rf s = xs − xf = −cq⋆ 
+
+> 11:
+
+Evaluate the phase-field value and gradient at the donor node 
+
+ϕf = ϕ(xf ), ∇ϕf = ∇ϕ(xf ) 
+
+> 12:
+
+Remove the wall-normal projection 
+
+∇∥ϕf = ∇ϕf − (∇ϕf · nw)nw 
+
+> 13:
+
+Convert the prescribed contact angle according to the normal convention 13 θc = π − θ 
+
+> 14:
+
+Impose the geometric wetting condition 
+
+∂nw ϕ = −|∇ ∥ϕf | cot θc 
+
+> 15:
+
+Construct the corrected gradient 
+
+∇ϕc = ∇∥ϕf + ( ∂nw ϕ)nw 
+
+> 16:
+
+Compute the interfacial localization factor 
+
+λs = p4ϕf (1 − ϕf ), ϕf = ϕ(xf ) 
+
+> 17:
+
+Extrapolate the ghost value 
+
+ϕg = ϕf + λs∇ϕc · rf s  
+
+> 18:
+
+Assign the ghost value to the solid node 
+
+ϕ(xs) ← ϕg 
+
+> 19:
+
+end for 
+
+At the boundary level, each solid node reads only neighboring fluid data and writes ex-clusively to its own ghost value. The wetting update is therefore local and race-free, and is directly compatible with the thread-safe GPU implementation of the hybrid lat-tice Boltzmann–Allen–Cahn solver. The global mass-control procedure described in the next section is separate from this boundary update and requires domain-wide reductions of scalar quantities. 
+
+C. Mass conservation in Allen–Cahn interface tracking in the presence of wetting boundaries 
+
+A conservative Allen–Cahn formulation preserves the total amount of each phase provided that the discrete phase-field flux satisfies a no-flux condition at solid boundaries. This property can be altered in the presence of wetting boundary conditions. In particular, for neutral wetting, corresponding to θ = 90 ◦, the imposed wall-normal derivative of the phase field vanishes. For non-neutral wetting, instead, the geometric contact-angle condition requires a non-zero wall-normal component of ∇ϕ at the solid surface. In a diffuse-interface formulation, this produces a finite phase-field flux across the numerical boundary stencil. As a consequence, even if the bulk Allen–Cahn equation is written in conservative form, the combined action of the finite-difference stencil and the ghost-node wetting condition may lead to a small but systematic gain or loss of the total phase-field mass. 14 Here, by phase-field mass we denote the discrete liquid volume, 
+
+Mϕ(t) = X
+
+> x∈Ωf
+
+ϕ(x, t ) ∆ V, (48) where the sum is restricted to fluid nodes and ∆ V is the lattice-cell volume. In lattice units, ∆V = 1. To remove the boundary-induced mass drift, we enforce a global conservation constraint at each time step by adding a corrective source or sink term to the Allen–Cahn update. This correction can be interpreted as a discrete Lagrange multiplier enforcing conservation of Mϕ.Let M nϕ be the phase-field mass at the beginning of the time step. After applying the wet-ting boundary condition and advancing the conservative Allen–Cahn equation, a tentative field ϕ⋆ is obtained. Its corresponding mass is 
+
+M ⋆ϕ = X
+
+> x∈Ωf
+
+ϕ⋆(x) ∆ V. (49) The mass defect generated during the time step is then ∆Mϕ = M nϕ − M ⋆ϕ . (50) A positive value of ∆ Mϕ indicates that phase-field mass has been lost and must be re-injected, whereas a negative value indicates a mass excess that must be removed. The correction is distributed only over the diffuse-interface region, rather than uniformly over the whole domain. This avoids modifying the bulk phases and preserves the sharpness of the interface. We define an interfacial weight 
+
+χ(x) = 
+
+
+
+ϕ⋆(x) [1 − ϕ⋆(x)] , ϵϕ < ϕ ⋆(x) < 1 − ϵϕ,
+
+0, otherwise ,
+
+(51) where ϵϕ is a small numerical threshold used to identify the diffuse-interface band. The normalization factor is 
+
+W = X
+
+> x∈Ωf
+
+χ(x) ∆ V. (52) Provided that W > 0, the corrected phase field is obtained as 
+
+ϕn+1 (x) = ϕ⋆(x) + ∆Mϕ
+
+W χ(x). (53) 15 Equivalently, this operation corresponds to adding to the conservative Allen–Cahn equation a source term of the form 
+
+SM (x, t ) = λM (t) χ(x), (54) where the scalar multiplier λM is chosen so that the integral constraint on Mϕ is exactly satisfied. In discrete form, 
+
+λM = ∆Mϕ
+
+∆t W . (55) In lattice units, ∆ t = 1. Since the correction is localized by χ, it vanishes in the bulk regions where ϕ ≃ 0 or ϕ ≃ 1and acts only where the diffuse interface is present. The procedure therefore compensates the net boundary-induced mass loss or gain without altering pure phases away from the interface. In practice, the correction is small at each time step but prevents the accumulation of systematic mass errors over long simulations, which is especially important for wetting-controlled dynamics in confined or porous geometries, where contact lines may remain in contact with solid boundaries for long times. 
+
+III. RESULTS A. Static contact-angle test 
+
+The accuracy of the geometric wetting boundary condition was first assessed through a series of static contact-angle tests. The benchmark consists of a liquid droplet resting on a flat solid wall and surrounded by the second fluid. The droplet is initialized as a spherical cap with an apparent contact angle of approximately 90 ◦ and is subsequently allowed to relax toward the equilibrium angle prescribed at the wall. This test therefore verifies whether the ghost-node wetting condition drives the interface toward the target macroscopic contact angle without introducing significant distortions of the equilibrium droplet shape. All simulations were performed in a cubic domain of size 
+
+nx × ny × nz = 256 3
+
+lattice nodes. Unless otherwise stated, all physical and numerical parameters are expressed in lattice units. The initial droplet radius was set to R0 = 40, with its center located at (xc, y c, z c) =  nx 
+
+> 2
+
+, ny 
+
+> 2
+
+, 2 . The bottom boundary was treated as a stationary solid wall, and 16 nz ny nx R₀FIG. 1: Schematic of the static contact-angle benchmark. A droplet of initial radius R0 is placed on the bottom solid wall of a cubic domain of size nx × ny × nz and allowed to relax toward the prescribed equilibrium contact angle. wettability was imposed using the ghost-node construction described in Section II. The two fluids were assigned equal densities and equal kinematic viscosities, 
+
+ρ1 = ρ2 = 1 , ν1 = ν2 = 0 .04 ,
+
+while the surface tension was set to 
+
+σ = 0 .02 .
+
+For each prescribed contact angle, the simulation was advanced until the droplet reached a stationary equilibrium configuration. The corresponding numerical contact angle was then evaluated a posteriori from the equilibrium phase-field distribution. Figure 2 compares the measured numerical contact angle with the prescribed theoretical value. The dashed line represents the ideal identity relation 
+
+θnum = θth ,
+
+while the open symbols denote the numerical measurements. The results remain close to the identity line over the entire range investigated, 30 ◦ ≤ θth ≤ 160 ◦, covering strongly hydrophilic, neutral-wetting, and strongly hydrophobic conditions. Only small deviations of 17 50 100 150  
+
+> th
+
+[°] 
+
+40 60 80 100 120 140 160 
+
+> num  [°]
+
+FIG. 2: Static contact-angle validation. The measured numerical contact angle θnum is compared with the prescribed theoretical contact angle θth . Open circles denote the numerical measurements, while the dashed line represents the ideal identity relation 
+
+θnum = θth . The close agreement over the range 30 ◦ ≤ θth ≤ 160 ◦ demonstrates the accuracy of the geometric wetting boundary condition from strongly hydrophilic to strongly hydrophobic conditions. a few degrees are observed, including at the limiting contact angles. This agreement demon-strates that the proposed geometric wetting condition accurately recovers the prescribed macroscopic contact angle over a wide range of wettabilities. The contact angle was measured from a two-dimensional vertical section of the final droplet configuration. The phase-field distribution was extracted on the central xz plane, and the diffuse interface was identified from the points satisfying 
+
+|ϕ(x, z ) − ϕ0| < ϵ f it , ϕ0 = 12,
+
+where ϵf it is a prescribed tolerance. The resulting Npoints interface coordinates were fitted with a circle, (x − x0)2 + ( z − z0)2 = R2,
+
+18 by determining ( x0, z 0, R ) through a least-squares minimization of the algebraic residual 
+
+E =
+
+> Npoints
+
+X
+
+> i=1
+
+(xi − x0)2 + ( zi − z0)2 − R22 . (56) Here, R denotes the radius of the fitted circle and should not be confused with the initial droplet radius R0.The apparent contact angle was then reconstructed geometrically from the intersection between the fitted circle and the wall. Denoting by zw the wall position used in the mea-surement, the numerical contact angle was calculated as 
+
+θnum = π − cos −1
+
+z0 − zw
+
+R
+
+
+
+. (57) The argument of the inverse cosine was clipped to the interval [ −1, 1] to avoid numerical round-off errors. This procedure provides a robust estimate of the apparent macroscopic contact angle from the relaxed diffuse-interface configuration. 
+
+B. Short-time dynamics of a spreading droplet on a surface 
+
+As a second validation of the wetting boundary condition, we consider the short-time spreading dynamics of a liquid droplet initially brought into contact with a solid surface. This benchmark is inspired by the experiments and scaling analysis of Bird, Mandre and Stone 46 ,who showed that the early spreading of partially wetting droplets is governed primarily by an inertial–capillary balance. In particular, the spreading exponent is not universal, but decreases systematically as the equilibrium contact angle is increased. The numerical simulations are performed in a cubic domain of size 
+
+nx × ny × nz = 512 3
+
+lattice nodes. A spherical droplet of initial radius R0 = 80 lattice units is initialized in contact with the bottom solid wall and is then allowed to spread freely. No external body force is applied, so that the transient dynamics is driven solely by capillarity and by the wetting condition imposed at the wall. The two fluids have equal densities and equal kinematic viscosities, 
+
+ρ1 = ρ2 = 1 , ν1 = ν2 = 0 .05 ,
+
+19 R0nx ny nz FIG. 3: Schematic of the short-time spreading benchmark. A spherical droplet of initial radius R0 is placed in contact with the bottom solid wall and allowed to spread under the combined action of capillarity and the prescribed wetting condition. No external body force is applied. while the surface tension is set to 
+
+σ = 0 .02 .
+
+The corresponding Ohnesorge number, evaluated using the initial droplet radius, is 
+
+Oh R0 = ρν 
+
+√ρσR 0
+
+= ν
+
+r ρσR 0
+
+≃ 3.95 × 10 −2,
+
+indicating that viscous effects remain secondary during the earliest stage of the spreading process. Seven equilibrium contact angles are investigated, 
+
+θeq = 40 ◦, 55 ◦, 70 ◦, 85 ◦, 100 ◦, 115 ◦, 130 ◦,
+
+thereby covering continuously the transition from hydrophilic to strongly hydrophobic con-ditions. The spreading dynamics is quantified through the instantaneous wetted radius r(t), nor-malized by the initial droplet radius R0. Time is made dimensionless using the inertial– capillary time scale 
+
+τi =
+
+ρR 30
+
+σ
+
+1/2
+
+, (58) 20 10 -1 10 010 0r(t)/R  0eq = 40° eq = 55° eq = 70° eq = 85° eq = 100° eq = 115° eq = 130° 1/2 1/4          
+
+> t*
+> 0.2 0.1 0.5 0.4 0.6 0.8 11.2 r(t)/R  0eq = 40° eq = 55° eq = 70° eq = 85° eq = 100° eq = 115° eq = 130° 1/2 1/4
+> t*
+
+(a) (b) FIG. 4: Short-time spreading dynamics for different equilibrium contact angles. (a) Normalized wetted radius r(t)/R 0 as a function of the inertial–capillary dimensionless time 
+
+t∗ = t/τ i, with τi = ( ρR 30/σ )1/2, for θeq = 40 ◦, 55 ◦, 70 ◦, 85 ◦, 100 ◦, 115 ◦, and 130 ◦. The dashed lines indicate the reference power laws r/R 0 ∝ t∗1/2 and r/R 0 ∝ t∗1/4. (b) Enlargement of the early-time interval highlighted by the dashed box in panel (a). and the dimensionless time is defined as t∗ = tτi . The spreading curves are therefore reported in terms of 
+
+r(t)
+
+R0
+
+versus t∗.
+
+This normalization isolates the inertial–capillary dynamics and permits a direct comparison of the early spreading behavior across the different wettability conditions. Figure 4 shows a systematic effect of wettability on the contact-line dynamics. Hy-21 drophilic droplets spread more rapidly and attain a larger wetted radius at a given dimen-sionless time, whereas increasing θeq progressively slows the spreading. During the early inertial–capillary regime, the dynamics can be represented by the effec-tive power law 
+
+r(t)
+
+R0
+
+∝
+
+ tτi
+
+αθ
+
+, (59) where the exponent αθ depends on the prescribed equilibrium contact angle. As shown more clearly in panel (b), the numerical curves lie between the reference scalings t∗1/2 and t∗1/4.The most hydrophilic case, θeq = 40 ◦, approaches the classical inertial scaling αθ ≃ 1/2, whereas the most hydrophobic cases, θeq = 115 ◦ and 130 ◦, approach αθ ≃ 1/4. Intermediate contact angles produce a continuous ordering between these limiting behaviors. The results are therefore consistent with the contact-angle-dependent spreading dynamics reported by Bird, Mandre and Stone 46 , and show that the proposed wetting treatment captures the transient response to surface wettability in addition to the prescribed static contact angle. 
+
+C. Maximal deformation of an impacting drop on a hydrophobic surface 
+
+As a further validation of the dynamic wetting behavior, we consider the impact of a liquid droplet on a hydrophobic solid surface. This benchmark follows the experiments and scaling analysis of Clanet et al. 47 , who showed that the maximum deformation of a low-viscosity droplet impacting a non-wetting surface follows the inertial–capillary scaling 
+
+Dmax 
+
+D0
+
+∝ W e 1/4, (60) where D0 is the initial droplet diameter and Dmax is the maximum diameter attained during spreading. The simulations are performed in a cubic domain of size nx × ny × nz = 512 3 lattice nodes. A spherical droplet of initial radius R0 = 80 ( D0 = 2 R0 = 160 ,) is initialized with its lower interface in contact with the bottom solid wall. The droplet is assigned a uniform initial velocity U0 directed normally towards the wall. Gravity is not applied, so that the impact velocity can be controlled directly and independently of the initial droplet position. A strongly hydrophobic equilibrium contact angle, θeq = 130 ◦, is imposed at the solid 22 (a) (b) (c) (d)        
+
+> D0Dmax U000.2 0.4 0.6 0.8 0.8 0.9 11.1 1.2 1.3 1.4 1.5 D( )/D  0
+> (d) (a) (b) (c)
+
+FIG. 5: Representative stages of droplet impact on a hydrophobic surface: the left plot report the non dimensional spreading diameter versus the non dimensional time 
+
+τ = t/ (D0/U 0) (a) initial configuration, with droplet diameter D0 and impact velocity U0;(b,c) intermediate deformation during impact and spreading; and (d) configuration at maximum lateral extension Dmax .surface. The liquid and gas densities are set to 
+
+ρℓ = 10 , ρg = 0 .01 ,
+
+corresponding to a liquid-to-gas density ratio 
+
+ρℓ
+
+ρg
+
+= 1000 .
+
+The two phases have equal kinematic viscosities, 
+
+νℓ = νg = 0 .05 ,
+
+and the surface tension is 
+
+σ = 0 .02 .
+
+The liquid Ohnesorge number, based on the initial droplet diameter, is therefore 
+
+Oh = μℓ
+
+√ρℓσD 0
+
+= νℓ
+
+r ρℓ
+
+σD 0
+
+≃ 8.8 × 10 −2, (61) placing the simulations in a regime in which inertia and capillarity provide the dominant contributions to the maximum deformation, although viscous effects are not entirely negli-gible. The impact Weber number is varied by changing the initial velocity U0 while keeping 23 all other physical and geometrical parameters fixed: 
+
+W e = ρℓU 20 D0
+
+σ . (62) For each simulation, the instantaneous lateral extension of the droplet is measured in the direction parallel to the wall. Its maximum value before the onset of retraction defines Dmax .The resulting maximum spreading factor is 
+
+βmax = Dmax 
+
+D0
+
+. (63) A representative sequence of the impact and spreading dynamics for W e ≃ 7 is shown in Fig. 5. Figure 6 reports βmax as a function of the Weber number. Increasing W e produces a progressively larger maximum spreading diameter, since the initial kinetic energy and momentum of the droplet become increasingly important relative to the capillary stresses opposing deformation. Over the investigated range, the maximum spreading factor increases from approximately 1 .15 at the lowest Weber number to about 2 .7 at the largest one. The numerical results closely follow the reference scaling 
+
+βmax ∝ W e 1/4
+
+over most of the investigated Weber-number range. A modest departure is observed for the lowest-W e case, for which the deformation induced by the impact is comparable to the initial wetting-driven deformation and a well-developed inertial spreading regime is not yet established. As the Weber number is increased, the numerical points progressively approach the W e 1/4 power law and remain approximately parallel to it over more than one decade in 
+
+W e .The agreement with the scaling proposed by Clanet et al. 47 demonstrates that the present formulation correctly captures the competition between impact inertia and capillary restora-tion during the strong deformation of a droplet on a hydrophobic surface. Together with the short-time spreading benchmark, this test shows that the geometric wetting boundary condition remains accurate not only during spontaneous contact-line motion, but also under finite-velocity impact, large interfacial deformation and a liquid-to-gas density ratio of 1000. 24 10 0 10 1 10 2We 11.5 22.5 3D max  /D  0
+
+Present results 
+
+## ∝ We 1/4 FIG. 6: Maximum deformation of a droplet impacting a hydrophobic surface. The maximum spreading factor Dmax /D 0 is reported as a function of the impact Weber number 
+
+W e = ρℓU 20 D0/σ . Symbols denote the present numerical results for θeq = 130 ◦, while the dashed line represents the inertial–capillary scaling Dmax /D 0 ∝ W e 1/4 proposed by Clanet et al. 47 .
+
+D. Drop motion through a sharp-edged orifice 
+
+The fourth benchmark considers the motion of a deformable droplet through a sharp-edged circular orifice, following the experimental configuration investigated by Bordoloi and Longmire 48 . In that study, a liquid drop driven by gravity interacts with a confining opening whose diameter is smaller than the drop size. Depending on the balance between gravita-tional forcing, capillary resistance, confinement, and wetting, different outcomes are ob-served, including capture, release, and release accompanied by breakup. This configuration represents a stringent test for the numerical model, since in the sharp-edged case the inter-face comes into direct contact with the solid rim of the orifice, making contact-line dynamics, wetting, and possible pinning at the edge central to the subsequent evolution. The overall behavior can be described in terms of a set of dimensionless parameters. The 25 nx ny nz Ddf zFIG. 7: Schematic of the gravity-driven droplet-orifice benchmark. A droplet of diameter 
+
+D is driven by the body force fz through a sharp-edged aperture of diameter d, with confinement set by the ratio d/D .Bond number, 
+
+Bo = ∆ρ g D 2
+
+σ ,
+
+the ratio dD where d is the orifice diameter and D is the initial droplet diameter, the Weber number, 
+
+W e = ρdU 2Dσ ,
+
+and the Ohnesorge number, 
+
+Oh = μd
+
+√ρdσD .
+
+Further, we also report the modified Bond-number parameter 
+
+RBo =
+
+"
+
+Bo 
+
+ dD
+
+3#1/2
+
+,
+
+defined as the ratio between the orifice capillary time scale and the drop gravitational time scale 48 .26 (3) (2)      
+
+> Bo 246810 d/D 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1Present simulations
+
+Capture Release Release and breakup   
+
+> RBo =0.9 d/D=0.18 + 0.06Bo
+
+(a) (b)  
+
+> (1) (1) (2) (3)
+> (ii)
+> (ii)
+> (i)
+> (i)
+> (iii)
+> (i)
+> (iii)
+> (ii) (iii)
+
+FIG. 8: Drop motion through a sharp-edged orifice. (a) Regime map in the ( Bo, d/D )plane. The reference curves indicate the capture–release and release–breakup boundaries reported by Bordoloi and Longmire 48 . (b) Representative phase-field snapshots at 
+
+d/D = 0 .6, showing capture, release, and release with breakup as Bo is increased. Here, ∆ ρ denotes the density difference between the two phases, g the acceleration driving the motion, σ the surface tension, ρd and μd the droplet density and dynamic viscosity, and 
+
+U a characteristic impact velocity. Consistently with the experimental observations, the global regimes are primarily orga-nized in the ( Bo, d/D ) plane, which determines whether the droplet remains captured or is able to pass through the orifice. Nevertheless, inertia remains relevant during the impact and early deformation stages, while viscous dissipation, although generally subdominant in 27 the parameter range considered here, still affects the transient dynamics. The sharp-edged geometry further amplifies the role of wettability, since the contact line interacts with a geometrically singular edge where local pinning and depinning mechanisms can strongly influence the drop motion. The orifice benchmark is carried out in a cubic domain of size 512 3 lattice nodes. A single droplet is initialized on the symmetry axis of the orifice, with radius R = 40 lattice units, corresponding to an initial droplet diameter D = 80. The initial center of the droplet is placed at (x0, y 0, z 0) = ( nx/ 2, ny/ 2, nz/ 2 + D),
+
+i.e. two droplet radii above the center of the domain. The solid plate is located at mid-height, 
+
+z = 256, and has thickness 
+
+h = 2R
+
+4 = 20 lattice units. The orifice is centerd at ( x, y ) = ( nx/ 2, ny/ 2) and consists of a sharp-edged cylindrical opening through the plate. The orifice diameter is varied through the ratio d/D ,as shown in Fig. 7, while the edge of the opening forms a right angle with the plate surface. The diffuse-interface thickness is set to δ = 6 lattice units and the surface-tension pa-rameter to σ = 0 .025. The two phases have densities ρl = 1 .2 and ρg = 0 .9, and kinematic viscosities ν1 = 0 .031 and ν2 = 0 .24, respectively. The prescribed equilibrium contact angle at the solid surface is fixed to θ = 110 ◦ in all simulations, consistently with the experimental configuration of Bordoloi and Longmire 48 .A constant body force is applied along the negative z direction to drive the droplet toward the orifice. In the simulations reported here, the Bond number is varied by changing the magnitude of this vertical forcing, while all other physical parameters are kept fixed. Nine simulations were performed by varying Bo and d/D . Figure 8 compares the result-ing outcomes with the experimental regime map of Bordoloi and Longmire 48 . The numerical points fall within the expected capture, release, and release-with-breakup regions. In par-ticular, droplets with RBo ≲ 0.9 remain captured, whereas larger values promote passage through the orifice. At sufficiently large Bo , the strong axial deformation generated during passage leads to necking and breakup. The snapshots in Fig. 8(b), obtained at d/D = 0 .6, illustrate this sequence. At low 
+
+Bo , capillary resistance and contact-line pinning retain the droplet above the plate. In-28 creasing Bo first produces complete release without fragmentation and, eventually, release accompanied by breakup. To characterize the passage dynamics beyond the final regime classification, Fig. 9 reports the axial positions of the leading edge, hlead , trailing edge, htrail , and droplet center of mass, hcm . The positions are normalized by the initial droplet diameter D, with h/D = 0 corresponding to the orifice plane. Negative values therefore indicate penetration below the plate. The leading edge alone does not provide an unambiguous criterion for release, since the droplet may partially enter the aperture while most of its volume remains above the plate. Capture is identified when hcm relaxes to a positive value, whereas complete release requires a sustained downward motion of the center of mass together with the passage of the trailing interface through the orifice. For d/D = 0 .3, the center of mass and trailing interface remain above the plate over the investigated range of Bo , indicating that confinement, capillary resistance, and edge pinning prevent release. At d/D = 0 .6, the lowest-Bo case exhibits partial penetration, with hlead < 0 but hcm > 0, whereas increasing the forcing promotes passage of both the center of mass and trailing interface. For d/D = 0 .8, the weaker confinement produces deeper penetration and stronger axial stretching; at sufficiently large Bo , the separation between the leading and trailing interfaces culminates in necking and breakup. These results show that the transition from capture to release is controlled by the coupled evolution of penetration, center-of-mass motion, and trailing-edge depinning, rather than by the first crossing of the leading interface alone. The benchmark therefore tests the wetting treatment under the simultaneous effects of gravity, capillarity, confinement, edge pinning, large deformation, and breakup. 
+
+IV. CONCLUSIONS 
+
+We have developed and validated a geometric wetting boundary condition for a con-servative Allen–Cahn-based lattice Boltzmann framework. The prescribed contact angle is enforced through ghost phase-field values constructed from a wall normal reconstructed from the local fluid–solid occupancy and an explicit donor-to-solid extrapolation. The formulation therefore does not require a predefined Cartesian wall direction and can be applied directly 29 t / t i       
+
+> *
+> 0.05 0.1 0.15
+> h / D
+> -2
+> -1
+> 0
+> 1
+> d / D = 0.3 d / D = 0.3
+> t / t i
+> *
+> 0.2 0.4 0.6
+> h / D
+> -2
+> -1
+> 0
+> 1
+> d / D = 0.6 d / D = 0.6
+> t / t i
+> *
+> 0.2 0.6 11.4
+> h / D
+> -2
+> -1
+> 0
+> 1
+> d / D = 0.8 d / D = 0.8
+> Bo = 1.5
+> Bo = 5
+> Bo = 10
+> hlead
+> htrail
+> hcm
+
+FIG. 9: Axial dynamics of a droplet crossing a sharp-edged orifice. Time evolution of the leading edge hlead , trailing edge htrail , and center of mass hcm , normalized by the droplet diameter D, for different confinement ratios d/D and Bond numbers Bo . The characteristic time is defined as t∗ 
+
+> i
+
+= D3/(U d 2). The horizontal line h/D = 0 marks the orifice plane. Capture occurs when the center of mass remains above the orifice, even if the leading edge partially penetrates it. Complete release is associated with the downward motion of both the center of mass and the trailing interface, while strong axial stretching leads to breakup. to voxelized solid geometries and sharp edges. The ghost-node update reads only neigh-boring fluid data and is consequently local, race-free, and compatible with the thread-safe implementation of the underlying lattice Boltzmann solver. A separate interface-localized volume correction provides global control of the phase-field mass and compensates for the small imbalance that may be introduced by non-neutral wetting boundary conditions. The method was assessed through four benchmarks addressing both equilibrium and dynamic wetting. Static droplets recovered the prescribed contact angle over a broad range of wettabilities. Short-time spreading reproduced the systematic dependence of the inertial– capillary dynamics on the equilibrium contact angle, with the numerical curves ranging between the limiting t1/2 and t1/4 behaviors. Simulations of droplet impact on a hydrophobic surface followed the classical W e 1/4 maximum-deformation scaling, including at a liquid-to-gas density ratio of 1000. Finally, the gravity-driven passage of a droplet through a sharp-edged orifice reproduced the experimentally observed capture, release, and release-with-breakup regimes. The evolution of the leading edge, trailing edge, and center of mass further showed that penetration of the front interface alone does not imply complete release, which also requires trailing-edge depinning and sustained passage of the droplet mass through the 30 aperture. These results indicate that the proposed formulation provides an accurate and compu-tationally efficient treatment of wetting-controlled multiphase flows involving contact-line motion, large interface deformation, confinement, and interaction with sharp solid features. The present validation focuses mainly on planar walls, complemented by the sharp-edged orifice configuration; a broader assessment on curved and rough surfaces would be required to establish its accuracy over fully general solid geometries. Nevertheless, the combination of a geometrically defined ghost-node update, phase-field mass control, and compatibility with high-performance lattice Boltzmann implementations makes the method a promising basis for large-scale simulations in porous media, microfluidic devices, and other geometrically confined multiphase systems. 
+
+REFERENCES 
+
+> 1
+
+D. Bonn, J. Eggers, J. Indekeu, J. Meunier, and E. Rolley, “Wetting and spreading,” Reviews of modern physics 81 , 739–805 (2009). 
+
+> 2
+
+P.-G. Gennes, F. Brochard-Wyart, D. Qu´ er´ e, et al. , Capillarity and wetting phenomena: drops, bubbles, pearls, waves (Springer, 2004). 
+
+> 3
+
+E. Dussan, “On the spreading of liquids on solid surfaces: static and dynamic contact lines,” Annual Review of Fluid Mechanics 11 , 371–400 (1979). 
+
+> 4
+
+M. J. Blunt, Multiphase flow in permeable media: A pore-scale perspective (Cambridge university press, 2017). 
+
+> 5
+
+D. Lohse, “Fundamental fluid dynamics challenges in inkjet printing,” Annual review of fluid mechanics 54 , 349–382 (2022). 
+
+> 6
+
+L. Nan, H. Zhang, D. A. Weitz, and H. C. Shum, “Development and future of droplet microfluidics,” Lab on a Chip 24 , 1135–1153 (2024). 
+
+> 7
+
+B. Zhao, C. W. MacMinn, and R. Juanes, “Wettability control on multiphase flow in patterned microfluidics,” Proceedings of the National Academy of Sciences 113 , 10251– 10256 (2016). 
+
+> 8
+
+M. L. Eggersdorfer, H. Seybold, A. Ofner, D. A. Weitz, and A. R. Studart, “Wetting controls of droplet formation in step emulsification,” Proceedings of the National Academy of Sciences 115 , 9479–9484 (2018). 31 9X. Zhao, M. J. Blunt, and J. Yao, “Pore-scale modeling: Effects of wettability on waterflood oil recovery,” Journal of Petroleum Science and Engineering 71 , 169–178 (2010). 
+
+> 10
+
+N. R. Morrow, “Wettability and its effect on oil recovery,” Journal of petroleum technology 
+
+42 , 1476–1484 (1990). 
+
+> 11
+
+W. Yang, J. W. Brownlow, D. L. Walker, and J. Lu, “Effect of surfactant-assisted wet-tability alteration on immiscible displacement: A microfluidic study,” Water Resources Research 57 , e2020WR029522 (2021). 
+
+> 12
+
+A. J. Ladd and P. Szymczak, “Reactive flows in porous media: Challenges in theoretical and numerical methods,” Annual review of chemical and biomolecular engineering 12 ,543–571 (2021). 
+
+> 13
+
+D. M. Anderson, G. B. McFadden, and A. A. Wheeler, “Diffuse-interface methods in fluid mechanics,” Annual review of fluid mechanics 30 , 139–165 (1998). 
+
+> 14
+
+Y. Sun and C. Beckermann, “Sharp interface tracking using the phase-field equation,” Journal of Computational Physics 220 , 626–653 (2007). 
+
+> 15
+
+Y. Hwang, J. Ma, Y. Nam, J. Kim, et al. , “Review of the conservative allen–cahn equa-tions,” Engineering Analysis with Boundary Elements 187 , 106713 (2026). 
+
+> 16
+
+M. Lauricella, A. Tiribocchi, S. Succi, L. Brandt, A. Mukherjee, M. La Rocca, and A. Montessori, “Thread-safe multiphase lattice boltzmann model for droplet and bubble dynamics at high density and viscosity contrasts,” Physics of Fluids 37 (2025). 
+
+> 17
+
+M. Lauricella, A. Mukherjee, L. Brandt, S. Succi, D. Izbassarov, and A. Montessori, “ac-clb: A high-performance lattice boltzmann code for multiphase turbulence on multi-gpu architectures,” Procedia Computer Science 267 , 40–51 (2025). 
+
+> 18
+
+E. Dinesh Kumar, S. A. Sannasiraj, and V. Sundar, “Phase field lattice boltzmann model for air-water two phase flows,” Physics of Fluids 31 (2019). 
+
+> 19
+
+H. Liang, J. Xu, J. Chen, H. Wang, Z. Chai, and B. Shi, “Phase-field-based lattice boltz-mann modeling of large-density-ratio two-phase flows,” Physical Review E 97 , 033309 (2018). 
+
+> 20
+
+M. Geier, A. Fakhari, and T. Lee, “Conservative phase-field lattice boltzmann model for interface tracking equation,” Physical Review E 91 , 063309 (2015). 
+
+> 21
+
+D. Lee and J. Kim, “Comparison study of the conservative allen–cahn and the cahn–hilliard equations,” Mathematics and Computers in Simulation 119 , 35–56 (2016). 
+
+> 22
+
+H. Wang, Z. Chai, B. Shi, and H. Liang, “Comparative study of the lattice boltzmann 32 models for allen-cahn and cahn-hilliard equations,” Physical Review E 94 , 033304 (2016). 
+
+> 23
+
+Z. Huang, G. Lin, and A. M. Ardekani, “Implementing contact angle boundary condi-tions for second-order phase-field models of wall-bounded multiphase flows,” Journal of Computational Physics 471 , 111619 (2022). 
+
+> 24
+
+R. L. Brown, S. Mirjalili, M. A. Khanwale, and A. Mani, “A mass-conserving contact line treatment for second-order conservative phase field methods based on the generalized navier boundary condition,” arXiv preprint arXiv:2412.16843 (2024). 
+
+> 25
+
+H. Ding and P. D. Spelt, “Wetting condition in diffuse interface simulations of contact line motion,” Physical Review E—Statistical, Nonlinear, and Soft Matter Physics 75 , 046708 (2007). 
+
+> 26
+
+H. G. Lee and J. Kim, “Accurate contact angle boundary conditions for the cahn–hilliard equations,” Computers & fluids 44 , 178–186 (2011). 
+
+> 27
+
+J.-J. Huang and L. Zhang, “Simplified method for wetting on curved boundaries in con-servative phase-field lattice-boltzmann simulation of two-phase flows with large density ratios,” Physics of Fluids 34 (2022). 
+
+> 28
+
+S. Zhang, J. Tang, and H. Wu, “Simplified wetting boundary scheme in phase-field lattice boltzmann model for wetting phenomena on curved boundaries,” Physical Review E 108 ,025303 (2023). 
+
+> 29
+
+J.-J. Huang, H. Huang, and X. Wang, “Wetting boundary conditions in numerical sim-ulation of binary fluids by using phase-field method: some comparative studies and new development,” International Journal for Numerical Methods in Fluids 77 , 123–158 (2015). 
+
+> 30
+
+A. Montessori, M. Lauricella, A. Mukherjee, and L. Brandt, “Breakdown of kolmogorov scaling and modified energy transfer in bubble-laden turbulence,” Physical Review Fluids 
+
+11 , 024605 (2026). 
+
+> 31
+
+A. Montessori, M. La Rocca, G. Amati, M. Lauricella, A. Tiribocchi, and S. Succi, “High-order thread-safe lattice boltzmann model for high performance computing turbulent flow simulations,” Physics of Fluids 36 (2024). 
+
+> 32
+
+A. Fakhari, T. Mitchell, C. Leonardi, and D. Bolster, “Improved locality of the phase-field lattice-boltzmann model for immiscible fluids at high density ratios,” Physical Review E 
+
+96 , 053301 (2017). 
+
+> 33
+
+Y. Zu and S. He, “Phase-field-based lattice boltzmann model for incompressible binary fluid systems with density and viscosity contrasts,” Physical Review E—Statistical, Non-33 linear, and Soft Matter Physics 87 , 043301 (2013). 
+
+> 34
+
+T. Kr¨ uger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, and E. M. Viggen, The lattice Boltzmann method , Vol. 10 (Springer, 2017). 
+
+> 35
+
+Z. Guo, C. Zheng, and B. Shi, “Discrete lattice effects on the forcing term in the lattice boltzmann method,” Physical review E 65 , 046308 (2002). 
+
+> 36
+
+S. Succi, The lattice Boltzmann equation: for complex states of flowing matter (Oxford university press, 2018). 
+
+> 37
+
+A. Montessori, M. Lauricella, A. Tiribocchi, M. Durve, M. La Rocca, G. Amati, F. Bonac-corso, and S. Succi, “Thread-safe lattice boltzmann for high-performance computing on gpus,” Journal of Computational Science 74 , 102165 (2023). 
+
+> 38
+
+A. Montessori, P. Prestininzi, M. La Rocca, and S. Succi, “Lattice boltzmann approach for complex nonequilibrium flows,” Physical Review E 92 , 043308 (2015). 
+
+> 39
+
+O. Malaspinas, “Increasing stability and accuracy of the lattice boltzmann scheme: recur-sivity and regularization,” arXiv preprint arXiv:1505.06900 (2015). 
+
+> 40
+
+G. Szeg, Orthogonal polynomials , Vol. 23 (American Mathematical Soc., 1939). 
+
+> 41
+
+D. Jacqmin, “Calculation of two-phase navier–stokes flows using phase-field modeling,” Journal of computational physics 155 , 96–127 (1999). 
+
+> 42
+
+T. Kr¨ uger, F. Varnik, and D. Raabe, “Shear stress in lattice boltzmann simulations,” Physical Review E—Statistical, Nonlinear, and Soft Matter Physics 79 , 046704 (2009). 
+
+> 43
+
+S. P. Thampi, S. Ansumali, R. Adhikari, and S. Succi, “Isotropic discrete laplacian oper-ators from lattice hydrodynamics,” Journal of Computational Physics 234 , 1–7 (2013). 
+
+> 44
+
+X. Shan, “Analysis and reduction of the spurious current in a class of multiphase lattice boltzmann models,” Physical Review E—Statistical, Nonlinear, and Soft Matter Physics 
+
+73 , 047701 (2006). 
+
+> 45
+
+P.-H. Chiu and Y.-T. Lin, “A conservative phase field method for solving incompressible two-phase flows,” Journal of Computational Physics 230 , 185–204 (2011). 
+
+> 46
+
+J. C. Bird, S. Mandre, and H. A. Stone, “Short-time dynamics of partial wetting,” Physical review letters 100 , 234501 (2008). 
+
+> 47
+
+C. Clanet, C. B´ eguin, D. Richard, and D. Qu´ er´ e, “Maximal deformation of an impacting drop,” Journal of Fluid Mechanics 517 , 199–208 (2004). 
+
+> 48
+
+A. D. Bordoloi and E. K. Longmire, “Drop motion through a confining orifice,” Journal of Fluid Mechanics 759 , 520–545 (2014). 34

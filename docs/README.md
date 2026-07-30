@@ -6,32 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-29
-- 运行时间：2026-07-29 21:24:44 UTC
+- 最新运行日期：2026-07-30
+- 运行时间：2026-07-30 21:41:58 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：0
-- 速读区：3
+- 本次总论文数：1
+- 精读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-1) 今日速读三篇多相流建模论文，聚焦相变、润湿与表面活性剂的扩散界面方法。
-2) 值得留意《A universal diffuse interface modeling framework for surfactants》对表面活性剂的通用处理，以及《Accurate wetting dynamics》基于Allen-Cahn的LBM高精度润湿模拟。
-3) 建议读者关注扩散界面框架从理想化问题向通用场景的拓展，可由此追踪多物理场耦合的应用边界。
-- 详情：[/202607/29/README](/202607/29/README)
+一种新的格子 Boltzmann 方法让润湿角随流动精准演化，比传统模型更贴合真实液滴碰撞。
+今日精读的 8 分论文用保守 Allen-Cahn 方程锁定了多相流动态润湿，解析力值得一看。
+下一步可把该数值框架放入复杂曲面或蒸发工况中比对实验，普通人也能读懂背后的物理直观。
+- 详情：[/202607/30/README](/202607/30/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows](/202607/30/2607.25444v1-accurate-wetting-dynamics-via-a-conservative-allen-cahn-based-lattice-boltzmann-approach-for-multiphase-flows)  
+   标签：评分：8.0/10、query:falling-film
+   evidence：提出了一种具有精确润湿边界条件的保守Allen-Cahn格子玻尔兹曼多相流方法，与降膜模拟相关
 
 ### 速读区论文标签
-1. [Two-phase source and reaction coefficient Stefan type problems](/202607/29/2607.21388v2-two-phase-source-and-reaction-coefficient-stefan-type-problems)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：相变换热的反斯蒂芬问题，与蒸发相关
-2. [Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows](/202607/29/2607.25444v1-accurate-wetting-dynamics-via-a-conservative-allen-cahn-based-lattice-boltzmann-approach-for-multiphase-flows)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：提出多相流LBM的润湿边界条件，可直接用于降膜流动模拟
-3. [A universal diffuse interface modeling framework for surfactants](/202607/29/2607.25453v1-a-universal-diffuse-interface-modeling-framework-for-surfactants)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：两相流中表面活性剂输运的通用扩散界面模型
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
