@@ -1,0 +1,851 @@
+Title: A sub-grid-scale model for polydisperse bubbly flows with heat and mass transfer
+
+URL Source: https://arxiv.org/pdf/2607.27426v1
+
+Published Time: Fri, 31 Jul 2026 00:11:13 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+A sub-grid-scale model for polydisperse bubbly flows with heat and mass transfer 
+
+Anand Radhakrishnan 1, Spencer H. Bryngelson 1,2,3 
+
+> 1School of Computational Science & Engineering, Georgia Institute of Technology, Atlanta, GA 30332, USA
+> 2Daniel Guggenheim School of Aerospace Engineering, Georgia Institute of Technology, Atlanta, GA 30332, USA
+> 3Woodruff School of Mechanical Engineering, Georgia Institute of Technology, Atlanta, GA 30332, USA
+
+Abstract 
+
+Ensemble-averaged models of polydisperse bubbly flows require statistics of the evolving bubble population. Prior quadrature-based moment formulations close bubble pressure with a polytropic relation that omits heat and mass transfer at the bubble wall. We formulate constant-transfer equations for bubble pressure and vapor mass within a conditional hyperbolic quadrature method. Second-order conditional inversion produces four joint radius–radial-velocity nodes per equilibrium-radius bin. Bubble pressure and vapor mass are advanced at each node. The node values close the ensemble-averaged flow equations without adding mixed pressure or vapor-mass moments to the transported moment set. The model is implemented in MFC. Monte Carlo calculations verify the evolution of quadrature nodes and the mean bubble variables for a harmonically forced population. Bubble-screen calculations quantify closure error as the equilibrium radius is discretized and the initial distributions vary. The constant-transfer calculation does not exhibit the high-frequency pressure oscillations observed with the polytropic closure under the conditions considered. 3D bubble-screen calculations give a 1.5% relative root-mean-square error between the Euler–Euler center pressure and the mean of 40 volume-averaged Euler–Lagrange realizations. 
+
+Keywords: bubbly flow, population balance, quadrature-based moment methods, sub-grid-scale modeling, heat and mass transfer, compressible multiphase flow 
+
+1 Introduction 
+
+A wide range of length and time scales of the dispersed phase imposes strict restrictions on the problem size of resolved simulations. Sub-grid-scale models can alleviate these high computational costs by modeling the dynamics of the dispersed phase through a statistical framework. While each particle of the dispersed phase can be tracked using an Euler–Lagrange simulation [ 1 , 2], performing these simulations is computationally expensive owing to poor scaling. We therefore treat the dispersed phase in an Eulerian frame. Colonius et al. [3] showed that, under impulsive forcing, the moments of dilute bubble populations rapidly approach a statistical equilibrium and may be computed efficiently through period-averaged bubble dynamics, highlighting the benefits of reduced-order statistical representations. The method of classes (MOC) employs ensemble phase averaging [ 4, 5 ] to couple the dispersed and resolved phases. The polydisperse bubble population is initialized using a log-normal distribution for the equilibrium radii. The bubble dynamic variables are then modeled as a weighted sum of each bin of the log-normal distribution, with the weights    
+
+> Email: shb@gatech.edu (Spencer H. Bryngelson) The source code, example cases, random seeds, and detailed README have been archived on Zenodo as version 1.0.0 and are available at doi:10.5281/zenodo.21590440. The archived release corresponds to Git commit c7d8fe135746 ,
+> https://github.com/anandrdbz/MFC/tree/c7d8fe135746558bfb7c9d6f5103711d55b0e300 .arXiv:2607.27426v1 [physics.flu-dyn] 29 Jul 2026
+
+obtained using Simpson’s rule. While the method of classes is an inexpensive alternative to Lagrangian methods, it employs only a stochastic framework for the equilibrium radius ( R0), with the internal variables fixed at each R0. Accurate representation of complex bubble dynamics requires incorporating stochasticity in the relevant internal bubble variables at each R0.The internal bubble variables at each R0 are modeled using the population balance equation (PBE). PBEs model the probability density of the dispersed phase [ 6]. The PBE uses the bubble radius and bubble velocity as the relevant internal variables and is solved via the method of moments (MOM) [ 7 ]. The MOM uses quadrature nodes to approximate unclosed high-order moments arising in the coupled flow equations [ 7 , 8]. PBE-based models can also accurately represent soot formation in the combustion process [ 9], aerosol sprays [ 10 ], and more. Here, a PBE-based method is used for its ability to represent the dynamics of the polydisperse bubbly phase [ 11 ]. Quadrature-based moment methods (QBMM) have emerged as an efficient Eulerian framework for representing polydisperse dispersed-phase distributions and have been successfully applied to bubbly flows and multivariate turbulent gas–liquid systems [ 12 , 13 ]. Here, we couple the constant-transfer equations for bubble pressure and vapor mass to the CHyQMOM quadrature representation [ 8 ]. These variables are advanced at the joint radius–radial-velocity abscissae, and their node values supply the ensemble-averaged terms required by the compressible carrier-phase equations. The sub-grid-scale model is coupled to the flow equations in the high-order, compressible flow solver MFC [14]. Previous PBE-based models have considered the relevant internal variables as the bubble radius, bubble velocity, and equilibrium radius ( R, ˙R, R0). The bubble radii and velocities of the polydisperse bubble population are initialized using a Gaussian distribution with means R0 and 0, respectively. A polytropic assumption models the bubble pressure pb as a function of R and R0. However, modeling complex bubble dynamics requires more sophisticated models, such as the constant-transfer model for bubble pressure [ 15 ], to accurately represent spherical bubble dynamics. Such models expand the set of relevant internal variables to include the bubble pressure pb and the vapor mass mv.The model extends Bryngelson et al. [16] , in which bubble pressure is closed through a polytropic relation involving R and R0. We instead advance pb and mv from the constant-transfer heat- and mass-transfer equations at the existing ( R, ˙R) quadrature nodes for each equilibrium-radius bin. The resulting node values close the ensemble-averaged terms without adding mixed moments in pb
+
+and mv to the transported moment set. We implement the model in MFC [ 17 , 18 ] and compare the node evolution and mean bubble variables with Monte Carlo calculations for a harmonically forced population. The bubble-screen calculations examine how the equilibrium-radius discretization and initial distributions affect closure error. We compare the resulting pressure response with the polytropic closure and, in three dimensions, with the mean of 40 volume-averaged Euler–Lagrange realizations [2]. 22 Model formulation 
+
+2.1 Compressible flow equations 
+
+The governing equations for the liquid phase follow from the mixture-averaged compressible flow equations as 
+
+∂ρ ∂t + ∇ · (ρu) = 0 ,∂ρ u
+
+∂t + ∇ · (ρuu + pI) = 0 , (1) 
+
+∂E ∂t + ∇ · [( E + p)u] = 0 ,
+
+where ρ, u, p, and E are the density, velocity vector, pressure, and total energy. The density of the dispersed phase is considered negligible compared to the liquid phase. The velocity of the liquid and dispersed phases is assumed to be the same, thus constituting a no-slip condition. The contribution of the dispersed phase to the flow equations in (1) is characterized through ensemble phase averaging. 
+
+2.2 Ensemble phase averaging 
+
+We use ensemble phase-averaged equations from prior work [ 4, 5, 19 ]. The void fraction of the dispersed phase αb is assumed to be negligible compared to the liquid phase ( αl) under dilute assumptions. The bubbles are represented statistically via random variables R, ˙R, and R0 cor-responding to the instantaneous bubble radius, time derivative, and equilibrium bubble radius, presented in the next section. The mixture-averaged pressure field is computed as 
+
+p(x, t ) = (1 − α)pl + α R3pbw 
+
+R3 − ρ R3 ˙R2
+
+R3
+
+!
+
+, (2) where pbw is the associated bubble wall pressure and pl(x, t ) is the liquid pressure according to the stiffened-gas equation of state [20]: 
+
+pl + γlπ∞,l = γl − 11 − α
+
+
+
+E − 12 ρu2
+
+
+
+. (3) where γl is the specific heat ratio of the liquid and π∞,l is the liquid stiffness. The bubble number density per unit volume n(x, t ) is conserved as 
+
+∂n ∂t + ∇ · (nu) = 0 . (4) For the spherical bubbles considered here, n is related to the void fraction α via 
+
+α(x, t ) = 43 πR 3n(x, t ), (5) and thus the void fraction α(x, t ) transports as 
+
+∂α ∂t + ∇ · (αu) = α∇ · (u) + 3 α R2 ˙RR3 , (6) 3Coupled flow Dispersion             
+
+> Nodes ( ̂ξ) and weights ( ̂w)Moment-based representation ( M)
+> Pop. balance
+> Quadrature
+> Inversion
+> Projection f(R, ˙R)
+> R˙R(̂ξ,̂w)1(̂ξ,̂w)2
+> (̂ξ,̂w)3
+> (̂ξ,̂w)4
+> R˙R
+
+Figure 1: Illustration of our moment method (adapted from Bryngelson et al. [21] with permission) 
+
+where the right-hand side represents the change in void fraction due to bubble growth and col-lapse. The over-barred terms appearing in (2), (5), and (6), 
+
+R3 ˙R2, R 3, R 2 ˙R, and R3pbw (7) denote average quantities of the bubble dispersion. The moments μlmn are averaged using a probability distribution function (PDF) f (R, ˙R, R 0) given as 
+
+μlmn = Rl ˙RmRn 
+
+> 0
+
+=
+
+Z
+
+> Ω
+
+Rl ˙RmRn 
+
+> 0
+
+f (R, ˙R, R 0) d Rd ˙RdR0. (8) For the method of classes, the instantaneous bubble radius and velocity are fixed, reducing the PDF 
+
+f (R, ˙R, R 0) = f (R0), where f (R0) is log-normal with mean μR0 = 1 and standard deviation σR0 .
+
+f (R0) is fixed since R0 is not a function of time. The polydispersity of the bubble population sets the number of bins nb, and (8) is integrated using Simpson’s rule. 
+
+2.3 Population balance formulation and inversion 
+
+We provide the formulation for the method of moments following that of Bryngelson et al. [16] .To account for stochasticity in R and ˙R, a population balance equation (PBE) is required for the evolution of the PDF. The conditional probability density function f (R, ˙R|R0) without coalescence or breakup effects is governed by the following PBE [6]. 
+
+∂f ∂t + ∂∂R (f ˙R) + ∂∂ ˙R (f ¨R) = 0 (9) 4Figure 1 illustrates the PBE-based approach. The evolution of the raw moments ⃗ μ is then obtained by integrating the PBE. The set of transport equations for ⃗ μ is 
+
+∂n⃗ μ
+
+∂t + ∇ · (n⃗ μu ) = n ˙⃗μ = n⃗ g (10) where 
+
+glmn = lμ l−1,m +1 ,n + m
+
+Z Z Z 
+
+> Ω
+
+¨RR l ˙Rm−1Rn 
+
+> 0
+
+f (R, ˙R, R 0) d Rd ˙RdR0 (11) and Ω = Ω R × Ω ˙R × ΩR0 = (0 , ∞) × (−∞ , ∞) × (0 , ∞) [ 21 ]. The integral is computed via quadrature nodes obtained by a conditional hyperbolic inversion procedure [ 8 ]. The bubble dynamics ¨R is described in section 2.4. The PDF f (R, ˙R, R 0) is then related to the conditional PDF via 
+
+f (R, ˙R, R 0) = f (R, ˙R|R0)f (R0), (12) and the raw moments are obtained as 
+
+μlmn ≡
+
+Z
+
+> ΩR0
+
+f (R0)Rn 
+
+> 0
+
+μlm (R0) d R0 ≈
+
+> nb
+
+X
+
+> i=1
+
+wi bRn 
+
+> 0,i
+
+μlm ( bR0,i ), (13) where nb represents the polydispersity of the bubble population. The quadrature rule weights and nodes for R0 are obtained through the same procedure as the method of classes. The R0-conditioned moments μlm are then given by 
+
+μlm ( bR0,i ) ≡
+
+Z Z  
+
+> ΩR, ˙R
+
+f (R, ˙R| bR0,i )Rl ˙Rm dRd ˙R ≈
+
+> NR
+
+X 
+
+> j=1
+> N˙R
+
+X
+
+> k=1
+
+hbwj,k bRlj
+
+b˙Rmk
+
+i
+
+> bR0,i
+
+. (14) The moment indices comprising the moment set of (14) are associated with the conditional quadrature moment method used to invert those moments [ 22 , 23 ]. The CHyQMOM algorithm is described in Fox et al. [8]. The total moments (13) are obtained by substituting (14) into (13): 
+
+μlmn =
+
+> nb
+
+X
+
+> i=1
+
+wi bRn
+
+> 0,i NR
+
+X 
+
+> j=1
+> N˙R
+
+X
+
+> k=1
+
+hbwj,k bRlj
+
+b˙Rmk
+
+i
+
+> bR0,i
+
+. (15) These moments evaluate the right-hand side of the moment evolution equation (10) and the ensemble-phase averaged terms (7). 
+
+2.4 Bubble dynamics model 
+
+We model the bubble’s radial dynamics with the Keller–Miksis equation, the compressible form of the Rayleigh–Plesset equation [ 24 ]. It captures complex bubbly-flow phenomena. This model assumes spherical bubbles filled with a gas-vapor mixture. Under these assumptions, the bubble radius is governed by a Rayleigh–Plesset-like equation 
+
+R ¨R 1 − ˙Rcl
+
+!
+
++ 32 ˙R2 1 − ˙R
+
+3cl
+
+!
+
+= pbw − pl
+
+ρl
+
+1 + ˙Rcl
+
+!
+
++ R ˙pbw 
+
+ρlcl
+
+, (16) 5which is dimensionless via the reference bubble size R0,ref , liquid pressure p0, and density ρ0. Since the bubble radius in our cases is much smaller than the imposed acoustic wavelength, the radiation term excludes the temporal variation in the liquid pressure pl. This reduces to the Rayleigh–Plesset equation under the assumption ˙R ≪ cl, where cl represents the liquid speed of sound. Here, ρl is the liquid density, and the bubble wall pressure pbw is given as 
+
+pbw = pb − 4μl ˙RR − 2σl
+
+R (17) with pb being the internal bubble pressure and μl and σl being the dynamic viscosity and surface tension of the liquid phase, respectively. The evolution of pb follows [15] ˙mv = 4πR 2Dρ bw 
+
+1 − χvw 
+
+∂χ vw 
+
+∂r r=R,
+
+˙pb = 3γb
+
+R
+
+
+
+− ˙Rp b + RvTbw 
+
+˙mv
+
+4πR 2 + γb − 1
+
+γb
+
+kbw 
+
+∂T ∂r r=R
+
+
+
+,
+
+(18) where χvw , kbw , ρbw , and Tbw are the vapor mass fraction, thermal conductivity, density, and temperature at the bubble wall. D is the binary diffusion coefficient, Rv is the gas constant, and γb
+
+is the specific heat ratio. The bubble wall closures in (18) are defined in Preston et al. [15]. 
+
+2.5 Integrating constant-transfer model with the method of moments 
+
+The conditional moments μlm ( bR0,i ) are limited to second order for our implementation, such that 
+
+l + m = 2. Closing the moments, therefore, requires the first- and second-order moments of the initial distribution. A joint normal distribution supplies them, with means μR and μ ˙R, standard deviations σR and σ ˙R, and a correlation coefficient ρR ˙R at each bin bR0,i . The conditional inversion procedure outlined in Fox et al. [8] thus uses 4 nodes in the joint phase space of R and ˙R, visualized in fig. 1. A log-normal PDF is used for R0 to represent the polydispersity in the flow with mean 
+
+μR0 = 1 and standard deviation σR0 . The individual bins bR0,i are subsequently calculated using Simpson’s rule. Evaluating R3pbw in (2) requires the statistics of the bubble pressure pb. Without polytropic assumptions, this requires including additional internal variables in the PBE. To reduce the computational cost, the ODEs for pb and mv in (18) are evolved at the quadrature nodes obtained by the moment inversion procedure for R and ˙R. The moment set μlm ( bR0,i ) is initialized as follows 
+
+μ0,0( ˆR0,i ) = 1 , μ1,0( ˆR0,i ) = ˆR0,i μR, μ0,1( ˆR0,i ) = 
+
+r p0
+
+ρ0
+
+μ ˙R,μ2,0( ˆR0,i ) = ˆR20,i 
+
+ μ2 
+
+> R
+
++ σ2
+
+> R
+
+ , μ1,1( ˆR0,i ) = ˆR0,i 
+
+r p0
+
+ρ0
+
+ μRμ ˙R + ρR ˙RσRσ ˙R
+
+ ,μ0,2( ˆR0,i ) = p0
+
+ρ0
+
+
+
+μ2˙R + σ2˙R
+
+
+
+(19) where p0 and ρ0 are the reference pressure and density at ambient conditions. The bubble ra-dius abscissa Rj,i is calculated using the CHyQMOM procedure [ 8 ] at all 4 quadrature nodes as follows 
+
+R±,i = μ1,0,i ±
+
+q
+
+μ2,0,i − μ21,0,i , R1,i = R2,i = R−,i , R3,i = R4,i = R+,i (20) 6The conditional velocity abscissae ˙Rj,i at the quadrature nodes are subsequently calculated as ˙R±,i = μ0,1,i ± μ1,1,i − μ1,0,i μ0,1,i 
+
+q
+
+μ2,0,i − μ21,0,i 
+
+, si =
+
+s
+
+μ0,2,i − μ20,1,i − (μ1,1,i − μ1,0,i μ0,1,i )2
+
+μ2,0,i − μ21,0,i 
+
+,
+
+˙R1,i = ˙R−,i − si, ˙R2,i = ˙R−,i + si, ˙R3,i = ˙R+,i − si, ˙R4,i = ˙R+,i + si
+
+(21) The bubble radius Rj,i is initialized at the 4 quadrature nodes for all ˆR0,i bins as 
+
+R1,i = R2,i = ˆR0,i (μR − σR) , R3,i = R4,i = ˆR0,i (μR + σR) (22) Parameters μR and σR are normalized using the equilibrium radius ˆR0,i at each bin. The bubble pressure pbj,i and vapor mass mvj,i are subsequently set at each of the quadrature nodes using the following isothermal assumptions owing to small errors in the ensuing bubble dynamics between the constant-transfer and isothermal models [15]. 
+
+mvj,i = mv0,i 
+
+R3
+
+> j,i
+
+ˆR30,i 
+
+, pbj,i = pb0,i 
+
+ˆR30,i 
+
+ mg0,i + mvj,i 
+
+
+
+R3
+
+> j,i
+
+ mg0,i + mv0,i 
+
+ (23) where mg0,i and mv0,i are the mass of gas and vapor at the equilibrium radius ˆR0,i evaluated using the ideal gas law. This procedure implicitly assumes the probability densities of pb and mv to be delta functions centered at the quadrature nodes for R and ˙R. The bubble dynamic equations in (18) are subsequently evaluated at the quadrature nodes for each of the ˆR0 bins as follows ˙mvj,i = 4πR 2
+
+> j,i
+
+Dρ bw 
+
+1 − χvw 
+
+∂χ vw 
+
+∂r r=Rj,i 
+
+,
+
+˙pbj,i = 3γb
+
+Rj,i 
+
+− ∂R j,i 
+
+∂t pbj,i + RvTbw 
+
+˙mvj,i 
+
+4πR 2
+
+> j,i
+
++ γb − 1
+
+γb
+
+kbw 
+
+∂T ∂r r=Rj,i 
+
+! (24) where ∂R j,i  
+
+> ∂t
+
+denotes the evolution of the radial abscissae for all 4 quadrature nodes as opposed to the conditional velocity abscissae ˙Rj,i . ∂R j,i  
+
+> ∂t
+
+is used to evolve pb as the equality to conditional velocity holds only for the ensemble average and not for individual quadrature nodes. ∂R j,i  
+
+> ∂t
+
+is calculated using the hyperbolic inversion procedure in Fox et al. [8] as follows 
+
+∂R 1,i 
+
+∂t = ∂R 2,i 
+
+∂t = ∂μ 1,0,i 
+
+∂t −
+
+∂μ 2,0,i 
+
+∂t − 2μ1,0,i 
+
+∂μ 1,0,i 
+
+∂t 
+
+2
+
+q
+
+μ2,0,i − μ21,0,i 
+
+,∂R 3,i 
+
+∂t = ∂R 4,i 
+
+∂t = ∂μ 1,0,i 
+
+∂t +
+
+∂μ 2,0,i 
+
+∂t − 2μ1,0,i 
+
+∂μ 1,0,i 
+
+∂t 
+
+2
+
+q
+
+μ2,0,i − μ21,0,i 
+
+,
+
+(25) The temporal evolution of the moments μ1,0,i and μ2,0,i is then formulated in terms of the conservative transport equations (10) as follows 
+
+∂μ 1,0,i 
+
+∂t = 1
+
+n
+
+ ∂ (nμ 1,0,i )
+
+∂t − μ1,0,i 
+
+∂n ∂t 
+
+
+
+, ∂μ 2,0,i 
+
+∂t = 1
+
+n
+
+ ∂ (nμ 2,0,i )
+
+∂t − μ2,0,i 
+
+∂n ∂t 
+
+
+
+(26) 7where ∂(nμ 1,0,i )/∂t and ∂(nμ 2,0,i )/∂t are calculated using (10) . ∂n/∂t in (26) is calculated using 
+
+μ0,0,i = 1 as 
+
+∂n ∂t + ∇ · (nu) = 0 , (27) recovering the number-density conservation law (4) . When μ2,0,i − μ21,0,i < 0, the moments are not realizable. The implementation floors the radius variance in the univariate inversion, 
+
+μ2,0,i − μ21,0,i ← max  μ2,0,i − μ21,0,i , σ ϵ
+
+ , (28) where σϵ = 10 −16 . The residual conditional velocity is also floored at σϵ.
+
+3 Numerical method 
+
+An interface-capturing finite-volume scheme evolves the governing equations for the liquid and dispersed phases. The conservative variables ⃗ qc are evolved in the cell centers according to 
+
+∂⃗ qc
+
+∂t + ∇ · ⃗ F =⃗ s (29) The source vector ⃗ s includes the moment sources n⃗ g of (10) and the void-fraction growth/collapse source on the right-hand side of (6). In the current MFC implementation, pbj,i and mvj,i are stored in separate node arrays rather than in ⃗ qc or ⃗ s, and no conservative transport is applied to them. Their right-hand sides are evaluated using (24) at every SSP–RK stage and updated with the same RK coefficients as the conservative state, without sub-cycling. The flux-induced corrections for 
+
+pb enter through (25) , (26) , and (27) , and are required by the temporal evolution term ∂R j,i /∂t 
+
+on the right-hand side of (24) . The evolution of mv requires no such correction, as its right-hand side in (24) contains no temporal evolution term. The conservative variables ⃗ qc are converted to their primitive forms ⃗ qp. The primitive variables are then reconstructed at the cell boundaries using a fifth-order WENO scheme [ 25 ]. The fluxes ⃗ F are computed using an HLLC approximate Riemann solver [ 26 ]. A third-order Runge–Kutta scheme advances the conservative variables. Our implementation is available in MFC, an open-source CFD solver [14]. 
+
+4 Model verification 
+
+We examine the ability of the model to accurately represent bubble dynamics for a monodisperse air bubble suspended in water. The liquid pressure pl is explicitly set to pl = p0(1 + A sin (ωt )) where 
+
+p0 is the reference pressure and t is the simulation time. This setup ignores the governing equations in (1) and only evolves the moment transport equations (10) along with pb and mv arrays to verify the ability of the model to capture bubble dynamics accurately. For our simulation, we set A = 0 .5and ω = π. This corresponds to an excitation frequency that is 1 .53 times the Minnaert frequency. We non-dimensionalize lengths by the reference equilibrium radius R0,ref = 10 μm . The bubbles are initialized at equilibrium μR = R0 = 1 and μ ˙R = 0, with standard deviations σR = σ ˙R = 0 .1 and 
+
+ρR ˙R = 0. The reference pressure and density of the liquid are set as p0 = 101 325 Pa and ρ0 = 1000 kg /m3. γb
+
+is set at 1 .4, with the speed of sound cl = 1475 m /s. Surface tension, viscosity, and vapor pressure of the liquid are set at σl = 0 .0752 N /m, μl = 0 .001 Pa s, and pv = 2388 Pa . The thermodynamic parameters associated with the constant-transfer model are calculated using a water vapor and air 8mixture, with the thermodynamic properties and bubble wall closures defined by Preston et al. [15] .The bubble dynamics is simplified to use the Rayleigh–Plesset equation, which is the incompressible version of (16) . The time step ∆ t is set to 0 .0005 t0, where t0 = R0,ref 
+
+pρ0/p 0 is the reference time. To examine closure errors in the moment set, we compare results with Monte Carlo simulations sampled from a multivariate Gaussian distribution for R and ˙R, with the same means and standard deviations. We generate Ns = 1000 individual samples for the Monte Carlo simulations using the class method and average them to obtain a surrogate for the true solution. The choice of Ns = 1000 follows prior practice: Charalampopoulos et al. [27] report adequate accuracy at this sample count for similar Monte Carlo runs under the polytropic assumption. We do not repeat that sample-count study here. The RMS error ∥e∥2 for a particular bubble variable v is calculated using 
+
+∥e∥2 = 1
+
+√Nt
+
+vuutNt−1X
+
+> i=0
+
+ v(QBMM) (ti) − v(MC) (ti)
+
+v(MC) (ti)
+
+2
+
+(30) where v can be any of the relevant bubble variables R, pb, and mv, or the moments μlm . The RMS error ∥e∥2 for the bubble variables R, pb, and mv for the constant-transfer model is compared against the polytropic model previously verified in table 1. The polytropic model carries no pb or mv, so table 1 crosses out those entries. The 1 .4× increase in errors in the constant-transfer model arises from the inexactness of the initial condition due to the ODE for pb and mv having no true solution. This is verified by examining ∥e∥2 for the constant-transfer QBMM model by setting kbw = 0 and using the infinite rate mass transfer limit, wherein the ODE for pb in (18) changes as ˙pb = − 3γb
+
+R ˙R (pb − pv) (31) where pv is the vapor pressure. This effectively yields a polytropic evolution for pb at the quadrature nodes, allowing an exact initial condition. This case is labeled pseudo-polytropic in table 1 and agrees analytically with the polytropic closure in MFC, while explicitly evolving pb at the ( R, ˙R) quadrature nodes using (31) . Error values for R are identical for both the polytropic and pseudo-polytropic cases up to round-off, with ∥e∥2 = 0 .58 %. This verifies that the increased error in R of 0 .81 % for the constant-transfer model arises from an inexact initial condition and not the pinning of pb and 
+
+mv at the quadrature nodes for R and ˙R. The evolution of the bubble radius R and bubble pressure 
+
+pb for the constant-transfer model and Monte Carlo simulations is shown in Figure 2, with good agreement between the two. Figure 3 verifies that the evolution of the quadrature nodes follows the probability density of the Monte Carlo samples at four different simulation times. 10 2 ∥e∥2 Polytropic Constant transfer Pseudo polytropic 
+
+R 0.58 0.81 0.58 
+
+pb ✗ 2.62 ✗
+
+mv ✗ 3.49 ✗    
+
+> Table 1: RMS relative error ∥e∥2between various QBMM models and Monte Carlo simulations with
+> Ns= 1000
+
+90 2 4 6
+
+0.6
+
+0.8
+
+1
+
+1.2
+
+1.4
+
+(a) 
+
+t/t 0
+
+> R/R 0
+
+0 2 4 6
+
+0
+
+1
+
+2
+
+(b) 
+
+t/t 0
+
+> pb/p 0
+
+QBMM Monte Carlo Figure 2: Comparison of the evolution of (a) the mean bubble radius and (b) the bubble pressure, for the constant-transfer QBMM and Monte Carlo simulations of a monodisperse bubble. 0.6 0.8 1 1.2 1.4
+
+−0.5
+
+0
+
+0.5
+
+> ˙R
+
+(a) t/t 0 = 1 .3
+
+0.6 0.8 1 1.2 1.4
+
+−0.5
+
+0
+
+0.5
+
+(b) t/t 0 = 2 .5
+
+0.6 0.8 1 1.2 1.4
+
+−0.5
+
+0
+
+0.5
+
+R
+
+> ˙R
+
+(c) t/t 0 = 3 .7
+
+0.6 0.8 1 1.2 1.4
+
+−0.5
+
+0
+
+0.5
+
+R
+
+(d) t/t 0 = 6 .5
+
+QBMM 
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+10 0
+
+f (R, ˙R)
+
+Figure 3: Evolution of probability density f (R, ˙R) obtained through Monte Carlo simulation with Ns = 1000 along with the quadrature nodes for the constant-transfer QBMM model at four different simulation times. 
+
+10 0 5 10 15 20      
+
+> 0.5
+> 1
+> 1.5
+> (a)
+> t/t 0
+> p/p 0
+> 10 20 30 40 50 60
+> 10 −6
+> 10 −4
+> 10 −2
+> 10 0
+> (b)
+> nb
+> ‖e‖2
+
+σR = 0.1 0.2 0.3Figure 4: (a) Dimensionless pressure p/p 0 versus time t/t 0 at the center of the bubble screen at nb = 51. (b) RMS relative error ∥e∥2 for the pressure for a varying number of bins nb, with a reference solution at         
+
+> nb= 91. Both are shown at varying values of σRand fixed σ˙R= 0 .2 and σR0= 0 .3.
+
+5 Application to bubble screens 
+
+We test our model by examining the bubble dynamics at the center of an acoustically excited polydisperse, dilute 1D bubble screen. The bubble screen is initialized with a void fraction of 
+
+αb = 4 × 10 −5 and a log-normal PDF with mean radius R0 = 1, non-dimensionalized by the reference bubble radius R0,ref = 10 μm . The bubble screen length is set to Lb = 800 R0 and is centered in a 1D domain of length 5 Lb, with Nx = 1600 grid points. The thermodynamic parameters are reused from the previous section on model verification. A one-way sinusoidal pressure pulse with peak amplitude 
+
+p0 excites the bubble screen, where p0 is the ambient pressure. The frequency of the sinusoidal pulse is set to 300 kHz , with the Minnaert frequency of the bubble population being 326 kHz with adiabatic assumptions ( γb = 1 .4) and negligible surface tension and viscous effects. Neumann boundary conditions are used along the pulse direction. The acoustic source is located 700 R0 from the center of the bubble screen with a support width spanning 15 grid spacings. The bubble population is polydisperse, with nb = {9, 21 , 31 , 51 } bins. The closure errors are measured relative to nb = 91, where the relative RMS error with nb = 51 for a representative case is 0 .01 %, indicating a converged solution. Previous work by Bryngelson et al. [5] for the method of classes also suggests convergence in this range. The standard deviation of the log-normal PDF is varied as σR0 = {0.1, 0.2, 0.3}. The initial distribution for the moment set is a joint Gaussian distribution with means μR = 1 and 
+
+μ ˙R = 0, with the standard deviations varied as σR = {0.1, 0.2, 0.3} and σ ˙R = {0.1, 0.2, 0.3}. We characterize the effects of varying σR, σ ˙R, σ R0 by plotting the pressure p at the center of the bubble screen and evaluating the resulting closure errors at varying nb. The pressure is non-dimensionalized by the reference pressure p0 and the time by t0 = R0,ref 
+
+pρ0/p 0. Bubble dynamics is governed by the Keller–Miksis equations (16) . We then compare with the previously validated polytropic model [ 16 ]to highlight differences in bubble dynamics. Finally, the model is validated by comparison with a previously validated volume-averaged Euler–Lagrange model [ 2 ] through 3D domain extension. Periodic boundary conditions are applied along the transverse directions. The CFL number for these simulations is set to 0 .2. 
+
+5.1 Varying σR
+
+We first consider the representative bubble screen problem by fixing σ ˙R = 0 .2 and σR0 = 0 .3 and varying σR = {0.1, 0.2, 0.3}. The closure errors are plotted in fig. 4 at varying values of nb compared 11 0 5 10 15 20 
+
+0.5
+
+1
+
+1.5
+
+(a) 
+
+t/t 0
+
+> p/p 0
+
+10 20 30 40 50 60 
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+(b) 
+
+nb
+
+> ‖e‖2
+
+σ ˙R = 0.1 0.2 0.3Figure 5: (a) Dimensionless pressure p/p 0 versus time t/t 0 at the center of the bubble screen at nb = 51. (b) RMS relative error ∥e∥2 for the pressure for a varying number of bins nb, with a reference solution at 
+
+nb = 91. Both are shown at varying values of σ ˙R and fixed σR = 0 .2 and σR0 = 0 .3. 0 5 10 15 20 
+
+0.5
+
+1
+
+1.5
+
+(a) 
+
+t/t 0
+
+> p/p 0
+
+10 20 30 40 50 60 
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+(b) 
+
+nb
+
+> ‖e‖2
+
+σR0 = 0.1 0.2 0.3
+
+Figure 6: (a) Dimensionless pressure p/p 0 versus time t/t 0 at the center of the bubble screen at nb = 51. (b) RMS relative error ∥e∥2 for the pressure for a varying number of bins nb, with a reference solution at 
+
+nb = 91. Both are shown at varying values of σR0 and fixed σR = σ ˙R = 0 .2. 
+
+12 0 10 20 30      
+
+> 0.5
+> 1
+> 1.5
+> (a)
+> t/t 0
+> p/p 0
+> 20 22 24 26 28 30
+> 0.96
+> 0.98
+> 1
+> 1.02
+> 1.04
+> (b)
+> t/t 0
+> p/p 0
+
+constant transfer polytropic Figure 7: (a) Dimensionless pressure p/p 0 versus time t/t 0 at the center of the bubble screen for the constant-transfer model and the polytropic model at σR = σ ˙R = 0 .2, σR0 = 0 .3, and nb = 51. (b) The outlined window of (a), 20 ≤ t/t 0 ≤ 30, at which point the pressure has equilibrated, and the high-frequency oscillations of the polytropic closure are clearest. 
+
+to a reference solution with nb = 91. The relative RMS error ∥e∥2 increases only slightly with σR.This contrasts with the results in Bryngelson et al. [16] for the polytropic model. The pressure at the center of the bubble screen at nb = 51 shows an absence of the higher frequency components associated with the natural frequency of the bubble present in Bryngelson et al. [16] . A slight decrease in the minimum radius during the collapse phase is observed with an increase in σR.
+
+5.2 Varying σ ˙R
+
+Next we fix σR = 0 .2 and σR0 = 0 .3 and vary σ ˙R = {0.1, 0.2, 0.3}. The closure errors are plotted in fig. 5 at varying values of nb compared to a reference solution with nb = 91. The relative RMS error 
+
+∥e∥2 is essentially unchanged by σ ˙R. This is consistent with the results presented in Bryngelson et al. [16] for the polytropic model. The pressure at the center of the bubble screen at nb = 51 is accordingly insensitive to σ ˙R. The effects of varying σR on the resulting bubble dynamics are more pronounced when compared to those of varying σ ˙R.
+
+5.3 Varying σR0
+
+Finally, we fix the initial condition for the moment set at σR = σ ˙R = 0 .2 and vary σR0 = {0.1, 0.2, 0.3}
+
+for the log-normal PDF. The closure errors are plotted in fig. 6 at varying values of nb compared to a reference solution with nb = 91. The relative RMS error ∥e∥2 increases with increasing σR0 . The pressure at the center of the bubble screen shows a tendency toward persistent oscillations as σR0
+
+is decreased. The high-frequency oscillations at larger values of σR0 in Bryngelson et al. [16] are absent with the constant-transfer model. The increase in the relative error ∥e∥2 can be attributed to a broader distribution, leading to a larger truncation error from Simpson’s rule. 
+
+5.4 Comparison to polytropic model 
+
+We compare the bubble dynamics at the center of the bubble screen for the constant-transfer model with those of the previously validated polytropic model. The initial condition for the moment set is set at σR = σ ˙R = 0 .2 and σR0 = 0 .3 with nb = 51. The results are displayed in fig. 7, which compares the pressure at the center of the bubble screen. While the effects of the large-wavelength input wave are similar in both models, the constant-transfer model suppresses the small-wavelength oscillations associated with the bubble screen’s natural frequencies. The simulation is run to t/t 0 = 30 to 13 0 5 10 15 20               
+
+> 0
+> 0.5
+> 1
+> 1.5
+> t/t 0
+> p/p 0
+> Euler–Euler
+> Euler–Lagrange (mean)
+> Euler–Lagrange Figure 8: Dimensionless pressure p/p 0versus time t/t 0at the center of the 3D bubble screen for the constant-transfer Euler–Euler model, compared with the mean of the volume-averaged Euler–Lagrange model across 40 independent simulations, with a band delineating the minimum and maximum values across those simulations, at σR=σ˙R= 0 .2, σR0= 0 .3, and nb= 51.
+
+demonstrate the differences between the models clearly, and panel (b) of fig. 7 shows a zoomed-in view of the pressure profiles for t/t 0 > 20. As the pressure equilibrates with the passage of the sinusoidal wave, this difference can be observed more clearly for larger t/t 0 > 20. This is consistent with the absence of the high-frequency components with increasing σR and σR0 observed in the previous section as compared to Bryngelson et al. [16]. 
+
+5.5 Comparison to Euler–Lagrange model 
+
+Finally, we validate our constant-transfer model with the previously validated Euler–Lagrange model [ 2 ]. The bubble screen length for this experiment is Lb = 500 R0, with the domain length 
+
+Lx = 8 Lb. To perform this comparison, we extend the bubble screen in 3D with Ly = Lz = 5 Lb/8and apply periodic boundary conditions along the transverse directions. The grid resolution is coarsened to ( Nx, N y, N z ) = 400 × 50 × 50. The coarsening is done to ensure that the grid resolution is sufficiently low so that the maximum radius of the Lagrangian bubbles is less than the grid resolution, while still resolving the sinusoidal input. The Lagrangian bubbles are placed uniformly within the bubble screen dimension Lb. We set σR0 = 0 .3 and sample the radii of the Lagrangian bubbles from the log-normal PDF to satisfy αb = 4 × 10 −5 within the bubble screen. We compute the mean of Nsim = 40 independent instances of the Euler–Lagrange simulation to sufficiently reduce sampling error as per Vaca-Revelo et al. [2] , Bryngelson et al. [5] . The Euler–Euler simulation is conducted with σR = σ ˙R = 0 .2 and nb = 51. The results are displayed in fig. 8, which compares the pressure at the center of the bubble screen for the Euler–Euler and the mean of the Euler–Lagrange simulations. The RMS relative error between these simulations is computed to be ∥e∥2 = 0 .015, indicating excellent agreement. The Euler–Euler curve is not pointwise contained within the minimum–maximum envelope of the individual Euler–Lagrange results during the early driven and collapse phases; its maximum departure from the envelope is approximately 4 % of p0.
+
+6 Conclusion 
+
+We present an Euler–Euler stochastic sub-grid-scale model that uses the method of moments. The population balance equation carries stochasticity in the dispersed-phase internal variables. A conditional hyperbolic inversion procedure advances the moment transport equations and the ensemble-averaged terms. A constant-transfer model represents complex bubble dynamics better than the previous polytropic model. The PBE carries additional internal variables. Delta functions at 14 the quadrature nodes approximate the probability densities, reducing cost. The model is incorporated into the high-order accurate compressible flow solver MFC. We verified the model by comparing node evolution and bubble variables to Monte Carlo simulations for a monodisperse bubble. The model was tested for an acoustically excited, polydisperse bubble-screen problem with a sinusoidal input pulse. The constant-transfer model suppresses the high-frequency oscillations associated with the bubble screen’s natural frequencies, compared to the polytropic model. The initial distribution of the moment set is found to have a small effect on closure errors, with sensitivity increasing with broader equilibrium-radius distributions ( σR0 ). The model is validated by comparing against the mean of previously validated volume-averaged Euler–Lagrange simulations. The model shows excellent agreement on the bubble dynamics in the center of the bubble screen, with an RMS relative error of 1 .5 %. The current limitation of the polydisperse method of moments is instability at large pressure ratios when paired with a small equilibrium radius. This limitation persists even with the previous polytropic implementation, when the bubble radius rapidly approaches zero. This currently causes stability issues in cases such as flow over an immersed boundary, where a strong shock wave passes through the domain, leading to non-realizable moments. Future work would aim to resolve these stability issues by investigating limiters for non-realizable moments and adaptive sub-stepping for the dispersed phase. 
+
+CRediT authorship contribution statement Anand Radhakrishnan: Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Visualization, Writing — original draft. 
+
+Spencer H. Bryngelson: Conceptualization, Methodology, Resources, Supervision, Funding acquisition, Writing — review & editing. 
+
+Declaration of competing interest 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+Acknowledgments 
+
+SHB acknowledges support from the US Office of Naval Research under grant number N00014-22-1-2519. This research used resources of the Oak Ridge Leadership Computing Facility at the Oak Ridge National Laboratory, which is supported by the Office of Science of the U.S. Department of Energy under Contract No. DE-AC05-00OR22725 (allocation CFD154, PI Bryngelson). This work also used PSC Bridges2 and NCSA Delta and Delta AI through allocation PHY210084 (PI Bryngelson) from the Advanced Cyberinfrastructure Coordination Ecosystem: Services & Support (ACCESS) program, which is supported by National Science Foundation grants #2138259, #2138286, #2138307, #2137603, and #2138296. 
+
+Data availability 
+
+The datasets generated during this study include simulation input files, example cases, random seeds, and the source code used to produce the reported results. These materials have been archived on Zenodo (version 1.0.0) and are publicly available at doi:10.5281/zenodo.21590440, corresponding to Git commit c7d8fe135746 .15 References 
+
+[1] K. Maeda, T. Colonius, Eulerian–Lagrangian method for simulation of cloud cavitation, J. Comp. Phys. 371 (2018) 994–1017. [2] D. Vaca-Revelo, B. Wilfong, S. H. Bryngelson, A. Gnanaskandan, Hardware-accelerated phase-averaging for cavitating bubbly flows, International Journal of Multiphase Flow (2026) 105674. [3] T. Colonius, R. Hagmeijer, K. Ando, C. E. Brennen, Statistical equilibrium of bubble oscillations in dilute bubbly flows, Phys. Fluids 20 (2008). [4] D. Z. Zhang, A. Prosperetti, Ensemble phase-averaged equations for bubbly flows, Phys. Fluids 
+
+6 (1994). [5] S. H. Bryngelson, K. Schmidmayer, T. Colonius, A quantitative comparison of phase-averaged models for bubbly, cavitating flows, Int. J. Mult. Flow 115 (2019) 137–143. [6] M. Vanni, Approximate population balance equations for aggregation breakage processes, J. Colloid Interface Sci. 221 (2000) 143–160. [7] R. McGraw, Description of aerosol dynamics by the quadrature method of moments, Aerosol Sci. Technol. 27 (1997) 255–265. [8] R. O. Fox, F. Laurent, A. Vi´ e, Conditional hyperbolic quadrature method of moments for kinetic equations, J. Comp. Phys. 365 (2018) 269–293. [9] M. E. Mueller, G. Blanquart, H. Pitsch, A joint volume-surface model of soot aggregation with the method of moments, Proc. Combust. Inst. 32 I (2009) 785–792. [10] A. Sibra, J. Dupays, A. Murrone, F. Laurent, M. Massot, Simulation of reactive polydisperse sprays strongly coupled to unsteady flows in solid rocket motors: Efficient strategy using Eulerian multi-fluid methods, J. Comp. Phys. 339 (2017) 210–246. [11] R. O. Fox, A quadrature-based third-order moment method for dilute gas–particle flows, J. Comp. Phys. 227 (2008) 6313–6350. [12] J. C. Heylmun, B. Kong, A. Passalacqua, R. Fox, A quadrature-based moment method for polydisperse bubbly flows, Comp. Phys. Comm. (2019). [13] A. Buffo, M. Vanni, D. L. Marchisio, R. O. Fox, Multivariate Quadrature-Based Moments Methods for turbulent polydisperse gas-liquid systems, Int. J. Mult. Flow 50 (2013) 41–57. [14] B. Wilfong, H. A. Le Berre, A. Radhakrishnan, A. Gupta, D. J. Vickers, D. Vaca-Revelo, D. Adam, H. Yu, H. Lee, J. R. Chreim, et al., Mfc 5.0: An exascale many-physics flow solver, Computer Physics Communications (2026) 110055. [15] A. Preston, T. Colonius, C. E. Brennen, A reduced-order model of diffusion effects on the dynamics of bubbles, Phys. Fluids 19 (2007). [16] S. H. Bryngelson, R. O. Fox, T. Colonius, Conditional moment methods for polydisperse cavitating flows, J. Comp. Phys. (2023) 111917. 16 [17] S. H. Bryngelson, K. Schmidmayer, V. Coralic, J. C. Meng, K. Maeda, T. Colonius, MFC: An open-source high-order multi-component, multi-phase, and multi-scale compressible flow solver, Comp. Phys. Comm. (2021) 107396. [18] A. Radhakrishnan, H. Le Berre, B. Wilfong, J.-S. Spratt, M. Rodriguez, T. Colonius, S. H. Bryngelson, Method for scalable and performant GPU-accelerated simulation of multiphase compressible flow, Comp. Phys. Comm. 302 (2024) 109238. [19] K. Ando, T. Colonius, C. E. Brennen, Numerical simulation of shock propagation in a polydisperse bubbly liquid, Int. J. Mult. Flow 37 (2011) 596–608. [20] R. Menikoff, B. J. Plohr, The Riemann problem for fluid-flow of real materials, Rev. Mod. Phys. 61 (1989) 75–130. [21] S. H. Bryngelson, T. Colonius, R. O. Fox, QBMMlib: A library of quadrature-based moment methods, SoftwareX 12 (2020) 100615. [22] C. Yuan, R. O. Fox, Conditional quadrature method of moments for kinetic equations, J. Comp. Phys. 230 (2011) 8216–8246. [23] R. G. Patel, O. Desjardins, R. O. Fox, Three-dimensional conditional hyperbolic quadrature method of moments, J. Comp. Phys. X 1 (2019) 100006. [24] M. S. Plesset, A. Prosperetti, Bubble dynamics and cavitation, Annu. Rev. Fluid Mech. 9
+
+(1977) 145–185. [25] G.-S. Jiang, C.-W. Shu, Efficient implementation of weighted eno schemes, J. Comp. Phys. 
+
+126 (1996) 202–228. [26] E. Toro, M. Spruce, W. Speares, Restoration of the contact surface in the HLL-Riemann solver, Shock waves 4 (1994) 25–34. [27] A. Charalampopoulos, S. H. Bryngelson, T. Colonius, T. P. Sapsis, Hybrid quadrature moment method for accurate and stable representation of non-gaussian processes applied to bubble dynamics, Philosophical Transactions of the Royal Society A 380 (2022) 20210209. 17

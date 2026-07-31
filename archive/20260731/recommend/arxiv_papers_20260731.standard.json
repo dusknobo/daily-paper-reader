@@ -1,0 +1,181 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-31T21:54:04.730904+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 4,
+    "quick_skim_target": 11,
+    "quick_selected": 4
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.25433v1",
+      "source": "arxiv",
+      "title": "Vortex dynamics and air entrainment in dam break wave impacting on vertical walls: A multiphase lattice Boltzmann study",
+      "abstract": "Air entrainment often plays a crucial role in determining impact loads exerted by free-surface wave flows interacting with structures, yet its modelling is often oversimplified in numerical approaches.   In this study a two-phase numerical model, based on the Lattice Boltzmann Method coupled to a conservative Allen--Cahn interface-capturing equation is employed to perform direct numerical simulations of dam-break waves propagating over a dry bed and impacting on vertical walls.   Access to high-resolution simulations enables a detailed assessment of how accurately resolving both air--water and solid--water interfaces affects local and overall dynamics, as well as quantities of extreme engineering interest. Indeed, the magnitudes and locations of the pressure peaks are strongly affected by wave front deflection and local aeration induced by a small corner vortex.   Additionally, comparisons between no-slip and free-slip implementations suggest that the large air cavity formation, commonly observed as trapped inside the reflected jet falling back onto the incoming flow, may be the result of modeling assumptions rather than intrinsic flow physics, again highlighting the key role of near-wall shear in jet breakup dynamics.",
+      "authors": [
+        "Massimiliano Mustè",
+        "Andrea Montessori",
+        "Pietro Prestininzi"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "physics.comp-ph"
+      ],
+      "published": "2026-07-28T08:26:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.25433v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "direct numerical simulation of two-phase dam-break wave using conservative Allen-Cahn LBM",
+      "llm_evidence_cn": "使用保守Allen-Cahn LBM对溃坝两相波进行直接数值模拟",
+      "llm_evidence": "使用保守Allen-Cahn LBM对溃坝两相波进行直接数值模拟",
+      "canonical_evidence": "使用保守Allen-Cahn LBM对溃坝两相波进行直接数值模拟",
+      "llm_tldr_en": "This study performs DNS of dam-break waves impacting vertical walls with a two-phase LBM, capturing air entrainment effects. High-resolution simulations reveal how interface resolution affects dynamics and loads, providing a method applicable to multiphase flow problems like falling films.",
+      "llm_tldr_cn": "该研究采用耦合保守Allen-Cahn界面捕获方程的格子Boltzmann方法，对溃坝波冲击垂直壁的过程进行了直接数值模拟，精确捕获了空气卷吸现象。高分辨率模拟揭示了界面解析对涡动力学和冲击载荷的影响，所发展的两相CFD方法可用于类似降膜的多相流问题。",
+      "llm_tldr": "该研究采用耦合保守Allen-Cahn界面捕获方程的格子Boltzmann方法，对溃坝波冲击垂直壁的过程进行了直接数值模拟，精确捕获了空气卷吸现象。高分辨率模拟揭示了界面解析对涡动力学和冲击载荷的影响，所发展的两相CFD方法可用于类似降膜的多相流问题。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.26674v1",
+      "source": "arxiv",
+      "title": "HORSES3D-GPU: A high-order discontinuous Galerkin solver for multi-GPU systems",
+      "abstract": "We present the GPU acceleration and large-scale performance assessment of HORSES3D, an open-source high-order discontinuous Galerkin solver for computational fluid dynamics. The solver is ported to NVIDIA GPU architectures using OpenACC directives, preserving the original Fortran code structure while enabling GPU-resident execution of the main computational kernels. The implementation exploits the element-local structure of discontinuous Galerkin spectral element methods by mapping element-level loops to GPU gangs and nodal operations to vector-level parallelism.   The GPU version is verified using the method of manufactured solutions and validated on canonical turbulent-flow benchmarks. Its performance is assessed on the MareNostrum 5 accelerated partition using NVIDIA H100 GPUs. Taylor-Green vortex benchmarks show that solver efficiency improves with polynomial order and that near-ideal strong and weak scaling is obtained when the workload exceeds approximately 16,000 to 20,000 elements per GPU.   The solver is further evaluated on the High-Lift Common Research Model wing-body configuration, which involves a complex geometry, realistic boundary conditions, and unstructured meshes with up to 20.8 million hexahedral elements. Simulations with polynomial orders up to $P=7$ reach approximately $10.7 \\times 10^9$ degrees of freedom and scale efficiently to 2,048 GPUs. The results demonstrate that HORSES3D preserves its performance characteristics for industrially relevant configurations and can exploit modern GPU-based supercomputers for billion-degree-of-freedom high-order CFD simulations.",
+      "authors": [
+        "Gerasimos Ntoukas",
+        "Gonzalo Rubio",
+        "Abbas Ballout",
+        "Stefano Colombo",
+        "David Huergo",
+        "Eduardo Jané",
+        "Albert Jiménez-Ramos",
+        "Hatem Kessasra",
+        "Himpu Marbona",
+        "Oscar Mariño",
+        "Rodrigo Salado",
+        "Pol Solé-Miró",
+        "Andrés M. Rueda-Ramírez",
+        "Miguel Chávez-Módena",
+        "Eusebio Valero",
+        "Esteban Ferrer"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-29T09:29:34+00:00",
+      "link": "https://arxiv.org/pdf/2607.26674v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Open-source high-order DG solver for CFD, applicable to multiphase flow simulations",
+      "llm_evidence_cn": "开源高阶DG求解器适用于多相流CFD模拟",
+      "llm_evidence": "开源高阶DG求解器适用于多相流CFD模拟",
+      "canonical_evidence": "开源高阶DG求解器适用于多相流CFD模拟",
+      "llm_tldr_en": "Presents GPU acceleration of the open-source CFD solver HORSES3D, which could be used for multiphase flow simulations including falling film heat transfer.",
+      "llm_tldr_cn": "本文实现了开源高阶间断Galerkin求解器HORSES3D的GPU加速，利用OpenACC将核心计算移植至GPU，并保持原Fortran结构。该求解器适用于通用计算流体动力学，其高精度和多物理场扩展能力使其有潜力用于垂直管内降膜换热的多相流CFD模拟。",
+      "llm_tldr": "本文实现了开源高阶间断Galerkin求解器HORSES3D的GPU加速，利用OpenACC将核心计算移植至GPU，并保持原Fortran结构。该求解器适用于通用计算流体动力学，其高精度和多物理场扩展能力使其有潜力用于垂直管内降膜换热的多相流CFD模拟。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.27426v1",
+      "source": "arxiv",
+      "title": "A sub-grid-scale model for polydisperse bubbly flows with heat and mass transfer",
+      "abstract": "Ensemble-averaged models of polydisperse bubbly flows require statistics of the evolving bubble population. Prior quadrature-based moment formulations close bubble pressure with a polytropic relation that omits heat and mass transfer at the bubble wall. We formulate constant-transfer equations for bubble pressure and vapor mass within a conditional hyperbolic quadrature method. Second-order conditional inversion produces four joint radius--radial-velocity nodes per equilibrium-radius bin. Bubble pressure and vapor mass are advanced at each node. The node values close the ensemble-averaged flow equations without adding mixed pressure or vapor-mass moments to the transported moment set. The model is implemented in MFC. Monte Carlo calculations verify the evolution of quadrature nodes and the mean bubble variables for a harmonically forced population. Bubble-screen calculations quantify closure error as the equilibrium radius is discretized and the initial distributions vary. The constant-transfer calculation does not exhibit the high-frequency pressure oscillations observed with the polytropic closure under the conditions considered. 3D bubble-screen calculations give a 1.5% relative root-mean-square error between the Euler--Euler center pressure and the mean of 40 volume-averaged Euler--Lagrange realizations.",
+      "authors": [
+        "Anand Radhakrishnan",
+        "Spencer H. Bryngelson"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "physics.comp-ph"
+      ],
+      "published": "2026-07-29T19:54:50+00:00",
+      "link": "https://arxiv.org/pdf/2607.27426v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "sub-grid model for polydisperse bubbly flows with heat and mass transfer is a two-phase flow simulation method",
+      "llm_evidence_cn": "含传热传质的弥散气泡流亚格子模型是两相流模拟方法",
+      "llm_evidence": "含传热传质的弥散气泡流亚格子模型是两相流模拟方法",
+      "canonical_evidence": "含传热传质的弥散气泡流亚格子模型是两相流模拟方法",
+      "llm_tldr_en": "This paper develops a sub-grid-scale model for heat and mass transfer in polydisperse bubbly flows, advancing two-phase flow simulation methods that could inform falling film modeling through similar interfacial phase-change physics.",
+      "llm_tldr_cn": "本文针对弥散气泡流的系综平均模型，提出同时考虑气泡壁面传热传质的亚格子模型，采用条件双曲求积法推进气泡压力和蒸气质量。该模型在两相流模拟中融入了界面传热传质效应，其方法学思想可借鉴至降膜蒸发过程中的相间传递模拟。",
+      "llm_tldr": "本文针对弥散气泡流的系综平均模型，提出同时考虑气泡壁面传热传质的亚格子模型，采用条件双曲求积法推进气泡压力和蒸气质量。该模型在两相流模拟中融入了界面传热传质效应，其方法学思想可借鉴至降膜蒸发过程中的相间传递模拟。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.28104v1",
+      "source": "arxiv",
+      "title": "An Adaptive Finite Element Method for Marker-Driven Level-Set Transport on Hierarchical Meshes",
+      "abstract": "This work presents a new adaptive finite-element framework for level-set transport, achieving high accuracy in kinematic interface transport problems relevant to interface-capturing methods for two-phase flows while reducing computational cost. This framework accommodates dynamic refinement and coarsening, and is compatible with standard finite-element data structures. The algorithm is applicable to both structured and unstructured discretizations in two and three dimensions. The method uses a tree-based hierarchical mesh with dynamic local refinement that tracks the evolving interface, concentrating resolution in a narrow band around the zero level set while preserving a coarse discretization elsewhere. The level-set field is updated through marker transport on adaptively refined meshes, enabling interface prediction and the construction of an evolving adaptive hierarchy. Concurrently, backward characteristic tracing provides accurate evaluation of the advected level-set field. Both operations employ an efficient multilevel marker and point-location algorithm to identify containing elements across refinement levels. Numerical experiments on two- and three-dimensional structured and unstructured grids, including quadrilateral, simplicial, wedge, and hexahedral meshes, subjected to severe interface deformations, demonstrate that the adaptive strategy achieves accuracy comparable to uniform discretizations at a substantially lower cost, while maintaining good conservation properties under aggressive adaptivity. Consequently, the proposed approach provides an efficient and flexible framework that can be naturally integrated into level-set-based multiphase flow solvers.",
+      "authors": [
+        "Eugenio Aulisa",
+        "Samuele Baldini",
+        "Giacomo Barbi",
+        "Andrea Chierici",
+        "Sandro Manservisi"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-30T12:12:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.28104v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adaptive FEM for level-set transport in two-phase flow simulations",
+      "llm_evidence_cn": "用于两相流模拟的自适应有限元水平集输运方法",
+      "llm_evidence": "用于两相流模拟的自适应有限元水平集输运方法",
+      "canonical_evidence": "用于两相流模拟的自适应有限元水平集输运方法",
+      "llm_tldr_en": "This paper presents an adaptive finite-element method for level-set transport in two-phase flows, using marker-driven mesh refinement to concentrate resolution near interfaces. It achieves accurate interface kinematics with reduced cost and is compatible with standard FE frameworks, useful for simulating falling films.",
+      "llm_tldr_cn": "本文针对两相流界面输运问题，提出了一种基于标记驱动的自适应有限元水平集输运方法。通过树形层次网格动态细化界面附近区域，在保证界面运动高精度的同时显著降低计算成本，并兼容主流有限元数据结构，为降膜等两相流的高效模拟提供了一种新途径。",
+      "llm_tldr": "本文针对两相流界面输运问题，提出了一种基于标记驱动的自适应有限元水平集输运方法。通过树形层次网格动态细化界面附近区域，在保证界面运动高精度的同时显著降低计算成本，并兼容主流有限元数据结构，为降膜等两相流的高效模拟提供了一种新途径。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-31",
+  "date": "2026-07-31",
+  "generated_at": "2026-07-31T21:59:32",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/31/2607.25433v1-vortex-dynamics-and-air-entrainment-in-dam-break-wave-impacting-on-vertical-walls-a-multiphase-lattice-boltzmann-study",
+      "section": "quick",
+      "title_en": "Vortex dynamics and air entrainment in dam break wave impacting on vertical walls: A multiphase lattice Boltzmann study",
+      "authors": "Massimiliano Mustè, Andrea Montessori, Pietro Prestininzi",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.25433v1",
+      "score": "6.0",
+      "evidence": "使用保守Allen-Cahn LBM对溃坝两相波进行直接数值模拟",
+      "tldr": "在溃坝波冲击结构时，空气卷吸对载荷预测具有决定性影响，但数值模拟常简化处理。本研究采用耦合Allen-Cahn界面捕捉的格子玻尔兹曼两相模型，对干床溃坝波冲击垂直壁进行高分辨直接数值模拟，系统探究涡动力学与空气卷吸机理。结果表明：壁面角涡诱发波前偏转与局部掺气，显著改变压力峰值大小与位置；对比无滑移与自由滑移条件发现，反射射流回落时形成的典型大空腔源于近壁剪切效应，而非固有物理现象。该工作强调了精确解析气-水-固多相界面对工程结构抗冲击设计的重要性。",
+      "tags": "query:falling-film",
+      "abstract_en": "Air entrainment often plays a crucial role in determining impact loads exerted by free-surface wave flows interacting with structures, yet its modelling is often oversimplified in numerical approaches.   In this study a two-phase numerical model, based on the Lattice Boltzmann Method coupled to a conservative Allen--Cahn interface-capturing equation is employed to perform direct numerical simulations of dam-break waves propagating over a dry bed and impacting on vertical walls.   Access to high-resolution simulations enables a detailed assessment of how accurately resolving both air--water and solid--water interfaces affects local and overall dynamics, as well as quantities of extreme engineering interest. Indeed, the magnitudes and locations of the pressure peaks are strongly affected by wave front deflection and local aeration induced by a small corner vortex.   Additionally, comparisons between no-slip and free-slip implementations suggest that the large air cavity formation, commonly observed as trapped inside the reflected jet falling back onto the incoming flow, may be the result of modeling assumptions rather than intrinsic flow physics, again highlighting the key role of near-wall shear in jet breakup dynamics.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/31/2607.26674v1-horses3d-gpu-a-high-order-discontinuous-galerkin-solver-for-multi-gpu-systems",
+      "section": "quick",
+      "title_en": "HORSES3D-GPU: A high-order discontinuous Galerkin solver for multi-GPU systems",
+      "authors": "Gerasimos Ntoukas, Gonzalo Rubio, Abbas Ballout, Stefano Colombo, David Huergo, Eduardo Jané, Albert Jiménez-Ramos, Hatem Kessasra, Himpu Marbona, Oscar Mariño, Rodrigo Salado, Pol Solé-Miró, Andrés M. Rueda-Ramírez, Miguel Chávez-Módena, Eusebio Valero, Esteban Ferrer",
+      "date": "2026-07-29",
+      "pdf": "https://arxiv.org/pdf/2607.26674v1",
+      "score": "6.0",
+      "evidence": "开源高阶DG求解器适用于多相流CFD模拟",
+      "tldr": "高阶间断Galerkin方法虽精度高，但计算量巨大，限制其在工业级流体仿真中的应用。本研究将开源CFD求解器HORSES3D通过OpenACC移植至NVIDIA GPU，利用单元局部性实现高效并行。在Taylor-Green涡旋和高升力翼身构型测试中，该求解器在超过1.6万个单元/GPU时近乎理想扩展，成功利用2048块H100 GPU完成107亿自由度模拟。其证明了高阶DG方法在GPU超算上进行十亿自由度级工业复杂流动仿真的可行性与高效性。",
+      "tags": "query:falling-film",
+      "abstract_en": "We present the GPU acceleration and large-scale performance assessment of HORSES3D, an open-source high-order discontinuous Galerkin solver for computational fluid dynamics. The solver is ported to NVIDIA GPU architectures using OpenACC directives, preserving the original Fortran code structure while enabling GPU-resident execution of the main computational kernels. The implementation exploits the element-local structure of discontinuous Galerkin spectral element methods by mapping element-level loops to GPU gangs and nodal operations to vector-level parallelism.   The GPU version is verified using the method of manufactured solutions and validated on canonical turbulent-flow benchmarks. Its performance is assessed on the MareNostrum 5 accelerated partition using NVIDIA H100 GPUs. Taylor-Green vortex benchmarks show that solver efficiency improves with polynomial order and that near-ideal strong and weak scaling is obtained when the workload exceeds approximately 16,000 to 20,000 elements per GPU.   The solver is further evaluated on the High-Lift Common Research Model wing-body configuration, which involves a complex geometry, realistic boundary conditions, and unstructured meshes with up to 20.8 million hexahedral elements. Simulations with polynomial orders up to $P=7$ reach approximately $10.7 \\times 10^9$ degrees of freedom and scale efficiently to 2,048 GPUs. The results demonstrate that HORSES3D preserves its performance characteristics for industrially relevant configurations and can exploit modern GPU-based supercomputers for billion-degree-of-freedom high-order CFD simulations.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/31/2607.27426v1-a-sub-grid-scale-model-for-polydisperse-bubbly-flows-with-heat-and-mass-transfer",
+      "section": "quick",
+      "title_en": "A sub-grid-scale model for polydisperse bubbly flows with heat and mass transfer",
+      "authors": "Anand Radhakrishnan, Spencer H. Bryngelson",
+      "date": "2026-07-29",
+      "pdf": "https://arxiv.org/pdf/2607.27426v1",
+      "score": "6.0",
+      "evidence": "含传热传质的弥散气泡流亚格子模型是两相流模拟方法",
+      "tldr": "针对多分散气泡流中忽略壁面热质传递导致模型无法准确预测压力演变的问题，本文提出一种基于条件双曲求积法的亚格子闭合模型。该模型在每个平衡半径分箱内通过二阶条件反演产生四个联合半径-径向速度节点，为节点构建常数形式的压力与蒸汽质量传递方程，从而在矩输运中避免引入混合矩。在MFC中实现后，蒙特卡洛模拟验证了节点演化和平均气泡变量，三维气泡屏计算表明中心压力的相对均方根误差仅1.5%，且消除了多变闭锁的高频压力振荡。该工作为含蒸发/凝结的多分散泡状流提供了可靠的欧拉-欧拉模拟框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "Ensemble-averaged models of polydisperse bubbly flows require statistics of the evolving bubble population. Prior quadrature-based moment formulations close bubble pressure with a polytropic relation that omits heat and mass transfer at the bubble wall. We formulate constant-transfer equations for bubble pressure and vapor mass within a conditional hyperbolic quadrature method. Second-order conditional inversion produces four joint radius--radial-velocity nodes per equilibrium-radius bin. Bubble pressure and vapor mass are advanced at each node. The node values close the ensemble-averaged flow equations without adding mixed pressure or vapor-mass moments to the transported moment set. The model is implemented in MFC. Monte Carlo calculations verify the evolution of quadrature nodes and the mean bubble variables for a harmonically forced population. Bubble-screen calculations quantify closure error as the equilibrium radius is discretized and the initial distributions vary. The constant-transfer calculation does not exhibit the high-frequency pressure oscillations observed with the polytropic closure under the conditions considered. 3D bubble-screen calculations give a 1.5% relative root-mean-square error between the Euler--Euler center pressure and the mean of 40 volume-averaged Euler--Lagrange realizations.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/31/2607.28104v1-an-adaptive-finite-element-method-for-marker-driven-level-set-transport-on-hierarchical-meshes",
+      "section": "quick",
+      "title_en": "An Adaptive Finite Element Method for Marker-Driven Level-Set Transport on Hierarchical Meshes",
+      "authors": "Eugenio Aulisa, Samuele Baldini, Giacomo Barbi, Andrea Chierici, Sandro Manservisi",
+      "date": "2026-07-30",
+      "pdf": "https://arxiv.org/pdf/2607.28104v1",
+      "score": "6.0",
+      "evidence": "用于两相流模拟的自适应有限元水平集输运方法",
+      "tldr": "针对两相流界面捕捉中水平集输运的高精度与计算效率需求，提出一种自适应有限元框架，在层次网格上动态跟踪界面，将分辨率集中在零水平集窄带内，并通过标记输运与反向特征追踪高效更新场量。方法在多种结构化与非结构化网格上验证，能以远低于均匀离散化的成本达到可比精度，并保持良好质量守恒性。该框架可自然集成至多相流求解器，提升界面捕捉效率。",
+      "tags": "query:falling-film",
+      "abstract_en": "This work presents a new adaptive finite-element framework for level-set transport, achieving high accuracy in kinematic interface transport problems relevant to interface-capturing methods for two-phase flows while reducing computational cost. This framework accommodates dynamic refinement and coarsening, and is compatible with standard finite-element data structures. The algorithm is applicable to both structured and unstructured discretizations in two and three dimensions. The method uses a tree-based hierarchical mesh with dynamic local refinement that tracks the evolving interface, concentrating resolution in a narrow band around the zero level set while preserving a coarse discretization elsewhere. The level-set field is updated through marker transport on adaptively refined meshes, enabling interface prediction and the construction of an evolving adaptive hierarchy. Concurrently, backward characteristic tracing provides accurate evaluation of the advected level-set field. Both operations employ an efficient multilevel marker and point-location algorithm to identify containing elements across refinement levels. Numerical experiments on two- and three-dimensional structured and unstructured grids, including quadrilateral, simplicial, wedge, and hexahedral meshes, subjected to severe interface deformations, demonstrate that the adaptive strategy achieves accuracy comparable to uniform discretizations at a substantially lower cost, while maintaining good conservation properties under aggressive adaptivity. Consequently, the proposed approach provides an efficient and flexible framework that can be naturally integrated into level-set-based multiphase flow solvers.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

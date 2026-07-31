@@ -6,26 +6,33 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-30
-- 运行时间：2026-07-30 21:41:58 UTC
+- 最新运行日期：2026-07-31
+- 运行时间：2026-07-31 21:59:22 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：1
-- 速读区：0
+- 本次总论文数：4
+- 精读区：0
+- 速读区：4
 
 ### 今日简报（AI）
-一种新的格子 Boltzmann 方法让润湿角随流动精准演化，比传统模型更贴合真实液滴碰撞。
-今日精读的 8 分论文用保守 Allen-Cahn 方程锁定了多相流动态润湿，解析力值得一看。
-下一步可把该数值框架放入复杂曲面或蒸发工况中比对实验，普通人也能读懂背后的物理直观。
-- 详情：[/202607/30/README](/202607/30/README)
+今日速览四篇流体力学新研究，涵盖溃坝漩涡、高阶GPU求解器与多分散气泡模拟。最值得关注的是溃坝冲击中的涡动力学与多气泡传热传质的亚网格模型，揭示了复杂多相流中的新机理。建议读者优先查看这两篇文摘，了解前沿数值方法与物理模型的突破。
+- 详情：[/202607/31/README](/202607/31/README)
 
 ### 精读区论文标签
-1. [Accurate wetting dynamics via a conservative Allen-Cahn based lattice Boltzmann approach for multiphase flows](/202607/30/2607.25444v1-accurate-wetting-dynamics-via-a-conservative-allen-cahn-based-lattice-boltzmann-approach-for-multiphase-flows)  
-   标签：评分：8.0/10、query:falling-film
-   evidence：提出了一种具有精确润湿边界条件的保守Allen-Cahn格子玻尔兹曼多相流方法，与降膜模拟相关
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Vortex dynamics and air entrainment in dam break wave impacting on vertical walls: A multiphase lattice Boltzmann study](/202607/31/2607.25433v1-vortex-dynamics-and-air-entrainment-in-dam-break-wave-impacting-on-vertical-walls-a-multiphase-lattice-boltzmann-study)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：使用保守Allen-Cahn LBM对溃坝两相波进行直接数值模拟
+2. [HORSES3D-GPU: A high-order discontinuous Galerkin solver for multi-GPU systems](/202607/31/2607.26674v1-horses3d-gpu-a-high-order-discontinuous-galerkin-solver-for-multi-gpu-systems)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：开源高阶DG求解器适用于多相流CFD模拟
+3. [A sub-grid-scale model for polydisperse bubbly flows with heat and mass transfer](/202607/31/2607.27426v1-a-sub-grid-scale-model-for-polydisperse-bubbly-flows-with-heat-and-mass-transfer)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：含传热传质的弥散气泡流亚格子模型是两相流模拟方法
+4. [An Adaptive Finite Element Method for Marker-Driven Level-Set Transport on Hierarchical Meshes](/202607/31/2607.28104v1-an-adaptive-finite-element-method-for-marker-driven-level-set-transport-on-hierarchical-meshes)  
+   标签：评分：6.0/10、query:falling-film
+   evidence：用于两相流模拟的自适应有限元水平集输运方法
 
 
 <div class="dpr-home-promo-card">

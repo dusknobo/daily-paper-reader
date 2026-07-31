@@ -1,0 +1,1433 @@
+Title: An Adaptive Finite Element Method for Marker-Driven Level-Set Transport on Hierarchical Meshes
+
+URL Source: https://arxiv.org/pdf/2607.28104v1
+
+Published Time: Fri, 31 Jul 2026 01:10:24 GMT
+
+Number of Pages: 41
+
+Markdown Content:
+# An Adaptive Finite Element Method for Marker-Driven Level-Set Transport on Hierarchical Meshes 
+
+## Eugenio Aulisa ∗ Samuele Baldini † Giacomo Barbi ∗
+
+## Andrea Chierici ∗ Sandro Manservisi †
+
+Accepted manuscript. The final authenticated version is available at: 
+
+https://doi.org/10.1016/j.jcp.2026.115229 
+
+Abstract 
+
+This work presents a new adaptive finite-element framework for level-set trans-port, achieving high accuracy in kinematic interface transport problems relevant to interface-capturing methods for two-phase flows while reducing computational cost. This framework accommodates dynamic refinement and coarsening, and is compatible with standard finite-element data structures. The algorithm is applicable to both struc-tured and unstructured discretizations in two and three dimensions. The method uses a tree-based hierarchical mesh with dynamic local refinement that tracks the evolving interface, concentrating resolution in a narrow band around the zero level set while pre-serving a coarse discretization elsewhere. The level-set field is updated through marker transport on adaptively refined meshes, enabling interface prediction and the construc-tion of an evolving adaptive hierarchy. Concurrently, backward characteristic tracing provides accurate evaluation of the advected level-set field. Both operations employ an efficient multilevel marker and point-location algorithm to identify containing elements across refinement levels. Numerical experiments on two- and three-dimensional struc-tured and unstructured grids, including quadrilateral, simplicial, wedge, and hexahe-dral meshes, subjected to severe interface deformations, demonstrate that the adaptive strategy achieves accuracy comparable to uniform discretizations at a substantially lower cost, while maintaining good conservation properties under aggressive adaptiv-ity. Consequently, the proposed approach provides an efficient and flexible framework that can be naturally integrated into level-set-based multiphase flow solvers. 
+
+Keywords: Kinematic interface transport; Level-set methods; Semi-Lagrangian methods; Adaptive mesh refinement; Interface reinitialization 
+
+> ∗
+
+Department of Mathematics and Statistics, Texas Tech University, Lubbock, TX, USA 
+
+> †
+
+Department of Industrial Engineering, University of Bologna, Bologna, Italy 
+
+1arXiv:2607.28104v1 [math.NA] 30 Jul 2026 1 Introduction 
+
+## 1.1 Background 
+
+The simulation of two-phase and, more generally, multiphase flows requires an accurate and robust description of moving interfaces, presenting significant numerical challenges when handling large deformations, topological changes, and coupled physical phenomena. In the present work, we focus on the kinematic transport component of such interface-capturing formulations. The numerical challenge is to advance these interfaces in the presence of complex velocity fields, inducing strong deformations that can lead to potential topological changes. To this end, two different techniques for transporting the interface have been devel-oped: explicit interface-tracking methods, which maintain a sharp, discrete representation of the interface geometry, and implicit interface-capturing methods, which embed the interface within a fixed grid using auxiliary scalar fields. The choice between these approaches involves inherent trade-offs between geometric precision, conservation properties, and robustness to topological changes. Among these approaches, the level-set method [1, 2] addresses this issue by transporting a smooth (Lipschitz-continuous) scalar field Φ( x, t ), whose zero isoline or isosurface represents the moving interface. This technique avoids any explicit treatment of the interface, thereby facilitating complex interface dynamics and topological changes. In particular, topological changes are handled implicitly through the Eulerian evolution of the level-set field rather than through explicit interface reconstruction. Moreover, geometric quantities of interest, such as normals and curvature, can be extracted directly from the level-set field, making this formulation compatible with a wide range of discretization and differentiation schemes. This formulation is compatible with both finite-volume/finite-difference and finite-element discretizations, as geometric quantities are derived directly from the level-set field. Despite its elegance and versatility, the level-set method suffers from several well-documented draw-backs, most notably mass loss and degradation of the level-set field, both of which can introduce significant errors during advection. Mass loss typically arises from discretization inaccuracies and the numerical diffusion required to stabilize the advection process, under-mining volume conservation. Meanwhile, degradation refers to the departure of the level-set function from a signed-distance profile due to numerical advection, necessitating periodic reinitialization to restore accuracy [3, 4]. Historically, these difficulties have been addressed using several strategies, including high-order Hamilton–Jacobi solvers (ENO/WENO schemes with TVD Runge–Kutta integration [5]), narrow- band evolution [6], reinitialization of Φ toward a signed-distance function [2], and hybridizations with particles or VOF techniques to improve mass conservation [7, 8]. In many particle-assisted formulations, particles contribute directly to interface correction or reconstruction. In contrast, the markers introduced in the present work are not used to reconstruct the interface itself. For a broader overview of level-set formulations, transport schemes, reinitialization strategies, and their applications to multiphase flow, we refer to the review by Gibou et al. [9]. Since the level-set method extends the interface motion to a volumetric field to simplify its advection, the region where high accuracy is most critical is the neighborhood of the zero level-set. Moreover, two- phase phenomena may occur at very small scales, demanding fine spatial detail and thus incurring high computational cost. For 2this reason, adaptive mesh refinement (AMR) aligns naturally with level-set methods, since it concentrates resolution at the interface. The objective is to use only the computational effort required to capture the relevant physical details. Adaptive strategies are typically divided into h-adaptivity and p-adaptivity. In h-adaptivity, the mesh is locally refined by increasing the number of elements, which reduces the local mesh size h, a principle underlying most AMR frameworks [10, 11]. In p-adaptivity, the mesh remains fixed while the local polynomial degree of the basis functions is increased to improve accuracy, a strategy grounded in the classical p-version finite element theory [12]. Recent work has applied p- and hp-adaptive high-order discretizations to multiphase flows [13, 14]. In this work, we focus exclusively on h-adaptivity. Within its context, one major group of methods is block-structured Cartesian AMR, where the mesh is organized as a hierarchy of nested Cartesian grids [15]. A recent formulation [16] exemplifies current developments in this class, incorporating consistent mass–momentum transport and enabling stable simulations at high density ratios and Reynolds numbers. A second group is tree-based AMR, in which refinement proceeds by recursively subdividing individual cells to form a hierarchical tree structure [17, 18]. The use of quadtree- and octree-based grids for level-set computations was first introduced in [19] and subsequently extended in several works. A second-order level-set method on such grids was presented in [20]. The quadtree/octree framework of Popinet [21] further advanced this class of methods by providing a robust adaptive solver for multiphase incompressible flow. While these approaches remain tied to structured Cartesian trees, in this work we combine semi-Lagrangian advection with a tree hierarchy on unstructured finite element meshes. More recent advances include parallel implementations of Cartesian tree-based AMR [22, 23], improved interface-capturing strategies on adaptive quadtrees [24], and updated octree-based formulations for fluid dynamics [25]. These methods rely on a Cartesian-cell refinement paradigm driven by uniform quadtree or octree subdivision. In contrast, our approach embeds the tree hierarchy directly within an unstructured finite element mesh and combines it with semi-Lagrangian transport. This allows adaptive refinement without being constrained to a Cartesian background grid, enabling resolution to be increased freely based on geometric or solution features rather than a fixed splitting pattern. This distinction also extends to classical adaptive finite element methods (AFEM), where elements of general shape are refined under mesh conformity constraints rather than by uni-form Cartesian subdivision [26]. While Cartesian AMR benefits from regularity and simple indexing, numerical simulation of multiphase flows on unstructured meshes introduces ad-ditional challenges due to complex connectivity, irregular geometries, and the absence of a uniform refinement template. However, adaptive refinement on tetrahedral and other un-structured grids offers the geometric flexibility required for complex, body-fitted discretiza-tions. Early algorithms for local refinement of tetrahedral meshes were introduced in [27], and more recent unstructured tetrahedral AMR strategies appear in [28]. Related octree-based finite element frameworks and multigrid solvers on hierarchical meshes have been pro-posed [29], yet level-set transport and reinitialization on such adaptive FEM trees remain largely unaddressed. Recent adaptive FEM frameworks have begun to integrate level-set formulations for multiphase flows with surface tension on dynamically refined triangular and tetrahedral meshes [26], permitting localized resolution near evolving interfaces while preserving the geometric adaptability of unstructured grids. Our work contributes to this 3area by introducing a tree-based adaptive FEM framework that supports efficient, mesh-aware semi-Lagrangian level-set transport and reinitialization, extending the flexibility of unstructured adaptation to interface-capturing multiphase flow simulations. For a prescribed velocity field v, the evolution equation for Φ can be written as a linear advection (Hamilton–Jacobi) problem of the form 
+
+∂tΦ + v · ∇ Φ = 0 .
+
+Accuracy and stability are often enhanced by high-order upwind spatial discretizations, such as ENO/WENO schemes, coupled with strong-stability-preserving (SSP) or total- variation-diminishing (TVD) time integrators [5, 30]. An alternative approach is provided by semi-Lagrangian (SL) schemes, which update the solution by integrating characteristics backward in time and interpolating at the departure points. This relaxes the usual CFL constraint and enables comparatively large time steps while retaining good stability properties [31]. Although SL schemes do not enforce mass conservation, they avoid the additional mass er-rors introduced by strongly diffusive upwind stabilizations. Its main drawbacks are the need for accurate and efficient interpolation and the associated computational overhead. Several works have explored SL-based approaches for interface transport, including semi-Lagrangian contouring for level-set advection [32] and improved particle level-set formulations designed to reduce mass-loss errors [33]. These approaches typically employ severe deformation benchmarks to assess robustness under thin filament formation and near-topological changes [34, 7, 35, 36, 37]. To prevent the progressive distortion of the level-set field induced by advection, Φ is periodically reinitialized to recover a signed-distance profile while preserving the zero level-set. Classical techniques fall into three broad families: direct distance computation, fast-marching or fast- sweeping methods, and PDE-based formulations. The direct approach computes the signed-distance function by evaluating, at each node, the minimum Euclidean distance to the interface [38]. Fast-marching [39] and fast-sweeping [40] methods solve the Eikonal equation |∇ d| = 1 with d = 0 on the interface to obtain a signed-distance field Φ = sign(Φ 0), d . These methods are highly efficient but typically first-order near the interface. The PDE-based formulation [2] computes a signed-distance map as the steady state of 
+
+∂Φ
+
+∂τ + sign(Φ 0) (|∇ Φ| − 1) = 0 ,
+
+where τ is a pseudo-time variable and Φ 0 is the initial level-set function. This equation is advanced in pseudo-time until a steady state is reached, at which point Φ approximates a signed- distance function. This approach can achieve high accuracy when discretized with high-order Hamilton– Jacobi schemes. Variants that improve curvature accuracy and mass preservation include conservative and smooth reinitialization strategies [41]. A fourth line of work adopts a geometric viewpoint based on closest-point projection. Here the signed-distance value at a node is reconstructed by projecting onto the interface and measuring its Euclidean distance. Early formulations include [42], which combines projection near the interface with fast marching elsewhere, and [43], which follows a similar hybrid strategy in finite differences. Extensions improving robustness through kink detection appear in [44]. Closest-point ideas have also been introduced in the finite-element setting, such as the exact 4projection method for linear elements in [45]. These geometric approaches avoid solving a nonlinear Hamilton–Jacobi problem but require accurate nearest-point searches and careful treatment of the interface zone. 
+
+## 1.2 A new mixed marker and level-set front-tracking algorithm 
+
+In this work, we present a level-set solver on marker-driven adaptively refined hierarchical meshes, combining a tree-based adaptive mesh refinement (AMR) strategy with a semi-Lagrangian transport scheme. The proposed method is intended as a highly adaptive trans-port framework that can be integrated into fully coupled multiphase flow solvers. This approach extends the mixed marker and level-set front-tracking framework introduced in [46] and is designed to improve the preservation of fine-scale interface structures, eliminate refinement constraints typical of Eulerian formulations, and enable efficient simulation of complex geometries. The level-set function is discretized within a finite-element framework on hierarchical quadtree (2D) or octree (3D) meshes. Unlike single-mesh AMR formulations, we maintain an explicit multilevel hierarchy T 0 ⊂ T 1 ⊂ · · · ⊂ T levelN , with stored parent–child relation-ships, and treat the entire hierarchy as a unified data structure throughout each time step. Refinement is dynamically concentrated within a narrow band surrounding the zero level-set, with the level-set field stored exclusively on the finest mesh level. A central feature of our method is the construction of refinement in reference (canonical) coordinates. For quadrilateral and hexahedral elements, this corresponds to uniform Carte-sian subdivision in reference space, while for triangular, tetrahedral, and wedge elements, refinement is defined via fixed templates on the master element. In all cases, the mapping to physical space ensures the underlying mesh remains unstructured. This preserves the simplicity and efficiency of Cartesian tree-based data structures, while greatly simplifying advection, interpolation, reinitialization, and point-location operations. This reference-space refinement strategy extends naturally to simplex elements, since subdivision occurs in the master element rather than through geometric splitting in physical coordinates. Our tree-based refinement fundamentally differs from classical finite-element AMR based on element bisection or longest-edge subdivision. Conventional FEM AMR enforces mesh conformity constraints and generates refinement patterns dictated by mesh topology, compli-cating the dynamic redistribution of degrees of freedom and increasing the cost of characteristic-based transport. In contrast, our reference- tree AMR produces a uniform hierarchical struc-ture independent of element shape. Because refinement is performed in reference coordinates, hanging-node configurations follow a predictable hierarchy, and no mesh-conformity propa-gation is required. This significantly simplifies dynamic adaptivity and reduces refinement costs compared to traditional FEM strategies. A second key contribution is the use of semi-Lagrangian advection to decouple the trans-port step from the refinement pattern and update the level-set field directly on the adapted mesh. Each time step proceeds in two phases: forward marker advection with mesh recon-struction and update. First marker points extracted from cut elements are advected forward in time and used to reconstruct a new multilevel hierarchy. The markers are used exclusively for geometric prediction and adaptive refinement and do not define interface topology or con-nectivity. Then, the level-set field on the new finest level is updated by tracing characteristics 5backward into the previous hierarchy and interpolating Φ at the departure points. This forward–rebuild/backward–update structure eliminates the need for compatibility between successive adaptive meshes and avoids projecting the level-set field through in-termediate coarse representations. The hierarchical tree organization further accelerates point-location queries along characteristics via a coarse-to-fine push-down mechanism based on stored parent–child maps, making semi-Lagrangian advection particularly efficient in this multilevel AMR context. Finally, we introduce a closest-point reinitialization algorithm tailored to the tree hierarchy, which reconstructs a signed-distance field without solving a nonlinear Hamilton–Jacobi equation. Its performance benefits directly from the structured refinement pattern near the interface. While the mixed marker and level-set framework of [46] already enabled two-dimensional dynamic simulations and benchmark flows, the present study focuses exclusively on kine-matic interface transport and introduces a multilevel input/output formulation well-suited to highly adaptive semi- Lagrangian updates. Accordingly, the numerical validation pre-sented in this work is restricted to prescribed kinematic velocity fields and severe interface deformation benchmarks. The multilevel mesh hierarchy developed here is designed for reuse in a fully dynamic formulation based on the incompressible Navier–Stokes equations. In that setting, the same hierarchy provides the natural data structure for multilevel and multigrid solvers on h-refined finite- element spaces with arbitrary hanging-node configurations, as constructed in [47]. The extension to fully dynamic two-phase flow will therefore integrate the present adaptive semi- Lagrangian transport framework with Navier–Stokes solvers based on multilevel algorithms, combined with the stabilization techniques introduced in [48] for consistent treatment of interfacial stresses and discontinuous material properties. 
+
+# 2 Notations on multilevel mesh construction 
+
+Let Ω be the computational domain and T 0(Ω) be its coarse triangulation. We consider the adaptive multilevel finite-element mesh hierarchy 
+
+T 0 ⊂ T 1 ⊂ · · · ⊂ T levelN ,
+
+built from a uniform level-0 mesh by iterative quadtree (2D) / octree (3D) refinement subject to a one-level (2:1) grading constraint. All levels T ℓ are stored together with explicit father-children relations and are treated as a single multilevel data structure throughout. 
+
+Element types and reference domains The following higher-order finite elements are employed: 
+
+• Quad9: ˆK = [ −1, 1] 2,
+
+• Tri7: ˆK = conv {(0 , 0) , (1 , 0) , (0 , 1) },
+
+• Hex27: ˆK = [ −1, 1] 3,
+
+• Tet15: ˆK = conv {(0 , 0, 0) , (1 , 0, 0) , (0 , 1, 0) , (0 , 0, 1) },6• Wedge21: ˆK = ˆKtri × [−1, 1]. For each element family, a canonical reference element, ˆK, and a consistent node ordering are taken as described in Figures 1-5. 
+
+Remark on the choice of higher-order element families and FEM pairing The adoption of Tri7, Tet15, and Wedge21 elements is dictated by consistency with the finite-element technology implemented in FEMuS [49], rather than by requirements intrinsic to the semi-Lagrangian formulation. Standard alternatives such as Tri6, Tet10, and Wedge18 could in principle be used. These enriched elements were introduced in FEMuS to obtain stable discretizations of the incompressible Navier-Stokes equations with biquadratic or triquadratic velocity and discontinuous linear pressure. While the Q2-P DG 1 pairing is stable on quadrilateral and hexahedral meshes, analogous simplicial and prismatic pairings based on Tri6, Tet10, or Wedge18 were observed to be unstable in practice within the FEMuS framework. Stability is recovered by enriching the velocity space with interior degrees of freedom: a barycenter node in 2D (Tri7) and face-barycenter and interior nodes in 3D (Tet15 and Wedge21). Although no general inf-sup result is claimed, extensive numerical evidence demonstrates robust behavior on simplicial, prismatic, and hybrid meshes [50, 51, 52]. Accordingly, these element families are retained here for compatibility with Navier-Stokes solvers in FEMuS . Their barycenter-enriched structure also supports consistent refinement templates and robust mappings under adaptive multilevel refinement, which are essential for reliable characteristic tracing and interpolation. 
+
+Adjacency choice The adjacency rule used to enforce grading can be selected by the user: (i) face/edge adjacency , or (ii) vertex adjacency . In the second case, adjacency through vertices implicitly includes adjacency through edges and faces. In the numerical experiments presented here, face/edge adjacency is used for quadrilateral and hexahedral meshes, while vertex adjacency is adopted for triangular, tetrahedral, and wedge meshes. 
+
+One-level (2:1) grading constraint The multilevel hierarchy is required to satisfy a one-level grading constraint: any two adjacent elements may differ in refinement level by at most one. More precisely, if two elements share a face (and, depending on the chosen adjacency rule, also an edge or a vertex), their refinement levels ℓ and ℓ′ must satisfy 
+
+|ℓ − ℓ′| ≤ 1.
+
+This constraint prevents the occurrence of arbitrarily large level jumps between neighboring elements and ensures geometric regularity of the hierarchy under refinement. 
+
+Cut elements An element K is said to be cut if the nodal values of the level-set function Φ on K exhibit a sign change or if at least one node satisfies Φ = 0. 70 1
+
+23
+
+4
+
+5
+
+6
+
+7 8
+
+child vertices 
+
+0 0 4 8 71 4 1 5 82 8 5 2 63 7 8 6 3
+
+Figure 1: Quad9 nodes and refinement. 
+
+0 1
+
+2
+
+3
+
+45
+
+6
+
+child vertices 
+
+0 0 3 51 3 1 42 5 4 23 4 5 3
+
+Figure 2: Tri7 nodes and refinement. 
+
+0 1
+
+23
+
+4 5
+
+67
+
+8
+
+9
+
+10 
+
+11 
+
+12 
+
+13 
+
+14 
+
+15 
+
+16 17 
+
+18 19 
+
+20 
+
+21 
+
+22 
+
+23 
+
+24 
+
+25 
+
+26 
+
+child vertices 
+
+0 0 8 24 11 16 20 26 23 1 8 1 9 24 20 17 21 26 2 24 9 2 10 26 21 18 22 3 11 24 10 3 23 26 22 19 4 16 20 26 23 4 12 25 15 5 20 17 21 26 12 5 13 25 6 26 21 18 22 25 13 6 14 7 23 26 22 19 15 25 14 7
+
+Figure 3: Hex27 nodes and refinement. 
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+10 
+
+11 12 
+
+13 
+
+14 
+
+child vertices 
+
+0 0 4 6 71 4 1 5 82 6 5 2 93 7 8 9 34 5 6 4 75 8 7 5 46 7 9 8 57 9 5 7 6
+
+Figure 4: Tet15 nodes and refinement. 
+
+0
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6 7
+
+8
+
+9 10 
+
+11 
+
+12 
+
+13 
+
+14 15 16 
+
+17 
+
+18 
+
+19 
+
+20 
+
+child vertices 
+
+0 0 6 8 12 15 17 1 6 1 7 15 13 16 2 8 7 2 17 16 14 3 7 8 6 16 17 15 4 12 15 17 3 9 11 5 15 13 16 9 4 10 6 17 16 14 11 10 57 16 17 15 10 11 9
+
+Figure 5: Wedge21 nodes and refinement. 8Storage convention The level-set field Φ is stored only on the finest mesh T levelN . During multilevel marking and refinement procedures, Φ is re-evaluated analytically on coarser levels as needed. 
+
+# 3 Multilevel mesh construction with one-level grading 
+
+## 3.1 Refinement templates 
+
+In two spatial dimensions, each refined element generates 4 children, while in three dimen-sions each refinement produces 8 children. Refinement is defined element-wise through fixed connectivity templates, and all parent-child relations are expressed in reference coordinates of the corresponding canonical element. Figure 1-5 illustrate, in dashed lines, the refinement templates adopted for the element families considered in this work. For all element families except Tet15 (namely, Quad9, Tri7, Hex27, and Wedge21), the refinement produces children that are all mutually similar, up to rigid motions (translations and rotations) and uniform scaling. In these cases, refinement corresponds to an affine subdivision of the reference element, and each child can be obtained from a single canonical child template by composition with a rigid motion and scaling. Consequently, a single reference element and a single parent-child connectivity template per element type suffice to describe the geometry of all children generated at any refinement level. The tetrahedral case requires special attention. For Tet15 elements, the refinement rule generates a finite but nontrivial set of similarity classes of child tetrahedra. Recursive ap-plication of the refinement produces six distinct similarity families up to rigid motions and scaling, which reduce to three families if mirror equivalence is also admitted. This behavior is well known in tetrahedral refinement schemes based on edge- or face-based subdivisions and contrasts with the uniform similarity observed for quadrilateral, triangular, hexahedral, and wedge elements [53, 54, 55]. Crucially, the set of tetrahedral similarity classes generated by the Tet15 refinement is finite and closed under further refinement. No new similarity types arise beyond a fixed depth, and all child tetrahedra remain shape-regular. All tetrahedral children, regardless of their similarity class, are mapped to the same canonical Tet15 reference element via orientation-preserving affine mappings. The finiteness of the similarity classes implies that the refinement rule avoids generating arbitrarily distorted or degenerate tetrahedra. As a result, the Jacobians of the geomet-ric mappings and their inverses remain uniformly bounded away from singularity across all refinement levels [53]. This property is essential for the robustness of inverse mappings, in-terpolation operators, and numerical integration, and it ensures stability of the discretization under repeated adaptive refinement. 
+
+## 3.2 Mark-and-closure refinement 
+
+Given a mesh T ℓ−1 satisfying the one-level (2 : 1) grading constraint, refinement is performed through a mark-and-closure procedure designed to preserve this property. 9Starting from an initial set of marked elements M ← M 0 (selected for refinement by a given marking strategy), we enlarge M so that the 2 : 1 rule is maintained after refinement. Since only elements in M are refined, refinement increases the level of each K ∈ M by one, while the level of any K′ /∈ M remains unchanged. As a consequence, a violation of the 2:1 grading condition can only be created across an interface between a marked element K and an unmarked neighbor K′, and only when 
+
+ℓ(K) − ℓ(K′) = 1 ,
+
+in which case refining K alone would produce a level difference of 2. To prevent this, the marked set is closed by iteratively adding any adjacent element 
+
+K′ /∈ M for which such a configuration occurs. The closure process terminates when no further elements need to be added. Only after this step is the actual refinement car-ried out: all elements in the final marked set are refined simultaneously according to the element-type–specific refinement templates, and the corresponding father–children relations are stored. The resulting mesh T ℓ therefore satisfies the one-level grading constraint by construction. This procedure is summarized in Algorithm 1. 
+
+Algorithm 1 Mesh refinement with one-level closure (from level ℓ − 1 to ℓ)
+
+Require: Mesh T ℓ−1 satisfying one-level grading; initial marked set M0; adjacency rule 
+
+N (·). 
+
+Ensure: Refined mesh T ℓ satisfying one-level grading; father/children relations updated.  
+
+> 1:
+
+M ← M 0 
+
+> 2:
+
+repeat  
+
+> 3:
+
+Mnew ← M  
+
+> 4:
+
+for all K ∈ M do  
+
+> 5:
+
+for all K′ /∈ M and in the neighbor of K do  
+
+> 6:
+
+if refining K would create a level jump > 1 between K and K′ then  
+
+> 7:
+
+Mnew ← M new ∪ { K′} 
+
+> 8:
+
+end if  
+
+> 9:
+
+end for  
+
+> 10:
+
+end for  
+
+> 11:
+
+Mold ← M ; M ← M new  
+
+> 12:
+
+until M = Mold  
+
+> 13:
+
+Refine all elements in M according to the element-type template to obtain T ℓ 
+
+> 14:
+
+Store father/children relations for all refined elements 
+
+## 3.3 Local parent-child transfer operator 
+
+For each element type, we precompute a local prolongation (coarse-to-fine) matrix on the reference element. Let {ϕc,i } denote the basis (test) functions of the father element, and let 
+
+{ξf,j } be the nodal points of the fine element mapped into the father reference coordinates. The local prolongation is 
+
+Pij = ϕc,i (ξf,j ).
+
+10 All operators are applied element-locally; we store one P per element type and reuse it throughout. 
+
+# 4 Adaptive initialization of the multilevel mesh and level-set Φ
+
+The level-set field Φ is initialized analytically in the physical domain, while the adaptive multilevel mesh hierarchy is constructed by successive refinements concentrated in a neigh-borhood of the interface Φ = 0. At each refinement level ℓ, the set of elements to be refined is determined through a two-step marking strategy. First, all cut elements are identified, namely, elements whose nodal values of Φ change sign or contain at least one zero node. These elements directly approximate the interface and constitute the core of the marked set. Second, this set is enlarged by adding one layer of adjacent elements, as defined by the se-lected adjacency rule. This additional layer ensures a sufficiently thick refined region around the interface, improving the robustness of subsequent characteristic tracing and interpola-tion. After this marking step, the one-level (2:1) grading constraint is enforced through the closure procedure described in Section 3, and all elements in the resulting marked set are refined. The process is repeated independently at each refinement level until the maximum level is reached. The outcome of this procedure is the initial multilevel mesh hierarchy 
+
+{T 0, T 1, . . . , T levelN },
+
+together with nodal values of the level-set field Φ stored only on the finest mesh T levelN . No level-set data are retained on coarser levels. For details, see Algorithm 2. 
+
+Algorithm 2 Adaptive initialization of Φ and construction of the multilevel hierarchy 
+
+{T 0, . . . , T levelN }
+
+Require: Uniform mesh T 0; maximum level levelN; analytic Φ( x); adjacency rule. 
+
+Ensure: Multilevel hierarchy {T 0, T 1, . . . , T levelN } with father/children relations; nodal val-ues Φ stored on T levelN . 
+
+> 1:
+
+for ℓ = 1 to levelN do  
+
+> 2:
+
+Re-evaluate Φ analytically at nodal coordinates of the current mesh T ℓ−1 
+
+> 3:
+
+Mark elements K ∈ T ℓ−1 such that (i) Φ changes sign across nodes of K, or (ii) at least one node has Φ = 0  
+
+> 4:
+
+Close the marked set by the neighbor-marking fixed-point procedure (one-level con-straint) using Algorithm 1  
+
+> 5:
+
+Refine marked elements to obtain T ℓ and store father/children relations  
+
+> 6:
+
+end for  
+
+> 7:
+
+On T levelN , evaluate and store Φ at all finest-level nodes 
+
+11 5 Point location on a multilevel mesh 
+
+Given a physical point x, we determine whether it lies inside the computational domain, and if so, we compute the containing element and reference coordinates ξ such that FK (ξ) = x,where FK : ˆK → K denotes the mapping from the reference element ˆK to the physical element K.
+
+## 5.1 Coarse Cartesian indexing for level-0 elements 
+
+We build a Cartesian grid of boxes covering the domain with characteristic size ≈ 0.1 times the minimum level-0 element size. For each box, we compute an ordered list of candidate overlapping level-0 elements using bounding-box overlap and a barycenter-based ordering: first an element containing the box barycenter (if any), followed by candidates sorted by increasing distance between the barycenter and element nodes. If the barycenter belongs to an element, we also precompute and store the inverse mapping of the box center for that element. To reduce the cost of repeatedly evaluating x = FK (ξ) and its Jacobian during the Newton iteration, we employ a polynomial representation of the isoparametric map that is uniform across all element families present in the mesh. For each level-0 element K, the mapping FK : ˆK → K is expressed in a polynomial basis on the reference element as 
+
+FK (ξ) = ∑
+
+> i+j+k≤n
+
+a(K) 
+
+> ijk
+
+ξi
+
+> 1
+
+ξj
+
+> 2
+
+ξk 
+
+> 3
+
+.
+
+The coefficients a(K) 
+
+> ijk
+
+depend only on the physical coordinates of the nodes of K and are precomputed once and stored. For two-dimensional elements (Quad9 and Tri7), the third reference coordinate is absent and the expansion reduces to the case k = 0. This representation provides a unified and efficient evaluation strategy for both FK (ξ)and ∇FK (ξ) across mixed element types, avoiding element-specific evaluation kernels inside the Newton iteration. The resulting reduction in computational cost is particularly beneficial in point-location and particle-tracking routines, where multiple candidate elements may be tested. Further details are given in [56]. 
+
+## 5.2 Inverse mapping and Newton criteria 
+
+Given a candidate element K and a physical point x, we compute the corresponding reference coordinate ξ = F −1 
+
+> K
+
+(x) by applying Newton’s method to the nonlinear system 
+
+FK (ξ) − x = 0 ,
+
+where FK : ˆK → K denotes the isoparametric mapping from the reference element ˆK to the physical element K.Starting from an initial guess ξ(0) ∈ ˆK, the Newton iteration reads 
+
+ξ(m+1) = ξ(m) − [JFK
+
+(ξ(m))] −1 (FK
+
+(ξ(m)) − x) .
+
+12 The iteration is terminated when the residual norm ‖FK (ξ(m))−x‖ falls below a prescribed tolerance ǫ, or when a maximum number of iterations is reached. If convergence is not achieved within the iteration cap, the candidate element is discarded without performing any reference-domain inclusion test, and the next element in the ordered list is examined. If the Newton iteration converges, the resulting reference coordinate ξ is tested for inclusion in the reference element ˆK. If ξ lies within the admissible bounds of ˆK, the point x is declared to be located in the element K. Otherwise, the candidate element is rejected and the search proceeds with the next element in the ordered list, restarting the inverse-mapping procedure. If all candidate elements have been examined and none yield a convergent Newton solution with ξ ∈ ˆK, the point x is marked as lying outside the computational domain. 
+
+Initial guess and acceleration strategy The initial Newton iterate ξ(0) is chosen accord-ing to the candidate-selection logic described in Section 5.1. If the element is the preferred candidate associated with the Cartesian box barycenter and a stored inverse mapping is avail-able, this value is used as ξ(0) . Otherwise, the reference coordinates of the closest element vertex provide a warm start. To accelerate convergence for higher-order elements (Quad9, Tri7, Hex27, Tet15, Wedge21), the Newton iteration is initialized using a linearized inverse mapping. Specifically, we first perform a small number of Newton iterations on the corresponding linear element map ob-tained by restricting FK to its vertex nodes only (Quad4, Tri3, Hex8, Tet4, Wedge6). The resulting reference coordinate serves as an improved initial guess for the full higher-order Newton iteration. This strategy significantly reduces the number of nonlinear iterations and improves robustness for highly curved or distorted elements. 
+
+## 5.3 Fast push-down using the multilevel hierarchy 
+
+Once a point is located in an element Kℓ ∈ T ℓ with reference coordinate ξℓ, its location in finer levels can be obtained without any additional global search. If Kℓ is refined, the child element Kℓ+1 containing the point and the corresponding reference coordinate ξℓ+1 are computed directly by applying the known affine parent-to-child reference mappings. This operation is purely local and incurs negligible cost. This push-down mechanism is used in two distinct phases of the algorithm. 
+
+(i) Push-down during multilevel mesh reconstruction When building a new multi-level hierarchy at time tn+1 , markers advected forward in time are first located on the coarse mesh T 0
+
+> n+1
+
+. The element in which a marker is found determines which elements are marked for refinement at level 0. After closure and refinement, the same marker is immediately pushed down to the refined level 1 using the parent-to-child maps. This process is repeated level by level: at each refinement stage, the marker location identifies elements to be marked (together with their adjacency-based closure), and the marker is then pushed down to the next level. In this context, point location drives multilevel mesh construction. 
+
+(ii) Push-down during point location on an existing hierarchy When locating a point in an already constructed multilevel mesh (e.g. during backward characteristic tracing 13 for the update of Φ), the point is first located on the coarse mesh T 0 using the Cartesian box index and inverse mapping. Once a containing level-0 element is identified, the point is pushed down deterministically through the existing hierarchy until the finest level T levelN is reached. In this case, no refinement or marking is performed: the push-down is used solely to locate the point efficiently on the finest mesh. In both cases, the global search is performed only at level 0. All finer-level locations are obtained by local affine mappings, which makes the procedure efficient, robust, and well-suited for repeated semi-Lagrangian queries on highly adaptive multilevel meshes. 
+
+Marker location Algorithm summary Algorithm 3 performs point location for a marker position x in two stages. In the first stage, x is located on the coarse mesh T 0. To this end, we identify the level–0 Cartesian box B containing x and retrieve its associated precom-puted ordered list C(B) of overlapping level–0 elements. The elements in C(B) are examined sequentially. For each candidate element K ∈ C (B), the inverse isoparametric mapping ξ = F −1 
+
+> K
+
+(x) is computed using Newton’s method. The initial guess ξ(0) is chosen according to the following strategy: if the element K contains the barycenter of B, ξ(0) is set to the precomputed inverse mapping of the box barycenter ξB ; otherwise, a warm start is constructed from the reference coordinates of the element node closest to x. A candidate element is accepted if the Newton iteration converges and the resulting reference coordinate satisfies the inclusion criterion ξ ∈ ˆK. The search terminates as soon as a valid candidate is found; if no candidate is accepted, the marker is classified as out-of-domain .Once a containing element is identified at level 0, the second stage of Algorithm 3 prop-agates the marker through the refinement hierarchy. The reference coordinate is mapped from parent to child elements using the known affine parent-to-child transformations, thereby locating the marker on finer levels without performing any additional global searches. 
+
+# 6 Reinitialization 
+
+## 6.1 Motivation 
+
+Although any Lipschitz continuous function Φ such that Φ = 0 on the interface can be used as a level-set function, it is standard to choose one with a controlled gradient magnitude near the interface. A common choice is the signed distance to the interface. In this work, we instead use a mollified signed-distance function 
+
+S(d) = 
+
+
+
+−1 d ≤ − ε
+
+−1 + 2( C0 + d(C1 + C3d2)) d ∈ (−ε, ε )1 d ≥ ε, (6.1) where d is the signed distance, ε is the half-bandwidth, C0 = 1 
+
+> 2
+
+, C1 = 3 
+
+> 4ε
+
+and C3 = − 1 
+
+> 4ε3
+
+.The reason for enforcing this controlled behavior of Φ is twofold. First, a bounded gradient magnitude that does not go to zero near the interface fixes the scale of Φ and keeps 14 Algorithm 3 Locate a point x in the hierarchy {T 0, . . . , T levelN }
+
+Require: Point x in physical coordinates; level-0 box index; hierarchy {T 0, . . . , T levelN }
+
+with father/children relations; tolerance ǫ and max iters. 
+
+Ensure: Either (element KlevelN , reference coordinate ξlevelN ) or out-of-domain . 
+
+> 1:
+
+Identify Cartesian box B containing x 
+
+> 2:
+
+Retrieve the ordered candidate list C(B) = ( K1, K 2, . . . , K m) of level-0 elements  
+
+> 3:
+
+found ← false  
+
+> 4:
+
+for i = 1 to m while found = false do  
+
+> 5:
+
+K ← Ki 
+
+> 6:
+
+Choose Newton initial guess:  
+
+> 7:
+
+if K is the barycenter-containing element of B and a stored inverse map ξB exists 
+
+then  
+
+> 8:
+
+ξ(0) ← ξB 
+
+> 9:
+
+else  
+
+> 10:
+
+ξ(0) ← reference coordinate of the closest node (warm start)  
+
+> 11:
+
+end if  
+
+> 12:
+
+Run Newton to solve FK (ξ) = x with tolerance ǫ and max iters  
+
+> 13:
+
+if Newton converged and ξ ∈ ˆK then  
+
+> 14:
+
+found ← true  
+
+> 15:
+
+(K0, ξ 0) ← (K, ξ ) 
+
+> 16:
+
+end if  
+
+> 17:
+
+end for  
+
+> 18:
+
+if found = false then  
+
+> 19:
+
+return out-of-domain  
+
+> 20:
+
+end if  
+
+> 21:
+
+for ℓ = 0 to levelN − 1 do  
+
+> 22:
+
+Using ( Kℓ, ξ ℓ) and the parent-to-child affine maps, determine ( Kℓ+1 , ξ ℓ+1 ) 
+
+> 23:
+
+end for  
+
+> 24:
+
+return (KlevelN , ξ levelN )
+
+geometric quantities, namely the normal and the curvature, ̂
+
+n = ∇Φ
+
+‖∇ Φ‖ , κ = ∇· 
+
+( ∇Φ
+
+‖∇ Φ‖
+
+)
+
+,
+
+well-conditioned. Second, the field advection is more robust. For the transport equation 
+
+∂tΦ + v· ∇ Φ = 0 ,
+
+overly steep ( ‖∇ Φ‖ ≫ 1) or flat ( ‖∇ Φ‖ ≪ 1) profiles tend to trigger spurious oscillations or excessive numerical diffusion in classical finite-element advection and tighten local CFL constraints. The same issue appears with Lagrangian (characteristic) updates, where DΦ 
+
+> Dt
+
+= 0 is enforced in practice via Φn+1 (xn+1 ) ≈ Φn(xn),
+
+15 with xn the back-traced footpoint defined by 
+
+xn = xn+1 −
+
+∫ tt−∆t
+
+v(x(s), s ) ds. 
+
+Because time discretization and spatial interpolation are not exact, irregular Φ profiles am-plify the evaluation errors at xn.Unfortunately, the level-set gradient magnitude on the interface is not preserved under advection, because the flow kinematics stretch or compress the level–set gradient. Let Γc := {x : Φ( x, t ) = c},
+
+and introduce the strain–rate tensor 
+
+S(x, t ) := 1
+
+2
+
+(∇v(x, t ) + ∇v(x, t )⊤).
+
+The component of the velocity gradient that governs the relative motion of the neighboring Φ iso-surfaces is its normal projection, ̂
+
+n⊤∇v̂ n∣∣Γc =̂ n⊤Ŝ n∣∣Γc ,
+
+since the skew–symmetric part does not contribute. As a consequence, the magnitude of the level–set gradient evolves along characteristics according to 
+
+D
+
+Dt ‖∇ Φ‖ = −(̂ n⊤Ŝ n) ‖∇ Φ‖ .
+
+Hence, whenever the normal strain rate ̂ n⊤Ŝ n is nonzero, ‖∇ Φ‖ departs from unity, pro-ducing local steepening or flattening even under exact transport. This purely kinematic distortion motivates periodic reinitialization to restore the field gradient. In addition, nu-merical diffusion during the advection process can also occur. 
+
+## 6.2 Numerical approach 
+
+In this work, we adopt a geometric strategy: the field is reconstructed in a narrow band around the interface through closest-point projection, while a cheaper extension is applied in the far field. Related closest-point formulations include hybrid projection–fast-marching approaches in finite differences [42, 43], full-grid projection with kink detection for robustness [44], and finite-element variants for linear elements [45]. Our method extends this geometric idea to higher-order finite elements (i.e., bi- and tri-quadratic). Let Φ h denote the discrete level-set function. The discrete interface is defined as Γh := { x ∈ Ω : Φ h(x) = 0 }, (6.2) Then, we define the interface region as the union of the cut cells Kcut and their immediate neighbors Knb :
+
+Kcut := { Kh ∈ T h : Kh ∩ Γh 6 = ∅ } ,
+
+16 Knb := { Kh ∈ T h : ∃ K′ ∈ K cut with Kh ∼ K′ },
+
+where Kh ∼ K′ means that Kh and K′ share an edge (2D) or a face (3D). Then the interface zone Ω int and the far-field zone Ω ext are defined as follows Ωint := ⋃
+
+> K∈K cut ∪K nb
+
+K, Ωext := Ω \ Ωint .
+
+In both regions, the signed distance to the interface is computed, and the level-set field is reconstructed using the mollifier (6.1). 
+
+Interface region Regarding the interface region, for each grid node, we compute the closest point on the surface by projecting it onto the zero level-set Φ = 0. Specifically, we project the node using a Newton iteration. Let x(0) ∈ Rd be a node in the interface region in physical coordinates. Its projection onto the zero level-set is obtained through the following update: 
+
+x(k+1) = x(k) − Φ( x(k))
+
+‖∇ Φ( x(k))‖2 ∇Φ( x(k)) . (6.3) The projection stops when |Φ( xk)| ≤ tol . Ill-conditioned gradients may occur in complex two-phase flows [44] and can lead to either a failure to project the node or to inaccurate results. Even though we project only the interface-field nodes, which are very close to the interface and therefore less likely to suffer from poor conditioning, in the case of slow or failed convergence of the projection method, a fallback value from the far-field reconstruction is safely adopted. The point projection procedure is summarized in Algorithm 4. 
+
+Algorithm 4 Project nodes in interface region Ω int on the interface Φ = 0 
+
+Require: Hierarchy {T 0, . . . , T levelN }; finite element interpolant Φ h (and ∇Φh); tolerance 
+
+tol ; max iters. 
+
+Ensure: The projection of each interface region node on the zero level-set Φ h = 0.  
+
+> 1:
+
+Collect the interface region nodes index set I and the corresponding coordinates {xi}i∈I  
+
+> 2:
+
+Initialize the active index set Iactive ← I  
+
+> 3:
+
+while it < max iters and Iactive 6 = ∅ do  
+
+> 4:
+
+Locate all points {xi}i∈I active in the mesh hierarchy  
+
+> 5:
+
+Evaluate the finite-element interpolant and its gradient at the located points: 
+
+{Φh(xi)}i∈I active and {∇ Φh(xi)}i∈I active  
+
+> 6:
+
+Iactive ← { i ∈ I active : |Φh(xi)| > tol } 
+
+> 7:
+
+Update {xi}i∈I active using (6.3)  
+
+> 8:
+
+end whilereturn {xi}i∈I\I active 
+
+A significant portion of the numerical error introduced by the reinitialization, namely the interface shift, originates in this procedure, as it is applied in the interface region. The main source of this error is the finite-element accuracy with which the reinitialized field is represented. Indeed, at the continuous level, the signed-distance function shares the same zero level-set as the original level-set field. At the discrete level, however, the signed distance 17 is reconstructed only at the mesh nodes and then subsequently interpolated using the finite-element basis. As a consequence, the original discrete interface defined in (6.2) does not generally coincide with the reconstructed interface 
+
+˜Γh := { x ∈ Ω : Sh(x) = 0 },
+
+where Sh denotes the finite-element interpolant of the nodal signed-distance (or mollified signed-distance, defined in (6.1)) values. Nevertheless, the mismatch between Γ h and ˜Γh
+
+decreases under mesh refinement, with a convergence rate dictated by the finite-element approximation. 
+
+Far-field region Regarding the far-field region, instead of applying a Fast Marching Method (FMM) to the remaining nodes, we perform a direct nearest-neighbor search us-ing a kd-tree algorithm [57]. The search is carried out on a set of interface markers, whose placement is described in Section 6.3. This approach exhibits a similar computational scaling to the FMM. In fact, given Nn cell nodes and Nm markers on the surface, the computational cost of building the tree scales as O(Nm log Nm), while the total cost of the searches scales as 
+
+O(Nn log Nm)[58]. In comparison, the overall complexity of the FMM scales as O(Nn log Nn). Moreover, we point out that, given our refinement strategy, the number of points Nn in the far-field region for which the search must be performed is minimal. 
+
+## 6.3 Marker placement 
+
+For each cut element K ∈ K cut , we construct a set of physical markers Xlocal placed on the zero level-set starting from its intersections with the cell’s edges. In two dimensions, for a simple cut (characterized by two intersection points), we place the markers along the segment connecting them. In three dimensions, we consider the cut to be simple when the number of edge intersections Nint ≥ 3 ∧ Nint ≤ 5. In this case we first compute the barycenter of those and then form a fan triangulation by creating Nint triangles sharing the barycenter as a common vertex. Markers are subsequently distributed over these triangles. For hexahedral cells, configurations with Nint = 6 may still be simple. However, to avoid the geometrical check they are automatically classified as complex, without loss of generality. Whenever the cut is no longer simple (e.g., more than two intersections in 2D or more than five intersections in 3D), we instead generate a localized marker network concentrated around the interface within the cell, by connecting the intersection points. This approach is not the most efficient in terms of the number of markers; however, while avoiding the explicit handling of complex configurations (especially in 3D), it does not compromise the accuracy of the advection and refinement routines. Moreover, the additional markers introduce a negligible overhead during advection and point-location, since such complex-cut scenarios occur only rarely. If markers are required only for advection, we place 3 markers on each segment and 4 markers on each triangle that forms the fan triangulation: one at the barycenter b, and the others at positions obtained by shifting each vertex vi toward b by one third of the 18 vertex-to-barycenter distance: 
+
+mi = vi + 1
+
+3 (b − vi) = 2
+
+3vi + 1
+
+3b. 
+
+For segments, i = 1 , 2 and for triangles, i = 1 , 2, 3. A representation is provided in Figure 6.      
+
+> v1v2
+> m1bm2
+> v1v2
+> v3
+> m1m2
+> m3
+> b
+
+Figure 6: Advection markers placement for a 2D segment (left) and a 3D triangle(right). Instead, when markers are used to reinitialize the level-set field, we employ a slightly higher marker density. For a prescribed linear density, markers are placed uniformly along each two-dimensional segment. For three-dimensional triangles, we take the longest edge as the base and fill the triangle with rows of markers parallel to the base. Both the marker spacing within each row and the spacing between rows are set using the same linear density. The marker density ranges from 10  
+
+> h
+
+in 2D to 5 
+
+> h
+
+in 3D, where h is the cell size. Finally, the resulting markers can eventually be projected onto the level-set interface using the same procedure described in Algorithm 4. 
+
+## 6.4 Adaptive frequency 
+
+To avoid unnecessary, costly reinitializations that may introduce spurious interface displace-ment, we monitor how far the local gradient magnitude deviates from its target value near the interface. Given the mollifier width ε and expression (6.1), we set the target gradient magnitude to 
+
+tε := 3
+
+2ε .
+
+We define a symmetric local deviation measure 
+
+D(x) := 
+
+∣∣∣∣log 
+
+(‖∇ Φ( x)‖
+
+tε
+
+)∣ ∣∣∣ , x ∈ Γ,
+
+which vanishes when ‖∇ Φ( x)‖ = tε and increases for both under- and over-shoots. Let 
+
+X = {m1, . . . , m N } be the set of Nm marker points used for the advection step (sampling locations on the interface). Collecting the sampled deviations into the vector 
+
+D := (D(m1), . . . , D (mNm )) ∈ RNm×d,
+
+we define the global deviation indicator as the normalized ℓ1-norm 
+
+D := 1
+
+Nm
+
+‖D‖1 = 1
+
+NmNm∑
+
+> i=1
+
+D(mi).
+
+19 In this work we use the ℓ1 norm, but other ℓp norms may be adopted depending on the application. A reinitialization step is activated if D is higher of a given tolerance τreinit , and skipped otherwise. This criterion activates reinitialization only when significant deviations of ‖∇ Φ‖
+
+from tε occur, thereby reducing both computational cost and the risk of unnecessary interface motion. 
+
+# 7 One adaptive semi-Lagrangian time step 
+
+We describe one complete time step from ( {T 0 
+
+> n
+
+, T 1 
+
+> n
+
+, . . . , T levelN  
+
+> n
+
+}, Φn) → ({T 0
+
+> n+1
+
+, T 1
+
+> n+1
+
+, . . . , T levelN  
+
+> n+1
+
+}, Φn+1 ),
+
+where both input and output include the full multilevel mesh hierarchy. Time is discretized with a fixed time step ∆ t > 0, and we denote tn = n∆t.The evolution over one time step is driven by a prescribed velocity field v(x, t ), assumed to be Lipschitz continuous in space uniformly in time, i.e., 
+
+v ∈ L∞(0 , T ; W 1,∞(Ω) d),
+
+and analytically extended outside the computational domain when needed. Under this as-sumption, characteristic curves are well defined and unique on each time interval [ tn, t n+1 ], allowing both forward and backward characteristic tracing. In the present work, the velocity field is prescribed analytically. However, the algorithm is designed to be coupled with a multiphase flow solver, in which case the velocity is typically defined only at mesh nodes. From a conceptual standpoint, the overall procedure remains unchanged. The only difference arises in the evaluation of the velocity during forward or backward characteristic tracing, where intermediate Runge–Kutta stages require velocity values at points located inside mesh elements rather than at nodes. In this setting, the same point-location and inverse-mapping strategy introduced above can be applied to evaluate the velocity at the required off-nodal positions. Each time step is decomposed into two logically distinct phases: a forward advection phase used exclusively to reconstruct an adaptive multilevel mesh at time tn+1 , and a back-ward semi-Lagrangian phase used to update the level-set field on the new mesh. Finally, we test whether the level-set Φ needs to be reinitialized, and if so, we reinitialize it. 
+
+## 7.1 Forward marker advection and hierarchy reconstruction 
+
+At time tn on the finest mesh T levelN  
+
+> n
+
+, we identify all cut elements, i.e., elements whose nodal values of Φ n change sign or contain at least one zero node. From these cut elements, we construct a set of physical marker points placed on the zero level-set, following the procedure outlined in Section 6.3. All markers are advected forward in time over one step ∆ t using a fourth-order Runge-Kutta scheme applied to the velocity field v(x, t ). The resulting marker positions at time 
+
+tn+1 are then used to reconstruct a new multilevel hierarchy {T 0
+
+> n+1
+
+, T 1
+
+> n+1
+
+, . . . , T levelN  
+
+> n+1
+
+} starting from a freshly initialized level-0 mesh. 20 Specifically, the advected markers are first located on T 0 
+
+> n+1
+
+using the level-0 Cartesian box index and inverse-mapping procedure described in section 5.1. The elements in which the markers are found determine the initial marked set for refinement. At each refinement level, the marked set is enlarged by the one-level (2:1) closure procedure, and all marked elements are refined simultaneously according to the element-type refinement templates. After refinement, the markers are pushed down to the next level using the known parent-to-child affine reference mappings, without any additional global search. This process is repeated level by level until the finest level T levelN  
+
+> n+1
+
+is constructed. The outcome of the forward phase is a new multilevel mesh hierarchy at time tn+1 , adapted to the advected interface geometry, together with updated father-children relations. No level-set values are transported or interpolated during this phase; forward characteristic tracing is used solely for geometric purposes. A schematic of the forward step is given in Figure 7. 
+
+Figure 7: Schematic representation of the adaptive grid update during one advection step: (a) initial mesh and level-set field at time tn; (b) marker points placed on the zero level-set and transported forward in time; (c) adapted mesh T n+1 refined around the advected marker positions. 
+
+## 7.2 Backward semi-Lagrangian update of the level-set field 
+
+Once the new multilevel hierarchy {T 0
+
+> n+1
+
+, T 1
+
+> n+1
+
+, . . . , T levelN  
+
+> n+1
+
+} has been constructed, the level-set field is updated by a backward semi-Lagrangian procedure. The arrival points are chosen as the physical coordinates of all nodes of the finest mesh T levelN  
+
+> n+1
+
+.For each such node xn+1 at time tn+1 = tn + ∆ t, a departure point xn is computed by integrating the characteristic backward in time over one step ∆ t. Backward tracing is performed using a fourth-order Runge-Kutta scheme with time step −∆t, applied to the same velocity field v(x, t ). This yields a high-order accurate approximation of the characteristic departure point and allows time steps that are not constrained by the mesh size in the usual CFL sense, although accuracy still depends on ∆ t.The departure point xn is then located in the old multilevel hierarchy {T 0 
+
+> n
+
+, T 1 
+
+> n
+
+, . . . , T levelN  
+
+> n
+
+}
+
+using the point-location algorithm described in Algorithm 3, without triggering any refine-ment. If a containing element is found, the level-set value at the departure point is evaluated 21 by finite-element interpolation using the nodal values stored on the deeper mesh T levelN  
+
+> n
+
+. If the departure point lies outside the computational domain, a prescribed exterior value is assigned; in this work, we set Φ = −1. The semi-Lagrangian update is defined by enforcing constancy of the level-set field along characteristics, Φn+1 (xn+1 ) = Φ n(xn),
+
+for all nodes xn+1 of T levelN  
+
+> n+1
+
+. The updated level–set function Φ n+1 is tested against the reinitialization algorithm described in Section 6; if it is excessively distorted, it is reinitialized. After completion of the update, the level-set field Φ n+1 is stored only at the nodes of the finest mesh T levelN  
+
+> n+1
+
+. Coarser levels do not carry independent representations of Φ. The multilevel hierarchy is thus used for geometric adaptation, refinement relations, and point location, while the level-set degrees of freedom are maintained exclusively on the active finest space. The complete forward-backward procedure for one adaptive semi-Lagrangian time step is summarized in Algorithm 5 and in Figure 8.                                                            
+
+> Initialization at t0:use analytic level-set Φ( x, 0) to build {T 00, . . . , TlevelN 0}
+> + store level-set Φ 0on TlevelN 0
+> Old multilevel mesh
+> {T 0
+> n, . . . , TlevelN
+> n}
+> + level-set Φ non TlevelN
+> n
+> Cut elements on TlevelN
+> n
+> ⇒markers at tn
+> located at the zeros of Φ n
+> Markers forward tracing to tn+1 (RK4 with ∆ t)
+> Locate markers on
+> T0
+> n+1 := T00
+> Mark + closure + refine + push down till levelN
+> ⇒new multilevel mesh
+> {T 0
+> n+1 , . . . , TlevelN
+> n+1 }
+> TlevelN
+> n+1 mesh nodes
+> ⇒markers at tn+1
+> Marker backward tracing to tn(RK4 with −∆t)
+> Locate markers on TlevelN
+> n:locate on T0
+> n
+> + push down till levelN (no refinement)
+> Interpolate Φ non TlevelN
+> n
+> or BC if outside
+> ⇒new level-set Φ n+1
+> If D(φn+1 )> τ reinit
+> ⇒φn+1 = reinit( φn+1 )
+> start time loop
+> n←0
+> advance time
+> n←n+ 1
+
+Figure 8: Overall workflow of the adaptive semi-Lagrangian scheme. 
+
+# 8 Numerical results and validation methodology 
+
+## 8.1 Overview 
+
+The numerical validation of the proposed level-set framework is carried out through a series of canonical kinematic benchmarks. These benchmarks are based on analytic, divergence-free velocity fields and are widely adopted in the literature for assessing the accuracy and robustness of level-set formulations. They provide a controlled environment for quanti-tatively evaluating two fundamental aspects of interface-capturing methods: (i) mass (or 
+
+22 Algorithm 5 One adaptive semi-Lagrangian time step (multilevel input/output) 
+
+Require: Multilevel hierarchy {T 0 
+
+> n
+
+, T 1 
+
+> n
+
+, . . . , T levelN  
+
+> n
+
+} with father/children relations; nodal Φn stored on T levelN  
+
+> n
+
+; timestep ∆ t; analytic velocity field v(x, t ) (extended outside the domain); adjacency rule. 
+
+Ensure: Multilevel hierarchy {T 0
+
+> n+1
+
+, T 1
+
+> n+1
+
+, . . . , T levelN  
+
+> n+1
+
+} with father/children relations; nodal Φn+1 stored on T levelN  
+
+> n+1
+
+.
+
+(A) Build the new hierarchy using forward-advected cut-element markers  
+
+> 1:
+
+Identify cut elements Kcut ⊂ T levelN  
+
+> n
+
+(sign change or zero node)  
+
+> 2:
+
+Build the marker set, Xn, of physical marker points placed on the zero level-set for all 
+
+K ∈ K cut  
+
+> 3:
+
+Advect each marker in Xn forward by RK4 over ∆ t to obtain Xn+1  
+
+> 4:
+
+Initialize a fresh level-0 mesh T 0 
+
+> n+1
+
+(same coarse topology as T 0 
+
+> n
+
+) 
+
+> 5:
+
+Locate markers in Xn+1 on T 0 
+
+> n+1
+
+using the level-0 box index (Algorithm 3, level-0 stage)  
+
+> 6:
+
+for ℓ = 1 to levelN do  
+
+> 7:
+
+Mark elements of T ℓ−1 
+
+> n+1
+
+using located markers and apply one-level closure  
+
+> 8:
+
+Refine to obtain T ℓn+1 and store father/children relations  
+
+> 9:
+
+Push markers down to level ℓ using parent-to-child affine maps (no global search)  
+
+> 10:
+
+end for (B) Update Φ on the new finest level using backward tracing in the old hierarchy  
+
+> 11:
+
+for all nodes xn+1 of T levelN  
+
+> n+1
+
+do  
+
+> 12:
+
+Trace xn+1 backward by ∆ t to get departure point xn 
+
+> 13:
+
+Locate xn in the old hierarchy {T 0 
+
+> n
+
+, T 1 
+
+> n
+
+, . . . , T levelN  
+
+> n
+
+} via Algorithm 3 (no refinement)  
+
+> 14:
+
+if departure point is out-of-domain then  
+
+> 15:
+
+Φn+1 (xn+1 ) ← − 1 
+
+> 16:
+
+else  
+
+> 17:
+
+Interpolate Φ n at xn in the containing element  
+
+> 18:
+
+Φn+1 (xn+1 ) ← Φn(xn) 
+
+> 19:
+
+end if  
+
+> 20:
+
+end for  
+
+> 21:
+
+Compute the distortion indicator D for Φ n+1 (Section 6.4)  
+
+> 22:
+
+if D(Φ n+1 ) > τ reinit then  
+
+> 23:
+
+Φn+1 ← Reinit(Φ n+1 ) 
+
+> 24:
+
+end if 
+
+volume) conservation , and (ii) geometric accuracy during severe interface deformation and near-topological changes. In all tests, the velocity field reverses exactly in time, so that the interface should return to its initial configuration at the final time t1. This property allows a direct quantitative com-parison between the initial and final states, yielding exact reference data for the evaluation of numerical errors. Because the prescribed velocity fields considered in these benchmarks are smooth and divergence-free, the corresponding continuous evolution preserves interface topology. For this reason, deformation benchmarks of this type are commonly used in the level-set literature 23 to assess robustness under severe stretching, thin filament formation, and near-topological changes, rather than to model exact physical breakup or coalescence phenomena [34, 7, 35, 36, 37]. In practice, genuine interface merging and breakup are typically investigated in fully coupled multiphase flow simulations, where the interface evolution is driven by the Navier-Stokes dynamics together with surface tension and other physical effects [35, 59, 46]. In the following sections, we evaluate the above metrics on a collection of two- and three-dimensional benchmark problems, including both Cartesian and curved grids (Figure 9), and employing all element types introduced in the previous sections. This comprehensive set of tests allows us to assess not only the accuracy and mass conservation properties of the method, but also its overall robustness and versatility across different mesh types and problem configurations. In Figure 9, we display the Quad9 and Hex27 mesh configurations after two uniform refinement steps. The Tri7 and Wedge21 meshes are obtained by subdivid-ing each quadrilateral coarse element into two triangles and each hexahedral coarse element into two wedges, respectively. The Tet15 meshes are fully unstructured: the box configu-ration is generated by partitioning the domain into five Tet15 elements, while the spherical configuration is obtained by decomposing the domain into octants.     
+
+> (a) (b) (c)
+> (d) (e) (f)
+
+Figure 9: Schematic view of the finite element reference meshes, including two levels of uniform refinement indicated by thin lines. Top row (2D): (a) Quad9 box element, (b) Quad9 circular element, (c) Quad9 funnel-shaped element. Bottom row (3D): (d) Hex27 box element, (e) Hex27 spherical element, (f) Hex27 funnel-shaped element. In each panel, the finite element nodes and edges are shown. 24 8.2 Error metrics and AMR-based convergence characterization 
+
+Two complementary error measures are employed to assess the accuracy of the level-set evolution: the mass-conservation error and the geometric error .
+
+Mass conservation error The mass conservation error quantifies deviations in the total area (or volume) enclosed by the zero level-set between the initial ( t0) and final ( t1) configu-rations. Following the conceptual framework presented in [34, 60], the discrete formulation used in the present work reads: 
+
+Em(t1) = 
+
+∣∣∣∑Nel  
+
+> i=1
+
+AiCi(t1) − AiCi(t0)
+
+∣∣∣
+
+∑Nel  
+
+> i=1
+
+AiCi(t0) . (8.1) Here, Ci(t) is the phase indicator in cell i, i.e., the fraction of the cell occupied by the dispersed phase, and Ai is the corresponding element area (in 2D) or volume (in 3D). 
+
+Geometric error The geometric accuracy is assessed by directly comparing, for each cell, the phase indicator field in the initial and final configurations. The discrete metric adopted here is defined as 
+
+Eg(t1) = 
+
+> Nel
+
+∑
+
+> i=1
+
+Ai |Ci(t1) − Ci(t0)| . (8.2) The error metrics introduced above are evaluated on a sequence of successively refined meshes in order to assess the observed order of convergence for the different test cases and finite-element discretizations. For a generic error quantity E, the convergence rate between two consecutive refinement levels is defined as 
+
+p(E) = log( Ei/E i+1 )
+
+log( hi/h i+1 ) = log 2(Ei/E i+1 ), (8.3) where Ei and Ei+1 denote the error values corresponding to mesh sizes hi and hi+1 = hi/2, respectively. In addition, an average convergence rate is reported to reduce the influence of level-to-level oscillations, ¯p(E) = log (Eℓmin /E ℓmax 
+
+)
+
+log (hℓmin /h ℓmax 
+
+) = log 2
+
+(Eℓmin /E ℓmax 
+
+)
+
+ℓmax − ℓmin 
+
+, (8.4) where ℓmin and ℓmax denote the coarsest and finest refinement levels considered. The averaged rate provides a more reliable indicator of the asymptotic convergence behav-ior, particularly for error measures such as the mass error, which may exhibit non-monotone behavior due to fortuitous cancellation of local gain and loss contributions. The same formulas also apply to the scaling of the computational time, as is shown in the next section. 25 AMR characterization, convergence and computational scaling In AMR computa-tions, the numerical error depends on the local refinement pattern rather than on a uniform grid spacing. Convergence is therefore characterized by the maximum refinement level ℓmax ,which sets the minimum spacing hmin = h02−ℓmax , and by the number of active leaf cells 
+
+Ncells , measuring computational cost. Here h0 is the characteristic length of the uniform mesh at ℓ0. Accordingly, mass and geometric errors are reported as functions of hmin (or 
+
+ℓmax ), allowing direct comparison with uniform-grid results at the same effective resolution. In addition, from a computational viewpoint, AMR refines only a narrow band around the interface, substantially reducing the growth of degrees of freedom compared with uni-form refinement. While uniform grids scale with the domain measure, Nuniform ∼ O (h−d)in d dimensions, AMR scales with the interface measure, yielding N2D 
+
+> AMR
+
+∼ O (h−1) and 
+
+N3D 
+
+> AMR
+
+∼ O (h−2). This reduction leads to significantly lower execution times while preserv-ing comparable accuracy. The scaling behavior observed in Tables 1 and 2 confirms these theoretical trends, where execution times [ s] and empirical scaling orders p (computed via Eq. (8.3)) are reported. Table 1: Scaling comparison between AMR and uniform refinement on the Quad9 box element domain. 
+
+ℓmax hmin NAMR cells tAMR pAMR Nuniform cells tuniform puniform 
+
+6 2−6 1.76E+03 0.89 — 4.10E+03 1.70 —7 2−7 4.74E+03 2.36 1.40 1.64E+04 6.70 2.04 8 2−8 1.22E+04 5.98 1.34 6.55E+04 28.78 2.04 9 2−9 2.82E+04 13.88 1.22 2.62E+05 117.25 2.03 10 2−10 6.05E+04 31.64 1.19 1.05E+06 475.21 2.02 
+
+Table 2: Scaling comparison between AMR and uniform refinement on the cubic domain with Hex27 elements. 
+
+ℓmax hmin NAMR cells tAMR pAMR Nuniform cells tuniform puniform 
+
+4 2−4 1.44E+03 2.01 — 4.10E+03 7.05 —5 2−5 5.90E+03 10.89 2.44 3.28E+04 58.22 3.05 6 2−6 2.45E+04 50.27 2.21 2.62E+05 471.60 3.02 7 2−7 1.10E+05 228.17 2.18 2.10E+06 3787.67 3.01 
+
+## 8.3 Tests overview 
+
+The two- and three-dimensional benchmarks presented in the following section are: a vortex deformation , a rising-bubble-type flow, and a solid-body rotation . Each case is examined on both a standard square/cubic domain and a circular/ball domain in order to assess robustness against grid distortion. Simulations are carried out with maximum refinement levels in the range ℓmax = 8–12 for 2D and ℓmax = 6–9 for 3D elements. For some cases, results 26 are compared for runs with and without reinitialization of the level-set field, in order to evaluate the effectiveness of the reinitialization algorithm. The accuracy is quantified using the previously defined mass and geometric errors ( Em, E g), while computational performance is analyzed through the scaling of total execution time with refinement level. 
+
+## 8.4 Vortex deformation test 
+
+Test definition The single-vortex deformation test, introduced by LeVeque [61], is a strin-gent benchmark for level-set methods, characterized by severe interface stretching and subse-quent recovery. It models a reversible kinematic deformation driven by a smooth, divergence-free velocity field. In two dimensions, the velocity field is defined as 
+
+u(x, y, t ) = cos 2(πx ) sin(2 πy ) cos( πt/T ) , (8.5) 
+
+v(x, y, t ) = − cos 2(πy ) sin(2 πx ) cos( πt/T ) , (8.6) with T = 8 denoting the full advection period. The initial interface is a circle of radius 
+
+r = 0 .15 centered at (0 .0, 0.25) within Ω = [ −0.5, 0.5] 2. At t = T / 2, the interface is stretched into a thin filament, and at t = T it should ideally recover its original configuration, allowing the computation of the mass and geometric errors. The three-dimensional vortex deformation test generalizes the classical two-dimensional single-vortex flow to three dimensions. Three-dimensional vortex deformation tests of spher-ical interfaces, distinct from the Enright benchmark, have been previously investigated, for instance, by Aulisa et al. [62, 63]. We adopt the smooth, divergence-free, time-dependent velocity field used in our codebase, 
+
+u(x, y, z, t ) = cos 2(πx ) ( sin(2 πy ) − sin(2 πz )) cos( πt/T ) , (8.7) 
+
+v(x, y, z, t ) = cos 2(πy ) ( sin(2 πz ) − sin(2 πx )) cos( πt/T ) , (8.8) 
+
+w(x, y, z, t ) = cos 2(πz ) ( sin(2 πx ) − sin(2 πy )) cos( πt/T ) , (8.9) with T=4, defined on the periodic domain Ω = [ −0.5, 0.5] 3. The initial interface is a sphere of radius r = 0 .15 centered at (0 .0, 0.0, 0.25). At t = T / 2 the interface undergoes extreme filamentation, while at t = T it should ideally recover its initial configuration. 
+
+Reinitialization study (Quad9) Table 3 reports numerical results for the 2D vortex benchmark obtained without and with reinitialization on Quad9 elements, with τreinit = 0 .25 in the latter case. This test is chosen for the comparison since it is particularly challenging for the reinitialization step, due to the high curvature of the interface in the tail region. We observe that, at the coarsest level ( ℓmax = 8), reinitialization increases both the mass and geometric errors compared to the non-reinitialized case. However, as the mesh is refined, the reinitialized results rapidly become more accurate, achieving much smaller errors at the finest resolution ( ℓmax = 12). In fact, reinitialization has two competing effects: it introduces an interface shift, while it also mitigates the errors that would otherwise accumulate during advection as the field deforms. As explained in Section 6, the interface-shift error scales with 27 the accuracy of the finite-element representation of the level-set, whereas the advection-error mitigation depends on how the field deforms during transport (and thus on several factors). In our tests, the first contribution decreases faster with mesh refinement, making reinitialization beneficial on finer meshes. The resolution threshold depends on the flow configuration. Notice that the convergence orders pm and pg are consistently higher when reinitialization is applied, for all the values of ℓmax . In particular, when reinitialization is performed, ¯ pm ≈
+
+3.41 and ¯ pg ≈ 2.62. Table 3: Vortex kinematic transport test (Quad9): mass and geometric errors ( Em, Eg) and convergence orders pm, pg without and with level-set reinitialization. 
+
+Without reinitialization With reinitialization 
+
+ℓmax Em pm Eg pg Em pm Eg pg
+
+8 4.64E −04 – 6.39E −04 – 8.33E −03 – 1.02E −03 –9 2.12E −04 1.13 8.67E −05 2.88 8.18E −04 3.35 1.75E −04 2.54 10 1.35E −04 0.65 1.82E −05 2.25 1.15E −04 2.83 2.31E −05 2.92 11 6.12E −05 1.14 5.66E −06 1.68 8.92E −06 3.69 3.94E −06 2.55 12 1.58E −05 1.96 1.97E −06 1.52 6.36E −07 3.81 7.06E −07 2.48 
+
+In Figure 10, the grid refinement for the 2D vortex test is reported, with the zero level-set curve depicted in red at different time instants, using a grid refinement of ℓmax = 8. Specifically, we report the initial grid configuration and the mesh refinement at half the period, when the interface undergoes its maximum stretching. The final time configuration is omitted, as the interface returns to its initial circular geometry. 
+
+Figure 10: Grid refinement for the 2D vortex test with Quad9 elements: t = 0 on the left, 
+
+t = T / 4 in the center and t = T / 2 on the right. In all subsequent simulations, the level-set function is reinitialized with τreinit = 0 .25. 
+
+Simplicial elements: Tri7 and Tet15 Table 4 reports numerical results for the vortex benchmark obtained using simplicial finite elements, namely Tri7 in two dimensions and Tet15 in three dimensions. As in the Quad9 case, the level-set reinitialization is enabled for 28 both discretizations. Results are reported as a function of the maximum refinement level 
+
+ℓmax , using the refinement ranges introduced above for the two- and three-dimensional cases: 
+
+ℓ = 8–12 for Tri7 and ℓ = 6–9 for Tet15. In two dimensions, the Tri7 discretization exhibits a clear reduction of both mass and geometric errors under mesh refinement. The observed average convergence rates are ap-proximately ¯ pm ≈ 3.55 for the mass error and ¯ pg ≈ 2.62 for the geometric error, in line with the expected high-order behavior of the method. In three dimensions, the Tet15 discretization shows a consistent decay of both error measures as the grid is refined. The corresponding average convergence rates are ¯ pm ≈
+
+2.57 and ¯ pg ≈ 2.26, which confirms robust accuracy also for simplicial elements in three dimensions. Table 4: Vortex kinematic transport test with level-set reinitialization: mass and geometric errors ( Em, Eg) and convergence orders ( pm, pg) for Tri7 (2D) and Tet15 (3D) elements. 
+
+Tri7 Tet15 
+
+ℓmax Em pm Eg pg ℓmax Em pm Eg pg
+
+8 5.98E −03 – 7.53E −04 – 6 9.12E −02 – 2.06E −03 –9 5.83E −04 3.36 1.26E −04 2.58 7 1.79E −02 2.35 4.80E −04 2.10 10 1.09E −04 2.42 1.78E −05 2.83 8 1.76E −03 3.34 8.75E −05 2.46 11 8.62E −06 3.66 2.82E −06 2.66 9 4.31E −04 2.03 1.87E −05 2.22 12 3.16E −07 4.77 5.24E −07 2.43 
+
+Figure 11 illustrates the interface evolution for the three-dimensional vortex test at two representative time instants. The configuration at t = T / 4 corresponds to the onset of strong stretching, while the configuration at t = T / 2 exhibits extreme filamentation. Results are shown for the Tet15 adaptive discretization with maximum refinement level ℓmax = 7. Awireframe representation of the mesh elements at the finest refinement level is also displayed in the vicinity of the interface. Away from the interface, the adaptive mesh refinement procedure generates a graded mesh, which is not visible in the figure. 
+
+High-order 3D elements: Wedge21 and Hex27 Table 5 reports numerical results for the vortex benchmark obtained using high-order three-dimensional finite elements, namely Wedge21 and Hex27. Both discretizations are tested over the same range of refinement levels, ℓmax = 6–9, enabling a direct comparison of accuracy and convergence behavior under identical resolution conditions. As in the previous cases, level-set reinitialization is enabled for both element types. For the Wedge21 discretization, both the mass and geometric errors decrease consistently from ℓ = 6 to ℓ = 9, with average convergence rates ¯ pm ≈ 2.46 and ¯ pg ≈ 2.33, indicating robust high-order accuracy on prismatic elements. For the Hex27 discretization, a similar decay is observed, with average convergence rates ¯pm ≈ 2.75 and ¯ pg ≈ 2.27, confirming comparable accuracy on both hexahedral and wedge-based high-order elements. 29 Figure 11: Three-dimensional vortex test. Interface deformation in the box domain computed with Tet15 elements at ℓmax = 7. Left: t = T / 4; right: t = T / 2. Wireframe shows finest-level elements near the interface. Overall, the two discretizations exhibit very similar convergence trends for both mass conservation and geometric fidelity. Minor differences in the absolute error levels at coarse resolutions can be attributed to element topology and mapping distortions, while at finer levels, both Wedge21 and Hex27 achieve comparable accuracy, demonstrating the robustness of the method across different high-order 3D element families. Table 5: Vortex kinematic transport test with level-set reinitialization: mass and geometric errors ( Em, Eg) and convergence orders ( pm, pg) for Wedge21 and Hex27 elements. 
+
+Wedge21 Hex27 
+
+ℓmax Em pm Eg pg Em pm Eg pg
+
+6 7.48E −02 – 1.85E −03 – 1.45E −01 – 3.03E −03 –7 1.81E −02 2.05 4.75E −04 1.96 2.55E −02 2.50 6.51E −04 2.22 8 1.98E −03 3.20 7.96E −05 2.58 2.51E −03 3.35 1.34E −04 2.28 9 4.48E −04 2.14 1.47E −05 2.44 4.75E −04 2.40 2.68E −05 2.32 
+
+Comparison with literature To further assess the proposed AMR strategy, we compare the mass conservation properties with the results reported by Ngo and Choi [64], who con-sidered the same two-dimensional time-reversed single-vortex test with period T = 8 using an adaptive finite-element level-set method. From the number of elements of their uniformly refined reference mesh, the minimum local resolution near the interface can be estimated as 
+
+hmin ≈ 1/512 using triangular elements. In our framework, this resolution corresponds to refinement level ℓ = 9, considering biquadratic triangular elements (Tri7). At this resolution, the relative mass error obtained in the present work is Em = 5 .83 ×
+
+10 −4 (i.e. 0 .058%), which is significantly lower than the mass errors reported in [64] for both one-level and two-level adaptive meshes, as shown in Table 6. Despite differences in discretization and AMR strategies, the comparison is meaningful at the level of local interface resolution. Ngo and Choi [64] use linear triangular elements, resulting in fewer global degrees 30 of freedom, while their one-level (M1) and two-level (M2) adaptive meshes preserve a similar minimum mesh spacing near the interface and differ mainly in the extent of the refined region. Accordingly, the present results are compared at matched hmin rather than matched degrees of freedom, confirming competitive and improved mass conservation. Table 6: Comparison of relative mass error for the 2D vortex test at comparable interface resolution hmin ≈ 1/512. Numbers of nodes and elements are evaluated at t = T / 2 (maximum stretching). 
+
+Method # nodes # elements hmin Mass error (%) 
+
+This work (AMR, Tri7, ℓ = 9) 168 491 54 467 1/512 0.058 Ngo & Choi (2016), M1 82 391 163 824 ≈ 1/512 0.231 Ngo & Choi (2016), M2 44 056 87 634 ≈ 1/512 0.448 
+
+## 8.5 Rising-bubble-type test 
+
+Test definition and funnel geometry The rising-bubble-type kinematic test is driven by a prescribed divergence-free, time-periodic velocity field on two- and three-dimensional domains. In two dimensions, we define 
+
+v(x, y, t ) = A 〈− U(x) V ′(y), U ′(x) V (y)〉 cos 
+
+( πt 
+
+T
+
+)
+
+, (8.10) where A = 0 .1 and T = 8. The auxiliary functions are 
+
+U(s) = cos 2
+
+( πs 
+
+L
+
+)
+
+sin 
+
+( 2πs 
+
+L
+
+)
+
+, V (s) = sin 2
+
+(πs 
+
+L
+
+)
+
+, L = 1 , (8.11) with derivatives 
+
+U′(s) = π
+
+L
+
+[
+
+cos 
+
+(2πs 
+
+L
+
+)
+
++ cos 
+
+(4πs 
+
+L
+
+)] 
+
+, V ′(s) = π
+
+L sin 
+
+(2πs 
+
+L
+
+)
+
+. (8.12) In three dimensions, we set T = 4 and define 
+
+v(x, y, z, t ) = A 〈− U(x) V ′(z), − U(y) V ′(z), (U′(x) + U′(y)) V (z)〉 cos 
+
+( πt 
+
+T
+
+)
+
+, (8.13) with the same functions U, V (and L = 1). The initial interface is a circular bubble of radius r = 0 .15 centered at (0 , 0.25) in two dimensions, and a spherical bubble of the same radius centered at (0 , 0, 0.25) in three dimen-sions. During half a period, the interface rises and elongates upward in a motion reminiscent of buoyant ascent, then returns to its original configuration at t = T . Unlike the vortex benchmark in Section 8.4, where the level-set is stretched along the flow direction, here it is compressed. In fact, the velocity-field gradient is opposite to the flow direction. Both flows deform the level-set in the flow direction, but in two opposite ways. Because advection 31 responds differently to stretching than to compression, this test is designed to evaluate how the proposed approach performs in this setting. A more thorough discussion of how level-set deformation influences advection accuracy is provided in Section 6. This benchmark is run directly on a funnel-shaped grid in both two and three dimensions, as shown in Figure 9. In two dimensions, the lateral boundaries are defined as hyperbolic arcs: 
+
+x(y) = h ± a
+
+√
+
+1 + 
+
+(y − k
+
+b
+
+)2
+
+,
+
+with a = 0 .4 and b = 0 .5 controlling the aperture and curvature, and ( h, k ) = (0 .0, 0.5) denoting the funnel axis position. In three dimensions, the funnel geometry is obtained by smoothly remapping the Cartesian cube mesh into a funnel-shaped domain. The trans-formation scales the lateral coordinates as a function of the vertical position, so that each horizontal cross-section remains square while its side length varies along the height accord-ing to the prescribed funnel profile. The resulting meshes therefore exhibit a gradual lateral contraction or expansion, providing a controlled amount of element distortion. 
+
+Element-type comparison: Tri7 and Wedge21 on funnel meshes Table 7 reports the mass and geometric errors, together with the corresponding convergence orders, for the rising-bubble test computed on funnel-shaped grids using Tri7 elements in two dimensions and Wedge21 elements in three dimensions. In both cases, level-set reinitialization is enabled. Results are reported as a function of the maximum refinement level ℓmax (or equivalently of the minimum local spacing hmin ). Table 7: Rising-bubble-type kinematic transport test on funnel meshes with level-set reini-tialization: mass and geometric errors ( Em, Eg) and convergence orders ( pm, pg) for Tri7 (2D) and Wedge21 (3D) elements. 
+
+Tri7 Wedge21 
+
+ℓmax Em pm Eg pg ℓmax Em pm Eg pg
+
+8 1.51E −01 – 1.07E −02 – 6 1.18E −02 – 3.27E −04 –9 7.92E −05 10.89 9.43E −06 10.14 7 1.94E −03 2.60 6.33E −05 2.37 10 6.06E −06 3.71 9.90E −07 3.25 8 1.36E −04 3.84 9.20E −06 2.78 11 3.63E −07 4.06 8.95E −08 3.47 9 5.53E −06 4.62 1.26E −06 2.87 12 4.10E −08 3.15 1.07E −08 3.07 
+
+The results reported in Table 7 show that both Tri7 and Wedge21 elements achieve monotonic convergence of the mass and geometric errors under compressive deformation on funnel-shaped meshes. In two dimensions, the Tri7 discretization reaches mass and geomet-ric errors of the order of 10 −7 and 10 −9, respectively, at the finest refinement level, while in three dimensions the Wedge21 discretization attains Em ≈ 5 × 10 −6 and Eg ≈ 10 −6 at 
+
+ℓmax = 9. Despite the strongly anisotropic deformation and the curved element topology in-duced by the funnel geometry, the observed convergence rates remain close to the theoretical expectations, with approximately third-order accuracy for the mass error and second-order 32 accuracy for the geometric error. These results confirm the robustness of the proposed AMR level-set formulation under compression-dominated interface transport and distorted mesh configurations. The level-8 Tri7 errors are noticeably larger than those observed for the other configura-tions. This behavior is attributed to the fact that, at this resolution, the deformed bubble approaches the funnel boundaries. The imposed level-set boundary condition, Φ = −1, on walls crossed by the velocity field is unphysical in this regime and leads to the formation of spurious bubbles. A more appropriate outflow boundary condition should therefore be employed. Nevertheless, the algorithm remains robust and does not exhibit any numerical breakdown. In Figure 12, we report, for the two-dimensional funnel case, the interface position of the bubble at four different time steps of the simulation, considering a grid refinement with 
+
+ℓmax = 8. We notice that the initial interface is rising to the top of the domain, where it starts to stretch along the x-direction, until the tails are moved towards the bottom of the domain. After that, the interface returns back to the initial configuration, where the circular geometry is achieved with low error. 
+
+Figure 12: Grid refinement for the 2D rising bubble test with Tri7 elements at ℓmax = 8: 
+
+t = 0 on the left, t = T / 4 in the center and t = T / 2 on the right. In Figure 13, the three-dimensional interface evolution is shown at two representative times, considering the half-period configuration with maximum elongation inside the funnel. 
+
+## 8.6 Rigid-body rotation test 
+
+Test definition The rotational test, originally introduced by LeVeque [61] and widely adopted in subsequent studies [34, 7, 60, 65], serves as a baseline for verifying the consistency of the advection scheme in a purely rigid-body motion. In two dimensions, the velocity field is defined as 
+
+v(x, y ) = ( y, −x), (8.14) which corresponds to a clockwise rotation about the origin. The computational domain is the unit square Ω = [ −0.5, 0.5] 2, discretized using Tri7 elements. The initial level-set field Φ( x, y ) is initialized as the signed distance from a circle of radius r = 0 .15 centered at 33 Figure 13: Rising bubble 3D test interface deformation at different time steps for the funnel domain with Wedge21 elements at ℓmax = 9: left t = T / 4, and right t = T / 2. (0 .0, 0.25). During the simulation, the interface undergoes a rigid rotation of 2 π radians, theoretically returning to its initial position after one full period. In three dimensions, we consider a fully three-dimensional rotational field inducing rota-tion around the main diagonal of the computational domain, defined as 
+
+v(x, y, z ) = ( y − z, z − x, x − y) . (8.15) The computational domain is the ball-shaped centered at the origin with radius equal to 0.5, discretized using Tet15 elements, which introduces curved simplicial elements. The initial interface is a sphere of radius r = 0 .15 centered at (0 .0, 0.0, 0.25), initialized as a signed-distance function. As in the two-dimensional case, the interface undergoes a rigid-body motion and should ideally recover its initial configuration after one full period. For ideal rigid rotation, both the mass error Em and the geometric error Eg remain neg-ligible and converge with the formal accuracy of the advection method. Since the prescribed velocity fields induce a rigid-body motion of the level-set, the interface is transported without deformation and does not require reinitialization; this behavior is automatically enforced by the reinitialization criterion described in Section 6 and is shown quantitatively in Section 8.7. 
+
+Error convergence on Tri7 (square) and Tet15 (ball) domains Table 8 reports the mass and geometric errors, together with the corresponding convergence orders, for the rigid-body rotation test computed on a straight square domain using Tri7 elements in two dimensions and on a curved spherical domain using Tet15 elements in three dimensions. Results are reported as a function of the maximum refinement level ℓmax (or equivalently of the minimum local spacing hmin ). In two dimensions, the Tri7 discretization yields extremely small errors, reaching Em ≈
+
+8 × 10 −9 and Eg ≈ 1 × 10 −9 at ℓmax = 12. The observed convergence rates are close to second order for both mass and geometric errors, in agreement with theoretical expectations for rigid-body transport. In three dimensions, the Tet15 discretization also produces small geometric errors, with 
+
+Eg ≈ 6 × 10 −7 at ℓmax = 9. The mass error decreases initially with refinement but exhibits a 34 mild saturation at fine levels, stabilizing around Em ≈ 3 × 10 −5. This behavior is attributed to the combined effects of curved element geometry, high-order quadrature, and accumulated round-off errors. These results confirm that the proposed AMR level-set method preserves good accuracy under rigid-body motion on both straight and curved meshes, while correctly suppressing unnecessary reinitialization. Table 8: Rigid-body rotation kinematic transport test: mass and geometric errors ( Em, Eg)and convergence orders ( pm, pg) for Tri7 (2D square) and Tet15 (3D ball) elements. 
+
+Tri7 Tet15 
+
+ℓmax Em pm Eg pg ℓmax Em pm Eg pg
+
+8 4.49E −06 – 1.39E −06 – 5 1.95E −04 – 1.51E −04 –9 3.29E −07 3.77 8.80E −08 3.98 6 1.20E −04 0.69 9.96E −06 3.92 10 3.52E −07 -0.10 2.49E −08 1.82 7 3.47E −05 1.79 1.21E −06 3.05 11 1.10E −07 1.67 7.81E −09 1.67 8 2.95E −05 0.23 6.84E −07 0.82 12 8.01E −09 3.79 1.33E −09 2.56 9 2.93E −05 0.01 5.93E −07 0.20 
+
+## 8.7 Reinitialization frequency 
+
+In this section, we analyze both the frequency and the computational cost of the reinitial-ization procedure. Unlike approaches based on a fixed reinitialization interval, the criterion employed in this work (see Sec. 6) activates reinitialization dynamically based on the evo-lution of the level-set field and on the prescribed threshold parameter D. As a result, the total number of reinitializations is not imposed a priori , but emerges naturally from the simulation. On the other hand, this approach requires evaluating the global indicator D at each time step. If the indicator exceeds the threshold τreinit , the reinitialization procedure is triggered. This means that the computational cost includes a small cost at every time step to compute the indicator, plus an additional cost only when the reinitialization is activated. Table 9 reports the total number of reinitializations observed in the test cases considered in this work, for the different element types and benchmarks. For compactness, the following acronyms are used: VQ9 = 2D vortex test with Quad9 elements; VT7 = 2D vortex test with Tri7 elements; RB-T7 = 2D rising-bubble test on funnel meshes with Tri7 elements; V-T15 
+
+= 3D vortex test with Tet15 elements; V-W21 = 3D vortex test with Wedge21 elements; 
+
+V-H27 = 3D vortex test with Hex27 elements; RB-W21 = 3D rising-bubble test on funnel meshes with Wedge21 elements. For the vortex benchmark, the number of reinitializations is essentially grid-independent in two dimensions (VQ9 and VT7) and becomes nearly grid-independent in three dimensions (V-T15, V-W21 and V-H27), where only minor variations of one or two events are observed across refinement levels. For the rising-bubble-type benchmark computed directly on funnel meshes, the number of level-set reinitializations stabilizes rapidly in three dimensions (RB–W21). In two dimensions (RB–T7), an elevated number of reinitializations is observed at the level-8 refinement level. 35 This effect is consistent with the boundary-related artifacts discussed above. Despite this behavior, the method remains stable under the same non-optimal boundary treatment. Upon mesh refinement, the number of reinitializations decreases and aligns with the values observed in the vortex test cases. In the rotation test cases, both in two and three dimensions, no reinitialization is trig-gered. Since the prescribed velocity field induces a rigid-body motion of the level-set, the only deformation arises from numerical errors in the advection step. For the chosen value of 
+
+τreinit , these errors are not sufficient to activate the reinitialization procedure. Table 9: Total number of reinitializations for the benchmarks considered in this work. Acronyms are defined in the text. 
+
+2D 3D 
+
+ℓmax VQ9 VT7 RB-T7 ℓmax V-T15 V-W21 V-H27 RB-W21 
+
+8 15 15 89 6 12 10 11 10 9 15 15 15 7 11 11 11 10 10 15 15 15 8 11 11 11 10 11 15 15 15 9 11 11 11 10 12 15 15 15 
+
+# 9 Conclusions 
+
+We have presented an adaptive finite element framework for level-set transport in two-phase flow simulations that combines the robustness of implicit interface representation with the accuracy of marker-based transport. The level-set formulation naturally accommodates topological changes, while forward marker transport enables predictive adaptive mesh con-struction and backward characteristic tracing provides accurate evaluation of the advected level-set field. An efficient multilevel point-location strategy supports both operations. Aconsistent reinitialization procedure restores the signed-distance property while preserving interface geometry and mass conservation. Numerical experiments in two and three spatial dimensions, on structured and unstruc-tured meshes and across multiple element types, demonstrate that the proposed adaptive strategy attains accuracy comparable to uniform discretizations at substantially reduced computational cost. The method exhibits robust behavior under strong deformation and aggressive adaptivity, while maintaining stable and conservative interface evolution. The present study considers prescribed velocity fields to isolate transport and adaptivity mechanisms. The next step is coupling with multiphase flow solvers, enabling fully adaptive finite-element simulations of complex two-phase flows that combine topology-resolving level-set evolution with marker-enhanced accuracy. This establishes a marker-consistent, fully adaptive foundation for accurate and efficient level-set transport. 36 References 
+
+[1] S. Osher, J. A. Sethian, Fronts propagating with curvature-dependent speed: Algo-rithms based on Hamilton–Jacobi formulations, Journal of Computational Physics 79 (1) (1988) 12–49. [2] M. Sussman, P. Smereka, S. Osher, A level set approach for computing solutions to incompressible two-phase flow, Journal of Computational physics 114 (1) (1994) 146– 159. [3] S. Osher, R. Fedkiw, K. Piechor, Level set methods and dynamic implicit surfaces, Appl. Mech. Rev. 57 (3) (2004) B15–B15. [4] C. Min, On reinitializing level set functions, Journal of Computational Physics 229 (8) (2010) 2764–2772. [5] G.-S. Jiang, D. Peng, Weighted ENO schemes for Hamilton–Jacobi equations, SIAM Journal on Scientific Computing 21 (6) (2000) 2126–2143. [6] D. Adalsteinsson, J. A. Sethian, A fast level set method for propagating interfaces, Journal of Computational Physics 118 (2) (1995) 269–277. [7] D. Enright, R. Fedkiw, J. Ferziger, I. Mitchell, A hybrid particle level set method for improved interface capturing, Journal of Computational Physics 183 (1) (2002) 83–116. [8] M. Sussman, E. G. Puckett, A coupled level set and volume-of-fluid method for com-puting 3D and axisymmetric incompressible two-phase flows, Journal of Computational Physics 162 (2) (2000) 301–337. [9] F. Gibou, R. Fedkiw, S. Osher, A review of level-set methods and some recent applica-tions, Journal of Computational Physics 353 (2018) 82–109. [10] M. J. Berger, J. Oliger, Adaptive mesh refinement for hyperbolic partial differential equations, Journal of Computational Physics 53 (3) (1984) 484–512. [11] M. J. Berger, P. Colella, Local adaptive mesh refinement for shock hydrodynamics, Journal of Computational Physics 82 (1) (1989) 64–84. [12] I. Babuska, B. A. Szabo, I. N. Katz, The p-version of the finite element method, SIAM journal on numerical analysis 18 (3) (1981) 515–545. [13] G. Ntoukas, J. Manzanero, G. Rubio, E. Valero, E. Ferrer, An entropy–stable p–adaptive nodal discontinuous galerkin for the coupled Navier–Stokes/Cahn–Hilliard system, Jour-nal of Computational Physics 458 (2022) 111093. [14] P. Mossier, D. Appel, A. D. Beck, C.-D. Munz, An efficient hp-adaptive strategy for a level-set ghost-fluid method, Journal of Scientific Computing 97 (2) (2023) 50. 37 [15] M. Sussman, A. S. Almgren, J. B. Bell, P. Colella, L. H. Howell, M. L. Welcome, An adaptive level set approach for incompressible two-phase flows, Journal of Computa-tional Physics 148 (1) (1999) 81–124. [16] Y. Zeng, H. Liu, Q. Gao, A. Almgren, A. P. S. Bhalla, L. Shen, A consistent adaptive level set framework for incompressible two-phase flows with high density ratios and high reynolds numbers, Journal of Computational Physics 478 (2023) 111971. [17] A. Khokhlov, Fully threaded tree algorithms for adaptive refinement fluid dynamics simulations, Journal of Computational Physics 143 (2) (1998) 519–543. [18] S. Popinet, Gerris: A tree-based adaptive solver for the incompressible euler equations in complex geometries, Journal of Computational Physics 190 (2) (2003) 572–600. [19] J. Strain, Tree methods for moving interfaces, Journal of Computational Physics 151 (2) (1999) 616–648. [20] C. Min, F. Gibou, A second order accurate level set method on non-graded adaptive cartesian grids, Journal of Computational Physics 225 (1) (2007) 300–321. [21] S. Popinet, A quadtree-adaptive multigrid solver for the Serre–Green–Naghdi equations, Journal of Computational Physics 302 (2015) 336–358. [22] C. Burstedde, L. C. Wilcox, O. Ghattas, p4est: Scalable algorithms for parallel adaptive mesh refinement on forests of octrees, SIAM Journal on Scientific Computing 33 (3) (2011) 1103–1133. [23] M. Mirzadeh, A. Guittet, C. Burstedde, F. Gibou, Parallel level-set methods on adaptive tree-based grids, Journal of Computational Physics 322 (2016) 345–364. [24] P. Hergibo, Q. Liang, T. N. Phillips, Z. Xie, A quadtree-based adaptive moment-of-fluid method for interface reconstruction with filaments, Journal of Computational Physics 499 (2024) 112719. [25] C.-H. Yang, G. Scovazzi, A. Krishnamurthy, B. Ganapathysubramanian, Octree-based adaptive mesh refinement and the shifted boundary method for efficient fluid dynamics simulations, Advances in Computational Science and Engineering 4 (2025) 57–84. [26] L. C. Ngo, H. G. Choi, A multi-level adaptive mesh refinement for an integrated fi-nite element/level set formulation to simulate multiphase flows with surface tension, Computers & Mathematics with Applications 79 (4) (2020) 908–933. [27] L.-B. Zhang, et al., A parallel algorithm for adaptive local refinement of tetrahedral meshes using bisection, Numer. Math.: Theory, Methods and Applications 2 (65-89) (2009) 13. [28] N. R. Morgan, J. I. Waltz, 3D level set methods for evolving fronts on tetrahedral meshes with adaptive mesh refinement, Journal of Computational Physics 336 (2017) 492–512. 38 [29] R. S. Sampath, G. Biros, A parallel geometric multigrid method for finite elements on octree meshes, SIAM Journal on Scientific Computing 32 (3) (2010) 1361–1392. [30] C.-W. Shu, High order weighted essentially nonoscillatory schemes for convection dom-inated problems, SIAM Review 51 (1) (2009) 82–126. [31] A. Staniforth, J. Cˆ ot´ e, Semi-lagrangian integration schemes for atmospheric models: A review, Monthly Weather Review 119 (9) (1991) 2206–2223. [32] A. W. Bargteil, T. G. Goktekin, J. F. O’brien, J. A. Strain, A semi-lagrangian contouring method for fluid simulation, ACM Transactions on Graphics (TOG) 25 (1) (2006) 19–38. [33] S. Kurioka, C. Hu, Improved particle level set method with higher-order kernel func-tion correction: Enhancing accuracy and conservation, Computers & Fluids 291 (2025) 106571. [34] W. J. Rider, D. B. Kothe, Reconstructing volume tracking, Journal of Computational Physics 141 (2) (1998) 112–152. [35] Z. Wang, J. Yang, B. Koo, F. Stern, A coupled level set and volume-of-fluid method for sharp interface simulation of plunging breaking waves, International Journal of Multi-phase Flow 35 (3) (2009) 227–246. doi:10.1016/j.ijmultiphaseflow.2008.11.004 .[36] A. Cervone, S. Manservisi, R. Scardovelli, S. Zaleski, A geometrical predictor–corrector advection scheme and its application to the volume fraction function, Journal of Com-putational Physics 228 (2) (2009) 406–419. doi:10.1016/j.jcp.2008.09.016 .[37] V. A. Ramanuj, R. Sankaran, High order anchoring and reinitialization of level set function for simulating interface motion, Journal of Scientific Computing 81 (3) (2019) 1963–1986. doi:10.1007/s10915-019-01053-6 .[38] M. Shakoor, Review of level-set reinitialization methods in computational mechanics and materials science, Modelling and Simulation in Materials Science and Engineering 33 (5) (2025). [39] J. Sethian, Evolution, implementation, and application of level set and fast marching methods for advancing fronts, Journal of Computational Physics 169 (2) (2001) 503–555. [40] H. Zhao, A fast sweeping method for eikonal equations, Mathematics of Computation 74 (250) (2005) 603–627. [41] E. Olsson, G. Kreiss, S. Zahedi, A conservative level set method for two phase flow, Journal of Computational Physics 225 (1) (2007) 785–807. [42] D. L. Chopp, Some improvements of the fast marching method, SIAM Journal on Sci-entific Computing 23 (1) (2001) 230–244. [43] L. Anumolu, M. F. Trujillo, Gradient augmented reinitialization scheme for the level set method, International Journal of Numerical Methods in Fluids 73 (12) (2013) 1011– 1041. 39 [44] F. Henri, M. Coquerelle, P. Lubin, Geometrical level set reinitialization using closest point method and kink detection for thin filaments, topology changes and two-phase flows, Journal of Computational Physics 448 (2022) 110704. [45] N. Parolini, E. Burman, A local projection reinitialization procedure for the level set equation on unstructured grids, Tech. rep., Technical Report CMCS-REPORT-2007-004, ´Ecole Polytechnique F´ ed´ erale de Lausanne (2007). [46] E. Aulisa, G. Barbi, A. Chierici, S. Manservisi, A mixed marker and level-set front-tracking approximation for multiphase flows simulations, Journal of Computational Physics (2025) 114285. [47] E. Aulisa, G. Capodaglio, G. Ke, Construction of h-refined continuous finite element spaces with arbitrary hanging node configurations and applications to multigrid algo-rithms, SIAM Journal on Scientific Computing 41 (1) (2019) A480–A507. [48] H. Gammanpila, E. Aulisa, A. Chierici, Stabilized nitsche-type cip/gp cutfem for two-phase flow applications, Mathematics 13 (17) (2025) 2853. [49] E. Aulisa, FEMuS: A finite element multiphysics solver, 
+
+https://github.com/eaulisa/MyFEMuS , gitHub repository (2024). [50] E. Aulisa, S. Bna, G. Bornia, A monolithic ale newton–krylov solver with multigrid-richardson–schwarz preconditioning for incompressible fluid-structure interaction, Com-puters & Fluids 174 (2018) 213–228. [51] S. Calandrini, E. Aulisa, Fluid-structure interaction simulations of venous valves: Amonolithic ale method for large structural displacements, International Journal for Nu-merical Methods in Biomedical Engineering 35 (2) (2019) e3156. [52] S. Calandrini, E. Aulisa, G. Ke, A field-split preconditioning technique for fluid-structure interaction problems with applications in biomechanics, International Journal for Numerical Methods in Biomedical Engineering 36 (3) (2020) e3301. [53] J. Bey, Tetrahedral grid refinement, Computing 55 (2000) 355–378. [54] M.-C. Rivara, Mesh refinement processes based on the generalized bisection of simplices, SIAM Journal on Numerical Analysis 21 (3) (1984) 604–613. [55] I. Kossaczky, A recursive approach to local mesh refinement in two and three dimensions, Journal of Computational and Applied Mathematics 55 (1994) 275–288. [56] G. Capodaglio, E. Aulisa, A particle tracking algorithm for parallel finite element ap-plications, Computers & Fluids 159 (2017) 338–355. [57] J. L. Blanco, P. K. Rai, nanoflann: a C++ header-only fork of FLANN, a library for nearest neighbor gitHub repository (2014). URL https://github.com/jlblancoc/nanoflann 
+
+40 [58] M. Shaakor, B. Scholtes, P.-O. Bouchard, M. Bernacki, An efficient and parallel level set reinitialization method – application to micromechanics and microstructural evolutions, Applied Mathematical Modelling 39 (23-24) (2015) 7291–7302. [59] Q. Xia, J. Yang, Y. Li, On the conservative phase-field method with the n-component incompressible flows, Physics of Fluids 35 (1) (2023). doi:10.1063/5.0135490 .[60] E. Aulisa, S. Manservisi, R. Scardovelli, A mixed markers and volume-of-fluid method for the reconstruction and advection of interfaces in two-phase and free-boundary flows, Journal of Computational Physics 188 (2) (2003) 611–639. [61] R. J. Leveque, High-resolution conservative algorithms for advection in incompressible flow, SIAM Journal on Numerical Analysis 33 (2) (1996) 627–665. [62] E. Aulisa, S. Manservisi, R. Scardovelli, A surface marker algorithm coupled to an area-preserving marker redistribution method for three-dimensional interface tracking, Journal of Computational Physics 197 (2) (2004) 555–584. [63] E. Aulisa, S. Manservisi, R. Scardovelli, S. Zaleski, Interface reconstruction with least-squares fit and split advection in three-dimensional cartesian geometry, Journal of Com-putational Physics 225 (2) (2007) 2301–2319. [64] L. C. Ngo, H. G. Choi, A multi-level adaptive mesh refinement method for level set sim-ulations of multiphase flow on unstructured meshes, International Journal for Numerical Methods in Engineering 110 (10) (2017) 947–971. [65] F. Henri, M. Coquerelle, P. Lubin, Geometrical level set reinitialization using closest point method and kink detection for thin filaments, topology changes and two-phase flows, Journal of Computational Physics 448 (2022) 110704. 41
