@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-01",
+  "date": "2026-08-01",
+  "generated_at": "2026-08-01T20:20:14",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/01/2607.26341v1-a-cartesian-grid-method-for-advection-diffusion-equations-with-robin-boundary-conditions-on-moving-domains",
+      "section": "quick",
+      "title_en": "A Cartesian Grid Method for Advection-Diffusion Equations with Robin Boundary Conditions on Moving Domains",
+      "authors": "Han Zhou, Yoichiro Mori, Lingxing Yao",
+      "date": "2026-07-28",
+      "pdf": "https://arxiv.org/pdf/2607.26341v1",
+      "score": "7.0",
+      "evidence": "移动域上对流扩散方程的 Robin 边界条件笛卡尔网格方法",
+      "tldr": "针对移动区域上的对流扩散方程，Robin边界条件带来挑战。本文提出笛卡尔网格方法，将移动域问题转化为界面问题，利用窄带校正施加Robin条件，避免重划网格。理论证明一维格式时间一阶、空间二阶收敛，且GMRES迭代次数与网格无关。该方法计算成本线性，数值实验展示高精度与效率，为移动边界问题提供了一种简便的笛卡尔网格求解方案。",
+      "tags": "query:falling-film",
+      "abstract_en": "We develop a Cartesian grid method for advection--diffusion equations with Robin boundary conditions on moving domains. The moving-domain problem is reformulated as an interface problem on a box, with an unknown density introduced on the moving interface to enforce the Robin condition. The bulk equation is discretized by a cell-centered finite-difference scheme on the Cartesian grid, while interface corrections are obtained from local problems in a narrow band around the interface. The resulting method requires only modest computational geometry, avoids remeshing and cut cells, and is compatible with geometric multigrid and matrix-free GMRES. The GMRES iteration count is essentially independent of the mesh size, and the computational cost scales linearly with the number of bulk degrees of freedom. For the one-dimensional scheme, first-order convergence in time and second-order convergence in space are proved. Numerical examples in one and two dimensions, including manufactured solutions and an active transport problem without an exact solution, demonstrate the accuracy and efficiency of the method.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

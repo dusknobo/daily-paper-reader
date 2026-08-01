@@ -1,44 +1,108 @@
-<div class="dpr-home-notice-card">
-  <h3 class="dpr-home-notice-title">🚀 Start Here</h3>
-  <ul class="dpr-home-notice-list">
-    <li><a href="#/tutorial/README">使用教程</a></li>
-  </ul>
+<div class="dpr-home-notice-card dpr-home-panel">
+  <div class="dpr-home-notice-header dpr-home-panel-header">
+    <h3 class="dpr-home-notice-title">公告与更新</h3>
+    <a class="dpr-home-notice-tutorial" href="#/tutorial/README">使用教程 <span aria-hidden="true">›</span></a>
+  </div>
+  <div class="dpr-home-notice-entry">
+    <time class="dpr-home-notice-date" datetime="2026-07-20">07.20</time>
+    <div>
+      <strong class="dpr-home-notice-entry-title">反馈功能上线</strong>
+      <span class="dpr-home-notice-entry-summary">新增反馈功能，欢迎大家踊跃反馈各种建议，我们会第一时间查看并协调处理。</span>
+    </div>
+  </div>
+  <div class="dpr-home-notice-entry">
+    <time class="dpr-home-notice-date" datetime="2026-07-19">07.19</time>
+    <div>
+      <strong class="dpr-home-notice-entry-title">首页新增社区统计</strong>
+      <span class="dpr-home-notice-entry-summary">现在可以看到今天看论文的人数和项目加入人数。</span>
+    </div>
+  </div>
+  <div class="dpr-home-site-stats" data-dpr-site-stats hidden aria-live="polite">
+    <span>今天有 <strong class="dpr-home-site-stat-value" data-dpr-daily-readers>--</strong> 人在看论文</span>
+    <span class="dpr-home-site-stat-separator" aria-hidden="true">·</span>
+    <span>昨天有 <strong class="dpr-home-site-stat-value" data-dpr-yesterday-readers>--</strong> 人在看论文</span>
+    <span class="dpr-home-site-stat-separator" aria-hidden="true">·</span>
+    <span>已有 <strong class="dpr-home-site-stat-value" data-dpr-fork-count>--</strong> 人加入 Daily Paper Reader</span>
+    <span class="dpr-home-history">
+      <button type="button" class="dpr-home-history-trigger" data-dpr-history-trigger aria-label="查看最近 14 天阅读趋势"><span aria-hidden="true">🔍</span></button>
+      <span class="dpr-home-history-popover" data-dpr-history-popover role="tooltip">
+        <span class="dpr-home-history-header">近 14 天阅读趋势</span>
+        <span class="dpr-home-history-meta">
+          <span data-dpr-history-range>--</span>
+          <span>峰值 <strong data-dpr-history-peak>--</strong></span>
+        </span>
+        <span class="dpr-home-history-chart" data-dpr-history-chart></span>
+      </span>
+    </span>
+  </div>
 </div>
 
-## 每次日报
-- 最新运行日期：2026-07-31
-- 运行时间：2026-07-31 21:59:22 UTC
-- 运行状态：成功
-- 本次总论文数：4
-- 精读区：0
-- 速读区：4
+<div class="dpr-home-dashboard-grid">
+<section class="dpr-home-dashboard-card dpr-home-report-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">2026-08-01</span>
+      <h3 class="dpr-home-dashboard-title">今日汇总</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">共 1 篇</strong>
+  </div>
+  <dl class="dpr-home-dashboard-stats">
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
+  </dl>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-01 20:20:10 UTC<br>状态：成功</p>
+</section>
+<section class="dpr-home-dashboard-card dpr-home-brief-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">合并后生成</span>
+      <h3 class="dpr-home-dashboard-title">今日简报</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">AI</strong>
+  </div>
+  <div class="dpr-home-dashboard-body">
+<p>今日速读一篇关于移动区域上对流扩散方程求解的笛卡尔网格方法研究。</p>
+<p>论文提出一种处理复杂运动边界罗宾条件的新算法，精度有保障。</p>
+<p>若您对流体仿真或偏微分方程数值解感兴趣，不妨深入看看它的边界处理技巧。</p>
+  </div>
+</section>
+<section class="dpr-home-dashboard-card dpr-home-deep-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">今日累计</span>
+      <h3 class="dpr-home-dashboard-title">精读推荐</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">0 篇</strong>
+  </div>
+  <div class="dpr-home-dashboard-body">
+<p class="dpr-home-dashboard-empty">今日暂无推荐。</p>
+  </div>
 
-### 今日简报（AI）
-今日速览四篇流体力学新研究，涵盖溃坝漩涡、高阶GPU求解器与多分散气泡模拟。最值得关注的是溃坝冲击中的涡动力学与多气泡传热传质的亚网格模型，揭示了复杂多相流中的新机理。建议读者优先查看这两篇文摘，了解前沿数值方法与物理模型的突破。
-- 详情：[/202607/31/README](/202607/31/README)
+</section>
+<section class="dpr-home-dashboard-card dpr-home-skim-card">
+  <div class="dpr-home-dashboard-header">
+    <div>
+      <span class="dpr-home-dashboard-kicker">今日累计</span>
+      <h3 class="dpr-home-dashboard-title">速读推荐</h3>
+    </div>
+    <strong class="dpr-home-dashboard-count">1 篇</strong>
+  </div>
+  <div class="dpr-home-dashboard-body">
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="A Cartesian Grid Method for Advection-Diffusion Equations with Robin Boundary Conditions on Moving Domains">A Cartesian Grid Method for Advection-Diffusion Equations with Robin Boundary Conditions on Moving Domains</span></li></ul>
+  </div>
+  <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">falling-film <strong>1</strong></span></div>
+</section>
+</div>
 
-### 精读区论文标签
-- 本次无精读推荐。
-
-### 速读区论文标签
-1. [Vortex dynamics and air entrainment in dam break wave impacting on vertical walls: A multiphase lattice Boltzmann study](/202607/31/2607.25433v1-vortex-dynamics-and-air-entrainment-in-dam-break-wave-impacting-on-vertical-walls-a-multiphase-lattice-boltzmann-study)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：使用保守Allen-Cahn LBM对溃坝两相波进行直接数值模拟
-2. [HORSES3D-GPU: A high-order discontinuous Galerkin solver for multi-GPU systems](/202607/31/2607.26674v1-horses3d-gpu-a-high-order-discontinuous-galerkin-solver-for-multi-gpu-systems)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：开源高阶DG求解器适用于多相流CFD模拟
-3. [A sub-grid-scale model for polydisperse bubbly flows with heat and mass transfer](/202607/31/2607.27426v1-a-sub-grid-scale-model-for-polydisperse-bubbly-flows-with-heat-and-mass-transfer)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：含传热传质的弥散气泡流亚格子模型是两相流模拟方法
-4. [An Adaptive Finite Element Method for Marker-Driven Level-Set Transport on Hierarchical Meshes](/202607/31/2607.28104v1-an-adaptive-finite-element-method-for-marker-driven-level-set-transport-on-hierarchical-meshes)  
-   标签：评分：6.0/10、query:falling-film
-   evidence：用于两相流模拟的自适应有限元水平集输运方法
-
-
-<div class="dpr-home-promo-card">
-  <h3 class="dpr-home-promo-title">💬 社区与支持</h3>
-  <ul class="dpr-home-promo-list">
-    <li>欢迎 Star / Fork / Issue / PR</li>
-    <li>QQ群：583867967（欢迎交流，已有：1151人）</li>
-  </ul>
+<div class="dpr-home-promo-card dpr-home-panel">
+  <div class="dpr-home-panel-header">
+    <h3 class="dpr-home-promo-title">社区与支持</h3>
+  </div>
+  <p class="dpr-home-promo-copy">欢迎通过 Star、Fork、Issue 或 PR 一起完善 Daily Paper Reader。</p>
+  <div class="dpr-home-promo-meta">
+    <span>QQ群 <strong>583867967</strong></span>
+    <span class="dpr-home-promo-separator" aria-hidden="true">·</span>
+    <span>已有 <strong>1,491</strong> 人参与交流</span>
+  </div>
 </div>

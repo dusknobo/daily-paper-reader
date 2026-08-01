@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-01T20:18:31.331279+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.26341v1",
+      "source": "arxiv",
+      "title": "A Cartesian Grid Method for Advection-Diffusion Equations with Robin Boundary Conditions on Moving Domains",
+      "abstract": "We develop a Cartesian grid method for advection--diffusion equations with Robin boundary conditions on moving domains. The moving-domain problem is reformulated as an interface problem on a box, with an unknown density introduced on the moving interface to enforce the Robin condition. The bulk equation is discretized by a cell-centered finite-difference scheme on the Cartesian grid, while interface corrections are obtained from local problems in a narrow band around the interface. The resulting method requires only modest computational geometry, avoids remeshing and cut cells, and is compatible with geometric multigrid and matrix-free GMRES. The GMRES iteration count is essentially independent of the mesh size, and the computational cost scales linearly with the number of bulk degrees of freedom. For the one-dimensional scheme, first-order convergence in time and second-order convergence in space are proved. Numerical examples in one and two dimensions, including manufactured solutions and an active transport problem without an exact solution, demonstrate the accuracy and efficiency of the method.",
+      "authors": [
+        "Han Zhou",
+        "Yoichiro Mori",
+        "Lingxing Yao"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "math-ph"
+      ],
+      "published": "2026-07-28T23:27:37+00:00",
+      "link": "https://arxiv.org/pdf/2607.26341v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Cartesian grid method for advection-diffusion with Robin BC on moving domains",
+      "llm_evidence_cn": "移动域上对流扩散方程的 Robin 边界条件笛卡尔网格方法",
+      "llm_evidence": "移动域上对流扩散方程的 Robin 边界条件笛卡尔网格方法",
+      "canonical_evidence": "移动域上对流扩散方程的 Robin 边界条件笛卡尔网格方法",
+      "llm_tldr_en": "Develops a Cartesian grid method for advection-diffusion equations on moving domains with Robin boundary conditions, using interface corrections and avoiding remeshing; potentially applicable to simulating heat/mass transfer on moving film interfaces.",
+      "llm_tldr_cn": "本文提出了一种在移动域上求解对流扩散方程的笛卡尔网格方法，通过界面校正处理 Robin 边界条件，无需重网格。该方法可避免复杂几何操作，适用于移动界面传热传质模拟，如垂直管降膜流动中的热传递，为降膜 CFD 提供了高效的数值工具。",
+      "llm_tldr": "本文提出了一种在移动域上求解对流扩散方程的笛卡尔网格方法，通过界面校正处理 Robin 边界条件，无需重网格。该方法可避免复杂几何操作，适用于移动界面传热传质模拟，如垂直管降膜流动中的热传递，为降膜 CFD 提供了高效的数值工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "CFD modeling of falling film heat transfer in vertical tubes",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
