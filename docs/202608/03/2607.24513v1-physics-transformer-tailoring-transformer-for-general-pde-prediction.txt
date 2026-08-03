@@ -1,0 +1,1115 @@
+Title: Physics Transformer: Tailoring Transformer for General PDE Prediction
+
+URL Source: https://arxiv.org/pdf/2607.24513v1
+
+Published Time: Tue, 28 Jul 2026 02:22:50 GMT
+
+Number of Pages: 36
+
+Markdown Content:
+# Physics Transformer: Tailoring Transformer for General PDE Prediction 
+
+## Guoze Sun 1, Rui Zhang 1, Jiankai Tang 1, Mengtao Yan 1, Runze Mao 2, Zhi X. Chen 2, Hao Sun 1
+
+> 1
+
+Gaoling School of Artificial Intelligence, Renmin University of China, Beijing, China 
+
+> 2
+
+School of Mechanics and Engineering Science, Peking University, Beijing, China 
+
+Abstract 
+
+Transformer architectures have attracted increasing attention for solving partial differential equations (PDEs), owing to their flexibility in handling irregular discretizations and their ability to capture long-range physical dependencies. However, unlike discrete language tokens or fixed-resolution image patches, observed physical fields are finite samples of underlying infinite-dimensional functions. Consequently, effectively applying Transformers to PDEs requires a tokenizer that respects the functional nature of physical fields and constructs physically expressive tokens from arbitrary discretizations.To this end, we propose Physics Transformer ,a function-projection-based Transformer architecture for physical field prediction. Physics Transformer treats a physical field as a continuous function and partitions its discretization into locality-preserving spatial patches. Within each patch, it dynamically learns a set of adaptive local basis functions and projects the sampled field onto these bases to obtain compact physics tokens. The resulting tokens capture diverse latent physical states while preserving fine-scale spatial structures, enabling efficient global interaction through factorized attention across space and physical states. The projected representation further supports efficient decoding at arbitrary query locations. Extensive experiments on diverse benchmarks, ranging from two-dimensional PDE dynamics to industrial-scale three-dimensional CFD simulations, demonstrate that Physics Transformer accurately captures fine-grained physical structures and achieves state-of-the-art predictive performance. These results establish function projection as a practical and effective foundation for designing Transformer architectures for PDE solving. 
+
+# 1 Introduction 
+
+Learning solution operators for PDE-governed systems is a central problem in scientific machine learning. By directly approximating the mapping from input conditions, coefficients, geometries, or source terms to physical fields, neural operators provide fast surrogate models for fluid dynamics, wave propagation, structural mechanics, and engineering design. Existing neural operators have achieved remarkable progress on regular grids, where physical fields can be naturally represented as dense tensors and processed by convolutional, spectral, or operator-learning architectures (Lu et al., 2021; Li et al., 2021; Kovachki et al., 2023). However, many of these models become difficult to apply effectively to irregular domains and complex geometries, where the underlying physical fields are sampled on unstructured meshes, point clouds, or geometry-dependent query locations rather than fixed Cartesian grids. Several recent neural operators have been extended to irregular domains and general geometries. Graph- or point-based neural operators naturally support irregular inputs by operating on local neighborhoods or scattered points. However, their local message passing mechanisms may require many layers to propagate information across distant regions, making it difficult to efficiently capture 1arXiv:2607.24513v1 [cs.LG] 27 Jul 2026 long-range physical dependencies. Transformer-based neural operators, on the other hand, can model global physical interactions in a single attention layer by allowing each token to directly attend to all others, and are therefore well suited to general geometries. However, the attention mechanism incurs quadratic complexity with respect to the number of tokens, which severely challenges scalability on large-scale discretizations. Therefore, choosing appropriate tokens as the input of a Transformer operator becomes crucial. In natural language processing and computer vision, tokens are naturally defined as words or image patches. For physical fields, however, tokenization is more subtle. Mesh points should not be viewed as independent pixels, but as discrete samples of an underlying continuous function. This distinction is important because a physically meaningful token should not only reduce the number of input elements, but also preserve the functional structure of the field. Existing approaches compress dense discretizations by projecting irregular points onto latent grids through local kernel integration, as in GINO, or by hierarchical graph aggregation followed by cross-attention, as in UPT. These approaches provide effective discretization-independent compression. However, their latent units remain generic grid features or learned latent slots, rather than explicit representations of the local functional modes of the field. Consequently, fine-scale variations within each local region must be implicitly folded into a single feature representation and may be lost under aggressive compression. Transolver and its variants take an important step toward physics-aware tokenization. Instead of attending on all mesh points level, Transolver introduces Physics-Attention, which adaptively aggregates mesh points into learnable slices and performs attention among the resulting physical slices (Wu et al., 2024a), leading to more meaningful physical representations. However, tokenization is performed globally over the entire domain. Although physically different subregions could be compressed into different slices, global aggregation could over-smooth local fine-scale structures. Further, despite in similar physical states, local fields could still evolve heterogeneously according to positions and surrounding influences, so explicitly modeling local interaction instead of global aggregation is essential to capture complex dynamics. To address these challenges, we propose Physics Transformer , a Transformer architecture tailored to PDE prediction. Given an irregular discretization, Physics Transformer first orders the input points using Hilbert space-filling curve to partition into P contiguous patches, providing an efficient and robust locality-preserving decomposition. Within each patch, a globally shared basis generator dynamically constructs M input-adaptive basis functions, each representing a distinct latent physical state. The local physical field is then projected onto these basis functions to obtain M compact physics tokens. Since the basis generator and its ordered basis slots are shared across all patches, tokens with the same basis index are encouraged to encode semantically aligned physical states in different spatial regions. This yields a structured token tensor of size P ×M, over which we perform factorized attention. Specifically, global attention is first applied across patches between tokens representing the same physical state, efficiently capturing long-range physical coupling. Local attention is subsequently applied across different physical states within each patch to model their local interactions and evolution. Compared with full self-attention over all PM tokens, the proposed factorization reduces the attention complexity while preserving both global physical communication and local state interaction. Finally, we decode these tokens back into physical fields using another set of adaptive basis functions. We further demonstrate that the tokens learned by our model is a compact representation of the local fields rather than the input points. We come up with a mechanism that could query the value of arbitrary points using the cached tokens during inference on a subset of input mesh with the same accuracy, which could accelerate inference on industrial-scale meshes like DriverML. We further provide a projected-operator interpretation of Physics Transformer .Inspired by Galerkin-type attention (Cao, 2021), the patch-wise encoder and decoder can be viewed as 2learnable test and trial spaces, while the factorized token attention learns a finite-dimensional operator between them. We evaluate Physics Transformer on a diverse set of PDE tasks, including 2D regular-grid problems, irregular-mesh problems with complex physical phenomena, and large-scale 3D CFD datasets. Across these settings, Physics Transformer achieves state-of-the-art accuracy with favorable efficiency, demonstrating its ability to handle both regular and irregular domains while preserving complex physical structures. Our contributions are summarized as follows: 
+
+• We propose Physics Transformer, a Transformer architecture tailored to physical field prediction on general geometries. The model reformulates Transformer-based operator learning as a problem of constructing meaningful physics tokens from continuous fields. 
+
+• We introduce patch-wise physics tokenization based on function projection which provides a more expressive representation of physical fields and factorized attention for efficient global interaction and local evolving. 
+
+• We propose a mechanism enabling Physics Transformer could decode at arbitrary points, facilitating efficient inference on industry scale tasks. 
+
+• We provide a projected-operator interpretation of Physics Transformer and demonstrate its effectiveness on 2D regular grids, irregular meshes, and large-scale 3D CFD datasets, where it achieves state-of-the-art performance with favorable efficiency. 
+
+# 2 Related Work 
+
+Neural operators on regular and irregular domains. Neural operators learn mappings between function spaces for PDE-governed systems. DeepONet represents solution operators through a branch–trunk decomposition with learned coordinate-dependent basis functions (Lu et al., 2021), while FNO performs global operator learning using truncated Fourier modes (Li et al., 2021). Although effective on structured domains, their standard formulations are less suited to unstructured meshes and geometry-dependent discretizations. Graph neural operators and mesh-based simulators address this issue through neighborhood message passing (Li et al., 2020; Pfaff et al., 2021). Geo-FNO learns a deformation from irregular physical domains to regular computational domains (Li et al., 2022b), whereas GINO encodes irregular inputs onto a latent grid, applies Fourier operators, and decodes predictions at arbitrary query locations (Li et al., 2023). These extensions improve geometric flexibility, but local propagation and intermediate grid representations can make it difficult to simultaneously preserve fine-scale structures and capture long-range physical coupling. 
+
+Patchification of irregular 3D discretizations. Unlike images, irregular meshes and point clouds lack a canonical partition into spatially coherent and computationally balanced patches. Point Transformer V3 voxelizes and serializes 3D points using space-filling curves, including Z-order and Hilbert curves, and groups contiguous points into fixed-size patches for efficient local attention (Wu et al., 2024b). SpiderSolver constructs boundary-guided spiderweb-like subregions and combines coarse-grained inter-patch attention with fine-grained interactions near domain boundaries (Qi et al., 2025). Erwin instead recursively organizes irregular points with a ball tree, performing attention within equal-cardinality partitions and progressively coarsening and refining the hierarchy to enlarge the receptive field (Zhdanov et al., 2025). These approaches expose a fundamental trade-off among partitioning cost, spatial locality, and cross-patch communication. In our method, Hilbert traversal 3provides an efficient and locality-preserving partition of arbitrary discretizations; importantly, the resulting patches serve as local function domains on which adaptive physical basis functions are constructed, rather than merely as windows for local attention. 
+
+Transformer-based neural operators and physical tokenization. Transformer-based opera-tors use attention to model nonlocal interactions on flexible discretizations. OFormer and GNOT combine self- and cross-attention to learn operators and evaluate solutions at arbitrary queries (Li et al., 2022a; Hao et al., 2023). UPT compresses simulation inputs into a compact latent token space before propagation and query-based decoding (Alkin et al., 2024), while GAOT combines geometry-aware graph encoders and decoders with Transformer processors (Wen et al., 2025). A closely related direction is the Transolver family. Transolver softly assigns mesh points to a small set of physics-aware slices, performs attention among slice tokens, and maps the updated representations back to the original mesh (Wu et al., 2024a). Subsequent variants improve scalability, geometric conditioning, or computational efficiency (Luo et al., 2025; Zhou et al., 2026; Hu et al., 2025; Adams et al., 2025). Nevertheless, they largely retain the global construction in which the entire domain is aggregated into a shared set of latent physical states. Such global aggregation can obscure fine-grained physical structures and limit the modeling of localized interactions. Moreover, Transolver reports that increasing the number of global slice tokens yields diminishing returns and can even degrade performance (Wu et al., 2024a). Therefore, simply increasing the slice count does not fundamentally resolve the representational bottleneck introduced by global compression. In contrast, our method learns adaptive basis functions independently within each spatial patch and projects the local physical field onto these bases. This patch-wise functional tokenization preserves heterogeneous local states while allowing global physical coupling through attention over the resulting tokens. 
+
+# 3 Method 
+
+We propose Physics Transformer, a Transformer-based neural solver for learning solution maps on regular grids, irregular meshes, and point clouds. Given a discretized physical domain X = {xi}Ni=1 ⊂
+
+Rd, input features ai ∈ Rcin , and target physical fields ui ∈ Rcout , our goal is to approximate the operator 
+
+G : {(xi, ai)}Ni=1 7 → { ui}Ni=1 .
+
+Instead of applying self-attention directly to all discretization points, Physics Transformer first partitions the domain into local patches, then compresses each patch into a small set of learned 
+
+physics tokens . Global interaction is performed over these compact physics tokens, and the updated tokens are decoded back to point-level fields. This design avoids dense global attention over all points while preserving local patch-conditioned physical representations. 
+
+## 3.1 Patchification 
+
+We first partition the input discretization into P local patches {P p}Pp=1 . For regular Cartesian grids, we use non-overlapping grid windows, following the standard patch partitioning strategy in vision Transformers (Dosovitskiy et al., 2021; Liu et al., 2021). For irregular 2D/3D meshes or point clouds, we serialize points with a locality-preserving space-filling curve and then split the ordered sequence into contiguous patches (Wu et al., 2024b). Concretely, we normalize coordinates to [0 , 1] d, quantize them onto a discrete lattice with 4Figure 1: The main structure of Physics Transformer. A general overview is on top left. And a detailed demonstration is provided focusing on the Patchification and Physics Transformer block for concrete understanding. resolution 2L, and compute a Hilbert serialization code 
+
+h(ℓ) 
+
+> i
+
+= Hilbert L
+
+> (
+
+QL
+
+> (
+
+Pσℓ ¯xi
+
+> ))
+
+, ¯xi ∈ [0 , 1] d,
+
+where QL denotes coordinate quantization and Pσℓ is an axis permutation used at layer ℓ. Sorting points by h(ℓ) 
+
+> i
+
+gives a permutation πℓ. We then define 
+
+P(ℓ) 
+
+> p
+
+= {πℓ(j) | (p − 1) Kℓ < j ≤ pK ℓ} , Kℓ = 
+
+> ⌈
+
+NP
+
+> ⌉
+
+.
+
+Changing σℓ across layers gives a simple Trans-Hilbert patchification, which changes patch boundaries and allows points near a patch boundary in one layer to interact with different neighbors in another layer. In our implementation, we fix the number of patches P , rather than fixing the number of points per patch. This makes each patch correspond to a physically comparable region of the domain under different sampling densities. 
+
+## 3.2 Patch-wise Physics Tokenization 
+
+Let F0 ∈ RN ×dh denote the initial point embedding: 
+
+f 0 
+
+> i
+
+= ϕin ([ ai, γ (xi)]) ,
+
+5where γ(·) is a coordinate encoding. For the p-th patch, we write 
+
+F0 
+
+> p
+
+∈ RKp×dh
+
+for the features of points inside Pp, where Kp is the number of points in the patch. Each patch is compressed into M learned physics tokens through a function-projection process. For the p-th patch, the point-wise feature field F0 
+
+> p
+
+∈ RKp×dh is first mapped to token projection scores: 
+
+Sp = F0
+
+> p
+
+Ws, Sp ∈ RKp×M .
+
+We then apply two nonlinear operators to obtain the tokenization basis functions and the de-tokenization basis functions: 
+
+Φp = NKp (Sp), Ψp = NM (Sp),
+
+where NKp = softmax Kp normalizes over the point dimension, and NM = softmax M normalizes over the token dimension. Thus, Φp ∈ RKp×M defines M local learned tokenization basis functions, while Ψp ∈ RKp×M defines the corresponding de-tokenization basis functions for reconstructing point-wise fields from physics tokens. With point values 
+
+Vp = F0
+
+> p
+
+Wv, Vp ∈ RKp×dt ,
+
+the p-th patch is encoded into M physics tokens: 
+
+Tp = K⊤ 
+
+> p
+
+Vp, Tp ∈ RM ×dt .
+
+Stacking all patches gives 
+
+T = {Tp,m }P,M p=1 ,m =1 ∈ RP ×M ×dt .
+
+Since the sprojection Ws is shared across patches, the same token index m represents a shared latent physics state in different local regions. Thus, Physics Transformer localizes physics tokenization before global interaction: each patch learns its own token representation, while token indices remain aligned across the whole domain. 
+
+## 3.3 Factorized Global Attention over Physics Tokens 
+
+The token tensor T ∈ RP ×M ×dt contains P spatial patches and M physics tokens per patch. We perform global interaction in a factorized manner. First, for each token index m, we perform spatial self-attention over all patches: 
+
+U:,m = T:,m + MHSA P (LN( T:,m ); C) , m = 1 , . . . , M, 
+
+where C = {cp}Pp=1 are patch centers, 
+
+cp = 1
+
+Kp
+
+∑
+
+> i∈P p
+
+xi.
+
+The patch centers provide spatial information for long-range interaction among the same physics token across different regions. Second, for each patch p, we perform token-wise self-attention across the M physics tokens within the same patch: 
+
+Zp, : = Up, : + MHSA M (LN( Up, :)) , p = 1 , . . . , P. 
+
+6Finally, a token-wise feed-forward network gives 
+
+T′ 
+
+> p, :
+
+= Zp, : + FFN (LN( Zp, :)) .
+
+The first stage captures global interactions among the same physics token across the domain, while the second stage models interactions among different physics tokens inside each local region. This factorization enables explicit global communication without applying attention to all point tokens. 
+
+## 3.4 De-tokenization and Output Prediction 
+
+After global token mixing, the updated physics tokens 
+
+T′ 
+
+> p
+
+∈ RM ×dt
+
+are mapped back to point-level features through the de-tokenization basis family Ψp. Recall that 
+
+Ψp defines how each point in patch p reconstructs its feature from the M updated physics tokens. The de-tokenized point-level features are computed as 
+
+Fp = ΨpT′
+
+> p
+
+Wo, Fp ∈ RKp×dh .
+
+Therefore, the output at each point is reconstructed from the learned patch-wise physics tokens. The decoded features from all patches are restored to the original point ordering and passed through an output head: ̂
+
+ui = ϕout 
+
+> (
+
+f i
+
+> )
+
+, i = 1 , . . . , N. 
+
+For time-dependent prediction, the predicted field can be used autoregressively to produce multi-step rollout predictions. 
+
+## 3.5 Arbitrary Query Decoding 
+
+A key property of Physics Transformer is that its prediction is not tied to the input discretization points. In Physics Transformer, the learned physics tokens are obtained through a function-projection process: local point-wise fields are projected into compact patch-wise tokens, which serve as latent representations of local physical fields. Therefore, for a given input instance, we first perform one forward pass on a set of support points and cache the intermediate physics tokens after global token interaction. Once these tokens are stored, predictions at new spatial locations are produced only through de-tokenization from the cached patch-wise physics tokens, without re-running the encoder or the global token interaction. Let 
+
+S = {(xi, ai)}Ns
+
+> i=1
+
+be a support point set used to encode the input function, where Ns can be much smaller than the full mesh size. Physics Transformer performs one encoding forward pass on S, producing updated patch-wise physics tokens 
+
+T′ = Eθ(S) ∈ RP ×M ×dt ,
+
+where P is the number of patches and M is the number of physics tokens per patch. During this forward pass, we also record the patch index pi of each support point xi. The cached tokens T′
+
+provide an input-dependent latent representation of the solution field over the domain. Given a new query point xq, we do not re-run tokenization or global token interaction. Instead, we find its nearest support point 
+
+n(q) = arg min  
+
+> i∈{ 1,...,N s}
+
+∥xq − xi∥2 ,
+
+7and use the patch index of this nearest support point to select the corresponding cached physics-token bank: 
+
+p(q) = pn(q).
+
+Then its de-tokenization weights are computed: 
+
+qq = softmax ( ϕq([ γ(xq), aq]) Wq) ∈ RM ,
+
+where γ(xq) is the coordinate encoding and aq denotes optional query features when available. The prediction at xq is then obtained by de-tokenizing from the selected cached patch-wise physics tokens: ̂
+
+u(xq) = ϕout 
+
+> (
+
+q⊤ 
+
+> q
+
+T′
+
+> p(q)
+
+Wo
+
+> )
+
+.
+
+For a query set 
+
+Q = {xq}Nq
+
+> q=1
+
+,
+
+the same cached tokens can be decoded repeatedly: ̂
+
+UQ = Dθ(Q, T′, S).
+
+Therefore, Physics Transformer follows the neural-operator paradigm: the support points are used to encode the input function into patch-wise physics tokens, while arbitrary query locations are evaluated by selecting the nearest support-associated token bank and computing query-specific de-tokenization weights. Changing the query resolution only requires nearest-neighbor lookup and lightweight de-tokenization, instead of recomputing the encoder or global token interaction. 
+
+## 3.6 Complexity 
+
+We analyze the token-mixing cost of one Physics Transformer block. Let N = P K , where P is the number of patches and K is the average number of points per patch. Let M be the number of physics tokens per patch and dt be the token dimension. Patch-wise physics tokenization and de-tokenization cost 
+
+O(N M d t).
+
+The global attention over the same token index is performed over P patches for each of the M token indices, giving 
+
+O(M P 2dt).
+
+The token-wise attention inside each patch costs 
+
+O(P M 2dt).
+
+Therefore, the total token-mixing complexity is 
+
+O(N M d t + M P 2dt + P M 2dt).
+
+In contrast, applying global self-attention to all discretization points requires 
+
+O(N 2dh)
+
+time and O(N 2) attention memory. Since M ≪ K and P ≪ N in large-scale physical fields, Physics Transformer substantially reduces the cost of global interaction while retaining explicit long-range communication through patch-wise physics tokens. 84 Analysis 
+
+We provide an input-adaptive projected-operator interpretation of Physics Transformer . The key observation is that Physics Transformer never constructs a dense global interaction matrix over the N discretization points. Instead, it projects point-level features onto P M patch-wise physics tokens, performs nonlocal interaction in the compressed token space, and reconstructs the point-level field. This leads to an expressive projected neural operator without quadratic point-wise attention. 
+
+## 4.1 Connection to Galerkin-Type Attention 
+
+Our interpretation is inspired by the Galerkin Transformer (Cao, 2021), which connects attention-based neural operators with classical Petrov–Galerkin projection. Standard self-attention performs global information exchange through 
+
+Attn( Q, K, V) = softmax  
+
+> (
+
+QK ⊤
+
+√dt
+
+> )
+
+V,
+
+which explicitly forms an N × N point-wise interaction matrix. Galerkin-type attention removes the softmax normalization and reassociates the matrix products as 
+
+(QK ⊤)V = Q
+
+> (
+
+K⊤V
+
+> )
+
+.
+
+When the feature dimension is fixed, this formulation has linear complexity with respect to N .It can also be interpreted as a learnable projection: K⊤ tests the input field against learned test functions, while Q reconstructs the output in a learned trial space. The attention layer therefore acts as a finite-dimensional projected operator analogous to a Petrov–Galerkin method. 
+
+Physics Transformer follows this projection principle but constructs its test and trial functions locally. For each of the P patches, it learns M tokenization basis functions Φp and 
+
+M de-tokenization basis functions Ψp. Because basis functions associated with different patches have disjoint supports, Physics Transformer has access to as many as P M patch-wise basis functions, rather than only M globally supported functions. The projected coefficients are then globally coupled by factorized token attention. Unlike a classical projection method, both the basis functions and the coefficient map are input-dependent, making Physics Transformer an adaptive nonlinear projected operator. 
+
+## 4.2 Patch-Wise Projected Operator 
+
+Consider one Physics Transformer layer and suppress the layer index ℓ for clarity. Let 
+
+X = {xi}Ni=1 
+
+be partitioned into 
+
+{P p}Pp=1 , Kp = |P p|,
+
+> P∑
+> p=1
+
+Kp = N. 
+
+For patch Pp, let 
+
+F0 
+
+> p
+
+∈ RKp×dh
+
+denote its point-level features. As defined in Section 3.2, the projection scores and value features are 
+
+Sp = F0
+
+> p
+
+Ws ∈ RKp×M , Vp = F0
+
+> p
+
+Wv ∈ RKp×dt .
+
+9The tokenization and de-tokenization basis matrices are 
+
+Φp = NKp (Sp), Ψp = NM (Sp),
+
+where 
+
+Φp, Ψp ∈ RKp×M .
+
+The patch-wise projection is therefore 
+
+Tp = Φ⊤ 
+
+> p
+
+Vp ∈ RM ×dt .
+
+Stacking the tokens across all patches gives 
+
+T = {Tp,m }P,M p=1 ,m =1 ∈ RP ×M ×dt .
+
+The factorized global attention module updates these coefficients as 
+
+T′ = Hθ(T),
+
+where Hθ consists of attention along the patch dimension, attention along the physics-token dimension, and the token-wise feed-forward network. Finally, point-level features are reconstructed by 
+
+Fp = ΨpT′
+
+> p
+
+Wo ∈ RKp×dh .
+
+To express this operation globally, reorder the points by their patch membership and define the block-local matrices 
+
+Φ = blkdiag ( Φ1, . . . , ΦP ) , Ψ = blkdiag ( Ψ1, . . . , ΨP ) ,
+
+where 
+
+Φ, Ψ ∈ RN ×P M .
+
+Similarly, let 
+
+V =
+
+[
+
+V⊤ 
+
+> 1
+
+· · · V⊤
+
+> P
+
+]⊤
+
+∈ RN ×dt .
+
+Identifying the tensor and flattened representations of the P M tokens, the nonlocal component of Physics Transformer can be written compactly as 
+
+Kθ(V) = Ψ Hθ
+
+(
+
+Φ⊤V
+
+)
+
+Wo.
+
+Thus, Physics Transformer realizes the sequence 
+
+N Φ⊤
+
+−−−→ P M Hθ
+
+−−−→ P M Ψ
+
+−−→ N. 
+
+It therefore performs global physical interaction without explicitly parameterizing or evaluating a dense N × N kernel. Conditioned on the input-dependent bases and attention weights in one forward pass, the attention component induces an effective token-position mixing matrix 
+
+Γθ(T) ∈ RP M ×P M 
+
+for each attention head. Suppressing channel projections, its induced point-wise mixing can be written as 
+
+F ≈ ΨΓ θ(T)Φ⊤
+
+︸ ︷︷ ︸
+
+> adaptive projected global operator
+
+V.
+
+This expression is an interpretation of the conditional linear mixing within one forward pass; the complete model remains nonlinear because Φ, Ψ, and Γθ all depend on the input features. 10 4.3 Patch-Wise Basis Capacity 
+
+We next formalize why Physics Transformer has access to as many as P M basis functions. Write 
+
+xp,j for the j-th point in patch Pp. For every patch p and token index m, define the tokenization basis function 
+
+φp,m (xi) = 
+
+> 
+
+(Φp)j,m , xi = xp,j ∈ P p,
+
+0, xi /∈ P p,
+
+and the de-tokenization basis function 
+
+ψp,m (xi) = 
+
+> 
+
+(Ψp)j,m , xi = xp,j ∈ P p,
+
+0, xi /∈ P p.
+
+The corresponding input-adaptive test and trial spaces are 
+
+Qh = span {φp,m : 1 ≤ p ≤ P, 1 ≤ m ≤ M } ,
+
+and 
+
+Vh = span {ψp,m : 1 ≤ p ≤ P, 1 ≤ m ≤ M } .
+
+For p̸ = q, basis functions from patches Pp and Pq have disjoint supports. Consequently, they are orthogonal under any diagonal discrete inner product: 
+
+⟨φp,m , φ q,n ⟩h = 0 , ⟨ψp,m , ψ q,n ⟩h = 0 .
+
+The dimensions of the two spaces are therefore 
+
+dim Qh =
+
+> P∑
+> p=1
+
+rank( Φp) ≤ P M, 
+
+and 
+
+dim Vh =
+
+> P∑
+> p=1
+
+rank( Ψp) ≤ P M. 
+
+If Kp ≥ M and the M learned assignments in every patch are linearly independent, then 
+
+dim Qh = dim Vh = P M. 
+
+Thus, even though only M physics-token types are used within each patch, their spatially localized realizations provide up to P M basis functions over the full domain. In contrast, a global tokenization mechanism with M globally supported slices has rank at most M .This distinction enables the same physics-token index to capture different patch-conditioned structures while remaining globally coupled through Hθ. Under this interpretation, Φ defines an adaptive test space, Ψ defines an adaptive trial space, and Hθ defines a nonlinear finite-dimensional operator between their coefficients. Hence, Physics Transformer can be viewed as a patch-wise Petrov–Galerkin-style neural operator: 
+
+V Φ⊤
+
+−−−→ test coefficients Hθ
+
+−−−→ updated token coefficients Ψ
+
+−−→ trial-space reconstruction .
+
+11 5 Experiments 
+
+We comprehensively evaluate Physics Transformer on six representative physical field prediction benchmarks spanning 2D regular grids, irregular meshes, and 3D point clouds. These benchmarks are selected to test whether SGNO can serve as an effective general-purpose neural solver across different physical regimes, discretization structures, and PDE complexities. 
+
+## 5.1 Benchmarks 
+
+Figure 2: We test Physics Transformer on six challenging tasks covering different discretizations with complex dynamics. 
+
+2D regular-grid dynamics. For regular-grid evaluation, we use two datasets from The Well (Ohana et al., 2024): turbulent_radiative_layer_2D (TRL2D) and gray_scott_reaction_ diffusion (GSRD). The former describes a turbulent radiative mixing layer where cold dense gas and hot dilute gas move relative to each other, featuring rich vortical structures, multiscale temporal evolution, and localized high-frequency patterns. The Gray–Scott reaction–diffusion dataset consists of two interacting chemical species whose concentrations evolve over space and time. Depending on the feed and kill rates, the system exhibits diverse pattern-formation behavior. These benchmarks emphasizes both local dependencies and long-range coupling with fine-grained local structures, making them challenging. 
+
+Irregular-domain multiphysics simulations. For irregular-domain evaluation, we use the rocket-engine dataset from REALM (Mao et al., 2025). This case represents a propulsion-related reactive-flow scenario, where strong coupling, stiffness, heterogeneous scales, and mesh irregularity make accurate rollout prediction challenging. It tests whether models can operate on irregular meshes while maintaining physically meaningful predictions in regimes beyond canonical PDE settings. We further evaluate on a geometry-grounded airflow dynamics benchmark, which we refer to as the F1-Airfoil Dynamics benchmark. This benchmark is based on 3D airfoil geometries inspired by Formula-1 front wings and was released through the GRaM Competition at ICLR 2026 (GRaM Workshop Organizers, 2026). Given the underlying geometry and past velocity fields, the task is 12 Table 1: Summary of the evaluation benchmarks. “Rollout” indicates whether the task is evaluated autoregressively.                                
+
+> Benchmark Discretization Rollout Resolution / points Turbulence 2D regular grid Yes 384 ×128
+> Gray–Scott Reaction–Diffusion 2D regular grid Yes 128 ×128
+> REALM Rocket Combustor 2D irregular mesh Yes ∼250K F1-Airfoil Dynamics 3D point cloud No ∼100K NASA CRM 3D surface mesh No ∼400K DrivAerML 3D surface mesh No ∼8M 3D volume mesh ∼160M
+
+to predict future airflow dynamics. This benchmark stresses the model’s ability to reason over geometry-conditioned, time-dependent flow fields on complex 3D structures. 
+
+Large-scale industrial CFD. To further examine scalability on industrial-level 3D simulations, we evaluate SGNO on two aerodynamic CFD benchmarks. First, we use the NASA Common Research Model (NASA-CRM) dataset, which contains 3D RANS simulations over a full aircraft configuration under varying flight conditions and control-surface deflections (Catalani et al., 2025). This benchmark requires the model to predict aerodynamic surface fields on a complex aircraft geometry and to generalize across operating conditions. Second, we use DrivAerML (Ashton et al., 2024), an industrial-scale high-fidelity automotive CFD dataset based on 500 parametrically morphed DrivAer vehicle geometries. The dataset provides rich aerodynamic fields generated by scale-resolving CFD workflows representative of industrial practice. DrivAerML poses a strong scalability challenge due to its high-resolution meshes and geometry-dependent aerodynamic structures. 
+
+Baselines. We compare Physics Transformer with representative neural solvers from three fami-lies. First, we include Transolver-style neural operators, including Transolver (Wu et al., 2024a), Transolver-3 (Zhou et al., 2026), LinearNO (Hu et al., 2025), and GeoTransolver (Adams et al., 2025). Second, we compare with latent-space operator learners, including UPT (Alkin et al., 2024), AB-UPT (Alkin et al., 2025), and GAOT (Wen et al., 2025). Third, we include Fourier-based neural operators, including FNO (Li et al., 2021), FFNO (Tran et al., 2023), and GINO (Li et al., 2023), to provide comparisons with classical operator-learning backbones. All methods are trained with the same data splits and evaluated using identical metrics. We use official implementations whenever available and amounts of parameters are controlled comparable. 
+
+## 5.2 Main Results 
+
+We report the main quantitative results in Tables 2 and 3. Overall, Physics Transformer achieves consistently strong performance across regular-grid dynamics, irregular-domain simulations, and large-scale 3D aerodynamic tasks. These results demonstrate that Physics Transformer is not specialized to a genre of single tasks, but can serve as a general Transformer-based neural solver for physical field prediction. 
+
+Regular-grid and irregular-domain rollout prediction. On the Turbulent Radiative Layer, Gray–Scott reaction–diffusion, and REALM rocket-engine benchmarks, Physics Transformer achieves 13 Table 2: One-step and autoregressive-rollout results on time-dependent benchmarks. Rollout error is averaged over the predicted trajectory. Lower is better.                                                   
+
+> Models Turbulence Gray–Scott REALM Rocket Engine
+> One-step Rollout One-step Rollout One-step Rollout
+> FNO 0.29 0.61 0.14 0.67 ––
+> FFNO 0.16 0.53 0.13 0.47 2.08 3.75
+> UPT 0.59 0.81 1.11 2.05 0.69 0.92
+> GAOT 0.23 0.58 0.28 0.90 2.37 2.59
+> Transolver 0.29 1.07 0.32 2.09 0.86 1.37
+> LinearNO 0.74 1.08 0.53 2.64 0.61 0.87
+> Physics Transformer 0.15 0.42 0.10 0.49 0.50 0.71
+
+best one-step prediction accuracy and, more importantly, maintains stable performance under 20-step autoregressive rollout. This is crucial for time-dependent PDE surrogate modeling, where small one-step errors can rapidly accumulate and lead to physically implausible long-horizon predictions. In contrast, Transolver and LinearNO obtain competitive one-step errors on several tasks, but their rollout performance degrades more rapidly. We attribute this behavior to the premature global aggregation used by transolver as a global-token neural solver. Although global physical tokens provide an efficient way to summarize the entire field, they may suppress localized fine-grained structures before temporal propagation. Once these local details are lost, subsequent autoregressive predictions rely increasingly on biased global representations, causing the rollout error to be amplified over time. By contrast, Physics Transformer implement local physics tokenization, preserving local fine-grained structures while still enabling long-range physical interaction, leading to more stable rollout behavior. FFNO also provides a strong comparison on structured 2D grids. On the Turbulent Radiative Layer benchmark, Physics Transformer outperforms FFNO, suggesting that localized physical tokenization is beneficial for capturing vortical structures and multiscale temporal dynamics. On the Gray–Scott reaction–diffusion dataset, FFNO achieves slightly better performance, which is consistent with the strength of Fourier-based operators on regular grids. However, FFNO degrades substantially on the REALM rocket-engine task, highlighting the limitation of Fourier-based architectures when handling irregular meshes and complex geometries. 
+
+Geometry-dependent and large-scale CFD prediction. On the F1-Airfoil Dynamics, NASA-CRM, and DrivAerML benchmarks, Physics Transformer again achieves the best overall perfor-mance.In these tasks the physical fields are conditioned on complex 3D geometries, and accurate prediction requires the model to capture geometry-induced local flow structures as well as global aerodynamic interactions. The consistent improvement of Physics Transformer on these benchmarks indicates that its patch-wise physical tokenization is effective not only for temporal PDE dynamics, but also for geometry-conditioned field prediction. GeoTransolver also performs competitively on these geometry-related tasks, benefiting from its explicit modeling of geometric information. However, its design is primarily tailored to geometry-aware prediction. In contrast, Physics Transformer does not rely on a geometry-specific architecture, yet still achieves better performance on geometry-dependent tasks. This suggests that Physics Transformer provides a more general mechanism for accurate physical fields. Transolver-3 further improves over previous Transolver variants by scaling to larger geometries, but its global aggregation 14 Table 3: Comparison on F1-Airfoil, NASA-CRM, and DrivAerML benchmarks. Lower error is better. The best results are highlighted in bold and the second-best results are underlined.                                                                  
+
+> Models F1-Airfoil NASA-CRM DrivAerML
+> upsCfpsuτpv
+> GINO 17.71 12.39 11.51 13.03 40.58 21.71 44.90
+> GAOT 28.46 30.38 59.79 34.00 57.18 61.00 56.90
+> UPT 13.27 12.78 23.78 7.44 8.74 12.93 10.05
+> AB-UPT 6.38 9.77 6.43 3.82 5.93 7.29 6.08
+> Transolver 5.50 9.61 7.04 4.81 6.78 8.95 7.74
+> Transolver-3 –8.71 5.85 3.71 4.14 5.85 5.72
+> GeoTransolver 4.45 6.89 4.85 3.64 4.67 5.71 4.05
+> Physics Transformer 3.98 5.82 3.31 3.35 3.40 5.24 3.08
+
+backbone still limits its ability to handle local interactions, leaving room for Physics Transformer to achieve stronger accuracy. 
+
+Integrated aerodynamic quantities on DrivAerML. In industrial CFD applications, point-wise field accuracy is important, but integrated aerodynamic quantities are often even more directly related to engineering decisions such as the drag coefficient Cd and lift coefficient Cl. These quantities are obtained by integrating predicted surface fields over the vehicle geometry, and therefore evaluate whether a surrogate model can preserve physically meaningful global aerodynamic responses, rather than merely matching local pointwise values. To assess this capability, we compute the coefficient of determination R2 for Cd and Cl on DrivAerML, comparing Physics Transformer with GeoTransolver and Transolver-3. As shown in Table 4, Physics Transformer achieves R2 scores above 0.99 for both Cd and Cl, indicating that it can accurately recover industrially relevant aerodynamic quantities.. Table 4: R2 prediction accuracy of integrated aerodynamic quantities on DrivAerML. Higher is better.         
+
+> Model CdCl
+> Transolver-3 0.972 0.985 GeoTransolver 0.996 0.991 Physics Transformer 0.996 0.993
+
+Summary. Across representative physical prediction tasks, Physics Transformer consistently demonstrates strong accuracy, stable rollout behavior, and favorable scalability. Its success on both time-dependent PDEs and industrial-scale aerodynamic simulations shows that localized physics tokenization and efficient global interaction are essential for building a general-purpose Transformer architecture for physical field prediction. 
+
+## 5.3 Effect of Point Ordering for Patchification 
+
+For irregular meshes and point-cloud inputs, Physics Transformer first partitions points into local patches and then performs patch-wise physical tokenization. The quality and cost of this patchifi-15 cation step depend on the point ordering or grouping strategy. We compare three representative choices: Morton ordering, Hilbert ordering, and BallTree-based partitioning. Morton ordering is computationally the cheapest among the three, as it maps multidimensional coordinates to one-dimensional indices through bit interleaving. However, although Morton ordering is locality-preserving in a coarse sense, it may introduce discontinuities in the one-dimensional traversal, causing spatially distant points to be assigned to the same patch. Such discontinuities can mix physically unrelated local regions and make the resulting patch tokens semantically ambiguous. Hilbert ordering incurs slightly higher preprocessing cost, but it provides better spatial continuity along the traversal curve and therefore produces more coherent local patches. BallTree-based partitioning constructs compact spatial groups through a tree-based nearest-neighbor structure. It usually gives the most geometrically compact patches, but its preprocessing cost is significantly higher. To quantify this trade-off, we evaluate different patchification strategies on DrivAerML. For each method, we report the sorting or grouping time for 100K points and the corresponding prediction performance. As shown in Table 5, Morton ordering leads to a clear performance drop, indicating that discontinuous patches can harm local physical tokenization. BallTree partitioning provides only marginal improvement over Hilbert ordering, despite its much higher preprocessing cost. This suggests that Physics Transformer does not rely on overly regular or perfectly compact patch partitions; instead, its physics tokenization learns robust local physical representations as long as the patches preserve reasonable spatial coherence. Considering both efficiency and accuracy, we use Hilbert ordering as the default patchification strategy in all experiments. Table 5: Effect of point-ordering strategies on DrivAerML. We report preprocessing latency for 
+
+100 K points and downstream relative L2 errors. Lower is better.             
+
+> Grouping Strategy Latency psτ
+> Morton ordering 12 ms 3.98 5.96 Hilbert ordering 50 ms 3.35 5.24 BallTree partitioning 479 ms 3.33 5.25
+
+## 5.4 Effect of the Number of Patches 
+
+The number of patches controls the granularity of local physical tokenization in Physics Transformer. A smaller number of patches leads to larger local regions, which improves computational efficiency but may mix heterogeneous local structures into the same patch. A larger number of patches provides finer local decomposition, but also reduces the number of points within each patch and increases the cost of global token interaction. Therefore, the patch number introduces a trade-off between local detail preservation, projection stability, and computational efficiency. We study this effect on two representative benchmarks: DrivAerML and Turbulent Radiative Layer. DrivAerML contains relatively smooth vehicle surface fields with strong geometry dependence, while TRL contains rich vortical structures and localized multiscale dynamics. These two tasks therefore have different requirements on the granularity of local physical representation. We vary the number of patches from 128 to 4096 and report the corresponding prediction errors in Table 6. The results are consistent with our expectation. For both benchmarks, increasing the number of patches initially improves performance, indicating that finer local decomposition helps the model learn more accurate local physical representations. On TRL, the improvement is substantial when increasing the number of patches from 128 to 1024 , reflecting the importance of fine-grained locality 16 Table 6: Effect of the number of patches on DrivAerML and TRL. Lower error is better. The best result for each setting is highlighted in bold.                                 
+
+> Benchmark 128 256 512 1024 2048 4096 DrivAerML – ps4.02 3.64 3.45 3.35 3.32 3.30
+> DrivAerML – τ6.13 5.58 5.31 5.24 5.22 5.19
+> TRL – One-step 0.22 0.18 0.16 0.15 0.15 0.17 TRL – Rollout 0.55 0.47 0.43 0.42 0.43 0.46
+
+for turbulent and multiscale dynamics. However, the gain becomes marginal at 2048 patches, and performance even slightly degrades at 4096 patches. We conjecture that overly fine partitioning reduces the number of points available within each patch, making the learned local basis functions under-sampled and the patch-wise projection less stable. On DrivAerML, the performance saturates earlier: increasing the patch number beyond 512 
+
+brings only minor improvement. This is consistent with the smoother nature of vehicle surface fields, where a moderate number of patches is already sufficient to capture geometry-conditioned local variations. Overall, the benefit of increasing the patch number exhibits a task-dependent saturation behavior. Importantly, the global token attention in Physics Transformer scales quadratically with the number of patches. Therefore, using an excessively large number of patches can substantially increase computation without bringing meaningful accuracy gains. Based on the trade-off observed across DrivAerML and TRL, we use 1024 patches as the default setting in our main experiments, which provides a robust balance between accuracy and efficiency. 
+
+## 5.5 Effect of the Number of Basis Functions 
+
+We further study the effect of the number of basis functions, i.e., the number of learned physics tokens per patch. Unlike the number of patches, which changes the spatial granularity of the domain decomposition, the number of basis functions controls the capacity of the local function-projection space within each patch. A larger number of basis functions allows the model to represent richer local physical variations, but it also increases the cost of tokenization, global token interaction, and de-tokenization. We vary the number of basis functions from 16 to 128 and evaluate the model on DrivAerML and Turbulent Radiative Layer. The results are reported in Table 7. Table 7: Effect of the number of basis functions on DrivAerML and TRL. The number of basis functions refers to the number of learned physics tokens per patch. Lower error is better.                       
+
+> Benchmark 16 32 64 128 DrivAerML – ps3.43 3.39 3.35 3.34 DrivAerML – τ5.31 5.27 5.24 5.22 TRL – One-step 0.155 0.152 0.151 0.151 TRL – Rollout 0.443 0.421 0.419 0.417
+
+As shown in Table 7, increasing the number of basis functions consistently improves the model performance, which indicates that a richer local projection basis helps encode more detailed physical structures within each patch. However, the improvement from more basis functions is relatively small. Since the token-mixing complexity grows with the number of basis functions, we set the 17 Figure 3: In part a, we show the satisfying predication accuracy of integrated quantities of Physics Transformer on DrivAerML. In part b, we compare the performance of Physics Transformer under different mesh density during traning and inference. The model used for inference is trained with 100k mesh points. It could be seen the performance saturate when using more than 100k points. number of basis functions to 32 or 64 in our main experiments, depending on the complexity of the physical problem. 
+
+## 5.6 Effect of Mesh Scale 
+
+DrivAerML contains million-scale surface meshes and even larger volumetric CFD grids, making it impractical to train neural solvers on all points. Moreover, compared with mesh density, the vehicle geometry and its surface aerodynamic fields are relatively smooth, suggesting that a moderate number of sampled points may already capture the dominant geometry-dependent physical patterns. This is consistent with the goal of neural solvers: rather than relying on extremely dense numerical discretization for convergence as in classical CFD solvers, they learn a fast mapping from input geometry to output physical fields. We first vary the number of training points sampled from each full point cloud, using 30 K, 50 K, 100 K, 200 K, and 400 K points. In this ablation, the relative L2
+
+error decreases as the training point count increases, but the improvement gradually saturates after 
+
+50 K points. Using more points substantially increases memory and computation, while bringing only marginal accuracy gains. Therefore, we use 100 K randomly sampled points for training in our experiments. We further evaluate the effect of inference point count using the model trained with 100 K points. We increase the input point scale from 50 K to 1M points. Increasing the inference scale from 
+
+100 K to 1M improves the relative L2 error by less than 1% . Both ablations indicate that Physics Transformer can already capture the vehicle geometry and geometry-dependent aerodynamic fields with a moderate number of points, while full-resolution predictions can be efficiently obtained by chunk-wise inference. 
+
+## 5.7 Comparison with Point-Cloud Patchification Methods 
+
+Point Transformer V3 (PTv3) (Wu et al., 2024b) and SpiderSolver (Qi et al., 2025) both organize computation through spatial partitioning of irregular point sets. Although neither provides a unified neural solver across all the discretization types considered in our work, they can be adapted to the three-dimensional point-cloud representations used by DrivAerML. We therefore compare them with Physics Transformer on this industrial-scale automotive CFD benchmark. For PTv3, we adopt its largest model configuration and replace the original perception head with a point-wise field-regression head. We also scale the width and depth of SpiderSolver to approximately 30 million trainable parameters, ensuring that its performance is not restricted by insufficient model capacity. All use 100k points to train. The results are reported in Table 8. 18 Figure 4: We illustrate two representative attention scores from the last layer of Physics Transformer among 1024 patches. The query token is circled by white line. Deeper red color express higher attention score. We draw only the top 5% patches. It could be seen that Physics Transformer could capture meaningful local interactions and long-range dependency. Table 8: Comparison with point-cloud patchification methods on DrivAerML. Lower error is better.                 
+
+> Method psuτpv
+> Point Transformer V3 (Wu et al., 2024b) 15.53 17.71 19.34 20.69 SpiderSolver (Qi et al., 2025) 7.48 14.28 10.54 8.13 Physics Transformer (Ours) 3.35 3.40 5.24 3.08
+
+Discussion. The main difference among these methods lies not in how the spatial patches are constructed, but in how the physical field within each region is represented by tokens. SpiderSolver employs a boundary-guided spiderweb partition that is well suited to complex CFD geometries. However, it constructs each spiderweb token by average-pooling the point features within the corresponding subregion. Consequently, each subregion is represented by a single coarse summary that primarily captures its mean feature statistics. Heterogeneous physical states and fine-scale variations within the same subregion may therefore be discarded before global token interaction, and cannot be recovered by subsequent attention. Its fine-grained branch enhances interactions between boundary points and nearby interior points, but does not provide multiple independent representation modes for general field variations within each subregion. PTv3 exhibits a different limitation. It retains serialized point or voxel features as tokens and uses the resulting patches primarily as local attention windows. Its hierarchical representations are formed through geometric downsampling and local feature aggregation originally designed for semantic 3D perception. Thus, PTv3 does not explicitly project a continuous physical field onto compact local functional modes. Long-range physical coupling must instead emerge through repeated local attention and hierarchical propagation, which is less effective for resolving globally coupled and multiscale PDE fields. 19 In contrast, Physics Transformer learns input-adaptive basis functions within each patch and constructs its physics tokens through the functional projection. Rather than compressing a region into a single average representation, these projection coefficients can preserve multiple coexisting physical states and spatial variation modes within the same patch. The resulting patch-wise physics tokens are then explicitly coupled across the full domain through factorized global attention. Importantly, this functional tokenization does not depend on CFD-specific boundary assumptions and can be applied without architectural modifications to regular grids, irregular meshes, and point clouds. The performance advantage of Physics Transformer therefore primarily stems from its field-adaptive token representation, rather than from the particular spatial partitioning strategy. 
+
+# References 
+
+Corey Adams, Rishikesh Ranade, Ram Cherukuri, and Sanjay Choudhry. GeoTransolver: Learning physics on irregular domains using multi-scale geometry-aware physics attention transformer. 
+
+arXiv preprint arXiv:2512.20399 , 2025. URL https://arxiv.org/abs/2512.20399. Benedikt Alkin, Andreas Fürst, Simon Schmid, Lukas Gruber, Markus Holzleitner, and Johannes Brandstetter. Universal physics transformers: A framework for efficiently scaling neural operators. In Advances in Neural Information Processing Systems , volume 37, 2024. URL https://arxiv.org/ abs/2402.12365. Benedikt Alkin, Maurits Bleeker, Richard Kurle, Tobias Kronlachner, Reinhard Sonnleitner, Matthias Dorfer, and Johannes Brandstetter. AB-UPT: Scaling neural CFD surrogates for high-fidelity automotive aerodynamics simulations via anchored-branched universal physics transformers. 
+
+Transactions on Machine Learning Research , 2025. URL https://arxiv.org/abs/2502.09692. Neil Ashton, Charles Mockett, Marian Fuchs, Louis Fliessbach, Hendrik Hetmann, Thilo Knacke, Norbert Schonwald, Vangelis Skaperdas, Grigoris Fotiadis, Astrid Walle, Burkhard Hupertz, and Danielle Maddix. DrivAerML: High-fidelity computational fluid dynamics dataset for road-car external aerodynamics. arXiv preprint arXiv:2408.11969 , 2024. URL https://arxiv.org/abs/2408. 11969. Shuhao Cao. Choose a transformer: Fourier or galerkin. In Advances in Neural Information Processing Systems , volume 34, 2021. URL https://arxiv.org/abs/2105.14995. Giovanni Catalani, Jean Fesquet, Xavier Bertrand, Frédéric Tost, Michael Bauerheim, and Joseph Morlier. Towards scalable surrogate models based on neural fields for large-scale aerodynamic simulations. arXiv preprint arXiv:2505.14704 , 2025. URL https://arxiv.org/abs/2505.14704. Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby. An image is worth 16x16 words: Transformers for image recognition at scale. In International Conference on Learning Representations , 2021. URL https://openreview.net/ forum?id=YicbFdNTTy. GRaM Workshop Organizers. GRaM Competition at ICLR 2026: Transient airflow prediction over 3d geometries. GRaM Workshop at ICLR 2026, 2026. URL https://gram-workshop.github.io/. Accessed 2026-07-23. 20 Zhongkai Hao, Zhengyi Wang, Hang Su, Chengyang Ying, Yinpeng Dong, Songming Liu, Ze Cheng, Jian Song, and Jun Zhu. GNOT: A general neural operator transformer for operator learning. In Proceedings of the 40th International Conference on Machine Learning , 2023. URL https: //proceedings.mlr.press/v202/hao23c.html. Wenjie Hu, Sidun Liu, Peng Qiao, Zhenglun Sun, and Yong Dou. Transolver is a linear transformer: Revisiting physics-attention through the lens of linear attention. arXiv preprint arXiv:2511.06294 ,2025. URL https://arxiv.org/abs/2511.06294. Nikola Kovachki, Zongyi Li, Burigede Liu, Kamyar Azizzadenesheli, Kaushik Bhattacharya, Andrew Stuart, and Anima Anandkumar. Neural operator: Learning maps between function spaces with applications to PDEs. Journal of Machine Learning Research , 24(89):1–97, 2023. URL https://jmlr.org/papers/v24/21-1524.html. Zijie Li, Kazem Meidani, and Amir Barati Farimani. Transformer for partial differential equations’ operator learning. arXiv preprint arXiv:2205.13671 , 2022a. URL https://arxiv.org/abs/2205. 13671. Zongyi Li, Nikola Kovachki, Kamyar Azizzadenesheli, Burigede Liu, Kaushik Bhattacharya, Andrew Stuart, and Anima Anandkumar. Neural operator: Graph kernel network for partial differential equations. arXiv preprint arXiv:2003.03485 , 2020. URL https://arxiv.org/abs/2003.03485. Zongyi Li, Nikola Kovachki, Kamyar Azizzadenesheli, Burigede Liu, Kaushik Bhattacharya, An-drew Stuart, and Anima Anandkumar. Fourier neural operator for parametric partial dif-ferential equations. In International Conference on Learning Representations , 2021. URL https://openreview.net/forum?id=c8P9NQVtmnO. Zongyi Li, Daniel Zhengyu Huang, Burigede Liu, and Anima Anandkumar. Fourier neural operator with learned deformations for PDEs on general geometries. arXiv preprint arXiv:2207.05209 ,2022b. URL https://arxiv.org/abs/2207.05209. Zongyi Li, Nikola Borislavov Kovachki, Chris Choy, Boyi Li, Jean Kossaifi, Shourya Prakash Otta, Mohammad Amin Nabian, Maximilian Stadler, Christian Hundt, Kamyar Azizzadenesheli, and Anima Anandkumar. Geometry-informed neural operator for large-scale 3d PDEs. In Advances in Neural Information Processing Systems , volume 36, 2023. URL https://arxiv.org/abs/2309.00583. Ze Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and Baining Guo. Swin transformer: Hierarchical vision transformer using shifted windows. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 10012–10022, 2021. doi: 10.1109/ICCV48922.2021.00986. URL https://arxiv.org/abs/2103.14030. Lu Lu, Pengzhan Jin, Guofei Pang, Zhongqiang Zhang, and George Em Karniadakis. Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators. 
+
+Nature Machine Intelligence , 3:218–229, 2021. doi: 10.1038/s42256-021-00302-5. URL https: //doi.org/10.1038/s42256-021-00302-5. Huakun Luo, Haixu Wu, Hang Zhou, Lanxiang Xing, Yichen Di, Jianmin Wang, and Mingsheng Long. Transolver++: An accurate neural solver for PDEs on million-scale geometries. In 
+
+Proceedings of the 42nd International Conference on Machine Learning , 2025. URL https: //arxiv.org/abs/2502.02414. 21 Runze Mao, Rui Zhang, Xuan Bai, Tianhao Wu, Teng Zhang, Zhenyi Chen, Minqi Lin, Bocheng Zeng, Yangchen Xu, Yingxuan Xiang, Haoze Zhang, Shubham Goswami, Pierre A. Dawe, Yifan Xu, Zhenhua An, Mengtao Yan, Xiaoyi Lu, Yi Wang, Rongbo Bai, Haobu Gao, Xiaohang Fang, Han Li, Hao Sun, and Zhi X. Chen. Benchmarking neural surrogates on realistic spatiotemporal multiphysics flows. arXiv preprint arXiv:2512.18595 , 2025. URL https://arxiv.org/abs/2512. 18595. Ruben Ohana, Michael McCabe, Lucas Meyer, Rudy Morel, Fruzsina J. Agocs, Miguel Beneitez, Marsha Berger, Blakesley Burkhart, Stuart B. Dalziel, Drummond B. Fielding, Daniel Fortunato, Jared A. Goldberg, Keiya Hirashima, Yan-Fei Jiang, Rich R. Kerswell, Suryanarayana Maddu, Jonah Miller, Payel Mukhopadhyay, Stefan S. Nixon, Jeff Shen, Romain Watteaux, Bruno Régaldo-Saint Blancard, François Rozet, Liam H. Parker, Miles Cranmer, and Shirley Ho. The well: A large-scale collection of diverse physics simulations for machine learning. In Advances in Neural Information Processing Systems , volume 37, 2024. URL https://arxiv.org/abs/2412.00568. Tobias Pfaff, Meire Fortunato, Alvaro Sanchez-Gonzalez, and Peter W. Battaglia. Learning mesh-based simulation with graph networks. In Proceedings of the 38th International Conference on Machine Learning , 2021. URL https://proceedings.mlr.press/v139/pfaff21a.html. Kai Qi, Fan Wang, Zhewen Dong, and Jian Sun. Spidersolver: A geometry-aware transformer for solving PDEs on complex geometries. In Advances in Neural Information Processing Systems ,2025. URL https://github.com/Kai-Qi/SpiderSolver. Alasdair Tran, Alexander Mathews, Lexing Xie, and Cheng Soon Ong. Factorized fourier neural operators. In International Conference on Learning Representations , 2023. URL https://openreview.net/forum?id=tmIiMPl4IPa. Shizheng Wen, Arsh Kumbhat, Levi Lingsch, Sepehr Mousavi, Yizhou Zhao, Praveen Chandrashekar, and Siddhartha Mishra. Geometry aware operator transformer as an efficient and accurate neural surrogate for PDEs on arbitrary domains. arXiv preprint arXiv:2505.18781 , 2025. URL https://arxiv.org/abs/2505.18781. Haixu Wu, Huakun Luo, Haowen Wang, Jianmin Wang, and Mingsheng Long. Transolver: A fast transformer solver for PDEs on general geometries. In Proceedings of the 41st International Conference on Machine Learning , 2024a. URL https://arxiv.org/abs/2402.02366. Xiaoyang Wu, Li Jiang, Peng-Shuai Wang, Zhijian Liu, Xihui Liu, Yu Qiao, Wanli Ouyang, Tong He, and Hengshuang Zhao. Point transformer v3: Simpler, faster, stronger. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 4840–4851, 2024b. doi: 10.1109/CVPR52733.2024.00463. URL https://arxiv.org/abs/2312.10035. Maksim Zhdanov, Max Welling, and Jan-Willem van de Meent. Erwin: A tree-based hierarchical transformer for large-scale physical systems. In Proceedings of the 42nd International Conference on Machine Learning , 2025. URL https://arxiv.org/abs/2502.17019. Hang Zhou, Haixu Wu, Haonan Shangguan, Yuezhou Ma, Huikun Weng, Jianmin Wang, and Mingsheng Long. Transolver-3: Scaling up transformer solvers to industrial-scale geometries. 
+
+arXiv preprint arXiv:2602.04940 , 2026. URL https://arxiv.org/abs/2602.04940. 22 A Full Mesh Inference 
+
+## A.1 Arbitrary-Point Querying 
+
+Notation. S = {(xi, ai)}Ns 
+
+> i=1
+
+denotes the support set used to encode the input function, where Xs
+
+and As collect its coordinates and input features. Q = {(xq, aq)}Nq 
+
+> q=1
+
+denotes the query set. The support locations may be a subset of or different from the query locations, and typically Ns ≪ Nq.
+
+L, P , and M denote the numbers of network layers, spatial patches, and physics tokens per patch, respectively. At layer ℓ, Fℓs denotes the support-point features, Tℓ ∈ RP ×M ×dt denotes the updated physics tokens after factorized global attention, pℓi denotes the patch index of support point xi,and σℓ denotes the axis permutation used for Trans-Hilbert patchification. The cache C stores the physics tokens and patch assignments from all layers. 
+
+## A.2 Resolution Agnostic Property 
+
+We evaluate the arbitrary-point querying capability of Physics Transformer on DrivAerML using 50 test cases. We first construct and cache the patch-wise physics tokens at all layers using a support set of only 100 K mesh points. We then keep these cached tokens fixed and query the predicted fields independently at every point of the full-resolution mesh. Table 9 compares prediction errors evaluated on the 100 K support set and on the complete mesh through arbitrary-point querying. Table 9: Arbitrary-point querying results on DrivAerML. The physics tokens are computed once from a 100 K-point support set and reused to query the full-resolution mesh. Lower error is better.             
+
+> Evaluation Mode psuτpv
+> Support-set prediction ( 100 K) 3.35 3.40 5.24 3.08 Cached-token querying (full mesh) 3.34 3.40 5.25 3.08
+
+Querying the complete mesh from the cached tokens introduces no measurable accuracy degra-dation relative to prediction on the original support set. This result demonstrates that Physics Transformer exhibits satisfactory resolution-independent behavior (super resolution only): its patch-wise physics tokens form an efficient representation of the local physical fields that can be decoded at previously unseen coordinates without recomputing the support-set representation. Consequently, a relatively small support set is sufficient to encode the physical state, while predictions can sub-sequently be evaluated on a substantially denser mesh or obtain planar cross-sections of the 3D domain for visualization. 
+
+## A.3 Difference from Transolver-3 Tiled Inference 
+
+Although Transolver-3 provides a point-wise decoding rule, its practical inference pipeline still constructs the physical-state cache from the whole high-resolution mesh and subsequently performs full-mesh decoding. Importantly, the ability to decode an individual point does not imply that the physical representation can be reliably constructed from a sparse support set. We test Transolver-3 (Zhou et al., 2026) by reducing the number of input cells used for physical-state caching from the full mesh to 100 K increases the prediction error from 3.71% , 4.14% , 5.85% , 5.72% (ps, u, τ, p v
+
+respectively) to 3.85% , 4.33% , 6.16% , 6.09% . This substantial degradation suggests that its global slice aggregation is relatively sample-inefficient: each physical state pools information over the entire domain, and sparse sampling may provide insufficient coverage of localized geometry and fine-scale physical structures. 23 Algorithm 1 Arbitrary-point querying with cached physics tokens 
+
+Require: Support set S = {(xi, ai)}Ns
+
+> i=1
+
+; query set Q = {(xq, aq)}Nq
+
+> q=1
+
+; number of layers L
+
+Ensure: Query predictions ̂ UQ = {̂u(xq)}Nq 
+
+> q=1
+> 1:
+
+F0 
+
+> s
+
+← ϕin ([ As, γ (Xs)]) ▷ Initial support-point embeddings  
+
+> 2:
+
+C ← [] ▷ Multi-layer token cache  
+
+> 3:
+
+for ℓ = 1 , . . . , L do 
+
+> 4:
+> (
+
+Fℓs, Tℓ, {pℓi }Ns
+
+> i=1
+> )
+
+← PhysicsTransformerLayer (Xs, Fℓ−1 
+
+> s
+
+, σ ℓ) ▷ Patchify, tokenize, factorized-attention, and de-tokenize  
+
+> 5:
+
+C[ℓ] ←
+
+> (
+
+Tℓ, {pℓi }Ns
+
+> i=1
+> )
+
+▷ Cache tokens and patch indices at layer ℓ 
+
+> 6:
+
+end for  
+
+> 7:
+
+for all (xq, aq) ∈ Q do  
+
+> 8:
+
+f 0 
+
+> q
+
+← ϕq ([ γ(xq), aq]) ▷ Initial query-point feature  
+
+> 9:
+
+n(q) ← arg min 
+
+> 1≤i≤Ns
+
+∥xq − xi∥2 ▷ Nearest support-point index  
+
+> 10:
+
+for ℓ = 1 , . . . , L do  
+
+> 11:
+
+pℓ(q) ← pℓn(q) ▷ Query-associated patch at layer ℓ 
+
+> 12:
+
+qℓq ← softmax M
+
+> (
+
+f ℓ−1 
+
+> q
+
+Wℓq
+
+> )
+
+∈ RM ▷ Layer-ℓ de-tokenization weights  
+
+> 13:
+
+f ℓq ← (qℓq)⊤Tℓpℓ(q)Wℓo ▷ Decode from layer-ℓ cached tokens  
+
+> 14:
+
+end for  
+
+> 15: ̂
+
+u(xq) ← ϕout 
+
+> (
+
+f Lq 
+
+> )
+> 16:
+
+end for  
+
+> 17:
+
+return ̂ UQ
+
+In contrast, Physics Transformer constructs physics tokens independently within spatial patches. Because each token only needs to represent the local geometry and physical variation inside its associated patch, fine-scale information is less likely to be diluted by aggregation over distant regions. Consequently, Physics Transformer can construct an accurate physical representation from a relatively small support set S, cache the resulting layer-wise patch tokens, and efficiently decode the solution on a much denser query discretization Q, where Ns ≪ Nq. Therefore, the key distinction is not whether a single point can be decoded from cached states, but how many support points are required to construct a sufficiently informative tokens for decoding. 
+
+# B Benchmarks 
+
+Turbulent Radiative Layer 2D (TRL2D). TRL2D is a two-dimensional hydrodynamic dataset from The Well benchmark (Ohana et al., 2024). It models a cold, dense gas moving relative to a hot, dilute gas. Their interface develops a Kelvin–Helmholtz instability, while radiative cooling acts on gas at intermediate temperatures. The dataset contains 90 trajectories generated from nine cooling-time settings and ten random seeds, with each trajectory consisting of 101 time steps on a 384 × 128 Cartesian grid. The predicted physical fields include density, pressure, and velocity. Given the physical fields from the previous three time steps, the task is to predict the fields at the next time step. We adopt the official trajectory-level split from The Well, resulting in 72 training, 9 validation, and 9 test trajectories. 24 Gray–Scott Reaction–Diffusion (GSRD). GSRD is another regular-grid dataset from The Well benchmark (Ohana et al., 2024). It describes the nonlinear reaction and diffusion of two chemical species, whose dynamics produce spatial patterns under different feed and removal parameters. The dataset contains 1,200 trajectories covering six parameter settings and multiple randomized initial conditions. Each trajectory contains 1,001 time steps on a 128 × 128 periodic grid. Since the dynamics between consecutive time steps evolve slowly, we temporally subsample each trajectory by a factor of 10 to obtain more informative prediction intervals. Given the concentration fields from the previous three subsampled time steps, the task is to predict the fields at the next subsampled time step. Following the official partition, we use 960 trajectories for training, 120 for validation, and 120 for testing. 
+
+REALM rocket-engine simulations. REALM is a collection of high-fidelity multiphysics simulations designed to represent realistic engineering systems (Mao et al., 2025). We use its rocket-engine benchmark, which models turbulent reacting flow in a rocket combustor with shear-coaxial injection. The interaction among fuel injection, turbulent mixing, combustion, heat release, and chamber-flow dynamics produces strongly coupled structures over irregular discretizations. Given the physical fields from the previous three time steps, the task is to predict the fields at the next time step. The dataset used in our experiments contains 100 complete trajectories. As no official partition is provided for this 100-trajectory set, we divide it into 80 training, 10 validation, and 10 test trajectories. 
+
+F1-Airfoil Dynamics. F1-Airfoil Dynamics is the official benchmark of the GRaM Competition at ICLR 2026, with simulated transient airflow provided by BeyondMath. It consists of irregular point-cloud simulations around three-dimensional geometries inspired by Formula-1 front wings. Given the geometry and five observed velocity frames, the task is to predict the subsequent five frames jointly. Since all future frames are produced in a single forward pass and no prediction is fed back into the model, this benchmark does not require autoregressive rollout. We therefore treat it as a fixed-horizon operator-learning problem rather than a rollout-based temporal benchmark. We follow the official training, validation, and test partition provided by the competition. 
+
+NASA Common Research Model (NASA-CRM). NASA-CRM is a transonic aerodynamic benchmark based on a full wing–body–horizontal-tail transport-aircraft configuration (Catalani et al., 2025). It contains 149 high-fidelity RANS simulations generated with the DLR TAU solver. Each simulation varies six parameters: Mach number, angle of attack, inboard and outboard aileron deflections, elevator deflection, and horizontal-tailplane deflection, while the flight altitude is fixed at 37 ,000 ft. Each case contains 454,404 irregularly distributed surface points, and the task is to predict the surface pressure coefficient over the complete aircraft geometry. We follow the official Halton-sequence-based partition, using 105 simulation cases for training and 44 cases for testing. 
+
+DrivAerML. DrivAerML is an industrial-scale automotive aerodynamics dataset containing 500 parametrically morphed DrivAer vehicle configurations (Ashton et al., 2024). The simulations are generated using scale-resolving CFD workflows and provide high-resolution surface and volume fields, including pressure, velocity, and wall shear stress. A typical case contains approximately eight million surface cells and can contain up to approximately 160 million volume cells, making DrivAerML particularly challenging for point-wise neural solvers. Since the original dataset does not prescribe a unique learning partition for this task, we split the 500 vehicle configurations into 400 training, 50 validation, and 50 test cases. 25 B.1 Metrics 
+
+We follow the standard evaluation protocols associated with each benchmark. Specifically, we use the variance-scaled root mean squared error (VRMSE) for the two datasets from The Well, normalized MSE for REALM, and relative L2 error for F1-Airfoil Dynamics, NASA-CRM, and DrivAerML. For DrivAerML, we additionally evaluate the integrated drag and lift coefficients and the corresponding coefficient of determination R2.
+
+Variance-scaled RMSE on The Well. Following the official evaluation protocol of The Well (Ohana et al., 2024), we evaluate TRL2D and GSRD using VRMSE. Let ̂ y(s,h ) 
+
+> c
+
+and y(s,h ) 
+
+> c
+
+denote the predicted and ground-truth values of field channel c for sample s at rollout step h. The VRMSE of this field is 
+
+VRMSE (s,h ) 
+
+> c
+
+=
+
+> √√√√√√
+> 1
+> N
+> ∑Ni=1
+> (̂
+
+y(s,h ) 
+
+> i,c
+
+− y(s,h )
+
+> i,c
+> )2
+
+Var i
+
+> [
+
+y(s,h )
+
+> i,c
+> ]
+
++ ε ,
+
+where the variance is computed over the spatial domain and ε = 10 −7 prevents numerical instability. The reported error is averaged over all predicted physical-field channels and test samples. The physical variables in The Well have different units and substantially different amplitudes. Normalizing each field by its spatial standard deviation prevents high-variance fields from dominating the aggregate error and produces a dimensionless metric that is comparable across density, pressure, velocity, and chemical concentration fields. VRMSE is also calibrated such that predicting the spatial mean of the target field gives a score of approximately 1, while a perfect prediction gives 0.
+
+Normalized MSE on REALM. We follow the official REALM protocol (Mao et al., 2025) and use normalized MSE for both training and evaluation. Reactive-flow variables exhibit severe cross-channel scale disparity: in particular, chemical-species mass fractions can range from approximately 
+
+10 −12 to 10 −1. Directly optimizing an error on the raw variables would therefore produce an ill-conditioned objective dominated by variables with large numerical magnitudes. Following REALM, the chemical-species channels are first transformed using a channel-wise Box–Cox transformation with λ = 0 .1, and all channels are then standardized using statistics computed from the training set. Let ˜y(s,h ) 
+
+> α
+
+and ̂ ˜y(s,h ) 
+
+> α
+
+denote the normalized ground truth and prediction for physical-variable group 
+
+α ∈ A = {chem , T, ρ, u, p }.
+
+The normalized MSE at step h is 
+
+MSE (s,h )REALM = ∑
+
+> α∈A
+
+1
+
+D(s)
+
+> α
+> ∥∥∥∥̂ ˜
+
+y(s,h ) 
+
+> α
+
+− ˜y(s,h )
+
+> α
+> ∥∥∥∥
+> 2
+> F
+
+,
+
+where D(s) 
+
+> α
+
+is the number of spatial and channel elements in group α. Averaging within each group prevents physical groups with more channels from dominating the loss. We use this same group-wise MSE during training and testing to maintain consistency between model optimization and benchmark evaluation. 
+
+Autoregressive rollout evaluation. For TRL2D, GSRD, and REALM, each model receives the previous three frames and predicts the next frame. During autoregressive evaluation, the prediction 26 is appended to the input window and the oldest frame is discarded. This procedure is repeated for 
+
+H steps without access to subsequent ground-truth frames. Let E(s,h ) denote the corresponding dataset-specific error at step h, namely VRMSE for TRL2D and GSRD and normalized MSE for REALM. We report the one-step error 
+
+Eone = 1
+
+S
+
+> S∑
+> s=1
+
+E(s, 1) ,
+
+the final-step error 
+
+Efinal = 1
+
+S
+
+> S∑
+> s=1
+
+E(s,H ),
+
+The final-step error measures the accumulated error at the longest prediction horizon. 
+
+Relative L2 error. For F1-Airfoil Dynamics, NASA-CRM, and DrivAerML, we evaluate point-wise field accuracy using relative L2 error. Given a prediction ̂ Y(s) ∈ RNs×dout and its ground truth 
+
+Y(s), the error is 
+
+Erel = 1
+
+S
+
+> S∑
+> s=1
+> ∥∥∥̂
+
+Y(s) − Y(s)∥∥∥F∥∥Y(s)∥∥F
+
+.
+
+The values in our tables are reported as percentages. For F1-Airfoil Dynamics, the five future velocity frames are predicted jointly and concatenated along the output dimension when computing the error; no autoregressive rollout is performed. On NASA-CRM, relative L2 errors are reported separately for surface pressure ps and skin-friction coefficient Cf . On DrivAerML, we report separate errors for surface pressure ps, volume velocity u, wall shear stress τ , and volume pressure pv.
+
+Integrated aerodynamic coefficients. Following Transolver-3, we derive the drag and lift coefficients on DrivAerML by integrating the predicted surface pressure and wall shear stress over the full-resolution vehicle surface. The aerodynamic force is 
+
+F =
+
+> ∫
+> S
+> [
+
+−(p(x) − p∞
+
+> )
+
+n(x) + τw(x)] dS, 
+
+where p∞ is the freestream pressure, n is the outward surface normal, and τw is the wall shear-stress vector. On a discrete surface mesh, this integral is evaluated as 
+
+F ≈
+
+> NS∑
+> i=1
+> [
+
+−(pi − p∞
+
+> )
+
+ni + τw,i  
+
+> ]
+
+Ai,
+
+where Ai is the area associated with surface element i.Let 
+
+q∞ = 12 ρ∞U 2
+
+> ∞
+
+denote the freestream dynamic pressure and Aref the reference area. The drag and lift coefficients are computed as 
+
+Cd = F · ed
+
+q∞Aref 
+
+, Cl = F · el
+
+q∞Aref 
+
+,
+
+where ed and el denote the drag and lift directions, respectively. The same surface quadrature is applied to the predicted and ground-truth fields. 27 R2 score. We quantify the agreement between the predicted and reference aerodynamic coefficients using the coefficient of determination. For C ∈ { Cd, C l},
+
+R2(C) = 1 −
+
+> ∑Ss=1
+> (̂
+
+C(s) − C(s))2
+
+> ∑Ss=1
+> (
+
+C(s) − C 
+
+> )2
+
+, C = 1
+
+S
+
+> S∑
+> s=1
+
+C(s).
+
+An R2 value of 1 indicates perfect agreement, R2 = 0 corresponds to predicting the test-set mean, and a negative value indicates performance worse than this mean predictor. 
+
+## B.2 Baselines and Implementation Details 
+
+We compare Physics Transformer with representative neural operators covering spectral, latent-token, geometry-aware, and physics-attention architectures. The spectral baselines include FNO (Li et al., 2021), factorized FNO (FFNO) (Tran et al., 2023), and GINO (Li et al., 2023). We also consider latent-token and geometry-aware operators, including UPT (Alkin et al., 2024), AB-UPT (Alkin et al., 2025), and GAOT (Wen et al., 2025). Physics-attention-based baselines include Transolver (Wu et al., 2024a), LinearNO (Hu et al., 2025), Transolver-3 (Zhou et al., 2026), and GeoTransolver (Adams et al., 2025). Together, these baselines cover regular-grid operators, arbitrary-query latent models, geometry-aware Transformers, and global physics-slice methods. 
+
+FNO. The Fourier Neural Operator (FNO) (Li et al., 2021) parameterizes global integral kernels using truncated Fourier modes. Each layer alternates spectral convolution in the frequency domain with point-wise channel mixing, providing an efficient operator-learning baseline for physical fields represented on regular Cartesian grids. We test it on 2D regular case TRL2D and GSRD. 
+
+FFNO. The Factorized Fourier Neural Operator (FFNO) (Tran et al., 2023) factorizes multidimen-sional spectral convolution into separate operations along individual spatial dimensions. Together with its enhanced residual design, this factorization reduces the cost of spectral mixing and enables deeper neural operator architectures. FFNO could extend to irregular cases so we test it on 2D regular case TRL2D and GSRD, as well as 2D irregular REALM rocket. 
+
+GINO. The Geometry-Informed Neural Operator (GINO) (Li et al., 2023) combines graph neural operators with Fourier operator layers to process physical fields on arbitrary geometries. It encodes irregularly sampled inputs onto a regular latent grid, performs global operator learning in the Fourier domain, and decodes the latent representation to arbitrary query locations. We test it on 3D geometry related F1-Airfoil, NASA-CRM and DrivAerML tasks. 
+
+UPT. The Universal Physics Transformer (UPT) (Alkin et al., 2024) encodes variable-size sim-ulation inputs into a fixed-size latent representation through hierarchical aggregation and latent pooling. A Transformer processes the compressed latent tokens, and a coordinate-conditioned decoder predicts physical quantities at the requested output locations. We test it on all tasks. 
+
+AB-UPT. AB-UPT (Alkin et al., 2025) extends UPT to large-scale industrial CFD through an anchored and branched architecture. It processes geometry, surface fields, and volumetric fields using dedicated branches and employs anchored latent representations to support efficient decoding on high-resolution simulation domains. For it is designed mainly for CFD simulation we test it on F1-Airfoil, NASA-CRM and DrivAerML tasks. 28 GAOT. The Geometry-Aware Operator Transformer (GAOT) (Wen et al., 2025) combines graph-based operator encoders and decoders with a Transformer processor. Its multiscale graph construction and geometry embeddings enable information exchange over irregular discretizations while explicitly incorporating the underlying domain geometry. We test it on all tasks. 
+
+Transolver. Transolver (Wu et al., 2024a) introduces Physics-Attention, which softly assigns discretization points to a small collection of learned physics slices. Self-attention is performed among these slice tokens, and the updated representations are subsequently de-sliced to recover point-wise physical fields. We test it on all tasks. 
+
+LinearNO. LinearNO (Hu et al., 2025) reformulates the slice and de-slice operations of Physics-Attention from the perspective of linear attention. Through an algebraic reordering of the associated projections, it obtains a streamlined neural operator with reduced parameter and computational costs. We test it on 2D regular case TRL2D and GSRD, as well as 2D irregular REALM rocket. 
+
+Transolver-3. Transolver-3 (Zhou et al., 2026) scales the Transolver framework to industrial geometries containing extremely large numbers of cells. It combines efficient slice computation, geometry slice tiling, subset-based amortized training, and cached physical states to reduce the memory and computation required by large-scale training and inference. For Transolver3 does not change the model structure of Transolver, providing mainly training and inference updates, we test it only when Transolver could not handle the whole mesh, on NASA-CRM and DrivAerML. 
+
+GeoTransolver. GeoTransolver (Adams et al., 2025) augments the Transolver backbone with multiscale geometry-aware context. It couples learned physics slices with geometric and boundary-condition features constructed from local neighborhoods, allowing the attention processor to incor-porate explicit geometric information on irregular computational domains. For it is designed mainly for CFD simulation we test it on F1-Airfoil, NASA-CRM and DrivAerML tasks. Unless explicitly identified as literature-reported results, all baselines are trained and evaluated using the same dataset partitions, input and output windows, preprocessing, dataset-specific training objectives, optimization schedule, and evaluation protocol as Physics Transformer. In particular, all methods use three input frames for one-step prediction on TRL2D, GSRD, and REALM and are evaluated using the same autoregressive rollout procedure. For F1-Airfoil Dynamics, all five future frames are predicted jointly under the official benchmark protocol. On irregular meshes, reproduced methods are given the same sampled input and query points whenever their architectures permit. Model widths and depths are adjusted within their original architectural designs so that all reproduced baselines have parameter counts comparable to Physics Transformer. We select checkpoints according to validation performance and apply the same test-time metric implementation to every reproduced method. For relatively small-scale datasets all models are trained with the full mesh except for larger-scale benchmarks including NASA-CRM and DrivAerML where a subset of mesh (100k) is used to enable training of each model. We adopt the results on NASA-CRM and DrivAerML from the paper of Transolver-3 and AB-UPT. (Zhou et al., 2026; Alkin et al., 2025) The GeoTransolver paper reports relative L1 errors for its point-wise physical-field predictions, whereas our industrial CFD experiments use relative L2
+
+error. So we reproduce GeoTransolver using its official PhysicsNeMo implementation and evaluate its predictions with the same relative L2 implementation used for all other models. For each baseline model, we employed the AdamW optimizer except for AB-UPT/UPT where LION was used and GeoTransolver where Muon was used. 29 Table 10: Training and model configurations of Physics Transformer. All reproduced baselines use the same training configuration for each benchmark and are scaled to comparable parameter counts. “Subset Size” denotes the number of points or cells sampled from each instance during training, while “Full Input” indicates that no spatial subsampling is applied. L, H, and C denote the numbers of layers, attention heads, and hidden channels, respectively. P is the number of spatial patches and M is the number of physics tokens per patch, resulting in P M physics tokens per layer.                                                    
+
+> Training Configuration Model Configuration Benchmark Loss Epochs Initial LR Optimizer Subset Size Layers LHeads HChannels CTokens MPatches P
+> TRL2D VRMSE 200 5×10 −4AdamW Full Input 64128 32 512 GSRD REALM MSE F1-Airfoil Relative L2200 10 −3AdamW Full Input 64128 32 1024 NASA-CRM Relative L2500 10 −3AdamW 100K 16 6192 64 1024 DrivAerML
+
+Table 11: Training efficiency compared with Transolver-3. Both models are trained on four NVIDIA H800 GPUs with a batch size of 1. Training time denotes the total wall-clock time, and memory denotes the peak allocation per GPU. 
+
+Task Model Params. (M) Training Time (h) Memory (GB/GPU) 
+
+Surface Transolver-3 11.33 23 8.3 Physics Transformer 12.02 8 2.6 Volume Transolver-3 7.6 11 6.5 Physics Transformer 12.02 8 2.6 
+
+Training was conducted in either float16 or bfloat16 precision, depending on which yielded better results. All models were trained for equal epochs as shown in table, a weight decay of 1e-4, and gradient clipping at 1. Expect for Transolver3, which is trained for 800 epochs and 600 epochs on DriverML surface and volume separately in line with its released code on GitHub. A cosine learning rate schedule was employed, including a 5% warm-up phase and a minimum learning rate of 1e-5. 
+
+## B.3 Training and Inference Efficiency 
+
+We compare the computational efficiency of Physics Transformer with Transolver-3 (Zhou et al., 2026) on industry-scale dataset DrivAerML. For the implementation of Transolver-3 in released code is different from the configuration reported in its paper, we experiment following the their code on GitHub for training and inference. Training is conducted in parallel on four NVIDIA H800 GPUs with a batch size of 1 using 100k points, checkpoint-blocks set to be true. We report the number of trainable parameters, end-to-end training time, and peak GPU memory allocated on each device. We further compare full-resolution inference efficiency. For each surface or volume mesh, we report the number of queried mesh points, the wall-clock inference time per instance, and the peak inference memory. Full inference of Transolver-3 follows its tiled inference to obtain the same accuracy performance reported in its papar. While Physics Transformer infer with our proposed token caching and arbitrary query technique. Our method uses bf16, in contrast, Transolver-3 must use fp32 to ensure precision. 30 Table 12: Full-resolution inference efficiency compared with Transolver-3. Inference time is measured per instance after model warm-up, and memory denotes peak GPU allocation. The surface and volume meshes are evaluated at their respective native resolutions.                   
+
+> Task Model Mesh Points Inference Time (s) Memory (GB)
+> Surface Transolver-3 ∼8M168 5.54 Physics Transformer 11 3.91 Volume Transolver-3 ∼15 M1524 4.84 Physics Transformer 203 3.92
+
+Why full-mesh inference is necessary. As reported for AB-UPT (Alkin et al., 2025) and Transolver-3 (Zhou et al., 2026), increasing the number of mesh points used during inference can substantially improve the accuracy of the predicted drag and lift coefficients, CD and CL. We observe the same phenomenon for Physics Transformer. This capability is important because integrated aerodynamic coefficients, rather than point-wise fields alone, are often the primary quantities of interest in industrial CFD. The improvement can be understood from two aspects. First, a denser input discretization may reduce point-wise field prediction errors by providing more complete geometric and physical information. However, our experiments show that the resulting improvement in point-wise accuracy is relatively small. More importantly, CD and CL are computed by numerically integrating the predicted pressure and wall-shear stress over the vehicle surface: 
+
+F ≈
+
+> N∑
+> i=1
+
+(−pini + τi) Ai,
+
+where Ai and ni denote the area and normal of the corresponding surface element. Consequently, errors in the surface quadrature, particularly in the estimated element areas, directly affect the resulting aerodynamic coefficients. A denser mesh provides a more accurate representation of the surface geometry and its integration elements. Moreover, industrial CFD meshes typically contain precomputed element areas and normals. Performing prediction on the original full-resolution mesh therefore preserves these quadrature quantities and enables accurate evaluation of CD and CL,making efficient whole-mesh inference essential for practical aerodynamic assessment. 
+
+Physics Transformer achieves preferable efficiency. As shown in Tables 11 and 12, Physics Transformer is more efficient than Transolver-3 in both training and inference under broadly comparable parameter budgets. Transolver-3 adopts a smaller architecture for volumetric prediction, whereas Physics Transformer uses the same model configuration for both surface and volume fields. During training, the two models require approximately 1 second per optimization step, and the reduction in total training time achieved by Physics Transformer primarily results from requiring fewer training epochs. The most substantial advantage arises during full-resolution inference. Transolver-3 relies on computationally intensive tiled inference over the entire mesh to recover its reported accuracy. In contrast, the local physics tokens of Physics Transformer efficiently represent the physical field using only a relatively small support set, after which predictions on the complete mesh can be decoded directly from the cached tokens without accuracy degradation. Consequently, Physics Transformer achieves approximately 15 .3× and 7.5× faster inference on the full surface and volume meshes, respectively. Specifically, it reduces the per-instance inference time from 2.8
+
+minutes to 11 seconds for surface fields and from 25 .4 minutes to 3.4 minutes for volumetric fields, substantially accelerating the evaluation of aerodynamic performance on industrial-scale meshes. 31 C More visualizations 
+
+Figure 5: Results on Trl2D dataset. 32 Figure 6: Results on GSDR dataset. 33 Figure 7: Results on REALM dataset. 
+
+Figure 8: Results on F1-Airfoil Dynamics dataset. 34 Figure 9: Full results on NASA-CRM dataset. 35 Figure 10: Full results on DrivAerML dataset. 36

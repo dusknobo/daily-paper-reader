@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-03",
+  "date": "2026-08-03",
+  "generated_at": "2026-08-03T21:44:41",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/03/2607.24513v1-physics-transformer-tailoring-transformer-for-general-pde-prediction",
+      "section": "quick",
+      "title_en": "Physics Transformer: Tailoring Transformer for General PDE Prediction",
+      "authors": "Guoze Sun, Rui Zhang, Jiankai Tang, Mengtao Yan, Runze Mao, Zhi X. Chen, Hao Sun",
+      "date": "2026-07-27",
+      "pdf": "https://arxiv.org/pdf/2607.24513v1",
+      "score": "6.0",
+      "evidence": "基于Transformer的通用偏微分方程预测方法",
+      "tldr": "针对PDE预测中Transformer难以处理连续函数场的问题，Physics Transformer将物理场视为连续函数并划分空间块，动态学习局部基函数进行投影以生成紧凑物理令牌，再通过分解注意力实现全局交互。该方法在二维动力学及工业级三维CFD模拟等基准上达到领先预测精度，验证了函数投影作为Transformer架构基础的有效性。",
+      "tags": "query:falling-film",
+      "abstract_en": "Transformer architectures have attracted increasing attention for solving partial differential equations (PDEs), owing to their flexibility in handling irregular discretizations and their ability to capture long-range physical dependencies. However, unlike discrete language tokens or fixed-resolution image patches, observed physical fields are finite samples of underlying infinite-dimensional functions. Consequently, effectively applying Transformers to PDEs requires a tokenizer that respects the functional nature of physical fields and constructs physically expressive tokens from arbitrary discretizations.To this end, we propose \\methodname{Physics Transformer}, a function-projection-based Transformer architecture for physical field prediction. Physics Transformer treats a physical field as a continuous function and partitions its discretization into locality-preserving spatial patches. Within each patch, it dynamically learns a set of adaptive local basis functions and projects the sampled field onto these bases to obtain compact physics tokens. The resulting tokens capture diverse latent physical states while preserving fine-scale spatial structures, enabling efficient global interaction through factorized attention across space and physical states. The projected representation further supports efficient decoding at arbitrary query locations. Extensive experiments on diverse benchmarks, ranging from two-dimensional PDE dynamics to industrial-scale three-dimensional CFD simulations, demonstrate that Physics Transformer accurately captures fine-grained physical structures and achieves state-of-the-art predictive performance. These results establish function projection as a practical and effective foundation for designing Transformer architectures for PDE solving.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

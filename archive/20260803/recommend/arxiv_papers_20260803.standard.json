@@ -1,0 +1,58 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-03T21:43:03.588424+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.24513v1",
+      "source": "arxiv",
+      "title": "Physics Transformer: Tailoring Transformer for General PDE Prediction",
+      "abstract": "Transformer architectures have attracted increasing attention for solving partial differential equations (PDEs), owing to their flexibility in handling irregular discretizations and their ability to capture long-range physical dependencies. However, unlike discrete language tokens or fixed-resolution image patches, observed physical fields are finite samples of underlying infinite-dimensional functions. Consequently, effectively applying Transformers to PDEs requires a tokenizer that respects the functional nature of physical fields and constructs physically expressive tokens from arbitrary discretizations.To this end, we propose \\methodname{Physics Transformer}, a function-projection-based Transformer architecture for physical field prediction. Physics Transformer treats a physical field as a continuous function and partitions its discretization into locality-preserving spatial patches. Within each patch, it dynamically learns a set of adaptive local basis functions and projects the sampled field onto these bases to obtain compact physics tokens. The resulting tokens capture diverse latent physical states while preserving fine-scale spatial structures, enabling efficient global interaction through factorized attention across space and physical states. The projected representation further supports efficient decoding at arbitrary query locations. Extensive experiments on diverse benchmarks, ranging from two-dimensional PDE dynamics to industrial-scale three-dimensional CFD simulations, demonstrate that Physics Transformer accurately captures fine-grained physical structures and achieves state-of-the-art predictive performance. These results establish function projection as a practical and effective foundation for designing Transformer architectures for PDE solving.",
+      "authors": [
+        "Guoze Sun",
+        "Rui Zhang",
+        "Jiankai Tang",
+        "Mengtao Yan",
+        "Runze Mao",
+        "Zhi X. Chen",
+        "Hao Sun"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-27T14:53:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.24513v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "General PDE prediction using transformer architecture",
+      "llm_evidence_cn": "基于Transformer的通用偏微分方程预测方法",
+      "llm_evidence": "基于Transformer的通用偏微分方程预测方法",
+      "canonical_evidence": "基于Transformer的通用偏微分方程预测方法",
+      "llm_tldr_en": "Proposes Physics Transformer, a function-projection-based Transformer for predicting physical fields governed by PDEs, addressing tokenization for infinite-dimensional functions and handling irregular discretizations.",
+      "llm_tldr_cn": "提出物理变压器方法，通过函数投影构建物理场Token，使得Transformer能适用于任意离散化的偏微分方程预测。该方法克服了传统Transformer将物理场视为离散样本的局限，能够捕获长程物理依赖，为多物理场预测提供了一个通用的代理模型架构。",
+      "llm_tldr": "提出物理变压器方法，通过函数投影构建物理场Token，使得Transformer能适用于任意离散化的偏微分方程预测。该方法克服了传统Transformer将物理场视为离散样本的局限，能够捕获长程物理依赖，为多物理场预测提供了一个通用的代理模型架构。",
+      "llm_tags": [
+        "query:falling-film:composite"
+      ],
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD.",
+      "matched_requirement_id": "req-composite-falling-film",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
