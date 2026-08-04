@@ -41,7 +41,7 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-03</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-04</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
     <strong class="dpr-home-dashboard-count">共 1 篇</strong>
@@ -51,7 +51,7 @@
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-03 21:44:36 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-04 22:01:54 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>用 Transformer 硬刚偏微分方程，今天速读了一篇为物理仿真量身订制的架构改进。</p>
-<p>核心发现是无需大规模预训练，结合物理约束的 Transformer 也能在多类 PDE 上超越专用数值解法。</p>
-<p>有趣但风险较高，建议先复现热传导和波动方程两个基础案例，验证泛化边界再深入。</p>
+<p>今日速读一篇数值算法论文，探索如何用高精度格式稳定模拟从两相到N相的可压缩流动。</p>
+<p>最值得关注的是该有限体积WENO格式能严格维持相界面的物理有界性，避免数值振荡破坏多相流细节。</p>
+<p>若对气液界面、多介质相互作用感兴趣，可跟进这类相场方法在复杂工程模拟中的验证案例。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -89,7 +89,7 @@
     <strong class="dpr-home-dashboard-count">1 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Physics Transformer: Tailoring Transformer for General PDE Prediction">Physics Transformer: Tailoring Transformer for General PDE Prediction</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Consistent and bound-preserving finite-volume WENO scheme for compressible two-/$N$-phase flows with Phase-Field mechanism">Consistent and bound-preserving finite-volume WENO scheme for compressible two-/$N$-phase flows with Phase-Field mechanism</span></li></ul>
   </div>
   <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">falling-film <strong>1</strong></span></div>
 </section>

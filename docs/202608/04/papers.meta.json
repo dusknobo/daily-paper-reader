@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-04",
+  "date": "2026-08-04",
+  "generated_at": "2026-08-04T22:02:01",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/04/2608.00746v1-consistent-and-bound-preserving-finite-volume-weno-scheme-for-compressible-two-n-phase-flows-with-phase-field-mechanism",
+      "section": "quick",
+      "title_en": "Consistent and bound-preserving finite-volume WENO scheme for compressible two-/$N$-phase flows with Phase-Field mechanism",
+      "authors": "Ziyang Huang",
+      "date": "2026-08-01",
+      "pdf": "https://arxiv.org/pdf/2608.00746v1",
+      "score": "7.0",
+      "evidence": "提出用于可压缩多相流的WENO格式结合相场法",
+      "tldr": "在可压缩多相流相场模拟中，高阶WENO格式常因数值振荡和重构缺陷导致非物理的虚假相、局部空洞或过填充，违背体积分数约束。为解决此问题，本文提出一种一致且保界的有限体积WENO格式，创新性地根据模板间相对光滑度计算WENO权重，并对质量和体积分数进行耦合重构，从构造上保证N相体积分数之和恒为1且无虚假物质产生。格式满足一致性、守恒性、平衡性和保界性四项要求，与一致保守相场方法结合并支持自适应网格细化，在多种两相/N相基准流中验证了其保界与守恒能力，并成功应用于激波诱导空腔坍塌、激波-容器-气泡相互作用等复杂问题，证明了保界处理对高阶相场多相流模拟的必要性与有效性。",
+      "tags": "query:falling-film",
+      "abstract_en": "In the present study, we propose a consistent and bound-preserving finite-volume WENO scheme that satisfies the requirements of consistency, conservation, equilibrium, and bound preservation for compressible multiphase flows with the Phase-Field mechanism. The proposed WENO scheme is developed based on a new calculation of WENO weights determined by relative smoothness between stencils and on a coupled reconstruction of the masses and volume fractions. Consistency of reduction and volume fraction summation to unity are considered during the development so that fictitious phases, local voids, or overfilling are not produced numerically when there are $N$ ($N \\geqslant 1$) different immiscible phases. The proposed WENO scheme is applied to the consistent and conservative Phase-Field method with adaptive mesh refinement enabled. Various benchmark compressible two- and $N$-phase flows are performed to verify the properties of the proposed WENO scheme as well as its variant with the consistent limiter. We finally demonstrate the capability of the proposed WENO scheme in shock-induced cavity collapse and shock-vessel-bubble interaction problems, with discussion of the necessity of bound preservation for high-order schemes and comparison of different compressible multiphase flow models.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
