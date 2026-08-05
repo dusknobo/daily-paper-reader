@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-05T21:32:35.090173+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.28872v1",
+      "source": "arxiv",
+      "title": "A generalized vertical coordinate transformation based on SPH(2) for efficient free surface flow simulations",
+      "abstract": "We propose three new particle methods that improve computational efficiency by introducing a generalized Vertical Coordinate Transformation (VCT) for free surface flow problems with complex bottom boundaries. The first method is a bottom boundary-fitted particle method (BF-SPH). The BF-SPH is simply an arrangement of the body-fitted-coordinate system in the finite difference method to the particle method. The BF-SPH can accurately impose the bottom boundary conditions, while a simple procedure is performed by transforming the complex bottom into a flat one. The second method is the bottom boundary-fitted ellipsoidal particle method (BFE-SPH), which combines the BF-SPH with the ellipsoidal particle model proposed by Shibata et al. The BFE-SPH can speed up the particle simulation by choosing a reasonable aspect ratio of ellipsoidal particles. The last method is the $σ$-SPH method, which automatically selects the aspect ratios of ellipsoidal particles concerning water depth using the $σ$-coordinate system. The $σ$-coordinate is often employed in numerical simulations of oceanographic fields, such as in the Princeton Ocean Model. However, this is the first attempt to apply the $σ$-coordinate to a particle method. Vertical resolution is required from offshore to the coastal region in oceanographic problems such as tsunamis, especially when conducting detailed analysis using a 3-D particle method. Using the $σ$-coordinate allows for a stepwise transition to a naturally efficient coordinate system by referencing water depth. In this paper, we have shown that the above three methods can be generalized as Vertical Coordinate Transformations (VCTs), and the VCTs are successfully achieved by employing SPH(2) with the second-order accuracy of the second-order derivatives, including cross derivatives.",
+      "authors": [
+        "Shujiro Fujioka",
+        "Kumpei Tsuji",
+        "Naoto Mitsume",
+        "Mitsuteru Asai"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-07-30T22:33:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.28872v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "proposes SPH-based particle methods with vertical coordinate transformation for free surface flow simulations, applicable to two-phase flow modeling",
+      "llm_evidence_cn": "提出基于SPH的粒子方法，采用垂直坐标变换进行自由表面流模拟，适用于两相流建模",
+      "llm_evidence": "提出基于SPH的粒子方法，采用垂直坐标变换进行自由表面流模拟，适用于两相流建模",
+      "canonical_evidence": "提出基于SPH的粒子方法，采用垂直坐标变换进行自由表面流模拟，适用于两相流建模",
+      "llm_tldr_en": "Develops three efficient particle methods for free surface flows by introducing a generalized vertical coordinate transformation, enabling accurate boundary treatment and improved computational efficiency for two-phase flow problems.",
+      "llm_tldr_cn": "针对自由表面流模拟中复杂底边界处理困难、计算效率低的问题，提出三种基于广义垂直坐标变换的无网格粒子方法（BF-SPH、BFE-SPH及IGA-SPH）。通过将复杂底面映射为平坦面，这些方法能精确施加底边界条件，避免传统粒子法复杂的边界处理，显著提升计算效率。数值实验表明，所提方法在两相流自由表面问题中具有良好的精度与鲁棒性，为自由表面流动模拟提供了高效新途径。",
+      "llm_tldr": "针对自由表面流模拟中复杂底边界处理困难、计算效率低的问题，提出三种基于广义垂直坐标变换的无网格粒子方法（BF-SPH、BFE-SPH及IGA-SPH）。通过将复杂底面映射为平坦面，这些方法能精确施加底边界条件，避免传统粒子法复杂的边界处理，显著提升计算效率。数值实验表明，所提方法在两相流自由表面问题中具有良好的精度与鲁棒性，为自由表面流动模拟提供了高效新途径。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

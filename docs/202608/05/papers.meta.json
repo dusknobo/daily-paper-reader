@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-05",
+  "date": "2026-08-05",
+  "generated_at": "2026-08-05T21:35:00",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/05/2607.28872v1-a-generalized-vertical-coordinate-transformation-based-on-sph2-for-efficient-free-surface-flow-simulations",
+      "section": "quick",
+      "title_en": "A generalized vertical coordinate transformation based on SPH(2) for efficient free surface flow simulations",
+      "authors": "Shujiro Fujioka, Kumpei Tsuji, Naoto Mitsume, Mitsuteru Asai",
+      "date": "2026-07-30",
+      "pdf": "https://arxiv.org/pdf/2607.28872v1",
+      "score": "6.0",
+      "evidence": "提出基于SPH的粒子方法，采用垂直坐标变换进行自由表面流模拟，适用于两相流建模",
+      "tldr": "自由表面流模拟中，复杂底部边界和跨尺度海域常导致粒子法计算昂贵且边界条件难精确施加。本文提出三种基于SPH(2)的广义垂直坐标变换粒子方法：BF-SPH将崎岖底部映射为平坦域；BFE-SPH引入椭球粒子优化纵横比加速计算；σ-SPH首次将σ坐标用于粒子法，依据水深自动调整粒子形状，实现从近海到岸线的自然变分辨率。数值实验表明，变换显著提升效率，SPH(2)保证二阶精度，尤其σ-SPH在海啸等跨尺度问题中潜力巨大，为三维粒子法海洋应用提供新框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "We propose three new particle methods that improve computational efficiency by introducing a generalized Vertical Coordinate Transformation (VCT) for free surface flow problems with complex bottom boundaries. The first method is a bottom boundary-fitted particle method (BF-SPH). The BF-SPH is simply an arrangement of the body-fitted-coordinate system in the finite difference method to the particle method. The BF-SPH can accurately impose the bottom boundary conditions, while a simple procedure is performed by transforming the complex bottom into a flat one. The second method is the bottom boundary-fitted ellipsoidal particle method (BFE-SPH), which combines the BF-SPH with the ellipsoidal particle model proposed by Shibata et al. The BFE-SPH can speed up the particle simulation by choosing a reasonable aspect ratio of ellipsoidal particles. The last method is the $σ$-SPH method, which automatically selects the aspect ratios of ellipsoidal particles concerning water depth using the $σ$-coordinate system. The $σ$-coordinate is often employed in numerical simulations of oceanographic fields, such as in the Princeton Ocean Model. However, this is the first attempt to apply the $σ$-coordinate to a particle method. Vertical resolution is required from offshore to the coastal region in oceanographic problems such as tsunamis, especially when conducting detailed analysis using a 3-D particle method. Using the $σ$-coordinate allows for a stepwise transition to a naturally efficient coordinate system by referencing water depth. In this paper, we have shown that the above three methods can be generalized as Vertical Coordinate Transformations (VCTs), and the VCTs are successfully achieved by employing SPH(2) with the second-order accuracy of the second-order derivatives, including cross derivatives.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

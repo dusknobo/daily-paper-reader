@@ -41,7 +41,7 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-04</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-05</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
     <strong class="dpr-home-dashboard-count">共 1 篇</strong>
@@ -51,7 +51,7 @@
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-04 22:01:54 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-05 21:34:51 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日速读一篇数值算法论文，探索如何用高精度格式稳定模拟从两相到N相的可压缩流动。</p>
-<p>最值得关注的是该有限体积WENO格式能严格维持相界面的物理有界性，避免数值振荡破坏多相流细节。</p>
-<p>若对气液界面、多介质相互作用感兴趣，可跟进这类相场方法在复杂工程模拟中的验证案例。</p>
+<p>今日探索了一种基于SPH(2)的通用垂向坐标变换法，用以加速自由表面流模拟。</p>
+<p>其核心思路是通过巧妙的坐标映射让粒子分布更合理，从而用更少的计算资源捕捉自由面与垂向分层细节。</p>
+<p>对水动力模拟感兴趣的读者，不妨查查原文的变换函数如何与现有SPH(2)框架解耦，日后或可融入自己的流场求解器。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -89,7 +89,7 @@
     <strong class="dpr-home-dashboard-count">1 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Consistent and bound-preserving finite-volume WENO scheme for compressible two-/$N$-phase flows with Phase-Field mechanism">Consistent and bound-preserving finite-volume WENO scheme for compressible two-/$N$-phase flows with Phase-Field mechanism</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="A generalized vertical coordinate transformation based on SPH(2) for efficient free surface flow simulations">A generalized vertical coordinate transformation based on SPH(2) for efficient free surface flow simulations</span></li></ul>
   </div>
   <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">falling-film <strong>1</strong></span></div>
 </section>
