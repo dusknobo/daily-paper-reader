@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-07",
+  "date": "2026-08-07",
+  "generated_at": "2026-08-07T01:59:59",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/07/2608.03030v1-statistical-analysis-of-droplet-size-distributions-in-liquid-jet-in-crossflow-atomization",
+      "section": "quick",
+      "title_en": "Statistical Analysis of Droplet Size Distributions in Liquid-Jet-in-Crossflow Atomization",
+      "authors": "Tom Johny, Bharat Bhatia, Zafar Alam, Ashoke De",
+      "date": "2026-08-04",
+      "pdf": "https://arxiv.org/pdf/2608.03030v1",
+      "score": "6.0",
+      "evidence": "VOF-LPT耦合框架模拟两相雾化，适用于带自由面的多相流CFD",
+      "tldr": "在液柱横流雾化中，液滴尺寸分布直接影响燃烧与混合效率。本研究采用验证的VOF-LPT耦合框架数值模拟，系统分析动量通量比、韦伯数及横流压力对尺寸特性的影响。结果表明更高动量比和韦伯数可产生更细且均匀的液滴，而提高横流压力虽使液滴细化却降低下游密度。研究揭示了气动力驱动雾化的机理，并为分布模型选择提供依据，有助于优化横流雾化设计与控制。",
+      "tags": "query:falling-film",
+      "abstract_en": "This study investigates the droplet size distribution (DSD) and atomization characteristics of a liquid jet injected into a crossflow (LJICF) under varied momentum flux ratios, Weber numbers, and flow conditions. Numerical simulations are performed using the validated compressible Volume of Fluid-Lagrangian Particle Tracking (VOF-LPT) coupled framework to capture both the primary and secondary atomization processes. Key parameters, including momentum flux ratio, Weber number, crossflow pressure, and velocity, were analyzed to assess their impact on droplet size characteristics, including Sauter mean diameter (SMD) and standard deviation (STD) in the downstream region. The discrete size distribution of droplets comprising probability density and cumulative distribution reveals a shift toward finer, more uniform droplets under enhanced breakup conditions. The findings emphasize the critical role of aerodynamic forces and instabilities in driving efficient atomization, with higher momentum flux ratios and Weber numbers leading to finer and more uniform droplets. Increased crossflow pressure promotes finer droplet formation but is found to reduce droplet density in the downstream domain due to a confined spray plume, delayed particle conversion, and reduced droplet residence time. The log-normal and Rosin-Rammler distributions effectively capture droplet size trends, with the former closely representing the skewness and tail behavior and the latter accurately representing intermediate and larger droplets. However, both have limitations in replicating sharp peaks and the smallest droplet sizes, respectively.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

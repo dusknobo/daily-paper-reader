@@ -41,7 +41,7 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-05</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-07</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
     <strong class="dpr-home-dashboard-count">共 1 篇</strong>
@@ -51,7 +51,7 @@
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-05 21:34:51 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-07 01:59:55 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日探索了一种基于SPH(2)的通用垂向坐标变换法，用以加速自由表面流模拟。</p>
-<p>其核心思路是通过巧妙的坐标映射让粒子分布更合理，从而用更少的计算资源捕捉自由面与垂向分层细节。</p>
-<p>对水动力模拟感兴趣的读者，不妨查查原文的变换函数如何与现有SPH(2)框架解耦，日后或可融入自己的流场求解器。</p>
+<p>今日速览一篇横流射流雾化论文，聚焦其液滴尺寸分布的统计特征。</p>
+<p>该研究发现某种分布模型能较好描述实验数据，为喷雾均匀性评估提供了量化依据。</p>
+<p>若想深入，可进一步挖掘不同工况下模型的适用边界与预测能力。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -89,7 +89,7 @@
     <strong class="dpr-home-dashboard-count">1 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="A generalized vertical coordinate transformation based on SPH(2) for efficient free surface flow simulations">A generalized vertical coordinate transformation based on SPH(2) for efficient free surface flow simulations</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Statistical Analysis of Droplet Size Distributions in Liquid-Jet-in-Crossflow Atomization">Statistical Analysis of Droplet Size Distributions in Liquid-Jet-in-Crossflow Atomization</span></li></ul>
   </div>
   <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">falling-film <strong>1</strong></span></div>
 </section>

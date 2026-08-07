@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-07T01:57:50.431879+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.03030v1",
+      "source": "arxiv",
+      "title": "Statistical Analysis of Droplet Size Distributions in Liquid-Jet-in-Crossflow Atomization",
+      "abstract": "This study investigates the droplet size distribution (DSD) and atomization characteristics of a liquid jet injected into a crossflow (LJICF) under varied momentum flux ratios, Weber numbers, and flow conditions. Numerical simulations are performed using the validated compressible Volume of Fluid-Lagrangian Particle Tracking (VOF-LPT) coupled framework to capture both the primary and secondary atomization processes. Key parameters, including momentum flux ratio, Weber number, crossflow pressure, and velocity, were analyzed to assess their impact on droplet size characteristics, including Sauter mean diameter (SMD) and standard deviation (STD) in the downstream region. The discrete size distribution of droplets comprising probability density and cumulative distribution reveals a shift toward finer, more uniform droplets under enhanced breakup conditions. The findings emphasize the critical role of aerodynamic forces and instabilities in driving efficient atomization, with higher momentum flux ratios and Weber numbers leading to finer and more uniform droplets. Increased crossflow pressure promotes finer droplet formation but is found to reduce droplet density in the downstream domain due to a confined spray plume, delayed particle conversion, and reduced droplet residence time. The log-normal and Rosin-Rammler distributions effectively capture droplet size trends, with the former closely representing the skewness and tail behavior and the latter accurately representing intermediate and larger droplets. However, both have limitations in replicating sharp peaks and the smallest droplet sizes, respectively.",
+      "authors": [
+        "Tom Johny",
+        "Bharat Bhatia",
+        "Zafar Alam",
+        "Ashoke De"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-04T02:20:31+00:00",
+      "link": "https://arxiv.org/pdf/2608.03030v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "VOF-LPT framework for two-phase atomization simulation, transferable CFD method for multiphase flow with free surface",
+      "llm_evidence_cn": "VOF-LPT耦合框架模拟两相雾化，适用于带自由面的多相流CFD",
+      "llm_evidence": "VOF-LPT耦合框架模拟两相雾化，适用于带自由面的多相流CFD",
+      "canonical_evidence": "VOF-LPT耦合框架模拟两相雾化，适用于带自由面的多相流CFD",
+      "llm_tldr_en": "Investigates droplet size distribution in liquid-jet-in-crossflow atomization using a compressible VOF-LPT framework, analyzing effects of momentum flux ratio and Weber number.",
+      "llm_tldr_cn": "采用可压缩VOF-LPT耦合框架对液体射流横向流雾化进行模拟，分析动量通量比、韦伯数和流动条件对液滴尺寸分布的影响，获得索特平均直径和分布标准差在下游的变化规律。",
+      "llm_tldr": "采用可压缩VOF-LPT耦合框架对液体射流横向流雾化进行模拟，分析动量通量比、韦伯数和流动条件对液滴尺寸分布的影响，获得索特平均直径和分布标准差在下游的变化规律。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
