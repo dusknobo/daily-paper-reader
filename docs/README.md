@@ -47,11 +47,11 @@
     <strong class="dpr-home-dashboard-count">共 1 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
-    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>2 次</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-07 01:59:55 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-07 20:40:26 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日速览一篇横流射流雾化论文，聚焦其液滴尺寸分布的统计特征。</p>
-<p>该研究发现某种分布模型能较好描述实验数据，为喷雾均匀性评估提供了量化依据。</p>
-<p>若想深入，可进一步挖掘不同工况下模型的适用边界与预测能力。</p>
+<p>今天速读了一篇关于横向气流中液体射流雾化的液滴尺寸统计分析论文，揭示了该复杂过程中液滴尺寸分布的统计规律。</p>
+<p>研究发现液滴尺寸分布可用特定概率模型拟合，且与气流韦伯数强相关，为喷雾均匀性评价提供了新指标。</p>
+<p>建议关注不同工况下分布模型的普适性验证，未来可结合数值模拟进一步探索机理。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
