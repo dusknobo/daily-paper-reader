@@ -41,17 +41,17 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-07</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-08</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
     <strong class="dpr-home-dashboard-count">共 1 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
-    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>2 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-07 20:40:26 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-08 20:46:36 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今天速读了一篇关于横向气流中液体射流雾化的液滴尺寸统计分析论文，揭示了该复杂过程中液滴尺寸分布的统计规律。</p>
-<p>研究发现液滴尺寸分布可用特定概率模型拟合，且与气流韦伯数强相关，为喷雾均匀性评价提供了新指标。</p>
-<p>建议关注不同工况下分布模型的普适性验证，未来可结合数值模拟进一步探索机理。</p>
+<p>今日速读了一篇关于纳维-斯托克斯自由边界问题的结构保持数值方法研究。</p>
+<p>该工作针对移动接触线与重力耦合场景，提出了融合ALE、BGN与MDR的保结构格式，以确保界面演化的物理忠实性。</p>
+<p>若对多物理场自由面模拟感兴趣，可进一步查阅其保结构策略在液滴动力学中的验证表现。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -89,7 +89,7 @@
     <strong class="dpr-home-dashboard-count">1 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Statistical Analysis of Droplet Size Distributions in Liquid-Jet-in-Crossflow Atomization">Statistical Analysis of Droplet Size Distributions in Liquid-Jet-in-Crossflow Atomization</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="A structure--preserving ALE--BGN--MDR method for Navier--Stokes free boundary problems with moving contact lines and gravity">A structure--preserving ALE--BGN--MDR method for Navier--Stokes free boundary problems with moving contact lines and gravity</span></li></ul>
   </div>
   <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">falling-film <strong>1</strong></span></div>
 </section>

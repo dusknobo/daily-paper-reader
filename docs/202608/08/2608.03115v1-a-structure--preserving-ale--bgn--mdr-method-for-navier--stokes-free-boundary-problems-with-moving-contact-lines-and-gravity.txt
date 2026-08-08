@@ -1,0 +1,3373 @@
+Title: A structure–preserving ALE–BGN–MDR method for Navier–Stokes free boundary problems with moving contact lines and gravity
+
+URL Source: https://arxiv.org/pdf/2608.03115v1
+
+Published Time: Wed, 05 Aug 2026 00:35:57 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+A STRUCTURE–PRESERVING ALE–BGN–MDR METHOD FOR NAVIER–STOKES FREE BOUNDARY PROBLEMS WITH MOVING CONTACT LINES AND GRAVITY 
+
+HARALD GARCKE ∗, JIASHUN HU † , AND NUO LEI ‡
+
+Abstract. We propose a gravity-consistent arbitrary Lagrangian–Eulerian finite element method for incompressible Navier–Stokes free-boundary problems with moving contact lines. A direct body-force discretization of gravity may fail to ensure consistency between the discrete gravitational work and the variation of the gravitational potential energy on the evolving domain, resulting in an artificial consistency error and persistent spurious velocities near equilibrium. To remove this inconsistency, we reformulate the gravitational potential energy variation as a moving-boundary integral over intermediate ALE configurations and evaluate it exactly using Simpson’s quadrature rule. This leads to a mildly nonlinear fully discrete scheme in which the gravitational contribution is exactly consistent with the discrete potential-energy variation. The proposed method preserves volume exactly, satisfies a discrete energy-dissipation law including gravitational potential energy, and under suitable assumptions, drives the discrete velocity to zero in the long-time regime, thereby excluding persistent gravity-induced spurious velocities. Together with the BGN treatment of the free surface and the MDR bulk mesh extension, the scheme maintains accurate interface tracking and good mesh quality near the moving contact line. Numerical experiments in two and three spatial dimensions confirm the theoretical properties. 
+
+Key words. Contact angle, arbitrary Lagrangian-Eulerian, finite element method, energy dissipa-tion, spurious velocity. 
+
+1. Introduction. Incompressible flows with free surfaces and moving contact lines arise in wetting, dewetting, and microfluidic applications. Numerical methods for such moving-interface problems are often divided into interface-capturing approaches and front-tracking or body-fitted approaches; the latter explicitly represent the interface by a lower-dimensional moving mesh and are therefore natural for accurate contact-line track-ing [1, 7, 16, 31, 32]. A central difficulty is that the evolution of the geometry, specifically the liquid–gas interface and the contact line, is coupled with the bulk viscous flow, sur-face tension, wall wettability, and contact-angle dynamics. A substantial literature has been devoted to moving contact line models. Fixed-contact-angle models prescribe the equilibrium Young angle, whereas dynamic contact-angle models incorporate contact-line physics through either microscopically motivated continuum boundary conditions, such as the generalized Navier slip condition [18, 24, 25], or effective sharp-interface laws, such as those proposed by Ren and E [26,27]. Recent numerical frameworks can accommodate a range of such contact-line laws, including the Ren–E, Cox, Onsager, and contact-angle-hysteresis models [29]. Moving contact lines are intrinsically a three-phase junction. Here we consider the standard one-phase free-boundary description, where the gas phase is not solved explicitly but enters through the boundary conditions. The liquid phase satisfies the incompress-ible Navier–Stokes equations on the moving domain Ω( t), whose boundary consists of the fluid–gas free surface Γ F(t) and the wetted fluid–solid boundary Γ s(t). Body-fitted ar-bitrary Lagrangian–Eulerian (ALE) methods provide a natural sharp-interface approach for such problems. Since the computational mesh moves with the fluid domain, the free surface and the contact line can be tracked explicitly and contact-angle conditions can 
+
+> ∗
+
+Corresponding author. Fakult¨ at f¨ ur Mathematik, Universit¨ at Regensburg, Regensburg, Germany (harald.garcke@ur.de ). 
+
+> †
+
+Department of Applied Mathematics, The Hong Kong Polytechnic University, Hong Kong (jiashun.hu@polyu.edu.hk ). 
+
+> ‡
+
+Department of Applied Mathematics, The Hong Kong Polytechnic University, Hong Kong (nuo97.lei@polyu.edu.hk ). Hua Loo-Keng Center for Mathematical Sciences, Academy of Mathematics and Systems Science, Chinese Academy of Sciences, Beijing, China. The work of this author is partially supported by the Hong Kong Scholar Program. 1arXiv:2608.03115v1 [math.NA] 4 Aug 2026 be imposed directly. For long-time simulations under gravity, however, accurate inter-face tracking alone is not sufficient. The fully discrete method must also preserve the energy-dissipation structure of the continuous system, particularly the rate-of-change law for gravitational potential energy. At the continuous level, gravity is conservative, with potential-energy density ρgz . Here, ρ is the mass density, g is the gravitational constant, and z is the vertical coordinate. In fact, the force f and the gravitational potential energy are defined as 
+
+f = −∇ (ρgz ) = −ρg ∇z, Epot (t) = 
+
+Z
+
+> Ω( t)
+
+ρgz dx. 
+
+The main difficulty is that Epot (t) is an integral in the evolving domain Ω( t). At the continuous level, the gravitational work is exactly coupled to the temporal variation of this moving-domain integral: 
+
+Epot (tm+1 ) − Epot (tm) = 
+
+Z
+
+> Ω( tm+1 )
+
+ρgz dx −
+
+Z
+
+> Ω( tm)
+
+ρgz dx = −
+
+Z tm+1 
+
+> tm
+
+Z
+
+> Ω( t)
+
+f · u dx dt, 
+
+where u is the fluid velocity. This rate-of-change identity follows from the transport theorem, but it is no longer automatically preserved at the fully discrete level. For the Navier–Stokes free-boundary problem with a contact line and gravity con-sidered in this work, the total energy also consists of the kinetic energy, the free-surface energy, the solid-wall energy, namely 
+
+Ekin (t) = ρ
+
+2
+
+Z
+
+> Ω( t)
+
+|u|2 dx, Efs (t) ∝ | ΓF(t)|, Ew(t) ∝ | Γs(t)|,
+
+where Γ F (t) is the free surface, Γ s(t) is the part of the solid substrate wetted by the fluid, and | · | denotes surface area; see Figure 1.1. Among these terms, the kinetic and gravita-tional potential energies are moving-domain volume integrals, whereas the free-surface and wall energies are integrals over moving boundaries. The rate-of-change law for the kinetic energy in an ALE formulation was studied in [14], where a first-order structure-preserving method was developed. Related structure-preserving discretizations for moving-domain integrals with linear integrands have been investigated for hyperbolic conservation laws and MMPDE-based moving meshes [11, 28]. For zeroth-order integrands, the preserva-tion of such a rate-of-change law is often manifested as volume conservation, e.g., for R 
+
+> Ω( t)
+
+1 d x, see [3]. For the surface energy, which is proportional to the surface area, the associated rate-of-change law was preserved in [7] by the well-known BGN formulation. This line of research is closely related to structure-preserving methods for curvature flows, such as surface diffusion, where preserving the area-decreasing and volume-conservation structures is also a primary objective. In this context, several approaches have been de-veloped, including the use of Lagrange multipliers in variational formulations [13, 15, 17] and the introduction of intermediate geometric quantities based on the homotopy idea of Jiang and Li [21]. These developments have led to mature methods that exactly pre-serve volume in three dimensions and area in two dimensions [3,16]. Overall, these works demonstrate that preserving the discrete rate-of-change laws of geometric quantities is essential for robust long-time simulations. However, in ALE free-boundary flows, the gravitational potential energy is more tightly coupled to the Navier–Stokes equations, making the preservation of its rate of change within the total energy dissipation law more subtle. The domain and boundary geometries are governed by the mesh velocity, whereas the corresponding energy contribu-tion must enter the energy estimate of the momentum equation. Thus the discretization has to handle the fact that the momentum test function is not the ALE mesh velocity, and it must pair the gravitational work with the moving-domain potential-energy variation at the fully discrete level. Moreover, the integral is more complicated than volume conserva-
+
+> 2
+
+tion because the integrand depends on the geometric position of the mesh. These features make the discrete balance between gravitational potential energy and gravitational work nontrivial in an ALE formulation. In many ALE discretizations for free-boundary flows, gravity is treated directly as a body force on the right-hand side of the momentum equation. Although this treatment is natural on fixed domains, it does not automatically produce the correct potential-energy variation on a moving domain. If the gravitational work is evaluated on the old domain Ωmh , while the potential-energy change is determined by the geometric deformation from Ωmh to Ω m+1  
+
+> h
+
+, the discrete energy law contains a residual induced by the geometric defect. Although the temporal error in the numerical solution is of the same order, the key issue is that this residual is not balanced in the discrete energy-dissipation law and therefore destroys the sign structure needed in the energy estimate. In near-equilibrium and long-time computations, the uncompensated residual may pollute the relaxation process and, in the pure-gravity setting analyzed below, the discrete energy estimate no longer implies the expected decay of the velocity. Related spurious-current phenomena are well documented for surface-tension balanced-force discretizations and two-phase flow computations [6, 12, 22, 23]; the mechanism considered here is the mismatch in the rate-of-change law for the gravitational potential energy. This paper develops a gravity-consistent body-fitted ALE discretization in which the discrete gravitational work exactly matches the variation of the gravitational potential energy, thereby preserving the energy-dissipation structure of the fully discrete system. The key step is to rewrite the gravitational work as a free-surface geometric flux com-patible with the ALE motion, thereby resolving the mismatch between the momentum test function and the ALE mesh velocity. After integration by parts, the bulk divergence term is absorbed into a generalized dynamic pressure, the solid-wall flux vanishes by im-permeability, and the remaining free-surface flux is linked to the normal mesh motion through the ALE kinematic condition. We then introduce a family of intermediate ge-ometries between two consecutive discrete free surfaces and represent the gravitational potential-energy variation over one time step as a time integral over these geometries. Since the mesh moves linearly within a time step, the product of the height function and the pulled-back normal vector is a polynomial of degree at most three in the intermediate time variable. With the help of Simpson’s rule, we can evaluate this integral exactly. The resulting gravitational term is paired with the discrete variation of ρg R 
+
+> Ωh(t)
+
+z dx, yielding a discrete energy-dissipation law that includes gravitational potential energy. On this ba-sis, we also prove a long-time relaxation property in the pure-gravity setting considered in this paper: as T → ∞ , the discrete velocity field decays to zero, excluding persistent spurious velocities caused by gravity-inconsistent discretization. At the level of the gravi-tational discretization, the treatment is not tied to a specific contact-angle condition. We also investigate the dynamic contact-angle models based on generalized Navier slip, and the Ren–E model. For the long-time computations reported in this paper, we use the existing BGN/MDR ALE mesh-update framework [19, 20] to maintain mesh stability. Let us summarize the main properties of the proposed scheme: 1. Gravity-consistent discretization: The gravitational contribution is discretized consistently with the variation of the gravitational potential energy, leading to a total energy-dissipation law including gravity. 2. Eliminating spurious velocities: The scheme drives the discrete velocity to zero in the long-time regime, excluding gravity-induced spurious velocities near equilibrium. 3. Exact volume conservation: The proposed ALE-FEM scheme preserves the volume exactly at the fully discrete level. 4. Good mesh quality: Combined with the BGN formulation and the MDR mesh 
+
+> 3
+
+extension, the method maintains stable meshes for long-time moving-contact-line simulations. The rest of the paper is organized as follows. Section 2 introduces the continuous model and the boundary conditions. Sections 3 and 4 present the fully discrete ALE-FEM schemes, and prove structure-preserving properties. Section 5 discusses the associated nonlinear system and the Newton solver for the system. Finally, Section 6 provides numerical validation, followed by concluding remarks in Section 7. 
+
+> Fig. 1.1
+
+: Geometrical configurations. 
+
+2. The mathematical model. We consider an incompressible Newtonian fluid droplet with constant density ρ, dynamic viscosity μ, and surface tension coefficient γ,occupying a time-dependent domain Ω( t) ⊂ Rd, d ∈ { 2, 3}. The boundary ∂Ω( t) consists of the free surface Γ F (t) and the solid substrate Γ s(t), which meet at the contact set Γc(t) := Γ F (t) ∩ Γs(t). We denote by nF and ns the unit outward normals to Γ F (t) and Γs(t), respectively, and by μF and μs the unit outward conormals to Γ F (t) and Γ s(t) at Γc(t), respectively. The contact angle θc is defined as the angle between μF and μs, as illustrated in Figure 1.1. After nondimensionalizing the system using a characteristic length L and velocity 
+
+U , the system can be simplified by using two dimensionless parameters: the Reynolds number and the Weber number, 
+
+Re = ρU L μ , We = ρU 2Lγ .
+
+Let u and p denote the dimensionless velocity and pressure, respectively. We consider the following incompressible Navier–Stokes equations in Ω( t)
+
+∂tu + u · ∇ u − ∇ · σ = −gez in Ω( t), (2.1a) 
+
+∇ · u = 0 in Ω( t), (2.1b) where g is the dimensionless gravitational acceleration, ez is the unit vector in the vertical direction, and the Cauchy stress tensor and the rate-of-strain tensor are defined by 
+
+σ(u, p ) = 2
+
+Re D(u) − p I, D(u) = 12
+
+ ∇u + ( ∇u)⊤,
+
+where p is the non-dimensional pressure. For convenience, we consider the x-z axis in 2D and the x-y-z axis in 3D, where z is always the vertical direction. On the free surface, the stress balance with surface tension gives the following. 
+
+σ n F = − 1
+
+We H nF on Γ F (t), (2.2) where H denotes the mean curvature of Γ F (t). On the solid substrate, we impose the impermeability condition and the Navier slip 
+
+> 4
+
+condition: 
+
+Ps (σn s + βsu) = 0, on Γ s(t) (2.3) 
+
+u · ns = 0 , on Γ s(t), (2.4) where Ps = I − ns ⊗ ns is the tangential projection operator on Γ s(t), and βs ≥ 0 is the dimensionless slip coefficient. At the contact set Γ c(t), the dynamic contact angle θc is prescribed by the Ren–E model [26, 27]: 
+
+μF · μs = cos θc on Γ c(t), (2.5) 
+
+βc Uc = 1
+
+We 
+
+ cos θY − cos θc
+
+ on Γ c(t), (2.6) where θY is Young’s equilibrium contact angle, Uc := Psu · μs = u · μs is the contact-line speed (the component of the slip velocity normal to Γ c within Γ s), and βc ≥ 0 is the dimensionless contact-line friction coefficient. Here μs lies in the tangent plane of the solid boundary, so that ns · μs = 0. At the moving contact line, the dynamic contact angle satisfies 
+
+μF = cos θc μs + sin θc ns on Γ c(t).
+
+The total energy consists of the kinetic energy of the fluid, the surface energy of the free boundary, the wall–adhesion energy on the solid substrate, and the gravitational potential energy: 
+
+E(t) := 12
+
+Z
+
+> Ω( t)
+
+|u|2 dx
+
+| {z }
+
+> Ekin
+
++ 1
+
+We |ΓF (t)|
+
+| {z }
+
+> Efs
+
+− cos θY
+
+We |Γs(t)|
+
+| {z }
+
+> Ew
+
++g
+
+Z
+
+> Ω( t)
+
+z dx
+
+| {z }
+
+> Epot
+
+. (2.7) The following dissipation property holds for the continuous model. 
+
+Lemma 2.1. The total energy E(t) defined in (2.7) satisfies 
+
+ddt E(t) = − 2
+
+Re 
+
+Z
+
+> Ω( t)
+
+|D(u)|2 dx −
+
+Z
+
+> Γs(t)
+
+βs|Psu|2ds −
+
+Z
+
+> Γc(t)
+
+βc|u · μs|2ds ≤ 0. (2.8) 
+
+Remark 2.1. The total energy is strictly positive when the reference height is chosen such that z = 0 on the solid boundary Γ s(t). With this choice, the gravitational potential energy is non-negative, and the kinetic energy is also non-negative. Since Γ F (t) is a curved free interface, while Γ s(t) is its projected contact region on the flat substrate, we have |ΓF (t)| > |Γs(t)|. Therefore, 1
+
+We (|ΓF (t)| − cos θY |Γs(t)|) > 0,
+
+with We > 0. Thus the surface energy is strictly positive, and consequently the total energy satisfies E(t) > 0. 
+
+2.1. ALE weak formulation. Testing (2.1a) with v, testing (2.1b) with q, testing (2.4) with λs and using the Navier slip condition (2.3) together with (2.2), we obtain (∂tu + ( u · ∇ )u, v) + 2
+
+Re (D(u), D (v)) − (p, ∇ · v) + ( ∇ · u, q ) + βs⟨Psu, Psv⟩Γs(t)
+
+− ⟨ κsns, v⟩Γs(t) + ⟨λsns, u⟩Γs(t) + 1
+
+We ⟨HnF , v⟩ΓF (t) = −g(ez , v), (2.9a) where κs is the Lagrange multiplier associated with the impermeability constraint u·ns =0 on Γ s(t), and λs denotes the corresponding test function. For simplicity, in the above 
+
+> 5
+
+formulation, we use the notation (u, v) := 
+
+Z
+
+> Ω( t)
+
+u · v dx, ⟨u, v⟩Γ( t) := 
+
+Z
+
+> Γ( t)
+
+u · v ds. 
+
+For the mean curvature H on Γ F (t), the geometric identity −∆Γid = HnF and integration by parts on Γ F (t) give, for any admissible test function η,
+
+−⟨ HnF , η⟩ΓF (t) = −⟨∇ Γid , ∇Γη⟩ΓF (t) + ⟨μF , η⟩Γc(t)
+
+= −⟨∇ Γid , ∇Γη⟩ΓF (t) + ⟨cos θc μs + sin θc ns, η⟩Γc(t)
+
+= −⟨∇ Γid , ∇Γη⟩ΓF (t) + ⟨cos θY μs + sin θc ns − We β c(u · μs)μs, η⟩Γc(t). (2.10) Here we have used the relaxed contact-angle condition in (2.6). We now rewrite the continuous model in an ALE framework. Let Φ( t) : Ω(0) → Ω( t)be the ALE map and let w = ∂tΦ ◦ Φ−1 be the associated mesh velocity. The ALE mesh velocity is introduced to track the evolution of the moving fluid domain. In particular, the normal velocity of the mesh must coincide with the normal velocity of the fluid on the free surface: 
+
+w · nF = u · nF on Γ F (t),
+
+while its tangential component may be chosen to improve the mesh quality. On the solid substrate, the mesh is required to remain attached to the solid boundary. Together with the impermeability condition for the fluid, this gives 
+
+w · ns = u · ns = 0 on Γ s(t).
+
+Consequently, at the contact set Γ c(t), the fluid and mesh velocities have the same com-ponent in the conormal direction μs:(Psu) · μs = ( Psw) · μs = w · μs = u · μs.
+
+The ALE material derivative is defined by 
+
+∂• 
+
+> t
+
+u := ∂tu + w · ∇ u.
+
+We introduce the skew-symmetric trilinear form 
+
+b(z; u, v) := 12 (z · ∇ u, v) − 12 (z · ∇ v, u).
+
+Since ( u − w) · n = 0 on Γ( t) and ∇ · u = 0, integration by parts yields 
+
+ (( u − w) · ∇ )u, v = b(u − w; u, v) + 12 (u, v ∇ · w).
+
+Consequently, the first term in (2.9a) can be rewritten as 
+
+ ∂tu + ( u · ∇ )u, v = ( ∂• 
+
+> t
+
+u, v) + 12 (u, v ∇ · w) + b(u − w; u, v).
+
+3. Fully Discrete ALE–FEM Schemes. In this section, we present the fully discrete ALE–FEM scheme. The main idea is to decompose the construction of the mesh velocity into two parts. We first determine the fluid variables u, p, together with the mesh velocity on the free boundary Γ F using the BGN method. It is then extended to the bulk mesh by the MDR method. The rest of this section is organized as follows. In Subsection 3.1, we introduce the finite element spaces and the basic fully discrete notation. In Subsection 3.2, we present the direct ALE–FEM discretization. The proposed decoupled schemes in two and three dimensions are then given in Subsections 3.3 and 3.4, respectively. Finally, Subsection 3.5 describes the MDR extension used to propagate the boundary mesh velocity into the interior of the computational domain. 
+
+> 6
+
+3.1. Discrete Setting and Finite Element Spaces. Let Ω 0 
+
+> h
+
+be the initial com-putational domain, equipped with a shape-regular and quasi-uniform triangulation K0 
+
+> h
+
+of mesh size h. Its boundary is decomposed into the discrete free boundary and the discrete solid boundary, Γ0 
+
+> h
+
+= Γ 0 
+
+> F,h
+
+∪ Γ0
+
+> s,h
+
+, Γ0 
+
+> c,h
+
+= Γ 0 
+
+> F,h
+
+∩ Γ0
+
+> s,h
+
+,
+
+where Γ 0 
+
+> c,h
+
+denotes the discrete contact line. Let tm = mτ , m = 0 , 1, . . . , M , be a uniform partition of the time interval. At time 
+
+tm, the discrete domain is denoted by Ω mh , with boundary decomposition Γmh = Γ mF,h ∪ Γms,h , Γmc,h = Γ mF,h ∩ Γms,h .
+
+The mesh is updated by the discrete ALE flow map 
+
+ψm+1  
+
+> h
+
+:= id + τ wm+1  
+
+> h
+
+, Ωm+1  
+
+> h
+
+= ψm+1  
+
+> h
+
+(Ω mh ).
+
+For convenience, we set Ω −1 
+
+> h
+
+= Ω 0 
+
+> h
+
+and ψ0 
+
+> h
+
+= id. The initial velocity is given as u0 
+
+> h
+
+= Ihu0
+
+on Ω 0
+
+> h
+
+, where Ih denotes the interpolation operator. In addition, we set w0 
+
+> h
+
+= 0.We denote by Xmh the position vector of the discrete domain at time tm. Hence the vertical coordinate at the new time level is 
+
+zm+1  
+
+> h
+
+= Xm+1  
+
+> h
+
+· ez = ( Xmh + τ wm+1  
+
+> h
+
+) · ez .
+
+Let Kmh be the simplicial triangulation of Ω mh . We assume that Kmh remains shape-regular and quasi-uniform for all time steps. For the bulk velocity and pressure, we use the Taylor–Hood P2-P1 finite element pair ( Umh , Qmh ) and Wmh is the linear finite element space 
+
+Umh := vh ∈ H1(Ω mh )d : vh|K ∈ P2(K)d ∀K ∈ K mh ,
+
+˚Umh := vh ∈ H10 (Ω mh )d : vh|K ∈ P2(K)d ∀K ∈ K mh ,
+
+Qmh := qh ∈ H1(Ω mh ) : qh|K ∈ P1(K) ∀K ∈ K mh ,
+
+Wmh := wh ∈ H1(Ω mh )d : wh|K ∈ P 1(K) ∀K ∈ K mh .
+
+As established in [9], these spaces satisfy the inf-sup condition: there exists a constant 
+
+β > 0, independent of h, such that for all qh ∈ Q mh ,
+
+β∥qh − ¯qh∥L2(Ω mh ) ≤ sup  
+
+> vh∈˚Umh\{ 0}
+
+(∇ · vh, q h)Ωmh
+
+∥vh∥H1(Ω mh )
+
+,
+
+where ¯ qh := 1 
+
+> |Ωmh|
+
+R
+
+> Ωmh
+
+qh dx. In fact, all other inf-sup stable pairs can be used; see [8]. On a discrete boundary, we denote the scalar-valued and vector-valued continuous piecewise linear spaces by Sh(·) and Sh(·)d, respectively. The corresponding piecewise quadratic spaces are denoted by Sh, 2(·) and Sh, 2(·)d.We use the standard mass-lumped inner product defined in Definition 43 of [8], de-noted by ⟨· , ·⟩ h
+
+> Γmh
+
+. To impose the normal constraint on the solid boundary, we introduce the weighted nodal pairing 
+
+⟨λsns, uh⟩s,h 
+
+> Γms,h
+
+:= X
+
+> σ∈T h(Γ ms,h )
+
+|σ|
+
+N2
+
+X 
+
+> P∈N 2(σ)
+
+λs(P )ns(P ) · uh(P ), (3.1) where N2(σ) is the collection of all vertices and edge midpoints corresponding to the degrees of freedom for quadratic elements, and N2 = dim P2(σ) =  d+2 
+
+> d
+
+.
+
+3.2. Two-dimensional direct ALE–FEM scheme. In this subsection, we first present a two-dimensional direct ALE–FEM scheme. In this reference scheme, the gravi-tational force is treated in the standard way as a body-force term on the right-hand side 
+
+> 7
+
+of the momentum equation. Although this treatment is natural and leads to a direct extension of the ALE–BGN–MDR method without gravity, it does not, in general, match the discrete gravitational work with the variation of the gravitational potential energy on the moving domain. After introducing the scheme, we therefore analyze the resulting inconsistent error in the discrete energy balance. For the time discretization of (2.1a), the ALE time-derivative term and the geometric-divergence term are treated together to preserve the energy-dissipation structure. Let ev
+
+denote the ALE transport of v, satisfying 
+
+∂• 
+
+> t
+
+ev = 0 , ev(·, t m) = v.
+
+Then, by the transport theorem, (∂• 
+
+> t
+
+u, v)Ωmh
+
++ 12 (u, v ∇ · w)Ωmh
+
+= 12 (∂• 
+
+> t
+
+u, v)Ωmh
+
++ 12ddt t=tm
+
+(u, ˜v)Ω( t)
+
+≈ 12τ
+
+ um+1  
+
+> h
+
+◦ ψmh − umh , vh ◦ ψmh
+
+
+
+> Ωm−1
+> h
+
++ 12τ
+
+h um+1  
+
+> h
+
+, vh
+
+
+
+> Ωmh
+
+− (umh , vh ◦ ψmh )Ωm−1
+
+> h
+
+i
+
+.
+
+This is the temporal discretization used in the fully discrete ALE–FEM schemes below. Based on the continuous formulation (2.9a) and (2.10), we replace the continuous variables and test spaces by their finite element counterparts on the discrete domain Ω mh ,and use the temporal discretization introduced above. This leads to the following fully discrete ALE–FEM scheme. Given umh , wmh and domain Ω mh , we seek ( um+1  
+
+> h
+
+, p m+1  
+
+> h
+
+, κ m+1  
+
+> s,h
+
+, H m+1  
+
+> h
+
+, ewm+1  
+
+> h
+
+, φ m+1  
+
+> c,h
+
+)such that 12τ (um+1  
+
+> h
+
+, v)Ωmh + 12τ (um+1  
+
+> h
+
+◦ ψmh , v ◦ ψmh )Ωm−1
+
+> h
+
++ b umh − wmh ; um+1  
+
+> h
+
+◦ ψmh , v ◦ ψmh
+
+
+
+> Ωm−1
+> h
+
++ ( 2
+
+Re D(um+1  
+
+> h
+
+), D (v)) Ωmh − (pm+1  
+
+> h
+
+, ∇ · v)Ωmh + ( q, ∇ · um+1  
+
+> h
+
+)Ωmh + 1
+
+We ⟨Hm+1  
+
+> h
+
+nmF,h , v⟩ΓmF,h 
+
+− ⟨ κm+1  
+
+> s,h
+
+ns, v⟩s,h 
+
+> Γms,h
+
++ ⟨λsns, um+1  
+
+> h
+
+⟩s,h 
+
+> Γms,h
+
++ βs⟨Psum+1  
+
+> h
+
+, Psv⟩Γms,h + ⟨ ewm+1  
+
+> h
+
+· ns, ϕ c⟩h
+
+> Γmc,h
+
+= 1
+
+τ (umh , v ◦ ψmh )Ωm−1
+
+> h
+
+− g(ez , v)Ωmh , (3.2a) 
+
+− ⟨ Hm+1  
+
+> h
+
+nmF,h , η⟩h 
+
+> ΓmF,h
+
+= −⟨∇ Γ(id + τ ewm+1  
+
+> h
+
+), ∇Γη⟩ΓmF,h + ⟨φm+1  
+
+> c,h
+
+ns, η⟩h
+
+> Γmc,h
+
++
+
+Z
+
+> Γmc,h
+
+cos θY μs − We β c( ewm+1  
+
+> h
+
+· μs)μs + sin θmc,h ns
+
+ · η ds, (3.2b) 
+
+⟨ ewm+1  
+
+> h
+
+· nmF,h , ϕ F ⟩h 
+
+> ΓmF,h
+
+= ⟨um+1  
+
+> h
+
+· nmF,h , ϕ F ⟩ΓmF,h , (3.2c) for all ( v, q, λ s, ϕ F , η, ϕ c) ∈ U mh × Q mh × Sh, 2(Γ ms,h ) × Sh(Γ mF,h ) × Sh(Γ mF,h )d × Sh(Γ mc,h ), where θmc,h in (3.2b) is defined by 
+
+θmc,h = arccos  Π[−1,1] (cmc,h ) , Π[−1,1] (r) := min {1, max {− 1, r }} , (3.3) with cmc,h := Ih, 0 (cos θY − We β c ewmh · μs), where Ih, 0 denotes the elementwise midpoint interpolation operator onto the space of piecewise constant functions on Γ mc,h . For the two-dimensional case, the conormals μs at the contact points Γ c are constants, such as 
+
+μs = ( −1, 0) ⊤ for the left contact point and μs = (1 , 0) ⊤ for the right contact point, see the left subfigure of Figure 1.1. In order to analyze the gravitational contribution in the scheme (3.2), we introduce the intermediate ALE configurations between Ω mh and Ω m+1  
+
+> h
+
+, which will be used to represent the moving-domain contributions. For ϑ ∈ [0 , 1], define the intermediate ALE flow map, 
+
+ψmh (ϑ) := id + τ ϑ wm+1  
+
+> h
+
+.
+
+> 8
+
+The corresponding intermediate domain and boundary are Ωmh (ϑ) := ψmh (ϑ)(Ω mh ), Γmh (ϑ) := ψmh (ϑ)(Γ mh ).
+
+Restricting ψmh (ϑ) to the free boundary Γ mF,h gives the parametrization of Γ mF,h (ϑ): 
+
+XmF,h (ϑ) := id ΓmF,h + τ ϑ ewm+1  
+
+> h
+
+, ϑ ∈ [0 , 1] , (3.4) where ewm+1  
+
+> h
+
+= wm+1  
+
+> h
+
+|ΓmF,h is the mesh velocity on the discrete free boundary. Further, the height of the intermediate discrete free boundary Γ mF,h (ϑ) is denoted as 
+
+zmh (ϑ) := XmF,h (ϑ) · ez . (3.5) We emphasize that zmh (ϑ) is defined on Γ mF,h , and satisfies 
+
+zmh (ϑ) = z ◦ XmF,h (ϑ). (3.6) In two dimensions, let s denote the arc-length parameter on Γ mF,h . The pulled-back tangent vector on the intermediate free boundary is ˆtF,h (ϑ) = ∂sXmF,h (ϑ) = tmF,h + ϑτ ∂ s ewm+1  
+
+> h
+
+, (3.7) where tmF,h is the tangent vector on Γ mF,h such that ( tmF,h )⊥ = nmF,h . By rotating this tangent vector by 90 ◦, we define the pulled-back unnormalized outward normal vector ˆnF,h (ϑ) :=  ˆtF,h (ϑ)⊥ = nmF,h + ϑτ  ∂s ewm+1 
+
+> h
+
+⊥. (3.8) Here the rotation is chosen so that ˆ nF,h (0) = nmF,h and ˆ nF,h (ϑ) is linear in ϑ.With these intermediate configurations at hand, we first recall the continuous balance between the gravitational work and the variation of the gravitational potential energy, and then show that this balance is not exactly preserved by the direct discretization. ddt Epot (t) = g ddt
+
+Z
+
+> Ω( t)
+
+z dx = g
+
+Z
+
+> ∂Ω( t)
+
+z u · n ds
+
+= g
+
+Z
+
+> Ω( t)
+
+∇ · (zu) d x = g
+
+Z
+
+> Ω( t)
+
+u · ∇ z dx = g
+
+Z
+
+> Ω( t)
+
+u · ez dx. (3.9) Here, we have used u · ns = 0 on Γ s(t), and the incompressibility condition ∇ · u = 0. Thus, we have 
+
+Epot (tm+1 ) − Epot (tm) = 
+
+Z tm+1 
+
+> tm
+
+g
+
+Z
+
+> Ω( t)
+
+u · ez dxdt. 
+
+However, the analogous property cannot be preserved by the direct ALE–FEM scheme (3.2) at the discrete level. In other words, we can show 
+
+Em+1 pot − Em
+
+> pot
+
+̸ = τ g 
+
+Z
+
+> Ωmh
+
+um+1  
+
+> h
+
+· ez dx, (3.10) where the right hand side is the gravitational contribution obtained by testing vh = um+1 
+
+> h
+
+in (3.2a) and the discrete gravitational potential energy is defined by 
+
+Em 
+
+> pot
+
+:= g
+
+Z
+
+> Ωmh
+
+z dx. 
+
+The exact discrete potential-energy variation induced by the ALE update is 
+
+Em+1 pot − Em 
+
+> pot
+
+= g
+
+Z
+
+> Ωm+1
+> h
+
+z dx − g
+
+Z
+
+> Ωmh
+
+z dx = g
+
+Z 10
+
+ddϑ 
+
+Z 
+
+> Ωmh(ϑ)
+
+z dx dϑ 
+
+= τ g 
+
+Z 10
+
+Z
+
+> ΓmF,h (ϑ)
+
+z( ewm+1  
+
+> h
+
+) ◦ (XmF,h (ϑ)) −1 · nmF,h (ϑ) ds(ϑ) dϑ 
+
+> 9
+
+= τ g 
+
+Z
+
+> ΓmF,h
+
+h Z 10
+
+zmh (ϑ) ˆ nF,h (ϑ)dϑ 
+
+i
+
+· ewm+1  
+
+> h
+
+ds, (3.11) where the last equality follows from zmh (ϑ) = z ◦ XmF,h (ϑ) in (3.6) and the change of variables below. In general, for any scalar function f defined on Γ mF,h (ϑ), we have 
+
+Z
+
+> ΓmF,h (ϑ)
+
+f nmF,h (ϑ)d s(ϑ) = 
+
+Z
+
+> ΓmF,h
+
+[f ◦ XmF,h (ϑ)] ˆnF,h (ϑ)
+
+|ˆtF,h (ϑ)| |∂sXmF,h (ϑ)|ds
+
+=
+
+Z
+
+> ΓmF,h
+
+[f ◦ XmF,h (ϑ)] ˆ nF,h (ϑ)d s. 
+
+By contrast, the gravitational work entering the direct body-force scheme (3.2) is 
+
+τ g 
+
+Z
+
+> Ωmh
+
+um+1  
+
+> h
+
+· ez dx = τ g 
+
+Z
+
+> Ωmh
+
+∇z · um+1  
+
+> h
+
+dx
+
+= τ g 
+
+Z
+
+> ΓmF,h
+
+z(um+1  
+
+> h
+
+· nmF,h ) d s + τ g 
+
+Z
+
+> Γms,h
+
+z(um+1  
+
+> h
+
+· ns) d s − τ g 
+
+Z
+
+> Ωmh
+
+z∇ · um+1  
+
+> h
+
+dx
+
+= τ g ⟨ ewm+1  
+
+> h
+
+· nmF,h , z ⟩h 
+
+> ΓmF,h
+
+= τ g 
+
+Z
+
+> ΓmF,h
+
+z( ewm+1  
+
+> h
+
+· nmF,h ) d s + O(τ h 2), (3.12) where we have used (3.2a) and (3.2c) in the last two equalities. Comparing (3.11) and (3.12), we observe that there is an inconsistency in discrete energy dissipation 
+
+Rm+1  
+
+> g
+
+: = Em+1 pot − Em 
+
+> pot
+
+− τ g 
+
+Z
+
+> Ωmh
+
+um+1  
+
+> h
+
+· ez dx
+
+= τ g 
+
+Z
+
+> ΓmF,h
+
+ewm+1  
+
+> h
+
+·
+
+Z 10
+
+zh(ϑ) ˆ nF,h (ϑ) d ϑ − znmF,h 
+
+
+
+ds + O(τ h 2)
+
+≈ O (τ 2 + τ h 2). (3.13) Although the local consistency residual Rm+1  
+
+> g
+
+= O(τ 2 + τ h 2) is small for sufficiently small τ and h, it has no definite sign and does not represent any physical dissipation. Consequently, the direct treatment of gravity does not yield a closed discrete energy-dissipation law for the total energy including Em
+
+> pot
+
+. In long-time simulations, especially near equilibrium where the true energy variation is already very small, the accumulated effect of Rm+1  
+
+> g
+
+may become comparable to the physical dissipation. As a result, the scheme may produce artificial spurious velocities near equilibrium. To overcome this issue, we propose a gravitationally consistent scheme in the next section, which preserves the correct discrete energy structure over long times. 
+
+3.3. Two-dimensional gravitationally consistent scheme. Our main idea is to find a better discretization of the work of gravitational force −g(ez , v)Ω( t) in (2.9a) than −g(ez , v)Ωmh in (3.2a) so that the discrete gravitational work is consistent with the change of gravitational potential energy. We begin with the following reformulation of the continuous problem. By integration by parts, we obtain 
+
+g(ez , v)Ω( t) = g
+
+Z
+
+> Ω( t)
+
+∇z · v dx
+
+= g
+
+Z 
+
+> ΓF(t)
+
+zv · nF ds + g
+
+Z
+
+> Γs(t)
+
+zv · ns ds − g
+
+Z
+
+> Ω( t)
+
+z∇ · v dx. (3.14) This inspires us to rewrite (2.9a) as (∂tu + ( u · ∇ )u, v) + 2
+
+Re (D(u), D (v)) − (˜ p, ∇ · v) + ( q, ∇ · u)
+
+> 10
+
+− ⟨ ˜κsns, v⟩Γs(t) + ⟨λsns, u⟩Γs(t) + βs⟨Psu, Psv⟩Γs(t) + ⟨ ˜HnF , v⟩ΓF (t) = 0 , (3.15) where ˜ p is the generalized dynamic pressure that absorbs the hydrostatic contribution: ˜p = p + gz, ˜κs = κ − gz, ˜H = H/We + gz. (3.16) Further, (2.10) leads to 
+
+−⟨ ˜HnF , η⟩ΓF (t) = −⟨ gz nF , η⟩ΓF (t) − 1
+
+We ⟨∇ Γid , ∇Γη⟩ΓF (t) (3.17a) + 1
+
+We ⟨cos θY μs + sin θc ns − We β c(u · μs)μs, η⟩Γc(t). (3.17b) The next idea is to seek an appropriate approximation of ⟨gz nF , η⟩ΓF (t) in (3.17a), namely, approximating znF by some G such that when testing η as the ALE velocity, we recover the difference of potential energy at the discrete level: 
+
+τ ⟨gG, ewm+1  
+
+> h
+
+⟩ΓmF,h = Em+1 pot − Em
+
+> pot
+
+. (3.18) To achieve this, we are inspired by (3.11) to take 
+
+G =
+
+Z 10
+
+zmh (ϑ) ˆ nF,h (ϑ)dϑ. (3.19) Note that zmh (ϑ) and ˆ nF,h (ϑ) are both linear functions of ϑ in two dimensions. Therefore, we can evaluate the exact time integral analytically by applying Simpson’s quadrature rule: 
+
+G = 16 zmh ˆnmF,h + 23 zm+1 /2 
+
+> h
+
+ˆnm+1 /2 
+
+> F,h
+
++ 16 zm+1  
+
+> h
+
+ˆnm+1  
+
+> F,h
+
+, (3.20) with notations 
+
+zm+1 /2 
+
+> h
+
+= zmh + τ
+
+2 ewm+1  
+
+> h
+
+· ez , (3.21) ˆnmF,h = ˆ nF,h (0) = nmF,h , (3.22) ˆnm+1 /2 
+
+> F,h
+
+= ˆ nF,h ( 12 ) = nmF,h + τ
+
+2 (∂s ewm+1  
+
+> h
+
+)⊥, (3.23) ˆnm+1  
+
+> F,h
+
+= ˆ nF,h (1) = nmF,h + τ (∂s ewm+1  
+
+> h
+
+)⊥. (3.24) According to (3.21)–(3.24), G is a nonlinear function of ˜wm+1  
+
+> h
+
+. Note that (3.22)–(3.24) only hold for the two-dimensional case. After substituting them into (3.20), we denote the resulting G by G2d . Therefore, we obtain the following structure-preserving BGN-type scheme: Given umh , wmh and domain Ω mh , we seek: (um+1  
+
+> h
+
+, ˜pm+1  
+
+> h
+
+, κ m+1  
+
+> s,h
+
+, ˜Hm+1  
+
+> h
+
+, ewm+1  
+
+> h
+
+, φ m+1  
+
+> c,h
+
+)in Umh × Q mh × Sh, 2(Γ ms,h ) × Sh(Γ mF,h ) × Sh(Γ mF,h )d × Sh(Γ mc,h ) satisfying 12τ (um+1  
+
+> h
+
+, v)Ωmh + 12τ (um+1  
+
+> h
+
+◦ ψmh , v ◦ ψmh )Ωm−1
+
+> h
+
++ b  umh − wmh ; um+1  
+
+> h
+
+◦ ψmh , v ◦ ψmh
+
+
+
+> Ωm−1
+> h
+
++ ( 2
+
+Re D(um+1  
+
+> h
+
+), D (v)) Ωmh − (˜ pm+1  
+
+> h
+
+, ∇ · v)Ωmh + ( q, ∇ · um+1  
+
+> h
+
+)Ωmh + ⟨ ˜Hm+1  
+
+> h
+
+nmF,h , v⟩ΓmF,h 
+
+− ⟨ κm+1  
+
+> s,h
+
+ns, v⟩s,h 
+
+> Γms,h
+
++ ⟨λsns, um+1  
+
+> h
+
+⟩s,h 
+
+> Γms,h
+
++ βs⟨Psum+1  
+
+> h
+
+, Psv⟩Γms,h + ⟨ ewm+1  
+
+> h
+
+· ns, ϕ c⟩h
+
+> Γmc,h
+
+= 1
+
+τ (umh , v ◦ ψmh )Ωm−1
+
+> h
+
+, (3.25a) 
+
+− ⟨ ˜Hm+1  
+
+> h
+
+ˆnm+1 /2 
+
+> F,h
+
+, η⟩h 
+
+> ΓmF,h
+
+= − 1
+
+We ⟨∇ Γ(id + τ ewm+1  
+
+> h
+
+), ∇Γη⟩ΓmF,h + 1
+
+We ⟨φm+1  
+
+> c,h
+
+ns, η⟩h
+
+> Γmc,h
+
++ 1
+
+We 
+
+Z
+
+> Γmc,h
+
+cos θY μs − We β c( ewm+1  
+
+> h
+
+· μs)μs + sin θmc,h ns
+
+ · η ds
+
+11 − g⟨G 2d ( ewm+1  
+
+> h
+
+), η⟩ΓmF,h , (3.25b) 
+
+⟨ ewm+1  
+
+> h
+
+· ˆnm+1 /2 
+
+> F,h
+
+, ϕ F ⟩h 
+
+> ΓmF,h
+
+= ⟨um+1  
+
+> h
+
+· nmF,h , ϕ F ⟩ΓmF,h , (3.25c) for all ( v, q, λ s, ϕ F , η, ϕ c) ∈ U mh × Q mh × Sh, 2(Γ ms,h ) × Sh(Γ mF,h ) × Sh(Γ mF,h )d × Sh(Γ mc,h ). In the above scheme, inspired by the structure-preserving parametric FEM [3, 21], we introduce ˆ nm+1 /2 
+
+> F,h
+
+defined in (3.23) as the equivalent intermediate normal vector. 
+
+3.4. Three-dimensional gravitationally consistent scheme. The reformula-tion (3.15)–(3.17) remains valid in three dimensions. The main difference from the two-dimensional case lies in the construction of the geometric quantity G. For the three-dimensional case, the free boundary Γ mF,h is a surface. Let s1 and s2 denote two local surface parameters on Γ mF,h . The pulled-back tangential vectors on the intermediate sur-face are given by ˆtF, 1(ϑ) := ∂s1 XmF,h (ϑ) = tmF, 1+ϑτ ∂ s1 ewm+1  
+
+> h
+
+, ˆtF, 2(ϑ) := ∂s2 XmF,h (ϑ) = tmF, 2+ϑτ ∂ s2 ewm+1  
+
+> h
+
+.
+
+Taking an appropriate ordering of the tangential vectors, we define the pulled-back un-normalized outward surface vector by ˆnF,h (ϑ) := ˆ tF, 1(ϑ) × ˆtF, 2(ϑ).
+
+The gravitational potential-energy difference can then be written as 
+
+Em+1 pot − Em 
+
+> pot
+
+= τ g 
+
+Z
+
+> ΓmF,h
+
+ewm+1  
+
+> h
+
+·
+
+Z 10
+
+zmh (ϑ)bnF,h (ϑ) d ϑ
+
+
+
+ds. (3.26) Motivated by the two-dimensional construction in (3.19), we define 
+
+G3d   ewm+1 
+
+> h
+
+ := 
+
+Z 10
+
+zmh (ϑ)bnF,h (ϑ) d ϑ. (3.27) Consequently, 
+
+τ g G3d   ewm+1 
+
+> h
+
+, ewm+1  
+
+> hΓmF,h
+
+= Em+1 pot − Em
+
+> pot
+
+. (3.28) Since bnF,h (ϑ) is quadratic in ϑ, while zmh (ϑ) is linear in ϑ. Hence their product is a polynomial of degree at most three, and Simpson’s rule is exact: 
+
+G3d   ewm+1 
+
+> h
+
+ = 16 zmh bnmF,h + 23 zm+1 /2 
+
+> h
+
+bnm+1 /2 
+
+> F,h
+
++ 16 zm+1  
+
+> h
+
+bnm+1  
+
+> F,h
+
+, (3.29) where ˆnmF,h = ˆ nF,h (0) = nmF,h , (3.30) ˆnm+1 /2 
+
+> F,h
+
+= ˆ nF,h ( 12 ) = nmF,h + τ
+
+2
+
+ ∂s1 ewm+1  
+
+> h
+
+× tmF, 2 + tmF, 1 × ∂s2 ewm+1 
+
+> h
+
+
+
++ τ 2
+
+4
+
+ ∂s1 ewm+1  
+
+> h
+
+× ∂s2 ewm+1 
+
+> h
+
+, (3.31) ˆnm+1  
+
+> F,h
+
+= ˆ nF,h (1) = nmF,h + τ  ∂s1 ewm+1  
+
+> h
+
+× tmF, 2 + tmF, 1 × ∂s2 ewm+1 
+
+> h
+
+
+
++ τ 2 ∂s1 ewm+1  
+
+> h
+
+× ∂s2 ewm+1 
+
+> h
+
+. (3.32) For the volume-conserving kinematic condition, we also introduce the averaged pulled-back surface vector 
+
+enm+1 /2 
+
+> F,h
+
+:= 
+
+Z 10
+
+bnF,h (ϑ) d ϑ = 16 bnmF,h + 23 bnm+1 /2 
+
+> F,h
+
++ 16 bnm+1  
+
+> F,h
+
+. (3.33) Since bnF,h (ϑ) is quadratic in ϑ, the last equality is again exact. Since ewm+1  
+
+> h
+
+is piecewise linear, enm+1 /2 
+
+> F,h
+
+and the related vectors bnmF,h , bnm+1 /2 
+
+> F,h
+
+, bnm+1  
+
+> F,h
+
+are elementwise constants. 
+
+> 12
+
+Furthermore, following [19], we employ the averaged solid conormal introduced in [4, (3.7)]: 
+
+μm+1 /2 
+
+> s,h
+
+= 12
+
+h
+
+∂s
+
+
+
+id Γmc,h 
+
+
+
++ ∂s
+
+
+
+id Γmc,h 
+
++ τ ewm+1  
+
+> hΓmc,h
+
+i 
+
+× ns, (3.34) where s denotes the arc-length parameter along Γ mc,h , and the orientation is chosen con-sistently with the outward conormal direction. In addition, we impose a tangential constraint on the mesh velocity along Γ mc,h . More precisely, let ξmc,h denote the tangential direction on the discrete contact line. We require 
+
+ewm+1  
+
+> h
+
+· ξmc,h = 0 on Γ mc,h ,
+
+which is enforced weakly by introducing a Lagrange multiplier ψm+1  
+
+> c,h
+
+. This gives the additional weak terms 
+
+⟨ ewm+1  
+
+> h
+
+, χ cξmc,h ⟩h 
+
+> Γmc,h
+
+and ⟨ψm+1  
+
+> c,h
+
+ξmc,h , η⟩h
+
+> Γmc,h
+
+in the discrete formulation. This constraint prevents tangential mesh rotation at the contact line and helps preserve the mesh quality near the contact-line region. With these definitions, the three-dimensional gravity-consistent ALE–FEM scheme is given as follows. Given the fluid velocity umh , mesh velocity wmh , flow map ψmh defined on Ω m−1 
+
+> h
+
+, and discretized domain Ω mh with boundary Γ mF,h at time tm, we seek: (um+1  
+
+> h
+
+, ˜pm+1  
+
+> h
+
+, κ m+1  
+
+> s,h
+
+, ˜Hm+1  
+
+> h
+
+, ewm+1  
+
+> h
+
+, φ m+1  
+
+> c,h
+
+, ψ m+1  
+
+> c,h
+
+)in Umh × Q mh × Sh, 2(Γ ms,h ) × Sh(Γ mF,h ) × Sh(Γ mF,h )d × Sh(Γ mc,h ) × Sh(Γ mc,h ) satisfying 12τ (um+1  
+
+> h
+
+, v)Ωmh + 12τ (um+1  
+
+> h
+
+◦ ψmh , v ◦ ψmh )Ωm−1
+
+> h
+
++ b umh − wmh ; um+1  
+
+> h
+
+◦ ψmh , v ◦ ψmh
+
+
+
+> Ωm−1
+> h
+
++ ( 2
+
+Re D(um+1  
+
+> h
+
+), D (v)) Ωmh − (˜ pm+1  
+
+> h
+
+, ∇ · v)Ωmh + ( q, ∇ · um+1  
+
+> h
+
+)Ωmh + ⟨ ˜Hm+1  
+
+> h
+
+nmF,h , v⟩ΓmF,h 
+
+− ⟨ κm+1  
+
+> s,h
+
+ns, v⟩s,h 
+
+> Γms,h
+
++ ⟨λsns, um+1  
+
+> h
+
+⟩s,h 
+
+> Γms,h
+
++ βs⟨Psum+1  
+
+> h
+
+, Psv⟩Γms,h 
+
++ 1
+
+We ⟨ ewm+1  
+
+> h
+
+, ϕ cns⟩h 
+
+> Γmc,h
+
++ 1
+
+We ⟨ ewm+1  
+
+> h
+
+, χ cξmc,h ⟩h 
+
+> Γmc,h
+
+= 1
+
+τ (umh , v ◦ ψmh )Ωm−1
+
+> h
+
+, (3.35a) 
+
+− ⟨ ˜Hm+1  
+
+> h
+
+˜nm+1 /2 
+
+> F,h
+
+, η⟩h 
+
+> ΓmF,h
+
+= − 1
+
+We ⟨∇ Γ(id + τ ewm+1  
+
+> h
+
+), ∇Γη⟩ΓmF,h + 1
+
+We ⟨φm+1  
+
+> c,h
+
+ns, η⟩h
+
+> Γmc,h
+
++ 1
+
+We 
+
+Z
+
+> Γmc,h
+
+h
+
+cos θY μm+1 /2 
+
+> s,h
+
+− We β c( ewm+1  
+
+> h
+
+· μms,h )μms,h + sin θmc,h ns
+
+i
+
+· η ds
+
++ 1
+
+We ⟨ψm+1  
+
+> c,h
+
+ξmc,h , η⟩h 
+
+> Γmc,h
+
+− g⟨G 3d ( ewm+1  
+
+> h
+
+), η⟩ΓmF,h (3.35b) 
+
+⟨ ewm+1  
+
+> h
+
+· ˜nm+1 /2 
+
+> F,h
+
+, ϕ F ⟩h 
+
+> ΓmF,h
+
+= ⟨um+1  
+
+> h
+
+· nmF,h , ϕ F ⟩ΓmF,h , (3.35c) for all ( v, q, λ s, ϕ F , η, ϕ c, χ c) ∈ U mh × Q mh × Sh, 2(Γ ms,h ) × Sh(Γ mF,h ) × Sh(Γ mF,h )d × Sh(Γ mc,h ) ×
+
+Sh(Γ mc,h ). 
+
+3.5. Mesh velocity in the bulk. Once the mesh velocity ew on the free boundary ΓF is determined, we extend it into the bulk by the minimal deformation rate (MDR) approach [19,20]. Although harmonic extension is simple and widely used, it may lead to mesh concentration and severe distortion near the moving contact line. In contrast, the MDR method also controls the mesh deformation along the solid boundary Γ s(t), and therefore gives better mesh regularity both in the bulk and near the contact-line region. More precisely, the bulk mesh velocity is defined as the minimizer of the functional 
+
+E(w) := 12
+
+Z
+
+> Ω( t)
+
+|D(w)|2 dx + 12
+
+Z
+
+> Γs(t)
+
+|∇ Γw|2 ds, (3.36) 
+
+13 subject to the constraints 
+
+w = ew on Γ F (t), w · ns = 0 on Γ s(t).
+
+Following [19], at the discrete level we use the piecewise linear space ˚Wmh := ζ ∈ W mh : ζ = 0 on the vertices of Γ mF,h ,
+
+which incorporates the homogeneous Dirichlet condition on the free boundary. Then, given the free-boundary mesh velocity ewm+1  
+
+> h
+
+, we compute the bulk mesh velocity wm+1 
+
+> h
+
+by seeking (wm+1  
+
+> h
+
+, φ m+1  
+
+> s,h
+
+) ∈ ( ewm+1  
+
+> h
+
++ ˚Wmh ) × Sh(Γ ms,h )such that (D(wm+1  
+
+> h
+
+), D (ζ)) Ωmh + ⟨∇ Γwm+1  
+
+> h
+
+, ∇Γζ⟩Γms,h = ⟨φm+1  
+
+> s,h
+
+ns, ζ⟩h 
+
+> Γms,h
+
+, (3.37a) 
+
+⟨wm+1  
+
+> h
+
+· ns, ϕ s⟩h 
+
+> Γms,h
+
+= 0 , (3.37b) for all ( ζ, ϕ s) ∈ ˚Wmh × Sh(Γ ms,h ).
+
+4. Structure-preserving properties. In this section, we establish the main prop-erties of the proposed ALE–FEM schemes. We first prove that the schemes preserve the discrete volume exactly and satisfy a discrete total energy-dissipation law, where the gravitational potential energy is included in the total energy. Then, based on this energy estimate and a Korn-type inequality, we further show that the discrete velocity vanishes in the long-time regime. This result indicates that the proposed method can eliminate gravity-induced spurious velocities. 
+
+Theorem 4.1. Let d ∈ { 2, 3}, and let (um+1  
+
+> h
+
+, ˜pm+1  
+
+> h
+
+, κ m+1  
+
+> s,h
+
+, ˜Hm+1  
+
+> h
+
+, ewm+1  
+
+> h
+
+, φ m+1  
+
+> c,h
+
+) be the solution of the 2D scheme (3.25) and let (um+1  
+
+> h
+
+, ˜pm+1  
+
+> h
+
+, κ m+1  
+
+> s,h
+
+, ˜Hm+1  
+
+> h
+
+, ewm+1  
+
+> h
+
+, φ m+1  
+
+> c,h
+
+, ψ m+1  
+
+> c,h
+
+)
+
+be the solution of the 3D scheme (3.35) . Then, the proposed schemes are strictly structure-preserving in the following sense: 
+
+(i) Volume Conservation: The total volume of the fluid domain is rigorously conserved at the discrete level, i.e., |Ωm+1  
+
+> h
+
+| = |Ωmh |.
+
+(ii) Total Energy Dissipation: The discrete total energy associated with the nu-merical solution is defined as 
+
+Emh := 12 ∥umh ∥2  
+
+> L2(Ω m−1
+> h)
+
++ 1
+
+We |ΓmF,h | − cos θY
+
+We |Γms,h | + g
+
+Z
+
+> Ωmh
+
+zdx. (4.1) 
+
+Then the discrete total energy decreases monotonically over time, satisfying: 
+
+Em+1  
+
+> h
+
+− Emh ≤ − 12 ∥um+1  
+
+> h
+
+◦ ψmh − umh ∥2Ωm−1
+
+> h
+
+− 2τRe ∥D(um+1  
+
+> h
+
+)∥2Ωmh
+
+− τ β s∥Psum+1  
+
+> h
+
+∥2Γms,h − τ β c∥ ewm+1  
+
+> h
+
+· μms,h ∥2Γmc,h ≤ 0, m ≥ 0. (4.2) 
+
+Here |Ωmh | denotes the d-dimensional Lebesgue measure, whereas |ΓmF,h | and |Γms,h | denote the (d − 1) -dimensional Hausdorff measures. 
+
+For clarity, we prove for the three-dimensional scheme (3.35); the proof for the two-dimensional case is analogous and therefore omitted. 
+
+Proof . Part I: Proof of Volume Conservation. Since ns is constant on the flat solid boundary and um+1  
+
+> h
+
+is piecewise quadratic, um+1  
+
+> h
+
+· ns ∈ Sh, 2(Γ ms,h ). Taking 
+
+λs = um+1  
+
+> h
+
+· ns in the discrete impermeability constraint in (3.35a) gives 
+
+(um+1  
+
+> h
+
+· ns)ns, um+1 
+
+> h
+> s,h
+> Γms,h
+
+= 0 .
+
+Since all nodal weights in (3.1) are positive, this implies that um+1  
+
+> h
+
+· ns vanishes at all 
+
+> 14
+
+quadratic Lagrange nodes, and hence vanishes identically on Γ ms,h . Therefore 
+
+Z
+
+> Γms,h
+
+um+1  
+
+> h
+
+· ns ds = 0 = ⟨um+1  
+
+> h
+
+· ns, 1⟩s,h 
+
+> Γms,h
+
+. (4.3) By choosing v = 0, q = ϕF = 1, ϕc = χc = 0 and λs = −1 in the weak formulation (3.35), we obtain, using the divergence theorem and (4.3), 0 = 
+
+Z
+
+> Ωmh
+
+∇ · um+1  
+
+> h
+
+dx + ⟨ ˜nm+1 /2 
+
+> F,h
+
+· ewm+1  
+
+> h
+
+, 1⟩h 
+
+> ΓmF,h
+
+− ⟨ nmF,h · um+1  
+
+> h
+
+, 1⟩ΓmF,h − ⟨ ns · um+1  
+
+> h
+
+, 1⟩s,h 
+
+> Γms,h
+
+= ⟨ ˜nm+1 /2 
+
+> F,h
+
+· ewm+1  
+
+> h
+
+, 1⟩h 
+
+> ΓmF,h
+
+.
+
+By (3.33), enm+1 /2 
+
+> F,h
+
+is elementwise constant on Γ mF,h , whereas ewm+1  
+
+> h
+
+is piecewise linear. Hence ewm+1  
+
+> h
+
+· enm+1 /2 
+
+> F,h
+
+is piecewise linear. Since the mass-lumped quadrature is exact for piecewise linear functions, we have 
+
+Z
+
+> ΓmF,h
+
+ewm+1  
+
+> h
+
+· enm+1 /2 
+
+> F,h
+
+ds =
+
+Z h
+
+> ΓmF,h
+
+ewm+1  
+
+> h
+
+· enm+1 /2 
+
+> F,h
+
+ds = 0 .
+
+According to (3.11), the volume change from tm to tm+1 can be written as 
+
+|Ωm+1  
+
+> h
+
+| − | Ωmh | =
+
+Z 10
+
+ddϑ
+
+Z 
+
+> Ωmh(ϑ)
+
+1d xdϑ = τ
+
+Z
+
+> ΓmF,h
+
+ewm+1  
+
+> h
+
+·
+
+Z 10
+
+ˆnF,h (ϑ)d ϑ
+
+
+
+ds. 
+
+Since ˆ nF,h (ϑ) = ˆ tF, 1(ϑ) × ˆtF, 2(ϑ) is a quadratic function of ϑ, the integration can be exactly represented by the Simpson formula (3.33) as R 10 ˆnF,h (ϑ) d ϑ = ˜ nm+1 /2 
+
+> F,h
+
+. Thus, the scheme is strictly volume preserving, 
+
+|Ωm+1  
+
+> h
+
+| − | Ωmh | = τ
+
+Z
+
+> ΓmF,h
+
+ewm+1  
+
+> h
+
+· ˜nm+1 /2 
+
+> F,h
+
+ds = 0 . (4.4) 
+
+Part II: Proof of Energy Dissipation. We test the fully discrete scheme (3.35) with v = um+1  
+
+> h
+
+, q = ˜ pm+1  
+
+> h
+
+, λs = κm+1  
+
+> s,h
+
+, ϕF = ˜Hm+1  
+
+> h
+
+, η = ewm+1  
+
+> h
+
+, ϕc = φm+1  
+
+> c,h
+
+and 
+
+χc = ψm+1  
+
+> c,h
+
+. Adding the resulting equations together, the pressure-incompressibility terms, the solid-boundary multiplier terms, and the contact-line constraint terms cancel. We obtain 12
+
+∥um+1  
+
+> h
+
+∥2Ωmh − ∥ umh ∥2Ωm−1
+
+> h
+
++ ∥um+1  
+
+> h
+
+◦ ψmh − umh ∥2Ωm−1
+
+> h
+
+ + 2τRe ∥D(um+1  
+
+> h
+
+)∥2Ωmh
+
++ τ β s∥Psum+1  
+
+> h
+
+∥2Γms,h + 1
+
+We ⟨∇ Γ(id + τ ewm+1  
+
+> h
+
+), ∇Γ(τ ewm+1  
+
+> h
+
+)⟩ΓmF,h 
+
+− 1
+
+We 
+
+Z
+
+> Γmc,h
+
+
+
+cos θY μm+1 /2 
+
+> s,h
+
++ sin θmc,h ns
+
+
+
+· τ ewm+1  
+
+> h
+
+ds + τ β c∥ ewm+1  
+
+> h
+
+· μms,h ∥2Γmc,h 
+
++ τ g ⟨G 3d ( ewm+1  
+
+> h
+
+), ewm+1  
+
+> h
+
+⟩ΓmF,h = 0 (4.5) where we used the identity 12τ ∥um+1  
+
+> h
+
+∥2Ωmh + 12τ ∥um+1  
+
+> h
+
+◦ ψmh − umh ∥2Ωm−1
+
+> h
+
+− 1
+
+τ (umh , um+1  
+
+> h
+
+◦ ψmh )Ωm−1
+
+> h
+
+= 12τ
+
+h
+
+∥um+1  
+
+> h
+
+∥2Ωmh − ∥ umh ∥2Ωm−1
+
+> h
+
++ ∥um+1  
+
+> h
+
+◦ ψmh − umh ∥2Ωm−1
+
+> h
+
+i
+
+.
+
+It remains to identify the geometric terms appearing in the energy estimate. Recall that θmc,h defined in (3.3) is piecewise constant, ewm+1  
+
+> h
+
+is piecewise linear and ns is constant 
+
+15 on Γ mc,h , by testing ϕc = 1 in (3.35a) gives 
+
+Z
+
+> Γmc,h
+
+sin θmc,h ns · τ ewm+1  
+
+> h
+
+ds = τ ⟨sin θmc,h ewm+1  
+
+> h
+
+, ns⟩h 
+
+> Γmc,h
+
+= 0 . (4.6) The remaining surface and contact-line terms can be related to the variations of the free-surface area and the wetted solid area. For the free surface, we use the area-decreasing inequality [5, (2.21)], 
+
+Z
+
+> ΓmF,h
+
+∇Γ(id + τ ewm+1  
+
+> h
+
+) · ∇ Γτ ewm+1  
+
+> h
+
+ds ≥ | Γm+1  
+
+> F,h
+
+| − | ΓmF,h |. (4.7) For the wetted solid surface, the averaged conormal vector μm+1 /2 
+
+> s,h
+
+defined in (3.34) yields the exact identity 
+
+Z
+
+> Γmc,h
+
+cos θY μm+1 /2 
+
+> s,h
+
+· τ ewm+1  
+
+> h
+
+ds = cos θY
+
+
+
+|Γm+1  
+
+> s,h
+
+| − | Γms,h |
+
+
+
+.
+
+Thus, the geometric terms in the discrete weak formulation control precisely the changes of the free surface and the wetted solid surface. Based on Simpson’s rule and (3.28), the gravitational potential energy change becomes 
+
+τ g ⟨G 3d ( ewm+1  
+
+> h
+
+), ewm+1  
+
+> h
+
+⟩ΓmF,h = Em+1 pot − Em 
+
+> pot
+
+= g
+
+Z
+
+> Ωm+1
+> h
+
+z dx − g
+
+Z
+
+> Ωmh
+
+z dx. 
+
+Substituting these identities into (4.5), we deduce the discrete energy inequality 
+
+Em+1  
+
+> h
+
+− Emh ≤ − 12 ∥um+1  
+
+> h
+
+◦ ψmh − umh ∥2Ωm−1
+
+> h
+
+− 2τRe ∥D(um+1  
+
+> h
+
+)∥2Ωmh
+
+− τ β s∥Psum+1  
+
+> h
+
+∥2Γms,h − τ β c∥ ewm+1  
+
+> h
+
+· μms,h ∥2Γmc,h ≤ 0. (4.8) This completes the proof of energy dissipation in the three-dimensional case. 
+
+Remark 4.1. The above structure-preserving property only needs the mesh velocity on the free surface Γ mF,h , since the bulk mesh velocity does not influence it. Therefore, by extending the mesh velocity ewm+1  
+
+> h
+
+along the free boundary, the MDR method does not destroy the discrete structure-preserving property proved in Theorem 4.1. Theorem 4.1 shows that the total energy always dissipates for the proposed scheme with gravity. To study the long-time behavior of the numerical solution, we first establish a Korn-type inequality under the mixed boundary conditions. This auxiliary result is stated in the following lemma and will be used together with the energy estimate to show the decay of the discrete velocity. 
+
+Lemma 4.2 (Korn’s Inequality with Mixed Boundary). Let Ω ⊂ Rd (d = 2 , 3)be a bounded Lipschitz domain with its boundary partitioned as ∂Ω = Γ 1 ∪ Γ2, where Γ1
+
+and Γ2 are disjoint open subsets of ∂Ω. Assume further that |Γ1| > 0. Then, there exists a constant C1 > 0, such that 
+
+∥u∥2 
+
+> L2(Ω)
+
+≤ C1
+
+
+
+∥D(u)∥2 
+
+> L2(Ω)
+
++ ∥u∥2
+
+> L2(Γ 1)
+
+
+
+∀u ∈ H1(Ω) d,
+
+where D(u) = 12 (∇u + ∇u⊤) is the symmetric strain tensor. Proof . Suppose that no such constant C1 exists. Then there exists a sequence {un}n≥1
+
+with ∥un∥2 
+
+> L2(Ω)
+
+= 1 , such that 1 = ∥un∥2 
+
+> L2(Ω)
+
+≥ n
+
+
+
+∥D(un)∥2 
+
+> L2(Ω)
+
++ ∥un∥2
+
+> L2(Γ 1)
+
+
+
+.
+
+We hence get the existence of a C2 > 0 such that 
+
+∥un∥2 
+
+> L2(Ω)
+
++ ∥D(un)∥2 
+
+> L2(Ω)
+
+≤ C2.
+
+> 16
+
+The coercivity of D(u) (see [30, Lemma 62.20]) gives the existence of a C3 > 0 such that 
+
+∥un∥H1(Ω) ≤ C3.
+
+As the embeddings H1(Ω) ,→ L2(∂Ω) and H1(Ω) ,→ L2(Ω) are compact, we get for a subsequence {unk } there exists u ∈ H1(Ω) d s.t. 
+
+unk ⇀ u in H1(Ω) , unk → u in L2(Ω) , unk → u in L2(∂Ω) . (4.9) As D(un) → 0 in L2(Ω) and un → 0 in L2(Γ 1), we obtain from [30, Lemma 62.20], 
+
+unk → u in H1(Ω) .
+
+By the continuity of the operator D(·) and the uniqueness of the limit, it follows that 
+
+D(u) = 0.
+
+Therefore, in the three-dimensional case, ∇u is strictly skew-symmetric, meaning 
+
+∂j ui +∂iuj = 0. Differentiating this relation and permuting the indices yields 2 ∂k∂j ui = 0, which implies that all second-order derivatives of u vanish. Therefore, 
+
+u(x) = a + b × x, and 
+
+Z
+
+> Γ1
+
+|u|2ds = 0 ,
+
+where a, b ∈ R3 are constant vectors. This gives a + b × x = 0 on Γ 1. Lemma 62.16 in [30] gives a, b = 0 which implies that u = 0. This contradicts ∥u∥L2(Ω) = 1, so there exists C1 > 0, such that 
+
+∥u∥2 
+
+> L2(Ω)
+
+≤ C1
+
+
+
+∥D(u)∥2 
+
+> L2(Ω)
+
++ ∥u∥2
+
+> L2(Γ 1)
+
+
+
+∀ u ∈ H1(Ω) d.
+
+For the two-dimensional case, a rigid body motion can only vanish along a one-dimensional curve segment Γ 1 if it is identically zero, as any non-trivial rotation in 2D admits at most a single stationary point. 
+
+Theorem 4.3. Assume that βs, β c > 0, that Emh is bounded from below, and that 
+
+|Γms,h | > 0 for all m. We further assume that the family {Ωmh }m≥0 admits a uniform Korn inequality with a constant CΩ > 0 independent of m. Then, for a fixed time step τ > 0,the discrete velocity of the ALE-FEM scheme (3.35) asymptotically vanishes: 
+
+lim  
+
+> m→∞
+
+∥um+1  
+
+> h
+
+∥Ωmh = 0 . (4.10) 
+
+Proof . Since the discrete energy is bounded from below, let 
+
+E∗ := inf  
+
+> m≥0
+
+Emh > −∞ .
+
+By summing the discrete energy dissipation inequality (4.2) from k = 0 to m, we obtain 
+
+τ
+
+> m
+
+X
+
+> k=0
+
+ 12τ ∥uk+1  
+
+> h
+
+◦ ψkh − ukh∥2Ωk−1
+
+> h
+
++ 2
+
+Re ∥D(uk+1  
+
+> h
+
+)∥2Ωkh
+
++βs∥Psuk+1  
+
+> h
+
+∥2Γks,h 
+
++ βc∥ ewk+1  
+
+> h
+
+· μks,h ∥2Γkc,h 
+
+
+
+≤ E0 
+
+> h
+
+− Em+1  
+
+> h
+
+< E 0 
+
+> h
+
+− E∗ < ∞.
+
+Since the partial sums on the left-hand side are nondecreasing and uniformly bounded, the corresponding infinite series converges. Consequently, for the fixed time step τ > 0, each nonnegative dissipation term vanishes asymptotically. In particular, since βs > 0: 
+
+∥D(um+1  
+
+> h
+
+)∥Ωmh → 0 and ∥Psum+1  
+
+> h
+
+∥Γms,h → 0.
+
+Moreover, the discrete impermeability constraint in (3.35a), together with the weighted nodal pairing defined in (3.1), implies 
+
+um+1  
+
+> h
+
+· ns = 0 on Γ ms,h ,
+
+since the pairing involves all quadratic boundary degrees of freedom. Hence um+1  
+
+> h
+
+=
+
+> 17
+
+Psum+1  
+
+> h
+
+on Γ ms,h , and therefore 
+
+∥um+1  
+
+> h
+
+∥Γms,h = ∥Psum+1  
+
+> h
+
+∥Γms,h → 0.
+
+By our geometric assumptions on the discrete domains Ω mh and the solid boundary Γ ms,h ,we apply Lemma 4.2 to the discrete velocity um+1  
+
+> h
+
+, which yields 
+
+∥um+1  
+
+> h
+
+∥2Ωmh ≤ CΩ
+
+ ∥D(um+1  
+
+> h
+
+)∥2Ωmh + ∥um+1  
+
+> h
+
+∥2Γms,h 
+
+.
+
+Taking the limit m → ∞ on both sides, the right-hand side goes to zero, which leads to lim  
+
+> m→∞
+
+∥um+1  
+
+> h
+
+∥Ωmh = 0 .
+
+This completes the proof. 
+
+Remark 4.2. Theorem 4.3 shows that the proposed scheme drives the discrete velocity to zero as m → ∞ . In this sense, the numerical solution approaches a rest state, and no persistent spurious fluid velocity remains in the long-time regime. This conclusion relies essentially on the exact cancellation of the gravitational work with the discrete variation of the gravitational potential energy. If gravity is instead treated directly as a body force in the momentum equation, according to (3.13), the discrete energy relation contains an additional term, 
+
+Em+1  
+
+> h
+
++ 12 ∥um+1  
+
+> h
+
+◦ ψmh − umh ∥2Ωm−1
+
+> h
+
++ 2τRe ∥D(um+1  
+
+> h
+
+)∥2Ωmh
+
++τ β s∥Psum+1  
+
+> h
+
+∥2Γms,h + τ β c∥ ewm+1  
+
+> h
+
+· μms,h ∥2Γmc,h ≤ Emh + Rm+1  
+
+> g
+
+. (4.11) In general, Rm+1 
+
+> g
+
+̸ = 0 and has no definite sign. Therefore, one cannot conclude that 
+
+um+1  
+
+> h
+
+→ 0.
+
+Consequently, for the direct treatment of gravity, the numerical solution may fail to relax to a true discrete rest state, and a nonzero residual velocity may persist near equilibrium. Such a persistent nonphysical velocity can be interpreted as a spurious velocity. 
+
+Remark 4.3. Although this paper focuses on a single-phase free-boundary problem, the proposed treatment for gravity can be naturally extended to two-phase flows, where the gravitational contribution can also be rewritten as an interface integral associated with the motion of the phase boundary. We note that Duan et al. [10] treated the gravitational potential energy by imposing a divergence-free constraint on the mesh velocity, namely 
+
+∇ · wmh = 0. In contrast, our approach does not require the bulk mesh velocity to be divergence-free. 
+
+5. Newton iteration method. The structure-preserving schemes (3.25) and (3.35) are inherently nonlinear, because the intermediate normal vector and the gravitational term are both parameterized by the unknown mesh velocity ewm+1  
+
+> h
+
+. Therefore, these fully discrete systems require the solution of a nonlinear algebraic problem at each time step. To this end, we adopt Newton’s method, which provides an efficient iterative solver for the present formulation. The Newton linearization in two and three dimensions is based on the same idea. Since the three-dimensional case contains all essential ingredients and is technically more involved, we only present the three-dimensional construction below; the two-dimensional version follows analogously and is simpler. We introduce the unknown vector 
+
+U m+1  
+
+> h
+
+:=  um+1  
+
+> h
+
+, epm+1  
+
+> h
+
+, κ m+1  
+
+> s,h
+
+, eHm+1  
+
+> h
+
+, ewm+1  
+
+> h
+
+, φ m+1  
+
+> c,h
+
+, ψ m+1 
+
+> c,h
+
+. (5.1) Given U mh , the discrete problem at time level tm+1 can be written in residual form as follows: find U m+1  
+
+> h
+
+such that 
+
+Ri(U m+1  
+
+> h
+
+) = 0 , i = 1 , 2, 3, (5.2) 
+
+> 18
+
+where the residual equations correspond to (3.35a)–(3.35c). More precisely, we define 
+
+R1(U ; v, q, λ s, ϕ c, χ c) := 12τ (u, v)Ωmh + 12τ (u ◦ ψmh , v ◦ ψmh )Ωm−1
+
+> h
+
++ b(umh − wmh ; u ◦ ψmh , v ◦ ψmh )Ωm−1
+
+> h
+
++
+
+ 2
+
+Re D(u), D (v)
+
+
+
+> Ωmh
+
+− (ep, ∇ · v)Ωmh
+
++ ( q, ∇ · u)Ωmh + ⟨ eH nmF,h , v⟩ΓmF,h − ⟨ κsns, v⟩s,h 
+
+> Γms,h
+
++ ⟨λsns, u⟩s,h 
+
+> Γms,h
+
++ βs⟨Psu, Psv⟩Γms,h 
+
++ 1
+
+We ⟨ ew · ns, ϕ c⟩h 
+
+> Γmc,h
+
++ 1
+
+We ⟨ ew · ξmc,h , χ c⟩h 
+
+> Γmc,h
+
+− 1
+
+τ (umh , v ◦ ψmh )Ωm−1
+
+> h
+
+, (5.3) 
+
+R2(U ; η) := −⟨ eH N ( ew), η⟩h 
+
+> ΓmF,h
+
++ 1
+
+We ⟨∇ Γ(id + τ ew), ∇Γη⟩ΓmF,h − 1
+
+We ⟨φcns, η⟩h
+
+> Γmc,h
+
+− 1
+
+We 
+
+Z
+
+> Γmc,h
+
+ cos θY M( ew) + sin θmc,h ns
+
+ · η ds + βc
+
+Z
+
+> Γmc,h
+
+( ew · μms,h )μms,h · ηds
+
+− 1
+
+We ⟨ψc ξmc,h , η⟩h 
+
+> Γmc,h
+
++ g⟨G 3d ( ew), η⟩ΓmF,h , (5.4) 
+
+R3(U ; ϕF ) := ⟨ ew · N ( ew), ϕ F ⟩h 
+
+> ΓmF,h
+
+− ⟨ u · nmF,h , ϕ F ⟩ΓmF,h , (5.5) where we use the notations 
+
+N ( ew) := 16 ˆnmF,h + 23 ˆnm+1 /2 
+
+> F,h
+
+( ew) + 16 ˆnm+1  
+
+> F,h
+
+( ew), M( ew) := μm+1 /2 
+
+> s,h
+
+.
+
+To solve (5.2), we apply Newton’s method. At the l-th iteration, let 
+
+U (l) 
+
+> h
+
+=  u(l) 
+
+> h
+
+, ep(l) 
+
+> h
+
+, κ (l)
+
+> s,h
+
+, eH(l) 
+
+> h
+
+, ew(l) 
+
+> h
+
+, φ (l)
+
+> c,h
+
+, ψ (l)
+
+> c,h
+
+
+
+be the current iterate, and let 
+
+δU (l) 
+
+> h
+
+=  δuh, δ eph, δκ s,h , δ eHh, δ ewh, δφ c,h , δψ c,h 
+
+
+
+denote the Newton increment. Starting from an initial guess U (0)  
+
+> h
+
+, usually taken as 
+
+U (0)  
+
+> h
+
+= U mh , we seek δU (l) 
+
+> h
+
+such that 
+
+DR 1(U (l) 
+
+> h
+
+)[ δU (l) 
+
+> h
+
+; v, q, λ s, ϕ c, χ c] = −R1(U (l) 
+
+> h
+
+; v, q, λ s, ϕ c, χ c), (5.6) 
+
+DR 2(U (l) 
+
+> h
+
+)[ δU (l) 
+
+> h
+
+; η] = −R2(U (l) 
+
+> h
+
+; η), (5.7) 
+
+DR 3(U (l) 
+
+> h
+
+)[ δU (l) 
+
+> h
+
+; ϕF ] = −R3(U (l) 
+
+> h
+
+; ϕF ). (5.8) After solving (5.6)–(5.8), the iterate is updated by 
+
+U (l+1)  
+
+> h
+
+= U (l) 
+
+> h
+
++ δU (l) 
+
+> h
+
+.
+
+The first residual R1 is linear with respect to the unknowns. Therefore, its Fr´ echet derivative is simply given by the corresponding bilinear form in (5.3), and we omit its explicit expression for brevity. The main difficulty lies in the geometric nonlinearities in 
+
+R2 and R3.To make the geometric nonlinearities explicit, we define 
+
+A( ew) := ∂s1 ew × ˆtmF, 2 + ˆ tmF, 1 × ∂s2 ew, B( ew) := ∂s1 ew × ∂s2 ew.
+
+The corresponding Jacobian is obtained by differentiating these quantities. We first note that 
+
+DA( ew)[ δ ew] = ∂s1 δ ew × ˆtmF, 2 + ˆ tmF, 1 × ∂s2 δ ew, (5.9) 
+
+DB( ew)[ δ ew] = ∂s1 δ ew × ∂s2 ew + ∂s1 ew × ∂s2 δ ew. (5.10) 
+
+19 Hence, we have 
+
+DN ( ew)[ δ ew] = τ
+
+2 DA( ew)[ δ ew] + τ 2
+
+3 DB( ew)[ δ ew], DM( ew)[ δ ew] = τ
+
+2 (∂sδ ew) × ns,
+
+moreover, for the gravitational term, we have 
+
+DG3d ( ew)[ δ ew] = τ (δ ew · ez )
+
+ 12 nmF,h + τ
+
+3 A( ew) + τ 2
+
+4 B( ew)
+
+
+
++ 23 zm+1 /2 
+
+> h
+
+( ew)
+
+ τ
+
+2 DA( ew)[ δ ew] + τ 2
+
+4 DB( ew)[ δ ew]
+
+
+
++ 16 zm+1  
+
+> h
+
+( ew)  τ D A( ew)[ δ ew] + τ 2DB( ew)[ δ ew] .
+
+Using the above identities, the Fr´ echet derivative of R2 is given by 
+
+DR 2(U (l) 
+
+> h
+
+)[ δU (l) 
+
+> h
+
+; η] = −⟨ δ eHh N ( ew(l) 
+
+> h
+
+), η⟩h 
+
+> ΓmF,h
+
+− ⟨ eH(l) 
+
+> h
+
+DN ( ew(l) 
+
+> h
+
+)[ δ ewh], η⟩h
+
+> ΓmF,h
+
++ τWe ⟨∇ Γδ ewh, ∇Γη⟩ΓmF,h − 1
+
+We ⟨δφ c,h ns, η⟩h 
+
+> Γmc,h
+
+− 1
+
+We ⟨δψ c,h ξmc,h , η⟩h
+
+> Γmc,h
+
+− 1
+
+We 
+
+Z
+
+> Γmc,h
+
+cos θY DM( ew(l) 
+
+> h
+
+)[ δ ewh] · η ds + βc
+
+Z
+
+> Γmc,h
+
+(δ ewh · μms,h )μms,h · ηds
+
++ g⟨DG3d ( ew(l) 
+
+> h
+
+)[ δ ewh], η⟩ΓmF,h , (5.11) while the derivative of R3 reads 
+
+DR 3(U (l) 
+
+> h
+
+)[ δU (l) 
+
+> h
+
+; ϕF ] = 
+
+D
+
+δ ewh · N ( ew(l) 
+
+> h
+
+) + ew(l) 
+
+> h
+
+· DN ( ew(l) 
+
+> h
+
+)[ δ ewh], ϕ F
+
+Eh
+
+> ΓmF,h
+
+− ⟨ δuh · nmF,h , ϕ F ⟩ΓmF,h . (5.12) Thus, each Newton step amounts to solving the linear system (5.6)–(5.8) for the increment δU (l) 
+
+> h
+
+.In practice, the iteration is terminated once the relative change of the free-boundary mesh velocity becomes sufficiently small: 
+
+ew(l+1)  
+
+> h
+
+− ew(l) 
+
+> hL2(Γ mF,h )
+
+1 + ew(l+1)  
+
+> hL2(Γ mF,h )
+
+< ε N , εN = 10 −12 . (5.13) 
+
+6. Numerical tests. In this section, we present numerical experiments for the pro-posed ALE–FEM method in both two and three spatial dimensions. Unless otherwise stated, we take βc = 0 .01. Although the theoretical decay of the discrete velocity is established for βs > 0, we test both the case βs = 0 and βs > 0. The case βs = 0 is used as an additional robustness test beyond the scope of Theorem 4.3. All computations are carried out using an implementation based on the finite element library NGSolve; see 
+
+https://ngsolve.org .
+
+6.1. Two-dimensional droplet problem. We first consider the two-dimensional evolution of a droplet under gravity with constants We = 1 and Re = 0 .5. The initial droplet is chosen as a semicircle, with initial contact angle close to 90 ◦. We compare the numerical solutions for different gravitational constants g and contact angles θY .In particular, the wetting and dewetting cases correspond to the static contact angles 
+
+θY = 60 ◦ and θY = 120 ◦, respectively. Figure 6.1 shows the computed droplet profiles and meshes for g = 0 , 1, 2, 10. In both the wetting and dewetting cases, the proposed ALE–BGN–MDR method maintains good mesh quality during the evolution, especially near the moving contact points. Com-pared with the case without gravity, the droplet under gravity becomes flatter, which is 
+
+> 20
+
+consistent with the physical effect of gravity. Moreover, the droplet becomes flatter as g
+
+increases and our method still maintains high mesh quality even for g = 10. Figure 6.2 shows that the contact angle converges to θY and the time evolution of the scaled volume error |Ωmh | − | Ω0
+
+> h
+
+| /|Ω0
+
+> h
+
+| with g = 1. The relative volume error remains at the level of 10 −15 , indicating that the proposed scheme preserves the droplet volume up to machine precision.                             
+
+> (a) θY= 60 ◦, g = 0 (b) θY= 120 ◦, g = 0
+> (c) θY= 60 ◦, g = 1 (d) θY= 120 ◦, g = 1
+> (e) θY= 60 ◦, g = 2 (f) θY= 120 ◦, g = 2
+> (g) θY= 60 ◦, g = 10 (h) θY= 120 ◦, g = 10 Fig. 6.1
+
+: Computed meshes at t = 5 .0 for two-dimensional wetting and dewetting tests under different gravitational strengths. 
+
+> Fig. 6.2
+
+: Evolution of the contact angle (left) and the scaled volume error (right) 
+
+|Ωmh | − | Ω0
+
+> h
+
+| /|Ω0
+
+> h
+
+| with g = 1. 
+
+6.2. Energy dissipation. We now compare the proposed method (3.25) with the standard direct treatment of gravity (3.2). We take 
+
+Re = 20 , We = 1 , θY = 90 ◦, g = 1 ,
+
+and compare the numerical results for three time step sizes τ = 0 .01 , 0.02 , 0.04. Figure 6.3 shows the time histories of the discrete total energy and the kinetic energy. In the presence of gravity, the total energy is expected to dissipate in time and eventually approach a limiting constant as the droplet relaxes to equilibrium. This behavior is clearly observed for the proposed method: the total energy decreases initially and then reaches a nearly constant value in the long-time regime. By contrast, for the direct treatment of gravity, the discrete total energy continues to decrease even after the droplet is close to equilibrium, 
+
+> 21
+
+and the artificial decay becomes more pronounced as the time step size increases. This is consistent with the inconsistency error Rm+1  
+
+> g
+
+derived in (3.13). The kinetic energy in the right panel of Figure 6.3 confirms the same observation: while the proposed method drives the kinetic energy to the level of machine precision, the direct method leaves a nonzero residual kinetic energy in the long-time regime, indicating persistent spurious velocities. To further quantify this effect, Figure 6.4 plots the energy increment between two consecutive time levels, Em+1  
+
+> h
+
+− Emh . For the proposed method, this quantity tends to zero, but for the direct method, the energy increment remains at a nonzero negative level, showing that the discrete total energy keeps decreasing artificially and the computed solution fails to settle into a true equilibrium. These observations confirm the importance of the gravity-consistent formulation for eliminating the associated spurious velocities. 
+
+> Fig. 6.3
+
+: Comparison between the proposed method and the direct treatment of gravity for different time step sizes. Left: total energy Emh . Right: kinetic energy Em
+
+> kin
+
+.
+
+> Fig. 6.4
+
+: Time evolution of the discrete energy increment Em+1  
+
+> h
+
+− Emh . Left: proposed method (3.25). Right: direct method (3.2). 
+
+6.3. Navier slip coefficient βs. In the Navier-slip boundary condition (2.3), βs
+
+measures the wall friction acting on the tangential slip velocity. Its contribution to dis-crete energy dissipation is βs∥Psuh∥2Γs,h . To illustrate the effect of βs, we use the same parameter setting as in Subsection 6.2 with time step τ = 0 .04, and compare βs = 0 , 0.1, 1for both the direct method (3.2) and the proposed method (3.25). Figure 6.5 shows the evolution of the total energy and kinetic energy. At early times, larger βs leads to faster energy decay, since the wall friction dissipates the tangential motion more strongly. For the proposed gravity-consistent method, the total-energy curves for different βs
+
+converge to the same limiting value. This is expected because βs affects the relaxation rate but not the static equilibrium energy, which is determined by the volume, surface tension, gravity, and contact angle. 
+
+> 22
+
+In contrast, for the direct method, the long-time energies do not collapse to a common value. As shown in the previous subsection, the direct method leaves a nonzero residual kinetic energy due to gravity-induced spurious velocities. A larger βs suppresses the tangential component of this artificial motion near the solid substrate, thereby reducing the resulting long-time energy drift. Hence the direct method can exhibit larger long-time total energy for larger βs, reflecting a βs-dependent numerical state rather than a physical equilibrium.   
+
+> (a) Total energy, direct method (3.2) (b) Total energy, proposed method (3.25)
+> (c) Kinetic energy, direct method (3.2) (d) Kinetic energy, proposed method (3.25) Fig. 6.5
+
+: Effect of the wall-friction coefficient βs.
+
+6.4. Damping test. Following [2], we consider the droplet motion driven by surface tension. Due to the initial imbalance of curvature along the free surface, the droplet starts to move and exhibits a damped oscillatory behavior. We take Re = 20 , θ Y = 60 ◦, and study the influence of different surface tension coefficients. To quantify the capillary oscillation, we monitor the vertical coordinate of the droplet centroid, 
+
+zm 
+
+> cen
+
+:= 1
+
+|Ωmh |
+
+Z
+
+> Ωmh
+
+z(x) d x, 
+
+where z(x) denotes the vertical coordinate. The computation is carried out up to T = 10. From the time history of zm
+
+> cen
+
+, we identify successive local maxima at tp0 < t p1 < · · · < t pn .
+
+The mean oscillation period and frequency are then computed as 
+
+T = tpn − tp0
+
+n , f = 1 /T = ntpn − tp0
+
+.
+
+Figure 6.6 shows the oscillation of zm 
+
+> cen
+
+and the corresponding frequency scaling. In the absence of gravity, the capillary scaling f ∼ We −1/2 is reported in [2]. Our numerical results reproduce this behavior for g = 0. For the weak-gravity case considered here, the measured frequencies for g = 1 also follow the same scaling trend. 
+
+6.5. Three-dimensional ellipsoid droplet. We next consider a three-dimensional droplet problem. The initial droplet geometry is configured as a semi-ellipsoid (restricted 
+
+> 23 Fig. 6.6
+
+: Capillary oscillation and frequency. Left: time histories of zm
+
+> cen
+
+. Right: measured mean frequency for g = 0 , 1, together with the reference f ∼ We −1/2.to the upper half-space z > 0), with semi-principal axes of lengths 1.5, 1, and 1 along the x-, y-, and z-directions, respectively. The initial mesh size is set to h = 0 .15. Two different contact angles are tested: the hydrophilic case θY = 60 ◦ and the hydrophobic case θY = 120 ◦. In both simulations, the dimensionless parameters are chosen as g = 1, 
+
+Re = 20, and We = 1. Figure 6.7 shows the evolution of the droplet surface over one oscillation cycle. We observe that the droplet undergoes a clear capillary-gravity-driven oscillation before ap-proaching its equilibrium shape. In both cases, the proposed BGN-MDR strategy pre-serves excellent mesh quality throughout the evolution, with no visible mesh degeneration near the free surface or the moving contact line. As shown in Figure 6.8, the relative volume error remains at the level of 10 −13 , demonstrating that the proposed method conserves the droplet volume up to machine precision. Moreover, the Newton solver typ-ically converges within 7 to 10 iterations per time step, indicating that the fully discrete nonlinear system can be solved efficiently. 
+
+t = 0 t = 0 .6 t = 1 .2 t = 1 .8 t = 2 .4
+
+> Fig. 6.7
+
+: Evolution of the ellipsoid droplet profile over one oscillation cycle. The top row corresponds to θY = 60 ◦, while the bottom row corresponds to θY = 120 ◦.
+
+7. Conclusion. In this paper, we develop a gravity-consistent ALE finite element method for Navier-Stokes free-boundary problems with moving contact lines. The key idea is to rewrite the gravitational force in geometric form and to evaluate the result-ing moving-boundary contribution by Simpson’s quadrature rule, so that the discrete gravitational work exactly matches the variation of the gravitational potential energy. As a result, the proposed nonlinear scheme preserves volume exactly, satisfies a discrete energy-dissipation law including gravity, and drives the discrete fluid velocity to zero in long-time simulations, thereby eliminating persistent spurious velocities. Numerical re-sults in both two and three dimensions confirm the theoretical properties and demonstrate 
+
+> 24
+
+Fig. 6.8 : Three-dimensional ellipsoid droplet simulations with θY = 60 ◦ and θY = 120 ◦
+
+under gravity. Left upper: Newton iteration counts; Right upper: relative volume error 
+
+|Ωmh | − | Ω0
+
+> h
+
+| /|Ω0
+
+> h
+
+|; Left bottom: gravitational potential energy Em
+
+> pot
+
+; Right bottom: total energy Emh .good mesh quality and correct long-time relaxation behavior. The present framework can be extended naturally to more general interfacial flows, including two-phase problems and multiphase configurations with triple junctions. 
+
+REFERENCES 
+
+[1] M. Agnese and R. N¨ urnberg , Fitted front tracking methods for two-phase incompressible Navier–Stokes flow: Eulerian and ALE finite element discretizations , Int. J. Numer. Anal. Model., 17 (2020), pp. 613––642. [2] E. B¨ ansch , Finite element discretization of the Navier–Stokes equations with a free capillary sur-face , Numer. Math., 88 (2001), pp. 203–235. [3] W. Bao and Q. Zhao , A structure-preserving parametric finite element method for surface diffu-sion , SIAM J. Numer. Anal., 59 (2021), pp. 2775–2799. [4] W. Bao and Q. Zhao , An energy-stable parametric finite element method for simulating solid-state dewetting problems in three dimensions , J. Comput. Math., 41 (2023), pp. 771–796. [5] J. W. Barrett, H. Garcke, and R. N¨ urnberg , On the parametric finite element approximation of evolving hypersurfaces in R3, J. Comput. Phys., 227 (2008), pp. 4281–4307. [6] , Eliminating spurious velocities with a stable approximation of viscous incompressible two-phase Stokes flow , Comput. Methods Appl. Mech. Engrg., 267 (2013), pp. 511–530. [7] , A stable parametric finite element discretization of two-phase Navier–Stokes flow , J. Sci. Comput., 63 (2015), pp. 78–117. [8] , Chapter 4 - parametric finite element approximations of curvature-driven interface evolu-tions , in Geometric Partial Differential Equations - Part I, A. Bonito and R. H. Nochetto, eds., vol. 21 of Handbook of Numerical Analysis, Elsevier, 2020, pp. 275–423. [9] D. Boffi, F. Brezzi, and M. Fortin , Mixed Finite Element Methods and Applications , vol. 44, Springer, 2013. [10] B. Duan, B. Li, and Z. Yang , An energy diminishing arbitrary Lagrangian–Eulerian finite element method for two-phase Navier–Stokes flow , J. Comput. Phys., 461 (2022), p. 111215. [11] G. Dziuk and C. M. Elliott , L2-estimates for the evolving surface finite element method , Math. Comput., 82 (2013), pp. 1–24. [12] S. Ganesan, G. Matthies, and L. Tobiska , On spurious velocities in incompressible flow problems with interfaces , Comput. Methods Appl. Mech. Engrg., 196 (2007), pp. 1193–1202. 25 [13] G. Gao and B. Li , Geometric-structure preserving methods for surface evolution in curvature flows with minimal deformation formulations , J. Comput. Phys., 524 (2025), p. 113718. [14] Y. Gao, J. Hu, and B. Li , A stabilized arbitrary Lagrangian-Eulerian sliding interface method for fluid-structure interaction with a rotating rigid structure , SIAM J. Sci. Comput., 47 (2025), pp. A2533–A2558. [15] H. Garcke, W. Jiang, C. Su, and G. Zhang , Structure-preserving parametric finite element method for surface diffusion based on Lagrange multiplier approaches , SIAM J. Sci. Comput., 47 (2025), pp. A1983–A2011. [16] H. Garcke, R. N¨ urnberg, and Q. Zhao , Structure-preserving discretizations of two-phase Navier–Stokes flow using fitted and unfitted approaches , J. Comput. Phys., 489 (2023), p. 112276. [17] H. Garcke, D. Trautwein, and G. Zhang , Structure-preserving parametric finite element meth-ods for two-phase Stokes flow based on Lagrange multiplier approaches , J. Comput. Phys., 560 (2026), p. 114922. [18] Y. Guo and I. Tice , Stability of contact lines in fluids: 2D Navier–Stokes flow , J. Eur. Math. Soc., 26 (2024), pp. 1445–1557. [19] J. Hu, N. Lei, B. Li, and R. Tang , Energy dissipating ALE-MDR method for Navier–Stokes free boundary problems with moving contact line , SIAM J. Sci. Comput., 48 (2026), pp. A1284– A1311. [20] J. Hu and B. Li , Evolving finite element methods with an artificial tangential velocity for mean curvature flow and Willmore flow , Numer. Math., 152 (2022), pp. 127–181. [21] W. Jiang and B. Li , A perimeter-decreasing and area-conserving algorithm for surface diffusion flow of curves , J. Comput. Phys., 443 (2021), p. 110531. [22] N. Nangia, B. E. Griffith, N. A. Patankar, and A. P. S. Bhalla , A robust incompressible Navier-Stokes solver for high density ratio multiphase flows , J. Comput. Phys., 390 (2019), pp. 548–594. [23] J. K. Patel and G. Natarajan , A novel consistent and well-balanced algorithm for simulations of multiphase flows on unstructured grids , J. Comput. Phys., 350 (2017), pp. 207–236. [24] T. Qian, X.-P. Wang, and P. Sheng , Molecular scale contact line hydrodynamics of immiscible flows , Phys. Rev. E, 68 (2003), p. 016306. [25] , A variational approach to moving contact line hydrodynamics , J. Fluid Mech., 564 (2006), pp. 333––360. [26] W. Ren and W. E , Boundary conditions for the moving contact line problem , Phys. Fluids, 19 (2007), p. 022101. [27] , Derivation of continuum models for the moving contact line problem based on thermody-namic principles , Commun. Math. Sci., 9 (2011), pp. 597–606. [28] H. Tang and T. Tang , Adaptive mesh methods for one- and two-dimensional hyperbolic conser-vation laws , SIAM J. Numer. Anal., 41 (2003), pp. 487–515. [29] X. Xu , A unified variational framework on macroscopic computations for two-phase flow with moving contact lines , SIAM J. Sci. Comput., 45 (2023), pp. B776–B801. [30] E. Zeidler , Nonlinear Functional Analysis and its Applications: IV: Applications to Mathematical Physics , Springer-Verlag, New York, 1988. [31] Q. Zhao and W. Ren , An energy-stable finite element method for the simulation of moving contact lines in two-phase flows , J. Comput. Phys., 417 (2020), p. 109582. [32] Q. Zhao, W. Ren, and Z. Zhang , A thermodynamically consistent model and its conservative numerical approximation for moving contact lines with soluble surfactants , Comput. Methods Appl. Mech. Engrg., 385 (2021), p. 114033. 26

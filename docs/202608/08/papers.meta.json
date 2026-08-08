@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-08",
+  "date": "2026-08-08",
+  "generated_at": "2026-08-08T20:46:43",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/08/2608.03115v1-a-structure--preserving-ale--bgn--mdr-method-for-navier--stokes-free-boundary-problems-with-moving-contact-lines-and-gravity",
+      "section": "quick",
+      "title_en": "A structure--preserving ALE--BGN--MDR method for Navier--Stokes free boundary problems with moving contact lines and gravity",
+      "authors": "Harald Garcke, Jiashun Hu, Nuo Lei",
+      "date": "2026-08-04",
+      "pdf": "https://arxiv.org/pdf/2608.03115v1",
+      "score": "6.0",
+      "evidence": "用于自由边界问题的ALE方法，含移动接触线，可直接应用于降膜CFD模拟",
+      "tldr": "针对纳维-斯托克斯自由边界问题中重力离散不一致导致虚假速度的难题，提出一种结构保持的ALE有限元方法。通过将重力势能变分重述为移动边界积分，并利用辛普森求积精确计算，实现了重力相容的离散格式。结合BGN自由表面处理和MDR网格扩展，方法满足能量耗散和体积守恒，消除了重力虚假速度，实现稳定精确的界面追踪。数值实验验证了理论的正确性。",
+      "tags": "query:falling-film",
+      "abstract_en": "We propose a gravity-consistent arbitrary Lagrangian--Eulerian finite element method for incompressible Navier--Stokes free-boundary problems with moving contact lines. A direct body-force discretization of gravity may fail to ensure consistency between the discrete gravitational work and the variation of the gravitational potential energy on the evolving domain, resulting in an artificial consistency error and persistent spurious velocities near equilibrium. To remove this inconsistency, we reformulate the gravitational potential energy variation as a moving-boundary integral over intermediate ALE configurations and evaluate it exactly using Simpson's quadrature rule. This leads to a mildly nonlinear fully discrete scheme in which the gravitational contribution is exactly consistent with the discrete potential-energy variation. The proposed method preserves volume exactly, satisfies a discrete energy-dissipation law including gravitational potential energy, and under suitable assumptions, drives the discrete velocity to zero in the long-time regime, thereby excluding persistent gravity-induced spurious velocities. Together with the BGN treatment of the free surface and the MDR bulk mesh extension, the scheme maintains accurate interface tracking and good mesh quality near the moving contact line. Numerical experiments in two and three spatial dimensions confirm the theoretical properties.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
