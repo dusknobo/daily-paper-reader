@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-11",
+  "date": "2026-08-11",
+  "generated_at": "2026-08-11T21:26:06",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/11/2608.09478v1-energy-consistent-hyperbolic-approximation-for-a-class-of-fourth-order-partial-differential-equations",
+      "section": "deep",
+      "title_en": "Energy consistent hyperbolic approximation for a class of fourth-order partial differential equations",
+      "authors": "Rahul Barthwal, Firas Dhaouadi, Christian Rohde",
+      "date": "2026-08-10",
+      "pdf": "https://arxiv.org/pdf/2608.09478v1",
+      "score": "8.0",
+      "evidence": "针对薄膜流方程提出双曲松弛方法，可用于多相流CFD。",
+      "tldr": "四阶偏微分方程在薄膜流动和相分离等物理问题中广泛出现，但传统离散格式常因刚性而难以高效计算。本文提出一种能量一致的双曲松弛近似系统，通过引入松弛参数耗散能量，使其逼近原方程的李雅普诺夫泛函。基于相对能量框架，严格证明松弛系统弱熵解收敛到光滑解，数值实验包括薄膜方程和Cahn-Hilliard方程。该方法为高阶扩散方程提供稳定高效的数值框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this article, we propose a novel hyperbolic relaxation system for a general class of fourth-order nonlinear partial differential equations arising in the modelling of thin film flows or the phase separation of binary mixtures. The approximations are constructed to dissipate energies which recover the energy (Lyapunov) functional of the limit equation when the relaxation parameters vanish.   Using the relative energy framework, we prove the convergence of weak entropy solutions of the relaxation system to smooth solutions of the limit equation. We validate our analysis with a series of numerical examples for thin film equations and Cahn-Hilliard equations.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/11/2608.05787v1-onsager-variational-principle-based-lattice-boltzmann-model-for-three-phase-dielectric-fluid-flows",
+      "section": "quick",
+      "title_en": "Onsager-variational-principle-based Lattice Boltzmann Model For Three-phase Dielectric Fluid Flows",
+      "authors": "Xinyue Liu, Xu Qian, Fang Xiong, Lei Wang",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.05787v1",
+      "score": "6.0",
+      "evidence": "基于Onsager变分原理的三相电流体动力学格子玻尔兹曼模型，多相流CFD方法",
+      "tldr": "多相电流体动力学（EHD）在工程应用中至关重要，但现有三相EHD模型多基于唯象描述，缺乏热力学一致性并忽视表面电荷对流。本文基于Onsager变分原理推导出热力学自洽的三相EHD模型，并开发格子玻尔兹曼方法求解。经基准验证后，成功模拟电场下双液滴聚并分离及EHD-剪切流耦合行为，为探索多相EHD非线性动态提供了可靠工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "Multiphase electrohydrodynamic (EHD) flows play a crucial role in various engineering applications. However, existing numerical studies on three-phase electrohydrodynamic systems predominantly rely on phenomenological models, often neglecting thermodynamic consistency and critical surface charge convection mechanisms. To address these fundamental gaps, this paper proposes a thermodynamically consistent three-phase EHD model derived strictly from the Onsager variational principle. This theoretical framework intrinsically guarantees thermodynamic consistency and accurately captures complex multiphysics interactions without requiring a priori assumptions. Furthermore, a mesoscopic lattice Boltzmann method is developed to solve the proposed model, enabling the natural capture of interfacial evolution and charge transport. The accuracy of the numerical framework are rigorously validated against several benchmark cases, including electroosmotic flow in microchannels, the spreading of a three-phase liquid lens, the equilibrium of static compound droplet, and the deformation of compound droplet under uniform electric field. Using this validated framework, we investigate EHD applications, specifically simulating the complex dynamics of double droplet coalescence and separation under electric field, as well as the behavior of droplets subjected to combined EHD and shear flow. Overall, this work provides a robust, thermodynamically reliable numerical tool for exploring the highly nonlinear behaviors of multiphase EHD systems.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
