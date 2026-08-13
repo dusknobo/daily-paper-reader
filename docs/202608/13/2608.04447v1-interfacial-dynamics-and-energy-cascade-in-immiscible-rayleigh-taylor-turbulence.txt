@@ -1,0 +1,1994 @@
+Title: Interfacial dynamics and energy cascade in immiscible Rayleigh-Taylor turbulence
+
+URL Source: https://arxiv.org/pdf/2608.04447v1
+
+Published Time: Thu, 06 Aug 2026 00:36:05 GMT
+
+Number of Pages: 42
+
+Markdown Content:
+> Under consideration for publication in J. Fluid Mech.
+
+Banner appropriate to article type will appear here in typeset article 
+
+# Interfacial dynamics and energy cascade in immiscible Rayleigh-Taylor turbulence 
+
+Dongxiao Zhao 1, Xiaoxue Huang 2, and Gaojin Li 1 
+
+> 1School of Ocean and Civil Engineering, Shanghai Jiao Tong University, Shanghai 200240, PR China
+> 2Department of Physics, National University of Defense Technology, Changsha, Hunan 410000, PR China
+> Corresponding author: Gaojin Li, gaojinli@sjtu.edu.cn (Received xx; revised xx; accepted xx)
+
+We investigate interfacial dynamics and multiscale energy transfer in immiscible Rayleigh –
+
+Taylor turbulence using numerical simulations with varying surface tension coefficients 
+
+𝜎 . Capillarity is shown to control characteristic length scales, interfacial area, and global energy and enstrophy budgets. The flow exhibits self-similar evolution with respect to surface tension, with the maximum kinetic energy scaling as 𝜎 1/2 and the flow duration as 
+
+𝜎 −1/4. A scale-by-scale budget shows that surface tension removes kinetic energy at large scales while injecting it at small scales, with the crossover occurring near the Hinze scale. We further recast and verify a local kinematic relationship between surface-tension power and interface stretching, up to conservative transport, 𝒇 𝜎 · u = −𝜎 S |∇ 𝑐 | + Transport, where 𝒇 𝜎 is the surface-tension force, 𝒖 the velocity, 𝑐 the heavy-fluid volume fraction, and 
+
+S the interface stretch rate. This relation links kinetic-energy transfer to the scalar-variance cascade and shows that energy transfer to the interface is governed by local strain. Statistics of individual bubbles and droplets reveal vertically elongated filaments with diameters of about three capillary scales, yielding a linear volume-area relation. Their vertical velocities scale with the square root of equivalent diameter, consistent with drag-buoyancy balance. These findings, particularly the direct link between surface tension power and resolved interface stretching, provide a rigorous physical framework for developing subgrid-scale closures for large eddy simulation of immiscible turbulent flows. 
+
+Key words: Buoyancy-driven instability, immiscible turbulence, surface tension, interface stretch-ing 
+
+1. Introduction 
+
+When a heavy fluid overlies a lighter fluid in a gravitational field, the interface becomes unstable to the Rayleigh –Taylor (RT) instability (Rayleigh 1883; Taylor 1950). In this process, small interfacial perturbations grow due to baroclinic effects arising from the misalignment of the density and pressure gradients. The RT instability evolves from an 
+
+Abstract must not spill onto p.2 0 X0-1 arXiv:2608.04447v1 [physics.flu-dyn] 5 Aug 2026 D. Zhao, X. Huang, and G. Li 
+
+initial linear stage, where perturbation amplitudes are small relative to their wavelengths and individual modes grow independently, to a nonlinear saturation stage in which mode coupling leads to the formation of coherent bubbles and spikes (Zhou 2017 a,b). Eventually, the system enters self-similar turbulent stages, characterized by a mixing width that scales quadratically with time and the development of a fully established energy cascade (Zhou 
+
+et al. 2021; Zhou 2024). RT instability is of broad relevance in both natural and engineering contexts. Examples include astrophysical flows such as supernova explosions and remnants (Arnett et al. 1989; Blondin & Ellison 2001), accretion disk dynamics (Krumholz et al. 
+
+2009), degradation of ignition performance in inertial confinement fusion (Zhou et al. 
+
+2025), mixing processes in combustion chambers (Sykes et al. 2021), and the spread of underwater oil spills (Brizzolara et al. 2024). In practical scenarios, RT instability is frequently complicated by additional physical mechanisms, including compressibility, mass ablation, rotation, and magnetic fields (Xu 
+
+et al. 2025; Briard et al. 2024; Bian et al. 2026). More recently, much attention has shifted towards immiscible RT flows where interfacial dynamics and surface tension play a dominant role (Chertkov et al. 2005; Young & Ham 2006 a; Zanella et al. 2020; Tavares et al. 2021; Zhao & Li 2026). These multiphase systems are ubiquitous in nature and industry, ranging from upper-ocean mixing to the processing of food emulsions, pharmaceuticals, and cosmetics (McClements 2010). In such regimes, particularly when the fluids possess comparable densities, gravitational acceleration drives the interface into a turbulent emulsion characterized by a broad spectrum of spatial and temporal scales. It has been well-established that, within the context of homogeneous isotropic turbulence, the size distribution of polydisperse droplets in the breakup-dominated regime follows a 
+
+−10 /3 power-law scaling (Deane & Stokes 2002). Beyond isotropic turbulence, this scaling universality has been corroborated across various flow configurations, including channel flows (Lu et al. 2025), Taylor –Couette turbulence (Wang et al. 2022), and even yield stress fluids (Girotto et al. 2022). However, the extent to which this classical scaling applies to the non-homogeneous, anisotropic, gravity-driven RT turbulence remains an open question. Regarding energy cascade in immiscible RT turbulence, Chertkov et al. (2005) developed a phenomenological model extending prior miscible RT theories (Zhou 2017 a,b). Their analysis confirmed quadratic growth of the turbulent mixing zone ( 𝐿 ∝ 𝑡 2) and a Kolmogorov cascade between 𝐿 and the viscous scale 𝜂 ∝ 𝑡 −1/4. Surface tension produces an emulsion-like state with characteristic droplet size 𝑙 𝑑 ∝ 𝑡 −2/5, determined by the balance between kinetic and interfacial energy densities. For 𝑙 𝑑 ≥ 𝜂 , scales above 𝑙 𝑑 follow an Obukhov –Corrsin cascade, while scales below 𝑙 𝑑 develop a capillary-wave energy cascade along droplet surfaces in parallel with bulk Kolmogorov turbulence. At late times, droplet size shrinks below viscous scale and the capillary cascade collapses, yielding a fine emulsion characterized by Batchelor-type velocity fields and logarithmic density structure functions. The above 3-D phenomenological theory has been extended to 2-D immiscible RT flows using lattice Boltzmann simulations (Tavares et al. 2021). Within the adapted Bolgiano –Obukhov framework, large-scale mixing in 2-D flows retains the 3-D scalings (𝐿 ∝ 𝑡 2, 𝑈 ∝ 𝑡 ). However, unlike the 3-D droplet-size scaling ( 𝑙 𝑑 ∝ 𝑡 −2/5), 2-D droplets scale as 𝑙 𝑑 ∝ 𝑡 2/11 , with total interface length 𝐿 tot ∝ 𝑡 20 /11 and enstrophy growth 𝛺 ∝ 𝑡 3/2.These findings indicate that dimensionality modifies scaling exponents while preserving the core physics of immsicible RT turbulence. Recently, Brizzolara et al. (2024) validated this phenomenological theory in immiscible Boussinesq RT turbulence via experiments and direct numerical simulations of immiscible fluids, such as oil –water systems. They confirmed the predicted 𝐿 ∝ 𝑡 2 and 𝑙 𝑑 ∝ 𝑡 −2/5
+
+scalings in Chertkov et al. (2005), along with the coexistence of bulk gravity-driven and sub-droplet-scale capillary-driven turbulence. Their key advancement was identifying  
+
+> 0X0-2
+
+Journal of Fluid Mechanics 
+
+a single, time-independent control parameter, 𝑅𝑒 0, that quantifies the scale separation between the mean droplet size and the Kolmogorov scale and thus governs the existence of capillary-driven turbulence. This capillary-driven turbulence regime emerges only when 
+
+𝑅𝑒 0 > 1, i.e., when the Kolmogorov scale is smaller than the mean droplet size. The existence of this regime enables prediction of the temporal evolution of interfacial area-to-volume ratios, a key quantity for assessing oil-spill biodegradation efficiency. Phenomenological models for immiscible RT turbulence predict the temporal scalings of key length scales and global energies, but the underlying inter-scale transfer mechanisms are more directly revealed by scale-by-scale budgets. In multiphase turbulence, such analyses have been developed through several complementary approaches, including spectral, coarse-grained, wavelet-based, and point-splitting formulations. Spectral methods have been used to quantify kinetic-energy spectra and fluxes in binary-fluid turbulence and emulsions (Perlekar 2019; Crialesi-Esposito et al. 2022 b, 2023). Meanwhile, coarse-grained formulations provide a physical-space description of scale-to-scale transfer in flows with spatially varying density, viscosity, or phase distribution (Aluie 2013). Related wavelet-based methods similarly combine scale and spatial localization (Freund & Ferrante 2019). From a complementary point-splitting perspective, Thiesset et al. (2020) introduced a scale-space description of liquid transport, separating the transport of liquid volume fraction in physical space from transport across scales. More recently, Thiesset & Vah´ e(2025) derived a K´ arm´ an-Howarth-Monin equation for multiphase turbulence, accounting for density and viscosity variations across phases as well as surface-tension effects, thereby providing a direct scale-by-scale kinetic-energy budget for multiphase flows. These scale-by-scale studies have revealed cascade mechanisms that are specific to multiphase turbulence. In buoyancy-driven bubbly flows, energy spectra show a dual scaling, with a Kolmogorov-like 𝑘 −5/3 range above the bubble diameter and a pseudo-turbulent 𝑘 −3 range below it (Pandey et al. 2023). In isotropic turbulent emulsions, surface tension provides an additional energy-transfer pathway, extracting kinetic energy at large scales through droplet deformation and breakup and returning it at smaller scales through coalescence or interfacial relaxation (Crialesi-Esposito et al. 2022 b, 2023; Thiesset & Vah´ e2025). Scale-by-scale budgets further show that advective fluxes dominate inertial-range transfer, whereas surface tension and viscosity regulate energy conversion and dissipation near droplet and viscous scales. Whether these cascade features carry over to immiscible RT turbulence remains unclear. Unlike statistically stationary and nearly homogeneous emulsions or bubbly flows, RT turbulence is strongly unsteady, inhomogeneous, and anisotropic, involving simultaneous mixing-layer growth, interfacial deformation, droplet and bubble formation, and gravi-tational energy release. Addressing how energy is redistributed among these processes through scale-by-scale density and kinetic-energy budgets is therefore a central objective of the present work. Beyond interfacial modulation of multiphase energy cascade, the breakup and coa-lescence of individual bubbles/droplets and swarms (Vela-Mart´ ın & Avila 2022), their size distribution (Skartlien et al. 2013), and their effects on turbulent statistics (Dodd & Ferrante 2016) and rheological properties (Yi et al. 2023) are crucial to the physics of multiphase flows. They underpin applications such as spray atomization, emulsion rheology, precipitation prediction, and climate modeling, as well as for large-eddy simu-lations with limited inertial range resolution (McClements 2010; Ni 2024). In canonical isotropic turbulence, droplet size distributions follow Hinze-scale-based power laws in which super-Hinze droplets undergo local fragmentation with a 𝑑 −10 /3 scaling, while sub-Hinze structures experience nonlocal coalescence with 𝑑 −3/2 scaling (Crialesi-Esposito 
+
+et al. 2022 b; Cannon et al. 2024). Beyond homogeneous, isotropic cases, investigations of  
+
+> 0X0-3
+
+D. Zhao, X. Huang, and G. Li 
+
+immiscible two-fluid turbulence in complex configurations are emerging. Scarbolo et al. 
+
+(2015) identified a Weber-number threshold governing stable coalescence versus dynamic breakup-coalescence equilibrium in turbulent channel flow. Yi et al. (2021) experimentally linked droplet statistics to effective viscosity in high-volume-fraction Taylor-Couette flows. In turbulent shear flow, Rosti et al. (2019) validated the Hinze criterion in turbulent shear flows. Trummler et al. (2022) distinguished gravitational segregation from coalescence through timescale analysis. Despite these advances, droplet statistics and their turbulence modulation in buoyancy-driven flows such as immiscible RT turbulence remain largely unexplored. The remainder of this paper is organized as follows. Section 2 outlines the governing equations and the numerical framework employed in the simulations. In Section 3, we present the global analysis of the flow, including flow visualizations, the evolution of characteristic length scales, and the similarity of global energy budgets with respect to surface tension. Section 4 focuses on scale-by-scale analysis. We present coarse-grained budgets to characterize the cascades of scalar variance and kinetic energy, specifically identifying the role of surface tension power in coupling these two quantities. This section also establishes the theoretical link between surface tension power and interface stretch rate. In Section 5, we examine the statistics of discrete bubbles and droplets, including their geometry, morphology, and dynamics, and provide direct validation of the relationship between surface tension power and the scalar variance cascade. Finally, we summarize our main findings in Section 6. 
+
+> 2. Preliminaries and Simulations
+
+2.1. Governing equations and numerical methods 
+
+We model the immiscible two-phase turbulent flow using a single-fluid incompressible formulation. The governing equations are the continuity equation, 
+
+∇ · u = 0, (2.1) and the momentum equation, 
+
+𝜌 
+
+ 𝜕 u
+
+𝜕𝑡 + u · ∇ u
+
+
+
+= −∇ 𝑃 + ∇ · 𝝉 𝑢 + 𝒇 𝜎 + 𝜌 𝒈 , (2.2) where u, 𝑃 , and 𝜌 are the velocity, pressure, and density fields. The terms on the right-hand side of Eq. (2.2) are the pressure gradient, the viscous stress tensor 𝝉 𝑢 = 𝜇 (∇ u + ∇ u𝑇 ),the surface tension force 𝒇 𝜎 , and the gravitational force, with 𝜇 and 𝒈 being the dynamic viscosity and gravitational acceleration. The fluid-fluid interface is tracked by the volume-of-fluid (VOF) method, which advects the volume fraction of the dispersed phase (heavy fluid), 𝑐 :
+
+𝜕𝑐 𝜕𝑡 + u · ∇ 𝑐 = 0. (2.3) The surface tension force is implemented using the continuous surface force (CSF) model, 
+
+𝒇 𝜎 = 𝜎𝜅 ∇𝑐 , where 𝜎 is the surface tension coefficient and 𝜅 is the interface curvature (Brackbill et al. 1992). The local fluid properties are determined by a linear mixture rule based on 𝑐 :
+
+𝜌 (𝑐 ) = 𝑐𝜌 ℎ + ( 1 − 𝑐 )𝜌 𝑙 , and 𝜇 (𝑐 ) = 𝑐𝜇 ℎ + ( 1 − 𝑐 )𝜇 𝑙 , (2.4) where the subscripts 𝑙 and ℎ denote the light and heavy phases, respectively.   
+
+> 0X0-4
+
+Focus on Fluids articles must not exceed this page length Journal of Fluid Mechanics 
+
+Simulations are performed using the open-source code PARIS-Simulator (Aniszewski 
+
+et al. 2021). This code has been extensively validated and applied to a variety of two-phase turbulent flows, including mixing layers (Jiang & Ling 2021), jet atomization (Crialesi-Esposito et al. 2022 a), and emulsion segregation (Trummler et al. 2022). The numerical scheme employs a finite-volume method on a staggered grid, where velocities are located at cell faces and scalar quantities (pressure, volume fraction) at cell centers. Time integration is performed with a second-order predictor-corrector scheme. For spatial discretization, viscous terms are calculated using a second-order central difference scheme, and convective fluxes for momentum are handled with the Superbee flux limiter. Incompressibility is enforced via the Chorin projection method, which requires solving a Poisson equation for pressure using the PFMG multigrid solver in the HYPRE library. The VOF interface is advected using a Lagrangian-explicit scheme, and its curvature is computed with the height-function method. Further details on the numerical implementation can be found in Aniszewski et al. (2021). 2.2. Spatial coarse-graining 
+
+In this work, we analyze scale interactions in immiscible RT turbulence using spatial coarse-graining, also known as the filtering approach. This is a general framework for decomposing a nonlinear system into components at different scales and studying the interactions between them. In the context of turbulence, coarse-graining provides a natural way to understand inter-scale dynamics (Eyink 2005). The core of the method involves convolving a flow variable a(x) with a low-pass filter kernel 𝐺 ℓ of characteristic width ℓ:
+
+aℓ (x) =
+
+∫
+
+𝑑 𝑑 r 𝐺 ℓ (r) a(x − r). (2.5) where the kernel is a dilated version of a normalized function 𝐺 , defined as 𝐺 ℓ (r) =
+
+ℓ−𝑑 𝐺 (r/ℓ) in 𝑑 dimensions. This operation separates the field into a large-scale component, 
+
+aℓ (x), and a small-scale component, a′ (x) = a(x) − aℓ (x). Similarly, we define a band-pass filtered quantity that isolates scales within the range [ℓ1, ℓ 2] as a[ℓ1 ,ℓ 2 ] ≡ aℓ1 − aℓ2 .This filtering framework is versatile, encompassing Fourier analysis and wavelet analysis as special cases with specific choices of kernels (Aluie & Eyink 2009; Zhao & Aluie 2023). In this study, we use a Gaussian kernel of the form: 
+
+𝐺 ℓ (r) =
+
+ 6
+
+𝜋ℓ 2
+
+3/2
+
+exp 
+
+
+
+− 6|r|2
+
+ℓ2
+
+
+
+. (2.6) For notational convenience, the subscript ℓ on filtered quantities will be omitted hereafter unless required for clarity. In simulations with non-periodic boundaries, such as the rigid top and bottom walls in our RT configuration, filtering near the boundaries requires special treatment. We extend the fields beyond the physical domain in a manner consistent with the boundary conditions: velocity is set to zero, scalar fields such as density and volume fraction are extended with zero normal gradient, and pressure is extended according to hydrostatic balance. The Gaussian convolution is then applied to the extended fields, and only the filtered values inside the physical domain are retained. In variable-density flows, the definition of large-scale kinetic energy is non-trivial. While several options exist (Zhao & Aluie 2018), we adopt the Favre-filtered kinetic energy, 𝐾 (eu) = 12 𝜌 |eu|2, where eu = 𝜌 u/𝜌 is the Favre density-weighted filtered velocity. This choice is motivated by two key factors. First, the Favre formulation ensures that kinetic energy scale transfer is independent of viscous effects, a crucial property for robust  
+
+> 0X0-5
+
+D. Zhao, X. Huang, and G. Li 
+
+Case 𝐿 𝑥 × 𝐿 𝑦 × 𝐿 𝑧 𝑁 𝑥 × 𝑁 𝑦 × 𝑁 𝑧 b𝑇 max 𝛷 𝜎 Re 𝜆 We 𝛥 We 𝐿 
+
+X1 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 5 × 10 −5 61 0.26 49 X2 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 1 × 10 −4 63 0.13 26 X4 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 2 × 10 −4 74 0.065 24 X8 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 4 × 10 −4 117 0.0325 33 X10 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 5 × 10 −4 122 0.026 28 X20 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 1 × 10 −3 171 0.013 26 X30 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 1.5 × 10 −3 165 0.0087 21 X100 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 5 × 10 −3 354 0.0026 14 X150 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.5 7.5 × 10 −3 1.2 0.0017 1.9 × 10 −4
+
+X1Ratio4 1.6 × 1.6 × 6.4 256 × 256 × 1024 27.2 0.5 5 × 10 −5 74 0.26 69 X1 Φ05 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.05 5 × 10 −5 33 0.26 3X1 Φ95 1.6 × 1.6 × 3.2 256 × 256 × 512 14.5 0.95 5 × 10 −5 42 0.26 9
+
+Table 1. Parameters of the numerical simulations. For all cases, the densities of the light and the heavy fluids are fixed at 𝜌 𝑙 = 0.9, 𝜌 ℎ = 1.0, the density difference is 𝛥𝜌 = 𝜌 ℎ − 𝜌 𝑙 , the mean density is 𝜌 𝑚 = (𝜌 𝑙 + 𝜌 ℎ)/ 2, and the kinematic viscosity is spatially constant and fixes at 2 .55 × 10 −4. The Taylor-scale ( 𝜆 , defined in equation 3.4) Reynolds number is Re 𝜆 = 𝑢 ′𝜆 /𝜈 , the grid Weber number is We 𝛥 = 𝜌𝑔𝐿 1/3 𝛥𝑥 5/3 
+
+> 𝜎 𝛥𝜌
+> 2𝜌 𝑚
+
+, and the integral scale Weber number is We 𝐿 = 𝜌 𝑙 𝑢 ′2𝑙 𝜎 where 𝑢 ′ is the root-mean-square turbulent velocity and 𝑙 is the integral length scale. The Reynolds and Weber numbers are evaluated at the instants of maximum dissipation: approximately b𝑡 = 5.8-6 .6 for cases X1-X150, b𝑡 = 11 .8 for case X1Ratio4, and b𝑡 ≈ 8 for cases X1 Φ05 and X1 Φ95. The column b𝑇 max denotes the maximum nondimensional time reached in each simulation. The column 
+
+Φ denotes the volume fraction of the heavy fluid. 
+
+scale analysis, particularly in flows with high density contrast (Zhao & Aluie 2018). Second, it simplifies the filtered momentum equation, making it a standard and practical choice in large-eddy simulations of multiphase flows (Saeedipour & Schneiderbauer 2021; Jain & Elnahhas 2025). Although eu is not divergence-free, the benefits of Favre filtering are compelling. Accordingly, our analysis of inter-scale kinetic energy transfer and its connection to interface dynamics will be based on this framework. 2.3. Simulation configurations 
+
+We simulate two-phase flow within a rectangular domain under a gravitational field, starting with an unstable density stratification. The top and bottom boundaries are no-slip walls, while the lateral boundaries are periodic. For simplicity, the contact angle at the walls is set to 𝜋 /2. Initially, the flow is driven by the RT instability, where potential energy is converted into kinetic energy. This leads to an emulsion-like turbulent stage. Subsequently, the decay of turbulence is initiated when viscous dissipation, primarily from coherent structures interacting with the walls, overwhelms the potential energy release. The turbulent emulsion then gradually segregates into two stably stratified, pure phases. Figure 1 (a)-(c) visualizes the density field at early, intermediate, and late times, clearly illustrating the initial RT instability growth, the formation of the turbulent emulsion, and its final segregation. The parameters for the numerical simulations presented in this paper are summarized in Table 1. We performed two distinct sets of simulations. The first set, X1 –X150, consists of binary mixtures with a fixed heavy fluid volume fraction of 0.5, where each case differs only by its surface tension coefficient. The second set, X1 Φ05 and X1 Φ95, is designed to study droplet and bubble dynamics at dilute (heavy fluid fraction Φ = 0.05) and dense (Φ = 0.95) volume fractions of the heavy fluid. In all simulations, the initial fluid interface was perturbed with random-phase sinusoids over a wavenumber range of 𝑘 ∈ [ 15 , 30 ], with 
+
+0 X0-6 Journal of Fluid Mechanics                   
+
+> Figure 1. Visualizations of the density fields. Panels (a)-(c) show the density visualizations for case X1 at non-dimensional time b𝑡 =𝑡 √︃ 𝐴 𝑡 𝑔 𝐿 𝑥 =2.7,6,13 .6, respectively, with corresponding Taylor-scale Reynolds numbers Re 𝜆 =17 .4,54 .0, and 17 .1. Panels (d)-(f) show the density visualizations at non-dimensional b𝑡 =6 for cases X2, X4, and X8, respectively, with corresponding Re 𝜆 =58 .2, 62 .1, and 62 .2.
+
+modal amplitudes scaling as 𝑘 −1 (Dimonte et al. 2004). The grid resolution is confirmed to be adequate, as indicated by a grid Grashof number of 𝐺𝑟 = 𝛥𝜌𝑔𝛥 3/( 𝜌 𝑚 𝜈 2) = 0.39 < 1, which is sufficient for resolving buoyancy-induced turbulence. For each simulation, the Taylor-scale Reynolds number (Re 𝜆 ) and the integral-scale Weber number (We 𝐿 ) are evaluated at the instant of maximum turbulent dissipation. A more detailed statistical analysis of these cases will be presented in the following sections. 
+
+3. Temporal evolution of immiscible RT turbulence 
+
+The simulations listed in Table 1 are transient, capturing both the growth and subsequent decay of turbulent kinetic energy. Figure 1 presents representative snapshots of the density field to illustrate this evolution. Panels (a) –(c) depict three distinct stages in simulation case X1: (a) initial RT growth, characterized by classical bubble and spike structures; (b) the turbulent emulsion stage, marked by strong interfacial deformations and the formation of abundant bubbles and droplets; and (c) the late-time decay and phase segregation stage. These snapshots correspond to non-dimensional times b𝑡 = 2.7, 6, 13 .6, respectively. Here, b𝑡 ≡ 𝑡 /𝜏 , where 𝜏 =√︁ 𝐿 𝑥 /( 𝐴 𝑡 𝑔 ) represents the characteristic RT time scale, and 
+
+𝐴 𝑡 = (𝜌 ℎ − 𝜌 𝑙 )/( 𝜌 ℎ + 𝜌 𝑙 ) is the Atwood number, with 𝜌 𝑙 , 𝜌 ℎ densities of the light and the heavy fluids. To demonstrate the effect of surface tension, panels (d) –(f) display snapshots from simulations X2, X4, and X8 at the same non-dimensional time as panel (b). A visual comparison reveals that the characteristic length scale of the flow structures increases with the surface tension coefficient 𝜎 . This indicates that surface tension imposes a small-scale 
+
+0 X0-7 D. Zhao, X. Huang, and G. Li 0 10 20 30 40 50 
+
+k
+
+> 0.00.20.40.60.81.0
+> γ(k)
+
+(a) X1 X2 X4 X8 X10 X20 X30        
+
+> 0246810 12 14
+
+̂
+
+t
+
+> 0.00.20.40.60.81.0
+> √h(t)/L z
+
+(b)           
+
+> Figure 2. (a) Linear RT growth rate from equation (3.1) as a function of perturbation wavenumber 𝑘 , including viscous and surface-tension effects. (b) Time evolution of the mixing width ℎ(𝑡 ); the green, red, and blue shaded intervals denote the RT growth, turbulent-emulsion, and segregation stages, respectively. Dashed lines indicate linear fits to √︁ ℎ(𝑡 )over b𝑡 ∈ [ 2,5.4], yielding 𝛼 =0.034, 0 .043, and 0 .048 for cases X1, X2, and X4 (blue, black, and red), respectively.
+
+cutoff on density (and volume fraction) fluctuations. Additional visualizations for cases X2, X4, and X8 at b𝑡 = 13 .6 are provided in figure 26 in the Appendix, showing that the flow is close to a stably stratified state at this late time. 3.1. Evolution of the mixing width 
+
+During the initial linear stage, the growth rate of a single-mode RT perturbation, including both viscous and surface-tension effects (Bellman & Pennington 1954; Sohn 2009), is 
+
+𝛾 (𝑘 ) = −𝜈𝑘 2 +√︄ 𝐴 𝑡 𝑘𝑔 − 𝜎𝑘 3
+
+𝜌 𝑙 + 𝜌 ℎ
+
++ ( 𝜈𝑘 2)2. (3.1) In this regime, different perturbation modes evolve independently. Figure 2(a) shows according to equation (3.1) that, for fixed surface tension, the growth rate 𝛾 (𝑘 ) increases with wavenumber at small 𝑘 , then decreases and vanishes at the cutoff wavenumber 
+
+𝑘 𝑐 =√︁ 𝑔 (𝜌 ℎ − 𝜌 𝑙 )/ 𝜎 . As 𝜎 increases, both the overall growth rates and the cutoff wavenumber decrease monotonically, indicating a progressively narrower and slower-growing unstable band. This trend is also evident in the early-time evolution of the mixing width in figure 2(b), where the onset and growth of the mixing zone are increasingly delayed as 𝜎 increases. In particular, from equation (3.1), the instability is suppressed in the inviscid limit when 
+
+𝜎 ≥ 𝜎 crit (𝑘 ) = (𝜌 ℎ −𝜌 𝑙 )𝑔 𝑘 2 . For the domain-scale mode, 𝜆 = 𝐿 𝑥 = 2𝜋 /𝑘 , this gives 
+
+𝜎 crit = (𝜌 ℎ − 𝜌 𝑙 )𝑔𝐿 2
+
+> 𝑥
+
+4𝜋 2 . (3.2) As shown in Table 1, case X30 ( 𝜎 /𝜎 crit = 0.23) remains well below marginal stability, whereas case X100 ( 𝜎 /𝜎 crit = 0.77) lies near the stability threshold and case X150 (𝜎 /𝜎 crit = 1.15) is fully suppressed. We therefore focus mainly on cases X1-X30 ( 𝜎 /𝜎 crit =
+
+0.0077-0 .23), with cases X100 and X150 included for reference. The linear behavior in the early RT stage persists until the perturbation amplitude reaches roughly one-tenth of the wavelength (Zhou 2017 a), at which point nonlinear effects become important. The subsequent dynamics are then dominated by nonlinear interactions, leading to the emergence of coherent rising bubbles and descending spikes, 
+
+0 X0-8 Journal of Fluid Mechanics 
+
+accompanied by an increasing level of multi-scale interactions. The vertical extent of these structures is defined as the mixing width, ℎ(𝑡 ). At sufficiently high Reynolds numbers and with high-wavenumber initial perturbations, the RT instability reaches a self-similar state where the mixing width grows quadratically: ℎ(𝑡 ) = 𝛼𝐴 𝑡 𝑔𝑡 2. Here, 𝛼 is a growth coefficient. For 3-D miscible RT instability, 𝛼 typically ranges from 0.02 to 0.04 (Dimonte 
+
+et al. 2004), whereas for immiscible fluids, it increases to approximately 0 .04–0 .05 (Young & Ham 2006 b). For the mixing width, we adopt an integral definition that remains valid throughout the simulation, encompassing both the growth and decay phases (Cabot & Cook 2006): 
+
+ℎ(𝑡 ) = 2
+
+∫ ∞−∞ 
+
+min (⟨ 𝑐 ⟩𝑥 𝑦 (𝑧, 𝑡 ), 1 − ⟨ 𝑐 ⟩𝑥 𝑦 (𝑧, 𝑡 )) 𝑑𝑧 (3.3) where ⟨𝑐 ⟩𝑥 𝑦 (𝑧, 𝑡 ) denotes the horizontal average of the volume fraction field. Figure 2(b) shows the time evolution of the mixing width for cases X1 –X30, which all display the same overall trend. At early times, ℎ(𝑡 ) increases exponentially, followed, in the low surface tension cases (X1 –X4 in dashed lines), by a quadratic growth interval. As the mixing layer thickens, wall confinement increasingly inhibits further expansion and ℎ saturates at a maximum of about 0 .8. Beyond this peak, RT-driven turbulence decays and the emulsion segregates, so ℎ(𝑡 ) decreases toward zero as the flow relaxes to a separated, stably stratified configuration. Consistent with this progression, we view the evolution in figure 2(b) as moving from an RT growth regime (shaded green) to a turbulent emulsion stage (red), and finally to a segregation regime (blue) marked by decaying turbulence and phase separation. The dashed lines in figure 2(b) highlights the early-time evolution of the mixing width. The low –surface-tension cases (X1 –X4) show a distinct quadratic-growth interval, whereas the higher –surface-tension cases (X8 –X30) do not, because larger 𝜎 confines the unstable spectrum to long wavelengths (small 𝑘 , see figure 2(a)) and, at the moderate Reynolds numbers considered here, prevents the emergence of the self-similar scaling observed at lower surface tension (Young & Ham 2006 b). For X1 –X4, √︁ ℎ(𝑡 ) grows approximately linearly over a finite window, with 𝛼 = 0.034, 0 .043, and 0 .048 for X1, X2, and X4, respectively from numerical fits. These coefficients exceed values typically reported for miscible RT flows, consistent with surface tension suppressing small-scale mixing and preserving coherent bubble structures (Briard et al. 2024). Moreover, 𝛼 increases with 
+
+𝜎 , since higher surface tension shifts the dominant mode to longer wavelengths and the bubble/spike terminal velocity increases with wavelength in two-phase RT flows (Sohn 2009). As 𝜎 increases, this quadratic-growth window also narrows and vanishes entirely for X8 and above. 3.2. Characteristic length scales and interfacial area 
+
+In the evolution of two-phase turbulence, multi-scale interactions lead to an extended iner-tial range and the emergence of characteristic length scales with distinct scale separation. The key characteristic length scales in the two-phase turbulent systems are the Kolmogorov scale ( 𝜂 ), the Taylor microscale ( 𝜆 ), and the Hinze scale ( 𝑙 𝐻 ). In the current context, these scales are defined as: 
+
+𝜂 = (𝜌 𝑙 𝜈 3/𝐷 )1/4, 𝜆 =
+
+" ⟨𝑢 ′2 
+
+> 𝑧
+
+⟩⟨( 𝜕𝑢 ′ 
+
+> 𝑧
+
+/𝜕𝑧 )2⟩
+
+#1/2
+
+, 𝑙 𝐻 = 0.725 (𝜎 /𝜌 𝑙 )3/5 (𝐷 /𝜌 𝑙 )−2/5 (3.4) where 𝐷 is the mean kinetic energy dissipation rate, 𝑢 ′ 
+
+> 𝑧
+
+is the root-mean-square vertical velocity fluctuation, 𝜈 is the kinematic viscosity, and 𝜌 𝑙 is the light fluid density. Here, the Taylor scale is evaluated from the vertical velocity gradient, while the horizontal Taylor  
+
+> 0X0-9
+
+D. Zhao, X. Huang, and G. Li 
+
+scales are smaller than the vertical one due to flow anisotropy (Zhou & Cabot 2019). Previous studies on miscible RT turbulence (Zhao et al. 2022, 2025) have confirmed that the classical definitions for the Kolmogorov and Taylor scales remain applicable. In this work, we will demonstrate that, in addition to 𝜂 and 𝜆 , the above Hinze scale definition similarly provides a crucial benchmark for immiscible RT turbulence, effectively predicting the scale at which surface tension transitions from acting as a sink to a source of kinetic energy. Figure 3 presents the temporal evolution of the characteristic length scales defined in equation (3.4), normalized by the grid size 𝛥𝑥 . In panel (a), the normalized Kolmogorov scale satisfies 𝜂 /𝛥𝑥 > 1.5/𝜋 for all simulation cases (X1 –X30). This confirms that the velocity fields are well-resolved according to the criterion of Pope (2001). The evolution of 
+
+𝜂 follows a consistent trend across all cases: a sharp rise and subsequent fall during the initial transient, followed by a plateau characteristic of well-developed turbulence (5 < b𝑡 < 10). Finally, the scale gradually increases during the decaying phase ( b𝑡 > 10). Notably, the duration of the well-developed turbulence phase shortens as the surface tension coefficient increases, reflecting the modulation of the flow field by surface tension. The Taylor microscale 𝜆 in panel (b) displays a stronger dependence on surface tension than the Kolmogorov scale. Specifically, 𝜆 increases with 𝜎 , consistent with the physical intuition that the velocity field becomes spatially smoother in high-surface-tension regimes. Low surface tension cases (X1 –X4) show a gradual temporal change. In contrast, high surface tension cases (X8 –X30) exhibit more drastic changes in time. The Taylor scales in different cases intersect during the turbulent emulsion stage ( b𝑡 ∈ [ 6, 10 ]). This crossing likely occurs because the interaction between large-scale RT structures and the domain walls begins to dominate over the effects of surface tension modulation. Panel (c) of figure 3 shows that the Hinze scale 𝑙 𝐻 increases with surface tension 𝜎 ,consistent with equation (3.4). In the high-𝜎 cases, 𝑙 𝐻 rises more rapidly after the plateau, indicating a faster decay of turbulent fluctuations. For reference, the capillary length 
+
+𝑙 𝑐 ≡√︁ 𝜎 /( 𝛥𝜌 𝑔 ) is shown as dashed lines. Notably, the minimum Hinze scale reached during the turbulent-emulsion stage is close to 𝑙 𝑐 , suggesting that breakup is ultimately limited by capillary stabilization under gravity-driven forcing. In immiscible RT turbulence, energy is injected by buoyancy and transferred through an approximately Kolmogorov cascade (Chertkov et al. 2005). During the growth phase the dissipation increases, driving 
+
+𝑙 𝐻 downward, but surface tension progressively suppresses fragmentation at small scales. Because the large-scale driving accelerations remain 𝑂 (𝑔 ), the cascade cannot sustain stable droplets much smaller than the scale at which surface tension balances gravity, i.e., 
+
+𝑙 𝑐 . Consequently, min (𝑙 𝐻 ) approaches 𝑙 𝑐 near peak turbulent intensity. This trend persists in the extended-domain simulation X1Ratio4 (figure 27 in the Appendix), supporting 𝑙 𝑐 as a robust lower bound for 𝑙 𝐻 in this regime. In addition to characteristic length scales, the total interfacial area, 𝐴 (𝑡 ), is a key quantity for characterizing RT turbulence and mixing. Figure 3(d) displays the evolution of 𝐴 (𝑡 )/ 𝐴 0
+
+(solid lines), where 𝐴 (𝑡 ) is calculated as the spatial integral of the local surface density field |∇ 𝑐 | (Trummler et al. 2022), and 𝐴 0 ≡ 𝐿 𝑥 𝐿 𝑦 is the cross-sectional area. Qualitatively similar to the mixing width, the interfacial area increases during the RT growth stage, saturates during the turbulent emulsion stage, and subsequently decreases during the segregation stage. The interfacial area is significantly larger for low surface tension cases. This is attributed to a reduced Hinze scale, which permits the proliferation of small-scale structures in the density field, as visualized in Figure 1.   
+
+> 0X0-10
+
+Rapids articles must not exceed this page length Journal of Fluid Mechanics 0 2 4 6 8 10 12 14 ̂
+
+t
+
+> 0510 15 20 25 30 35 40
+> η(t)/∆x
+
+(a) X1 X2 X4 X8 X10 X20 X30        
+
+> 0246810 12 14
+
+̂
+
+t
+
+> 010 20 30 40 50 60 70
+> λ(t)/∆x
+
+(b)       
+
+> 0246810 12 14
+
+̂
+
+t
+
+> 0510 15 20 25 30 35 40
+> lH (t)/∆x
+
+(c)        
+
+> 0246810 12 14 16
+
+̂
+
+t
+
+> 020 40 60 80 100 120
+> A/A 0, AlH /A 0
+
+(d)
+
+Figure 3. Temporal evolution of the (a) Kolmogorov scale 𝜂 , (b) Taylor microscale 𝜆 , (c) Hinze scale 𝑙 𝐻 , and (d) interfacial area 𝐴 . In panel (c), the horizontal dashed lines corresponds to the capillary scale 𝑙 𝑐 =√︃ 𝜎      
+
+> (𝜌 ℎ−𝜌 𝑙 )𝑔 .In panel (d), solid lines represent areas calculated from simulations X1 –X30, while dashed lines indicate the estimated area b𝐴 𝑙 𝐻 in equation (3.5) based on the respective Hinze scale.
+
+We further estimate the interfacial area by combining the Hinze scale with the mixing width: 
+
+𝐴 𝑙 𝐻 = ℎ(𝑡 )
+
+𝑙 𝐻 
+
+𝐴 0, (3.5) where 𝐴 0 ℎ(𝑡 ) represents the volume of the emulsion within the mixing region. This model assumes that, within the turbulent emulsion, the two fluids form an interconnected structure of length scale 𝑙 𝐻 , rather than a dilute suspension of isolated droplets. The dashed lines in figure 3(d) show the estimation of the interfacial area agrees qualitatively with the simulations, particularly during the nonlinear RT growth stage. Noticeable deviations arise during the turbulent emulsion and subsequent segregation stages. As illustrated in figure 1(b) –(f), isolated droplets appear at these later times, violating the space-filling assumption underlying equation (3.5). 3.3. Bulk kinetic energy budget 
+
+From equations (2.1) and (2.2), we derive the kinetic energy budget equation: 
+
+𝜕 𝑡 
+
+ 12 𝜌 |u|2
+
+
+
++ ∇ · 
+
+ 12 𝜌 u|u|2 + 𝑃 u − 𝝉 𝑢 · u
+
+
+
+= −𝐷 + 𝜓 𝜎 + 𝜖 inj (3.6) The terms on the right-hand side represent the viscous dissipation rate 𝐷 = 𝝉 𝑢 : 𝑺 , the rate of work done by surface tension 𝜓 𝜎 = u· 𝒇 𝜎 (hereafter ‘surface tension power’ for brevity), and the energy injection rate due to buoyancy 𝜖 inj = 𝜌 u · 𝒈 . Averaging these terms over the 
+
+0 X0-11 D. Zhao, X. Huang, and G. Li 
+
+domain volume 𝑉 and time 𝑡 yields the change in internal energy 𝛥𝐼 = ∫ 𝑡  
+
+> 0
+
+⟨𝐷 ⟩d𝑡 , the change in surface energy 𝛥𝛹 = − ∫ 𝑡  
+
+> 0
+
+⟨𝜓 𝜎 ⟩d𝑡 , and the released potential energy 𝛥𝑃 = ∫ 𝑡  
+
+> 0
+
+⟨𝜖 inj ⟩d𝑡 .Similarly, the change in total kinetic energy is 𝛥𝐾 = ∫ 𝑡  
+
+> 0
+
+⟨ 𝜕 𝜕𝑡 
+
+ 12 𝜌 |u|2
+
+
+
+⟩d𝑡 . Here, ⟨·⟩ denotes the domain average, defined as ⟨·⟩ = 𝑉 −1 ∫ · 𝑑𝑉 . Applying this average and integrating equation (3.6) in time gives 
+
+𝛥𝐾 = −𝛥𝐼 − 𝛥𝛹 + 𝛥𝑃. (3.7) Figures 4(a) and (c) show the temporal evolution of the mean instantaneous and cumulative kinetic-energy budgets for case X1, respectively. Panel (c) additionally includes case X30 in dashed lines, which exhibits trends similar to those of case X1 but over a shorter duration. The instantaneous budget is normalized by 𝜀 0 = 𝜌 𝑙 𝑢 3RT /𝐿 𝑧 , where 𝑢 RT =√︁ 𝐴 𝑡 𝑔𝐿 𝑧 
+
+is the characteristic RT velocity scale, while the cumulative budget is normalized by the total potential-energy release. In panel (a), the instantaneous kinetic-energy rate 𝑑 𝑑𝑡 ⟨ 12 𝜌 |u|2⟩
+
+is positive during the RT growth stage, crosses zero in the turbulent emulsion stage, and becomes negative during the segregation stage as turbulence decays. Both energy injection and dissipation remain positive throughout the evolution. The injection rate peaks earlier than the dissipation rate, and its magnitude exceeds dissipation during the growth stage but falls below it during the decay stage, reflecting their causal relationship. The work done by surface tension is negative during the growth stage, converting kinetic energy into surface energy by increasing the total interfacial area. In contrast, during the segregation stage, this contribution becomes positive, indicating the release of surface energy back into kinetic energy as the deformed interface relaxes. A magnified view of the surface-tension power is compared with the time derivative of the total interfacial area in figure 4(b), confirming the relation ⟨f 𝜎 · u⟩ = −𝜎 𝑑 𝐴 𝑑𝑡 . This agreement shows that the rate of change of surface energy is directly proportional to the rate of change of total interfacial area (Dodd & Ferrante 2016). In panel (c), the cumulative kinetic energy 𝛥𝐾 peaks during the turbulent emulsion stage and decays to nearly zero by the end of the segregation stage. The change in surface energy follows a similar temporal evolution (negative time integral of ⟨𝜓 𝜎 ⟩), but with a much smaller magnitude in case X1 and relatively larger in case X30. The released potential energy and the increase in internal energy exhibit comparable evolutions and identical terminal values, confirming that all released potential energy is ultimately dissipated. Although the mean surface energy of the bulk flow is small compared to the other budget terms in case X1, its spatial distribution, shown by the probability density function (PDF) in figure 4(d), reveals that its local magnitude exceeds that of the other contributions. This suggests that surface tension plays an important role in high-order statistics, such as vorticity and strain rate. We will show that the scale-by-scale contribution of surface tension is also significant. Figure 5 shows the effect of surface tension on the instantaneous energy budgets. The rate of mean kinetic-energy change, 𝑑 𝑑𝑡 ⟨ 12 𝜌 |u|2⟩, mean dissipation rate ⟨𝐷 ⟩, mean energy injection ⟨𝜖 inj ⟩, and mean surface-tension power ⟨ 𝒇 𝜎 · u⟩ all increase in magnitude with increasing surface tension. This trend is consistent with the mixing-width evolution: lower surface tension produces a larger interfacial area, suppressing mixing-layer growth and reducing the mean energy injection rate ⟨𝜖 inj ⟩ = ⟨𝜌 𝒈 · u⟩. This leads to lower kinetic energy growth and dissipation rate, so cases with smaller 𝜎 require longer times to complete segregation. Figure 6 presents the cumulative energy budgets, including changes in kinetic, internal, potential, and surface energies. The similar profile shapes across cases, especially in panels (b) and (c), suggest that surface tension sets the characteristic timescale of the bulk  
+
+> 0X0-12
+
+Journal of Fluid Mechanics 0 2 4 6 8 10 12 14 16 ̂
+
+t
+
+> −0.02 0.00 0.02 0.04 0.06 0.08 0.10
+
+(a) ddt 〈 12 ρ|u|2〉〈D〉〈ψσ 〉〈inj 〉        
+
+> 0246810 12 14 16
+
+̂
+
+t
+
+> −0.008
+> −0.006
+> −0.004
+> −0.002 0.000 0.002 0.004 0.006
+
+(b)         
+
+> 〈ψσ〉−σdA/dt
+> 0246810 12 14 16
+
+̂
+
+t
+
+> −0.20.00.20.40.60.81.0
+
+(c)       
+
+> ∆K
+> ∆I
+> ∆Ψ ∆P
+> −0.6−0.4−0.20.00.20.40.60.8
+
+budgets 
+
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> PDF
+
+(d) Dψσ
+
+> inj
+
+Figure 4. Kinetic-energy budgets for case X1. (a) Mean instantaneous budget terms from equation (3.6), normalized by 𝜀 0 = 𝜌 𝑙 𝑢 3RT /𝐿 𝑧 , with 𝑢 RT =√︁ 𝐴 𝑡 𝑔𝐿 𝑧 . (b) Normalized mean surface-tension power and time derivative of the total interfacial area multiplied by 𝜎 . (c) Cumulative energy balance, normalized by the total potential-energy release; solid and dashed lines denote cases X1 and X30, respectively. (d) PDFs of the three right-hand-side terms in equation (3.6) at b𝑡 = 6. 
+
+energy-budget evolution. Panel (d) further shows that kinetic-to-surface-energy conversion is non-negligible: the excess surface energy 𝛥𝛹 reaches approximately 0 .11 in case X30, compared with a total potential-energy release of around 1. 3.4. Scaling of RT statistics with surface tension 
+
+Figures 3(d) and 5(b,c) show that the interfacial area, mean dissipation rate, and mean energy injection exhibit similar temporal profiles across different surface-tension cases, suggesting that these RT quantities can be collapsed onto a single curve through appropriate renormalization. Figure 7 shows the minimum Hinze scale, min (𝑙 𝐻 ), and the maxima of the interfacial area, max ( 𝐴 ), mean kinetic energy, max (KE ), and mean dissipation rate, max (𝐷 ), for cases X1-X150 as functions of 𝜎 /𝜎 crit , spanning 0 .0077 to 1 .15. Here, 𝜎 crit 
+
+is the critical surface tension defined in equation (3.2), above which the domain-scale perturbation is suppressed. Within the range 𝜎 /𝜎 crit ∈ [ 0.0077 , 0.23 ], corresponding to cases X1-X30, the numerical results show the scalings min (𝑙 𝐻 ) ∝ 𝜎 1/2, max ( 𝐴 ) ∝ 𝜎 −1/2,max (KE ) ∝ 𝜎 1/2, and max (𝐷 ) ∝ 𝜎 1/4. At larger surface tensions, deviations arise as the flow approaches or exceeds the stability threshold, as in cases X100 and X150. Assuming that 3-D immiscible RT turbulence satisfies the Kolmogorov energy cascade (Chertkov et al. 2005), the inertial range extends down to the Hinze scale, 𝑙 𝐻 , defined in equation (3.4) as the scale where turbulent dynamic pressure balances surface tension: 
+
+𝑙 𝐻 ∼
+
+ 𝜎 𝜌 
+
+3/5
+
+𝐷 −2/5.
+
+0 X0-13 D. Zhao, X. Huang, and G. Li 0 2 4 6 8 10 12 14 ̂
+
+t
+
+> −0.20
+> −0.15
+> −0.10
+> −0.05 0.00 0.05 0.10 0.15
+> ddt  〈12 ρ|u|2〉
+
+(a)       
+
+> X1 X2 X4 X8 X10 X20 X30
+> 0246810 12 14
+
+̂
+
+t
+
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> 〈D〉
+
+(b)       
+
+> 0246810 12 14
+
+̂
+
+t
+
+> −0.05 0.00 0.05 0.10 0.15 0.20 0.25 0.30
+> 〈inj 〉
+
+(c)       
+
+> 0246810 12 14
+
+̂
+
+t
+
+> −0.06
+> −0.04
+> −0.02 0.00 0.02 0.04 0.06
+> 〈ψσ〉
+
+(d)
+
+Figure 5. Temporal evolution of mean instantaneous budgets for simulations X1 –X30: (a) Time derivative of KE; (b) dissipation rate; (c) energy injection rate; and (d) surface tension power. Normalization is identical to figure 4(a). 
+
+At the late-time self-similar stage, the flow at small scales is governed by the balance between gravity and surface tension. Consequently, the minimum characteristic length scale corresponds to the capillary length, 𝑙 𝑐 :
+
+𝑙 𝑐 =√︂ 𝜎 𝛥𝜌𝑔 .
+
+By identifying the minimum Hinze scale with the capillary length as observed in figure 3(c) (i.e., min (𝑙 𝐻 ) ≈ 𝑙 𝑐 ), we obtain the following balance: 
+
+ 𝜎 𝜌 
+
+3/5
+
+𝐷 −2/5 ∼
+
+ 𝜎 𝛥𝜌𝑔 
+
+1/2
+
+.
+
+Solving for the dissipation rate 𝐷 , we derive: 
+
+𝐷 ∼ 𝐶 𝐷 
+
+ 𝜎 𝛥𝜌𝑔 
+
+ −5/4  𝜎 𝜌 
+
+3/2
+
+= 𝐶 𝐷 𝛥𝜌 5/4𝑔 5/4 𝜌 −3/2𝜎 1/4.
+
+This yields the scaling relation 𝐷 ∝ 𝜎 1/4, which agrees with our numerical observations. In the above expression, 𝐶 𝐷 denotes the dimensionless compensated coefficient, defined as 𝐶 𝐷 = max (𝐷 )𝜌 3/2  
+
+> 𝑚
+> 𝛥𝜌 5/4𝑔 5/4𝜎 1/4
+
+, where 𝜌 𝑚 = (𝜌 ℎ + 𝜌 𝑙 )/ 2 is the reference density. The numerical results show that 𝐶 𝐷 is approximately 0.4-0.45 for the simulations X1-X30, as is indicated in figure 30 in the Appendix. Adopting the scaling 𝐷 ∝ 𝜎 1/4, we first consider the Hinze scale, 𝑙 𝐻 ∼ ( 𝜎 /𝜌 )3/5 𝐷 −2/5,which yields 𝑙 𝐻 ∝ 𝜎 1/2. Similar relation holds for the interfacial area, 𝐴 ∝ 𝑙 −1 
+
+> 𝐻
+
+∝ 𝜎 −1/2
+
+0 X0-14 Journal of Fluid Mechanics 0 2 4 6 8 10 12 14 ̂
+
+t
+
+0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 
+
+> ∆K
+
+(a)
+
+0 2 4 6 8 10 12 14 ̂
+
+t
+
+0.00.20.40.60.81.0
+
+> ∆I
+
+(b)
+
+0 2 4 6 8 10 12 14 ̂
+
+t
+
+0.00.20.40.60.81.0
+
+> ∆P
+
+(c)
+
+0 2 4 6 8 10 12 14 ̂
+
+t
+
+−0.02 0.00 0.02 0.04 0.06 0.08 0.10 0.12 
+
+> ∆Ψ
+
+(d)
+
+Figure 6. Temporal evolution of cumulative budgets for simulations X1 –X30: increments of (a) kinetic energy; (b) internal energy; (c) potential energy; and (d) excess surface energy. Normalization is identical to figure 4(c). 10 −2 10 −1 10 0
+
+𝜎 /𝜎 crit 
+
+> 10 1
+> 10 2
+> min (𝑙 𝐻  )/ Δ𝑥
+
+𝜎 1/2
+
+(𝑎 )  
+
+> 10 −210 −110 0
+
+𝜎 /𝜎 crit 
+
+> 10 0
+> 10 1
+> 10 2
+> max ( 𝐴 )/ 𝐴 0
+
+𝜎 −1/2
+
+(𝑏 )  
+
+> 10 −210 −110 0
+
+𝜎 /𝜎 crit 
+
+> 10 −1
+> max (KE )/ KE 0
+
+𝜎 1/2
+
+(𝑐 )  
+
+> 10 −210 −110 0
+
+𝜎 /𝜎 crit 
+
+> 10 −1
+> max (𝐷 )/ 𝜀 0
+
+𝜎 1/4
+
+(𝑑 )
+
+Figure 7. Scaling of the temporal minimum Hinze scale and the maxima of interfacial area, kinetic energy, and dissipation rate with the surface tension coefficient. The kinetic energy KE is equal to its increment 𝛥𝐾 ,since the flow starts from rest. In panels (c, d), the normalizations are KE 0 = 12 𝜌 𝑙 𝑢 2RT and 𝜖 0 = 𝜌 𝑙 𝑢 3RT /𝐿 𝑧 ,respectively. 
+
+0 X0-15 D. Zhao, X. Huang, and G. Li 0 2 4 6 8 10 ̂
+
+> t∗
+> 0.00 0.05 0.10 0.15 0.20 0.25
+> ∆K∗
+
+(a) X1 X2 X4 X8 X10 X20 X30 0 2 4 6 8 10 ̂
+
+> t∗
+> 0.00.20.40.60.81.0
+> ∆I∗
+
+(b)     
+
+> 0246810 ̂
+> t∗
+> 0.00.20.40.60.81.0
+> ∆P ∗
+
+(c)     
+
+> 0246810 ̂
+> t∗
+> 0.000 0.005 0.010 0.015 0.020 0.025
+> ∆Ψ ∗
+
+(d)
+
+Figure 8. Rescaled cumulative kinetic-energy budgets for cases X1 –X30. Panels show the contributions from (a) kinetic energy, (b) internal-energy change, (c) potential-energy release, and (d) excess surface energy. Both time and energy are nondimensionalized following equation (3.8). 
+
+(equation (3.5)). Next, relating the dissipation to the integral scale via 𝐷 ∼ 𝑢 3 
+
+> 𝐿
+
+/𝐿 ∼(𝑔𝐿 )3/2/𝐿 = 𝑔 3/2 𝐿 1/2, we find that 𝐿 also scales as 𝜎 1/2. Consequently, the kinetic energy, 𝐾 ∼ ( 𝐷 𝐿 )2/3, follows the scaling 𝐾 ∼ 𝜎 1/2, while the injection term scales as 
+
+𝜖 inj = 𝜌𝑢 𝑖 𝑔 𝑖 ∼ 𝜌𝑔 √𝑔𝐿 ∼ 𝜎 1/4. Finally, assuming the total potential energy released during the RT process is constant ( ∫ 𝐷𝑑𝑡 = const), the duration of the flow scales inversely with the dissipation rate, yielding 𝑇 ∼ 𝐷 −1 ∝ 𝜎 −1/4. This is consistent with the shorter durations of the RT development and segregation stages observed in high-𝜎 cases that remain well below the stability threshold. Thus, the Taylor-scale Reynolds number scales as 
+
+𝑅 𝜆 ∼ 𝑢 rms 𝜆 𝜈 ∼ 𝑢 2rms 
+
+√𝜈𝐷 ∼ 𝛥𝐾 
+
+√𝜈𝐷 ∼ 𝜎 3/8.
+
+Similarly, the excess surface energy scales as 𝛥𝛹 = 𝜎 ( 𝐴 − 𝐴 0 ) 
+
+> 𝑉
+
+∼ 𝜎 1/2. The surface-tension power can be estimated as 𝜓 𝜎 = − 𝑑𝛥𝛹 𝑑𝑡 ∼ 𝛥𝛹 𝑇 , where 𝑇 is a characteristic timescale of the RT evolution. As discussed above, 𝑇 ∼ 𝐷 −1 ∼ 𝜎 −1/4. Therefore, 𝜓 𝜎 ∼ 𝛥𝛹 𝑇 ∼ 𝜎 3/4.
+
+Based on the derived scaling relations, we rescale the cumulative budgets of cases X1-X30 presented in figure 6 using the following normalization: 
+
+b𝑡 ∗ = (b𝑡 − b𝑡 peak )Bo −1/4 + b𝑡 peak ,𝛥𝐾 ∗ = 𝛥𝐾 Bo 1/2, 𝛥𝐼 ∗ = 𝛥𝐼, 𝛥𝑃 ∗ = 𝛥𝑃, 𝛥𝛹 ∗ = 𝛥𝛹 Bo 1/2 (3.8) where Bo ≡ 𝛥𝜌𝑔𝑙 2ref /𝜎 is the Bond number, with 𝑙 ref the characteristic length corresponding to the wavenumber at which the initial perturbation spectrum attains its maximum ( 𝑙 ref ≈
+
+𝐿 𝑥 /24), and b𝑡 peak the time at which the kinetic energy reaches its maximum. Note that b𝑡 peak 
+
+varies slightly among cases X1 –X30, as it depends on both the initial perturbations and 
+
+0 X0-16 Journal of Fluid Mechanics 0 2 4 6 8 10 12 14 ̂
+
+> t
+> −40
+> −30
+> −20
+> −10 010 20 30 40
+> X1
+
+(a)       
+
+> 0246810 12 14 ̂
+> t
+> −60
+> −40
+> −20 020 40
+> X2
+
+(b)       
+
+> 0246810 12 14 ̂
+> t
+> −100
+> −80
+> −60
+> −40
+> −20 020 40 60
+> X8
+
+(c)   
+
+> ddt 〈ρΩ2〉〈Ωstretch 〉〈Ωbaro 〉〈Ωviscous 〉〈Ωsurf 〉
+> Figure 9. Mean enstrophy budget evolution for (a) case X1, (b) case X2, and (c) case X8. The budgets are defined in equation (3.9).
+
+the surface tension, and no single universal formula is applicable. In figure 8, the rescaled kinetic, internal, potential and surface energies collapse well across different cases. 3.5. Small scale statistics 
+
+At small scales, vorticity and the strain-rate tensor govern flow topology and play key roles in the energy cascade and dissipation. Although the budgets of enstrophy and squared strain-rate have been widely studied in canonical flows (Pope 2001; Zhao et al. 2023), immiscible RT turbulence introduces additional complexity through interfacial forces. To quantify these effects, we examine the evolution equation for enstrophy ( 𝛺 2 = |𝝎 |2/2) in immiscible RT flows (Hasslberger et al. 2018): 
+
+𝜌 𝐷 𝐷𝑡 
+
+12 |𝝎 |2 = 𝜌 𝝎 · ∇ u · 𝝎 
+
+| {z }
+
+> 𝛺 stretch
+
++ 1
+
+𝜌 𝝎 · (∇ 𝜌 × ∇ 𝑃 )
+
+| {z }
+
+> 𝛺 baro
+
++ 𝜌 𝝎 · ∇ × 
+
+ 1
+
+𝜌 ∇ · 𝝉 𝑢 
+
+| {z }
+
+> 𝛺 viscous
+
++ 𝜎 𝝎 · (∇ 𝜅 × ∇ 𝑐 )
+
+| {z }
+
+> 𝛺 surf
+
+,
+
+(3.9) After domain averaging, it reduces to 
+
+𝑑 𝑑𝑡 𝜌𝛺 2 = ⟨𝛺 stretch ⟩ + ⟨ 𝛺 baro ⟩ + ⟨ 𝛺 viscous ⟩ + ⟨ 𝛺 surf ⟩
+
+Figure 9 shows the temporal evolution of these budget terms for cases X1, X2, and X8. The time derivative of enstrophy reflects the stages of RT mixing: it is positive during the development stage, crosses zero near the turbulent emulsion phase, and becomes negative during phase segregation. The baroclinic torque ( 𝛺 baro ) and vortex stretching ( 𝛺 stretch ) terms act as positive sources in the spatial mean, while the viscous term ( 𝛺 viscous ) consistently acts as a sink. Comparison of cases X1, X2, and X8 shows that the baroclinic term is relatively insensitive to surface tension, as it is primarily driven by the global density stratification. In contrast, the magnitudes of both vortex stretching and viscous dissipation increase with surface tension. This is because higher surface tension produces larger characteristic structures (larger Hinze scale), which attain higher terminal velocities, leading to a higher effective Reynolds number (Table 1) and more intensified motion. The direct contribution of surface tension, 𝛺 surf , reveals a competition between inter-facial stabilization and capillary-driven vorticity generation. As shown in Figure 9, this term acts primarily as a sink in the low-surface-tension case (X1) but becomes a source at higher surface tension (X2 and X8). This transition corresponds to the changes in flow regimes. During the RT development stage, surface tension primarily suppresses 
+
+0 X0-17 D. Zhao, X. Huang, and G. Li 
+
+enstrophy growth by resisting interfacial stretching and damping small-scale Kelvin –
+
+Helmholtz instabilities. Conversely, during the decay phase, phase segregation dominates through droplet coalescence and interface restoration. These processes rapidly convert stored surface energy into kinetic energy, making surface tension a net enstrophy source. This effect is strongly amplified in high-𝜎 cases, where stiffer interfaces drive more violent restoration and sustain high-frequency droplet oscillations. 
+
+> 4. Multi-scale scalar and kinetic energy transfer
+
+The generation and destruction of a wide range of length scales in both the scalar (color function or volume fraction) and the velocity field during immiscible turbulent RT evolution are governed by multi-scale interactions and transfer processes. These processes, which directly shape the spectral distributions of the fields, are strongly modulated by surface tension. In this section, we examine the scale-by-scale budgets of scalar variance and kinetic energy in immiscible RT turbulence, with particular emphasis on the role of surface tension in inter-scale transfer. 4.1. Scalar and kinetic-energy spectra and structure functions 
+
+Figure 10 presents the filtering spectra for the scalar and KE fields at two distinct instants, corresponding to the turbulent emulsion stage and the phase segregation stage. The filtering spectra (Sadek & Aluie 2018) are defined as: 
+
+𝐸 𝑐 (𝑘 ℓ ) = 𝑑 𝑑𝑘 ℓ
+
+⟨| 𝑐 ℓ (x)| 2⟩, 𝐸 KE (𝑘 ℓ ) = 𝑑 𝑑𝑘 ℓ
+
+⟨𝜌 ℓ |euℓ (x)| 2⟩/ 2 (4.1) where 𝑘 ℓ = 𝐿 /ℓ is the filtering wavenumber and eu = 𝜌 u/𝜌 represents the Favre density-weighted filtering. As shown in figure 10(a,b), the scalar spectra scale as 𝑘 −2 at high wavenumbers in all simulation cases. This scaling arises from the near-step function of the density interface inherent in two-phase VOF simulations of immiscible fluids, analogous to the density spectra scaling observed in the presence of strong shocks (Wang et al. 2018). During the emulsion stage ( b𝑡 = 6, figure 10a), the spectra indicate that flows with low surface tension exhibit greater scalar variance at small scales. Conversely, in high surface tension cases, the scalar variance is predominantly contained within the large scales. This is attributed to the stabilizing effect of surface tension, which suppresses small-scale fluctuations. Similarly, during the phase segregation stage ( b𝑡 = 13 .6, figure 10b), cases X4 –X30 exhibit a 𝑘 −2
+
+scaling across the entire wavenumber range, suggesting that phase segregation is nearly complete. However, for cases X1 and X2, deviations from this scaling imply that small-scale structures persist in the scalar field, indicating that additional time is required to achieve full phase segregation. As for kinetic energy, the normalized velocity spectra in figure 10(c,d) reveal distinct dynamics between the two stages. During the emulsion stage ( b𝑡 = 6, panel c), the spectra exhibit a limited range of −5/3 scaling and a pronounced spectral peak near 𝑘 ℓ = 3. This peak reflects the energy-injection process, identifying the scale at which potential energy is actively converted into kinetic energy before cascading to smaller scales. In contrast, during the segregation stage ( b𝑡 = 13 .6, panel d), this conversion process has largely ceased, leading to the disappearance of the spectral peak. As a result, kinetic energy decays more rapidly than in the emulsion stage, and the −5/3 scaling is no longer evident. Among the different surface tension cases, X1 and X2 retain relatively higher energy at small scales, which is consistent with the persistence of fine-scale structures in the scalar field shown in  
+
+> 0X0-18
+
+Journal of Fluid Mechanics 10 0 10 1 10 2
+
+> k`
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> Ec
+> k−2
+
+(a)  
+
+> X1 X2 X4 X8 X10 X20 X30 10 010 110 2
+> k`
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> Ec
+> k−2
+
+(b)  
+
+> 10 010 110 2
+> k`
+> 10 −8
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> EKE
+> k−5/3
+
+(c)  
+
+> 10 010 110 2
+> k`
+> 10 −9
+> 10 −8
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> EKE
+> k−5/3
+
+(d)
+
+Figure 10. Filtering spectra of the scalar field (a,b) and the kinetic energy (c,d). Panels (a, c) are calculated at 
+
+b𝑡 = 6, while panels (b,d) are calculated at b𝑡 = 13 .6. The kinetic energy spectra in (c, d) are normalized to ensure equal total energy across all cases. The filtering wavenumber 𝑘 ℓ is defined as 𝑘 ℓ = 𝐿 𝑥 /ℓ. The dashed lines indicate reference slopes only; owing to the limited scale separation, the spectra are not intended to establish classical inertial-range scaling (Zhou 2007). 
+
+figure 10(b). Note that due to limited scale separation, the −5/3 scaling shown here is not intended to establish classical inertial-range scaling (Zhou 2007). The spectra of the volume-fraction field are closely linked to interfacial geometry. For a sharp two-phase indicator field, the structure function 𝑆 𝑐  
+
+> 2
+
+(𝑟 ) = [𝑐 (𝒙 + 𝒓 ) − 𝑐 (𝒙 )] 2
+
+measures the probability that two points separated by 𝑟 ≡ | 𝒓 | lie in different phases. For a smooth interface, this probability scales with the volume of an 𝑂 (𝑟 ) neighbourhood of the interface, giving 𝑆 𝑐  
+
+> 2
+
+(𝑟 ) ∼ 𝐴 𝑉 𝑟 , where 𝐴 is the interfacial area and 𝑉 is the domain volume. This leads to the Porod-type scaling (Feigin & Svergun 1987) 
+
+𝐸 𝑐 (𝑘 ℓ ) = 𝑑 𝑑𝑘 ℓ
+
+|𝑐 ℓ |2 ∼ 𝐶 𝐴𝑘 −2 
+
+> ℓ
+
+, (4.2) where the coefficient 𝐶 depends on the filter and normalization. More generally, if the interface is a surface-fractal with dimension 𝐷 𝑠 , then 
+
+𝑆 𝑐  
+
+> 2
+
+(𝑟 ) ∼ 𝑟 3−𝐷 𝑠 , 𝐸 𝑐 (𝑘 ℓ ) ∼ 𝑘 𝐷 𝑠 −4 
+
+> ℓ
+
+. (4.3) The observed 𝑘 −2 
+
+> ℓ
+
+scaling at large 𝑘 ℓ is therefore interpreted as a Porod-type regime, in which the small-scale variance of the volume-fraction field is primarily controlled by interfacial area. To test this interpretation, we examine the compensated spectra 𝐸 𝑐 𝑘 2 
+
+> ℓ
+
+/𝐴 .As shown in figure 11, these curves approach an approximately case-independent plateau at large 𝑘 ℓ , with values close to 0 .01 at both times. This collapse supports the robustness of the Porod-law prefactor and the use of 𝐸 𝑐 as a spectral measure of the microstructural content of the dense phase. At intermediate wavenumbers, particularly for the larger Weber-number cases, the local spectral slope varies with scale and does not exhibit an extended plateau. We therefore do not infer a unique fractal dimension directly from 𝐸 𝑐 . Instead, we estimate a scale-
+
+0 X0-19 D. Zhao, X. Huang, and G. Li 10 0 10 1 10 2
+
+k`
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+> Eck2
+> ` /A
+
+(a)
+
+X1 X2 X4 X8 X10 X20 X30 10 0 10 1 10 2
+
+k`
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+> Eck2
+> ` /A
+
+(b)
+
+Figure 11. Compensated scalar filtering spectra, 𝐸 𝑐 𝑘 2 
+
+> ℓ
+
+/𝐴 , at nondimensional times (a) b𝑡 = 6 and (b) b𝑡 = 13 .6, where 𝐴 is the interfacial area of the corresponding case. 10 0 10 1 10 2
+
+r/ ∆x
+
+> 10 −2
+> 10 −1
+> 10 0
+> Sc
+> 2
+
+r1
+
+(a)  
+
+> 10 010 110 2
+
+k = Lx/r 
+
+> 1.41.61.82.02.22.42.62.83.03.2
+> 3 − ζ, D S2
+> s
+
+(b)
+
+> X1 X2 X4 X8 X10 X20 X30
+
+Figure 12. (a) Structure function of the volume-fraction field at b𝑡 = 6 versus increment 𝑟 . (b) Scale-dependent interfacial dimension inferred from 𝑆 𝑐  
+
+> 2
+
+(𝑟 ), 𝐷 𝑆 2 
+
+> 𝑠
+
+= 3 − 𝜁 ≡ 3 − 𝑑 log 𝑆 𝑐  
+
+> 2
+
+/𝑑 log 𝑟 , plotted as a function of 𝑘 = 𝐿 𝑥 /𝑟 
+
+(solid lines), compared with the box-counting estimate 𝐷 𝑠 for the 𝑐 = 0.5 isosurface using boxes of size 𝑟 
+
+(dashed lines). 
+
+dependent interfacial dimension from the structure function, 
+
+𝐷 𝑆 2 
+
+> 𝑠
+
+(𝑟 ) = 3 − 𝑑 log 𝑆 𝑐 
+
+> 2
+
+𝑑 log 𝑟 ,
+
+and compare it with a box-counting estimate of the 𝑐 = 0.5 isosurface (Zhao et al. 
+
+2025). As shown in figure 12(a), the structure function 𝑆 𝑐  
+
+> 2
+
+(𝑟 ) approaches an approximately linear scaling at small separations, consistent with a smooth-interface Porod regime. Over intermediate-to-small scales shown in figure 12(b), the dimensions inferred from 𝑆 𝑐  
+
+> 2
+
+(𝑟 )
+
+and from box counting agree reasonably well, confirming the expected connection between the structure function and interfacial geometry. 4.2. Coarse-grained equations 
+
+We adopt scale decomposition to investigate the multi-scale dynamics of immiscible RT turbulence. Applying coarse-graining to the scalar field yields the budget equation for the large-scale volume fraction variance: 
+
+𝜕 𝑡 
+
+ 12 |𝑐 ℓ |2
+
+
+
++ ∇ · 
+
+ 12 |𝑐 ℓ |2u + 𝑐 ℓ 𝝉 ℓ (𝑐, u)
+
+
+
+= −𝛩 ℓ (4.4) 
+
+0 X0-20 Journal of Fluid Mechanics 
+
+where 𝛩 ℓ (x, 𝑡 ) = −∇ 𝑐 ℓ · 𝝉 ℓ (𝑐, u) represents the transfer of scalar variance across scales, with the sub-scale scalar flux defined as 𝝉 ℓ (𝑐, u) = 𝑐 u − 𝑐 u. We note that the scale transfer term is identical for both the squared filtered field, 12 |𝑐 ℓ |2, and the true resolved variance,  
+
+> 12
+
+(𝑐 ℓ − ⟨ 𝑐 ℓ ⟩) 2. Consequently, we analyze equation (4.4) as the governing equation for the large-scale scalar variance budget. After domain averaging, equation (4.4) reduces to 12
+
+𝜕 𝜕𝑡 ⟨| 𝑐 ℓ |2⟩ = −⟨ 𝛩 ℓ ⟩ (4.5) The budget equation for the Favre density-weighted filtered kinetic energy at scales larger than ℓ is given by: 
+
+𝜕 𝑡 
+
+
+
+𝜌 ℓ
+
+|euℓ |2
+
+2
+
+
+
++ ∇ · 𝑱 ℓ = −𝛱 ℓ − 𝛬 ℓ − 𝐷 ℓ + 𝜖 inj  
+
+> ℓ
+
++ 𝛹 𝜎,ℓ (4.6) where 𝑱 ℓ represents the spatial transport of large-scale kinetic energy. Domain averaging of equation (4.6) leads to 
+
+𝜕 𝑡 
+
+ 12 𝜌 ℓ |euℓ |2
+
+
+
+= −⟨ 𝛱 ℓ ⟩ − ⟨ 𝛬 ℓ ⟩ − ⟨ 𝐷 ℓ ⟩ + ⟨ 𝜖 inj  
+
+> ℓ
+
+⟩ + ⟨ 𝛹 𝜎,ℓ ⟩. (4.7) The individual budget terms are defined as: 
+
+𝑱 ℓ (x) = 𝜌 |eu|2
+
+2 eu + ¯𝑃 u + ¯𝜌 e𝜏 (u, u) · eu − 𝝉 𝑢 · eu
+
+𝛱 ℓ (x) = − ¯𝜌 ∇eu : e𝜏 (u, u); 𝛬 ℓ (x) = 1¯𝜌 ∇ ¯𝑃 · 𝜏 (𝜌, u); 𝜖 inj  
+
+> ℓ
+
+(x) = ¯𝜌 eu · e𝒈 ;
+
+𝐷 ℓ (x) = 2𝜇 𝑺 : ∇eu; 𝛹 𝜎,ℓ (x) = eu · ¯𝒇 𝜎 
+
+(4.8) Here, e𝝉 (u, u) = fuu − eu eu denotes the sub-scale stress tensor. The terms 𝛱 ℓ and 𝛬 ℓ govern the energy transfer between large scales ( ≳ ℓ) and small scales ( ≲ ℓ). Specifically, 𝛱 ℓ
+
+represents the deformation work performed by the sub-scale stress against the large-scale strain, while 𝛬 ℓ is the baropycnal work done by the sub-scale mass flux against the large-scale pressure gradient. The term 𝛹 𝜎,ℓ quantifies the work done by surface tension on the large-scale kinetic energy. Consequently, its derivative with respect to the filtering wavenumber 𝑘 ℓ ≡ 𝐿 𝑥 /ℓ, given by 𝑑𝛹 𝜎,ℓ /𝑑𝑘 ℓ , represents the spectral contribution of surface tension to the kinetic energy at a specific scale ℓ.4.3. Transfer of scalar variance across scales 
+
+In immiscible two-phase flows, the absence of molecular mixing between different phases implies that the total squared scalar volume fraction is strictly conserved, i.e., ⟨𝑐 2⟩( 𝑡 ) ≡ ⟨𝑐 2⟩( 0). Consequently, the transfer process described in equation (4.4) redistributes scalar variance conservatively across length scales without changing the total content. Since 𝛩 ℓ
+
+appears as a sink term in the large-scale budget, ⟨𝛩 ℓ ⟩ > 0 denotes an average forward transfer of variance (from large to small scales), while ⟨𝛩 ℓ ⟩ < 0 represents a net inverse transfer (from small to large scales). Figure 13 presents the spatially averaged transfer term ⟨𝛩 ℓ ⟩ as a function of the filtering wavenumber 𝑘 ℓ = 𝐿 𝑥 /ℓ. The temporal evolution is illustrated by the color-code of the curves, from dark blue (early time) to dark red (late time). For Case X1 (panel a), the RT growth stage ( b𝑡 ≲ 5, blue lines) exhibits positive ⟨𝛩 ℓ ⟩ across all wavenumbers. This indicates a forward cascade where scalar variance moves to smaller scales, driving the formation of fine-scale structures. During the turbulent emulsion stage (5 ≲ b𝑡 ≲ 8, light 
+
+0 X0-21 D. Zhao, X. Huang, and G. Li 10 0 10 1 10 2 10 3      
+
+> k`
+> −3
+> −2
+> −1012345
+> 〈Θ`〉
+> ×10 −3
+> X1 (a)
+> 10 010 110 210 3
+> k`
+> −4
+> −202468
+> 〈Θ`〉
+> ×10 −3
+> X2 (b)
+> 10 010 110 210 3
+> k`
+> −0.6
+> −0.4
+> −0.20.00.20.40.60.81.0
+> 〈Θ`〉
+> ×10 −2
+> X8 (c)
+> 46810 12 14 ̂
+> t
+
+Figure 13. Spatial average of the scalar variance transfer term 𝛩 ℓ versus the filtering wavenumber 𝑘 ℓ = 𝐿 𝑥 /ℓ
+
+> at different time instants indicated by the colorbar. Panels (a),(b),(c) corresponds to simulation cases X1, X2, and X8, respectively.
+
+lines), the dynamics shift: ⟨𝛩 ℓ ⟩ becomes negative at large scales while remaining positive at small scales, representing simultaneous inverse transfer at large scales and forward transfer at small scales. By the phase segregation stage ( b𝑡 ≳ 8, red lines), the forward transfer region diminishes, and the flow is dominated by inverse transfer. For the higher –
+
+surface-tension cases X2 and X8 (panels b and c), the behavior is broadly similar, although the dual-cascade structure of ⟨𝛩 ℓ ⟩ in the turbulent emulsion stage becomes progressively less pronounced as 𝜎 increases. The scale-by-scale budget term in figure 13 is presented in cumulative form as a function of the cutoff wavenumber 𝑘 ℓ = 𝐿 𝑥 /ℓ, corresponding directly to the filtered budget at each filter scale. To identify the dominant contributing scales more clearly, we also compute the logarithmic-scale density 
+
+𝑑 ⟨𝛩 ℓ ⟩
+
+𝑑 log 𝑘 ℓ
+
+= 𝑘 ℓ
+
+𝑑 ⟨𝛩 ℓ ⟩
+
+𝑑𝑘 ℓ
+
+.
+
+The resulting density plots are shown in figure 28 of the Appendix. Positive values indicate an increase of ⟨𝛩 ℓ ⟩ contributed by scale ℓ, providing a physically meaningful diagnostic of the scale-by-scale contribution to scalar-variance transfer. Analogous density representations for the kinetic-energy budgets are shown in Appendix figure 29. The scalar variance transfer term 𝛩 ℓ , as we demonstrate below, is intrinsically linked to the (filtered) tangential strain-rate, defined as Sℓ = −𝒏 𝒏 : ∇u, where 𝒏 = ∇𝑐 ℓ /|∇ 𝑐 ℓ | is the unit normal vector. Here, it is equal to the stretching term quantifying the rate of surface deformation, as demonstrated by the relation (Poinsot & Veynante 2005; Zhao et al. 2025): 
+
+Sℓ = −𝒏 𝒏 : ∇u = (I − 𝒏 𝒏 ) : ∇u = 1
+
+e𝐴 𝐷 e𝐴 𝐷𝑡 (4.9) where e𝐴 represents local area density in the filtered scalar field, and 𝐷 /𝐷𝑡 represents the material derivative.The incompressibility condition is adopted in the derivation above. The connection between surface stretching Sℓ and scalar variance transfer 𝛩 ℓ is established via the nonlinear model (or gradient model). This approximation relies on the scale locality of the interactions and a Taylor series expansion of the filtered fields (Borue & Orszag 1998; Eyink 2006; Zhao et al. 2025). Assuming a Gaussian filtering kernel, the nonlinear model approximates the sub-scale flux 𝜏 ℓ (𝑐, u) as (Zhao et al. 2025): 
+
+𝜏 ℓ (𝑐, u) ≈ 112 ℓ2∇𝑐 ℓ · ∇ u (4.10) 
+
+0 X0-22 Journal of Fluid Mechanics −0.1 0.0 0.1 0.2  
+
+> Θ`
+> −0.10.00.10.2
+> ΘNL
+> `
+> `=Lx/8
+
+(a)    
+
+> 6.3e-02 2.5e-01 1.e+00 4.e+00 1.6e+01 6.3e+01 2.5e+02 1.0e+03 4.e+03 1.6e+04
+> −0.40.00.4
+> Θ`
+> −0.40.00.4
+> ΘNL
+> `
+> `=Lx/32
+
+(b)     
+
+> 4.e-03 1.6e-02 6.3e-02 2.5e-01 1.e+00 4.e+00 1.6e+01 6.3e+01 2.5e+02 1.0e+03 4.e+03
+> −0.6−0.20.20.6
+> Θ`
+> −0.6
+> −0.20.20.6
+> ΘNL
+> `
+> `=Lx/64
+
+(c)
+
+> 2.8e-03 1.1e-02 4.5e-02 1.8e-01 7.1e-01 2.8e+00 1.1e+01 4.5e+01 1.8e+02 7.1e+02 2.8e+03 1.1e+04
+
+Figure 14. Joint PDFs of the scalar variance transfer term 𝛩 ℓ and the nonlinear model approximation 𝛩 NL  
+
+> ℓ
+
+=
+
+− 112 ℓ2 |∇ 𝑐 ℓ |2Sℓ . The data correspond to simulation case X1 at time b𝑡 = 6.3. The panels represent filtering wavenumbers of (a) 𝑘 ℓ = 8, (b) 𝑘 ℓ = 32, and (c) 𝑘 ℓ = 64. The correlation coefficients for these scales are 0.81, 0.94, and 0.97, respectively. 
+
+Consequently, 𝛩 ℓ and Sℓ are related by: 
+
+𝛩 ℓ = −∇ 𝑐 ℓ · 𝜏 ℓ (𝑐, u) ≈ − 112 ℓ2∇𝑐 ℓ ∇𝑐 ℓ : ∇u
+
+= − 112 ℓ2Sℓ |∇ 𝑐 ℓ |2 ≡ 𝛩 NL 
+
+> ℓ
+
+(4.11) The link between scalar-variance transfer and interface stretching is physically rooted in the relationship between the filtering spectrum 𝐸 𝑐 and the interfacial area 𝐴 . From the filtered scalar-variance budget, 12
+
+𝜕 𝜕𝑡 ⟨| 𝑐 ℓ |2⟩ = −⟨ 𝛩 ℓ ⟩, (4.12) together with the definition 𝐸 𝑐 (𝑘 ℓ ) = 𝜕 𝜕𝑘 ℓ ⟨| 𝑐 ℓ |2⟩, we obtain 
+
+− 𝜕 ⟨𝛩 ℓ ⟩
+
+𝜕𝑘 ℓ
+
+= 12
+
+𝜕𝐸 𝑐 (𝑘 ℓ )
+
+𝜕𝑡 . (4.13) In the Porod regime, 𝐸 𝑐 ∼ 𝐶 𝐴 (𝑡 )𝑘 −2 
+
+> ℓ
+
+, this implies 
+
+⟨𝛩 ℓ ⟩ ∼ 𝐶 
+
+2
+
+𝑑𝐴 𝑑𝑡 𝑘 −1 
+
+> ℓ
+
+∼ ℓ 𝑑𝐴 𝑑𝑡 . (4.14) Thus, scalar-variance transfer is governed by the rate of change of interfacial area, i.e. by interface stretching, 1 
+
+> 𝐴 𝑑 𝐴 𝑑𝑡
+
+. The nonlinear model above provides the corresponding local expression and gives the coefficient 1 /12 for the Gaussian filter. Figure 14 displays the joint PDFs of 𝛩 ℓ and 𝛩 NL  
+
+> ℓ
+
+for Case X1 at b𝑡 = 6.3, evaluated at three filter widths. The two terms show strong agreement with high correlation coefficients, particularly at small ℓ. Similar correlations are found at other times and across different simulation cases. These results indicate that forward variance transfer ( ⟨𝛩 ℓ ⟩ > 0) is physically associated with interface stretching at scales ⪆ ℓ, whereas inverse transfer (⟨𝛩 ℓ ⟩ < 0) corresponds to interface compression. 4.4. Transfer of kinetic energy across scales 
+
+Figure 15 illustrates the averaged filtered kinetic energy budgets (equation 4.8) as functions of the filtering wavenumber for Case X1; the other cases show qualitatively similar behavior. In panel (a), the time derivative of the filtered kinetic energy, 𝑑 ⟨KE ℓ ⟩/ 𝑑𝑡 , where KE ℓ ≡
+
+𝜌 ℓ |euℓ |2/2, is positive during the RT growth stage ( b𝑡 ≲ 5, blue lines), indicating a net increase in kinetic energy. During the turbulent emulsion stage (5 ≲ b𝑡 ≲ 8, light-colored 
+
+0 X0-23 D. Zhao, X. Huang, and G. Li 10 0 10 1 10 2 10 3                
+
+> k`
+> −2.0
+> −1.5
+> −1.0
+> −0.50.00.51.01.52.0
+> 〈 DDt  KE `〉
+> ×10 −1
+> (a)
+> 10 010 110 210 3
+> k`
+> −0.50.00.51.01.52.0
+> 〈Π`〉
+> ×10 −1
+> (b)
+> 10 010 110 210 3
+> k`
+> 0.00.20.40.60.81.0
+> 〈Λ`〉
+> (c)
+> 10 010 110 210 3
+> k`
+> 0123456789
+> 〈D`〉
+> ×10 −1
+> (d)
+> 10 010 110 210 3
+> k`
+> 0.10.20.30.40.50.60.70.80.91.0
+> 〈inj
+> ` 〉
+> (e)
+> 10 010 110 210 3
+> k`
+> −1.5
+> −1.0
+> −0.50.00.5
+> 〈Ψσ〉
+> ×10 −1
+> (f)
+> 46810 12 14 ̂
+> t
+
+Figure 15. Filtered kinetic energy budget terms from equation (4.8) for Case X1, plotted as functions of the filtering wavenumber 𝑘 ℓ . The curves correspond to different time instants, color-coded according to the colorbar. All terms are normalized by the maximum unfiltered injection rate observed over the entire simulation duration. 
+
+lines), the mean value becomes negative as dissipation exceeds the energy injection rate. Finally, in the phase segregation stage ( b𝑡 ≳ 8, red lines), it remains negative as kinetic energy continues to decay. The deformation work 𝛱 ℓ and baropycnal work 𝛬 ℓ (figure 15 b,c) act as cascade terms transferring kinetic energy across scales. As in 3-D miscible RT turbulence (Zhao et al. 
+
+2022), both are positive on average, indicating a net forward transfer. Their magnitudes increase during RT growth, peak in the turbulent-emulsion stage, and decay during segregation. The peak of ⟨𝛱 ℓ ⟩ shifts from 𝑘 ℓ ≈ 40 initially to ≈ 20 near peak turbulence before returning toward ≈ 40, whereas ⟨𝛬 ℓ ⟩ remains concentrated at low wavenumbers (𝑘 ℓ ≈ 3) and is typically larger. Both the injection and dissipation terms (figure 15 d,e) evolve in time similarly, with injection confined to the largest scales ( 𝑘 ℓ < 5, negligible for 
+
+𝑘 ℓ ≳ 10) and dissipation dominated by high wavenumbers ( 𝑘 ℓ ≈ 100). Finally, panel (f) shows the filtered surface tension power. The unfiltered value ( 𝑘 ℓ → ∞ )is negative during the growth and emulsion stages, thus converting kinetic energy into surface energy via interface deformation, but becomes positive during phase segregation as the interface relaxes. The scale-by-scale contribution, indicated by the derivative 
+
+𝑑 ⟨𝛹 𝜎,ℓ ⟩/ 𝑑𝑘 ℓ , is negative at large-to-intermediate scales and positive at small scales throughout the simulation. The crossover wavenumber (where the derivative is zero) varies with time. Notably, this crossover wavenumber has been used in recent studies (Crialesi-Esposito et al. 2023; Cannon et al. 2024) to define the Hinze scale, offering an alternative to the traditional definition in equation (3.4) for homogeneous isotropic two-phase turbulence. While the two definitions of the Hinze scale are known to align in steady homogeneous isotropic turbulence (Crialesi-Esposito et al. 2023; Cannon et al. 2024), here we compare them in the context of anisotropic, non-stationary immiscible RT turbulence. Figure 16 presents time-wavenumber diagrams of the scale-by-scale surface tension contribution to kinetic energy, 𝑑 ⟨𝛹 𝜎 (𝑘 ℓ )⟩/ 𝑑𝑘 ℓ , for cases X1, X2, and X8. In Case X1 (panel a), the diagram shows a blue region at low-to-intermediate wavenumbers, indicating where kinetic energy is converted into surface energy. Conversely, the red region at high wavenumbers indicates where surface energy returns to kinetic energy. The solid line marks the zero-crossing boundary between these regions, while the dashed line represents the traditional Hinze scale (equation 3.4). The close proximity of these lines confirms that the traditional 
+
+0 X0-24 Journal of Fluid Mechanics 4 6 8 10 12 14 ̂
+
+𝑡 
+
+> 124816 32 64 128 256
+> 𝑘 ℓ
+
+X1 
+
+(𝑎 )     
+
+> 46810 12 14
+
+̂
+
+𝑡 
+
+> 124816 32 64 128 256
+> 𝑘 ℓ
+
+X2 
+
+(𝑏 )     
+
+> 46810 12 14
+
+̂
+
+𝑡 
+
+> 124816 32 64 128 256
+> 𝑘 ℓ
+
+X8 
+
+(𝑐 )   
+
+> −10 −2
+> −10 −3
+> −10 −4
+> 010 −4
+> 10 −3
+> 10 −2
+> 𝑑 𝑑𝑘 ℓ〈Ψ𝜎 (𝑘 ℓ)〉
+
+Figure 16. Time-wavenumber evolution of the scale-by-scale surface tension power contribution, 
+
+𝑑 ⟨𝛹 𝜎 (𝑘 ℓ )⟩/ 𝑑𝑘 ℓ , for Cases X1, X2, and X8, starting at b𝑡 = 2.7 (established turbulence). The filtering wavenumber is shown on a logarithmic scale. Solid lines indicate zero-crossings; dashed lines mark the Hinze scale (Eq. 3.4). −1.0 −0.5 0.0 0.5 1.0  
+
+> cos( ˜uL/ 8,fL/ 8)
+> 0.00.20.40.60.81.01.2
+> PDF
+
+(a)      
+
+> −1.0−0.50.00.51.0
+> cos( ˜u[L/ 64 ,L/ 32] ,f[L/ 64 ,L/ 32] )
+> 0.20.30.40.50.60.70.80.91.0
+> PDF
+
+(b)      
+
+> −1.0−0.50.00.51.0
+> cos( ˜u′
+> L/ 64 ,f′
+> L/ 64 )
+> 0.20.40.60.81.01.21.41.6
+> PDF
+
+(c) X1 X2 X4 X8 X10 X20 X30 
+
+Figure 17. PDFs of the alignment cosine between the velocity and surface tension fields at time b𝑡 = 6, evaluated at the interface. Panels show: (a) large scales ( ℓ > 𝐿 𝑥 /8); (b) intermediate scales ( 𝐿 𝑥 /64 < ℓ < 𝐿 𝑥 /32), where the band-pass filtered velocity eu[ℓ1 ,ℓ 2 ] ≡ euℓ1 −euℓ2 ; and (c) small scales ( ℓ < 𝐿 𝑥 /64), where the residual velocity 
+
+u′ 
+
+> ℓ
+
+≡ u − euℓ .
+
+Hinze definition effectively identifies the transition scale where surface tension switches from acting as a sink to a source. For the high surface tension cases X2 and X8 (figure 16 b and c), the Hinze scale shifts to larger values, and the result of case X2 resembles that of case X1. In contrast for case X8, it exhibit larger deviations between the two definitions. This discrepancy likely arises because high surface tension suppresses the formation of small-scale structures (as seen in the visualization in figure 1 (f)). Consequently, scalar turbulence and its hierarchy of length scales are not fully established, reducing the accuracy of the traditional Hinze definition in predicting the energetic crossover scale. The scale-dependent role of surface tension, which acts as either a sink or a source of filtered kinetic energy, is elucidated by the alignment cosine between the velocity and surface tension fields, shown in figure 17. At large scales ( ℓ > 𝐿 𝑥 /8, panel a), the velocity and surface tension force tend to be anti-aligned, as evidenced by the probability density functions (PDFs) peaking at -1. At intermediate scales ( 𝐿 𝑥 /64 < ℓ < 𝐿 𝑥 /32, panel b), this anti-alignment diminishes, and the PDFs shift toward positive cosine values. Finally, at small scales ( ℓ < 𝐿 𝑥 /64, panel c), the PDFs peak at 1, indicating a preferential parallel alignment between the two fields. These alignment trends result in negative surface tension power at large scales and positive value at small scales, as observed in figure 16. Physically, large scales in immiscible RT turbulence are dominated by inertial effects driven by energy injection and the cascade process. This causes large-scale interface distortion (area increase), meaning the velocity field works against surface tension, thereby converting kinetic energy into surface energy. 
+
+0 X0-25 D. Zhao, X. Huang, and G. Li 
+
+In contrast, small scales are dominated by viscous effect and surface tension. Here, interface perturbations tend to relax toward equilibrium; this restoring force drives the small-scale velocity field, resulting in alignment between the force and velocity. Consequently, surface energy is converted back into kinetic energy. This phenomenon is most pronounced during the RT growth and turbulent emulsion stages, where energy injection and the cascade process are dominant. 4.5. Connection between surface tension power and interface stretching 
+
+The budget equation (4.4) for filtered scalar variance and its nonlinear model (4.11) identify 
+
+𝛩 ℓ as the cascade term for scalar variance. Since this term governs the evolution of scalar variance, it is intrinsically linked to changes in interfacial area (stretching or compression) and, consequently, the total surface energy. Therefore, the scalar variance cascade 𝛩 ℓ
+
+essentially reflects the energy change due to surface tension power. This connection is quantified using the continuous surface force method (Brackbill et al. 
+
+1992), where the surface tension 𝒇 𝜎 = 𝜎𝜅 ∇𝑐 . For unfiltered quantities, the surface tension power 𝛹 𝜎 can be expanded as: 
+
+𝛹 𝜎 = 𝒇 𝜎 · u = 𝜎𝜅 u · ∇ 𝑐 = 𝜎 ∇ · 
+
+
+
+− ∇𝑐 
+
+|∇ 𝑐 |
+
+
+
+u · ∇ 𝑐 
+
+= −∇ · 
+
+
+
+𝜎 ∇𝑐 
+
+|∇ 𝑐 | u · ∇ 𝑐 − 𝜎 u|∇ 𝑐 |
+
+
+
++ 𝜎 
+
+|∇ 𝑐 | ∇𝑐 · ∇ u · ∇ 𝑐 
+
+= 𝜎 ∇ · 
+
+
+
+|∇ 𝑐 | ( I − 𝒏𝒏 ) · u
+
+
+
+− 𝜎 |∇ 𝑐 |S 
+
+(4.15) where S = −𝒏𝒏 : ∇u equals the tangential strain-rate and 𝒏 = ∇𝑐 /|∇ 𝑐 | is the interface normal. In the final line, the first divergence term represents the transport of interfacial area density ( |∇ 𝑐 |) by the tangential velocity field, while the second term is proportional to the interface stretching S in incompressible flows. Consequently, when integrated over an isolated bubble or droplet, the divergence term vanishes, leaving the surface tension power proportional to the interface stretching. Moreover, after volume averaging over the full domain, the right-hand side recovers the interfacial-area evolution, ⟨f 𝜎 · u⟩ = −𝜎 𝑑𝐴 /𝑑𝑡 ,through the area-density |∇ 𝑐 | budget, as shown in figure 4(b). The relation between surface-tension power and changes in interfacial area is well established (Dodd & Ferrante 2016; Vela-Mart´ ın & Avila 2021; Calado & Balaras 2024), both in integrated form and in local phase-field form. Here, we recast this relation in a local VOF-CSF formulation. Specifically, the surface-tension power is decomposed into a conservative transport term for the interfacial area density and a local surface-stretching contribution. While derived for unfiltered fields, this relationship extends to coarse-grained fields with minor modifications. Specifically, the filtered surface tension force, 𝒇 𝜎 , does not simply equal the product of filtered curvature and filtered scalar gradient (i.e., 𝒇 = 𝜎𝜅 ∇𝑐 ≠
+
+𝜎𝜅 ∇𝑐 ); this discrepancy is typically handled via a subgrid scale model (Labourasse et al. 
+
+2007; Saeedipour & Schneiderbauer 2019). However, if we approximate the filtered work as 𝛹 𝜎,ℓ ≈ 𝜎𝜅 ℓ uℓ · ∇ 𝑐 ℓ (the calculated correlation coefficient between 𝒇 𝜎 and 𝜎𝜅 ∇𝑐 
+
+exceeds 0.5 at all scales and is greater than 0.8 for scales smaller than 𝐿 /64), the key conclusion remains that filtered surface tension power is closely related to the filtered  
+
+> 0X0-26
+
+Journal of Fluid Mechanics 0.0 0.2 0.4 0.6 0.8 1.0                                          
+
+> |cos( ∇c, e )|
+> 0.20.40.60.81.01.21.41.61.82.0
+> PDF
+> (a)̂
+> eα̂
+> eβ̂
+> eγ
+> 0.00.20.40.60.81.0
+> |cos( ∇c`, e `)|
+> 0.60.81.01.21.41.61.8
+> PDF
+> `∈[L/ 8,∞]
+> (b)
+> 0.00.20.40.60.81.0
+> |cos( ∇c′
+> `, e ′
+> `)|
+> 0.00.51.01.52.02.5
+> PDF
+> `∈[0 , L/ 64]
+> (c)
+> 0.00.20.40.60.81.0
+> |cos( ∇c, e )|
+> 0.00.51.01.52.02.53.0
+> PDF
+> (d)
+> 0.00.20.40.60.81.0
+> |cos( ∇c`, e `)|
+> 0.40.60.81.01.21.41.61.82.0
+> PDF
+> `∈[L/ 8,∞]
+> (e)
+> 0.00.20.40.60.81.0
+> |cos( ∇c′
+> `, e ′
+> `)|
+> 0.00.51.01.52.02.53.0
+> PDF
+> `∈[0 , L/ 64]
+> (f)
+
+Figure 18. Alignment between the scalar gradient and the eigenvectors of the strain-rate tensor for simulation case X1 at non-dimensional times b𝑡 = 6 (a-c) and b𝑡 = 13 .6 (d-f). The columns correspond to: (a, d) unfiltered fields; (b, e) large-scale fields (scales > 𝐿 𝑥 /8); and (c, f) small-scale fields (scales < 𝐿 𝑥 /64). The high-pass filter is defined as 𝑐 ′ 
+
+> ℓ
+
+≡ 𝑐 − 𝑐 ℓ and 𝑒 ′ 
+
+> 𝑙
+
+is the eigenvector of the high-pass strain-rate tensor. 
+
+interface stretching. More specifically, 
+
+𝛹 𝜎,ℓ ≈ 𝜎𝜅 ℓ uℓ · ∇ 𝑐 ℓ = 𝜎 ∇ · 
+
+
+
+|∇ 𝑐 ℓ | ( I − 𝒏𝒏 ) · uℓ
+
+
+
+− 𝜎 |∇ 𝑐 |S ℓ (4.16) where the normal vector 𝒏 = ∇𝑐 ℓ /|∇ 𝑐 ℓ | and Sℓ ≡ − 𝒏 · ∇ uℓ · 𝒏 equals the coarse-grained tangential strain-rate, which equals to the interface stretch rate in incompressible flows. Given the connection between surface tension power and interface stretching, the scale-dependent role of surface tension is also manifested in the sign of the mean stretching filtered at different length scales. By recasting the stretching term into the eigen-basis of the filtered strain-rate tensor, we obtain: 
+
+Sℓ |∇ 𝑐 ℓ |2 = −∇ 𝑐 ℓ · ∇ uℓ · ∇ 𝑐 ℓ = −∇ 𝑐 ℓ · Sℓ · ∇ 𝑐 ℓ
+
+= −∇ 𝑐 ℓ · ( 𝜆 𝛼 b𝒆 𝛼 b𝒆 𝛼 + 𝜆 𝛽 b𝒆 𝛽 b𝒆 𝛽 + 𝜆 𝛾 b𝒆 𝛾 b𝒆 𝛾 ) · ∇ 𝑐 ℓ
+
+= −𝜆 𝛼 cos (∇ 𝑐 ℓ , b𝒆 𝛼 )2 − 𝜆 𝛽 cos (∇ 𝑐 ℓ , b𝒆 𝛽 )2 − 𝜆 𝛾 cos (∇ 𝑐 ℓ , b𝒆 𝛾 )2
+
+(4.17) where 𝜆 𝛼 > 𝜆 𝛽 > 𝜆 𝛾 are the eigenvalues of the filtered strain-rate tensor Sℓ ≡ 12 (∇ u +∇u𝑇 ), and b𝒆 𝛼 , b𝒆 𝛽 , b𝒆 𝛾 are the associated eigenvectors. In incompressible flows, 𝜆 𝛼 > 0(extensive) and 𝜆 𝛾 < 0 (compressive). Consequently, the sign of the mean stretching depends on the alignment of the scalar gradient with these eigenvectors. Alignment with the extensive eigenvector ( ∇𝑐 ℓ ∥ b𝒆 𝛼 ) yields a negative contribution, while alignment with the compressive eigenvector ( ∇𝑐 ℓ ∥ b𝒆 𝛾 ) yields a positive contribution. In miscible RT turbulence (Zhao et al. 2025), the scalar gradient preferentially aligns with the compressive eigenvector ( b𝒆 𝛾 ), favoring positive interface stretching. For the immiscible RT turbulence studied here, the alignment is shown in Figure 18. For the unfiltered fields (panels a,d), ∇𝑐 is generally perpendicular to the intermediate eigenvector 
+
+b𝒆 𝛽 and preferentially aligned with the compressive eigenvector b𝒆 𝛾 ; the mean angles between 
+
+∇𝑐 and b𝒆 𝛾 and b𝒆 𝛼 are approximately 35 ◦ and 55 ◦, respectively. At large scales ( ℓ > 𝐿 𝑥 /8, panels b, e), the preferential alignment of ∇𝑐 ℓ with b𝒆 𝛾 is strong, indicating that mean interface stretching is positive. In contrast, for high-pass filtered fields 
+
+0 X0-27 D. Zhao, X. Huang, and G. Li        
+
+> Figure 19. Color function fields for cases X1 Φ95 (a, c) and X1 Φ05 (b, d) at non-dimensional times b𝑡 =6.5 (a, b) and b𝑡 =12 (c, d).
+
+representing small scales ( ℓ < 𝐿 𝑥 /64, using residual fields), the trend reverses that the scalar gradient preferentially aligns with the extensive eigenvector b𝒆 𝛼 , leading to negative interface stretching. These observations are consistent with the surface tension power depicted in figures 16 and 17. At late time (panels d-f), the alignment statistics remains similar. Since surface tension power is negatively proportional to stretching (equation 4.15), positive stretching at large scales corresponds to the sink role of surface tension in kinetic energy budgets, while negative stretching at small scales corresponds to the source role. This confirms the link between scalar variance transfer, interface stretching, and surface tension power. We will further assess the validity of equation (4.15) when analyzing bubble and droplet dynamics in the following section. 
+
+> 5. Bubble and droplet statistics
+
+During the turbulent emulsion and segregation stages, the immiscible RT turbulent flow contains isolated bubbles and droplets over a broad range of length scales. They significantly increase the total interfacial area, enhance the mixing of the resulting emulsion, and modulate both interface stretching and the scalar and kinetic energy budgets. To investigate the kinematics and dynamics of these structures, we performed simulations with heavy fluid volume fractions of Φ = 0.95 (Case X1 Φ95) and Φ = 0.05 (Case X1 Φ05). These conditions produce rich rising bubbles and sinking droplets, respectively, as the dispersed phase, allowing us to isolate and study their behaviors individually. Figure 19 visualizes the scalar field for these cases at non-dimensional times b𝑡 = 6.5 and b𝑡 = 12. At b𝑡 = 6.5, both the 
+
+0 X0-28 Journal of Fluid Mechanics 0 2 4 6 8 10 12 14 16 ̂
+
+t
+
+> 01000 2000 3000 4000 5000 6000 7000 8000 9000
+> N
+
+(a) bubbles drops  
+
+> 10 010 1
+
+d/l c
+
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> PDF
+> d−3/2
+> d−10 /3
+
+(b)                
+
+> bubble early drop early bubble late drop late
+> Figure 20. (a) Time evolution of the total number of isolated bubbles and droplets for cases X1 Φ95 (labeled as bubbles) and X1 Φ05 (labeled as drops). (b) Droplet and bubble size distributions at 5 .5<b𝑡 < 6.5 (early time) and 11 <b𝑡 < 12 (late time). Two dashed lines indicate reference scalings of 𝑑 −10 /3and 𝑑 −3/2, and
+> 𝑙 𝑐 ≡√︁ 𝜎 /( 𝜌 ℎ−𝜌 𝑙 )/ 𝑔 is the capillary scale.
+
+bubbles (panel a) and droplets (panel b) exhibit a mix of small spherical shapes and long filaments elongated along the vertical direction. By b𝑡 = 12, however, the morphology shifts that the number of long filamentary structures is significantly reduced, and the remaining bubbles and droplets are predominantly spherical. For statistical purpose, we hereafter denote the cases within the time range 5 .5 < b𝑡 < 6.5 as ‘early time’ and those within 11 < b𝑡 < 12 as ‘late time’. Numerically, isolated bubbles and droplets are identified using a 3-D two-pass connected-component algorithm, augmented with Union-Find and a decision tree (Rosenfeld & Pfaltz 1966; Silversmith 2021). 5.1. Bubbles and droplets distribution and morphology 
+
+Figure 20 depicts the evolution of isolated bubbles and droplets for Cases X1 Φ95 and X1 Φ05. Panel (a) shows the total number of isolated structures. We observe that the dispersed phase begins to break up due to instability after b𝑡 > 2. Subsequently, the number of structures increases nearly linearly, reaches a peak at b𝑡 ≈ 11, and then decreases linearly. This initial linear growth is attributed to shear stripping driven by the Kelvin-Helmholtz instability, which continuously sheds small elements from the boundaries of large-scale primary structures (RT spikes and bubbles). Figure 20(b) shows the size distributions of bubbles (case X1 Φ95) and droplets (case X1 Φ05) at early (5 .5 < b𝑡 < 6.5) and late (11 < b𝑡 < 12) times. Droplets tend to have larger equivalent diameters, 𝑑 ≡ ( 6𝑉 /𝜋 )1/3 (with 𝑉 the connected-element volume), consistent with the heavier phase being less susceptible to breakup than the lighter bubbles. The time evolution also differs between the two cases. For bubbles, the small-diameter portion of the distribution changes little between early and late times, whereas the large-diameter tail is reduced at late times, indicating a larger population of big bubbles during the initial RT growth that later fragments. By contrast, the droplet size distribution varies only weakly from early to late times, with changes mainly confined to the largest structures. For reference, two power-law scalings are plotted in figure 20(b): 𝑑 −3/2 and 𝑑 −10 /3, rep-resenting coalescence-dominated and breakup-dominated regimes, respectively (Crialesi-Esposito et al. 2022 b; Cannon et al. 2024). The droplet distribution follows these scalings over a limited inertial range. This consistency with classical Kolmogorov –Hinze theory suggests that droplet fragmentation is primarily driven by dynamic pressure fluctuations in the inertial subrange. Conversely, the bubble distribution decays more steeply and deviates from these standard power laws. This behavior is attributed to the light bubbles experiencing 
+
+0 X0-29 D. Zhao, X. Huang, and G. Li 0 200 400 600 800 
+
+A/l 2
+
+> c
+> −200 0200 400 600 800
+> V /l 3
+> c
+
+(a)     
+
+> 0246810
+
+d/l c
+
+> 0.00.51.01.52.0
+
+〈VA |d〉/l c
+
+〈rLS |d〉/l c
+
+(b) bubble early drop early bubble late drop late              
+
+> Figure 21. (a) Scatter plot of normalized area versus normalized volume for isolated bubbles and droplets at early (5 .5<b𝑡 < 6.5) and late (11 <b𝑡 < 12) times. For clarity, the red, green, and cyan points are vertically shifted by -150, 150, and 300 units, respectively. (b) The mean volume-to-surface ratio, ⟨𝑉 /𝐴 |𝑑 ⟩, and the mean maximum absolute signed distance, ⟨𝑟 LS |𝑑 ⟩, conditioned on the equivalent diameter 𝑑 . All quantities are normalized by the capillary scale, 𝑙 𝑐 .
+
+stronger buoyancy-induced shear and wake instabilities. These forces accelerate the disintegration of large structures via rapid surface stripping, resulting in the observed steeper decay in the size distribution. Beyond size distribution, we analyze the shape and morphology of the isolated bubbles and droplets. Figure 21(a) displays a scatter plot of the normalized area versus volume. Regardless of the evolution time (early vs. late), the data collapses onto a linear trend with similar slopes for bubbles and droplets. This implies that the volume-to-area ratio 
+
+𝑉 /𝐴 remains constant for bubbles and droplets across a wide range of sizes. This ratio is further quantified in Figure 21(b), which plots the conditional mean ⟨𝑉 /𝐴 |𝑑 ⟩ against the equivalent diameter 𝑑 . For structures larger than 𝑑 /𝑙 𝑐 ≳ 3, the ratio plateaus, reaching an asymptotic value of approximately 0 .6 − 0.8 𝑙 𝑐 . A constant 𝑉 /𝐴 ratio suggests that these large structures adopt a filamentary geometry where the length increases while the cross-section remains relatively constant. Approximating these filaments as cylinders, the cross-sectional diameter ( 𝑑 cross ) relates to the volume-to-area ratio via 𝑑 cross ≈ 4(𝑉 /𝐴 ).Based on the observed asymptote, this predicts a filament thickness of 𝑑 cross ≈ 2.4 − 3.2 𝑙 𝑐 .To validate this morphology, we analyze the maximum absolute signed distance within each element, 𝑟 LS ≡ max (| 𝑑 sign |) , where 𝑑 sign is the signed distance to the interface and the maximum is taken over the discrete bubbles or droplets. Thus the quantity 𝑟 LS 
+
+serves as a proxy for the cross-sectional radius. Figure 21(b) shows that the conditional mean ⟨𝑟 LS |𝑑 ⟩/ 𝑙 𝑐 asymptotes to a value of 1 .4 − 1.5. This corresponds to a cross-sectional diameter of 2 .8 − 3.0 𝑙 𝑐 , which is in good agreement with the prediction derived from the 𝑉 /𝐴 ratio. These results confirm that large structures in immiscible RT turbulence are predominantly filamentary, maintaining a characteristic thickness of approximately three capillary lengths. To corroborate the filamentary nature of the large discrete elements, we analyze their three principal moments of inertia ( 𝐼 min ≤ 𝐼 mid ≤ 𝐼 max ). Figure 22 displays the joint PDFs of the ratios 𝐼 min /𝐼 max versus 𝐼 mid /𝐼 max . These distributions are mathematically confined within a triangular region (note that 𝐼 min + 𝐼 mid ≥ 𝐼 max ) where the vertices represent distinct morphologies: the top-left corresponds to filaments ( 𝐼 min ≪ 𝐼 mid ≈ 𝐼 max ), the top-right to spheres ( 𝐼 min ≈ 𝐼 mid ≈ 𝐼 max ), and the bottom to pancake-like structures (𝐼 min ≈ 𝐼 mid ≈ 0.5𝐼 max ). 
+
+0 X0-30 Journal of Fluid Mechanics 0.0 0.2 0.4 0.6 0.8 1.0
+
+> Imin /I max
+> 0.50.60.70.80.91.0
+> Imid /I max
+> bubble early
+
+(a)     
+
+> 0.8 1.3 2. 3.2 5.0 7.9 12.6 20. 31.6 50.1 79.4 0.00.20.40.60.81.0
+> Imin /I max
+> 0.50.60.70.80.91.0
+> Imid /I max
+> bubble late
+
+(b)     
+
+> 0.2 0.3 0.6 1. 1.7 3.0 5.2 9.1 15.8 27.5 47.9 0.00.20.40.60.81.0
+> Imin /I max
+> 0.50.60.70.80.91.0
+> Imid /I max
+> drop early
+
+(c)     
+
+> 0.6 1. 1.6 2.5 4. 6.3 10. 15.8 25.1 39.8 63.1 100.0 0.00.20.40.60.81.0
+> Imin /I max
+> 0.50.60.70.80.91.0
+> Imid /I max
+> drop late
+
+(d)
+
+> 0.2 0.3 0.6 1. 1.7 3.0 5.2 9.1 15.8 27.5 47.9 83.2
+
+Figure 22. Joint PDFs of the middle-to-maximum and minimum-to-maximum moment of inertia ratios. Panels (a, b) show the bubble case (X1 Φ95), while panels (c, d) show the droplet case (X1 Φ05). The left column (a, c) corresponds to early time (5 .5 < b𝑡 < 6.5), and the right column (b, d) corresponds to late time (11 < b𝑡 < 12). 
+
+At early times (5 .5 < b𝑡 < 6.5), both the bubble (panel a) and droplet (panel c) cases exhibit a high concentration near the top-left corner. This indicates a dominance of filamentary structures, confirming the geometric results in figure 21. While spherical structures (top-right) are present, they remain secondary to the filaments during this phase. In contrast, at late times (11 < b𝑡 < 12, panels b and d), the region of highest probability shifts toward the top-right corner. This transition marks the emergence of numerous small spherical elements, consistent with the breakup mechanisms visualized in figure 19. Concurrently, the intensity at the top-left corner decreases slightly, reflecting a reduction in the relative population of filaments. Pancake structures appear primarily at late times, but their numbers remain statistically insignificant compared to filaments and spheres. We characterize the orientation of isolated bubbles and droplets using the principal axes of their moment-of-inertia tensor. Geometrically, the major, middle, and minor axes correspond to the minimum ( 𝐼 min ), intermediate ( 𝐼 mid ), and maximum ( 𝐼 max ) moments of inertia, respectively. Figure 23 quantifies the orientation of these structures by analyzing the alignment of their principal axes with the mean vorticity vector (over each discrete element) and the fixed coordinate axes. Panel (a) illustrates the alignment with the mean vorticity for the bubble case. The solid lines represent the full population, while the dashed lines represent the subset of filamentary structures ( 𝐼 min /𝐼 max < 0.15). In the full statistics, the vorticity vector tends to be perpendicular to the minor axis, with a broad probability of aligning with both the major and middle axes. However, focusing on the filamentary subset reveals a strong preferential alignment between the major axis and the local vorticity. This behavior is primarily driven by vortex stretching: as vortex tubes stretch along their rotation axes, entrained elements are passively elongated in the same direction. This alignment also enhances stability, as filaments aligned with the stretching direction are less susceptible to immediate breakup by shear instabilities. Panel (c) of figure 23 examines the alignment of the major axis with the coordinate system. The full population displays no preferential alignment, as the statistics are 
+
+0 X0-31 D. Zhao, X. Huang, and G. Li 0.0 0.2 0.4 0.6 0.8 1.0
+
+| cos( ω, ̂ e)|
+
+> 0.00.51.01.52.02.53.0
+> PDF
+
+bubble (a)̂ emajor ̂     
+
+> emiddle ̂
+> eminor
+> 0.00.20.40.60.81.0
+
+| cos( ω, ̂ e)|
+
+> 0.51.01.52.0
+> PDF
+
+drop (b)̂ emajor ̂     
+
+> emiddle ̂
+> eminor
+> 0.00.20.40.60.81.0
+
+| cos( ̂ emajor ,̂ i)|
+
+> 01234567
+> PDF
+
+bubble (c)̂ x̂     
+
+> ŷ
+> z
+> 0.00.20.40.60.81.0
+
+| cos( ̂ emajor ,̂ i)|
+
+> 012345
+> PDF
+
+drop (d)̂ x̂
+
+> ŷ
+> z
+
+Figure 23. Alignment of principal axes for isolated bubbles (case X1 Φ95; panels a, c) and droplets (case X1 Φ05; panels b, d) at late time (11 < b𝑡 < 12). Panels (a, b) show the alignment with mean vorticity, while panels (c, d) show the alignment of the major axis with the three coordinate axes. Solid lines show all objects, while dashed lines correspond to long filamentary objects (moment of inertia ratio 𝐼 min /𝐼 max < 0.15). 
+
+dominated by numerous small, spherical structures that lack a distinct orientation bias. In contrast, the filamentary subset (dashed lines) aligns preferentially with the vertical axis. This confirms that the elongated structures are generated by the vertical growth inherent to the RT instability. Finally, panels (b) and (d) show that the droplet case mirrors the bubble behavior. Long filamentary droplets align simultaneously with the local mean vorticity and the global vertical direction. 5.2. Bubbles and droplets dynamics 
+
+The dynamics of discrete bubbles and droplets are intrinsically linked to their geometry and morphology. Figure 24 presents the joint PDFs of the element-averaged vertical velocity, enstrophy, and squared strain-rate plotted against the equivalent diameter. We first examine the vertical velocity in panels (a,d). As expected for RT flows, the conditional mean vertical velocity is positive for bubbles (panel a) and negative for droplets (panel d), corresponding to rising and sinking motions, respectively. To explain the observed mean magnitude in solid lines, we employ a drag-buoyancy balance model. Assuming an isolated spherical element moving at terminal velocity, the drag force balances the buoyancy force: 12𝐶 𝑑 𝜌 𝑎𝑚𝑏 𝑉 2 
+
+> 𝑧
+
+𝐴 = (𝜌 ℎ − 𝜌 𝑙 )𝑉𝑔, (5.1) where 𝐶 𝑑 ≈ 0.5 is the drag coefficient for a sphere, 𝜌 𝑎𝑚𝑏 is the density of the ambient fluid, and 𝑉 and 𝐴 are the element’s volume and cross-sectional area. This relation implies that the terminal velocity scales as 𝑉 𝑧 ∝ √𝑑 .
+
+0 X0-32 Journal of Fluid Mechanics 1.0 1.5 2.0 2.5 3.0 3.5 4.0
+
+> d/l c
+> −0.05 0.00 0.05 0.10
+> Vz
+
+√d
+
+(a)      
+
+> 0.1 0.2 0.3 0.6 1. 1.7 3.0 5.2 9.1 15.8 27.5 47.9 1.01.52.02.53.03.54.0
+> d/l c
+> 0.00.51.01.52.0
+> Ω2
+
+d3/2(b)     
+
+> 0.0 0.0 0.1 0.1 0.2 0.5 1. 2.1 4.4 9.1 1.01.52.02.53.03.5
+> d/l c
+> 0.00.51.01.52.02.5
+> S2
+
+d3/2
+
+(c)     
+
+> 0.0 0.0 0.0 0.1 0.1 0.3 0.6 1.2 2.5 5.2 11. 123456
+> d/l c
+> −0.10
+> −0.08
+> −0.06
+> −0.04
+> −0.02 0.00 0.02 0.04 0.06
+> Vz
+
+√d
+
+(d)    
+
+> 0.1 0.1 0.2 0.3 0.6 1. 1.7 3.0 5.2 9.1 15.8 12345
+> d/l c
+> 0.00.51.01.52.0
+> Ω2
+
+d3/2(e)    
+
+> 0.0 0.0 0.0 0.1 0.1 0.3 0.6 1.2 2.5 5.2 12345
+> d/l c
+> 0.00.51.01.52.02.5
+> S2
+
+d3/2(f )
+
+> 0.0 0.0 0.0 0.0 0.1 0.2 0.3 0.7 1.4 3.0 6.3
+
+Figure 24. Joint PDFs of the mean vertical velocity (a, d), mean enstrophy (b, e), and mean squared strain-rate (c, f) averaged over isolated structures, plotted against the equivalent diameter normalized by capillary length. Panels (a –c) correspond to the bubble case (X1 Φ95) and (d –f) to the droplet case (X1 Φ05) at late time (11 < b𝑡 < 12). Solid black lines denote the conditional means. Purple dashed lines indicate theoretical scalings: the drag-buoyancy balance ∼ 𝑑 1/2 in (a, d), and the dissipation scaling ∼ 𝑑 3/2 in (b, c, e, f). 
+
+However, this simple scaling breaks down for very small elements below the capillary scale, where the buoyancy force is negligible, and motion is dominated by ambient turbulence. To account for this, we introduce a modified scaling that incorporates a minimum size cutoff 𝑙 cutoff (∼ 𝑙 𝑐 , the capillary length) and a coefficient 𝑐 0 to represent turbulence modulation: 
+
+𝑉 𝑧 = 𝑐 0√︄ 43𝐶 𝑑 
+
+𝜌 ℎ − 𝜌 𝑙 
+
+𝜌 𝑎𝑚𝑏 
+
+𝑔 (𝑑 − 𝑙 cutoff ). (5.2) The dashed lines in Figure 24(a, d) compare this model with the simulation data. Using a coefficient of 𝑐 0 = 0.35, the model shows good agreement with the conditional mean vertical velocity for both bubbles and droplets. The analysis of element-averaged mean enstrophy and squared strain-rate (panels b, c, e, f) draws upon the inertial dynamics established in panels (a,d). The vertical velocity scaling, ⟨𝑢 𝑧 ⟩ ∼ 𝑑 1/2, indicates an inertial regime where turbulent drag balances buoyancy. Under Kolmogorov scaling, the energy dissipation rate is given by ∼ 𝑈 3/𝐿 . Since the characteristic velocity grows as 𝑈 ∼ 𝑑 1/2 while the length scale 𝐿 remains effectively constant (limited to ≈ 3𝑙 𝑐 by surface tension, see Figure 21), the dissipation rate is predicted to scale as 𝑑 3/2. Thus the mean enstrophy and squared strain-rate over discrete structures follows this scaling. This prediction (purple dashed lines in figure 24 b,c,e,f) agrees well with the observed conditional mean profiles (black lines). Physically, this confirms that larger bubbles and droplets sustain more intense internal shear due to the combination of higher terminal velocities and fixed, capillary-limited widths. Finally, we verify the theoretical relationship between surface tension power and interface stretching derived in equation (4.15). Figure 25 presents scatter plots of the element-averaged surface tension power, ⟨ 𝒇 𝜎 · u⟩, against the normalized interface stretching, 
+
+⟨𝜎 S |∇ 𝑐 |⟩ . Element averaging is essential here, as it eliminates the spatial transport contribution, thereby isolating the direct coupling between surface tension power and 
+
+0 X0-33 D. Zhao, X. Huang, and G. Li −2 −1 0 1 2   
+
+> 〈fσ·u〉bubble
+> −2
+> −1012
+> 〈σS/|∇ c|〉 bubble
+
+(a)       
+
+> 0.02.55.07.510 .012 .515 .017 .520 .022 .525 .0
+> d/ ∆x
+> −2−1012
+> 〈fσ·u〉bubble
+> −2
+> −1012
+> 〈σS/|∇ c|〉 bubble
+
+(b)       
+
+> 0.02.55.07.510 .012 .515 .017 .520 .022 .525 .0
+> d/ ∆x
+> −2−1012
+> 〈fσ·u〉drop
+> −2
+> −1012
+> 〈σS/|∇ c|〉 drop
+
+(c)       
+
+> 0.02.55.07.510 .012 .515 .017 .520 .022 .525 .0
+> d/ ∆x
+> −2−1012
+> 〈fσ·u〉drop
+> −2
+> −1012
+> 〈σS/|∇ c|〉 drop
+
+(d)
+
+> 0.02.55.07.510 .012 .515 .017 .520 .022 .525 .0
+> d/ ∆x
+
+Figure 25. Scatter plots of surface tension power versus surface stretching, integrated over individual bubbles (a, b) and droplets (c, d). Panels (a, c) represent early time (5 .5 < b𝑡 < 6.5), while panels (b, d) represent late time (11 < b𝑡 < 12). 
+
+stretching. Across all regimes, including bubbles and droplets, and at both early and late times, the data collapses well onto the diagonal line 𝑦 = −𝑥 , providing strong numerical confirmation of the proposed balance. Some deviations are observed at late times (panels b and d), likely attributable to the dense packing of elements. In such configurations, the element-averaged divergence term may become non-negligible, resulting in slight statistical discrepancies. Nonetheless, the robust correlation ⟨ 𝒇 𝜎 · u⟩ ≈ −⟨ 𝜎 S |∇ 𝑐 |⟩ confirms that surface tension power is fundamentally linked to interface stretching. This validates the physical framework proposed in Section 4, linking surface tension power directly to the transfer of scalar variance across scales. While demonstrated here for RT turbulence, the above mechanism describes a fundamen-tal kinematic relationship that should be generally applicable to immiscible turbulent flows. This insight holds promise for the development of large-eddy-simulation (LES) models. In LES, where subgrid interfacial scales are often unresolved, this relation suggests that the transfer of kinetic energy to surface energy can be parameterized as a function of the resolved strain rate. By linking hydrodynamic straining directly to the generation of interfacial area, physics-based subgrid closures can be constructed. Such models would accurately capture the “energy sink” effect of droplet formation and interface wrinkling without requiring explicit resolution of the complex subgrid geometry. 
+
+6. Conclusions 
+
+In this work, we investigated the interfacial dynamics and energy transfer mechanisms in immiscible two-phase Rayleigh-Taylor turbulence. By varying the surface tension coefficient 𝜎 , we analyzed the impact of capillarity on the energy budget, the cascade process, and the behaviour of discrete dispersed elements. For the global dynamics, we identified three distinct stages in the RT evolution: the linear growth stage, the turbulent emulsion stage, and the phase segregation stage. The temporal 
+
+0 X0-34 Journal of Fluid Mechanics 
+
+evolution of the interfacial area can be estimated from the ratio of the mixed volume to the Hinze scale, with the Hinze scale being bounded from below by the capillary scale. The global evolution of energy budgets exhibits self-similarity with respect to surface tension: the flow duration scales as 𝜎 −1/4, the maximum kinetic energy as 𝜎 1/2, and the maximum dissipation rate as 𝜎 1/4. Consequently, the temporal evolution of kinetic, potential, internal, and surface energies collapse onto same curves upon rescaling. At small scales, the role of surface tension transitions depending on the capillary strength. At low 𝜎 , it acts primarily as an enstrophy sink, while at high 𝜎 , the interface stiffness promotes surface restoration, generating intense localized shear and enstrophy, effectively acting as a source of enstrophy. Coarse-grained analysis of the scalar variance and kinetic energy budgets revealed the mechanisms governing cross-scale transfer. The scalar variance transfer flux, 𝛩 ℓ , correlates strongly with filtered interface stretching, Sℓ , via a nonlinear model. During the growth stage, 𝛩 ℓ is positive (forward cascade), driven by interface stretching, while at late times, it becomes negative (inverse transfer), driven by compression and coalescence. In the kinetic energy budget, three terms dominate the transfer across scales: deformation work ( 𝛱 ℓ ), baropycnal work ( 𝛬 ℓ ), and surface tension power ( 𝛹 𝜎,ℓ ). Crucially, surface tension power is scale-dependent: it acts as a kinetic energy sink at large scales (where velocity and surface tension force are anti-aligned during breakup) and as a source at small scales (where they align during relaxation). The crossover scale between these two regimes aligns remarkably well with the classical Hinze scale definition. By isolating individual fluid elements via additional simulations, we found that the generation of bubbles and droplets is dominated by interface stripping from the bulk, leading to a linear increase in element count over time. Morphologically, large structures are predominantly filamentary and vertically oriented, with cross-sectional diameters approximately three times the capillary scale. Consequently, the volume and surface area of these elements exhibit a linear relationship, distinct from the scaling of spherical objects. Dynamically, the element-averaged vertical velocity scales with the square root of the equivalent diameter ( ∼ 𝑑 1/2), consistent with a drag-buoyancy balance, while enstrophy and squared strain-rate scale linearly with size. Finally, we verified a fundamental kinematic relationship connecting hydrodynamics to geometry: element-averaged surface tension power is directly balanced by interface stretching, ⟨ 𝒇 𝜎 · u⟩ ≈ −⟨ 𝜎 S |∇ 𝑐 |⟩ . This relation holds across all regimes—bubbles and droplets, early and late times—and serves as the physical link between the kinetic energy budget and the scalar variance cascade. This finding holds promising implications for the development of large-eddy-simulation models for immiscible turbulence. It suggests that subgrid energy transfer to surface tension can be effectively parameterized as a function of the resolved strain rate, allowing for the accurate modeling of subgrid interface production and damping without the need to explicitly resolve complex subgrid geometries.   
+
+> Acknowledgement This work is supported by the National Natural Science Foundation of China (Nos. 12202270 and 12372264) and partially by the open funds of the State Key Laboratory for Strength and Vibration of Mechanical Structures (No. SV2025-KF-02). The authors also appreciate the computational support from the Centre for High Performance Computing at Shanghai Jiao Tong University.
+> Declaration of interests The authors report no conflict of interest.
+
+Appendix A. Density visualizations at late time     
+
+> The late-time density visualizations at b𝑡 =13 .6 for cases X2, X4, and X8 are shown in figure 26, providing a complementary view to the earlier-time results presented in figure 1. These visualizations show that, at this later stage, the density fields in the high-𝜎 cases have largely reorganized into a stably stratified configuration, with substantially reduced interfacial overturning compared with the earlier snapshots.
+
+0 X0-35 D. Zhao, X. Huang, and G. Li 
+
+Figure 26. Panels (a)-(c) show density visualizations for cases X2, X4, and X8, respectively, at the nondimensional time b𝑡 = 13 .6. 0 5 10 15 20 25 ̂
+
+t
+
+010 20 30 40 50 60 
+
+> lH (t)/∆x
+
+X1Ratio4 
+
+lc/∆x
+
+Figure 27. Temporal evolution of the Hinze scale for case X1Ratio4 (see Table 1). The horizontal dashed line indicates the capillary length scale, 𝑙 𝑐 , normalized by the grid spacing 𝛥𝑥 .
+
+Appendix B. Hinze scale in longer RT domain 
+
+To verify the hypothesis that the minimum Hinze scale in immiscible RT turbulence is bounded by the capillary scale, we performed an additional simulation with a 4:1 aspect ratio (Case X1Ratio4), extending the parameter space beyond the 2:1 aspect ratio used in cases X1-X30. The evolution of the Hinze scale for this case is shown in Figure 27, plotted alongside the corresponding capillary length. We observe that the Hinze scale approaches the capillary scale from above, reaching a minimum value comparable to 𝑙 𝑐 without falling below it. This behavior is consistent with the observations for the 2:1 aspect ratio cases (Figure 3(c)), thereby further confirming the validity of our argument. 
+
+0 X0-36 Journal of Fluid Mechanics 10 0 10 1 10 2 10 3
+
+k`
+
+> −8
+> −6
+> −4
+> −2024
+> d〈Θ`〉/d  log  k`
+> ×10 −3
+
+X1 (a)   
+
+> 10 010 110 210 3
+
+k`
+
+> −5
+> −4
+> −3
+> −2
+> −10123
+> d〈Θ`〉/d  log  k`
+> ×10 −3
+
+X2 (b)   
+
+> 10 010 110 210 3
+
+k`
+
+> −4
+> −3
+> −2
+> −101234
+> d〈Θ`〉/d  log  k`
+> ×10 −3
+
+X8 (c)
+
+> 46810 12 14
+
+̂
+
+t
+
+Figure 28. Spatial average of the scalar variance transfer density 𝑑 ⟨𝛩 ℓ ⟩/ 𝑑 log 𝑘 ℓ versus the filtering wavenumber 
+
+𝑘 ℓ = 𝐿 𝑥 /ℓ at different time instants indicated by the colorbar. Panels (a),(b),(c) corresponds to simulation cases X1, X2, and X8, respectively. 10 0 10 1 10 2 10 3
+
+> k`
+> −0.8
+> −0.6
+> −0.4
+> −0.20.00.20.40.60.81.0
+> d〈 DDt  KE `〉/d  log  k`
+> ×10 −1
+
+(a)   
+
+> 10 010 110 210 3
+> k`
+> −1.5
+> −1.0
+> −0.50.00.51.01.5
+> d〈Π`〉/d  log  k`
+> ×10 −1
+
+(b)   
+
+> 10 010 110 210 3
+> k`
+> −4
+> −3
+> −2
+> −1012
+> d〈Λ`〉/d  log  k`
+> ×10 −1
+
+(c)   
+
+> 10 010 110 210 3
+> k`
+> 0.00.51.01.52.02.53.03.5
+> d〈D`〉/d  log  k`
+> ×10 −1
+
+(d)   
+
+> 10 010 110 210 3
+> k`
+> 0.00.20.40.60.81.01.21.41.6
+> d〈inj
+> ` 〉/d  log  k`
+> ×10 −1
+
+(e)   
+
+> 10 010 110 210 3
+> k`
+> −1.0
+> −0.50.00.51.0
+> d〈Ψσ〉/d  log  k`
+> ×10 −1
+
+(f )
+
+> 46810 12 14 ̂
+> t
+
+Figure 29. Filtered kinetic-energy budgets, differentiated with respect to log 𝑘 ℓ , for Case X1 as a function of the filtering wavenumber 𝑘 ℓ . Curves denote different times, color-coded by the colorbar. All terms are normalized by the maximum unfiltered injection rate over the simulation. 
+
+Appendix C. Density representation of the filtered scalar and kinetic-energy budgets 
+
+To complement the budget analysis, we also compute the corresponding logarithmic-scale densities of the scalar-variance and kinetic-energy transfer budgets, 
+
+𝑑 (·) 
+
+𝑑 log 𝑘 ℓ
+
+= 𝑘 ℓ
+
+𝑑 (·) 
+
+𝑑𝑘 ℓ
+
+,
+
+shown in figures 28 and 29 for the scalar-variance transfer term and the kinetic-energy budget terms, respectively. These density plots offer an alternative way to show the scale-by-scale contribution and support the same physical conclusions as the cumulative plots in figures 13 and 15. 
+
+Appendix D. Compensated dissipation coefficient 
+
+The compensated dissipation coefficient is defined as 
+
+𝐶 𝐷 = max (𝐷 ) 𝜌 3/2
+
+𝑚 
+
+𝛥𝜌 5/4𝑔 5/4𝜎 1/4 ,
+
+where 𝜌 𝑚 = (𝜌 ℎ + 𝜌 𝑙 )/ 2 is the mean density. We have evaluated 𝐶 𝐷 for cases X1 –X30, as shown in figure 30. Over the range of surface tension considered, 𝐶 𝐷 remains approximately constant, around 0.4-0.45. This indicates that the observed scaling, max (𝐷 ) ∝ 𝜎 1/4, is not merely an empirical power law, but is consistent with the full dimensional relation. 
+
+0 X0-37 D. Zhao, X. Huang, and G. Li 0 5 10 15 20 25 30 
+
+𝜎 /𝜎 0   
+
+> 0.30 0.35 0.40 0.45 0.50
+> 𝐶 𝐷
+> Figure 30. Compensated coefficient 𝐶 𝐷 as a function of surface tension coefficient for cases X1 –X30.
+> REFERENCES
+
+Aluie, Hussein 2013 Scale decomposition in compressible turbulence. Physica D: Nonlinear Phenomena 247 (1), 54–65. Aluie, Hussein & Eyink, Gregory L 2009 Localness of energy cascade in hydrodynamic turbulence. ii. sharp spectral filter. Physics of Fluids 21 (11), 115108. Aniszewski, Wojciech, Arrufat, T, Crialesi-Esposito, Marco, Dabiri, S, Fuster, Daniel, Ling, Y, Lu, Jiacai, Malan, L, Pal, Sukla, Scardovelli, R & others 2021 Parallel, robust, interface simulator (paris). Computer Physics Communications 263 ,107849. Arnett, W David, Bahcall, John N, Kirshner, Robert P & Woosley, Stanford E 1989 Supernova 1987a. Annual review of Astronomy and Astrophysics 27 (1), 629–700. Bellman, Richard & Pennington, Ralph H. 1954 Effects of surface tension and viscosity on taylor instability. Bian, Xin, Betti, Riccardo, Zhao, Dongxiao & Aluie, Hussein 2026 Effects of external magnetic fields on the multi-mode rayleigh –taylor instability. Physics of Plasmas 33 (1), 012303. Blondin, John M & Ellison, Donald C 2001 Rayleigh-taylor instabilities in young supernova remnants undergoing efficient particle acceleration. The Astrophysical Journal 560 (1), 244. Borue, Vadim & Orszag, Steven A 1998 Local energy flux and subgrid-scale statistics in three-dimensional turbulence. Journal of Fluid Mechanics 366 , 1–31. Brackbill, Jeremiah U, Kothe, Douglas B & Zemach, Charles 1992 A continuum method for modeling surface tension. Journal of computational physics 100 (2), 335– 354. Briard, A., Gr´ ea, B.-J. & Nguyen, F. 2024 Turbulent mixing in the vertical magnetic rayleigh –taylor instability. Journal of Fluid Mechanics 979 , A8. Brizzolara, Stefano, Naudascher, Robert, Rosti, Marco Edoardo, Stocker, Roman, Boffetta, Guido, Mazzino, Andrea & Holzner, Markus 2024 Immiscible rayleigh –taylor turbulence: Implications for bacterial degradation in oil spills. 
+
+Proceedings of the National Academy of Sciences 121 (11), e2311798121. Cabot, William H & Cook, Andrew W 2006 Reynolds number effects on rayleigh– taylor instability with possible implications for type ia supernovae. Nature Physics 2 (8), 562–568. Calado, Andre & Balaras, Elias 2024 Dynamics of bubble deformation and breakup 
+
+0 X0-38 Journal of Fluid Mechanics 
+
+in decaying isotropic turbulence. Phys. Rev. Fluids 9, 123604. Cannon, Ianto, Soligo, Giovanni & Rosti, Marco E. 2024 Morphology of clean and surfactant-laden droplets in homogeneous isotropic turbulence. Journal of Fluid Mechanics 987 , A31. Chertkov, M., Kolokolov, I. & Lebedev, V. 2005 Effects of surface tension on immiscible rayleigh-taylor turbulence. Phys. Rev. E 71 , 055301. Crialesi-Esposito, Marco, Chibbaro, Sergio & Brandt, Luca 2023 The interaction of droplet dynamics and turbulence cascade. Communications Physics 6 (1), 5. Crialesi-Esposito, Marco, Gonzalez-Montero, LA & Salvador, FJ 2022 a Effects of isotropic and anisotropic turbulent structures over spray atomization in the near field. 
+
+International Journal of Multiphase Flow 150 , 103891. Crialesi-Esposito, Marco, Rosti, Marco Edoardo, Chibbaro, Sergio & Brandt, Luca 2022 b Modulation of homogeneous and isotropic turbulence in emulsions. Journal of Fluid Mechanics 940 , A19. Deane, G. & Stokes, M. 2002 Scale dependence of bubble creation mechanisms in breaking waves. Nature 418 , 839–844. Dimonte, Guy, Youngs, DL, Dimits, A, Weber, S, Marinak, M, Wunsch, S, Garasi, C, Robinson, A, Andrews, MJ, Ramaprabhu, P & others 2004 A comparative study of the turbulent rayleigh–taylor instability using high-resolution three-dimensional numerical simulations: the alpha-group collaboration. Physics of Fluids 16 (5), 1668– 1693. Dodd, Michael S & Ferrante, Antonino 2016 On the interaction of taylor length scale size droplets and isotropic turbulence. Journal of Fluid Mechanics 806 , 356–412. Eyink, Gregory L 2005 Locality of turbulent cascades. Physica D: Nonlinear Phenomena 
+
+207 (1), 91–116. Eyink, Gregory L 2006 Multi-scale gradient expansion of the turbulent stress tensor. 
+
+Journal of Fluid Mechanics 549 , 159–190. Feigin, L. A. & Svergun, D. I. 1987 Structure Analysis by Small-Angle X-Ray and Neutron Scattering . New York, NY: Springer, eBook ISBN: 978-1-4757-6624-0; Softcover ISBN: 978-1-4757-6626-4. Freund, Andreas & Ferrante, Antonino 2019 Wavelet-spectral analysis of droplet-laden isotropic turbulence. Journal of Fluid Mechanics 875 , 914 –928. Girotto, Ivan, Benzi, Roberto, Staso, Gianluca Di, Scagliarini, Andrea, Schifano, Sebastiano Fabio & Toschi, Federico 2022 Build up of yield stress fluids via chaotic emulsification. Journal of Turbulence 23 (6), 265–275. Hasslberger, Josef, Klein, Markus & Chakraborty, Nilanjan 2018 Flow topologies in bubble-induced turbulence: a direct numerical simulation analysis. Journal of Fluid Mechanics 857 , 270 –290. Jain, Suhas S. & Elnahhas, Ahmed 2025 Stationary states of forced two-phase turbulence. Chemical Engineering Journal 524 , 169077. Jiang, D & Ling, Y 2021 Impact of inlet gas turbulence on the formation, development and breakup of interfacial waves in a two-phase mixing layer. Journal of Fluid Mechanics 
+
+921 , A15. Krumholz, Mark R, Klein, Richard I, McKee, Christopher F, Offner, Stella SR & Cunningham, Andrew J 2009 The formation of massive star systems by accretion. 
+
+Science 323 (5915), 754–757. Labourasse, E., Lacanette, D., Toutant, A., Lubin, P., Vincent, S., Lebaigue, O., Caltagirone, J.-P. & Sagaut, P. 2007 Towards large eddy simulation of isothermal two-phase flows: Governing equations and a priori tests. International Journal of Multiphase Flow 33 (1), 1–39.  
+
+> 0X0-39
+
+D. Zhao, X. Huang, and G. Li 
+
+Lu, Min, Yang, Zixuan & Deng, Bingqing 2025 Numerical study of turbulent bubbly upflow: effect of density ratio. Journal of Fluid Mechanics 1007 , A63. McClements, David Julian 2010 Emulsion design to improve the delivery of functional lipophilic components. Annual review of food science and technology 1, 241–269. Ni, Rui 2024 Deformation and breakup of bubbles and drops in turbulence. Annual Review of Fluid Mechanics 56 (Volume 56, 2024), 319–347. Pandey, Vikash, Mitra, Dhrubaditya & Perlekar, Prasad 2023 Kolmogorov turbulence coexists with pseudo-turbulence in buoyancy-driven bubbly flows. Phys. Rev. Lett. 131 , 114002. Perlekar, Prasad 2019 Kinetic energy spectra and flux in turbulent phase-separating symmetric binary-fluid mixtures. Journal of Fluid Mechanics 873 , 459–474. Poinsot, T. & Veynante, D. 2005 Theoretical and numerical combustion . RT Edwards, Inc. Pope, Stephen B 2001 Turbulent flows . IOP Publishing. Rayleigh 1883 Investigation of the character of the equilibrium of an incompressible heavy fluid of variable density. Proceedings of the London Mathematical Society s1-14 (1), 170–177. Rosenfeld, Azriel & Pfaltz, John L. 1966 Sequential operations in digital picture processing. Journal of the ACM 13 (4), 471 –494. Rosti, Marco E, Ge, Zhouyang, Jain, Suhas S, Dodd, Michael S & Brandt, Luca 2019 Droplets in homogeneous shear turbulence. Journal of Fluid Mechanics 876 , 962–984. Sadek, Mahmoud & Aluie, Hussein 2018 Extracting the spectrum of a flow by spatial filtering. Physical Review Fluids 3 (12), 124610. Saeedipour, Mahdi & Schneiderbauer, Simon 2019 A new approach to include surface tension in the subgrid eddy viscosity for the two-phase les. International Journal of Multiphase Flow 121 , 103128. Saeedipour, Mahdi & Schneiderbauer, Simon 2021 Favre-filtered les-vof of two-phase flows with eddy viscosity-based subgrid closure models: An a-posteriori analysis. 
+
+International Journal of Multiphase Flow 144 , 103780. Scarbolo, Luca, Bianco, Federico & Soldati, Alfredo 2015 Coalescence and breakup of large droplets in turbulent channel flow. Physics of Fluids 27 (7), 073302. Silversmith, William 2021 cc3d: Connected components on multilabel 3D & 2D images. Software, version 3.2.1. Skartlien, R, Sollum, E & Schumann, H 2013 Droplet size distributions in turbulent emulsions: breakup criteria and surfactant effects from direct numerical simulations. 
+
+The Journal of chemical physics 139 (17), 174901. Sohn, Sung-Ik 2009 Effects of surface tension and viscosity on the growth rates of rayleigh-taylor and richtmyer-meshkov instabilities. Phys. Rev. E 80 , 055302. Sykes, J. P., Gallagher, T. P. & Rankin, B. A. 2021 Effects of rayleigh-taylor instabilities on turbulent premixed flames in a curved rectangular duct. Proc. Combust. Inst. 38 (4), 6059–6066. Tavares, H. S., Biferale, L., Sbragaglia, M. & Mailybaev, A. A. 2021 Validation and application of the lattice boltzmann algorithm for a turbulent immiscible rayleigh –taylor system. Philosophical Transactions of the Royal Society A: Mathematical, Physical and Engineering Sciences 379 (2208), 20200396. Taylor, Geoffrey 1950 The instability of liquid surfaces when accelerated in a direction perpendicular to their planes. i. Proceedings of the Royal Society of London. Series A. Mathematical and Physical Sciences 201 (1065), 192–196. Thiesset, F., Duret, B., M´ enard, T., Dumouchel, C., Reveillon, J. & Demoulin, F. X. 2020 Liquid transport in scale space. Journal of Fluid Mechanics 886 , A4.  
+
+> 0X0-40
+
+Journal of Fluid Mechanics 
+
+Thiesset, Fabien & Vah´ e, Jonathan 2025 Scale-by-scale kinetic energy budgets in multiphase turbulence. Journal of Fluid Mechanics 1025 , A63. Trummler, Theresa, Begemann, Alexander, Trautner, Elias & Klein, Markus 2022 Numerical investigation of the segregation of turbulent emulsions. Physics of Fluids 34 (11), 113324. Vela-Mart´ ın, Alberto & Avila, Marc 2021 Deformation of drops by outer eddies in turbulence. Journal of Fluid Mechanics 929 , A38. Vela-Mart´ ın, Alberto & Avila, Marc 2022 Memoryless drop breakup in turbulence. 
+
+Science Advances 8 (50), eabp9561. Wang, Cheng, Yi, Lei, Jiang, Linfeng & Sun, Chao 2022 Turbulence drag modulation by dispersed droplets in taylor –couette flow: the effects of the dispersed phase viscosity. 
+
+Journal of Fluid Mechanics 952 , A39. Wang, Jianchun, Wan, Minping, Chen, Song, Xie, Chenyue & Chen, Shiyi 2018 Effect of shock waves on the statistics and scaling in compressible isotropic turbulence. Phys. Rev. E 97 , 043108. Xu, Xin, Zhao, Zhiye, Lin, Fenghui, Wang, Pei, Liu, Nan-Sheng & Lu, Xi-Yun 2025 On the evolution of the mixing layer in rotation-driven rayleigh –taylor turbulence. Journal of Fluid Mechanics 1018 , A28. Yi, Lei, Toschi, Federico & Sun, Chao 2021 Global and local statistics in turbulent emulsions. Journal of fluid mechanics 912 , A13. Yi, Lei, Wang, Cheng, Huisman, Sander G & Sun, Chao 2023 Recent developments of turbulent emulsions in taylor–couette flow. Philosophical Transactions of the Royal Society A 381 (2243), 20220129. Young, Y.-N. & Ham, F. E. 2006 a Surface tension in incompressible rayleigh –taylor mixing flow. Journal of Turbulence 7, N71. Young, Y.-N. & Ham, F. E. 2006 b Surface tension in incompressible rayleigh –taylor mixing flow. Journal of Turbulence 7, N71. Zanella, R., Tegze, G., Le Tellier, R. & Henry, H. 2020 Two- and three-dimensional simulations of rayleigh –taylor instabilities using a coupled cahn –hilliard/navier –stokes model. Physics of Fluids 32 (12), 124115. Zhao, Dongxiao & Aluie, Hussein 2018 Inviscid criterion for decomposing scales. 
+
+Physical Review Fluids 3 (5), 054603. Zhao, Dongxiao & Aluie, Hussein 2023 Measuring scale-dependent shape anisotropy by coarse-graining: Application to inhomogeneous rayleigh-taylor turbulence. Phys. Rev. Fluids 8, 114601. Zhao, Dongxiao, Aluie, Hussein & Li, Gaojin 2025 Multi-scale dynamics of scalar transfer in rayleigh –taylor turbulent mixing. Journal of Fluid Mechanics 1011 , A4. Zhao, Dongxiao, Betti, Riccardo & Aluie, Hussein 2022 Scale interactions and anisotropy in rayleigh–taylor turbulence. Journal of Fluid Mechanics 930 , A29. Zhao, Dongxiao & Li, Gaojin 2026 Influence of immiscibility and atwood number on the dynamics of confined rayleigh –taylor turbulence. International Journal of Multiphase Flow 202 , 105811. Zhao, Dongxiao, Xiao, Lanlan, Aluie, Hussein, Wei, Ping & Lin, Chensen 2023 Lagrangian investigation of the interface dynamics in single-mode rayleigh –taylor instability. Physics of Fluids 35 (10), 104103. Zhou, Ye 2007 Unification and extension of the similarity scaling criteria and mixing transition for studying astrophysics using high energy density laboratory experiments or numerical simulations. Physics of Plasmas 14 (8), 082701. Zhou, Ye 2017 a Rayleigh–taylor and richtmyer–meshkov instability induced flow, turbulence, and mixing. i. Physics Reports 720 , 1–136.  
+
+> 0X0-41
+
+D. Zhao, X. Huang, and G. Li 
+
+Zhou, Ye 2017 b Rayleigh–taylor and richtmyer–meshkov instability induced flow, turbulence, and mixing. ii. Physics Reports 723 , 1–160. Zhou, Ye 2024 Hydrodynamic Instabilities and Turbulence: Rayleigh –Taylor, Richtmyer –
+
+Meshkov, and Kelvin –Helmholtz Mixing . Cambridge University Press. Zhou, Ye & Cabot, William H 2019 Time-dependent study of anisotropy in rayleigh-taylor instability induced turbulent flows with a variety of density ratios. Physics of Fluids 31 (8), 084106. Zhou, Ye, Sadler, James D. & Hurricane, Omar A. 2025 Instabilities and mixing in inertial confinement fusion. Annual Review of Fluid Mechanics 57 (Volume 57, 2025), 197–225. Zhou, Ye, Williams, Robin JR, Ramaprabhu, Praveen, Groom, Michael, Thornber, Ben, Hillier, Andrew, Mostert, Wouter, Rollin, Bertrand, Balachandar, S, Powell, Phillip D & others 2021 Rayleigh–taylor and richtmyer-meshkov instabilities: A journey through scales. Physica D: Nonlinear Phenomena p. 132838.

@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-13",
+  "date": "2026-08-13",
+  "generated_at": "2026-08-13T20:51:44",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/13/2608.04447v1-interfacial-dynamics-and-energy-cascade-in-immiscible-rayleigh-taylor-turbulence",
+      "section": "quick",
+      "title_en": "Interfacial dynamics and energy cascade in immiscible Rayleigh-Taylor turbulence",
+      "authors": "Dongxiao Zhao, Xiaoxue Huang, Gaojin Li",
+      "date": "2026-08-05",
+      "pdf": "https://arxiv.org/pdf/2608.04447v1",
+      "score": "6.0",
+      "evidence": "不混溶Rayleigh-Taylor湍流数值模拟，两相流",
+      "tldr": "针对不混溶 RT 湍流，采用不同表面张力系数 σ 的数值模拟，研究界面动力学与多尺度能量传递。流动呈自相似演化：最大动能标度 σ^{1/2}，持续时间标度 σ^{-1/4}；表面张力在大尺度移除、小尺度注入动能，交叉于 Hinze 尺度。验证了表面张力功率与界面拉伸的局部关系，关联动能传递与标量方差级串。气泡/液滴统计显示毛细尺度细丝及阻力-浮力平衡，为 LES 亚格子闭合提供物理框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "We investigate interfacial dynamics and multiscale energy transfer in immiscible Rayleigh-Taylor turbulence using numerical simulations with varying surface tension coefficients $σ$. Capillarity is shown to control characteristic length scales, interfacial area, and global energy and enstrophy budgets. The flow exhibits self-similar evolution with respect to surface tension, with the maximum kinetic energy scaling as $σ^{1/2}$ and the flow duration as $σ^{-1/4}$. A scale-by-scale budget shows that surface tension removes kinetic energy at large scales while injecting it at small scales, with the crossover occurring near the Hinze scale. We further recast and verify a local kinematic relationship between surface-tension power and interface stretching, up to conservative transport, $ \\boldsymbol{f}^σ\\cdot\\boldsymbol{u} = - σ\\mathcal{S}~|\\nabla c| + \\mathrm{Transport}$, where $\\boldsymbol{f}^σ$ is the surface-tension force, $\\boldsymbol{u}$ the velocity, $c$ the heavy-fluid volume fraction, and $\\mathcal{S}$ the interface stretch rate. This relation links kinetic-energy transfer to the scalar-variance cascade and shows that energy transfer to the interface is governed by local strain. Statistics of individual bubbles and droplets reveal vertically elongated filaments with diameters of about three capillary scales, yielding a linear volume-area relation. Their vertical velocities scale with the square root of equivalent diameter, consistent with drag-buoyancy balance. These findings, particularly the direct link between surface tension power and resolved interface stretching, provide a rigorous physical framework for developing subgrid-scale closures for large eddy simulation of immiscible turbulent flows.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

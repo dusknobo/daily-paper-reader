@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-13T20:48:50.123200+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.04447v1",
+      "source": "arxiv",
+      "title": "Interfacial dynamics and energy cascade in immiscible Rayleigh-Taylor turbulence",
+      "abstract": "We investigate interfacial dynamics and multiscale energy transfer in immiscible Rayleigh-Taylor turbulence using numerical simulations with varying surface tension coefficients $σ$. Capillarity is shown to control characteristic length scales, interfacial area, and global energy and enstrophy budgets. The flow exhibits self-similar evolution with respect to surface tension, with the maximum kinetic energy scaling as $σ^{1/2}$ and the flow duration as $σ^{-1/4}$. A scale-by-scale budget shows that surface tension removes kinetic energy at large scales while injecting it at small scales, with the crossover occurring near the Hinze scale. We further recast and verify a local kinematic relationship between surface-tension power and interface stretching, up to conservative transport, $ \\boldsymbol{f}^σ\\cdot\\boldsymbol{u} = - σ\\mathcal{S}~|\\nabla c| + \\mathrm{Transport}$, where $\\boldsymbol{f}^σ$ is the surface-tension force, $\\boldsymbol{u}$ the velocity, $c$ the heavy-fluid volume fraction, and $\\mathcal{S}$ the interface stretch rate. This relation links kinetic-energy transfer to the scalar-variance cascade and shows that energy transfer to the interface is governed by local strain. Statistics of individual bubbles and droplets reveal vertically elongated filaments with diameters of about three capillary scales, yielding a linear volume-area relation. Their vertical velocities scale with the square root of equivalent diameter, consistent with drag-buoyancy balance. These findings, particularly the direct link between surface tension power and resolved interface stretching, provide a rigorous physical framework for developing subgrid-scale closures for large eddy simulation of immiscible turbulent flows.",
+      "authors": [
+        "Dongxiao Zhao",
+        "Xiaoxue Huang",
+        "Gaojin Li"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-05T04:52:53+00:00",
+      "link": "https://arxiv.org/pdf/2608.04447v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "numerical simulations of immiscible Rayleigh-Taylor turbulence, two-phase flow",
+      "llm_evidence_cn": "不混溶Rayleigh-Taylor湍流数值模拟，两相流",
+      "llm_evidence": "不混溶Rayleigh-Taylor湍流数值模拟，两相流",
+      "canonical_evidence": "不混溶Rayleigh-Taylor湍流数值模拟，两相流",
+      "llm_tldr_en": "This paper investigates interfacial dynamics and multiscale energy transfer in immiscible Rayleigh-Taylor turbulence via numerical simulations with varying surface tension. It provides insights into two-phase flow simulation relevant to multiphase CFD.",
+      "llm_tldr_cn": "针对不混溶Rayleigh-Taylor湍流，用数值模拟研究界面动力学与跨尺度能量传递。表面张力控制特征尺度、界面面积和能量预算，流动呈现自相似演化。该研究为两相流CFD提供了界面与能量级串的机理认识。",
+      "llm_tldr": "针对不混溶Rayleigh-Taylor湍流，用数值模拟研究界面动力学与跨尺度能量传递。表面张力控制特征尺度、界面面积和能量预算，流动呈现自相似演化。该研究为两相流CFD提供了界面与能量级串的机理认识。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
