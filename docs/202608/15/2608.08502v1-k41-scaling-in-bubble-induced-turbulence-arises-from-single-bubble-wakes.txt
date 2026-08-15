@@ -1,0 +1,517 @@
+K41 Scaling in Bubble-Induced Turbulence Arises from Single-Bubble Wakes
+Dabao Li,1 Zhilong Jin,1 and Guangzhao Zhou1, 2, ∗
+1School of Engineering Science, University of Chinese Academy of Sciences, Beijing 101408, China
+2State Key Laboratory of Nonlinear Mechanics, IMECH & UCAS, Beijing 100190, China
+We use high-resolution, interface-resolved direct numerical simulations (DNS) to investigate the
+origin of Kolmogorov (K41) scaling in bubble-induced turbulence (BIT). Region-wise velocity struc-
+ture functions show that the 2/3 scaling appears only within bubble wake regions. Comparison with
+matched single-bubble DNS further indicates that the K41 scaling observed in the full BIT field
+arises from the superposition of individual bubble wakes. On this basis, we derive a scaling for the
+dissipation rate in dilute BIT that is consistent with experimental results from the literature.
+Bubbly flows are ubiquitous in both industrial pro-
+cesses and natural systems [1–8]. In these flows, bubble-
+induced turbulence (BIT) has attracted sustained atten-
+tion over the past three decades through numerous exper-
+imental and numerical studies [9–16]. Most earlier work
+focused on the regime of pseudo-turbulence, in which ve-
+locity fluctuations originate from bubble wakes and the
+energy spectrum as a function of wavenumber k exhibits a
+k−3 scaling [12–14, 17, 18]. This regime does not sustain
+a classical inertial cascade and therefore is not equiva-
+lent to fully developed turbulence in the sense of Kol-
+mogorov’s 1941 (K41) theory [19], where a −5/3 scaling
+in the energy spectrum can be observed. Nevertheless,
+some observations have hinted at behavior beyond this
+pseudo-turbulent regime. In particular, Riboux et al. [11]
+reported a −5/3 scaling range at small scales, which they
+interpreted as probably corresponding to a classical Kol-
+mogorov inertial subrange. More recent studies further
+identified K41 scaling in BIT at high Galilei number (Ga,
+the ratio of buoyancy to viscous forces) [16, 20], suggest-
+ing that BIT may transition to a regime consistent with
+a classical inertial cascade.
+DNS by Pandey et al. [16] showed that, at sufficiently
+large Ga, a −5/3 scaling emerges in the energy spectrum
+over kd ≲k ≲0.3/η, where kd ≡2π/d, d is the bubble
+diameter, and η is the Kolmogorov length scale. They
+further showed that advective energy transfer dominates
+in this range. Experiments by Ma et al. [20] showed that,
+at a separation distance r smaller than d, the longitudinal
+and transverse second-order structure functions in BIT,
+DLL and DNN, approximately follow K41 scaling, with
+DLL, DNN ∼r2/3, corresponding to an energy spectrum
+E(k) ∼k−5/3. They found that this scaling is outside the
+bubble wakes, while the in-wake structure functions are
+steeper than r2/3. They also proposed a dissipation-rate
+scaling based on the mean bubble spacing.
+Although the extent of the identified k−3 range differs
+across studies [11, 14], the reported k−5/3 range is com-
+paratively more consistent [11, 16, 20]. In particular, the
+latter scaling is generally observed at scales smaller than
+O(d). This suggests that the emergence of K41 scaling in
+BIT may be closely related to local bubble-scale dynam-
+ics. However, most previous analyses of BIT are based
+on global statistical averages of the flow field [11, 14, 16],
+while physical models have been formulated in terms of
+collective quantities such as the mean interbubble spac-
+ing [20]. This raises a fundamental question: is K41 scal-
+ing in BIT governed by a local mechanism associated
+with individual bubble wakes, or by a collective mecha-
+nism arising from many bubbles?
+In this Letter, we perform DNS of BIT at rela-
+tively high Ga with realistic density and viscosity ra-
+tios, fully resolving the bubble wakes. By separately an-
+alyzing wake and non-wake regions, and by comparing
+the bubble-swarm results with the single-bubble results
+under the same conditions, we show that the observed
+K41 scaling in BIT arises from individual bubble wakes.
+Based on this finding, we further derive a scaling for the
+dissipation rate.
+The direct numerical simulations are performed with
+the open-source Basilisk solver [21].
+A volume-of-fluid
+(VOF) method is used to capture the gas–liquid inter-
+face [22, 23]. The same numerical framework has been
+validated against benchmark cases for buoyancy-driven
+bubbly flows and has been used in high-resolution simu-
+lations of bubble-induced turbulence (see, e.g., [14]).
+All simulations are performed in a cubic periodic do-
+main of side length Lbox. The density and viscosity ra-
+tios between liquid and gas are fixed at ρl/ρg = 1000
+and µl/µg = 100, respectively.
+The bubbles are ini-
+tialized as spheres with the same diameter d.
+For all
+cases, Lbox/d is approximately ten. The cases are spec-
+ified by the gas volume fraction α, the Galilei number
+Ga = ρl
+p
+gd3/µl, and the E¨otv¨os number Eo = ρlgd2/σ,
+where g is the gravitational acceleration and σ is the
+surface tension coefficient. Unless otherwise specified, all
+quantities are reported in nondimensional form. Lengths,
+velocities, times, and densities are nondimensionalized
+by L0, (gL0)1/2, (L0/g)1/2, and ρl, respectively, where
+L0 = Lbox/(2π).
+The parameters of simulated cases are summarized in
+Table I. All simulations are performed using adaptive
+mesh refinement, with a maximum refinement level of
+9, corresponding to a finest-cell spacing equivalent to a
+uniform resolution of 5123. The results reported in this
+Letter are insensitive to further grid refinement. Within
+arXiv:2608.08502v1  [physics.flu-dyn]  9 Aug 2026
+
+
+2
+TABLE I. Parameters and scale separation d/η for DNS. W,
+NW and L in the last column denote the wake, non-wake, and
+entire liquid regions, respectively. η = (ν3
+l /ε)1/4, νl = µl/ρl.
+The dissipation rate ε = 2νl⟨S :S⟩, where ⟨·⟩denotes a spatial
+average over the selected region, S = (∇u + ∇uT )/2, and u
+is velocity.
+Case
+Ga
+Eo
+Lbox/d
+α
+d/η (W/NW/L)
+1
+300
+2.6
+9.82
+1.22%
+34/22/24
+2
+650
+1.7
+12.57
+0.53%
+59/33/36
+3
+820
+2.3
+10.47
+0.82%
+71/43/46
+4
+910
+2.6
+9.82
+0.61%
+74/43/46
+5
+910
+2.6
+9.82
+1.22%
+76/49/53
+6
+1500
+2.6
+9.82
+1.22%
+105/69/74
+the present range of the gas volume fraction, bubble coa-
+lescence and breakup are negligible [14]. Further details
+of the numerical method, validation tests, and movies are
+provided in the Supplemental Material (SM) [24].
+Figure 1(a) shows the vortical structures identified by
+the Q-criterion at a representative instant in the statis-
+tically stationary regime for the Ga = 1500 case. The
+bubble interfaces and vortical structures in the flow are
+both well resolved. The bubbles exhibit significant defor-
+mation and deviate markedly from a spherical shape. As
+expected, most vortical structures are located beneath
+the bubbles.
+Figure 1(b) shows the kinetic energy spectra for all
+cases.
+The wavenumber is normalized by kd.
+The
+spectrum is normalized by E(kd) and compensated by
+(k/kd)5/3, so that the −5/3 scaling appears as a plateau
+as indicated by the magenta dashed line. No clear −5/3
+scaling is observed for the low-Ga cases (Ga = 300 and
+650). By contrast, a −5/3 range emerges near k/kd ∼1
+(corresponding to a length scale of d) for the higher-Ga
+cases. This range extends towards smaller scales as Ga
+increases.
+For Ga = 1500, the K41 range extends to
+nearly half a decade, consistent with [16]. The spectrum
+for Ga = 300 is closer to a −3 scaling over the range
+0.7 ≲k/kd ≲2.5. For the higher-Ga cases, however, the
+−3 scaling is not prominent. It appears only over a short
+range at scales smaller than the −5/3 interval. Since pre-
+vious studies have often discussed the −3 scaling in con-
+nection with scales around the bubble diameter [9, 12–
+14], the present results suggest that, once a −5/3 range
+emerges, it may dominate the spectral interval in which a
+−3 behavior would otherwise be observed. Consistently,
+no clear −3 scaling was observed in the experiments of
+[20].
+In order to further trace the origin of the K41 scaling,
+we treat the wake and non-wake regions separately. Fol-
+lowing [20], the wake region is identified as the volume
+swept by a sphere of diameter ds along the bubble-center
+trajectory traced backward from its current position over
+FIG. 1.
+(a) Instantaneous vortical structures for Ga = 1500,
+visualized using an isosurface of the Q criterion at Q = 50
+and colored by the vertical vorticity ωz.
+Here, Q = (Ω:
+Ω−S : S)/2, with Ω= (∇u −∇uT )/2.
+Gray surfaces
+denote the bubble interfaces. (b) Normalized and compen-
+sated kinetic energy spectra versus normalized wavenumber.
+˜E = E(k)/E(kd), ˜k = k/kd. The magenta dashed and solid
+lines indicate the reference k−5/3 and k−3 scalings, respec-
+tively.
+a prescribed length l. The sphere diameter ds = 1.5d
+is chosen to conservatively account for the effective re-
+gion over which the deformed bubble strongly disturbs
+the surrounding liquid. The wake length l is determined
+from the decay of turbulent kinetic energy (TKE) along
+the wake centerline. As shown in Fig. 2(a), the TKE de-
+cays rapidly with the distance from the bubble and shows
+a clear change in slope around 2d. This suggests that
+the wake-induced fluctuations are mainly concentrated
+within about two bubble diameters behind the bubble.
+We therefore set l = 2d for all cases. The identified wake
+region at the same instant as in Fig. 1(a) is visualized
+in translucent red in Fig. 2(b). Notably, Ma et al. [20]
+adopted a comparatively large wake extent (ds = 2d and
+l = 5d) in their work. The sensitivity of the results to
+the wake definition is examined in the SM [24].
+Subsequently, we perform a region-wise analysis of the
+velocity structure functions, which can be evaluated lo-
+cally and also provide information complementary to the
+energy spectrum. For a separation vector r, we define the
+
+
+3
+FIG. 2.
+(a) Turbulent kinetic energy at the wake centerline,
+defined as 1
+2⟨u′
+iu′
+i⟩, where u′
+i = ui−⟨ui⟩, versus distance along
+the bubble trajectory. (b) Distribution of the identified wake
+region in the Ga = 1500 case, shown at the same instant as
+in Fig. 1(a).
+Red volumes denote wakes and gray surfaces
+denote bubble interfaces.
+velocity increment ∆u(x, r, t) ≡u(x+r, t)−u(x, t). Its
+longitudinal and transverse components with respect to r
+are denoted by ∆uL and ∆uN, respectively. The second-
+and third-order structure functions considered here are
+defined as DLL(r, t) = ⟨(∆uL)2⟩, DNN(r, t) = ⟨(∆uN)2⟩,
+and DLLL(r, t) = ⟨(∆uL)3⟩, where ⟨·⟩denotes a spatial
+average over the selected region. Figure 3(a) shows DLL
+for the Ga = 1500 case, computed separately in the wake
+region, the non-wake region, and the entire liquid phase.
+A clear r2/3 scaling is observed only in the wake region
+over r ∈(0.3d, 2d), consistent with the k−5/3 scaling
+range in the energy spectrum. By contrast, neither the
+non-wake region nor the entire liquid phase displays a
+clear scaling behavior.
+At sufficiently small scales, all
+curves tend toward the r2 scaling as is expected in the
+dissipation range [32].
+To further verify the presence of K41 scaling, we ex-
+amine the third-order structure function and the cor-
+responding dissipation-rate estimates inferred from the
+second-order structure functions.
+Figures 3(b) and
+3(c) show the compensated quantities (DLL/C2)3/2/r,
+FIG. 3.
+(a) DLL as a function of the normalized separation
+distance r/d for the Ga = 1500 case, computed separately
+in the wake region, the non-wake region, and the entire liq-
+uid phase. The two magenta reference lines indicate slopes
+of r2 and r2/3, respectively.
+(b,c) Structure-function-based
+estimates of the dissipation rate ε for the Ga = 1500 case.
+The magenta dashed lines indicate the approximate common
+plateau levels. Panels (b) and (c) correspond to the wake re-
+gion and the entire liquid phase, respectively.
+(3DNN/4C2)3/2/r, and −(5/4)DLLL/r, where C2 = 2.1
+is a constant, for the wake region and the entire liq-
+uid phase, respectively.
+Under K41 scaling, the three
+curves are expected to collapse onto a common plateau,
+with the plateau value equal to the dissipation rate
+ε [19, 33]. In the wake region, such a plateau occurs for
+0.2d ≲r ≲0.7d, indicating a K41 cascade over this range.
+In the entire liquid phase, the plateau becomes narrower.
+This further confirms that K41 behavior is concentrated
+in the wake region. The corresponding structure-function
+results for the other cases are presented in the SM [24].
+As a further confirmation, we conduct simulations for
+a single rising bubble with all other parameters identi-
+cal to the corresponding bubble-swarm cases. Figure 4
+compares DLL for the bubble-swarm case and the single-
+bubble case at Ga = 1500. The structure function in the
+single-bubble wake (obtained by averaging over five tem-
+porally separated wake samples) is found to nearly col-
+lapse onto that in the wake region of the bubble swarm.
+By contrast, the non-wake structure-function magnitude
+is much smaller in the single-bubble case than in the bub-
+ble swarm. These results indicate that the K41 scaling
+observed in the bubble swarm is a reflection of the ef-
+
+
+4
+FIG. 4.
+DLL for the Ga = 1500 case in the wake and
+non-wake regions of the bubble swarm, compared with the
+corresponding single-bubble results. The magenta reference
+line indicates the r2/3 scaling.
+fects of individual bubble wakes.
+Under the relatively
+dilute conditions considered here, it is expected that the
+bubble-swarm environment does not alter the individ-
+ual wake dynamics or the associated cascade behavior,
+but only enhances the velocity fluctuations outside the
+wakes. This explains why the single-bubble parameter
+Ga can be used to assess whether K41 scaling can emerge
+in BIT [16, 20]. When Ga is sufficiently large, the cor-
+responding bubble Reynolds number is high enough to
+create a separation between the scales of energy injec-
+tion (∼d) and dissipation (∼η) within individual bub-
+ble wakes (see the d/η values in Table I), such that an
+inertial cascade can be observed. Consistently, the two
+cases at Ga = 910, despite a notable difference in gas
+volume fraction, exhibit very similar −5/3 scaling ranges
+(Fig. 1(b)).
+The above interpretation also motivates a scaling es-
+timate for the kinetic energy dissipation rate ε. Within
+the K41 framework, the inertial-subrange energy flux is
+constant, and scales as u3
+r/r [34], where ur denotes the
+characteristic velocity of turbulent fluctuations at scale
+r.
+This flux is equal to ε.
+Therefore, for an individ-
+ual bubble wake in BIT, we can estimate εwake from
+the largest inertial-subrange scale by taking r ∼d and
+ur ∼Ub ∼√gd, where Ub is the single-bubble rise veloc-
+ity. This yields εwake ∼U 3
+b /d ∼g3/2d1/2. Since dissipa-
+tion in BIT is mainly concentrated in the wake regions,
+the global dissipation rate is then calculated by superpo-
+sition as ε ∼εwakeVwake/V , where V is the total volume
+and Vwake is the total wake volume. Since the wake vol-
+ume associated with each bubble is proportional to the
+bubble volume, and the overlap between wakes is negli-
+gible at low gas volume fraction, one has Vwake/V ∼α,
+yielding
+ε = Cε g3/2αd1/2,
+(1)
+where Cε is a dimensionless constant. Equation (1) dif-
+fers from the scaling in Ref. [20], which treats BIT as a
+collective flow and takes the interbubble spacing, dα−1/3,
+as the characteristic length scale in the dissipation esti-
+mate.
+To assess this scaling, Fig. 5 plots ε against g3/2αd1/2
+using the experimental data extracted from Fig. 4 of
+[20]. The data are broadly consistent with a linear de-
+pendence. Moreover, they are reasonably described by a
+line passing through the origin, consistent with the phys-
+ically trivial limit that ε →0 when the driving vanishes,
+for example as α →0 or g →0.
+FIG. 5.
+Kinetic energy dissipation rate ε as a function of
+g3/2αd1/2, using the experimental data extracted from Fig. 4
+of [20]. In [20], ε was estimated from compensated structure
+functions obtained from 3D Lagrangian particle tracking mea-
+surements. The dashed line represents Eq. (1) with Cε = 0.25.
+The variables in this figure are dimensional.
+It is worth noting that Lance and Bataille [9] estimated
+the BIT dissipation rate from the power input associated
+with bubble drag, leading to the scaling CDαU 3
+b /d, where
+CD is the drag coefficient.
+Pandey et al. [35] further
+rewrote this expression as CDg3/2αd1/2, whose form is
+identical to that of Eq. (1). This agreement is physically
+expected, since under statistically stationary conditions,
+the energy input, the inertial-subrange energy flux, and
+the final dissipation rate are equal on average within the
+K41 framework.
+In summary, our high-resolution DNS show that the
+r2/3 scaling is confined to bubble wake regions. The K41
+scaling observed in the entire BIT field originates from
+inertial cascades within individual bubble wakes and can
+be interpreted as the superposition of contributions from
+these wakes. A wake-based scaling law for the dissipation
+rate in dilute BIT is proposed, which agrees well with
+existing experimental data and theoretical work. These
+results provide new insight into the origin of Kolmogorov
+scaling in bubble-induced turbulence.
+Acknowledgements The authors acknowledge the support
+of the National Natural Science Foundation of China
+(Grant No. 12572298).
+
+
+5
+∗zgz@ucas.ac.cn
+[1] J. Magnaudet and I. Eames, The motion of high-
+Reynolds-number
+bubbles
+in
+inhomogeneous
+flows,
+Annu. Rev. Fluid Mech. 32, 659–708 (2000).
+[2] R. F. Mudde, Gravity-driven bubbly flows, Annu. Rev.
+Fluid Mech. 37, 393–423 (2005).
+[3] S. Balachandar and J. K. Eaton, Turbulent dispersed
+multiphase flow, Annu. Rev. Fluid Mech. 42, 111–133
+(2010).
+[4] S. Takagi and Y. Matsumoto, Surfactant effects on bub-
+ble motion and bubbly flows, Annu. Rev. Fluid Mech.
+43, 615–636 (2011).
+[5] F. Risso, Agitation, mixing, and transfers induced by
+bubbles, Annu. Rev. Fluid Mech. 50, 25–48 (2018).
+[6] S. Elghobashi, Direct numerical simulation of turbulent
+flows laden with droplets or bubbles, Annu. Rev. Fluid
+Mech. 51, 217–244 (2019).
+[7] V. Mathai, D. Lohse, and C. Sun, Bubbly and buoy-
+ant particle–laden turbulent flows, Annu. Rev. Condens.
+Matter Phys. 11, 529–559 (2020).
+[8] L. Deike, Mass transfer at the ocean–atmosphere inter-
+face: The role of wave breaking, droplets, and bubbles,
+Annu. Rev. Fluid Mech. 54, 191–224 (2022).
+[9] M. Lance and J. Bataille, Turbulence in the liquid phase
+of a uniform bubbly air-water flow, J. Fluid Mech. 222,
+95–118 (1991).
+[10] B. Bunner and G. Tryggvason, Dynamics of homogeneous
+bubbly flows Part 2. Velocity fluctuations, J. Fluid Mech.
+466, 53–84 (2002).
+[11] G. Riboux, F. Risso, and D. Legendre, Experimental
+characterization of the agitation generated by bubbles
+rising at high Reynolds number, J. Fluid Mech. 643,
+509–539 (2010).
+[12] I. Roghair, J. M. Mercado, M. van Sint Annaland,
+H. Kuipers, C. Sun, and D. Lohse, Energy spectra and
+bubble velocity distributions in pseudo-turbulence: Nu-
+merical simulations vs. experiments, Int. J. Multiphase
+Flow 37, 1093–1098 (2011).
+[13] V. N. Prakash, J. M. Mercado, L. van Wijngaarden,
+E. Mancilla, Y. Tagawa, D. Lohse, and C. Sun, Energy
+spectra in turbulent bubbly flows, J. Fluid Mech. 791,
+174–190 (2016).
+[14] A. Innocenti, A. Jaccod, S. Popinet, and S. Chibbaro, Di-
+rect numerical simulation of bubble-induced turbulence,
+J. Fluid Mech. 918, A23 (2021).
+[15] T. Ma, H. Hessenkemper, D. Lucas, and A. D. Bragg,
+An experimental study on the multiscale properties of
+turbulence in bubble-laden flows, J. Fluid Mech. 936,
+A42 (2022).
+[16] V. Pandey, D. Mitra, and P. Perlekar, Kolmogorov turbu-
+lence coexists with pseudo-turbulence in buoyancy-driven
+bubbly flows, Phys. Rev. Lett. 131, 114002 (2023).
+[17] J. M. Mercado, D. C. G´omez, D. van Gils, C. Sun, and
+D. Lohse, On bubble clustering and energy spectra in
+pseudo-turbulence, J. Fluid Mech. 650, 287–306 (2010).
+[18] E. Alm´eras, V. Mathai, D. Lohse, and C. Sun, Experi-
+mental investigation of the turbulence induced by a bub-
+ble swarm rising within incident turbulence, J. Fluid
+Mech. 825, 1091–1112 (2017).
+[19] A. N. Kolmogorov, The local structure of turbulence in
+incompressible viscous fluid for very large Reynolds num-
+bers, Dokl. Akad. Nauk SSSR 30, 299 (1941).
+[20] T. Ma, S. Tan, R. Ni, H. Hessenkemper, and A. D. Bragg,
+Kolmogorov scaling in bubble-induced turbulence, Phys.
+Rev. Lett. 134, 244001 (2025).
+[21] S. Popinet, A quadtree-adaptive multigrid solver for the
+Serre–Green–Naghdi equations, J. Comput. Phys. 302,
+336–358 (2015).
+[22] R. Scardovelli and S. Zaleski, Direct numerical simula-
+tion of free-surface and interfacial flow, Annu. Rev. Fluid
+Mech. 31, 567–603 (1999).
+[23] S. Popinet, An accurate adaptive solver for surface-
+tension-driven interfacial flows, J. Comput. Phys. 228,
+5838–5866 (2009).
+[24] See Supplemental Material at [URL will be inserted by
+publisher] for details of the numerical method, valida-
+tion analysis, wake identification, additional structure-
+function results, and movies, which includes Refs. [10,
+11, 16, 20–23, 25–31].
+[25] A. J. Chorin, Numerical solution of the Navier-Stokes
+equations, Math. Comput. 22, 745–762 (1968).
+[26] S. Popinet, Numerical models of surface tension, Annu.
+Rev. Fluid Mech. 50, 49–75 (2018).
+[27] W.
+Aniszewski,
+T.
+Arrufat,
+M.
+Crialesi-Esposito,
+S. Dabiri, D. Fuster, Y. Ling, J. Lu, L. Malan, S. Pal,
+R. Scardovelli, G. Tryggvason, P. Yecko, and S. Zaleski,
+PArallel, Robust, Interface Simulator (PARIS), Comput.
+Phys. Commun. 263, 107849 (2021).
+[28] R. Ramadugu, V. Pandey, and P. Perlekar, Pseudo-
+turbulence in two-dimensional buoyancy-driven bubbly
+flows: a DNS study, Eur. Phys. J. E 43, 73 (2020).
+[29] S. B. Pope, Turbulent Flows (Cambridge University
+Press, Cambridge, 2000).
+[30] N. Hidman, H. Str¨om, S. Sasic, and G. Sardina, Assess-
+ing passive scalar dynamics in bubble-induced turbulence
+using direct numerical simulations, J. Fluid Mech. 962,
+A32 (2023).
+[31] X. Xu, S. Tan, Y. Qi, and R. Ni, Experimental investi-
+gation of turbulence modulation by deformable bubbles,
+Phys. Rev. Fluids 10, 033605 (2025).
+[32] G. Stolovitzky and K. R. Sreenivasan, Scaling of struc-
+ture functions, Phys. Rev. E 48, R33–R36 (1993).
+[33] A. N. Kolmogorov, Dissipation of energy in locally
+isotropic turbulence, Dokl. Akad. Nauk SSSR 32, 19–21
+(1941).
+[34] J. C. Vassilicos, Dissipation in turbulent flows, Annu.
+Rev. Fluid Mech. 47, 95–114 (2015).
+[35] V. Pandey, R. Ramadugu, and P. Perlekar, Liquid veloc-
+ity fluctuations and energy spectra in three-dimensional
+buoyancy-driven bubbly flows, J. Fluid Mech. 884, R6
+(2020).

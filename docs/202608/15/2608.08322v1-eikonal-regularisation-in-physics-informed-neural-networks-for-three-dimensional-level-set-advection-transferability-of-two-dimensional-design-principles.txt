@@ -1,0 +1,2000 @@
+Eikonal Regularisation in Physics-Informed Neural
+Networks for Three-Dimensional Level-Set Advection:
+Transferability of Two-Dimensional Design Principles
+Muhammad Akbar Khan
+∗1
+1Department of Mathematics, NED University of Engineering and
+Technology, Karachi 75270, Pakistan
+Abstract
+Physics-informed neural networks applied to the level-set formulation of interface ad-
+vection commonly augment the residual and initial-condition losses with an eikonal
+regulariser, penalising the deviation of ∥∇ϕ∥from unity. A previous two-dimensional
+study identified this weight as the single most influential hyperparameter and ob-
+served that its optimum shifts by four orders of magnitude between rigid-body and
+strongly deforming flows, but left two questions open: whether the design principles
+established there transfer to three dimensions, where collocation requirements grow
+substantially, and whether the reported differences survive the run-to-run variability
+that single-seed experiments cannot assess. This paper answers both. We repeat the
+weight selection in three dimensions across four benchmarks (a translating sphere,
+a rotating sphere, a rotating slotted sphere, and a sphere deformed and restored by
+a reversed vortex), sweeping six weights with three random seeds at the full train-
+ing budget under a selection rule fixed in advance. The two-dimensional ordering
+is confirmed: the selected weight tracks how far the exact solution departs from
+a signed distance function, spanning four decades from 10−1 where the property
+holds exactly to 10−5 where the interface is stretched. The specific values, how-
+ever, transfer only benchmark by benchmark; two of the four carry over from two
+dimensions unchanged and two do not, so inheritance must be verified rather than
+assumed. The multi-seed protocol reveals a further effect invisible to single-seed
+experiments: at small weights the seed-to-seed standard deviation of the error is of
+the same order as the error itself, and the regulariser reduces it by more than an
+order of magnitude, so it buys reproducibility as well as accuracy. We benchmark
+∗Email: akbar.bsma1337@gmail.com
+1
+arXiv:2608.08322v1  [physics.flu-dyn]  8 Aug 2026
+
+
+against a fifth-order weighted essentially non-oscillatory (WENO) solver on identi-
+cal grids and error measures; the classical scheme is the more accurate on all four
+problems, by two orders of magnitude on smooth rigid advection, with a margin
+that narrows monotonically with geometric difficulty and is considerably smaller in
+volume conservation than in the field norm. Finally, we show that the relative L2
+error cannot certify the preservation of thin features, and report a feature-restricted
+measure that can.
+Keywords: physics-informed neural networks; level-set method; interface advection;
+eikonal regularisation; loss weighting; three-dimensional benchmarks
+1
+Introduction
+The level-set method represents a moving interface implicitly, as the zero contour of a
+higher-dimensional function ϕ transported by the flow [1]. Because the interface is never
+meshed, topological changes such as merging and breakup require no special treatment,
+which is why the formulation is used throughout multiphase flow, combustion, solidifica-
+tion and image segmentation. In the simplest and most fundamental case the interface is
+carried by a prescribed velocity field and ϕ satisfies a linear transport equation.
+That equation is deceptively difficult to solve accurately. The quantity of interest is
+not ϕ itself but its zero level set, and a scheme may reduce the error in ϕ while still
+losing volume, rounding corners, or destroying thin features. It is standard practice to
+initialise ϕ as a signed distance function, for which ∥∇ϕ∥= 1, because the conditioning
+of the field near the interface then does not degrade; but this property is not preserved
+by transport except under rigid motion, and classical solvers restore it by periodically
+re-solving a separate reinitialisation equation [2, 3].
+Physics-informed neural networks [4] (PINNs) offer an alternative in which ϕ is rep-
+resented by a network trained to satisfy the governing equation and its initial data in a
+least-squares sense at sampled collocation points. The representation is mesh-free and
+continuous in space and time, so there is no Courant–Friedrichs–Lewy (CFL) restriction
+and no interpolation is required to evaluate the solution between grid points or time
+levels. Against this, training is a non-convex optimisation whose outcome depends on
+architecture, sampling and, in particular, on the relative weighting of the terms in the
+composite loss. Krishnapriyan et al. [5] showed that physics-informed networks can fail on
+convection-dominated problems even when the network is expressive enough to represent
+the solution, so the difficulty lies in the optimisation rather than in the approximation.
+Level-set advection is convection dominated by construction, which is why the configura-
+tion of the training problem, and the loss weighting in particular, matters as much as it
+does here.
+2
+
+
+1.1
+Physics-informed neural networks for level-set advection
+A number of studies have applied physics-informed networks to interface transport. Mullins
+et al. [6] examined several architectures for moving interface problems in the level-set for-
+mulation and observed that adding an eikonal regularisation term to the loss improves
+the results when given an appropriate weight; they did not characterise what that weight
+should be. Bi et al. [7] developed an extended-interface formulation for moving interface
+problems. More recently, Zhai et al. [8] proposed a meshfree piecewise-network formula-
+tion for two-phase flows with prescribed or solution-driven interface motion, with rigorous
+approximation and error estimates, though without an explicit level-set representation,
+and Chang et al. [9] coupled a dedicated interface-tracking network with a modified zero-
+level-set function to resolve the Stefan problem, including Mullins–Sekerka instabilities.
+In previous work we conducted a systematic ablation of network and loss configurations
+for two-dimensional level-set advection across four benchmarks [10], establishing an ar-
+chitecture and training protocol and identifying the eikonal weight as the dominant hy-
+perparameter, but leaving open whether the weights established there transfer to three
+dimensions.
+Two threads of the wider physics-informed literature bear directly on the present work.
+The first concerns where the residual is enforced: residual-based adaptive distribution
+and refinement concentrate collocation points where the equation is least well satisfied
+[11, 12], which matters when the solution has localised features occupying a small fraction
+of the domain. The second concerns how the loss terms are balanced. Manually chosen
+weights are a known source of failure [13, 5], and several schemes adapt them during
+training, whether by gradient statistics [14], by trainable pointwise multipliers [15], or by
+uncertainty [16]. Adaptive balancing, however, presupposes that the terms are mutually
+compatible, so that driving all of them down is the correct objective. The eikonal term
+does not always satisfy that premise, and identifying when it does not is the subject of
+this paper.
+1.2
+Contributions
+That extension is not automatic. Extending a two-dimensional study to three dimensions
+is not merely a matter of adding a coordinate: the collocation domain grows from three
+dimensions to four, so at fixed sample count the density per dimension falls sharply; the
+interface becomes a surface rather than a curve, so the fraction of the domain resolving
+a thin feature shrinks; and evaluation costs grow by roughly two orders of magnitude,
+which constrains how much hyperparameter exploration is affordable. Whether settings
+established in two dimensions remain appropriate is therefore an open question rather
+than an assumption, and it is one practitioners face directly, since the natural way to
+configure a three-dimensional solver is to inherit from a two-dimensional one.
+3
+
+
+Our previous two-dimensional study closed with two explicit open questions: whether
+the design principles it established transfer to three-dimensional interface transport, and
+whether its single-seed results survive an assessment of run-to-run variance [10]. This
+paper answers both, and in doing so establishes the following.
+1. The two-dimensional ordering transfers to three dimensions. The selected
+eikonal weight tracks how far the exact solution departs from a signed distance
+function, spanning four decades: 10−1 where the property holds exactly for all
+time, 10−3 where it is violated locally near reentrant edges, and 10−5 where the
+interface is stretched and it fails globally. This confirms in three dimensions the
+shift reported in two dimensions, in a setting where the collocation density per
+dimension is substantially lower.
+2. The specific weights transfer only benchmark by benchmark. Two of the
+four values carry over from two dimensions unchanged; the translating sphere and
+the reversed vortex do not. For the translating sphere the optimum moves from
+1 to 10−1, at which the two-dimensional value is three times worse. Inheritance
+is therefore benchmark-dependent and must be verified rather than assumed, a
+distinction the mechanism alone does not predict, since the ordering is preserved
+while the values are not.
+3. Multi-seed statistics change what can be concluded. With three seeds per
+configuration we find that at small weights the seed-to-seed standard deviation of
+the error is of the same order as the error itself, and that the regulariser reduces it
+by more than an order of magnitude. Differences smaller than this spread cannot be
+resolved by single-seed experiments, and one benchmark yields a nominal tie between
+weights that is an artefact of that variance rather than a genuine equivalence.
+4. The weight remains consequential in three dimensions.
+Varying it over
+four decades changes the relative L2 error by up to a factor of 31 and the volume
+conservation error by up to a factor of 40, with a non-monotone response and a
+well-defined interior optimum on every benchmark.
+5. A comparison against a high-order finite-difference solver.
+Fifth-order
+WENO reconstruction with third-order total-variation-diminishing (TVD) Runge–
+Kutta time stepping [17, 18], on identical grids, snapshots and error definitions.
+This complements the discontinuous-Galerkin comparison reported in two dimen-
+sions with a different class of classical scheme at three-dimensional resolution. The
+outcome favours the classical solver on accuracy throughout, by a margin that nar-
+rows with geometric difficulty.
+4
+
+
+6. Global norms cannot certify thin features. On the slotted sphere, replacing
+the exact solution by a sphere with no slot at all changes the relative L2 error by
+about one percentage point, so that measure cannot distinguish a captured slot from
+an absent one. We report a sign-based, feature-restricted measure that can.
+Section 2 states the formulation, the network and the training procedure. Section 3
+defines the four benchmarks and the error measures. Section 4 reports the weight sweeps
+and the selected configurations. Section 5 gives the comparison against the classical solver,
+Section 6 discusses limitations, and Section 7 concludes.
+2
+Methodology
+2.1
+Level-set formulation and loss function
+The interface is represented implicitly as the zero contour of a level-set field transported
+by a prescribed velocity,
+∂ϕ
+∂t + u · ∇ϕ = 0,
+x ∈Ω= [0, 1]3, t ∈[0, T],
+(1)
+with ϕ(x, 0) = ϕ0(x) the signed distance function of the initial interface.
+Neural network
+Physics-informed residuals
+x
+y
+z
+( )
+x
+y
+z
+pde
+eik
+ic
+Loss
+Optimizer
+(W, b)
+Figure 1: Network architecture and training loop. The dashed encoding block γ(·) is
+used only for the slotted-sphere benchmark. Loss terms are defined in Equation (10); the
+residual is Equation (2).
+5
+
+
+The level-set field is approximated by a neural network ˆϕ(x, τ; θ) with parameters θ,
+taking as input the three spatial coordinates and a normalised time τ = t/T ∈[0, 1].
+Normalisation keeps all four inputs on a comparable scale, and introduces an explicit
+factor of T in the residual through the chain rule: writing (1) in terms of τ gives
+r(x, τ; θ) = ∂ˆϕ
+∂τ + T u(x, τ) · ∇ˆϕ.
+(2)
+All derivatives are obtained by automatic differentiation, so no spatial or temporal dis-
+cretisation enters the solution procedure.
+Training minimises the composite objective (10), whose three terms are the mean
+squared residual, the mismatch against the prescribed initial field, and the eikonal regu-
+lariser:
+Lpde = 1
+Nf
+Nf
+X
+i=1
+r(xi, τi; θ)2,
+(3)
+Lic = 1
+Ni
+Ni
+X
+j=1
+ ˆϕ(xj, 0; θ) −ϕ0(xj)
+2,
+(4)
+Leik = 1
+Nf
+Nf
+X
+i=1
+ ∥∇ˆϕ(xi, τi; θ)∥−1
+2.
+(5)
+No boundary condition is imposed: in every benchmark the interface remains interior to
+the domain for all time, and the network is free to determine the far field. Throughout,
+wpde = 1 and wic = 10; the determination of weik is the subject of Section 4. Component
+losses are recorded unweighted, so that runs at different weik remain comparable term by
+term. Figure 1 summarises the architecture and the training loop.
+2.2
+Neural-network architecture
+The network is a fully connected feed-forward architecture of eight hidden layers with 256
+units each and tanh activations, initialised by the Xavier scheme, following the configu-
+ration established for the two-dimensional benchmarks [10].
+For the slotted sphere the raw coordinates are first mapped through a random Fourier
+feature encoding [19],
+γ(v) =
+
+sin(v⊤B), cos(v⊤B)
+
+,
+Bkℓ∼N(0, σ2),
+(6)
+with 128 features and σ = 5, which mitigates the spectral bias of fully connected networks
+towards low frequencies. The three smooth-interface benchmarks do not use the encoding,
+since their solutions contain no comparably sharp features.
+6
+
+
+2.3
+Collocation and adaptive sampling
+Collocation points are drawn uniformly in the four-dimensional domain Ω× [0, 1] and
+initial-condition points uniformly in Ωat τ = 0. For the slotted sphere and the reversed
+vortex the collocation set is additionally adapted during training by two mechanisms.
+Residual-based adaptive distribution [11] (RAD) resamples the base set every 103 it-
+erations from a pool of 2 × 104 candidates, with selection probability proportional to
+|r|k/|r|k +c using k = c = 1. Residual-based adaptive refinement [12] (RAR) additionally
+appends the 500 highest-residual points from a pool of 5 × 104 every 1800 iterations, so
+the collocation set grows over training. The initial-condition points are not adapted.
+2.4
+Causal weighting
+For the two benchmarks that use adaptive sampling, the residual term is weighted causally [20].
+The collocation points are sorted by τ and partitioned into M contiguous chunks; chunk
+m receives the weight
+ωm = exp
+
+−ϵ
+X
+k<m
+r2k
+
+,
+(7)
+where r2k is the mean squared residual of chunk k, held fixed with respect to the gradi-
+ent. Later times are therefore down-weighted until earlier ones are well satisfied, which
+discourages the network from fitting a solution that is accurate late in the interval but
+inconsistent with the initial data. We use ϵ = 1 throughout, with M = 32 for the slotted
+sphere and M = 10 for the reversed vortex.
+2.5
+Optimisation and training procedure
+Training proceeds in two stages. Adam is run for 2 × 104 iterations at an initial learning
+rate of 10−3 under a cosine annealing schedule completing one full cycle to ηmin = 10−5,
+with gradient norms clipped at unity.
+Limited-memory Broyden–Fletcher–Goldfarb–
+Shanno (L-BFGS) with a strong-Wolfe line search then refines the result. The second
+stage is retained as an optional refinement rather than a required one: where the an-
+nealed Adam iterate is already tightly converged the line search finds no admissible step
+and the stage is inactive, whereas where convergence is incomplete it reduces the loss
+substantially. Both outcomes occur across the benchmarks reported here, and the im-
+provement attributable to L-BFGS is recorded for every run.
+Random seeds control both the network initialisation and the collocation sampling, so
+the seed-to-seed spread reported in Section 4 covers both sources of variability. Table 1
+collects the settings that differ between benchmarks.
+7
+
+
+Table 1: Configuration by benchmark (labels defined in Section 3). Settings not listed
+are common to all four: eight hidden layers of 256 tanh units, wpde = 1, wic = 10, Adam
+for 2 × 104 iterations under a cosine schedule from 10−3 to 10−5, and evaluation on a 2013
+grid at six snapshots.
+TR3D
+RO3D
+ZD3D
+RV3D
+T
+5
+2π
+2π
+2
+Nf
+104
+104
+2 × 104
+104
+Ni
+5 × 103
+5 × 103
+104
+5 × 103
+Fourier features
+–
+–
+128, σ = 5
+–
+RAD / RAR
+–
+–
+yes
+yes
+causal chunks M
+–
+–
+32
+10
+L-BFGS iterations
+500
+500
+500
+2000
+selected weik
+10−1
+10−1
+10−3
+10−5
+The weight sweep for ZD3D (Table 4) was run at Nf = 104, Ni = 5 × 103; the reported
+configuration uses twice that budget. The full six-weight sweep was re-run at the larger budget
+and selects the same weight (10−3); see Section 4.4.
+3
+Benchmarks and error measures
+Four benchmarks are used, on the unit cube Ω= [0, 1]3, ordered by the extent to which
+their exact solutions depart from a signed distance function.
+Translating sphere (TR3D).
+A sphere of radius 0.15 centred at (0.5, 0.2, 0.5) is car-
+ried by the uniform velocity u = (0, 0.1, 0) to (0.5, 0.7, 0.5) at T = 5.
+Rotating sphere (RO3D).
+A sphere of radius 0.15 centred at (0.5, 0.75, 0.5) is carried
+by solid-body rotation about the vertical axis through (0.5, 0.5), u = (−(y −0.5), x −
+0.5, 0). One full revolution completes at T = 2π, so the shape returns to its initial position
+and the error at t = T measures accumulated drift over a closed orbit.
+Zalesak slotted sphere (ZD3D).
+The same rotation applied to a sphere of radius 0.15
+from which a rectangular slot of half-extents (0.025, 0.125, 0.10) centred at (0.5, 0.725, 0.5)
+has been removed. The slot has finite depth in z and is therefore a blind pocket: a section
+near the pole shows an unbroken sphere while a section through the middle shows the
+notch, so three mutually orthogonal sections are required to characterise the solid.
+8
+
+
+Reversed single vortex (RV3D).
+A sphere of radius 0.15 centred at (0.35, 0.35, 0.35)
+is deformed by the three-dimensional field of Enright et al. [21],
+u =
+2 sin2(πx) sin(2πy) sin(2πz) cos(πτ),
+v = −sin(2πx) sin2(πy) sin(2πz) cos(πτ),
+w = −sin(2πx) sin(2πy) sin2(πz) cos(πτ),
+(8)
+with T = 2.
+The field is exactly divergence free, so the enclosed volume is constant
+in time; the factor cos(πτ) integrates to zero over the interval, so the flow reverses at
+τ = 1/2 and the sphere reforms at t = T. This is the only benchmark in which the
+interface is stretched, and hence the only one in which the advected field ceases to be a
+signed distance function over an extended region.
+3.1
+Reference solutions
+For the three rigid benchmarks the exact solution is available in closed form, being the
+initial field composed with the inverse of the rigid motion. The reversed vortex admits
+none, so the reference is constructed by integrating the characteristics dX/dτ = Tu
+backward from each snapshot with a fourth-order Runge–Kutta scheme and evaluating
+ϕ0 at the foot of each characteristic; since ϕ is advected as a passive scalar this is exact
+up to the integration error. That error is bounded by a self-consistency check at t = T,
+where the flow has reversed exactly and the reference must reproduce ϕ0: with 200 steps
+the discrepancy is 6.3 × 10−6 in the maximum norm and 1.2 × 10−7 in the root mean
+square, three to four orders of magnitude below the errors being measured.
+3.2
+Error measures
+All quantities are evaluated on a uniform 2013 grid (∆x = 0.005, chosen so that the section
+planes used in the figures fall exactly on grid points) at six equally spaced snapshots
+t = 0, T/5, . . . , T, and reported both per snapshot and as a snapshot average. Writing
+e = ˆϕ −ϕ,
+• the absolute error ∥e∥2 =
+ e21/2, which on a domain of unit measure coincides
+with the discrete L2 norm;
+• the relative error ∥e∥2/∥ϕ∥2, expressed as a percentage, in the convention standard
+in the physics-informed literature;
+• the volume conservation error |Vpred−Vexact|/Vexact, with Vpred obtained by count-
+ing cells for which ˆϕ < 0. For the slotted sphere, which has no convenient closed-
+form volume, the reference is the counted volume of the exact field at t = 0, so that
+prediction and reference share the same estimator and its leading-order bias cancels;
+9
+
+
+• the feature-restricted classification errors, defined for benchmarks whose in-
+terface carries a thin geometric feature. Let Ωsol(t) = {x : ϕ(x, t) < 0} be the exact
+solid region and let Ωfea(t) be the region the feature removes from it, that is the set
+of points lying inside the unfeatured body but outside the true solid. For the slotted
+sphere Ωfea is the intersection of the slot with the sphere, obtained by transporting
+the unslotted sphere by the same rigid motion. We then report
+Ffill =
+{x ∈Ωfea : ˆϕ(x, t) < 0}
+
+Ωfea
+
+,
+Ferode =
+{x ∈Ωsol : ˆϕ(x, t) ≥0}
+
+Ωsol
+
+,
+(9)
+the fraction of the feature wrongly predicted solid and the fraction of the solid
+wrongly predicted void, both evaluated by cell counting on the same grid. Together
+they form a symmetric difference restricted to the feature. Unlike the volume error
+these are sign-based and cannot cancel: filling part of the feature while eroding the
+outer surface leaves the volume error small but raises both of these;
+• the eikonal deviation
+∥∇ˆϕ∥−1
+, restricted to the band |ϕ| < 3∆x about the
+interface.
+The restriction excludes the gradient singularity at the centre of the
+sphere, where the exact signed distance function is not differentiable and a nonzero
+deviation is expected of any smooth approximation.
+The cell-counting volume estimator has a resolution floor, which we quantify rather
+than assume: applying it to the exact field at each snapshot and comparing against the
+reference gives a noise floor that is reported alongside the volume errors and is below 0.3%
+on every benchmark at this resolution.
+4
+Eikonal weight selection
+The composite loss minimised during training,
+L = wpde Lpde + wic Lic + weik Leik,
+Leik = 1
+Nf
+Nf
+X
+i=1
+ ∥∇ˆϕ(xi, τi)∥−1
+2,
+(10)
+contains one term whose weight is not fixed by the problem statement. The residual
+and initial-condition terms enforce the governing equation and the prescribed data; the
+eikonal term is a regulariser that pushes ˆϕ towards a signed-distance function. Its weight
+weik therefore has to be chosen, and the choice is not obviously transferable between
+problem settings. This section reports a systematic determination of weik for each three-
+dimensional benchmark.
+10
+
+
+4.1
+Experimental protocol
+For each benchmark, weik was swept over six logarithmically spaced values spanning four
+decades, including weik = 0 as a control that removes the regulariser entirely. Each value
+was trained with three random seeds (42, 43, 44), giving 18 independent training runs
+per benchmark. The seed controls both network initialisation and collocation sampling,
+so the reported spread covers both sources of run-to-run variability.
+Every run in the sweep used the full training budget of the reported configuration: 2×
+104 Adam iterations under a complete cosine annealing cycle from 10−3 to 10−5, followed
+by L-BFGS with a strong-Wolfe line search. Using the production budget rather than a
+shortened probe means the ranking transfers to the reported model without extrapolation
+from truncated training. All other settings were held fixed at the values given in Section 2.
+Component losses were logged unweighted, so runs at different weik remain comparable
+term by term.
+The selection rule was fixed before the sweep was run:
+1. lowest seed-averaged relative L2 error;
+2. tiebreak: lowest seed-averaged volume conservation error;
+3. tiebreak: lowest eikonal deviation;
+4. tiebreak: the smaller weight.
+Two weights are treated as tied when the gap between their means is smaller than the
+larger of their two seed standard deviations. Eikonal deviation is deliberately demoted to
+a second-order tiebreak: it is, up to the band restriction, the very quantity that the swept
+term minimises, so ranking by it would recover the sweep by construction and select the
+largest weight irrespective of solution accuracy.
+All metrics were evaluated on a uniform 2013 grid (∆x = 0.005) at six snapshots
+t = 0, T/5, . . . , T. The eikonal deviation is restricted to a narrow band |ϕ| < 3∆x about
+the interface, which excludes the gradient singularity at the centre of the sphere, where
+the exact signed-distance function is not differentiable.
+4.2
+Translating sphere (TR3D)
+Table 2 reports the sweep for the translating sphere. The error is a strongly non-monotone
+function of weik, with a pronounced interior optimum at weik = 10−1: the relative L2 error
+there is 0.442%, an order of magnitude below the value obtained with the regulariser
+switched off, and more than three times better than at weik = 1.
+Two features of Table 2 are worth separating from the point estimate itself.
+11
+
+
+Table 2: Eikonal weight sweep for the translating sphere (TR3D). Each entry is the mean
+± standard deviation over three seeds of the corresponding snapshot-averaged metric.
+MAPE: mean absolute percentage error. Selected value in bold.
+weik
+rel. L2 (%)
+volume MAPE (%)
+eikonal deviation
+0
+11.947 ± 3.295
+3.982 ± 1.862
+6.51 × 10−2
+10−4
+10.729 ± 6.585
+4.754 ± 1.517
+7.30 × 10−2
+10−3
+13.821 ± 7.793
+20.411 ± 14.129
+1.06 × 10−1
+10−2
+5.829 ± 6.960
+12.803 ± 9.525
+2.94 × 10−2
+10−1
+0.442 ± 0.227
+1.207 ± 0.240
+2.64 × 10−2
+1
+1.422 ± 0.399
+0.810 ± 0.568
+1.20 × 10−2
+Variance reduction.
+The seed standard deviation falls from 3.3–7.8 percentage points
+at weik ≤10−2 to 0.23 percentage points at weik = 10−1, a reduction of more than an
+order of magnitude. The regulariser therefore buys reproducibility as well as accuracy:
+without it, the outcome of a single training run is a poor predictor of the outcome of
+the next. Reporting a single-seed result at small weik would be misleading, which is the
+reason three seeds were used throughout.
+Control of temporal error growth.
+Table 6 shows the relative L2 error as a function
+of snapshot. With the regulariser switched off, the error grows by a factor of 79 between
+t = 0 and t = T; at weik = 10−1 the growth factor is 3.7. Volume conservation behaves
+similarly: at weik = 10−3 the volume error reaches 105% at t = T, meaning the zero
+level set has effectively been lost, whereas at weik = 10−1 it remains near 1.2% at every
+snapshot. The regulariser does not merely improve the time-averaged error; it prevents
+the progressive degradation of the interface over the integration window.
+The selection rule reports weik = 10−1 as tied with 10−2 on the primary metric. This
+tie is an artefact of the tie criterion rather than a genuine equivalence: the gap between
+the means, 5.39 percentage points, is smaller than the standard deviation of the worse
+candidate (6.96), which is itself large because one of its three seeds produced an outlier
+(15.66% against 0.49% and 1.34%). The individual seed values at weik = 10−1 are 0.12%,
+0.62% and 0.58%. The tie is therefore driven by instability at weik = 10−2, and weik = 10−1
+dominates on both consistency and volume conservation. The criterion is reported as pre-
+registered rather than revised after inspection of the results.
+Figures 2 and 3 show the solution obtained at the selected weight; Figure 4 shows the
+growth of both error measures over the integration window.
+4.3
+Rotating sphere (RO3D)
+Table 3 reports the corresponding sweep for solid-body rotation. The selection is unam-
+biguous, with no tie declared: weik = 10−1 attains a relative L2 error of 0.297% against
+12
+
+
+t = T
+PINN  
+= 0
+Exact  
+= 0
+t = 4T/5
+t = 3T/5
+t = 2T/5
+t = T/5
+x
+y
+z
+t = 0
+Figure 2: Translating sphere at the selected weight weik = 10−1. Shaded surface: predicted
+zero level set ˆϕ = 0, extracted by marching cubes on the 2013 evaluation grid. Black
+wireframe: exact interface. The dotted line and grey disc on the lower plane mark the
+centre trajectory and its projection. Axes are cropped to x, z ∈[0.18, 0.82] and y ∈[0, 1];
+tick marks are at the ends and midpoint of each range.
+13
+
+
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(a) z = 0.50 plane
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+z
+(b) y = 0.70 plane
+0.0
+0.5
+1.0
+y
+0.0
+0.5
+1.0
+z
+(c) x = 0.50 plane
+-0.85
+0
+0.85
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(d) |
+| at t = T
+10
+5
+10
+4
+10
+3
+10
+2
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(e) | |
+|
+1| at t = T
+0.00
+0.01
+0.02
+0.03
+0.04
+Figure 3: Verification for the translating sphere at weik = 10−1. (a)–(c) Three mutually
+orthogonal sections through the interface centre at t = T, with the predicted zero con-
+tour (solid black) and the exact one (dashed red) superposed on the predicted field; three
+circular cross-sections distinguish a sphere from a cylinder, which a single section cannot.
+(d) Pointwise error at t = T on a logarithmic scale, the peak coinciding with the gradient
+singularity at the sphere centre where the exact signed-distance function is not differen-
+tiable. (e) Eikonal deviation, colour-scaled to the 99th percentile within |ϕ| < 5∆x so
+that the smoothed singularity at the centre does not saturate the map.
+0
+1
+2
+3
+4
+5
+t
+0.08
+0.10
+0.12
+0.14
+0.16
+0.18
+0.20
+rel. L2 error (%)
+relative L2
+volume
+1.05
+1.10
+1.15
+1.20
+1.25
+1.30
+1.35
+1.40
+volume MAPE (%)
+Figure 4: Growth of relative L2 error and volume MAPE over the integration window for
+the translating sphere at weik = 10−1.
+14
+
+
+1.097% for the next best value, and a volume error of 0.913% against 4.52–30.5% for every
+other weight tested.
+Table 3: Eikonal weight sweep for the rotating sphere (RO3D). Each entry is the mean
+± standard deviation over three seeds of the corresponding snapshot-averaged metric.
+Selected value in bold.
+weik
+rel. L2 (%)
+volume MAPE (%)
+eikonal deviation
+0
+1.257 ± 0.593
+20.108 ± 13.471
+2.16 × 10−1
+10−4
+1.640 ± 0.048
+30.530 ± 1.427
+2.91 × 10−1
+10−3
+1.206 ± 0.557
+21.541 ± 14.284
+2.21 × 10−1
+10−2
+1.097 ± 0.108
+19.460 ± 4.129
+2.35 × 10−1
+10−1
+0.297 ± 0.205
+0.913 ± 0.984
+2.77 × 10−2
+1
+1.181 ± 0.698
+4.520 ± 2.535
+2.64 × 10−2
+Rotation is a more demanding test than translation for this formulation. At every
+weight other than the selected one, the volume error lies between 4.5% and 30.5% while
+the relative L2 error remains near 1.2%. A small field error combined with a large volume
+error indicates that the far field is well represented while the interface itself is materially
+displaced, which is precisely the failure mode that a level-set method must avoid.
+Second-stage optimiser engagement.
+The L-BFGS stage behaved differently on this
+benchmark and the effect is large enough to require explicit reporting. Across the 18
+runs the improvement attributable to L-BFGS, measured as the reduction in total loss
+between the end of Adam and the end of L-BFGS, was bimodal rather than continuously
+distributed: in 13 runs it was of order 10−8 and the wall-clock time was 12.1–12.2 minutes,
+whereas in 5 runs it was of order 10−4 and the wall-clock time was 16.4–17.5 minutes. In
+the latter group the strong-Wolfe line search located an admissible step from the annealed
+Adam iterate; in the former it did not, and the second stage was effectively inactive. The
+seed-averaged means and standard deviations in Table 3 are therefore contaminated by
+this variability. For comparison, the same quantity averaged 5.70 × 10−7 across all 18
+TR3D runs, where the second stage was uniformly dormant.
+Stratifying by engagement leaves the selection intact. Among the five runs in which
+L-BFGS engaged, the two at weik = 10−1 gave relative L2 errors of 0.143% and 0.160%,
+against 0.197%, 0.419% and 0.426% at other weights. Among the thirteen runs in which
+it did not, the single run at weik = 10−1 gave 0.587%, the lowest value in that group. The
+selected weight is thus the best choice within each stratum separately, and the conclusion
+does not depend on which optimiser regime a given run happened to fall into. Per-run
+engagement figures are reported in the supplementary results file.
+Figures 5 and 6 show the corresponding solution at the selected weight; Figure 7 shows
+the growth of both error measures over the integration window.
+15
+
+
+t = T
+PINN  
+= 0
+Exact  
+= 0
+t = 4T/5
+t = 3T/5
+t = 2T/5
+t = T/5
+x
+y
+z
+t = 0
+Figure 5: Rotating sphere at the selected weight weik = 10−1. Shaded surface: predicted
+zero level set; black wireframe: exact interface. The dotted circle on the lower plane is
+the orbit of the sphere centre. One full revolution is completed at t = T, so the final
+panel returns to the initial configuration and its error measures accumulated drift over a
+closed orbit.
+16
+
+
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(a) z = 0.50 plane
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+z
+(b) y = 0.75 plane
+0.0
+0.5
+1.0
+y
+0.0
+0.5
+1.0
+z
+(c) x = 0.50 plane
+-0.88
+0
+0.88
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(d) |
+| at t = T
+10
+5
+10
+4
+10
+3
+10
+2
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(e) | |
+|
+1| at t = T
+0.000
+0.025
+0.050
+0.075
+0.100
+0.125
+0.150
+Figure 6: Verification for the rotating sphere at weik = 10−1. Panels as in Figure 3, with
+the sections taken through the interface centre at t = T.
+0
+1
+2
+3
+4
+5
+6
+t
+0.10
+0.15
+0.20
+0.25
+0.30
+rel. L2 error (%)
+relative L2
+volume
+0.025
+0.050
+0.075
+0.100
+0.125
+0.150
+0.175
+0.200
+0.225
+volume MAPE (%)
+Figure 7: Growth of relative L2 error and volume MAPE over the integration window for
+the rotating sphere at weik = 10−1.
+17
+
+
+4.4
+Zalesak slotted sphere (ZD3D)
+The slotted sphere differs from the two preceding benchmarks in a way that bears directly
+on the eikonal term. Its initial field is constructed as the constructive-solid-geometry
+difference ϕ0 = max(ϕsphere, −ϕslot), which returns the distance to the nearer face rather
+than to the edge in a neighbourhood of the reentrant edges of the slot. The exact solution
+therefore does not satisfy ∥∇ϕ∥= 1 everywhere, and the eikonal term is inconsistent with
+the initial condition in those neighbourhoods. The sweep grid was shifted down by one
+decade accordingly.
+Table 4: Eikonal weight sweep for the Zalesak slotted sphere (ZD3D). Note the grid is
+shifted one decade below that of Tables 2 and 3. Selected value in bold; the volume-
+optimal value is italicised.
+weik
+rel. L2 (%)
+volume MAPE (%)
+eikonal deviation
+0
+14.241 ± 16.447
+36.726 ± 44.833
+4.10 × 10−1
+10−5
+2.593 ± 0.157
+9.351 ± 3.059
+2.43 × 10−1
+10−4
+1.674 ± 0.025
+4.553 ± 2.441
+1.78 × 10−1
+10−3
+1.014 ± 0.290
+7.429 ± 2.889
+8.55 × 10−2
+10−2
+1.181 ± 0.096
+16.843 ± 0.664
+5.06 × 10−2
+10−1
+1.392 ± 0.203
+18.714 ± 0.333
+4.55 × 10−2
+Three features of Table 4 distinguish this benchmark from the two smooth-sphere
+cases.
+The regulariser remains necessary, and more so.
+At weik = 0 the method fails
+outright: the seed-averaged relative L2 error is 14.2% with a standard deviation of 16.4
+percentage points, and one of the three seeds produced a relative L2 error of 37.5% with
+a volume error of 99.998%, meaning the zero level set was lost entirely. Removing the
+signed-distance constraint from a non-convex interface with thin features is not a viable
+configuration.
+A large weight is actively harmful.
+Unlike TR3D and RO3D, where volume con-
+servation was best at the largest weights tested, here it degrades monotonically once weik
+exceeds 10−4: from 4.55% at 10−4 to 18.71% at 10−1, a factor of four. This is the be-
+haviour anticipated by the geometry of the initial condition. Enforcing ∥∇ϕ∥= 1 near the
+slot edges pulls the solution away from the exact field, and the stronger the enforcement
+the further it is pulled. The same weight weik = 10−1 that is optimal on both smooth
+spheres is among the worst settings here.
+The metrics disagree.
+This is the first benchmark on which the primary criterion and
+the first tiebreak point to different weights: relative L2 is minimised at weik = 10−3 while
+18
+
+
+volume conservation is minimised at 10−4. The pre-registered rule resolves this in favour
+of 10−3, and the per-snapshot data in Table 6 support that choice: at 10−3 the volume
+error decreases monotonically over the integration window, from 8.64% to 5.78%, whereas
+at 10−4 it increases from 2.24% to 6.17%. The two settings therefore end the window at
+comparable volume error, while 10−3 is 40% more accurate in the field norm. The rule
+also declares ties with 0 and 10−2; as in Section 4.2, the tie with 0 is an artefact of that
+setting’s very large seed variance rather than a genuine equivalence.
+Resolution of the slot.
+At the sweep budget of Nf = 104, Ni = 5 × 103 the selected
+configuration does not resolve the slot. The volume error is 5.54% and, critically, is already
+6.28% at t = 0, where the initial-condition term is directly supervised and no transport
+has yet occurred; a section through the slot shows the pocket rounded and roughly one
+third filled. The failure is not visible in the field norm, which reads 0.606%, because the
+relative L2 error is normalised by ∥ϕ∥over the whole domain and is therefore dominated
+by far-field values that the network represents well. This is what motivates the feature-
+restricted measures of Equation (9): a model that omits the slot entirely scores Ffill = 1,
+whereas one that captures it scores Ffill ≈0, so the two cases are separated by the full
+range of the measure rather than by one percentage point.
+The origin is sampling rather than capacity. The slot occupies 2.36 × 10−3 of the
+unit cube, so of 5×103 uniformly drawn initial-condition points approximately twelve fall
+inside it. Doubling both point sets to Nf = 2 × 104, Ni = 104, with every other setting
+unchanged, reduces the volume error at t = 0 by an order of magnitude, from 7.40 × 10−4
+to 7.29×10−5, and the snapshot-averaged volume error from 5.54% to 0.328%; the relative
+L2 field error also improves, from 0.606% to 0.480%. Increasing the Fourier feature scale
+was tried and made matters worse, consistent with the constraint being the density of
+supervision near a thin feature rather than the bandwidth available to represent it.
+The weight sweep of Table 4 was run at the smaller budget and is reported as such;
+the reported configuration of Section 4.7 uses the larger one. We re-ran the full six-weight
+sweep at Nf = 2 × 104, Ni = 104 to confirm the selection transfers: the same weight
+(10−3) is selected, and the statistical ties with 0 and 10−2 present at the smaller budget
+disappear.
+Figures 8, 9, and 10 show the solution at the selected weight and the larger sampling
+budget; Figure 11 shows the growth of both error measures over the integration window.
+4.5
+Reversed single vortex (RV3D)
+The three preceding benchmarks are all rigid motions. The reversed single vortex is not:
+the sphere is stretched into a thin folded sheet by the three-dimensional deformation
+field of Enright et al. [21] and returned to its initial shape at t = T, the driving field
+19
+
+
+PINN     (t = 0.00, cut at x = 0.5)
+Exact     (t = 0.00, cut at x = 0.5)
+Figure 8: Half-space cutaway at x = 0.5 through the slot, predicted (left) and exact
+(right), at t = 0. The slot has finite depth in z and is therefore a blind pocket: a section
+near the pole shows an unbroken sphere while a section through the middle shows the
+notch. The mouth is a narrow opening near z = 0.5, so from outside the shape reads as
+an almost intact sphere and this view is required to establish the geometry.
+carrying a factor cos(πτ) whose integral over the interval vanishes. Wherever the interface
+is stretched the advected field ceases to be a signed-distance function, so the eikonal
+constraint is inconsistent with the exact solution not merely near isolated edges, as in
+ZD3D, but throughout the deformed region. The signed-distance property fails globally
+here, so the analysis predicts a selected weight at or near zero, and the sweep grid was
+placed accordingly at {0, 10−5, 10−4, 10−3, 10−2, 10−1}.
+Table 5 reports the sweep. The prediction is borne out, and more sharply than on the
+other benchmarks. The primary criterion does not distinguish weik = 0 from weik = 10−5:
+the seed-averaged relative L2 errors are 0.578% and 0.588%, a gap smaller than either
+seed standard deviation, so the rule declares them tied. Volume conservation separates
+them, at 1.173% against 2.732%, and the selection falls to weik = 10−5, four decades below
+the value chosen for the two smooth-sphere benchmarks. That the field norm cannot tell
+zero from near-zero is itself the predicted behaviour: where the exact solution is not a
+signed distance function, the regulariser has nothing correct to enforce. Above 10−5 the
+penalty becomes severe rather than merely unhelpful, the relative L2 error rising by an
+order of magnitude at 10−4 and the volume MAPE reaching 82.6% at 10−3.
+The eikonal deviation measured over the integration window makes the mechanism
+explicit. At the selected weight it rises from 2.06 × 10−2 at t = 0 to 1.23 near maximum
+deformation and falls back to 4.67 × 10−2 at t = T, a variation of nearly two orders of
+magnitude within a single run. The departure from the signed-distance property is thus
+20
+
+
+t = T
+PINN  
+= 0
+Exact  
+= 0
+t = 4T/5
+t = 3T/5
+t = 2T/5
+t = T/5
+x
+y
+z
+t = 0
+Figure 9: Zalesak slotted sphere at the selected weight weik = 10−3. Shaded surface:
+predicted zero level set.
+Black outline: silhouette of the exact interface, obtained by
+culling back-facing triangles of the exact isosurface against the view direction; the shape
+is non-convex, so the analytic wireframe used in Figures 2 and 5 does not apply. The rim
+of the slot is visible as the orientation rotates.
+Table 5: Eikonal weight sweep for the reversed single vortex (RV3D). Mean ± standard
+deviation over three seeds. Selected value in bold.
+weik
+rel. L2 (%)
+volume MAPE (%)
+eikonal deviation
+0
+0.578 ± 0.020
+2.732 ± 0.254
+6.12 × 10−1
+10−5
+0.588 ± 0.026
+1.173 ± 0.639
+6.07 × 10−1
+10−4
+4.876 ± 1.502
+65.013 ± 17.932
+4.89 × 10−1
+10−3
+10.578 ± 0.861
+82.586 ± 2.615
+2.06 × 10−1
+10−2
+11.176 ± 0.529
+32.003 ± 9.710
+1.76 × 10−1
+10−1
+15.124 ± 1.676
+58.012 ± 13.135
+2.26 × 10−1
+21
+
+
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(a) z = 0.50 plane
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+z
+(b) y = 0.75 plane
+0.0
+0.5
+1.0
+y
+0.0
+0.5
+1.0
+z
+(c) x = 0.50 plane
+-0.89
+0
+0.89
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(d) |
+| at t = T
+10
+5
+10
+4
+10
+3
+10
+2
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(e) | |
+|
+1| at t = T
+0.0
+0.2
+0.4
+0.6
+0.8
+Figure 10: Verification for the Zalesak slotted sphere at weik = 10−3. Panels as in Figure 3.
+In (e) the elevated eikonal deviation near the slot edges is expected: the exact field is not
+a signed distance function there, so a nonzero deviation is not purely network error.
+0
+1
+2
+3
+4
+5
+6
+t
+0.2
+0.4
+0.6
+0.8
+1.0
+rel. L2 error (%)
+relative L2
+volume
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+volume MAPE (%)
+Figure 11: Growth of relative L2 error and volume MAPE over the integration window
+for the Zalesak slotted sphere at weik = 10−3.
+22
+
+
+not a defect of the approximation but a property of the exact solution being approximated:
+it appears as the interface stretches and disappears as it reforms. Penalising that departure
+penalises the correct answer, which is why the weight selected here is the smallest of the
+four benchmarks.
+Figures 12 and 13 show the solution at the selected weight; Figure 14 shows the growth
+of both error measures over the integration window.
+Reference solution.
+The deformation field admits no closed-form solution, so the ref-
+erence is constructed by integrating the characteristics dX/dτ = T u backward from each
+snapshot with a fourth-order Runge–Kutta scheme and evaluating ϕ0 at the foot of each
+characteristic. Because ϕ is advected as a passive scalar this is exact up to the integration
+error, which is bounded by a self-consistency check at t = T: the flow has reversed ex-
+actly by that time, so the reference must reproduce ϕ0. With 200 steps the discrepancy is
+6.26 × 10−6 in the maximum norm and 1.15 × 10−7 in the root mean square, three to four
+orders of magnitude below the errors being measured. The reference does not depend on
+the network and is computed once for the entire sweep.
+t = T
+PINN  
+= 0
+Exact  
+= 0
+t = 4T/5
+t = 3T/5
+t = 2T/5
+t = T/5
+x
+y
+z
+t = 0
+Figure 12: Reversed single vortex at the selected weight weik = 10−5. Shaded surface:
+predicted zero level set; black outline: silhouette of the exact interface obtained from
+the backtraced reference. The sphere is stretched into a folded sheet, reaching maximum
+deformation at t = T/2, and reforms at t = T.
+23
+
+
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(a) z = 0.35 plane
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+z
+(b) y = 0.35 plane
+0.0
+0.5
+1.0
+y
+0.0
+0.5
+1.0
+z
+(c) x = 0.35 plane
+-0.98
+0
+0.98
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(d) |
+| at t = T
+10
+5
+10
+4
+10
+3
+10
+2
+0.0
+0.5
+1.0
+x
+0.0
+0.5
+1.0
+y
+(e) | |
+|
+1| at t = T
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+Figure 13: Verification for the reversed single vortex at weik = 10−5. Panels as in Figure 3,
+with sections taken through the centre of the reformed sphere at t = T.
+0.00
+0.25
+0.50
+0.75
+1.00
+1.25
+1.50
+1.75
+2.00
+t
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+rel. L2 error (%)
+relative L2
+volume
+0.2
+0.4
+0.6
+0.8
+1.0
+volume MAPE (%)
+Figure 14: Growth of relative L2 error and volume MAPE over the integration window
+for the reversed single vortex at weik = 10−5.
+24
+
+
+4.6
+Transferability from two to three dimensions
+Table 6: Relative L2 error (%) by snapshot, averaged over three seeds. The selected
+weight is shown in bold. Note that the ZD3D sweep grid is shifted one decade below that
+of TR3D and RO3D.
+Benchmark
+weik
+t = 0
+T/5
+2T/5
+3T/5
+4T/5
+T
+TR3D
+0
+0.411
+1.074
+4.468
+11.581
+21.585
+32.565
+10−4
+0.442
+1.136
+4.382
+10.735
+19.281
+28.399
+10−3
+0.526
+1.475
+5.708
+13.942
+24.899
+36.376
+10−2
+0.335
+0.743
+2.510
+5.903
+10.365
+15.118
+10−1
+0.193
+0.257
+0.375
+0.506
+0.611
+0.711
+1
+0.202
+0.450
+0.941
+1.603
+2.323
+3.016
+RO3D
+0
+0.451
+0.921
+1.311
+1.519
+1.617
+1.724
+10−4
+0.620
+1.215
+1.639
+1.968
+2.146
+2.251
+10−3
+0.478
+0.909
+1.219
+1.482
+1.533
+1.617
+10−2
+0.517
+0.848
+1.062
+1.253
+1.392
+1.506
+10−1
+0.157
+0.231
+0.284
+0.337
+0.363
+0.409
+1
+0.305
+0.796
+1.166
+1.397
+1.638
+1.787
+ZD3D
+0
+4.059
+11.783
+15.430
+17.110
+18.085
+18.981
+10−5
+0.229
+2.094
+3.079
+3.138
+3.324
+3.692
+10−4
+0.203
+1.292
+1.890
+1.858
+2.057
+2.746
+10−3
+0.547
+0.791
+0.990
+1.140
+0.983
+1.634
+10−2
+0.791
+1.125
+1.167
+1.320
+1.226
+1.454
+10−1
+0.865
+1.149
+1.218
+1.410
+1.513
+2.198
+RV3D
+0
+0.136
+0.432
+0.674
+0.762
+0.741
+0.720
+10−5
+0.152
+0.454
+0.689
+0.768
+0.747
+0.717
+10−4
+0.561
+4.011
+5.565
+6.447
+6.373
+6.300
+10−3
+0.854
+10.266
+12.824
+13.271
+13.240
+13.015
+10−2
+1.080
+10.770
+13.045
+13.978
+14.066
+14.117
+10−1
+1.373
+14.147
+17.416
+18.971
+19.472
+19.366
+Table 7 compares the weights selected in three dimensions with those used for the
+corresponding two-dimensional benchmarks in the preceding study [10]. The comparison
+is informative in both directions. For the rotating sphere the two-dimensional value carries
+over unchanged. For the translating sphere it does not: the two-dimensional configuration
+used weik = 1, whereas the three-dimensional sweep selects 10−1, at which the relative L2
+error is 0.442% against 1.422% at the two-dimensional value, a factor of 3.2.
+The practical implication is that a weight established in two dimensions cannot be
+assumed to remain appropriate in three, but neither can it be assumed to change: transfer
+is benchmark-dependent and has to be checked. Two of the four benchmarks transfer
+unchanged; both the translating sphere and RV3D do not.
+A clearer pattern emerges when the selected weights are read against the geometry of
+25
+
+
+Table 7: Eikonal weight used in two dimensions [10] against the value selected here in
+three dimensions.
+Benchmark
+2D value
+3D selected
+Transfers?
+Translating sphere (TR3D)
+1
+10−1
+no
+Rotating sphere (RO3D)
+10−1
+10−1
+yes
+Zalesak sphere (ZD3D)
+10−3
+10−3
+yes
+Reversed vortex (RV3D)
+10−4
+10−5
+no
+the exact solution rather than against dimensionality. Ordering the benchmarks by the
+extent to which their exact solutions depart from a signed distance function reproduces
+the ordering of the selected weights over four decades:
+• No departure. TR3D and RO3D transport a smooth sphere by a rigid motion,
+so ∥∇ϕ∥= 1 holds exactly for all time.
+The eikonal constraint is everywhere
+consistent with the governing equation and supplies information at no cost. Both
+select weik = 10−1.
+• Local departure. ZD3D is also a rigid motion, but the constructive-solid-geometry
+construction of the slotted sphere violates ∥∇ϕ∥= 1 in a neighbourhood of the reen-
+trant edges. The selected weight falls two decades to 10−3, and volume conservation
+degrades monotonically for larger weights.
+• Global departure. RV3D stretches the interface, so the advected field ceases to be
+a signed-distance function throughout the deformed region; the measured eikonal
+deviation varies by two orders of magnitude within a single run as the interface
+deforms and reforms. The selected weight falls two decades further, to 10−5.
+The appropriate eikonal weight is therefore governed not by the spatial dimension
+but by how far the exact solution departs from a signed-distance function. The same
+ordering was observed in two dimensions, where the optimum was reported to shift by
+four orders of magnitude between rigid-body and strongly deforming flows [10]; the present
+sweeps establish that it survives the transition to three dimensions, where the collocation
+density per dimension is substantially lower and the transfer was explicitly left open. The
+statement is more useful than a single recommended value, because the departure can be
+assessed from the problem specification before any training is performed: it is a property
+of the initial geometry and of the velocity field, both of which are known in advance.
+4.7
+Performance at selected weights
+Table 8 gives the metrics for the single run at the selected weight that is used for all
+reported results and figures. In each case the run reproduces the corresponding entry of
+26
+
+
+the sweep to the quoted precision, since the seed and every other setting are unchanged;
+the sweep and the reported model are the same computation.
+Table 8: Metrics at each benchmark’s selected weight, seed 42, evaluated on the 2013 grid
+and averaged over the six snapshots. Timings are for a single NVIDIA T4.
+Benchmark
+abs. L2
+rel. L2 (%)
+volume MAPE (%)
+eikonal dev.
+time (min)
+TR3D
+4.73 × 10−4
+0.122
+1.143
+1.31 × 10−2
+11.8
+RO3D
+6.76 × 10−4
+0.160
+0.117
+2.08 × 10−2
+15.6
+ZD3D†
+2.03 × 10−3
+0.480
+0.328
+1.02 × 10−1
+27.1
+RV3D
+2.52 × 10−3
+0.591
+0.564
+5.97 × 10−1
+23.7
+† ZD3D uses Nf = 2 × 104 and Ni = 104, twice the sampling budget of the weight sweep, for the
+reason given in Section 4.4. The selected weight is unchanged.
+The benchmarks trade off differently between the two error measures. Translation
+attains the lower field error but a volume error of 1.14%, which is nearly constant across
+snapshots and therefore represents a systematic offset rather than progressive loss: the im-
+plied radius error is δr/r = 0.38%, or approximately one ninth of a grid cell at ∆x = 0.005.
+Rotation attains a slightly larger field error but conserves volume to 0.117%, close to the
+resolution floor of the cell-counting estimator on this grid. The two benchmarks whose
+exact solutions are not signed-distance functions, ZD3D and RV3D, carry field errors
+roughly four times larger than TR3D while still conserving volume to better than 0.6%.
+Their eikonal deviations are larger by factors of eight and forty-five respectively, which
+reflects the geometry of the exact solution rather than a deficiency of the approximation.
+4.8
+Summary
+Across all four benchmarks the eikonal weight is a consequential hyperparameter rather
+than a minor regularisation detail. Varying it over four decades changes the relative L2
+error by a factor of up to 31 (TR3D) and the volume conservation error by a factor of up
+to 40 (ZD3D), and the response is non-monotone with a well-defined interior optimum.
+The location of that optimum varies by four decades between benchmarks, from 10−1 for
+a rigidly transported smooth sphere to 10−5 under deformation, and tracks how far the
+exact solution departs from a signed-distance function rather than the spatial dimension.
+Setting the weight by inheritance from a lower-dimensional study is therefore not reliable,
+and the cost of determining it directly (18 training runs per benchmark, between four and
+thirteen hours on a single T4 GPU depending on the configuration) is modest relative to
+the sensitivity involved. At the selected weight the two smooth-sphere benchmarks are
+solved to a relative L2 error below 0.2%, and the two whose exact solutions are not signed-
+distance functions to below 0.6%, with volume conservation better than 1.2% throughout.
+27
+
+
+5
+Comparison with a high-order classical solver
+A neural solver for linear advection has to be justified against the classical schemes it
+would replace. We therefore solve the same four benchmarks with a fifth-order WENO
+reconstruction of the convective derivatives [17], in the level-set form of Osher and Fedkiw
+[22], advanced by third-order TVD Runge–Kutta time stepping [18].
+The comparison is matched wherever a choice could favour one method. Both use
+the same 2013 grid, the same six snapshots, the same reference solutions and the same
+error definitions of Section 3.2. Where the exact field is known it is imposed as Dirichlet
+data on a three-cell boundary shell for the WENO solver; the reversed vortex requires
+none, since that velocity field vanishes on the faces of the cube. No reinitialisation is
+applied, so that the comparison is like for like: the network maintains the signed-distance
+property through its eikonal term rather than by periodically re-solving for it, and the
+eikonal deviation is reported for both.
+The two methods are not commensurable in cost without care, and we report the
+components separately. The classical solver is CFL limited, so its cost is set by the number
+of time steps at the given resolution; the network is trained once and then evaluated, so
+its cost divides into a training phase and an inference phase, the latter being a forward
+pass at arbitrary points and times with no step restriction.
+Table 9: PINN against WENO5 + TVD-RK3 on identical grids, snapshots and error
+measures. Wall-clock time for the network is training; for the classical scheme it is the
+full time integration. Better value in bold. A single NVIDIA T4 was used throughout.
+rel. L2 (%)
+volume MAPE (%)
+time (min)
+Benchmark
+PINN
+WENO
+PINN
+WENO
+PINN
+WENO
+TR3D
+0.122
+0.001
+1.143
+0.079
+11.8
+2.0
+RO3D
+0.160
+0.003
+0.117
+0.050
+15.6
+24.4
+ZD3D
+0.480
+0.046
+0.328
+0.160
+24.9
+24.4
+RV3D
+0.591
+0.136
+0.564
+0.240
+23.7
+20.7
+The classical scheme is more accurate on all four benchmarks.
+On smooth
+rigid advection at this resolution WENO5 reaches a relative L2 error of 10−5, two orders
+of magnitude below what the network attains, and a study proposing a neural solver for
+this problem class has to begin by acknowledging it.
+The margin narrows with geometric difficulty.
+The advantage narrows monoton-
+ically with geometric difficulty. In the field norm the ratio of the network error to the
+classical error falls from 122 on the translating sphere, to 53 on the rotating sphere, to
+10 on the slotted sphere, to 4.3 on the reversed vortex. That ordering is the same one
+28
+
+
+that governs the eikonal weight in Section 4: the classical scheme is furthest ahead pre-
+cisely where the solution is smoothest and remains an exact signed distance function, and
+closest where the interface is deformed. The trend does not reverse within the four bench-
+marks considered here, and we do not claim that it would; but its direction is consistent,
+and it suggests that the comparison on smooth rigid advection understates the network’s
+standing on harder geometries.
+The gap is smaller in volume conservation.
+The gap is much smaller in the con-
+servation measure than in the field norm. On three of the four benchmarks the network
+conserves volume to within a factor of about two of the classical scheme (2.3, 2.0 and 2.3
+for RO3D, ZD3D and RV3D), against factors of 4.3 to 122 in the relative L2 error. For a
+level-set method the volume of the enclosed region is the more physically meaningful of
+the two, and the network is therefore closer to the classical scheme on the measure that
+matters most than the field norm alone would suggest. The exception is the translating
+sphere, where the network’s volume error of 1.14% is a systematic sub-cell offset in the
+interface radius rather than progressive loss, as noted in Section 4.7.
+An asymmetry favours the classical solver.
+The comparison is matched on grid,
+snapshots, reference solutions and error definitions, and neither method applies reini-
+tialisation, so the classical scheme gains no level-set-specific advantage that the network
+lacks. It is nonetheless not matched in one respect, and the asymmetry favours the classi-
+cal solver. Where the exact field is known it is supplied to the WENO scheme as Dirichlet
+data on a three-cell boundary shell, whereas the network receives no boundary informa-
+tion whatsoever: it infers the far field from the residual and the initial condition alone.
+The boundary data are not a convenience but a requirement for the classical scheme here.
+The level-set field grows towards the domain boundary, so at an inflow face zero-gradient
+extrapolation injects incorrect values that propagate inwards; without Dirichlet data the
+translating sphere sits at a relative L2 error of about 36% that does not reduce under grid
+refinement, even though the interface itself is transported correctly. The reversed vortex
+is the exception, its velocity field vanishing on the faces of the cube so that no information
+enters the domain and none is supplied.
+We record this rather than adjust for it. Withholding the boundary data would hand-
+icap the classical scheme rather than equalise the comparison, since a practitioner solving
+these problems would have the same information available and would use it. The point is
+that the accuracy reported for the classical scheme is obtained with an input the network
+is never given, and that the narrowest margin in Table 9, a factor of 4.3, occurs on the
+one benchmark where that input is not supplied to either method.
+29
+
+
+Wall-clock cost is comparable but structurally different.
+Wall-clock cost is com-
+parable, but the two costs are of different kinds. The classical solver is CFL limited, so its
+time is fixed by the step count at the given resolution: 255 steps for the translating sphere
+but 3145 for the two rotating cases, which is why it is nearly six times faster than training
+on the first benchmark and roughly a third slower on the second. Network training is a
+one-off cost after which evaluation is a forward pass at arbitrary points and times; the
+classical solution exists only at the grid points and time levels it was marched through,
+and a finer output or a different final time requires the integration to be repeated.
+The case for the neural approach.
+The case for the neural approach on these prob-
+lems does not rest on beating a mature scheme at linear advection on a uniform grid. It
+rests on properties the comparison does not measure: the representation is mesh-free and
+continuous in time, requires no reinitialisation, and extends to inverse and parameter-
+identification settings in which no forward solver is available. The purpose of Table 9 is
+to establish the cost of those properties honestly rather than to claim they are free.
+6
+Discussion and limitations
+6.1
+Adaptive weighting
+The protocol reported here determines the eikonal weight by a sweep, and a sweep is
+expensive: eighteen training runs per benchmark, between four and thirteen hours on
+a single GPU. This is the principal obstacle to applying the method without manual
+intervention, and it was identified as such in the two-dimensional study [10]. Adaptive
+weighting schemes that balance the loss terms automatically during training offer an
+obvious alternative, whether based on neural tangent kernel eigenvalues [23], on gradient
+statistics [13, 14], on trainable pointwise multipliers [15], or on uncertainty [16].
+Two observations from the present results bear on whether such schemes can succeed
+here. The first is encouraging: the results establish what the correct answer is on four
+benchmarks, so an adaptive scheme can now be evaluated against a known target rather
+than only against its own convergence. Reporting that an adaptive method reaches a
+given accuracy is much weaker than reporting whether it recovers the optimum that a
+controlled sweep identified.
+The second is a caution. Adaptive balancing rests on the premise that the loss terms
+are mutually compatible, so that driving all of them down simultaneously is the correct
+objective. On two of our four benchmarks that premise fails. For the slotted sphere the
+exact initial field is not a signed distance function near the reentrant edges of the slot,
+and for the reversed vortex the advected field ceases to be one wherever the interface is
+stretched; in both cases the eikonal residual of the exact solution is nonzero, and driving
+30
+
+
+it towards zero moves the network away from the correct answer. A scheme that equalises
+gradient contributions or residual magnitudes has no mechanism for recognising that one
+of the residuals it is balancing should not vanish. Whether existing adaptive methods can
+recover a weight four decades below the value that maximises measured consistency is,
+on this evidence, an open question rather than a foregone conclusion, and one the present
+benchmarks are now equipped to settle.
+6.2
+Implications for sparse and noisy interface data
+All four benchmarks use analytically specified initial conditions sampled without noise and
+at a density chosen for convergence rather than by availability. Engineering two-phase-flow
+settings differ in both respects: interface data are typically sparse, derived from imaging or
+tomography, and contaminated by measurement error. The two-dimensional study set out
+the extensions required before the approach can be applied to such data [10]; the three-
+dimensional results reported here sharpen the picture in one specific and unfavourable
+direction.
+The relevant finding is the sampling behaviour of the slotted sphere reported in Sec-
+tion 4.4. The slot occupies 2.36 × 10−3 of the domain volume, so of 5 × 103 uniformly
+drawn initial-condition points roughly twelve fall inside it, and at that density the pocket
+is approximately one third filled at t = 0, before any transport has occurred and at a time
+where the initial-condition term is directly supervised. Doubling the sampling budget
+reduces the volume error at t = 0 by an order of magnitude. Data density near a thin
+feature is therefore not a secondary consideration but the binding constraint on whether
+that feature is represented at all, and the constraint tightens with dimension: the fraction
+of a domain occupied by a feature of fixed thickness falls as the dimension rises.
+This has a direct consequence for sparse-data applications.
+The regime in which
+initial-condition data are scarce is precisely the regime in which small geometric features
+are lost, and the loss is not visible in the field norm. Establishing the point at which
+eikonal regularisation can no longer compensate for missing data, and characterising the
+degradation under additive noise, are the two experiments we regard as necessary before
+the method is applied to sparse or noisy interface data. The feature-restricted measure
+introduced in Section 3.2 is a prerequisite for both, since neither degradation would be
+reliably detected by the relative L2 error alone.
+6.3
+Threats to validity
+The mechanism, and what would falsify it.
+The ordering of selected weights by
+departure from the signed-distance property is a claim about mechanism, not a curve
+fit, and it made a prediction before the final benchmark was run: the reversed vortex, in
+which the property fails globally rather than locally, should select a weight at or near zero.
+31
+
+
+It selected 10−5, the smallest nonzero value on the grid. The claim would be falsified by
+a benchmark whose exact solution remains an exact signed distance function but which
+selects a small weight, or conversely.
+The second optimisation stage is not uniformly active.
+On the rotating sphere
+the improvement attributable to L-BFGS was bimodal across runs: in five of eighteen
+the strong-Wolfe line search located an admissible step from the annealed Adam iterate
+and the loss fell by four orders of magnitude more than in the remaining thirteen. The
+reported means are therefore contaminated by this variability. Stratifying by engagement
+leaves the selection intact, as shown in Section 4.3, but a study seeking tighter confidence
+intervals would need to control it.
+Global norms do not certify thin features.
+The relative L2 error is normalised by
+∥ϕ∥over the whole domain and is therefore dominated by far-field values. On the slotted
+sphere, replacing the exact solution by a sphere with no slot at all changes it by only about
+one percentage point. Volume conservation is far more discriminating and is reported
+alongside throughout, but it is a signed scalar and can cancel. Any study of interfaces
+with thin features should report a measure restricted to those features. Equation (9) gives
+one: a pair of sign-based classification errors over the region the feature occupies, which
+cannot cancel in the way a signed volume error can.
+Scope.
+All four benchmarks use a prescribed velocity field, so the results speak to
+interface transport and not to coupled flow. Three of the four are rigid motions. The
+weights reported here are established for this architecture and training protocol; whether
+they transfer to substantially different networks is untested, and the evidence assembled
+here suggests the question should be asked rather than assumed.
+7
+Conclusions
+Our two-dimensional study of physics-informed level-set advection closed with two open
+questions: whether the design principles it established transfer to three dimensions, and
+whether its single-seed results survive an assessment of run-to-run variance [10]. We have
+answered both, by repeating the eikonal weight selection in three dimensions across four
+benchmarks with six weights, three seeds and the full training budget per configuration,
+under a selection rule fixed before the sweeps were run.
+The ordering transfers. The selected weight tracks how far the exact solution departs
+from a signed distance function, across four decades: 10−1 where the property holds
+exactly for all time, 10−3 where it is violated locally near reentrant edges, and 10−5 where
+the interface is stretched and it fails globally. The mechanism identified in two dimensions
+32
+
+
+therefore survives a setting in which the collocation domain gains a dimension and the
+sampling density per dimension falls accordingly.
+The values do not transfer reliably. Two of the four carry over unchanged and two do
+not; the translating sphere’s optimum moves by a decade, at which the two-dimensional
+value is three times worse, and the reversed vortex optimal weight shifts from 10−4 in
+two dimensions to 10−5 in three. The ordering is preserved while the values are not, so
+inheritance from a lower-dimensional study is a hypothesis to be checked rather than a
+shortcut.
+Multi-seed evaluation changes what can be concluded. At small weights the seed-to-
+seed standard deviation of the error is of the same order as the error itself; the regulariser
+reduces it by more than an order of magnitude, so it buys reproducibility as well as
+accuracy. Differences smaller than that spread are not resolvable from single runs, and
+one benchmark produces a nominal tie between weights that is an artefact of variance
+rather than a genuine equivalence. This is the concrete respect in which the present results
+are stronger than their single-seed predecessor.
+Against a fifth-order WENO solver on identical grids and error measures, the classical
+scheme is more accurate on all four benchmarks, by two orders of magnitude on smooth
+rigid advection. The margin narrows monotonically with geometric difficulty, from a factor
+of 122 on the translating sphere to 4.3 under deformation, and is smaller throughout in
+volume conservation than in the field norm, the network staying within roughly a factor
+of two on three of the four benchmarks. A neural solver is not the efficient choice for
+prescribed-flow advection on a uniform grid, and we do not claim otherwise; the properties
+that motivate it (a mesh-free representation continuous in time, no reinitialisation, and
+extensibility to inverse settings) are not measured by this comparison, and its purpose is
+to price them honestly.
+One methodological finding applies beyond this work.
+The relative L2 error, the
+standard measure in the physics-informed literature, cannot certify the preservation of
+thin features: on the slotted sphere, substituting a sphere with no slot at all changes it
+by about one percentage point. Studies of interfaces with fine geometric structure should
+report a measure restricted to that structure, and we give one.
+The natural next steps follow from the limitations set out in Section 6: evaluating
+adaptive weighting schemes against the optima established here, characterising robustness
+to sparse and noisy initial data, and extending to velocity fields obtained from a coupled
+flow solve rather than prescribed.
+Code and Data Availability
+The implementation and the per-run results files for every sweep reproducing every re-
+ported figure are available at Zenodo [24].
+33
+
+
+Acknowledgements
+The author acknowledges the Department of Mathematics, NED University of Engineering
+& Technology, Karachi, for providing the computational resources used in this work.
+Declaration of Competing Interest
+The author declares no competing financial interests or personal relationships that could
+have appeared to influence the work reported in this paper.
+References
+[1] Stanley Osher and James A Sethian. Fronts propagating with curvature-dependent
+speed: Algorithms based on Hamilton-Jacobi formulations. Journal of Computational
+Physics, 79(1):12–49, 1988. doi: 10.1016/0021-9991(88)90002-2.
+[2] Mark Sussman, Peter Smereka, and Stanley Osher. A Level Set Approach for Com-
+puting Solutions to Incompressible Two-Phase Flow.
+Journal of Computational
+Physics, 114(1):146–159, 1994. doi: 10.1006/jcph.1994.1155.
+[3] Mark Sussman and Emad Fatemi. An Efficient, Interface-Preserving Level Set Re-
+distancing Algorithm and Its Application to Interfacial Incompressible Fluid Flow.
+SIAM Journal on Scientific Computing, 20(4):1165–1191, 1999.
+doi:
+10.1137/
+S1064827596298245.
+[4] M. Raissi, P. Perdikaris, and G.E. Karniadakis. Physics-informed neural networks: A
+deep learning framework for solving forward and inverse problems involving nonlinear
+partial differential equations. Journal of Computational Physics, 378:686–707, 2019.
+doi: 10.1016/j.jcp.2018.10.045.
+[5] Aditi S. Krishnapriyan, Amir Gholami, Shandian Zhe, Robert M. Kirby, and
+Michael W. Mahoney. Characterizing possible failure modes in physics-informed neu-
+ral networks. Advances in neural information processing systems, 34:26548–26560,
+2021.
+[6] Mathieu Mullins, Hamza Kamil, Adil Fahsi, and Azzeddine Soula¨ımani. Physics-
+informed neural networks for solving moving interface flow problems using the level
+set approach. Physics of Fluids, 37(10):107124, 2025. doi: 10.1063/5.0289386.
+[7] Ran Bi, Weibing Deng, and Yameng Zhu.
+Extended Interface Physics-Informed
+Neural Networks Method for Moving Interface Problems, 2026.
+34
+
+
+[8] Qijia Zhai, Pengtao Sun, Xiaoping Xie, Xingwen Zhu, and Chen-Song Zhang.
+Physics-informed neural networks for solving two-phase flow problems with moving
+interfaces, 2026.
+[9] Che-Chia Chang, Te-Sheng Lin, and Ming-Chih Lai.
+Physics-Informed Machine
+Learning for Two-Phase Moving-Interface and Stefan Problems, 2025.
+[10] Muhammad Akbar Khan and Fahim Raees. A systematic study of physics-informed
+neural networks for the level-set interface advection. Machine Learning: Science and
+Technology, 7(4):045032, 2026. doi: 10.1088/2632-2153/ae8b74.
+[11] Chenxi Wu, Min Zhu, Qinyang Tan, Yadhu Kartha, and Lu Lu. A comprehensive
+study of non-adaptive and residual-based adaptive sampling for physics-informed
+neural networks. Computer Methods in Applied Mechanics and Engineering, 403:
+115671, 2023. doi: 10.1016/j.cma.2022.115671.
+[12] Lu Lu, Xuhui Meng, Zhiping Mao, and George Em Karniadakis. DeepXDE: A Deep
+Learning Library for Solving Differential Equations. SIAM Review, 63(1):208–228,
+2021. doi: 10.1137/19M1274067.
+[13] Sifan Wang, Yujun Teng, and Paris Perdikaris. Understanding and Mitigating Gra-
+dient Flow Pathologies in Physics-Informed Neural Networks.
+SIAM Journal on
+Scientific Computing, 43(5):A3055–A3081, 2021. doi: 10.1137/20M1318043.
+[14] Suryanarayana Maddu, Dominik Sturm, Christian L M¨uller, and Ivo F Sbalzarini.
+Inverse Dirichlet weighting enables reliable training of physics informed neural
+networks.
+Machine Learning:
+Science and Technology, 3(1):015026, 2022.
+doi:
+10.1088/2632-2153/ac3712.
+[15] Levi D. McClenny and Ulisses M. Braga-Neto. Self-adaptive physics-informed neural
+networks. Journal of Computational Physics, 474:111722, 2023. doi: 10.1016/j.jcp.
+2022.111722.
+[16] Zixue Xiang, Wei Peng, Xu Liu, and Wen Yao. Self-adaptive loss balanced Physics-
+informed neural networks. Neurocomputing, 496:11–34, 2022. doi: 10.1016/j.neucom.
+2022.05.015.
+[17] Guang-Shan Jiang and Chi-Wang Shu. Efficient Implementation of Weighted ENO
+Schemes. Journal of Computational Physics, 126(1):202–228, 1996. doi: 10.1006/
+jcph.1996.0130.
+[18] Chi-Wang Shu and Stanley Osher.
+Efficient implementation of essentially non-
+oscillatory shock-capturing schemes. Journal of Computational Physics, 77(2):439–
+471, 1988. doi: 10.1016/0021-9991(88)90177-5.
+35
+
+
+[19] Matthew Tancik, Pratul P. Srinivasan, Ben Mildenhall, Sara Fridovich-Keil, Nithin
+Raghavan, Utkarsh Singhal, Ravi Ramamoorthi, Jonathan T. Barron, and Ren Ng.
+Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional
+Domains. Advances in neural information processing systems, 33:7537–7547, 2020.
+[20] Sifan Wang, Shyam Sankaran, and Paris Perdikaris. Respecting causality for training
+physics-informed neural networks.
+Computer Methods in Applied Mechanics and
+Engineering, 421:116813, 2024. doi: 10.1016/j.cma.2024.116813.
+[21] Douglas Enright, Ronald Fedkiw, Joel Ferziger, and Ian Mitchell. A Hybrid Parti-
+cle Level Set Method for Improved Interface Capturing. Journal of Computational
+Physics, 183(1):83–116, 2002. doi: 10.1006/jcph.2002.7166.
+[22] Stanley Osher and Ronald Fedkiw. Level Set Methods and Dynamic Implicit Surfaces,
+volume 153 of Applied Mathematical Sciences. Springer New York, 2003. doi: 10.
+1007/b98879.
+[23] Sifan Wang, Xinling Yu, and Paris Perdikaris. When and why PINNs fail to train:
+A neural tangent kernel perspective. Journal of Computational Physics, 449:110768,
+2022. doi: 10.1016/j.jcp.2021.110768.
+[24] Muhammad Akbar Khan. Eikonal regularization in physics-informed neural networks
+for three-dimensional level-set advection: Transferability of two-dimensional design
+principles — Source Code, 2026. doi: 10.5281/zenodo.21852144.
+36

@@ -1,0 +1,130 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-15T20:31:34.638951+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2608.08763v1",
+      "source": "arxiv",
+      "title": "Turbulence anisotropy in a bubbly vertical channel flow with topological change",
+      "abstract": "High-fidelity numerical simulations of bubble-laden, vertical channel flow in the upward configuration, where the bubbles undergo topological changes (breakup and coalescence), were performed with the purpose of exploring the effect of the surface tension on the turbulence anisotropy in the carrier phase. A qualitative analysis shows that velocity fluctuations are enhanced in the wake of large bubbles. Moreover, as shown by the velocity spectra, these structures seem to scale with bubble size and interact with those closer to the wall. Finally, a barycentric map and other indicators of turbulence anisotropy clarify that, except at the core of the channel where the largest bubbles reside, the multiphase flow cases are actually more isotropic than the single-phase flow at a matching friction Reynolds number. This unexpected behavior is attributed to a better redistribution of energy due to an enhancement of sweep events (high-speed fluid towards the wall) in the presence of large bubbles.",
+      "authors": [
+        "Arturo A. Arosemena",
+        "Davide Procacci",
+        "Simone Di Giorgio",
+        "Jannike Solsvik",
+        "Shahab Mirjalili"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-09T15:23:11+00:00",
+      "link": "https://arxiv.org/pdf/2608.08763v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "high-fidelity numerical simulation of bubbly vertical channel flow, two-phase flow with topological changes",
+      "llm_evidence_cn": "气泡垂直通道流的高保真数值模拟，包含拓扑变化的两相流",
+      "llm_evidence": "气泡垂直通道流的高保真数值模拟，包含拓扑变化的两相流",
+      "canonical_evidence": "气泡垂直通道流的高保真数值模拟，包含拓扑变化的两相流",
+      "llm_tldr_en": "Performs high-fidelity simulations of bubble-laden vertical channel flow with breakup/coalescence, analyzing surface tension effects on turbulence anisotropy. Provides insights into multiphase flow physics relevant to two-phase simulation.",
+      "llm_tldr_cn": "该论文针对含气泡垂直通道流进行高保真数值模拟，考虑气泡破碎与聚并等拓扑变化，研究表面张力对载相湍流各向异性的影响。结果显示大泡尾流增强速度脉动，多相流在通道核心区更趋各向同性。这项工作深化了对两相流湍流结构的理解，对两相流模拟和降膜换热中的界面动力学有参考价值。",
+      "llm_tldr": "该论文针对含气泡垂直通道流进行高保真数值模拟，考虑气泡破碎与聚并等拓扑变化，研究表面张力对载相湍流各向异性的影响。结果显示大泡尾流增强速度脉动，多相流在通道核心区更趋各向同性。这项工作深化了对两相流湍流结构的理解，对两相流模拟和降膜换热中的界面动力学有参考价值。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.08502v1",
+      "source": "arxiv",
+      "title": "K41 Scaling in Bubble-Induced Turbulence Arises from Single-Bubble Wakes",
+      "abstract": "We use high-resolution, interface-resolved direct numerical simulations (DNS) to investigate the origin of Kolmogorov (K41) scaling in bubble-induced turbulence (BIT). Region-wise velocity structure functions show that the 2/3 scaling appears only within bubble wake regions. Comparison with matched single-bubble DNS further indicates that the K41 scaling observed in the full BIT field arises from the superposition of individual bubble wakes. On this basis, we derive a scaling for the dissipation rate in dilute BIT that is consistent with experimental results from the literature.",
+      "authors": [
+        "Dabao Li",
+        "Zhilong Jin",
+        "Guangzhao Zhou"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-09T05:46:57+00:00",
+      "link": "https://arxiv.org/pdf/2608.08502v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "interface-resolved DNS of bubble-induced turbulence for multiphase flow",
+      "llm_evidence_cn": "气泡诱导湍流的界面解析DNS多相流模拟",
+      "llm_evidence": "气泡诱导湍流的界面解析DNS多相流模拟",
+      "canonical_evidence": "气泡诱导湍流的界面解析DNS多相流模拟",
+      "llm_tldr_en": "This paper uses interface-resolved direct numerical simulations to show that Kolmogorov scaling in bubble-induced turbulence arises from the superposition of individual bubble wakes, and derives a scaling for dissipation rate consistent with experiments.",
+      "llm_tldr_cn": "针对气泡诱导湍流中Kolmogorov标度的起源问题，本文采用高分辨率界面解析直接数值模拟，分析区域速度结构函数，发现2/3标度仅出现在气泡尾流区。通过与单气泡DNS对比，证明全场K41标度源于单气泡尾流的叠加，并推导出与实验一致的稀相气泡流耗散率标度。该工作为理解多相湍流提供了机理见解。",
+      "llm_tldr": "针对气泡诱导湍流中Kolmogorov标度的起源问题，本文采用高分辨率界面解析直接数值模拟，分析区域速度结构函数，发现2/3标度仅出现在气泡尾流区。通过与单气泡DNS对比，证明全场K41标度源于单气泡尾流的叠加，并推导出与实验一致的稀相气泡流耗散率标度。该工作为理解多相湍流提供了机理见解。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.08322v1",
+      "source": "arxiv",
+      "title": "Eikonal Regularisation in Physics-Informed Neural Networks for Three-Dimensional Level-Set Advection: Transferability of Two-Dimensional Design Principles",
+      "abstract": "Physics-informed neural networks applied to the level-set formulation of interface advection commonly augment the residual and initial-condition losses with an eikonal regulariser, penalising the deviation of $\\|\\nablaφ\\|$ from unity. A previous two-dimensional study identified this weight as the dominant hyperparameter and found its optimum shifts by four orders of magnitude between rigid-body and deforming flows, but left open whether these principles transfer to three dimensions and whether single-seed results survive run-to-run variability. We answer both by repeating the weight selection across four 3D benchmarks (translating sphere, rotating sphere, slotted sphere, reversed vortex), sweeping six weights with three seeds at full training budget under a pre-registered selection rule. The ordering transfers: the selected weight tracks how far the exact solution departs from the signed-distance property, spanning four decades from $10^{-1}$ where it holds exactly to $10^{-5}$ where the interface is stretched. Values transfer only benchmark by benchmark; two of four carry over unchanged and two do not, so inheritance must be verified. The multi-seed protocol reveals that at small weights the seed-to-seed standard deviation equals the error itself, and the regulariser reduces it by more than an order of magnitude, buying reproducibility as well as accuracy. We benchmark against a fifth-order WENO solver on identical grids and error measures; the classical scheme is more accurate on all four problems, by two orders of magnitude on smooth rigid advection, with a margin that narrows with geometric difficulty and is smaller in volume conservation than in the field norm. Finally, we show that the relative $L_2$ error cannot certify the preservation of thin features, and report a feature-restricted measure that can.",
+      "authors": [
+        "Muhammad Akbar Khan"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "cs.LG",
+        "physics.comp-ph"
+      ],
+      "published": "2026-08-08T20:20:13+00:00",
+      "link": "https://arxiv.org/pdf/2608.08322v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "level-set advection for interface tracking in two-phase flow",
+      "llm_evidence_cn": "用于两相流界面跟踪的水平集平流方法",
+      "llm_evidence": "用于两相流界面跟踪的水平集平流方法",
+      "canonical_evidence": "用于两相流界面跟踪的水平集平流方法",
+      "llm_tldr_en": "Investigates eikonal regularisation for PINNs in 3D level-set advection, finding optimal weight transfer from 2D; interface tracking method relevant to two-phase flow simulation.",
+      "llm_tldr_cn": "针对物理信息神经网络在水平集界面平流中程函正则化权重选择困难的问题，将二维研究拓展到三维，在多个基准上重复权重选择并考察随机性。研究发现二维最优权重规律可部分迁移到三维，但需重新标定。该方法可直接用于两相流和降膜流动的界面追踪，为CFD模拟提供参考。",
+      "llm_tldr": "针对物理信息神经网络在水平集界面平流中程函正则化权重选择困难的问题，将二维研究拓展到三维，在多个基准上重复权重选择并考察随机性。研究发现二维最优权重规律可部分迁移到三维，但需重新标定。该方法可直接用于两相流和降膜流动的界面追踪，为CFD模拟提供参考。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

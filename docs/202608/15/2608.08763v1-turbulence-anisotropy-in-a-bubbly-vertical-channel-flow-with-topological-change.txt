@@ -1,0 +1,576 @@
+14th International Symposium on Turbulence and Shear Flow Phenomena (TSFP14)
+Heidelberg, Germany, July 28–31, 2026
+TURBULENCE ANISOTROPY IN A BUBBLY VERTICAL CHANNEL FLOW
+WITH TOPOLOGICAL CHANGES
+Arturo A. Arosemena
+Department of Chemical Engineering
+Norwegian University of Science and Technology
+Sem Sælands vei 6, Trondheim, Trøndelag, 7491, Norway
+arturo.arosemena@ntnu.no
+Davide Procacci
+FLOW, Department of Engineering Mechanics
+KTH Royal Institute of Technology
+Osquars backe 18, Stockholm, Stockholms l¨an, 114 28, Sweden
+procacci@kth.se
+Simone Di Giorgio
+Istituto di Ingegneria del Mare
+Consiglio Nazionale delle Ricerche
+Via di Vallerano 139, Rome, Lazio, 00128, Italy
+simone.digiorgio@cnr.it
+Jannike Solsvik
+Department of Chemical Engineering
+Norwegian University of Science and Technology
+Sem Sælands vei 6, Trondheim, Trøndelag, 7491, Norway
+jannike.solsvik@ntnu.no
+Shahab Mirjalili
+FLOW, Department of Engineering Mechanics
+KTH Royal Institute of Technology
+Osquars backe 18, Stockholm, Stockholms l¨an, 114 28, Sweden
+msey@kth.se
+ABSTRACT
+High-fidelity numerical simulations of bubble-laden, ver-
+tical channel flow in the upward configuration, where the bub-
+bles undergo topological changes (breakup and coalescence),
+were performed with the purpose of exploring the effect of
+the surface tension on the turbulence anisotropy in the car-
+rier phase. A qualitative analysis shows that velocity fluctu-
+ations are enhanced in the wake of large bubbles. Moreover,
+as shown by the velocity spectra, these structures seem to scale
+with bubble size and interact with those closer to the wall.
+Finally, a barycentric map and other indicators of turbulence
+anisotropy clarify that, except at the core of the channel where
+the largest bubbles reside, the multiphase flow cases are ac-
+tually more isotropic than the single-phase flow at a match-
+ing friction Reynolds number. This unexpected behavior is at-
+tributed to a better redistribution of energy due to an enhance-
+ment of sweep events (high-speed fluid towards the wall) in
+the presence of large bubbles.
+INTRODUCTION
+Turbulent bubbly flows are found in a multitude of set-
+tings. From wave breaking on the surface of oceans to bubble
+column reactors and piping systems used in industrial appli-
+cations. In many instances, these flows present two-way cou-
+pled dynamics between the phases, making their analysis quite
+complex. In particular, in the case of bubbly flow delimited by
+walls, velocity fluctuations in the carrier may arise not only
+due to the action of an external pressure gradient or imposed
+flow rate–as in single-phase flow–but also due to buoyancy and
+the generation of bubble-induced agitation (Risso, 2018). In
+addition, other effects such as interface contamination, gas vol-
+ume fraction, bubble deformability, and topological changes in
+the dispersed phase (i.e., breakage and coalescence) may affect
+the bubbly flow motion.
+Regarding the study of turbulent bubbly flow that under-
+goes topological changes, there is in fact a gap in the litera-
+ture. Many experiments and nearly all numerical simulations
+have focused on dispersed flow where bubbles, for the most
+part, do not go through changes in topology (Garbin et al.,
+2025). It was not until fairly recently that works on the sta-
+tistical description of turbulent bubbly flows with bubbles un-
+dergoing breakup and coalescence started to be reported (Lu
+& Tryggvason, 2018, 2019; Lu et al., 2025). Furthermore, the
+focus of these studies has been the investigation of low-order
+statistics (e.g., mean values, variances, and covariance) with
+little attention to proper characterization of the states of turbu-
+lence; information that is key for the validation and advance-
+1
+arXiv:2608.08763v1  [physics.flu-dyn]  9 Aug 2026
+
+
+14th International Symposium on Turbulence and Shear Flow Phenomena (TSFP14)
+Heidelberg, Germany, July 28–31, 2026
+ment of second-moment closures for the modeling of turbu-
+lent bubbly flow (Ma et al., 2020). In this context, Procacci
+et al. (2026) recently conducted the first investigation on tur-
+bulence anisotropy in heterogeneous bubbly flow with topo-
+logical changes. Here, we expand the qualitative discussion,
+including velocity spectra, and provide a summary of the key
+findings.
+NUMERICAL SIMULATIONS
+High-fidelity
+numerical
+simulations
+of
+a
+three-
+dimensional, bubble-laden vertical channel in the up-flow
+configuration were performed. See figure 1. The computation
+domain has a size of 4πh × 2h × 2πh in the x (streamwise), y
+(wall-normal) and z (spanwise) directions, respectively. Note
+that, h (half-channel width) is the characteristic length and
+uτ (friction velocity) is the characteristic velocity scale. The
+flow is driven by an effective constant pressure gradient that
+also accounts for the weight of the mixture.
+Periodicity is
+imposed for all variables in x and z, while the no-slip and
+impermeability boundary conditions are imposed for the
+velocity field at the walls. A right constant angle (π/2) is
+imposed for the phase indicator. The code solves the one-fluid
+incompressible Navier–Stokes equations and the interface is
+captured using a volume-of-fluid (VOF) method (Weymouth
+& Yue, 2010). Details about the numerical implementation
+and a thorough validation of the code are found in Di Giorgio
+et al. (2024) and Rossi et al. (2025), respectively.
+In this problem, the important physical parameters are
+Reτ (friction Reynolds number; ratio of inertial to viscous
+forces), Weτ (friction Weber number; ratio of inertial to sur-
+face tension forces) and Fr (Froude number; ratio of iner-
+tial to buoyancy forces). In addition, the multiphase flow is
+also characterized by α (gas volume fraction), ρr (density ra-
+tio; bubbles to carrier phase), and µr (dynamic viscosity ratio;
+bubbles to carrier phase). With the objective of studying tur-
+bulence anisotropy with surface tension–thus, for cases with
+differences in the breakage and coalescence events–multiphase
+simulations with three different Weτ were carried out: 2.8, 1.4,
+and 0.7. All other parameters were kept constant: Reτ = 150,
+Fr = 0.014, α = 5.4%, ρr = 0.1, and µr = 1. The results of a
+single-phase (SP) simulation at Reτ = 150 serve as a basis for
+comparison with the multiphase cases.
+It is also noted that a fixed grid resolution was used in all
+simulations. For the two homogeneous directions, a constant
+grid spacing of ∆x+ = ∆z+ = 1.84 was considered. On the
+other hand, in the wall-normal direction, a natural grid stretch-
+ing was employed (Pirozzoli & Orlandi, 2021), with a mini-
+mum resolution near the wall of ∆y+
+min = 0.041 and a maxi-
+mum resolution at the channel center of ∆y+max = 1.76. Here,
+the superscript + is used to denote viscous units. In the follow-
+ing, to facilitate comparison with SP and homogeneous bubbly
+channel flow, we only show information corresponding to the
+largest and smallest Weτ cases, that is, 2.8 and 0.7. For a more
+complete report of the different cases and for further details
+about the simulations performed, see Procacci et al. (2026).
+RESULTS
+Before discussing the states of turbulence in the carrier,
+we consider some relevant qualitative features of the multi-
+phase flow.
+Figure 1: Computational domain and instantaneous rendering
+of the bubbles at t+ ≈103, after discarding the initial tran-
+sients, for Weτ = 0.7.
+Qualitative features of the bubbly flow
+First, as displayed in figure 1, most of the gas volume
+fraction appears to be encountered in the channel core. This is
+expected for heterogeneous bubbly flow, as large, deformable
+bubbles tend to cluster at the center of the channel (Lu & Tryg-
+gvason, 2008). This also suggests important bubble-induced
+agitation at the core of the channel. Moreover, such an effect
+is probably more pronounced with increasing surface tension
+(decreasing Weτ) due to the appearance of even larger bubbles.
+Indeed, as shown by the comparative bar chart in figure 2(a),
+the highest values of V +
+bubble are found within the larger bub-
+ble sizes; that is, those having d+
+eq (bubble equivalent diameter)
+larger than d+
+H (Hinze scale, the smallest dimension for a stable
+fluid particle; Hinze, 1955), and for the highest surface tension
+case. Here, V +
+bubble is the total bubble volume within a range of
+bubble sizes in the core of the channel; 100 ≤y+ ≤200. Fur-
+thermore, as shown in figure 2(b) for Weτ = 0.7 at the chan-
+nel center, both u′+ (streamwise velocity fluctuations) and v′+
+(wall-normal velocity fluctuations) are enhanced in the wake
+of large bubbles. The former mostly in the streamwise direc-
+tion, whereas the latter both inwards and outwards with respect
+to the wall-normal direction. It is also noted that the strong, in-
+stantaneous velocity structures seem to roughly scale with the
+2
+
+
+14th International Symposium on Turbulence and Shear Flow Phenomena (TSFP14)
+Heidelberg, Germany, July 28–31, 2026
+(a)
+(0,d +
+H ]
+(d +
+H ,4d +
+H ]
+(4d +
+H ,7d +
+H ] (7d +
+H ,10d +
+H ]
+0
+1
+2
+3
+V +
+bubbles/V +
+core ×100%
+We=2.8, d +
+H =11.18
+We=0.7, d +
+H =22.36
+(b)
+Figure 2: (a) Comparative bar chart for gas volume fraction
+in the channel core for the different bubbles sizes. (b) Iso-
+contours for streamwise (left) and wall-normal (right) veloc-
+ity fluctuations in the channel center for Weτ = 0.7. Results
+are for t+ ≈103, after discarding the initial transients. In (a),
+Vcore = 16π2h3/3. In (b), positive and negative isocontours
+are respectively identify in red and blue, while bubbles are
+rendered in green. Also, the red arrows mark some regions
+of intense fluctuations in the wake of bubbles.
+bubble size.
+Next, we consider the streamwise and wall-normal veloc-
+ity spectra at the center of the channel, as well as at y+ ≈12,
+closer to the wall. Figure 3 shows the pre-multiplied stream-
+wise and spanwise spectral densities for u′+ and v′+, which
+have been normalized by their respective variances, against the
+corresponding wavelength. As seen from the figure, there is an
+overall shift of the spectral content towards smaller scales for
+the bubble-laden cases when compared to SP. This is particu-
+larly conspicuous at the channel center, yet it is also seen to
+a lesser extent closer to the wall. Interestingly, as shown in
+panels (a) and (c), there is indeed a correspondence between
+the scales of the most energetic streamwise velocity structures
+and the bubble size at the core of the channel. In fact, over-
+lapping at low to moderate wavelengths is recovered for both
+Weτ cases when normalizing by the respective dH+. See in-
+sets. On the other hand, as displayed in panels (b) and (d),
+the effect of increasing the surface tension (decreasing Weτ)
+and having larger bubbles on the wall-normal velocity spectra
+seems negligible. Moreover, as shown in panel (b), very simi-
+lar streamwise spectral content distributions are seen near the
+wall and at the channel center, hinting of potentially important
+interactions between the near-wall structures and those found
+at the channel core.
+States of turbulence in the carrier phase
+In order to characterize the states of turbulence in the car-
+rier, we consider the Reynolds stress anisotropy tensor, defined
+as
+ai j = ui j
+2k −1
+3δi j,
+(1)
+where ui j, k, and δi j are the Reynolds stress tensor, turbulent
+kinetic energy, and Kronecker delta (1 if i = j and 0 other-
+wise), respectively.
+Typically, characterization of turbulent
+states is performed considering tools such as anisotropy in-
+variant maps, which are based on the invariants of ai j (Emory
+& Iaccarino, 2014). Nevertheless, we can also make a rapid
+diagnosis by directly considering the components of ai j. For
+instance, it is well known that in canonical wall-turbulence,
+very near the wall (y+ ≈10) most of the turbulent kinetic en-
+ergy is found in the streamwise velocity component, whereas
+near the channel center states closer to isotropic conditions are
+attained (Pope, 2000). Therefore, a11 is expected to approach
+2/3 near the wall and 0 at the core of the channel. Figure 4(a)
+shows that this is indeed so for SP. For the bubble-laden cases,
+states closer and farther away from isotropic conditions are
+seen at y+ ≈10 and y+ ≈150, respectively. Furthermore, with
+the exception of the central channel region, the bubble-laden
+cases are actually closer to isotropic conditions with respect to
+SP.
+The previous observation is further corroborated by
+means of a barycentric map (BAM; Banerjee et al., 2007) and
+F (the Lumley’s flatness; Lumley, 1979). See figure 4(b) and
+(c). A BAM is a linear map in the form of an isosceles trian-
+gle, delimitating all realizable states of turbulence. The base
+represents two-component states, that is, when one normal
+Reynolds stress component is negligible compared to the oth-
+ers, while the right and left hand sides, respectively, identify
+the axisymmetric expansion (prolate-like) and axisymmetric
+contraction (oblate-like) states, which converge at the isotropic
+(iso) limit. For further details on the terminology used to iden-
+tify the states of turbulence, see, e.g., Simonsen & Krogstad
+(2005). On the other hand, the F parameter is an indicator of
+proximity to the base of the triangle and to the iso limit, taking
+a value of 1 and 0 for isotropic and two-component turbulence,
+respectively. Then, as shown in panels (b) and (c), turbulence
+is indeed more anisotropic for the bubble-laden cases at the
+channel center. This is expected considering the previous ob-
+servation about larger bubbles residing in the core of the chan-
+nel and the consequent appearance of strong bubble-induced
+fluctuations. Rather surprising, on the other hand, is the fact
+that this trend is truly only confined to the channel center, and
+as we move from it, there is actually a higher degree of tur-
+bulence anisotropy for SP than for heterogeneous bubbly flow.
+See profiles that are mostly to the left and above the SP one
+3
+
+
+14th International Symposium on Turbulence and Shear Flow Phenomena (TSFP14)
+Heidelberg, Germany, July 28–31, 2026
+(a)
+101
+102
+103
+0.0
+0.2
+0.4
+0.6
+kxEu
+10
+1100 101 102
++
+x /d +
+H
+0.00
+0.25
+(b)
+101
+102
+103
++
+x
+0.0
+0.2
+0.4
+0.6
+kxEv
+(c)
+101
+102
+103
+0.0
+0.2
+0.4
+0.6
+0.8
+kzEu
+10
+1100 101 102
++
+z /d +
+H
+0.00
+0.25
+(d)
+101
+102
+103
++
+z
+0.00
+0.25
+0.50
+0.75
+kzEv
+Figure 3: Pre-multiplied, normalized, spectral densities for
+(a), (c) the streamwise velocity component, ˆEu, and (b), (d)
+the wall-normal velocity components, ˆEv. A gray line style is
+used for SP, whereas cyan and purple line styles are used for
+the Weτ = 0.7 and 2.8 cases, respectively. Continuous- and
+dashed-line styles respectively identify profiles at y+ = 150
+and y+ ≈12. Note that, λx = 2π/kx and λz = 2π/kz are the
+wavelengths along the homogeneous directions.
+in panels (b) and (c), respectively. It is also interesting to note
+that this behavior–higher degree of isotropy when compared
+to SP–is also quite different from the one reported for homo-
+geneous bubbly channel flow. See representative case corre-
+sponding to a monodisperse swarm of small bubbles (case la-
+beled as SmMany in Ma et al., 2020) in panel (c), which dis-
+plays a very anisotropic and approximately constant state of
+turbulence across a significant portion of the channel.
+Sweeps and ejections
+Lastly, in light of potentially important inner/outer in-
+teractions discussed in the qualitative section and with the
+purpose of providing a plausible physical explanation for the
+unexpected changes in turbulence anisotropy for the bubbly-
+laden cases, we analyze intense momentum transfer events in
+the wall-bounded flow by means of a quadrant analysis (Wal-
+lace, 2016). Figure 5 presents the fractional contribution of
+sweeps (Q4, high-speed fluid inward) and ejections (Q2, low-
+speed fluid outward) events to u′v′ (the Reynolds shear stress).
+These are the quadrant events that positively contribute to u′v′,
+while the others (Q1 and Q3, not shown), simply counterbal-
+ance the Q2s and Q4s such that at any y+, the fractional con-
+tribution of the four quadrant events is unitary. Therefore, as
+seen in the figure, both sweeps and ejections increase for the
+bubble-laden cases. However, those that significantly deviate
+from the SP results for most of the channel are the sweeps. It
+is also noted that there are some differences between the two
+bubble-laden cases. For Weτ = 2.8, there is still a crossing
+point where Q2s overcome Q4 events, whereas this is not the
+case for Weτ = 0.7. In fact, for the former, the sweeps appear
+to be as important as the ejections for a significant portion of
+the channel, while for the latter, the sweeps are always the
+dominant momentum transfer events. In other words, higher
+momentum in the form of high-speed fluids towards the wall
+is present for the bubble-laden cases, which may lead to a bet-
+ter redistribution of energy across the channel and explain the
+observed decrease in anisotropy seen for most of the channel,
+when compared to SP. In addition, this effect is more pro-
+nounced with increasing surface tension (decreasing Weτ), as
+larger bubbles appear in the core of the channel and there is
+more bubble-induced agitation; see the qualitative discussion.
+CONCLUSIONS
+High-fidelity simulations of bubble-laden vertical chan-
+nel flow were performed. The flow is driven upward by an ef-
+fective constant pressure gradient, and the deformable bubbles
+undergo breakage and coalescence. The interface is captured
+by a VOF method. Three sets of simulations, only differing in
+their Weτ, were performed to observe the effect of changing
+the surface tension on the turbulence anisotropy in the carrier.
+Here, only the results corresponding to Weτ = 0.7 and 2.8 are
+shown. As a basis for comparison, a SP case with matching
+Reτ was also considered.
+The main finding is that the turbulence anisotropy in the
+carrier is actually lower for the multiphase flow cases com-
+pared to SP. Only close to the core of the channel where the
+largest bubbles reside is the opposite true. This is also in strik-
+ing contrast to results reported for homogeneous bubbly chan-
+nel flow, where the turbulence anisotropy is actually higher
+for most of the channel compared to SP (Ma et al., 2020).
+Such behavior is attributed to an important increase of the mo-
+mentum transfer events consisting of high-speed fluid towards
+the wall, which may help to a better redistribution of energy
+among the different normal Reynolds stress components and
+across the channel for the considered bubble-laden cases.
+Further analyzes, with the aim of clarifying the in-
+ner/outer interactions and the transport of turbulent kinetic en-
+ergy and momentum, may include a full reporting of the ve-
+locity spectra and the Reynolds stress budgets.
+4
+
+
+14th International Symposium on Turbulence and Shear Flow Phenomena (TSFP14)
+Heidelberg, Germany, July 28–31, 2026
+(a)
+50
+100
+150
+y +
+0.0
+0.2
+0.4
+0.6
+u 2/2k
+1/3
+(b)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+xB
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+yB
+iso
+wall
+center
+(c)
+50
+100
+150
+y+
+0.00
+0.25
+0.50
+0.75
+1.00
+F
+Figure 4:
+(a) First diagonal component of the Reynolds
+stress anisotropy tensor, a11, against y+. (b) Reynolds stress
+anisotropy in a barycentric map with coordinates xB,yB. (c)
+Lumley’s flatness, F, against y+. Statistics are conditioned to
+the carrier phase only. A gray line style/marker is used for
+SP, whereas cyan and purple line styles/markers are used for
+the Weτ = 0.7 and 2.8 cases, respectively. In (a), a dashed-
+line style identifies the 2/3 limit. In (b), red, blue, and black
+line styles are used to identify the axisymmetric expansion,
+axisymmetric contraction, and two-component limits, respec-
+tively. Also, the isotropic limiting state is labeled as iso, while
+the red arrows (with self-explanatory labels) mark states close
+to the wall and to the channel center. In (c), a dashed-line
+style identify results corresponding to homogeneous bubbly
+flow (case labeled as SmMany in Ma et al., 2020).
+ACKNOWLEDGMENTS
+Computing resources awarded by EuroHPC (project ID:
+R0387) and Sigma2 (project ID: NN9646K) are acknowl-
+edged. AA and JS also acknowledge financial support by the
+Research Council of Norway (RCN, grant number: 334652).
+REFERENCES
+Banerjee, S, Krahl, R., Durst, F. & Zenger, Ch. 2007 Presenta-
+tion of anisotropy properties of turbulence, invariants versus
+eigenvalue approaches. J. Turbul. 8, 1–27.
+Di Giorgio, S., Pirozzoli, S. & Iafrati, A. 2024 Evaluation of
+advection schemes and surface tension model for algebraic
+and geometric VOF multiphase flow solvers. J. Comput.
+Phys. 499, 112717.
+Emory, E. & Iaccarino, G. 2014 Visualizing turbulence
+anisotropy in the spatial domain with componentality con-
+tours. Center for Turbulence Research, Annual Research
+Briefs pp. 123–138.
+Garbin, V., Bothe, D., G., Brenn, Casciola, C. M., Colin,
+C., Marengo, M., Risso, F., Tryggvason, G. & Lohse, D.
+2025 Bubbles and bubbly flows. Int. J. Multiph. Flow 190,
+105240.
+Hinze, J. O. 1955 Fundamentals of the hydrodynamic mecha-
+nism of splitting in dispersion processes. AIChE J. 1, 289–
+295.
+Lu, J. & Tryggvason, G. 2008 Effect of bubble deformability in
+turbulent bubbly upflow in a vertical channel. Phys. Fluids
+20, 040701.
+Lu, J. & Tryggvason, G. 2018 Direct numerical simulations of
+multifluid flows in a vertical channel undergoing topology
+changes. Phys. Rev. Fluids 3, 084401.
+Lu, J. & Tryggvason, G. 2019 Multifluid flows in a vertical
+channel undergoing topology changes: Effect of void frac-
+tion. Phys. Rev. Fluids 4, 084301.
+Lu, M., Yang, Z. & Deng, B. 2025 Numerical study of turbu-
+lent bubbly upflow: Effect of density ratio. J. Fluid Mech.
+1007, A63.
+Lumley, J. L. 1979 Computational modeling of turbulent
+flows. Adv. Appl. Mech., vol. 18, pp. 123–176.
+Ma, T., Lucas, D., Jakirli´c, S. & Fr¨ohlich, J. 2020 Progress in
+the second-moment closure for bubbly flow based on direct
+numerical simulation data. J. Fluid Mech. 883, A9.
+Pirozzoli, S. & Orlandi, P. 2021 Natural grid stretching for
+DNS of wall-bounded flows. J. Comput. Phys 439, 110408.
+Pope, S. B. 2000 Turbulent Flows. CUP.
+Procacci, D., Arosemena, A. A., Di Giorgio, S. & J., Solsvik
+2026 Turbulence anisotropy modulation in bubble-laden
+channel flow: A numerical study. Int. J. Multiph. Flow 195,
+10550.
+Risso, F. 2018 Agitation, mixing, and transfers induced by
+bubbles. Annu. Rev. Fluid Mech. 50, 25–48.
+Rossi, D., Di Giorgio, S. & Pirozzoli, S. 2025 Comparative
+analysis of volume of fluid and phase-field methods for
+numerical simulations of two-phase flows. Int. J. Multiph.
+Flow 189, 105245.
+Simonsen, A.J. & Krogstad, P.- ˚A. 2005 Turbulent stress invari-
+ant analysis: Clarification of existing terminology. Phys.
+Fluids 17, 088103.
+Wallace, J. M. 2016 Quadrant analysis in turbulence research:
+History and evolution. Annu. Rev. Fluid Mech. 48, 131–158.
+Weymouth, G.D. & Yue, D. K. P. 2010 Conservative volume-
+of-fluid method for free-surface simulations on Cartesian-
+grids. J. Comput. Phys. 229, 2853–2865.
+5
+
+
+14th International Symposium on Turbulence and Shear Flow Phenomena (TSFP14)
+Heidelberg, Germany, July 28–31, 2026
+20
+40
+60
+80
+100
+120
+140
+y+
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+(u v )Qi/u v
+Q2 (u <0,v >0) & Q4 (u >0,v <0)
+Figure 5: Fractional contribution of ejections (Q2) and sweeps (Q4) to the shear Reynolds stress, (u′v′)Qi/u′v′, against y+. A gray
+line style is used for SP, whereas cyan and purple line styles are used for the Weτ = 0.7 and 2.8 cases, respectively. Continuous- and
+dashed-line styles respectively identify the fractional contributions of the Q2 and Q4 events. Statistics are conditioned to the carrier
+phase only.
+6

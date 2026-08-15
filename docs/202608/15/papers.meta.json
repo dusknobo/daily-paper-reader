@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-15",
+  "date": "2026-08-15",
+  "generated_at": "2026-08-15T20:38:50",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/15/2608.08763v1-turbulence-anisotropy-in-a-bubbly-vertical-channel-flow-with-topological-change",
+      "section": "deep",
+      "title_en": "Turbulence anisotropy in a bubbly vertical channel flow with topological change",
+      "authors": "Arturo A. Arosemena, Davide Procacci, Simone Di Giorgio, Jannike Solsvik, Shahab Mirjalili",
+      "date": "2026-08-09",
+      "pdf": "https://arxiv.org/pdf/2608.08763v1",
+      "score": "8.0",
+      "evidence": "气泡垂直通道流的高保真数值模拟，包含拓扑变化的两相流",
+      "tldr": "本文针对垂直通道中含气泡并发生拓扑变化的泡状流，采用高保真数值模拟研究表面张力对载相湍流各向异性的影响。通过对大泡尾迹速度涨落及速度谱的分析，发现气泡尺度相关结构可与近壁结构相互作用。重心图等指标表明，除核心区外，多相流比匹配摩擦雷诺数下的单相流更趋各向同性。该现象源于大泡增强sweep事件，促进能量再分配，对理解泡状湍流各向异性机制有贡献。",
+      "tags": "query:falling-film",
+      "abstract_en": "High-fidelity numerical simulations of bubble-laden, vertical channel flow in the upward configuration, where the bubbles undergo topological changes (breakup and coalescence), were performed with the purpose of exploring the effect of the surface tension on the turbulence anisotropy in the carrier phase. A qualitative analysis shows that velocity fluctuations are enhanced in the wake of large bubbles. Moreover, as shown by the velocity spectra, these structures seem to scale with bubble size and interact with those closer to the wall. Finally, a barycentric map and other indicators of turbulence anisotropy clarify that, except at the core of the channel where the largest bubbles reside, the multiphase flow cases are actually more isotropic than the single-phase flow at a matching friction Reynolds number. This unexpected behavior is attributed to a better redistribution of energy due to an enhancement of sweep events (high-speed fluid towards the wall) in the presence of large bubbles.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/15/2608.08502v1-k41-scaling-in-bubble-induced-turbulence-arises-from-single-bubble-wakes",
+      "section": "quick",
+      "title_en": "K41 Scaling in Bubble-Induced Turbulence Arises from Single-Bubble Wakes",
+      "authors": "Dabao Li, Zhilong Jin, Guangzhao Zhou",
+      "date": "2026-08-09",
+      "pdf": "https://arxiv.org/pdf/2608.08502v1",
+      "score": "7.0",
+      "evidence": "气泡诱导湍流的界面解析DNS多相流模拟",
+      "tldr": "气泡诱导湍流中 Kolmogorov (K41) 标度的来源长期不明。本研究采用高分辨率界面解析 DNS，进行区域速度结构函数分析并与匹配单气泡 DNS 对比。发现 2/3 标度仅出现在气泡尾流区域，整个 BIT 场的 K41 标度源于单个气泡尾流的叠加。在此基础上推导出稀薄 BIT 耗散率的标度律，与文献实验一致，揭示了 K41 标度的物理机制。",
+      "tags": "query:falling-film",
+      "abstract_en": "We use high-resolution, interface-resolved direct numerical simulations (DNS) to investigate the origin of Kolmogorov (K41) scaling in bubble-induced turbulence (BIT). Region-wise velocity structure functions show that the 2/3 scaling appears only within bubble wake regions. Comparison with matched single-bubble DNS further indicates that the K41 scaling observed in the full BIT field arises from the superposition of individual bubble wakes. On this basis, we derive a scaling for the dissipation rate in dilute BIT that is consistent with experimental results from the literature.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/15/2608.08322v1-eikonal-regularisation-in-physics-informed-neural-networks-for-three-dimensional-level-set-advection-transferability-of-two-dimensional-design-principles",
+      "section": "quick",
+      "title_en": "Eikonal Regularisation in Physics-Informed Neural Networks for Three-Dimensional Level-Set Advection: Transferability of Two-Dimensional Design Principles",
+      "authors": "Muhammad Akbar Khan",
+      "date": "2026-08-08",
+      "pdf": "https://arxiv.org/pdf/2608.08322v1",
+      "score": "6.0",
+      "evidence": "用于两相流界面跟踪的水平集平流方法",
+      "tldr": "物理信息神经网络用于三维水平集平流时，Eikonal正则化权重是主导超参数，但二维设计原则能否迁移未验证。本研究在四个三维基准上扫描六个权重、三个种子，发现权重选择顺序可迁移：权重跟踪偏离有符号距离程度，跨越四个数量级，但具体值仅部分继承。多种子协议显示正则化降低标准差超一个数量级，提升可重复性。与五阶WENO对比，经典方案仍更准确，且相对L2误差不能认证薄特征，需特征限制度量。",
+      "tags": "query:falling-film",
+      "abstract_en": "Physics-informed neural networks applied to the level-set formulation of interface advection commonly augment the residual and initial-condition losses with an eikonal regulariser, penalising the deviation of $\\|\\nablaφ\\|$ from unity. A previous two-dimensional study identified this weight as the dominant hyperparameter and found its optimum shifts by four orders of magnitude between rigid-body and deforming flows, but left open whether these principles transfer to three dimensions and whether single-seed results survive run-to-run variability. We answer both by repeating the weight selection across four 3D benchmarks (translating sphere, rotating sphere, slotted sphere, reversed vortex), sweeping six weights with three seeds at full training budget under a pre-registered selection rule. The ordering transfers: the selected weight tracks how far the exact solution departs from the signed-distance property, spanning four decades from $10^{-1}$ where it holds exactly to $10^{-5}$ where the interface is stretched. Values transfer only benchmark by benchmark; two of four carry over unchanged and two do not, so inheritance must be verified. The multi-seed protocol reveals that at small weights the seed-to-seed standard deviation equals the error itself, and the regulariser reduces it by more than an order of magnitude, buying reproducibility as well as accuracy. We benchmark against a fifth-order WENO solver on identical grids and error measures; the classical scheme is more accurate on all four problems, by two orders of magnitude on smooth rigid advection, with a margin that narrows with geometric difficulty and is smaller in volume conservation than in the field norm. Finally, we show that the relative $L_2$ error cannot certify the preservation of thin features, and report a feature-restricted measure that can.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
