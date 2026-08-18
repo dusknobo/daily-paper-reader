@@ -1,0 +1,3243 @@
+Title: A diffuse-interface method for compressible two-phase flows with seven- and six-equation models
+
+URL Source: https://arxiv.org/pdf/2608.16750v1
+
+Published Time: Tue, 18 Aug 2026 02:30:53 GMT
+
+Number of Pages: 47
+
+Markdown Content:
+# A diffuse-interface method for compressible two-phase flows with seven- and six-equation models 
+
+Luis H. Hatashita, Suhas S. Jain 
+
+> aFlow Physics and Computational Science Lab, Center for Multiphase flow Research, Georgia Institute of Technology, 30332, GA, USA
+
+Abstract 
+
+In this work, a novel phase-field method is proposed for the six- and seven-equation non-equilibrium models for simulating compressible two-phase flows. Such formulations allow for monotonic mixture speed of sound, minimizing artificial wave delay during transmission across an interface. The proposed phase field formulation is constructed from the baseline seven-equation model, and interface-regularization terms are added in divergence form, while maintaining consistency between the partial differential equations (PDE) without introduc-ing spurious source terms. It analytically admits conservative phasic and mixture entropy transport equations, thus facilitating the construction of discrete conservative schemes. The six-equation formulation is subsequently obtained under instantaneous velocity equilibrium. To avoid eigenvector degeneracy of the system of PDEs, the volumetric interface regular-ization flux is modified to account for a finite amount of conjugate phase, which improves on how phasic density is captured implicitly. Stability of compressible two-phase flow rely on the preservation of the interface-equilibrium conditions (IEC), and the preservation of discrete kinetic energy and entropy (KEEP). A detailed analysis of IEC demonstrates addi-tional requirements on the consistency of flux splittings between the convective and interface-regularization terms for all quantities, as well as the effects on the phasic internal energy flux splittings. A KEEP-like discretization is proposed and evaluated over a suite of high-density ratio test cases, including interface advection, acoustic wave-induced bubble oscilla-tion, oblique acoustic wave reflection and transmission, and two-phase Taylor-Green vortex flow. Results demonstrate accuracy, stability and robustness for very long time integrations, a desired feature for simulation of turbulent flows and acoustics, since the framework does not rely on the addition of numerical dissipation. 
+
+Keywords: compressible two-phase flows, phase-field modeling, six-equation model, seven-equation model, kinetic energy and entropy preserving schemes 
+
+1. Introduction 
+
+Compressible two-phase flows are pervasive in both nature and industrial applications. For instance, bubble dynamics and collapse eventually rise as the governing phenomena in vascular injuries due to cavitation [1] and as the source of structural damage in propulsion systems and turbomachinery [2, 3]. Moreover, it is of interest for the optimization of com-bustion systems in scramjets [4], rotating detonation engines [5], liquid rocket propulsion [6], and hybrid/solid rockets [7]. In addition to the presence of the interface and considerable  
+
+> Preprint submitted to Journal of Computational Physics August 18, 2026 arXiv:2608.16750v1 [physics.flu-dyn] 17 Aug 2026
+
+compressibility effects in these flows, turbulence is expected to be observed for sufficiently high Reynolds numbers. Turbulence is characterized by chaotic fluctuations, which carry over to almost all quantities of interest, e.g. , scalars such as temperature. The primary challenge of compressible two-phase flows is the presence of discontinuities, 
+
+e.g. density jumps due to the interface, contact discontinuities, and shocks. Although sharp interface methods, such as level-set and ghost-fluid methods, exist, maintaining discrete con-servation and being able to dynamically handle significant interface topology changes are more difficult to handle if compared to the diffuse interface method (DIM) approach [8] (de-tails on interface-capturing approaches can be found in [9]). Furthermore, DIM is often pre-ferred given that it requires only a single set of equations to describe motion for both phases without explicit tracking either, providing significant scale up to large problem sizes [10]. In order to handle discontinuities, a standard approach for DIM is the use of upwind schemes coupled with Riemann solvers. The addition of numerical dissipation for stabilization further diffuses the initially “thick” interface, whereas they are inherently sharp [11, 12], therefore, controlling interface thickness in DIM is a desirable feature. Earlier formulations focused on the construction of models for the mixture; however, a unique equation of state for multiphase flows is not trivial since each phase obeys its own equation of state [13, 14, 15]. Hence, it is natural to adopt two-phase flow descriptions where the equations of state can be separate. One of the first seminal works using the two-phase formulation is the one from Baer and Nunziato [16], where the authors proposed a formulation for the detonation-to-deflagration transition in energetic materials. The model consists of the conservation equations for the phasic masses, momenta and energies appended by a volume fraction transport equation. The seven-equation model by Baer and Nunziato [16] admits all non-equilibrium effects for velocity, pressure, temperature and chemical potential and is thus the most complete one. It has been reduced under the assumptions of infinitely fast relaxation process by Kapila et al. [17] to the six- [15, 18, 19], five-equation [20, 21, 22, 23, 24, 25] models, reducing to single mixture momentum; and, single mixture momentum and energy equations, respectively. In-dependently, Allaire et al. [26] developed an alternative five-equation model [11, 27, 28, 29, 30] without a non-conservative term in the volume transport equation obtained through the asymptotic analysis. Though robust, the model struggles with creation and destruction of interfaces by coalescence and breakup. Temperature equilibrium yields in the four-equation model [31, 32, 33, 34, 12, 35], with the transport of the mixture mass rather than individual phasic contributions. Lastly, chemical equilibrium yields in the three-equation model [36], re-covering all mixture equations, namely a homogeneous equilibrium model. The suite of five-, four- and three-equation models allow for simpler extension of multiphysics effects, such as viscous, capillary [20], and phase change [22, 37]. Since mixture equations are used for the momentum and energy equations, there is no need to define how much the contributions by each phase are. Despite capturing the compressibility of both phases and producing accurate results [29] within an efficient computational cost, the original five-equation model formulation [17, 26] and further reduced models fail to accurately capture wave transmission across interfaces under extreme conditions ( e.g. high density and pressure ratios), leading to variations in volume fraction and loss of positivity [38, 15, 18, 19]. Hence, the models which enable non-equilibrium effects for velocity and pressure are more suitable to the aforementioned ap-plications. The six-equation model was shown to provide results comparable to the baseline 2seven-equation [18], and is computationally simpler for its a priori knowledge of the ordering of the hyperbolic operator eigenvalues [19]. Both six- and seven-equation models allow for distinct phasic pressures, eliminating the mixture closure which may not exist for any combi-nation of arbitrary equations of state [15]. Moreover, supporting distinct phasic pressure also permits the underlying models to sustain large pressure ratios. In the mixture zone across the interface, both models have a monotonic mixture speed of sound, this feature minimizes delays in wave transmission [19]. The velocity non-equilibrium effect is more subtle, the seven-equation model is the only one to allow for precise control of drag between the phases, which is of interest for modeling the dense-dilute transition [39, 40]. As a first baseline work, the more general formulations provide a foundational comparison to future reduced models. Interface sharpening/regularization techniques circumvent the numerical diffusion of the interface using standard numerical schemes. Shukla et al. [11] proposed a density and volume fraction correction in pseudo time to correct for the diffusion after time integration of a five-equation model [26]. Tiwari et al. [23] introduced regularization terms of a similar form to the operator proposed by [11] in the five-equation model of [17], which was further extended to a seven-equation model by Panchal et al. [39]. However, these proposed formulations were not in divergence form, which limits conservation properties. Flux limiting has also been proposed by Chiapolino et al. [41] to control interface thickness in a six-equation model [15]; however, their approach still requires detection of the interface. More recently, Jain et al. [29] consistently introduced interface regularization terms in all conservation equations in a baseline five-equation model of [26] using a conservative form of a second-order phase field model. The phase field formulation was further extended to a four-equation model in Jain et al. [12]. However, such phase field formulations have not been developed before for seven-and six-equation models. Adding a phase field model as an interface regularization flux helps maintaining the interface thickness for long time integrations [12]. However, one problem exists with all the current phase field models. Even if the volume fraction is initialized with a non-zero amount of other phase ( δ) everywhere, the phase field model will redistribute such that δ → 0. The practice of adding δ > 0 is standard for accurate computation of phasic density, and it is even required to avoid degeneracy of eigenvectors for the seven-equation model [18]. Phasic density is an implicit quantity in most of the aforementioned models, and it is of significant importance in the model by Jain et al. [29] since it dictates regularization of mass, momentum and energy. In their work, Jain et al. [29] introduced the approximation of ρl ≈ ρ0,l in the limit of δ → 0 imposed by the phase field model. Nevertheless, for accurate interface regularization and even pressure relaxation procedures [19] of six- and seven-equation models, a finite amount of volume fraction is required. Jain et al. [12] proposed a modification of the Allen-Cahn based regularization flux to maintain the finite non-zero bound on the volume fraction field, constructed on a four-equation model. Therefore, it would be also of interest to further extend such formulation to more general seven- and six-equation models, and to develop more consistent modifications to phase field model than previously proposed. The first stability test, models are evaluated under, is the requirement to satisfy the in-terface equilibrium conditions (IEC). Originally, Abgrall [31] proposed that a stable model should maintain uniform pressure and velocity fields if initialized as such. Given the initial assumption of uniform fields, IEC translates to conditions of how the volume fraction field has to be discretized and the form of certain non-conservative operators [13]. For formula-3tions with interface regularization or other additional terms ( e.g. , artificial viscosity), IEC further imposes restrictions on flux splittings for face reconstructions [42] and the form of such terms [23, 29, 43, 35]. Interface regularization and a high-order Riemann solver that sat-isfies the IEC can produce accurate results. Nevertheless, as the Reynolds number increases, introducing turbulence, the small scale fluctuations are likely to be dissipated. Second-order central schemes are low-dissipative and can sustain even the smallest of the fluctuations. For such schemes, discretely conserving kinetic energy and entropy (KEEP schemes) is an additional stability test for compressible flows [44, 45, 46, 42, 47]. Specifically for two-phase flows, Jain and Moin [42] developed consistency conditions between the fluxes to achieve discrete local and global kinetic energy preservation, therefore approximately preserving en-tropy. The authors were first to simulate compressible turbulent two-phase flows with the baseline five-equation model of [17], such as Taylor-Green vortex and homogeneous isotropic turbulence, at infinite Reynolds numbers demonstrating robustness. Since then, others have either extended such consistency conditions [48, 49] or constructed exact entropy preserving schemes [50] for the seven-equation model. Thus, the main objective of this work is to develop and demonstrate a long-time accurate, robust and stable phase-field/diffuse interface method formulation for compressible two-phase flows suitable for capturing non-equilibrium effects. To this end, a phase field method is proposed for seven- and six-equation models; a consistent modification is proposed for phase field models to maintain finite non-zero bounds; and a robust KEEP-like scheme is proposed that ensures long time accuracy and stability. The remainder of this paper is organized as follows: interface regularization terms in divergence form are first presented here for the six- and seven-equation models, enabling the construction of conservative schemes (such as the KEEP schemes) in Section 2, along with the finite bound phase field model (it is formally derived and its effects are demonstrated in Appendix A); analytical entropy conservation properties are demonstrated for the seven-equation model in Section 3; in addition to IEC requirements on the non-conservative terms, flux splittings and consistency conditions among the discretization of all equations are thor-oughly explored in Section 4; the numerical methods consisting of the hyperbolic integration and relaxation steps are presented in Section 5; a suite of test cases is presented to evaluate accuracy, robustness and stability for the problems of interest and to demonstrate long-term stability in Section 6; and finally, the conclusions are presented in Section 7. 
+
+2. Governing equations and phase-field formalism 
+
+We start with the fully-coupled two-phase flow equations, based on the formulation pre-sented in the work of Saurel and Abgrall [13], which can be considered as a simplified version of the one from Baer and Nunziato [16] (without considering solid-gas specific interactions). 4The system of equations is given by 
+
+∂ϕ 1
+
+∂t + uI,j 
+
+∂ϕ 1
+
+∂x j
+
+= μ(p1 − p2),∂∂t (ϕlρl) + ∂∂x j
+
+(ϕlρlul,j ) = 0 ,∂∂t (ϕlρlul,i ) + ∂∂x j
+
+(ϕlρlul,i ul,j + ϕlplδij ) = pI
+
+∂ϕ l
+
+∂x i
+
+± λ(u2,i − u1,i ),∂∂t (ϕlρ1et,l ) + ∂∂x j
+
+[ϕl(ρlet,l + pl)ul,j ]= pI uI,j 
+
+∂ϕ l
+
+∂x j
+
+∓ μp I (p1 − p2) ± λu I,j (u2,j − u1,j ),
+
+(1) where the phasic conservation equations for mass, momentum and total energy for the phases 1 and 2 are supplemented by the transport equation for the volume fraction ϕ1 of the phase 1. 
+
+ϕlρl, ϕlρlul and ϕlρlet,l are the phasic mass, momentum and total energy ( et,l = el + ul,i ul,i /2, where el is the phasic internal energy per unit mass). The l index is restricted to represent the phase, l = 1 , 2; i and j are Einstein indexes, which imply summation when repeated; and 
+
+δij is the Kronecker delta tensor. The phasic equations are obtained via the averaging procedure of Drew [51], which leads to the interface pressure pI force coupled with volume fraction gradient and the correspond-ing work term with the interface velocity uI . The non-equilibrium effects are incorporated through the relaxation terms, the coefficient μ for the phasic pressures pl and the coefficient 
+
+λ for the phasic velocities ul,i dictating the rate at which these processes occur. Finite-rate relaxation may be incorporated following [52], however in this study, both relaxation steps are taken to be instantaneous [13], i.e. both μ, λ tend to ∞. The Euler equations are obtained for the mixture by summing the phasic equations, or in the single-phase limit. The system is closed by defining the expression for the interface quantities pI and uI and the equation of state to be used. Simpler expression as pI = pg and uI = us, where the subscripts g and s respectively refer to gas and solid phases, have been initially proposed by Baer and Nunziato [16]. Saurel and Abgrall [13] suggest the approximation of the inter-face quantities as the corresponding mixture values. Saurel et al. [53] also propose closures function of the impedance of each phase. Herein, the interface quantities are defined as 
+
+pI = X
+
+> l
+
+ϕlpl,uI,i =
+
+P 
+
+> l
+
+ϕlρlul,i 
+
+P 
+
+> l
+
+ϕlρl
+
+.
+
+(2) In the context of phase change, Zein et al. [18] alert to the use of cubic, Van der Waals equations of state, which may produce negative squared speed of sounds, and suggest a mod-ified stiffened gas equation of state (SG-EoS). Although phase change is not considered here, the standard SG-EoS is sufficiently general [13, 53] and is therefore considered throughout this work. It is defined as 
+
+pl (ρl, e l) = ( γl − 1) ρlel − γlπl, (3) 5where γl and πl are phase specific constants. Interface sharpening terms are consistently added in the phasic conservation equations and are highlighted in the system of equations in Eq. (4), in addition to viscous terms. The full system of equations are given by 
+
+∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uI,j ) = ϕ1
+
+∂u I,j 
+
+∂x j
+
++ ∂a 1,j 
+
+∂x j
+
++ μ(p1 − p2),∂∂t (ϕlρl) + ∂∂x j
+
+(ϕlρlul,j ) = ∂R l,j 
+
+∂x j
+
+,∂∂t (ϕlρlul,i ) + ∂∂x j
+
+[ϕl(ρlul,i ul,j + plδij − τl,ij )] = ∂∂x j
+
+(Rl,j ul,i ) + pI
+
+∂ϕ l
+
+∂x i
+
+± λ(u2,i − u1,i ),∂∂t (ϕlρlet,l ) + ∂∂x j
+
+[ϕl(ρlet,l + pl)ul,j − ϕlτl,ij ul,i ]= ∂∂x j
+
+
+
+Rl,j 
+
+ul,i ul,i 
+
+2
+
+
+
++ ∂∂x j
+
+(ρlelal,j )+ pI uI,j 
+
+∂ϕ l
+
+∂x j
+
+∓ μp I (p1 − p2) ± λu I,i (u2,i − u1,i ),
+
+(4) where al,i is the volumetric interface-regularization flux, which satisfies the condition a2,i =
+
+−a1,i . The phasic mass regularization flux is defined by Rl,i = ρlal,i , the phasic density 
+
+ρl is required to be explicitly computed, and if no explicit treatment is provided, standard calculations, e.g. , ρl = ϕlρl/ϕ l, may yield inaccurate results in the limit of the pure other phase. A solution for this issue is further addressed in Section 2.1.1. The phasic momentum, kinetic energy and internal energy are regularized based on the volumetric al,i and the phasic mass Rl,i regularization fluxes. There are several descriptions of the volumetric interface-regularization flux, such as conservative diffuse interface (CDI) [54] and accurate conservative diffuse interface (ACDI) [55] models. However, as it will be further shown, the existing models asymptote to exact pure phases ( ϕl = 0) even if a small amount of the other phase is added ( ϕl = δ > 0) initially. Therefore, a finite-bound modification is proposed to the phase field models in Section 2.1.1. The viscous stresses are modeled as Newtonian fluids for both phases, where τl,ij = 2 μlSl,ij + βlθlδij with μl as the phasic dynamic viscosity, 
+
+Sl,ij = ( ∂u l,i /∂x j +∂u l,j /∂x i)/2 as the phasic strain rate tensor, βl as the phasic bulk viscosity, and θl = ∂u l,i /∂x i as the dilatation rate. The bulk viscosity is closed under the Stokes’ hypothesis as βl = −2μl/3. The novel extension of interface regularization for the non-equilibrium models is obtained following the approach of Jain et al. [29]. The interface regularization term al is introduced in the volume fraction transport, and the corresponding terms are added to the phasic mass, momentum, and energy, all of which are in divergence form; hence, allowing for discrete con-servation irrespective of the numerical scheme chosen. A systematic derivation is presented in the following subsections, alongside further proofs of entropy consistency and interface equilibrium conditions. 6The main difference between the newly proposed formulation and the one by Jain et al. [29] is that non-equilibrium effects are allowed here, which changes the extra interface terms added to each phasic equation. For instance, the additional pressure terms plal [see Eq. (27) in Section 2.4] no longer cancel for the mixture energy equation resulting in a modified regularization term in the total energy equation in Eq. (4). This seven-equation formulation has the additional advantage of admitting conservative phasic and mixture entropy transport equations (in the absence of relaxation steps), even in the presence of regularization terms [Section 3]. Mixture equations for the conservation equations for the proposed formulation also retain a conservative form. A six-equation formulation is also presented in the Section 2.5. 
+
+2.1. Volume fraction transport 
+
+There are several descriptions of the volumetric interface-regularization flux based on the phase-field formulations. Herein, the scope is limited to second-order conservative Allen-Cahn-based formulations, given their lower derivative order, as opposed to fourth-order derivative in Cahn-Hilliard-based models. For instance, the conservative diffuse-interface method (referred to as CDI) [54, 56, 29] and the more accurate model that is reformulated using the interface equilibrium profile analytically (the accurate conservative diffuse-interface method, ACDI [55]) are respectively given by 
+
+∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uj ) = ϕ1
+
+∂u j
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ∂ϕ 1
+
+∂x j
+
+− ϕ1(1 − ϕ1)nϕ
+
+> 1,j
+
+ò™ 
+
+,∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uj ) = ϕ1
+
+∂u j
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ∂ϕ 1
+
+∂x j
+
+− 14
+
+Å
+
+1 − tanh 2
+
+Åψ1
+
+2ϵ
+
+ãã 
+
+nψ
+
+> 1,j
+
+ò™ 
+
+,
+
+(5) where the interface regularization velocity, Γ, is set as the global maximum magnitude of the velocity field between the two phases Γ = max l(|ul,i |∞), the interface thickness, ϵ, is set as a constant times the grid spacing ϵ = c max ∆ xi, chosen according to stability analysis and cost of performing simulations ( c ≥ 1 for CDI, and c > 0.5 for ACDI). In ACDI, the interface distance-like function is defined as ψl = ϵ log(( ϕl + ε)/(1 − ϕl + ε)), where the small number 
+
+ε = 10 −100 . As discussed in Jain [55], the interface normal nl,i is often computed directly from the volume fraction gradient in CDI as nϕl,i = ∂ϕ l/∂x i/|∂ϕ l/∂x k|. Nevertheless, one may show that it is analytically equivalent to compute it based on the interface distance-like function ψ, which is smoother than the volume fraction field. Hence, Jain [55] proposed a more accurate normal computation, given by nψl,i = ∂ψ l/∂x i/|∂ψ l/∂x k|.
+
+2.1.1. Introducing finite non-zero bounds 
+
+It is a well-known issue that compressible two-phase diffuse interface formulations require division by ϕ, e.g. , in algebraic expressions for pressure relaxation [19] and phasic density calculation [29, 42]. Therefore, it is standard practice to add a small amount of the conjugate phase on the order of 10 −8 [13], which is not an issue in the absence of interface regularization terms. Nonetheless, standard phase field methods undesirably redistribute the small amount of the conjugate phase, initially introduced for the robustness of the numerical methods, and force the pure phases to take a value of ϕ = 0 or ϕ = 1. In this work, we formally derive (see Appendix A) the modifications to the phase field models in such a way that ϕ asymptotes to δ and 1 − δ. The final expression for the volume 7fraction transport equation, without the relaxation term, is 
+
+∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uI,j )= ϕ1
+
+∂u I,j 
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ(1 − 2δ)∂ϕ 1
+
+∂x j
+
+− (ϕ1 − δ)(1 − ϕ1 − δ)nϕ
+
+> 1,j
+
+ò™ 
+
+,
+
+= ϕ1
+
+∂u I,j 
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ(1 − 2δ)∂ϕ 1
+
+∂x j
+
+− (1 − 2δ)2
+
+4
+
+Å
+
+1 − tanh 2
+
+Åψ1
+
+2ϵ
+
+ãã 
+
+nψ
+
+> 1,j
+
+ò™ 
+
+.
+
+(6) 
+
+2.2. Phasic mass transport equation 
+
+The construction of the phasic mass transport equation is the same as the one proposed in Jain et al. [29] for the five-equation model, for which there are also two distinct phasic mass transport equations. For completeness, we report the major steps of the derivation and refer to Jain et al. [29] for additional details. Interface regularization terms are introduced in the conservation equation of each phasic mass such that in the limit of incompressible flow, i.e. , ρl → ρ0,l and ∂u I,j /∂x j = 0, the volume fraction transport equation [Eq. (6)] is recovered. Therefore, consider the transport equation for the mass of the phase l with interface regularization as 
+
+∂∂t (ϕlρl) + ∂∂x j
+
+(ϕlρlul,j ) = ∂∂x j
+
+(ρlal,j ) , (7) where al,j is any volumetric interface regularization term, nonetheless, we limit the scope to the one proposed in Section 2.1.1 since ρl is required to be explicitly computed. Given the assumptions on incompressible flow for both phases, the Eq. (7) can be rearranged as 
+
+ρ0,l 
+
+ï∂ϕ l
+
+∂t + ∂∂x j
+
+(ϕlul,j )
+
+ò
+
+= ρ0,l 
+
+∂∂x j
+
+(al,j ) , (8) recovering the Eq. (6) as 
+
+∂ϕ l
+
+∂t + ∂∂x j
+
+(ϕlul,j ) = ϕl
+
+∂u l,j 
+
+∂x j
+
++ ∂a l,j 
+
+∂x j
+
+. (9) The difference between the current approach and the one proposed by Jain et al. [29] is that, given the modified phase field model with finite non-zero bound, the computation of ρl is now accurate. Therefore, interface regularization may be computed directly based on ρl and not on a reference state ρ0,l as originally proposed, which ultimately should improve accuracy for applications where compressibility effects are more significant, e.g. , strong acoustics and shocks. Similarly, the mixture mass transport equation follows from the sum of Eq. (7) for each phase, yielding in 
+
+∂ρ ∂t + ∂∂x j
+
+(ρu j ) = ∂∂x j
+
+(R1,j + R2,j ) , (10) where the consistent mass regularization term Rl,j is accurately computed based on the phasic density ρl and the finite non-zero bound ACDI interface regularization as 
+
+Rl,j = ρlal,j = ρlΓ
+
+ß
+
+ϵ(1 − 2δ) ∂ϕ l
+
+∂x j
+
+− (1 − 2δ)2
+
+4
+
+ï
+
+1 − tanh 2
+
+Åψl
+
+2ϵ
+
+ãò 
+
+nψl,j 
+
+™
+
+. (11) 82.3. Phasic momentum transport equation 
+
+Given the distinct phasic momentum transport equations, the construction of the consis-tent momentum regularization term now requires that no spurious oscillations in the phasic kinetic energy are introduced, which is analogous to the approach proposed by Jain et al. [29]. However, the constraint is now posed at the phasic level rather than on the mixture. Consider the consistent phasic momentum equation in the inviscid limit, without the source and relaxation terms, as 
+
+∂∂t (ϕlρlul,i ) + ∂∂x j
+
+(ϕlρlul,i ul,j + ϕlplδij ) = ∂∂x j
+
+(ρlal,j ul,i ) . (12) Multiplying Eq. (12) by ul,i /2 and rearranging for the transport of ϕlρlkl, where kl = ul,i ul,i /2, yields in 
+
+∂∂t (ϕlρlkl) + ∂∂x j
+
+(ϕlρlklul,j ) + ul,i 
+
+∂∂x j
+
+(ϕlplδij )+ kl
+
+ï ∂∂t (ϕlρl) + ∂∂x j
+
+(ϕlρlul,j ) − ∂∂x j
+
+(ρlal,j )
+
+ò
+
+− ul,i 
+
+2
+
+ï ∂∂t (ϕlρlul,i ) + ∂∂x j
+
+(ϕlρlul,i ul,j + ϕlplδij ) − ∂∂x j
+
+(ρlal,j ul,i )
+
+ò
+
++ ul,i 
+
+∂∂x j
+
+(ϕlplδij )= ∂∂x j
+
+(ρlal,j kl).
+
+(13) Using the identities from Eqs. (7) and (12) in Eq. (13), one may simplify both terms in the square brackets, which yields in 
+
+∂∂t (ϕlρlkl) + ∂∂x j
+
+(ϕlρlklul,j ) + ul,i 
+
+∂∂x j
+
+(ϕlplδij ) = ∂∂x j
+
+(ρlal,j kl). (14) Therefore, it does not lead to the spurious generation of phasic kinetic energy. Further-more, this form allows for the construction of a numerical scheme that also satisfies IEC. This specific form of phasic momentum regularization due to interface preservation is es-sential particularly when coupled to low-dissipative numerical schemes, because otherwise, spurious generation of phasic kinetic energy would lead in nonphysical states and unstable simulations [29]. The momentum regularization in the seven-equation model [Eq. (15)] is be included in the hyperbolic integration step as a part of the operator splitting described in Section 5. The velocity relaxation step is performed separately. 
+
+∂∂t (ϕlρlul,i ) + ∂∂x j
+
+(ϕlρlul,i ul,j + ϕlplδij ) = ∂∂x j
+
+(ρlal,j ul,i ) + pI
+
+∂ϕ l
+
+∂x i
+
+± λ(u2,i − u1,i ). (15) Furthermore, the mixture momentum transport equation may be shown to be in conservative form by summing Eq. (15) for each phase, as 
+
+∂∂t (ρu i) + ∂∂x j
+
+[ρu iuj + ( ϕ1p1 + ϕ2p2)δij ] = ∂∂x j
+
+(R1,j u1,i + R2,j u2,i ) , (16) 9where both source and relaxation terms cancel out. 
+
+2.4. Phasic total energy transport equation 
+
+The original five-equation model with interface preservation proposed by Jain et al. [29] could only require approximate entropy conservation. After the addition of the interface regularization terms, the sum of the phasic internal energy regularization terms was imposed to be approximate or equal to zero whilst maintaining IEC. Lastly, the regularization of the total energy was obtained by adding the internal energy to the consistent kinetic energy terms. Given the distinct transport of phasic total energy in the seven-equation model, we now search for the consistent interface regularization of phasic internal energy that at least ap-proximately conserves entropy. Define the phasic material derivative as 
+
+Dl
+
+Dt (·) = ∂∂t (·) + ul,j 
+
+∂∂x j
+
+(·) , l = 1 , 2. (17) The phasic internal energy transport equation is obtained by subtracting the phasic kinetic energy equation from the phasic total energy equation. From the system [Eq. (1)], the construction of the baseline phasic kinetic energy equation follows from multiplying the phasic momentum equation by ul,i /2 and using the identities for the conservation of phasic mass and momentum. It has the form of 
+
+∂∂t (ϕlρlkl) + ∂∂x j
+
+(ϕlρlklul,j ) + ul,i 
+
+∂∂x j
+
+(ϕlplδij ) = ul,j pI
+
+∂ϕ l
+
+∂x j
+
+± λu l,j (u2,j − u1,j ), (18) where the corresponding baseline phasic internal energy equation is as follows 
+
+∂∂t (ϕlρlel) + ∂∂x j
+
+(ϕlρlelul,j ) + ϕlpl
+
+ul,j 
+
+∂x j
+
+= pI (uI,j − ul,j )∂ϕ l
+
+∂x i
+
+± λ(uI,i − ul,i )( u2,i − u1,i ) ∓ μp I (p1 − p2).
+
+(19) In the material derivative form [Eq. (17)], it is 
+
+Dl
+
+Dt (ϕlρlel) + ϕlρlhl
+
+ul,j 
+
+∂x j
+
+= pI (uI,j − ul,j )∂ϕ l
+
+∂x i
+
+± λ(uI,i − ul,i )( u2,i − u1,i ) ∓ μp I (p1 − p2),
+
+(20) where the phasic enthalpy is defined as hl = el + pl/ρ l.The goal is to obtain the consistent internal energy regularization term such that entropy is conserved in the absence of the source and relaxation terms; namely, solve for Xl in 
+
+Dl
+
+Dt (ϕlρlel) + ϕlρlhl
+
+ul,j 
+
+∂x j
+
++ Xl = 0 . (21) Let the Gibbs’ relation for the phasic internal energy be d ( ρlel) = ρld ( el) + eld ( ρl) = ρlTld ( sl) + hld ( ρl) . (22) 10 Distributing the material derivative in Eq. (21) for ϕl and ρlel and using Eq. (22), it results in 
+
+ϕl
+
+Å
+
+ρlTl
+
+Dlsl
+
+Dt + hl
+
+Dlρl
+
+Dt 
+
+ã
+
++ ρlel
+
+Dlϕl
+
+Dt + ϕlρlhl
+
+ul,j 
+
+∂x j
+
++ Xl = 0 , (23) where the transport of the material derivative for ρl follows from Eq. (7), as 
+
+ϕl
+
+Dlρl
+
+Dt = −ϕlρl
+
+∂u l,j 
+
+∂x j
+
++ al,j 
+
+∂ρ l
+
+∂x j
+
+− ρl
+
+Å∂ϕ l
+
+∂t + ul,j 
+
+∂ϕ l
+
+∂x j
+
+− ∂a l,j 
+
+∂x j
+
+ã
+
+. (24) One may take the term in parentheses to be equal to 0 by the transport of volume fraction equation in the absence of the source and relaxation terms, which yields in 
+
+ϕlρlTl
+
+Dlsl
+
+Dt + hl
+
+∂∂x j
+
+(ρlal,j ) − pl
+
+∂a l,j 
+
+∂x j
+
++ Xl = 0 . (25) Therefore, in order to satisfy phasic entropy conservation during internal energy regulariza-tion, the consistent phasic internal energy equation would have the form of 
+
+∂∂t (ϕlρlel) + ∂∂x j
+
+(ϕlρlelul,j ) + ϕlpl
+
+∂u l,j 
+
+∂x j
+
+= hl
+
+∂∂x j
+
+(ρlal,j ) − pl
+
+∂a l,j 
+
+∂x j
+
+. (26) Nevertheless, one may show that Eq. (26) does not satisfy IEC. Instead, we propose the IEC-compatible form, while maintaining entropy conservation through a conservative flux redistribution mechanism [Eq. (38)], as 
+
+∂∂t (ϕlρlel) + ∂∂x j
+
+(ϕlρlelul,j ) + ϕlpl
+
+∂u l,j 
+
+∂x j
+
+= ∂∂x j
+
+(ρlhlal,j ) − ∂∂x j
+
+(plal,j ) = ∂∂x j
+
+(ρlelal,j ) , (27) where both forms differ by 
+
+ï ∂∂x j
+
+(ρlhlal,j ) − ∂∂x j
+
+(plal,j )
+
+ò
+
+−
+
+ï
+
+hl
+
+∂∂x j
+
+(ρlal,j ) − pl
+
+∂a l,j 
+
+∂x j
+
+ò
+
+= al,j 
+
+Å
+
+ρl
+
+∂h l
+
+∂x j
+
+− ∂p l
+
+∂x j
+
+ã
+
+. (28) This residual can be rearranged with the Gibbs relation, which further allows for conservative phasic [Eq. (38)] and mixture entropy [Eq. (39)] transport equations. Given the distinct phasic pressures, the proposed formulations differs from the original work based on the five-equation model of Jain et al. [29], and uses the interface regularization of internal energy per unit mass rather than enthalpy per unit mass. The consistent regularization of the phasic total energy equation follows from the addition of Eq. (27) and Eq. (14) as 
+
+∂∂t (ϕlρlet,l ) + ∂∂x j
+
+[ϕl(ρlet,l + pl)ul,j ] = ∂∂x j
+
+(ρlelal,j ) + ∂∂x j
+
+(ρlklal,j ) , (29) where the regularizations of internal and kinetic energy are kept separately to construct a numerical scheme that discretely conserves kinetic energy and preserves entropy, which is described in Section 5.1. 11 The final equation for the consistent transport of phasic total energy with all terms is given by ∂∂t (ϕlρlet,l ) + ∂∂x j
+
+[ϕl(ρlet,l + pl)ul,j ]= ∂∂x j
+
+(ρlelal,j ) + ∂∂x j
+
+(ρlklal,j )+ pI uI,j 
+
+∂ϕ l
+
+∂x j
+
+± λu I,j (u2,j − u1,j ) ∓ μp I (p1 − p2).
+
+(30) The mixture total energy transport equation can be further shown to be in conservative form after adding the contribution of each phases as 
+
+∂∂t (ρe t) + ∂∂x j
+
+(ρe tuj ) + ∂∂x j
+
+(ϕ1p1u1,j + ϕ2p2u2,j )=
+
+> 2
+
+X
+
+> l=1
+
+ï ∂∂x j
+
+
+
+Rl,j 
+
+ul,i ul,i 
+
+2
+
+
+
++ ∂∂x j
+
+(ρlelal,j )
+
+ò
+
+.
+
+(31) 
+
+2.5. Phase field model for the six-equation formulation 
+
+The derivation of the six-equation model follows the regularization procedure developed for the seven-equation model in Sections 2.1 to 2.4, together with the instantaneous velocity-relaxation limit. The main differences are the single mixture-momentum equation and the equilibrium of the velocity field, which requires momentum interface regularization in the form that does not contribute to any spurious oscillation in mixture kinetic energy. Following asymptotic analysis, a mass fraction Yl based splitting of the kinetic energy to each of the phases in the phasic total energy equation is used in the model. The phase field method for the six-equation model is given by 
+
+∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uj ) = ϕ1
+
+∂u j
+
+∂x j
+
++ ∂a 1,j 
+
+∂x j
+
++ μ(p1 − p2)
+
+∂∂t (ϕlρl) + ∂∂x j
+
+(ϕlρluj ) = ∂R l,j 
+
+∂x j
+
+∂∂t (ρu i) + ∂∂x j
+
+(ρu iuj ) + ∂∂x i
+
+(ϕ1p1 + ϕ2p2) = ∂∂x j
+
+(fj ui)
+
+∂∂t (ϕlρlet,l ) + ∂∂x j
+
+[ϕl(ρlet,l + pl)uj ] ± Λ = Yl
+
+∂∂x j
+
+
+
+fj
+
+uiui
+
+2
+
+
+
++ ∂∂x j
+
+(ρlelal,j )
+
+∓ μp I (p1 − p2),
+
+(32) where the mixture-mass regularization flux is fj = P 
+
+> l
+
+Rl,j , the mixture-velocity-pressure gra-dient term is Λ = −uj
+
+ï
+
+Y2
+
+∂∂x j
+
+(ϕ1p1) − Y1
+
+∂∂x j
+
+(ϕ2p2)
+
+ò
+
+, and the mass fraction is Yl = ϕlρl/ρ .12 3. Entropy conservation properties 
+
+In addition to satisfying IEC, the proposed interface regularization for the seven-equation formulation allows for the phasic internal energy to admit conservative phasic and mixture entropy transport equations. One may rearrange Eq. (25) with the proposed internal energy regularization term as 
+
+ϕlρlTl
+
+Dlsl
+
+Dt = ∂∂x j
+
+(ρlelai,j ) −
+
+ï
+
+hl
+
+∂∂x j
+
+(ρlal,j ) − pl
+
+∂a l,j 
+
+∂x j
+
+ò
+
+= ρlai,j 
+
+Å ∂e j
+
+∂x j
+
+− pl
+
+ρ2
+
+> l
+
+∂ρ l
+
+∂x j
+
+ã
+
+, (33) where the last term in parentheses is in the form of the Gibbs’ relation, i.e. ,
+
+Tld ( sl) = d ( el) − pl
+
+ρ2
+
+> l
+
+d ( ρl) . (34) Moreover, given that the total derivative operator in Eq. (34) is a geometrical representation of the change in entropy by the net flux in internal energy and the ratio of pressure to density, one may take the identity to also represent a gradient operator, which yields in 
+
+Tl
+
+∂s l
+
+∂x j
+
+= ∂e l
+
+∂x j
+
+− pl
+
+ρ2
+
+> l
+
+∂ρ l
+
+∂x j
+
+. (35) Substituting the identity in Eq. (33), yields in 
+
+ϕlρlTl
+
+Dlsl
+
+Dt = ρlai,j Tl
+
+∂s l
+
+∂x j
+
+. (36) Recasting Eq. (36) in conservative form, leads to 
+
+Tl
+
+ï ∂∂t (ϕlρlsl) + ∂∂x j
+
+(ϕlρlslul,j )
+
+ò
+
+= ϕlρlTl
+
+Dlsl
+
+Dt + Tlsl
+
+Dl
+
+Dt (ϕlρl) + ϕlρlsl
+
+∂u l,j 
+
+∂x j
+
+. (37) Using Eq. (7) in Eq. (37) yields in 
+
+∂∂t (ϕlρlsl) + ∂∂x j
+
+(ϕlρlslul,j ) = ∂∂x j
+
+(ρlslal,j ) . (38) Furthermore, interface regularization can be shown to be entropy conservative also at the mixture level, as 
+
+∂∂t (ρs ) + ∂∂x j
+
+(ϕ1ρ1s1u1,j + ϕ2ρ2s2u2,j ) = ∂∂x j
+
+(ρ1s1a1,j + ρ2s2a2,j ) , (39) where ρs = ϕ1ρ1s1 + ϕ2ρ2s2. In the absence of relaxation processes, entropy evolution is governed exclusively by conservative entropy fluxes associated with interface regularization. Considering all non-equilibrium effects, Eq. (38) would have the form of 
+
+Tl
+
+"
+
+∂∂t (ϕlρlsl) + ∂∂x j
+
+(ϕlρlslul,j )
+
+#
+
+= Tl
+
+∂∂x j
+
+(ρlslal,j )+ ( pI − pl)( uI,j − ul,j ) ∂ϕ l
+
+∂x j
+
+∓ μ(pI − pl)( p1 − p2)
+
+± λ(uI,j − ul,j )( u2,j − u1,j ),
+
+(40) 13 and the corresponding mixture equation is 
+
+∂∂t (ρs ) + ∂∂x j
+
+(ϕ1ρ1s1u1,j + ϕ2ρ2s2u2,j )= ∂∂x j
+
+(ρ1s1a1,j + ρ2s2a2,j )+
+
+> 2
+
+X
+
+> l=1
+
+(
+
+1
+
+Tl
+
+"
+
+(pI − pl)( uI,j − ul,j ) ∂ϕ l
+
+∂x j
+
+∓ μ(pI − pl)( p1 − p2)
+
+± λ(uI,j − ul,j )( u2,j − u1,j )
+
+#) 
+
+.
+
+(41) 
+
+4. Interface equilibrium condition 
+
+The interface equilibrium conditions provide discretization consistency conditions in order to preserve uniform velocity and pressure fields, thus inhibiting the generation of spurious oscillations. It can be formally stated as the following postulate. 
+
+Postulate 1. If u|ni = u0 and p|ni = p0 across the interface, where i is the cell index and n is the time integration index, then a model is said to satisfy the interface equilibrium conditions (IEC) if u|n+1  
+
+> i
+
+= u0 and p|n+1  
+
+> i
+
+= p0.
+
+One may show that the proposed model in Eq. (4) allows for the construction of a con-sistent discretization that satisfies IEC. One then searches for the necessary conditions such that IEC holds, i.e. , the required discretization for the non-conservative terms related to 
+
+∂ϕ l/∂x i and the discrete form of the volume fraction transport equation. 
+
+4.1. Uniform velocity and consistency conditions 
+
+Let n = 0, and assume an initial uniform velocity unl,i = u0 and pressure pnl,i = p0 state for both phases on a uniform mesh for any cell i. For simplicity, limit the equations to one dimension. Discretize the phasic mass equation based on a first order Euler explicit time integration and an arbitrary spatial discretization for the fluxes as 
+
+ϕlρl|n+1  
+
+> i
+
+= ϕlρl|ni
+
+− ∆t
+
+∆x
+
+Åfl ϕlρlul 
+
+> ni+1 /2
+
+− fl ϕlρlul
+
+> ni−1/2
+
+ã
+
++ ∆t
+
+∆x
+
+Ä gρlal|ni+1 /2 − gρlal|ni−1/2
+
+ä , (42) where the “ ef |i±1/2” operator denotes the flux splitting of the quantity f at the cell face 
+
+i ± 1/2. Given the uniform velocity assumption, it reduces to 
+
+ϕlρl|n+1  
+
+> i
+
+= ϕlρl|ni
+
+− ∆t
+
+∆x
+
+Å
+
+gϕlρl 
+
+> ni+1 /2
+
+− gϕlρl
+
+> ni−1/2
+
+ã
+
+u0 + ∆t
+
+∆x
+
+Ä gρlal|ni+1 /2 − gρlal|ni−1/2
+
+ä . (43) 14 Discretizing the phasic momentum equation yields in 
+
+ϕlρlul|n+1  
+
+> i
+
+= ϕlρlul|ni
+
+− ∆t
+
+∆x
+
+Å‡ϕlρlu2 
+
+> l
+> ni+1 /2
+
+− ‡ϕlρlu2
+
+> l
+> ni−1/2
+
+ã
+
+− ∆t
+
+∆x
+
+Å
+
+gϕlpl 
+
+> ni+1 /2
+
+− gϕlpl
+
+> ni−1/2
+
+ã
+
++ ∆t
+
+∆x
+
+Ä fl ρlalul 
+
+> ni+1 /2
+
+− fl ρlalul
+
+> ni−1/2
+
+ä + ∆ tp I ∆,
+
+(44) where ∆ is the discrete form of ∂ϕ l/∂x . Given the initial uniform velocity and pressure assumptions, and Eq. (43), Eq. (44) simplifies to 
+
+ϕlρlul|n+1  
+
+> i
+
+= u0
+
+"
+
+ϕlρl|n+1  
+
+> i
+
++ ∆t
+
+∆x
+
+Å
+
+gϕlρlϕρ ni+1 /2 − gϕlρlϕρ ni−1/2
+
+ã
+
+u0
+
+− ∆t
+
+∆x
+
+Å
+
+gρlalϕρ ni+1 /2 − gρlalϕρ ni−1/2
+
+ã #
+
+− ∆t
+
+∆x
+
+Å
+
+gϕlρlϕρu ni+1 /2 − gϕlρlϕρu ni−1/2
+
+ã
+
+u20
+
+− ∆t
+
+∆x
+
+Å‹ϕl 
+
+> ni+1 /2
+
+− ‹ϕl
+
+> ni−1/2
+
+ã
+
+p0
+
++ ∆t
+
+∆x
+
+Å
+
+gρlalϕρu ni+1 /2 − gρlalϕρu ni−1/2
+
+ã
+
+u0 + ∆ tp 0∆.
+
+(45) Splitting the next iteration phasic momentum ϕlρlul|n+1  
+
+> i
+
+as ϕlρl|n+1  
+
+> i
+
+ul|n+1  
+
+> i
+
+yields in 
+
+ϕlρl|n+1  
+
+> i
+
+ul|n+1  
+
+> i
+
+= ϕlρl|n+1  
+
+> i
+
+u0 − ∆t
+
+Ö ‹ϕl 
+
+> ni+1 /2
+
+− ‹ϕl
+
+> ni−1/2
+
+∆x − ∆
+
+è
+
+p0
+
++ ∆t
+
+∆x
+
+ïÅ 
+
+gϕlρlϕρ ni+1 /2 − gϕlρlϕρ ni−1/2
+
+ã
+
+−
+
+Å
+
+gϕlρlϕρu ni+1 /2 − gϕlρlϕρu ni−1/2
+
+ãò 
+
+u20
+
+− ∆t
+
+∆x
+
+ïÅ 
+
+gρlalϕρ ni+1 /2 − gρlalϕρ ni−1/2
+
+ã
+
+−
+
+Å
+
+gρlalϕρu ni+1 /2 − gρlalϕρu ni−1/2
+
+ãò 
+
+u0.
+
+(46) Therefore, the conditions for the preservation of uniform velocity, i.e. , ul|n+1  
+
+> i
+
+= u0 = ul|ni ,are ∆ = 
+
+‹ϕl 
+
+> ni+1 /2
+
+− ‹ϕl
+
+> ni−1/2
+
+∆x , (47) and the face reconstruction of the phasic mass in the convective and the interface regulariza-tion fluxes are consistent, given by 
+
+gϕlρlϕρ ni±1/2 = gϕlρlϕρu ni±1/2 ,
+
+gρlalϕρ ni±1/2 = gρlalϕρu ni±1/2 ,
+
+(48) 15 for the next time step n + 1 = 1 for any cell i. By induction, uniform velocity is maintained for all future time steps and everywhere. 
+
+4.2. Uniform pressure and consistency conditions 
+
+Furthermore, one may verify uniformity of pressure after time integration. Discretizing the phasic total energy equation yields in 
+
+ϕlρlet,l |n+1  
+
+> i
+
+= ϕlρlet,l |ni
+
+− ∆t
+
+∆x
+
+Å‚  ϕlρlet,l ul 
+
+> ni+1 /2
+
+− ‚  ϕlρlet,l ul
+
+> ni−1/2
+
+ã
+
+− ∆t
+
+∆x
+
+Åfl ϕlplul 
+
+> ni+1 /2
+
+− fl ϕlplul
+
+> ni−1/2
+
+ã
+
++ ∆t
+
+∆x
+
+Ä fl ρlelal 
+
+> ni+1 /2
+
+− fl ρlelal
+
+> ni−1/2
+
+ä
+
++ ∆t
+
+∆x
+
+Åfl ρlklal 
+
+> ni+1 /2
+
+− fl ρlklal
+
+> ni−1/2
+
+ã
+
++ ∆ tp I uI ∆.
+
+(49) Given the uniform velocity and pressure assumptions and the condition for the preservation of the uniform velocity in Eq. (49), the fl ϕlplul and the ∆ terms cancel out. Splitting phasic total energy into internal and kinetic energy contributions gives 
+
+ϕlρlel|n+1  
+
+> i
+
++ ϕlρl|n+1 
+
+> i
+
+u20
+
+2 = ϕlρlel|ni + ϕlρl|ni
+
+u20
+
+2
+
+− ∆t
+
+∆x
+
+ïÅ fl ϕlρlel 
+
+> ni+1 /2
+
+− fl ϕlρlel
+
+> ni−1/2
+
+ã
+
++
+
+Å
+
+gϕlρlϕρk ni+1 /2 − gϕlρlϕρk ni−1/2
+
+ã u20
+
+2
+
+ò
+
+u0
+
++ ∆t
+
+∆x
+
+Ä fl ρlelal 
+
+> n
+> +1 /2
+
+− fl ρlelal
+
+> ni−1/2
+
+ä
+
++ ∆t
+
+∆x
+
+Å
+
+gρlalϕρk n 
+
+> +1 /2
+
+− gρlalϕρk ni−1/2
+
+ã u20
+
+2 .
+
+(50) Another consistency condition follows from Eq. (50) upon substitution of Eq. (42). The face reconstruction of the phasic mass in the convective and the interface regularization fluxes between the phasic mass and phasic momentum discrete transport equations need to satisfy 
+
+gϕlρlϕρ ni±1/2 = gϕlρlϕρk ni±1/2 ,
+
+gρlalϕρ ni±1/2 = gρlalϕρk ni±1/2 .
+
+(51) If both conditions are satisfied, then the discrete phasic internal energy equation is 
+
+ϕlρlel|n+1  
+
+> i
+
+= ϕlρlel|ni
+
+− ∆t
+
+∆x
+
+Åfl ϕlρlel 
+
+> ni+1 /2
+
+− fl ϕlρlel
+
+> ni−1/2
+
+ã
+
+u0
+
++ ∆t
+
+∆x
+
+Ä fl ρlelal 
+
+> ni+1 /2
+
+− fl ρlelal
+
+> ni−1/2
+
+ä .
+
+(52) 16 Following Saurel and Abgrall [13], nearly all equations of state (EoS) can be written under the Mie-Gruneisen form of 
+
+pl = [ γl(ρl) − 1] ρlel − γl(ρl)πl(ρl). (53) In the phasic internal energy form, the equation of state can be written as 
+
+ρlel = α(ρl)pl − η(ρl), or ,el = α(ρl) pl
+
+ρl
+
+− η(ρl) 1
+
+ρl
+
+, (54) where α(ρl) = 1 /(γ(ρl) − 1) and η(ρl) = γ(ρl)π(ρl)/(γ(ρl) − 1). 
+
+4.2.1. Phasic internal energy convective and volumetric interface regularization flux splittings 
+
+The flux splittings of the phasic internal energy convection and volumetric interface reg-ularization are crucial in obtaining the conditions to preserve uniform pressure. Therefore, we present the all possibilities for flux splitting. The phasic internal convective flux can be split into 
+
+·  ϕlρlelul i±1/2 = ϕlρlelul(i±1/2) , (55) 
+
+·  ϕlρlelul i±1/2 = ϕlρlel(i±1/2) ul(i±1/2) , (56) 
+
+·  ϕlρlelul i±1/2 = ϕlρl(i±1/2) el(i±1/2) ul(i±1/2) , (57) 
+
+·  ϕlρlelul i±1/2 = ϕl(i±1/2) ρl(i±1/2) el(i±1/2) ul(i±1/2) , (58) where “ ( ·)(i±1/2) 
+
+” operator denotes the face reconstruction scheme at the cell face i ± 1/2, 
+
+e.g. , for second-order central f i±1/2 = ( f |i + f |i±1)/2. The splittings are respectively referred to as the divergence form [Eq. (55)], the quadratic form [Eq. (56)], the cubic form [Eq. (57)], and the quartic form [Eq. (58)]. Analogously, the volumetric phasic internal energy interface regularization flux can be split into 
+
+fl ρlelal i±1/2 = ρlelal(i±1/2) , (59) 
+
+fl ρlelal i±1/2 = ρlel(i±1/2) al(i±1/2) , (60) 
+
+fl ρlelal i±1/2 = ρl(i±1/2) el(i±1/2) al(i±1/2) , (61) where the splittings are respectively referred to as the divergence form [Eq. (59)], the quadratic form [Eq. (60)], and the cubic form [Eq. (61)]. Upon substitution of equation of state [Eq. (54)] in the discrete transport equation for the phasic internal energy, it follows that, although there exist conditions for the preservation of uniform pressure for all combinations, only the quadratic and quartic phasic internal energy convective flux splittings paired with either quadratic or cubic volumetric phasic internal energy interface regularization flux splittings provide a condition consistent with the transport of the volume fraction equation. The divergence form for flux splittings is not evaluated here due to its increased aliasing errors [57, 42]. 17 Proposition 1. Both quadratic and cubic splittings of the volumetric phasic internal energy interface regularization flux are at least approximately consistent with the discretization of the volume fraction equation. 
+
+Proposition 2. Both quadratic and quartic splittings of the phasic internal energy convec-tive flux are at least approximately consistent with the discretization of the volume fraction equation. Proof. Consider first both quadratic splittings for the convective and interface regularization fluxes. Splitting the cell-wise phasic internal energy ϕlρlel|ni as ϕl|ni ρlel|ni and substitut-ing Eq. (54) in Eq. (52), given the uniform pressure assumption, yields in 
+
+ϕl|n+1  
+
+> i
+
+(αlpl + ηl)|n+1  
+
+> i
+
+= ϕl|ni (αlp0 + ηl)|ni
+
+− ∆t
+
+∆x
+
+ïÅ 
+
+αl ϕl 
+
+> ni+1 /2
+
+p0 + ηl ϕl
+
+> ni+1 /2
+
+ã
+
+−
+
+Å
+
+αl ϕl 
+
+> ni−1/2
+
+p0 + ηl ϕl
+
+> ni−1/2
+
+ãò 
+
+u0
+
++ ∆t
+
+∆x
+
+î(αlp0 + ηl) al|ni+1 /2 − (αlp0 + ηl) al|ni+1 /2
+
+ó .
+
+(62) In particular, for ideal and stiffened-gas EoS, the parameters αl and ηl are constants. Fur-thermore, Saurel and Abgrall [13] argue that ρl does not vary as significantly as ϕlρl does across the interface, which suggests that αl and ηl can be locally approximated as constants. Rearranging Eq. (62) leads to 
+
+ϕl|n+1  
+
+> i
+
+(αlpl + ηl)|n+1  
+
+> i
+
+=
+
+"
+
+ϕl|ni (αlp0 + ηl)|ni − ∆t
+
+∆x
+
+Å
+
+ϕl 
+
+> ni+1 /2
+
+− ϕl
+
+> ni−1/2
+
+ã
+
+u0
+
++ ∆t
+
+∆x
+
+Äal|ni+1 /2 − al|ni−1/2
+
+ä #
+
+(αp 0 + η).
+
+(63) Hence, if the volume fraction transport equation is discretized as 
+
+ϕl|n+1  
+
+> i
+
+= ϕl|ni − ∆t
+
+∆x
+
+Å
+
+ϕl 
+
+> ni+1 /2
+
+− ϕl
+
+> ni−1/2
+
+ã
+
+u0 + ∆t
+
+∆x
+
+Äal|ni+1 /2 − al|ni−1/2
+
+ä , (64) then, Eq. (63) simplifies to 
+
+αl pl|n+1  
+
+> i
+
++ ηl = αlp0 + ηl =⇒ pl|n1 
+
+> i
+
+= p0 = pl|ni , (65) which provides the consistent discretization for the volume fraction transport equation. With respect to Proposition 1, if one takes the cubic splitting for the volumetric pha-sic internal energy interface regularization flux, then the phasic internal energy transport 18 equation would be in the form of 
+
+ϕl|n+1  
+
+> i
+
+(αlpl + ηl)|n+1  
+
+> i
+
+= ϕl|ni (αlp0 + ηl)|ni
+
+− ∆t
+
+∆x
+
+ïÅ 
+
+αl ϕl 
+
+> ni+1 /2
+
+p0 + ηl ϕl
+
+> ni+1 /2
+
+ã
+
+−
+
+Å
+
+αl ϕl 
+
+> ni−1/2
+
+p0 + ηl ϕl
+
+> ni−1/2
+
+ãò 
+
+u0
+
++ ∆t
+
+∆x
+
+"
+
+ρl|ni+1 /2
+
+Ç
+
+αl
+
+p0
+
+ρl|ni+1 /2
+
++ ηl
+
+1
+
+ρl|ni+1 /2
+
+å
+
+al|ni+1 /2
+
+− ρl|ni−1/2
+
+Ç
+
+αl
+
+p0
+
+ρl|ni−1/2
+
++ ηl
+
+1
+
+ρl|ni−1/2
+
+å
+
+al|ni−1/2
+
+#
+
++ O(∆ ρ2 
+
+> l
+
+),
+
+(66) where the last term in square brackets is the same as the one in Eq. (62). The O(∆ ρ2 
+
+> l
+
+) error term 1 is negligible given the small variation in ρl assumption, which is also used in taking αl
+
+and ηl as local constants [13]. Eq. (66) simplifies to Eq. (63), therefore requiring the same condition for the preservation of uniform pressure. With respect to Proposition 2, if one takes the quartic splitting for the phasic internal energy convection flux, then the phasic internal energy transport equation would be in the form of 
+
+ϕl|n+1  
+
+> i
+
+(αlpl + ηl)|n+1  
+
+> i
+
+= ϕl|ni (αlp0 + ηl)|ni
+
+− ∆t
+
+∆x
+
+"
+
+ϕl 
+
+> ni+1 /2
+
+ρl|ni+1 /2
+
+Ç
+
+αl
+
+p0
+
+ρl|ni+1 /2
+
++ ηl
+
+1
+
+ρl|ni+1 /2
+
+å
+
+− ϕl 
+
+> ni−1/2
+
+ρl|ni−1/2
+
+Ç
+
+αl
+
+p0
+
+ρl|ni−1/2
+
++ ηl
+
+1
+
+ρl|ni−1/2
+
+å #
+
+u0 + O(∆ ρ2 
+
+> l
+
+)+ ∆t
+
+∆x
+
+î(αlp0 + ηl) al|ni+1 /2 − (αlp0 + ηl) al|ni+1 /2
+
+ó .
+
+(67) where the first term in square brackets is the same as the one in Eq. (62), which again would simplify to Eq. (63), therefore requiring the same condition for the preservation of uniform pressure. Nevertheless, if one takes the cubic splitting for the phasic internal energy convective flux, then the first term in the right-hand-side of Eq. (62) would be distinct. The phasic internal energy transport equation would be in the form of 
+
+ϕl|n+1  
+
+> i
+
+(αlpl + ηl)|n+1  
+
+> i
+
+= ϕl|ni (αlp0 + ηl)|ni
+
+− ∆t
+
+∆x
+
+"
+
+ϕlρl
+
+> ni+1 /2
+
+Ç
+
+αl
+
+p0
+
+ρl|ni+1 /2
+
++ ηl
+
+1
+
+ρl|ni+1 /2
+
+å
+
+− ϕlρl
+
+> ni−1/2
+
+Ç
+
+αl
+
+p0
+
+ρl|ni−1/2
+
++ ηl
+
+1
+
+ρl|ni−1/2
+
+å #
+
+u0 + O(∆ ρ2 
+
+> l
+
+)+ ∆t
+
+∆x
+
+î(αlp0 + ηl) al|ni+1 /2 − (αlp0 + ηl) al|ni+1 /2
+
+ó ,
+
+(68) 
+
+> 1
+
+From approximating the arithmetic average of the inverse of phasic density at the cell face by the inverse of the arithmetic average for a second-order central scheme. 
+
+19 which would then require the volume fraction transport equation, for the preservation of uniform pressure, to be in the form of 
+
+ϕl|n+1  
+
+> i
+
+= ϕl|ni − ∆t
+
+∆x
+
+Ö
+
+ϕlρl
+
+> ni+1 /2
+
+ρl|ni+1 /2
+
+−
+
+ϕlρl
+
+> ni−1/2
+
+ρl|ni−1/2
+
+è
+
+u0 + ∆t
+
+∆x
+
+Äal|ni+1 /2 − al|ni−1/2
+
+ä . (69) The same condition would follow if a cubic split were used for the interface regularization flux. In summary, the proposed model allows for the construction of a discretization that satisfies the IEC. Moreover, we demonstrated several combinations of splittings that satisfy these conditions. However, as it will be further discussed, in order to satisfy other consistency conditions for implicit discrete kinetic energy and entropy preservation, the quartic and cubic splittings will be chosen for the phasic internal energy convective and interface regularization fluxes, respectively. 
+
+5. Numerical implementation 
+
+In this work, we perform operator splitting of the hyperbolic integration and the relax-ation steps in the form of ⃗ Q|n+1  
+
+> i
+
+= LpLuLh(⃗Q|ni ). The hyperbolic integration is detailed in Section 5.1, and the velocity and pressure relaxations in Sections 5.2 and 5.3, respectively. In summary, the system of equations is presented in standard vector form. The phasic con-servation equations in Eq. (4) in one dimension may be arranged as 
+
+∂⃗Q ∂t + ∂⃗E ∂x − ∂⃗E v
+
+∂x − ∂⃗E s
+
+∂x =⃗ H ∂ϕ 1
+
+∂x +⃗ Ψλ +⃗ Ψμ, (70) 20 where the vectors are defined by ⃗Q =
+
+
+
+ϕ1ρ1
+
+ϕ1ρ1u1
+
+ϕ1ρ1et, 1
+
+ϕ2ρ2
+
+ϕ2ρ2u2
+
+ϕ2ρ2et, 2
+
+
+
+,⃗ E =
+
+
+
+ϕ1ρ1u1
+
+ϕ1ρ1u21 + ϕ1p1
+
+ϕ1 (ρ1et, 1 + p1) u1
+
+ϕ2ρ2u2
+
+ϕ2ρ2u22 + ϕ2p2
+
+ϕ2 (ρ2et, 2 + p2) u2
+
+
+
+,⃗ Ev =
+
+
+
+0
+
+ϕ1τ1
+
+ϕ1τ1u1
+
+0
+
+ϕ2τ2
+
+ϕ2τ2u2
+
+
+
+,⃗ E s =
+
+
+
+ρ1a1
+
+ρ1u1a1
+
+ρ1
+
+u21
+
+2 a1 + ρ1e1a1
+
+ρ2a2
+
+ρ2u2a2
+
+ρ2
+
+u22
+
+2 a2 + ρ2e2a2
+
+
+
+,⃗ H =
+
+
+
+0
+
+pI
+
+pI uI
+
+0
+
+−pI
+
+−pI uI
+
+
+
+,⃗ Ψλ =
+
+
+
+0
+
+λ (u2 − u1)
+
+uI λ (u2 − u1)0
+
+−λ (u2 − u1)
+
+−uI λ (u2 − u1)
+
+
+
+,⃗ Ψμ =
+
+
+
+00
+
+−pI μ (p1 − p2)00
+
+pI μ (p1 − p2)
+
+
+
+.
+
+(71) The Eq. (70) is appended by the volume fraction transport of the phase 1, which also contains one step to be solved first in the hyperbolic integration and second in the pressure relaxation steps. 
+
+5.1. Hyperbolic integration with a KEEP scheme 
+
+A finite volume approach is adopted to integrate Eq. (70), which yields in ⃗Q n+1  
+
+> i
+
+=⃗ Q ni − ∆t
+
+∆x
+
+Å⃗E ni+1 /2 −⃗ E ni−1/2
+
+ã
+
++ ∆t
+
+∆x
+
+Å⃗Ev 
+
+> ni+1 /2
+
+−⃗ Ev
+
+> ni−1/2
+
+ã
+
++ ∆t
+
+∆x
+
+Å⃗Es 
+
+> ni+1 /2
+
+−⃗ Es
+
+> ni−1/2
+
+ã
+
++ ∆ t⃗ H ni ∆,
+
+(72) where the state variables for the ith cell of the n+1 time step are updated based on the current time step, n, convective, ⃗ E|ni+1 /2, viscous, ⃗ Ev|ni+1 /2, and interface regularization, ⃗ Es|ni+1 /2,fluxes constructed at the cell faces i ± 1/2. In Eq. (72), the ∆ term multiplying the interface force and work term is the discrete form of ∂ϕ 1/∂x . The fluxes are constructed based on a second-order central scheme, for which the splitting is performed as an analogous extension of the kinetic-energy and entropy-preserving (KEEP) scheme of Jain and Moin [42]. The 21 convective, viscous and sharpening fluxes for phase 1 are given by ⃗E1 
+
+> ni±1/2
+
+=
+
+
+
+ϕ1(i±1/2) ρ1(i±1/2) u1(i±1/2) 
+
+ϕ1(i±1/2) ρ1(i±1/2) u1(i±1/2) u1(i±1/2) + ϕ1p1(i±1/2) 
+
+ϕ1(i±1/2) ρ1(i±1/2) e1(i±1/2) u1(i±1/2) + ϕ1(i±1/2) ρ1(i±1/2) u1|i u1|i±1
+
+2 u1(i±1/2) 
+
++ u1|i ϕ1p1|i±1 + u1|i±1 ϕ1p1|i
+
+2
+
+
+
+,⃗ E1,v 
+
+> ni±1/2
+
+=
+
+
+
+0
+
+ϕ1(i±1/2) τ1(i±1/2) 
+
+ϕ1(i±1/2) τ1(i±1/2) u1(i±1/2) 
+
+ ,⃗ E1,s 
+
+> ni±1/2
+
+=
+
+
+
+ρ1(i±1/2) a1(i±1/2) 
+
+ρ1(i±1/2) u1(i±1/2) a1(i±1/2) 
+
+ρ1(i±1/2) e1(i±1/2) a1(i±1/2) + ρ1(i±1/2) u1|i u1|i±1
+
+2 a1(i±1/2) 
+
+ .
+
+(73) The fluxes for phase 2 are analogous to the ones defined in Eq. (73) with phasic index instead set to l = 2. The volume fraction transport in Eq. (1) is not in conservative form. Stable discretization follows from the IEC as proposed by Saurel and Abgrall [13]. The preservation of uniform velocity requires ∆ = 
+
+
+
+ϕ1(i+1 /2) − ϕ1(i−1/2) 
+
+/∆x in Eq. (72). And the preservation of uniform pressure, considering the quartic splitting for the convection of phasic internal energy, requires the transport equation for the volume fraction field to be in the form of 
+
+ϕ1|n+1  
+
+> i
+
+= ϕ1|ni − ∆t
+
+∆x
+
+îunI,i 
+
+Äϕ1(i+1 /2) − ϕ1(i−1/2) äó + ∆t
+
+∆x
+
+îÄ a1(i+1 /2) − a1(i−1/2) äó . (74) Time integration is performed using a fourth-order Runge-Kutta scheme for increased stability bounds, where ⃗ Q|n+1 /2 
+
+> i
+
+are constructed based on the corresponding sub timestep fluxes and source terms. 
+
+5.2. Velocity relaxation 
+
+After the hyperbolic integration step, the velocity relaxation is constructed and has the general form of 
+
+∂⃗Q ∂t =⃗ Ψλ, (75) where both the volume fraction of phase 1 and each phasic mass are conserved. The approach of Saurel and Abgrall [13] is adopted herein; the reader is referred to their work for the com-plete derivation. One may rearrange the phasic momentum equation with the conservation of phasic mass to obtain the phasic velocity transport equations in the form of 
+
+∂u 1
+
+∂t = λ (u2 − u1)
+
+ϕ1ρ1
+
+,∂u 2
+
+∂t = −λ (u2 − u1)
+
+ϕ2ρ2
+
+.
+
+(76) 22 The steady state solution assuming λ > 0 is 
+
+uhu = uhu 1 = uhu 2 = (ϕ1ρ1u1)h + ( ϕ2ρ2u2)h
+
+(ϕ1ρ1)h + ( ϕ2ρ2)h , (77) where the superscripts ‘h’ and ‘hu’ denote the values after hyperbolic integration and hy-perbolic integration and velocity relaxation, respectively. One may then update the phasic momentum by multiplying the phasic mass ( ϕlρl)hu = ( ϕlρl)h (conserved) with uhu . The phasic total energies must be updated accordingly given the energy transfer in the form of drag between the phases during the velocity relaxation process. The phasic internal energy transport equations are obtained by replacing the conservation of phasic mass and the phasic velocity transport equations [Eq. (76)]. If uI is assumed to vary linearly during the velocity relaxation step, then the internal phasic energies per unit mass are updated by 
+
+ehu 1 = eh1 + 12
+
+ uhu 1 − uh1
+
+   uh 
+
+> I
+
+− uh1
+
+ ,ehu 2 = eh2 + 12
+
+ uhu 2 − uh2
+
+   uh 
+
+> I
+
+− uh2
+
+ .
+
+(78) The phasic total energy is updated by multiplying the conserved phasic mass ( ϕlρl)hu by 
+
+ehu  
+
+> l
+
++ 12
+
+ uhu 
+
+> l
+
+2.
+
+5.3. Pressure relaxation 
+
+The general form of the pressure relaxation after the hyperbolic integration and velocity relaxation is ∂ϕ 1
+
+∂t = μ(p1 − p2),∂⃗Q ∂t =⃗ Ψμ,
+
+(79) where both the phasic mass and momentum are conserved in the pressure relaxation step. One may replace μ(p1 − p2) = ∂ϕ 1/∂t in the phasic total energy equations through ⃗ Ψμ and obtain transport equations of the phasic internal energies per unit mass in the form of 
+
+∂e 1
+
+∂t = − pI
+
+ϕ1ρ1
+
+∂ϕ 1
+
+∂t ,∂e 2
+
+∂t = pI
+
+ϕ2ρ2
+
+∂ϕ 1
+
+∂t .
+
+(80) An approximate integration of Eq. (80), considering that pI varies linearly with ϕ1 [19] or approximating pI = 12
+
+Äphup  
+
+> I
+
++ phu 
+
+> I
+
+ä [13, 15, 18], where the superscript ‘hup’ denotes the stage after hyperbolic integration, velocity and pressure relaxations, is given by 
+
+ehup 1 = ehu 1 − pI
+
+(ϕ1ρ1)hu 
+
+Äϕhup 1 − ϕhu 1
+
+ä = ehu 1 − 1(ϕ1ρ1)hu 
+
+phup  
+
+> I
+
++ phu 
+
+> I
+
+2
+
+Äϕhup 1 − ϕhu 1
+
+ä ,ehup 2 = ehu 2 + pI
+
+(ϕ2ρ2)hu 
+
+Äϕhup 1 − ϕhu 1
+
+ä = ehu 2 + 1(ϕ2ρ2)hu 
+
+phup  
+
+> I
+
++ phu 
+
+> I
+
+2
+
+Äϕhup 1 − ϕhu 1
+
+ä ,
+
+(81) 23 which is a system of 2 equations and 2 unknowns, given that phup  
+
+> I
+
+= phup 1 = phup 2 . For arbitrary equations of state, the system of equations in Eq. (81) must be solved iteratively, by replacing the el in terms of ρl and pl and solving for ϕhup 1 such that phup 1 = phup 2 [13]. A more robust approach was proposed that analytically enforces phup  
+
+> I
+
+= phup 1 = phup 2 [58, 19, 59], and is specific to the SG-EoS. It follows from using the equation of state to rearrange Eq. (81), as a function of only phup  
+
+> I
+
+and ϕhup 1 , to obtain an algebraic relation for phup  
+
+> I
+
+in the form of 
+
+a Äphup 
+
+> I
+
+ä2
+
++ b Äphup 
+
+> I
+
+ä + c = 0 , (82) where the constants are given by 
+
+a = 1 + ϕhu 1 γ2 + ϕhu 2 γ1,b = c1ϕhu 2 + c2ϕhu 1 − (1 + γ2) ϕhu 1 phu 1 − (1 + γ1) ϕhu 2 phu 2 ,c = −  c2ϕhu 1 phu 1 + c1ϕhu 2 phu 2
+
+ ,c1 = 2 γ1π1 + ( γ1 − 1) phu  
+
+> I
+
+,c2 = 2 γ2π2 + ( γ2 − 1) phu  
+
+> I
+
+.
+
+(83) The Eq. (82) has two analytical solutions, and only the physical positive one is retained. Rearranging Eq. (81) yields in 
+
+ϕhup 1 = ϕhu 1
+
+(γ1 − 1) phup  
+
+> I
+
++ 2 phu 1 + c1
+
+(γ1 + 1) phup  
+
+> I
+
++ c1
+
+. (84) And lastly, ehup  
+
+> l
+
+is updated using Eq. (81) and the phasic total energy by multiplying the conserved mass ( ϕlρl)h = ( ϕlρl)hu with the relaxed internal energy ehup  
+
+> l
+
+plus the conserved phasic kinetic energy per unit mass 12
+
+ uhu 
+
+> l
+
+2 = 12
+
+Äuhup 
+
+> l
+
+ä2
+
+.
+
+6. Results 
+
+The following test cases are proposed to evaluate accuracy, stability and robustness of the proposed method under challenging and realistic conditions for moderately compressible two-phase flows. High-density ratio advection is evaluated in Section 6.1, acoustic problems in Section 6.2, and turbulence in Section 6.3. All interfaces are initialized based on the finite-bound equilibrium profile [Eq. (A.2)], where the interface thickness is set to ϵ = 0 .6∆ x; the interface regularization velocity to Γ = max l(|ul,i |∞); and the amount of the conjugate phase to δ = 10 −8, unless stated otherwise. Phasic masses are initialized, considering initial uniform phasic density, with 
+
+ϕlρl = ϕlρ0,l . Phasic velocities and phasic pressure are problem dependent. The former close phasic momentum and the latter close phasic internal energies [Eq. (3)], and so does for pha-sic total energies. Herein, all initial phasic velocities and phasic pressures are assumed to be in equilibrium. Standard ambient ( pl = patm = 10 5 Pa) stiffened gas equation of state param-eters are used for the advection and acoustic cases, all presented in Table 1, non-dimensional values are used for the compressible two-phase Taylor-Green vortex case, presented therein. 24 Air Water Kerosene 
+
+γl [−] 1.4 4.4 4.4 
+
+πl [Pa] 0 6 × 10 8 3.266 × 10 8
+
+> Table 1: Dimensional stiffened gas equation of state parameters.
+
+6.1. Interface advection tests 
+
+The accuracy, stability and robustness of high-density ratio interface dynamics are eval-uated by evolving a water drop in ambient air with uniform velocity and pressure. The preservation of uniform primitive (velocity and pressure) conditions is evidence of the IEC characteristics [Postulate 1] of the scheme [13]. High density ratio is achieved by setting the air density to 1 and the water density to 1000, viscosity for both phases is set to 0. Moderate compressibility is achieved by setting the phasic velocities to ul = 100 m/s and the phasic pressures to pl = 10 5 Pa, which approximately yields a M a air ≈ 0.25. The one-dimensional computational grid spans [0 , 1] m over 200 cells, and the water drop is initialized at 0 .5 with a radius R = 0 .25. Both boundaries are periodic for all quantities. The final time is at t = 2 s, such that the drop advects 200 times over the domain (flow through times, τFT ), to demonstrate long-time integration stability. The time step is set to a constant ∆ t = 1 .25 × 10 −6 s, which yields an acoustic CFL approximately equal to 0 .5. This setup is similar to the one proposed by [60]; nevertheless, the simulation is integrated to several τFT here, whereas it was only advected for 1 τFT in Wong et al. [60]. Fig. 1 depicts the conserved quantities compared to initial profiles after 200 τFT . Excellent agreement is observed even in log-scale, which demonstrates the accuracy of the phase field model in preserving the interface thickness and finite bounds imposed for numerical stability. For instance, in the volume fraction profile [Fig. 1 (a)], it is clear that the amount of conjugate phase is well captured, i.e. , in this case ϕ1 = δ = 10 −8 in the almost pure phase 2 regime. Profiles for individual phasic masses [Fig. 1 (b)] and total energies [Fig. 1 (c)] are also properly captured. Only a small deviation is observed toward the direction of advection; nonetheless, the deviation does not grow after a couple of τFT and the profile in Fig. 1 is maintained. In order to further quantify the accuracy and stability of the proposed formulation and discretization, Fig. 2 demonstrates relative errors compared to initial values of phasic pres-sure, phasic velocity and phasic densities. Characterization of relative errors of pressure and velocity is a measure of the accuracy with respect to the IEC. The test case imposes uniform phasic velocities and phasic pressures, which are expected to be preserved throughout the simulation, indicating a stable simulation. Indeed, Fig. 2 (a,b) highlight that the proposed method is capable of maintaining uniform phasic pressure and velocities with a normalized relative error up to an order of 10 −10 for phase 1, similar results are observed for phase 2. Interestingly, there is no clear distinction of limitations in capturing accurate phasic pressure and velocities between the limits of almost pure and conjugate phases [Fig. 2 (a,b)], demon-strating that the method uniformly preserves pressure and velocity. Nevertheless, for phasic densities [Fig. 2 (c,d)], this distinction is observed. In spite of the greater error at the limit of conjugate phase, the errors remain bounded, where ϕ → δ. Phasic density is challenging to capture accurately, given that it is an implicit quantity ( ρl = ϕlρl/ϕ l). Furthermore, if the phasic density becomes negative or grows unbounded, stability is lost as it determines the rate of phasic mass interface regularization. Fig. 2 (c,d) depict the accuracy at which 25 0.0 0.5 1.0
+
+x/L [-] 10 −7
+
+10 −5
+
+10 −3
+
+10 −1 
+
+> φ1 [-] (a) Volume fraction, ϕ1
+
+0.0 0.5 1.0
+
+x/L [-] 10 −4
+
+10 −2
+
+10 0
+
+10 2
+
+> φ1ρ1 [kg /m3]
+
+10 −7
+
+10 −5
+
+10 −3
+
+10 −1  
+
+> φ2ρ2 [kg /m3](b) Phasic mass, ϕlρl
+
+0.0 0.5 1.0
+
+x/L [-] 10 2
+
+10 4
+
+10 6
+
+10 8
+
+> φ1ρ1et, 1 [J /m3]
+
+10 −1
+
+10 1
+
+10 3
+
+10 5 
+
+> φ2ρ2et, 2 [J /m3]
+> (c) Phasic total energy, ϕlρlet,l
+
+Figure 1: High-density ratio interface advection. Initial profile is depicted by solid black lines ( ), and the current simulation after advection by red ( , phase 1) and blue ( , phase 2) squares. Profiles after advection in log-scale of (a) volume fraction, (b) phase mass, and (c) phasic total energy, respectively. 
+
+26 0.00 0.25 0.50 0.75 1.00                     
+
+> x/L [-]
+> −101relative error in  p [−] ×10 −10 (a) Pressure equilibrium 0.00 0.25 0.50 0.75 1.00
+> x/L [-]
+> −101relative error in  u [−] ×10 −10 (b) Velocity equilibrium 0.00 0.25 0.50 0.75 1.00
+> x/L [-]
+> −101relative error in  ρ1 [−] ×10 −9
+> (c) Error of density of phase 1, ρ10.00 0.25 0.50 0.75 1.00
+> x/L [-]
+> −101relative error in  ρ2 [−] ×10 −5(d) Error of density of phase 2, ρ2
+
+Figure 2: Interface equilibrium conditions of high-density ratio advection in terms relative error of (a) uniform pressure, and (b) uniform velocity. Relative errors of density of (c) phase 1, and (d) phase 2. Red ( ) and blue ( ) squares denote values for phases 1 and 2, respectively. 
+
+the formulation is able to capture each phasic density. In the limit of almost pure phase, both phasic densities are accurately captured. However, in the limit of conjugate phase, more noticeable errors are observed, up to 10 −9 for phase 1 [Fig. 2 (c)] and up to 10 −5 for phase 2 [Fig. 2] (d). The increased relative error for phase 2 is due to ρ2 < ρ 1, which allows phase 2 to deform more easily compared to phase 1. The specific error profile of phase is a representation of the small deviations observed in Fig. 1. It is noteworthy that although a small deviation is observed, tied to the deformation of lighter phase, the formulation is able to keep the deformation limited, thus bounding phasic density, pivotal for long-time integra-tion stability. Other approaches that explicitly track phasic density [61] have been proposed to a baseline six-equation model [15], which can improve phasic density error bounds; never-theless, the method demands addition transport equation for all phasic densities increasing computation cost. In addition to the verified IEC, robust and stable simulations of compressible two-phase flows require preservation of kinetic energy and entropy. For this test case and the compress-ible two-phase Taylor-Green vortex case in Section 6.3, phasic and mixture kinetic energy and entropy are computed throughout the simulations. Total phasic kinetic energy is defined 27 as 
+
+Kl =
+
+Z
+
+> Ω
+
+ϕlρlul,i ul,i dV =
+
+Z
+
+> Ω
+
+ϕlρlkldV, (85) where the mixture kinetic energy follows from the sum of the contributions from each phase 
+
+K = P 
+
+> l
+
+Kl. Total phase entropy is defined as 
+
+Sl =
+
+Z
+
+> Ω
+
+ϕlρlsldV, (86) and analogously, the mixture entropy follows from the sum of the contributions from each phase S = P 
+
+> l
+
+Sl. The phasic entropy per unit mass sl for the SG-EoS [Eq. (3)] is defined as 
+
+sl = cv,l log 
+
+Åpl + πl
+
+ργl
+
+> l
+
+ã
+
++ so 
+
+> l
+
+, (87) where both the heat capacity at constant volume, cv,l , and the reference state value for entropy, so 
+
+> l
+
+, remain to be defined. Realistic values for cv,l and so 
+
+> l
+
+demand careful treatment, further details on computing these quantities is described in [62]. For simplicity, we take 
+
+so 
+
+> l
+
+= 0, which also does not contribute to phasic and mixture entropy change in a periodic domain where phasic mass is conserved, except for normalization. With this assumption, the normalized change in total phasic entropy becomes independent of cv,l . The normalized change in total mixture entropy, on the other hand, still depends on cv,l given that each phase has its own value. Based on the phasic temperature, cv,l for a SG-EoS is obtained by 
+
+cv,l = pl + πl
+
+Tlρl(γ − 1) . (88) The phasic temperatures do not need to match in the proposed model [Eq. (4)], we estimate 
+
+cv,l by assuming Tl = 300 K for simplicity, which yields in cv, 1 = 588 .3 and cv, 2 = 833 .3. Fig. 3 depicts conservation properties at the mixture level with respect to total kinetic energy and change in total entropy. The proposed scheme [Eq. (73)] is evaluated, and according to Fig. 3, both total mixture kinetic energy and the change in total mixture entropy (∆( S) = S|n −S|0)are well preserved, up to an error of order 10 −10 for the former and 10 −12 for the latter. Furthermore, Fig. 4 demonstrates preservation properties at the phasic level, specially for the lighter phase, entropy changes are expected to be larger due to greater density fluctua-tions. Nevertheless, when weighed by mass, the larger changes in total phasic entropy are compensated at the mixture level. Similar to total mixture kinetic energy, the total phasic kinetic energy is also preserved up to an error of order 10 −10 [Fig. 4 (a,b)]. The change in the total phasic entropy by unit mass is bounded by an error of order 10 −14 [Fig. 4 (c,d)] for both phases, almost close to machine double precision, this is likely due to the approximate KEEP nature of the scheme. Qualitatively, the same test case is demonstrated in three dimensions. The domain spans [0 , 1] ×[0 , 1] ×[0 , 1] and is discretized with 64 3 cells, the water drop is initialized at (0 .5, 0.5, 0.5) with a radius R = 0 .25. All boundaries are periodic. The final time is t = 0 .05 s, such that the drop is evolved for 5 τFT . The time step is the same as the 1D case, which reduces the CFL to 0 .13. 28 0 100 200 
+
+t/τ [−]
+
+−101
+
+> K/K 0 [−]
+
+×10 −10 + 1 (a) Mixture kinetic energy, K0 100 200 
+
+t/τ [−]
+
+−1.0
+
+−0.50.00.51.0∆( S)/|S0| [−]
+
+×10 −12 (b) Change in mixture entropy, ∆( S)
+
+Figure 3: Mixture conservation properties of high-density ratio advection. Constant value depicted by solid black lines ( ), and the instantaneous values of the current simulation by red ( ) squares. Evolution of normalized (a) total mixture kinetic energy K = P 
+
+> l
+
+Kl, (b) change in mixture entropy ∆( S). 0 100 200 
+
+t/τ [−]
+
+−101
+
+> K1/K 0,1 [−]
+
+×10 −10 + 1  
+
+> (a) Kinetic energy of phase 1, ϕ1ρ1k1
+
+0 100 200 
+
+t/τ [−]
+
+−101
+
+> K2/K 0,2 [−]
+
+×10 −10 + 1 (b) Kinetic energy of phase 2, ϕ2ρ2k20 100 200 
+
+t/τ [−]
+
+−50∆( ˜S1)/| ˜S0,1| [−]
+
+×10 −14  
+
+> (c) Change in entropy per unit mass of phase 1, ϕ1s1
+
+0 50 100 150 200 
+
+t/τ [−]0.02.55.07.5∆( ˜S2)/| ˜S0,2| [−]
+
+×10 −14 (d) Change in entropy per unit mass of phase 2, ϕ2s2
+
+Figure 4: Phasic conservation properties of high-density ratio advection. Constant value depicted by solid black lines ( ), and the instantaneous values of the current simulation by red ( , phase 1) and blue ( , phase 2) squares. Evolution of normalized total phasic kinetic energy Kl = R ϕlρlkldV of (a) phase 1, and (b) phase 2. Evolution of normalized change in total phasic entropy per unit mass ˜Sl = R ϕlsldV of (c) phase 1, and (d) phase 2. 
+
+29 1.25 2.5 3.75 5Time, t/τ FT [−] 
+
+> Figure 5: Three-dimensional high-density ratio interface advection. Evolution of interface isocontour ( ϕ1=0.5) over several flow-through times ( τFT ).
+
+Air Water Kerosene 
+
+ρl [kg /m3] 1.225 997 820 
+
+μl [N /m2] 1.81 × 10 −5 8.9 × 10 −4 1.64 × 10 −3
+
+> Table 2: Material properties for acoustic test cases.
+
+Fig. 5 depicts the evolution of the isocontour ( ϕ1 = 0 .5) of the volume fraction field over 5 τFT . They simulation remains stable and bounded. The phase field method is able to retain the initial spherical shape of the interface, whilst maintaining conserved quantities bounded. Only a small deviation leads to a deformation of the spherical shape after a finite time, however, the deformation is not expected to increase once this “new equilibrium” state is achieved. 
+
+6.2. Acoustic tests 
+
+Accurate propagation of acoustic waves require the underlying model to capture com-pressibility effects of both phases. The following two test cases were first proposed by Jain et al. [29] and are repeated here to evaluate the performance of the non-equilibrium model. The material properties for all phases are presented in Table 2. Temporally and spatially evolving boundary conditions are required for both cases, in order to control the timing of the pressure pulses for both, and radial focusing for the pressure-driven bubble oscillation case. 
+
+6.2.1. Pressure-driven bubble oscillation 
+
+The domain spans [ −5, 5] × [−5, 5] μm and is discretized with 25 2, 50 2, and 100 2 cells, evaluating the limit of coarse grid. An air bubble is initialized at the center (0 , 0) with a radius 
+
+R = 2 μm, surrounded by water, and the surface tension coefficient is set to σ = 0. The fluid properties follow from Table 2 and the quiescent ambient conditions are set to ul,i = 0 m/s and pl = 10 5 Pa. Similar to the setup of Jain et al. [29], the interface velocity regularization scale is set to Γ = 10 max l(|ul,i |∞). Temporally- and spatially-evolving boundary conditions are set for the phasic pressures to mimic a radially inward wave in the form of 
+
+pl(( x, y, z ), t ) = 10 5 1 + 0 .1 sin(10 ωc˜t) , (89) 30 where the phase shift is defined as ˜ t = t − [r(x, y, z ) − rmin ]/c , with the local radial location of the wall as r, the minimum radius as rmin = 5 μm, and c as a reference wave speed. Although a mixture of both phases is defined everywhere, at the boundaries, the wave speed required for phase shifting is set as cwater = 1627 .38 m/s. The remaining quantities have zero-gradient type boundary conditions. The final time is 6 .25 × 10 −7 s such that t/ (2 π/ω c) ≈ 1, where 
+
+ωc = 10208967 .75 s −1 is the characteristic resonance frequency of the bubble. The time window of interest is limited to the regime dominated by transient effects, and not to the long-time response. The time steps are set to ∆ t = 5 , 2.5, and 1 .25 × 10 −11 s, respectively, such that the acoustic CFL is approximately equal to 0 .2 for the water phase. The Rayleigh-Plesset equation for finite-size domains [29] is 
+
+pB(t) − pliquid ,S (t)
+
+ρliquid 
+
+= log 
+
+Å SR
+
+ã hÄ ˙Rä2
+
++ R ¨R
+
+i
+
++
+
+ÅR2 − S2
+
+2S2
+
+ã Ä ˙Rä2
+
++ 2νliquid ˙RR + σρliquid R , (90) where pB is the uniform pressure inside the bubble, and pliquid ,S is the liquid pressure at a finite distance from the center of the bubble at r = S. The reference fluid properties are the liquid density ρliquid , the liquid kinematic viscosity νliquid , and the surface tension coefficient 
+
+σ. Considering an isentropic compressible/expansion for the gas phase, the pressure variation can be measured based on the change in volume as 
+
+pB(t)
+
+pB(0) =
+
+ïVB(0) 
+
+VB(t)
+
+òγB in 2D 
+
+−−−→
+
+ïAB,2D (0) 
+
+AB,2D (t)
+
+òγB
+
+=
+
+ïRB,2D (0) 
+
+RB,2D (t)
+
+ò2γB
+
+, (91) which closes the ODE for R and therefore for any derived quantity such as the perimeter, the area, and the volume of the bubble. Therefore, the analytical solution of the temporal evolution of the bubble’s radius ( RB = R for conciseness) for the proposed setup follows from 10 5
+
+ρliquid 
+
+ïR(0) 
+
+R(t)
+
+ò2γB
+
+− 10 5 [1 + 0 .1 sin(10 ωct)] 
+
+ρliquid 
+
+= log 
+
+rmin 
+
+R
+
+ h Ä ˙Rä2
+
++ R ¨R
+
+i
+
++
+
+ÅR2 − r2min 
+
+2r2min 
+
+ã Ä ˙Rä2
+
++ 2νliquid ˙RR .
+
+(92) Fig. 6 demonstrates the evolution of 2D area (equivalent to volume in 3D) of the bubble due to pressure fluctuations imposed by the boundary condition. A significant improve-ment with respect to the work of Jain et al. [29] is observed. In their work [29], a partial-equilibrium formulation is used, namely the five-equation model with a non-KEEP scheme. Given both improvements proposed in the current model [Eq. (4)] and the current discretiza-tion [Eq. (73)], even with much coarser grids, the numerics converge better to the analytical solution. Furthermore, with the proposed formulation, a resolution of roughly 20 grid points over the diameter of the bubble ( R/ ∆ = 10) is sufficient to capture the physics of the problem well, consistent with other works [63, 64, 65, 66]. 
+
+6.2.2. Oblique wave incidence at high-impedance two-phase interface 
+
+The domain spans [0 , 10] ×[0 , 10] μm where the water-kerosene interface is aligned with the north-west/south-east diagonal, discretized with 1000 2 cells. The setup is consistent with the 31 0.00 0.25 0.50 0.75 1.00        
+
+> t/τ c[−]0.995 1.000 1.005
+> A/A 0 [−] R/ ∆ = 5
+> R/ ∆ = 10
+> R/ ∆ = 20 Analytical
+> R/ ∆ = 20 – Jain et al. (2020) Figure 6: Pressure-driven bubble oscillation. Normalize bubble area evolution ( A/A 0) over a span of one resonance period ( τc). Colored dashed lines ( ) represent results from current simulation for 3 different grid resolution. Black squares ( ) represent literature results [29] using a five-equation model and analogous grid resolution. Solid black line ( ) represent analytical solution of finite-domain Rayleigh-Plesset equation.
+
+one proposed by Jain et al. [29], further imposing a finite bound on ϕ, where ϕ1 is initialized based on the equilibrium profile 1 − 0.5 {1 + (1 − 2δ) tanh [(10 −5 − x − y)/(2 ϵ)] }, such that phase 1 (kerosene) is in the upper triangle and phase 2 (water) in the lower triangle. The fluid properties follow from Table 2, and the quiescent ambient conditions are set to ul,i = 0 m/s and pl = 10 5 Pa. An improvement to [29] with respect to interface thickness is tested given that here ϵ = 0 .6∆ x. A leftward-leaning wave is imposed via the time varying phasic pressure boundary condition on the east face following 10 5 [1 − 0.5 sin( ωker t)] for t < 755 .297 ps, where ωker = 2 πc ker /λ and λ = 2 μm. All other quantities support zero-gradient boundary conditions. Given the orientation of the interface and pressure pulse, the incident acoustic wave forms a θi = 45 ◦ angle with respect to the interface normal. The final time is t = 6 ps to allow for the pressure pulse to traverse roughly half of the domain. The time step is ∆t = 5 ps such that the acoustic CFL are approximately 0.65 for kerosene and 0.8 for water. For the proposed combination of fluids, where cker = 1324 and cwater = 1627 .4, the angle of the transmitted wave, θt, follows from the Snell’s law of refraction, which is defined as sin( θi)
+
+ci
+
+= sin( θt)
+
+ct
+
+. (93) Therefore, the expected angle of the transmitted wave is θt = 60 .36 ◦. Given that the incident angle is greater than the critical angle, there is no total internal reflection. The angle of reflection for an oblique wave is equal to the angle of incidence; thus, θr is expected to be equal to 45 ◦.Fig. 7 depicts the mixture pressure contours after the incident wave has traversed roughly half of the domain. The red lines and arrows represent qualitatively the direction of propa-gation of the incident, transmitted, and reflected waves. The overlay of the wave schematics were constructed considering the theoretical predictions of θi = 45 ◦, θt = 60 .36 ◦, and θr = 45 ◦.Therefore, comparing the red lines and the pressure contours provides a qualitative descrip-tion of the accuracy of the model in capturing acoustic wave propagation at interfaces. From which, we observe good agreement between the model and the theory. 32 1 2 3 4
+
+x/λ [−]1234
+
+> y/λ  [−]
+
+0.24 0.40 0.56 0.72 0.88 1.04 1.20   
+
+> p/p 0 [−]Figure 7: Mixture pressure contours of oblique acoustic wave incidence at high-impedance two-phase interface. 45 ◦-angle interface represented by dashed blue line ( ). Incident, reflected and transmitted waves (from top to bottom) depicted by solid red lines/arrows ( ).
+
+6.3. Turbulent flow 
+
+Robustness and stability in compressible flows without any additional numerical dissipa-tion, impeditive for simulations of turbulent flows, rely on discrete preservation of kinetic energy and entropy. The most challenging scenario is in the limit of Re → ∞ , without physical viscous dissipation, which is the target of the proposed test case. In this section, a two-phase Taylor-Green vortex case is simulated in the limit of infinite Reynolds num-ber, which was proposed by Jain and Moin [42] as a robustness test case for compressible two-phase flows. The domain spans [0 , 2π] × [0 , 2π] × [0 , 2π] m and is discretized with 64 3 cells to evaluate the limit of coarse grid without any numerical dissipation. A phase 1 slab of width 2 L = 2 m is initialized in the middle of the domain, according to 
+
+ϕ1 = 1 − 0.5
+
+®
+
+1 + (1 − 2δ) tanh 
+
+ñp(x − π)2 − L
+
+2ϵ
+
+ô´ 
+
+. (94) The fluid properties of phase 1 are changed to achieve density ratios from 1 to 1000, while phase 2 is maintained as an ideal gas with unity phasic density. Two suites of test cases are evaluated: first maintaining both phases with ideal gas-like parameters and varying uniquely the density of phase 1 as in [42]; and second replicating water-air with stiffened gas parameters as in [50]. For the former, all parameters are summarized in Table 3, and for the latter, all parameters are summarized in Table 4. 33 Phase 1 Phase 2 
+
+ρl [kg /m3] 1, 0.1, 0.01 1
+
+γl [−] 1.4 1.4 
+
+πl [−] 0 0  
+
+> Table 3: Non-dimensional ( pref = 1) stiffened gas equation of state parameters for ideal gas compressible two-phase Taylor-Green vortex cases.
+
+Phase 1 Phase 2 
+
+ρl [kg /m3] 1000 1
+
+γl [−] 4.4 1.4 
+
+πl [−] 6000 0 
+
+> Table 4: Non-dimensional ( pref = 1) stiffened gas equation of state parameters for water-air compressible two-phase Taylor-Green vortex cases.
+
+The domain is triply periodic for all quantities and the initial conditions are given by 
+
+ul = M a 0 sin( x) cos( y) cos( z),vl = −M a 0 cos( x) sin( y) cos( z),wl = 0 ,pl = p0 + ρM a 20
+
+16 [cos(2 x) + cos(2 y)][cos(2 z) + 2] ,
+
+(95) where M a 0 is the initial Mach number, p0 is the initial baseline pressure, and ρ = ϕ1ρ0,1 +(1 −
+
+ϕ1)ρ0,2 is the mixture density. The final non-dimensional time is M a 0t = 40 to evaluate long-term preservation properties of the scheme (qualitative 3D flow field depicted in Fig. 10). The time steps for increasing density ratios are ∆ t = 2 .5, 1.25 , 0.625 , and 1 .25 ×10 −3, respectively, which yields an acoustic CFL ⪅ 0.05 to minimize the effects of time integration error. For both test suites, the phasic dynamics viscosities are set to μl = 0 and the surface tension coefficient to σ = 0, to evaluate the limit of zero physical dissipation ( Re l = ∞)without capillary effects ( W e l = ∞), thus characterizing robustness of the discretization in not generating any spurious entropy. Given the degree of difficulty of the problem and the approximate preservation nature of the scheme, the interface thickness is increased to 
+
+ϵ = 1 .25∆ x and the amount of the conjugate phase increased to δ = 10 −6, similar to what was used in [50]. In Section 6.3.1, the effect of density ratio on the preservation properties of the scheme are evaluated with an initial Mach number of M a 0 = 0 .2; and in Section 6.3.2, the preservation properties are evaluated for a realistic water-air density and equation of states with an initial Mach number of M a 0 = 0 .05. 
+
+6.3.1. Density ratio sweep for M a 0 = 0 .2In this section, the baseline pressure p0 is set to 1 /γ ≈ 0.7, which is sufficient for positive pressures, given that the maximum dynamic pressure ρ0,2M a 20 ≈ 0.04. For sufficiently high 
+
+M a , kinetic energy is not fully conserved as in incompressible flows, primarily due to exchange to internal energy. The role of the density ratio in this exchange is not fully understood. However, it is expected that, due to the differences in inertia of each phase, for increasing 34 0 10 20 30 40                              
+
+> t/τ [−]0.00.51.01.52.0
+> K/K 0 [−]
+> ρ1/ρ 2
+> 10.10.01 (a) Mixture kinetic energy, ρk 020 40
+> t/τ [−]
+> −0.0010
+> −0.0005 0.0000 0.0005 0.0010 ∆( S)/|S0| [−](b) Mixture entropy, ρs
+> Figure 8: Mixture conservation properties of compressible Taylor-Green vortex at M a = 0 .2 for two ideal gases spanning density ratios from 1 to 100. Constant value depicted by solid black lines ( ), and the instantaneous values of the current simulation for different density ratios by blue ( , ρ1/ρ 2= 1), orange ( ,
+> ρ1/ρ 2= 0 .1), and green ( , ρ1/ρ 2= 0 .01) symbols. Evolution of normalized (a) total mixture kinetic energy
+> K=P
+> lKl, (b) change in mixture entropy S=P
+> l
+> RϕlρlsldV =RρsdV .
+
+density ratios, the rate of the exchange between kinetic energy and internal energy is likely to increase. Fig. 8 depicts the kinetic energy and entropy preservation properties for the proposed scheme for varying density ratios. The unity density ratio does not present noticeable transfer of kinetic energy to internal energy for M a 0 = 0 .2. However, as the ratio increases in order of magnitude difference, this transfer is more significant (see for instance ρ1/ρ 2 = 0 .01). For the estimation of the change in total mixture entropy, one needs to determine the corresponding cv,l . For the non-dimensional SG-EoS parameters with pref = 1, we further assume Tl = 1, which yields in cv, 1 = 1 .765, and cv, 2 = 2 .5. Fig. 8 (b) presents the change in total mixture entropy normalized by its initial value. Overall, mixture entropy always increases, and it is “preserved” up to an order of 10 −4, providing an evidence of robustness for increasing order of magnitude difference of density ratios. In addition to the faster exchange of kinetic and internal energy, the rate of entropy increase is also observed to be higher. Phasic preservation properties are presented in Fig. 9. For the proposed test case, phase 2 is the heavier one and also the “carrier” phase since ⟨ϕ2⟩ > ⟨ϕ1⟩. Therefore, it is the phase to carry the majority of the mixture kinetic energy. As observed in Fig. 9 (a,b), the evolution of the total phasic kinetic energy of phase 2 is more representative of the behavior identified at the mixture level [Fig. 8]. For larger differences in order of magnitude of density ratio, where the phasic kinetic energy also tends to decrease faster to the equilibrium value. For the lighter phase (1), the total phasic kinetic energy actually increases. With respect to the preservation characteristics of total phasic entropy, there are no noticeable differences for the density ratio sweep. Overall, the change in total phasic entropy normalized by its initial value is captured up to an error of 10 −3.35 0 10 20 30 40 
+
+t/τ [−]12345 
+
+> K1/K 0,1 [−](a) Kinetic energy of phase 1, ϕ1ρ1k1
+
+0 10 20 30 40 
+
+t/τ [−]0.80.91.0  
+
+> K2/K 0,2 [−](b) Kinetic energy of phase 2, ϕ2ρ2k2
+
+0 20 40 
+
+t/τ [−]
+
+−0.02 
+
+−0.01 0.00 0.01 0.02 ∆( ˜S1)/| ˜S0,1| [−] 
+
+> (c) Change in entropy per unit mass of phase 1, ϕ1s1
+
+0 20 40 
+
+t/τ [−]
+
+−0.02 
+
+−0.01 0.00 0.01 0.02 ∆( ˜S2)/| ˜S0,2| [−] (d) Change in entropy per unit mass of phase 2, ϕ2s2
+
+Figure 9: Phasic conservation properties of compressible Taylor-Green vortex at M a = 0 .2 for two ideal gases spanning density ratios from 1 to 100. Constant value depicted by solid black lines ( ), and the instantaneous values of the current simulation for different density ratios by blue ( , ρ1/ρ 2 = 1), orange ( , ρ1/ρ 2 = 0 .1), and green ( , ρ1/ρ 2 = 0 .01) symbols. Evolution of normalized total phasic kinetic energy 
+
+Kl = R ϕlρlkldV of (a) phase 1, and (b) phase 2. Evolution of normalized change in total phasic entropy per unit mass ˜Sl = R ϕlsldV of (c) phase 1, and (d) phase 2. 
+
+36 1 5 20 40 Time, M a 0t [−] 
+
+> Figure 10: Water-air compressible Taylor-Green vortex visualizations at different times. Interface iso-contour (ϕ1= 0 .5) as gray opaque surfaces, and Q-criterion iso-contour surfaces colored by vorticity magnitude.
+
+6.3.2. Water-air combination with M a 0 = 0 .05 In this section, the baseline pressure is increased to p0 = 10 to allow for positive pressures, given that the maximum dynamic pressure ρ0,1M a 20 ≈ 2.5 ≫ 1/γ 1. For this last test case, as the densities reach 3 orders of magnitude difference, the rate of exchange of kinetic and internal energy is likely to further increase compared to the previous cases [Section 6.3.1]. On the other hand, the M a 0 is decreased to compensate for the density ratio, which should decrease the rate of energy exchange due to compressibility effects. A qualitative flow field description is presented in Fig. 10, where the interface is contorted by the vortical flow. Fig. 11 demonstrates the preservation properties of the scheme at the mixture level. Although the lower M a 0 = 0 .05, the rate of kinetic energy and internal energy exchange is higher compared to the previous cases. Conversely, the change in total mixture entropy is much lower, mostly influenced by M a 0. It is noteworthy that the proposed scheme in this work, which is not an exact entropy preserving scheme as in [50], is able to achieve comparable mixture entropy preservation levels up to order of 10 −6. Possibly demonstrating an advantage of using the cheaper approximate scheme to achieve the same entropy preservation levels as an exact scheme. Evaluating phasic preservation properties, for this test case, phase 1 (water) is the heavier one though still the “dispersed” one ( ⟨ϕ1⟩ ≈ 0.3). Fig. 12 (a) demonstrates that the total phasic kinetic energy decay is dominated by the heavier phase (1), while the lighter one (2) increases. Even though the total kinetic energy of phase 2 increases by an order of magnitude, given that its phasic density is much lower, its initial value K0,2 is also a small value, it does not yield in nonphysical kinetic energy generation the the mixture level [Fig. 11 (a)]. The change in total phasic entropy is better captured compared to the previous cases as observed in Fig. 12 (c,d). The heavier phase (1) presents a change in total phasic internal energy better than an order of 10 −2, whereas phase 2 demonstrates an increase at an order of 10 −2.
+
+7. Conclusions 
+
+In this work, we proposed a new phase field model for the non-equilibrium six- and seven-equation formulations for compressible two-phase flows. Both models have a monotonic 37 0 10 20 30 40 
+
+t/τ [−]0.00.51.01.52.0 
+
+> K/K 0 [−](a) Mixture kinetic energy, ρk
+
+0 10 20 30 40 
+
+t/τ [−]0.00.51.0∆( S)/|S0| [−]
+
+×10 −6 (b) Mixture entropy, ρs 
+
+Figure 11: Mixture conservation properties of compressible Taylor-Green vortex at M a = 0 .05 for a water-air combination with 1000 density ratio. Constant value depicted by solid black lines ( ), and the instantaneous values of the current simulation by red ( ) squares. Evolution of normalized (a) total mixture kinetic energy 
+
+K = P 
+
+> l
+
+Kl, (b) change in mixture entropy S = P
+
+> l
+
+R ϕlρlsldV = R ρsdV .0 10 20 30 40 
+
+t/τ [−]0.40.60.81.0 
+
+> K1/K 0,1 [−]
+> (a) Kinetic energy of phase 1, ϕ1ρ1k1
+
+0 10 20 30 40 
+
+t/τ [−]510   
+
+> K2/K 0,2 [−](b) Kinetic energy of phase 2, ϕ2ρ2k2
+
+0 20 40 
+
+t/τ [−]
+
+−0.02 
+
+−0.01 0.00 0.01 0.02 ∆( ˜S1)/| ˜S0,1| [−] 
+
+> (c) Change in entropy per unit mass of phase 1, ϕ1s1
+
+0 20 40 
+
+t/τ [−]
+
+−0.02 
+
+−0.01 0.00 0.01 0.02 ∆( ˜S2)/| ˜S0,2| [−] (d) Change in entropy per unit mass of phase 2, ϕ2s2
+
+Figure 12: Phasic conservation properties of compressible Taylor-Green vortex at M a = 0 .05 for a water-air combination with 1000 density ratio. Constant value depicted by solid black lines ( ), and the instantaneous values of the current simulation by red ( ) squares. Evolution of normalized total phasic kinetic energy 
+
+Kl = R ϕlρlkldV of (a) phase 1, and (b) phase 2. Evolution of normalized change in total phasic entropy per unit mass ˜Sl = R ϕlsldV of (c) phase 1, and (d) phase 2. 
+
+38 mixture speed of sound, which better captures wave transmission across interfaces. The phase field model for the seven-equation formulation specifically provides an IEC-compatible entropy-conservative regularization framework admitting conservative phasic and mixture entropy transport equations, a desirable feature for the construction of stable and robust numerical schemes. In contrast to equilibrium formulations, the non-equilibrium formulations require a finite amount of the conjugate phase to avoid degeneracy of eigenvectors. Therefore, we proposed a modification of the phase field model to account for the presence of a finite amount of the conjugate phase at interface equilibrium, with the analogous ACDI model also derived. These modifications allow for more accurate capturing of phasic densities, essential in regularization of phasic mass around the interface. Furthermore, we proved additional consistency conditions for flux splittings considering the interface-equilibrium conditions. Among the possible combinations of phasic internal en-ergy convective and interface regularization flux splittings, we identified the ones to allow for long-time integration stability and consistent with discrete kinetic energy and entropy preser-vation requirements. The quartic flux splitting for the phasic internal energy convection, and the cubic flux splitting for the phasic internal energy interface regularization, both require the same discretization of the volume fraction transport equation as previous formulations. Finally, to demonstrate accuracy, stability and robust of the underlying seven-equation formulation with phase field model that allows for finite amount of conjugate phase and the proposed KEEP-like flux splittings, we performed numerical simulations of high-density ratio interface advection, pressure-driven bubble oscillation, high-impedance interface oblique wave interaction, and compressible two-phase Taylor-Green vortex. The proposed framework is able to extend stability to previously non-reported long limits of time integration, and improved accuracy for acoustic test cases, while being nondissipative. 
+
+Acknowledgments 
+
+This work was supported by the Air Force Office of Scientific Research under award num-ber FA9550-25-1-0137. A preliminary version of this work has been published as conference proceedings of AIAA Scitech 2025 [48], 2026 [67], and ILASS-Americas 2026 [49]. The authors also acknowledge the generous computing resources from the DOE’s 2024 and 2025 ALCC awards (TUR147 & BubbleLaden, PI: Jain). This research used supporting resources at the Argonne and the Oak Ridge Leadership Computing Facilities. The Argonne Leadership Computing Facility at Argonne National Laboratory is supported by the Office of Science of the U.S. DOE under Contract No. DE-AC02-06CH11357. The Oak Ridge Leadership Computing Facility at the Oak Ridge National Laboratory is supported by the Office of Science of the U.S. DOE under Contract No. DE-AC05-00OR22725. 
+
+Appendix A. Non-zero finite bound phase field model 
+
+Consider, for instance, the standalone advection of an interface with a small amount of the other phase, ϕ1 = δ = 10 −1 (exaggerated for illustrative purposes), in a periodic domain presented in the Fig. A.13. Both approaches asymptote to 0 and 1, eliminating the small amount of the other phase added. 39 0.0 0.5 1.0
+
+x/L [−]0.00.51.0
+
+> φ [−]
+
+Initial Central CDI ACDI Figure A.13: Redistribution of the other phase by standard phase field models in interface advection with small amount of other phase added, ϕ = 10 −1, in a periodic domain, compared to the initial profile, the standard central discrezation without phase field model and the standard central discretization with both CDI and ACDI as phase field models. 
+
+The equilibrium profile for both formulations is a tanh function described as 
+
+ϕoriginal = 12
+
+h
+
+1 + tanh 
+
+ x
+
+2ϵ
+
+i 
+
+, (A.1) where x indicates the distance from the interface and ϵ its finite interface thickness. It is clear that ϕ asymptotes respectively to 0 and 1 for large enough negative and positive x,
+
+i.e. , the limit of pure phase. We propose a correction factor in the Eq. (A.1), such that ϕ
+
+asymptotes to δ and 1 − δ (the small amount of the other phase), which is given by 
+
+ϕproposed = 12
+
+h
+
+1 + (1 − 2δ) tanh 
+
+ x
+
+2ϵ
+
+i 
+
+. (A.2) A comparison of both equilibrium profiles is presented in the Fig. A.14. The proposed equilibrium profile is constructed such that in the limit of the amount of other phase goes to zero, the original profile is recovered. Let x be the signed-distance-like function to the interface ψ, the Eq. (A.2) may be rear-ranged as follows 
+
+ϕproposed = 12
+
+h
+
+1 + (1 − 2δ) tanh 
+
+ x
+
+2ϵ
+
+i 
+
+= (1 − δ)eψ/ϵ + δeψ/ϵ + 1 . (A.3) Differentiating the Eq. (A.3) with respect to the signed-distance-like function yields in 
+
+dϕ dψ = 1
+
+ϵ
+
+(1 − 2δ)eψ/ϵ 
+
+(eψ/ϵ + 1) 2 = 1
+
+ϵ
+
+(ϕ − δ)(1 − ϕ − δ)(1 − 2δ) , (A.4) where the signed-distance function may be defined as ψ(ϕ) = s(ϕ) − s(ϕ = 0 .5) with s
+
+being the coordinate in the normal direction of the interface. Taking another derivative of 40 −1.0 −0.5 0.0 0.5 1.0
+
+x/L [−]0.00 0.25 0.50 0.75 1.00 
+
+> φ [−]
+
+Original Proposed Figure A.14: Comparison of interface equilibrium profiles with and without finite non-zero bounds. 
+
+the Eq. (A.4) with respect to s, where dϕ/dψ = dϕ/ds , leads to. 
+
+dds 
+
+ï
+
+ϵ(1 − 2δ)dϕ ds − (ϕ − δ)(1 − ϕ − δ)
+
+ò
+
+= 0 . (A.5) Recasting the Eq. (A.5) in Cartesian coordinates yields in (the modified Allen-Cahn for finite non-zero bounds formulation) 
+
+∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uj ) = ϕ1
+
+∂u j
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ(1 − 2δ)∂ϕ 1
+
+∂x j
+
+− (ϕ1 − δ)(1 − ϕ1 − δ)n1,j 
+
+ò™ 
+
+.
+
+(A.6) Substituting the proposed equilibrium profile from the Eq. (A.2) in the modified Allen-Cahn formulation in the Eq. (A.6) gives 
+
+∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uj ) = ϕ1
+
+∂u j
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ(1 − 2δ)∂ϕ 1
+
+∂x j
+
+− (1 − 2δ)2
+
+4
+
+Å
+
+1 − tanh 2
+
+Åψ1
+
+2ϵ
+
+ãã 
+
+n1,j 
+
+ò™ 
+
+,
+
+(A.7) where the signed distance-like function ψ is adapted based on the proposed equilibrium profile. Solving for ψ in the Eq. (A.3) yields in 
+
+ψ = ϵ log 
+
+Å ϕ − δ
+
+1 − ϕ − δ
+
+ã
+
+. (A.8) In order to control the limit of ψ when ϕ or 1 −ϕ → δ, one may add a small number ε = 10 −100 
+
+in both numerator and denominator inside of the log of the Eq. (A.8). 41 0.0 0.5 1.0
+
+x/L [−]0.00.51.0
+
+> φ [−]
+
+Initial Central ACDI mACDI Figure A.15: Interface advection with small amount of other phase, ϕ = 10 −1, in a periodic domain, with the proposed modified interface equilibrium profile compared to the initial profile, standard central discrezation without phase field model and standard central discretization with ACDI as the phase field model. 
+
+One may solve the standalone advection of an interface with a small amount of the other phase in a periodic domain with the Eq. (A.7). The Fig. A.15 highlights how the proposed phase field model with finite non-zero bounds is able to retain the modified equilibrium in-terface profile and the amount of the other phase added, contrary to standard phase field models. This proposed model has potential to more accurately capture phasic density ρl
+
+and allow for more robust numerical schemes that require division by ϕ, such as the step for pressure relaxation with an algebraic expression for stiffened-gas equation of state. Further-more, this model is not restricted to the seven-equation model for compressible two-phase formulation, it can be used whenever division by ϕ is a concern. In the context of the seven-equation model, instead of ϕ1 being advected by the relaxed velocity u, it is advected by the interface velocity uI . Thus, the final expression for volume fraction transport equation without the relaxation term is 
+
+∂ϕ 1
+
+∂t + ∂∂x j
+
+(ϕ1uI,j )= ϕ1
+
+∂u I,j 
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ(1 − 2δ)∂ϕ 1
+
+∂x j
+
+− (ϕ1 − δ)(1 − ϕ1 − δ)n1,j 
+
+ò™ 
+
+,
+
+= ϕ1
+
+∂u I,j 
+
+∂x j
+
++ ∂∂x j
+
+ß
+
+Γ
+
+ï
+
+ϵ(1 − 2δ)∂ϕ 1
+
+∂x j
+
+− (1 − 2δ)2
+
+4
+
+Å
+
+1 − tanh 2
+
+Åψ1
+
+2ϵ
+
+ãã 
+
+n1,j 
+
+ò™ 
+
+.
+
+(A.9) 
+
+References 
+
+[1] V. Coralic, T. Colonius, Shock-induced collapse of a bubble inside a deformable vessel, European Journal of Mechanics - B/Fluids 40 (2013) 64–74. [2] J. R. Blake, D. C. Gibson, Cavitation bubbles near boundaries, Annual Review of Fluid Mechanics 19 (1987) 99–123. 42 [3] X. Escaler, E. Egusquiza, M. Farhat, F. Avellan, M. Coussirat, Detection of cavitation in hydraulic turbines, Mechanical Systems and Signal Processing 20 (2006) 983–1007. [4] A. Ben-Yakar, B. Natan, A. Gany, Investigation of a solid fuel scramjet combustor, Journal of Propulsion and Power 14 (1998) 447–455. [5] P. Tarey, P. Ramaprabhu, J. A. McFarland, Evolution of a shock-impacted reactive liquid fuel droplet with evaporation effects: A numerical study, International Journal of Multiphase Flow 174 (2024) 104744. [6] Y. Utturkar, J. Wu, G. Wang, W. Shyy, Recent progress in modeling of cryogenic cavitation for liquid rocket propulsion, Progress in Aerospace Sciences 41 (2005) 558– 608. [7] C. Carmicino, A. Russo Sorge, Experimental investigation into the effect of solid-fuel additives on hybrid rocket performance, Journal of Propulsion and Power 31 (2015) 699–713. [8] J. A. Sethian, P. Smereka, Level set methods for fluid interfaces, Annual Review of Fluid Mechanics 35 (2003) 341–372. [9] S. Mirjalili, S. S. Jain, M. S. Dodd, Interface-capturing methods for two-phase flows: An overview and recent developments, Center for Turbulence Research Annual Research Briefs 2017 (2017). [10] R. Saurel, C. Pantano, Diffuse-interface capturing methods for compressible two-phase flows, Annual Review of Fluid Mechanics 50 (2018) 105–130. [11] R. K. Shukla, C. Pantano, J. B. Freund, An interface capturing method for the simu-lation of multi-phase compressible flows, Journal of Computational Physics 229 (2010) 7411–7439. [12] S. S. Jain, M. C. Adler, J. R. West, A. Mani, P. Moin, S. K. Lele, Assessment of diffuse-interface methods for compressible multiphase fluid flows and elastic-plastic deformation in solids, Journal of Computational Physics 475 (2023) 111866. [13] R. Saurel, R. Abgrall, A multiphase Godunov method for compressible multifluid and multiphase flows, Journal of Computational Physics 150 (1999) 425–467. [14] R. Saurel, O. Le M´ etayer, A multiphase model for compressible flows with interfaces, shocks, detonation waves and cavitation, Journal of Fluid Mechanics 431 (2001) 239–271. [15] R. Saurel, F. Petitpas, R. A. Berry, Simple and efficient relaxation methods for inter-faces separating compressible fluids, cavitating flows and shocks in multiphase mixtures, Journal of Computational Physics 228 (2009) 1678–1712. [16] M. R. Baer, J. W. Nunziato, A two-phase mixture theory for the deflagration-to-detonation transition (DDT) in reactive granular materials, International Journal of Multiphase Flow 12 (1986) 861–889. 43 [17] A. K. Kapila, R. Menikoff, J. B. Bdzil, S. F. Son, D. S. Stewart, Two-phase modeling of deflagration-to-detonation transition in granular materials: Reduced equations, Physics of Fluids 13 (2001) 3002–3024. [18] A. Zein, M. Hantke, G. Warnecke, Modeling phase transition for compressible two-phase flows applied to metastable liquids, Journal of Computational Physics 229 (2010) 2964–2998. [19] M. Pelanti, K.-M. Shyue, A mixture-energy-consistent six-equation two-phase numerical model for fluids with interfaces, cavitation and evaporation waves, Journal of Compu-tational Physics 259 (2014) 331–357. [20] G. Perigaud, R. Saurel, A compressible flow model with capillary effects, Journal of Computational Physics 209 (2005) 139–178. [21] A. Murrone, H. Guillard, A five equation reduced model for compressible two phase flow problems, Journal of Computational Physics 202 (2005) 664–698. [22] R. Saurel, F. Petitpas, R. Abgrall, Modelling phase transition in metastable liquids: application to cavitating and flashing flows, Journal of Fluid Mechanics 607 (2008) 313–350. [23] A. Tiwari, J. B. Freund, C. Pantano, A diffuse interface model with immiscibility preservation, Journal of Computational Physics 252 (2013) 290–309. [24] R. Abgrall, M. Rodio, Discrete equation method (dem) for the simulation of viscous, compressible, two-phase flows, Computers & Fluids 91 (2014) 164–181. [25] M. Rodio, R. Abgrall, An innovative phase transition modeling for reproducing cav-itation through a five-equation model and theoretical generalization to six and seven-equation models, International Journal of Heat and Mass Transfer 89 (2015) 1386–1401. [26] G. Allaire, S. Clerc, S. Kokh, A five-equation model for the simulation of interfaces between compressible fluids, Journal of Computational Physics 181 (2002) 577–616. [27] V. Coralic, T. Colonius, Finite-volume WENO scheme for viscous compress-ible multicomponent flows, Journal of Computational Physics 274 (2014) 95–121. doi:10.1016/j.jcp.2014.06.003. [28] D. P. Garrick, M. Owkes, J. D. Regele, A finite-volume hllc-based scheme for compress-ible interfacial flows with surface tension, Journal of Computational Physics 339 (2017) 46–67. [29] S. S. Jain, A. Mani, P. Moin, A conservative diffuse-interface method for compressible two-phase flows, Journal of Computational Physics 418 (2020) 109606. [30] Z. Huang, E. Johnsen, A consistent and conservative phase-field method for compressible multiphase flows with shocks, Journal of Computational Physics 488 (2023) 112195. 44 [31] R. Abgrall, How to prevent pressure oscillations in multicomponent flow calculations: A quasi conservative approach, Journal of Computational Physics 125 (1996) 150–160. [32] R. Saurel, R. Abgrall, A simple method for compressible multifluid flows, SIAM Journal on Scientific Computing 21 (1999) 1115–1145. [33] E. Johnsen, F. Ham, Preventing numerical errors generated by interface-capturing schemes in compressible multi-material flows, Journal of Computational Physics 231 (2012) 5705–5717. [34] A. Chiapolino, P. Boivin, R. Saurel, A simple and fast phase transition relaxation solver for compressible multicomponent two-phase flows, Computers & Fluids 150 (2017) 31– 45. [35] H. Collis, S. Mirjalili, S. Jain, A. Mani, et al., Assessment of weno and teno schemes for the four-equation compressible two-phase flow model with regularization terms, Center for Turbulence Research Annual Research Briefs (2022) 151–165. [36] S. Clerc, Numerical simulation of the homogeneous equilibrium model for two-phase flows, Journal of Computational Physics 161 (2000) 354–375. [37] A. D. Demou, N. Scapin, M. Pelanti, L. Brandt, A pressure-based diffuse interface method for low-mach multiphase flows with mass transfer, Journal of Computational Physics 448 (2022) 110730. [38] F. Petitpas, E. Franquet, R. Saurel, O. Le M´ etayer, A relaxation-projection method for compressible flows. part ii: Artificial heat exchanges for multiphase shocks, Journal of Computational Physics 225 (2007) 2214–2248. [39] A. Panchal, S. H. Bryngelson, S. Menon, A seven-equation diffused interface method for resolved multiphase flows, Journal of Computational Physics 475 (2023) 111870. [40] M. Viqueira-Moreira, C. Brehm, Implementation and validation of a 7-equation model for high-speed droplet impingement, AIAA AVIATION FORUM AND ASCEND 2024 (2024). [41] A. Chiapolino, R. Saurel, B. Nkonga, Sharpening diffuse interfaces with compressible fluids on unstructured meshes, Journal of Computational Physics 340 (2017) 389–417. [42] S. S. Jain, P. Moin, A kinetic energy–and entropy-preserving scheme for compressible two-phase flows, Journal of Computational Physics 464 (2022) 111307. [43] S. S. Jain, R. Agrawal, P. Moin, Stable, entropy-consistent, and localized artificial-diffusivity method for capturing discontinuities, Phys. Rev. Fluids 9 (2024) 024609. [44] A. E. Honein, P. Moin, Higher entropy conservation and numerical stability of com-pressible turbulence simulations, Journal of Computational Physics 201 (2004) 531–545. 45 [45] P. Chandrashekar, Kinetic energy preserving and entropy stable finite volume schemes for compressible euler and navier-stokes equations, Communications in Computational Physics 14 (2013) 1252–1286. doi:10.4208/cicp.170712.010313a. [46] Y. Kuya, K. Totani, S. Kawai, Kinetic energy and entropy preserving schemes for compressible flows by split convective forms, Journal of Computational Physics 375 (2018) 823–853. [47] Y. Tamaki, Y. Kuya, S. Kawai, Comprehensive analysis of entropy conservation property of non-dissipative schemes for compressible flows: Keep scheme redefined, Journal of Computational Physics 468 (2022) 111494. [48] L. H. Hatashita, S. S. Jain, Interface preservation in modeling compressible two-phase flows using six- and seven-equation formulations, AIAA SCITECH 2025 Forum (2025). [49] L. H. Hatashita, S. S. Jain, Advancements in the seven-equation formulation for com-pressible two-phase flows for modeling leidenfrost effect, in: Proceedings of ILASS-Americas 2026, 2026. [50] S. Yoshida, S. Kawai, S. Kawai, Strictly entropy-conserving seven-equation based keep scheme coupled with phase-field method for compressible two-phase flows, AIAA SCITECH 2026 Forum (2026). [51] D. A. Drew, Mathematical modeling of two-phase flow, Annual Review of Fluid Me-chanics 15 (1983) 261–291. [52] M. Pelanti, Arbitrary-rate relaxation techniques for the numerical modeling of compress-ible two-phase flows with heat and mass transfer, International Journal of Multiphase Flow 153 (2022) 104097. [53] R. Saurel, S. Gavrilyuk, F. Renaud, A multiphase model with internal degrees of free-dom: application to shock–bubble interaction, Journal of Fluid Mechanics 495 (2003) 283–321. [54] P.-H. Chiu, Y.-T. Lin, A conservative phase field method for solving incom-pressible two-phase flows, Journal of Computational Physics 230 (2011) 185–204. doi:10.1016/j.jcp.2010.09.021. [55] S. S. Jain, Accurate conservative phase-field method for simulation of two-phase flows, Journal of Computational Physics 469 (2022) 111529. [56] S. Mirjalili, C. B. Ivey, A. Mani, A conservative diffuse interface method for two-phase flows with provable boundedness properties, Journal of Computational Physics 401 (2020) 109006. doi:10.1016/j.jcp.2019.109006. [57] G. Blaisdell, E. Spyropoulos, J. Qin, The effect of the formulation of nonlinear terms on aliasing errors in spectral methods, Applied Numerical Mathematics 21 (1996) 207–219. [58] M.-H. Lallemand, R. Saurel, Pressure Relaxation Procedures for Multiphase Compress-ible Flows, Research Report RR-4038, INRIA, 2000. Projet M3N. 46 [59] D. Furfaro, R. Saurel, A simple hllc-type riemann solver for compressible non-equilibrium two-phase flows, Computers & Fluids 111 (2015) 159–178. [60] M. L. Wong, J. B. Angel, M. F. Barad, C. C. Kiris, A positivity-preserving high-order weighted compact nonlinear scheme for compressible gas-liquid flows, Journal of Computational Physics 444 (2021) 110569. [61] S. Brill, B. Olson, A six-equation multimaterial method for compact finite differences, in: APS Division of Fluid Dynamics Meeting Abstracts, 2024, pp. T20–007. [62] O. Le M´ etayer, J. Massoni, R. Saurel, ´Elaboration des lois d’´ etat d’un liquide et de sa vapeur pour les mod` eles d’´ ecoulements diphasiques, International Journal of Thermal Sciences 43 (2004) 265–276. [63] M. S. Dodd, A. Ferrante, On the interaction of taylor length scale size droplets and isotropic turbulence, Journal of Fluid Mechanics 806 (2016) 356–412. [64] A. Battistella, S. van Schijndel, M. Baltussen, I. Roghair, M. van Sint Annaland, On the terminal velocity of single bubbles rising in non-newtonian power-law liquids, Journal of Non-Newtonian Fluid Mechanics 278 (2020) 104249. [65] M. Crialesi-Esposito, M. E. Rosti, S. Chibbaro, L. Brandt, Modulation of homogeneous and isotropic turbulence in emulsions, Journal of Fluid Mechanics 940 (2022) A19. [66] L. H. Hatashita, P. Nathan, S. S. Jain, Scalings and simulation requirements in two-phase flows, Phys. Rev. Fluids 11 (2026) 074303. [67] L. H. Hatashita, T. Samanta, S. S. Jain, A robust seven-equation formulation for com-pressible two-phase flows for high-speed applications, AIAA SCITECH 2026 Forum (2026). 47

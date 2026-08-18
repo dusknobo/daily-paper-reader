@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-18",
+  "date": "2026-08-18",
+  "generated_at": "2026-08-18T19:35:03",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/18/2608.16750v1-a-diffuse-interface-method-for-compressible-two-phase-flows-with-seven--and-six-equation-models",
+      "section": "deep",
+      "title_en": "A diffuse-interface method for compressible two-phase flows with seven- and six-equation models",
+      "authors": "Luis H. Hatashita, Suhas S. Jain",
+      "date": "2026-08-17",
+      "pdf": "https://arxiv.org/pdf/2608.16750v1",
+      "score": "8.0",
+      "evidence": "可压缩两相流模型的扩散界面方法，直接支持两相流模拟",
+      "tldr": "针对可压缩两相流中混合声速非单调导致跨界面声波延迟以及现有数值方法依赖人工耗散的问题，本文提出一种基于七方程非平衡模型的扩散界面相场方法，通过在散度形式下添加界面正则化项保持偏微分方程之间的一致性，不引入虚假源项。进一步在瞬时速度平衡假设下导出六方程模型，并修改体积界面正则化通量以避免特征向量简并，同时改进相密度隐式捕获。设计KEEP离散方案保持离散动能与熵，在高密度比界面平流、气泡振荡、斜声波反射透射和两相Taylor-Green涡流等测试中展示了长时间积分的准确性、稳定性和鲁棒性，且无需数值耗散，适用于湍流与声学模拟。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this work, a novel phase-field method is proposed for the six- and seven-equation non-equilibrium models for simulating compressible two-phase flows. Such formulations allow for monotonic mixture speed of sound, minimizing artificial wave delay during transmission across an interface. The proposed phase field formulation is constructed from the baseline seven-equation model, and interface-regularization terms are added in divergence form, while maintaining consistency between the partial differential equations without introducing spurious source terms. It admits conservative phasic and mixture entropy transport equations, thus facilitating the construction of discrete conservative schemes. The six-equation formulation is obtained under instantaneous velocity equilibrium. To avoid eigenvector degeneracy of the system of PDEs, the volumetric interface regularization flux is modified to account for a finite amount of conjugate phase, which improves on how phasic density is captured implicitly. Stability of compressible two-phase flow rely on the preservation of the interface-equilibrium conditions, and the preservation of discrete kinetic energy and entropy. A detailed analysis of IEC demonstrates additional requirements on the consistency of flux splittings between the convective and interface-regularization terms for all quantities, as well as the effects on the phasic internal energy flux splittings. A KEEP discretization is proposed and evaluated over a suite of high-density ratio test cases, including interface advection, acoustic wave-induced bubble oscillation, oblique acoustic wave reflection and transmission, and two-phase Taylor-Green vortex flow. Results demonstrate accuracy, stability and robustness for very long time integrations, a desired feature for simulation of turbulent flows and acoustics, since the framework does not rely on the addition of numerical dissipation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
