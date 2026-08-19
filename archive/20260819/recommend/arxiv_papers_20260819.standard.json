@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-19T20:53:44.275266+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.17825v1",
+      "source": "arxiv",
+      "title": "Towards Rapid Prototyping of Spray Injectors: A Regime-Agnostic Neural Operator Surrogate for Gas-Liquid Interface Evolution",
+      "abstract": "Spray atomisation rapidly creates large liquid-gas interfacial areas and is central to many industrial processes. However, predicting spray behaviour and surface area remains difficult: experiments cannot access all spray regions, while CFD becomes prohibitively expensive as finer structures develop. Data driven surrogates can learn interface evolution, enabling rapid design space exploration, operating condition ranking, and ultimately spray control. We investigate how state representation, neural architecture, and physics-informed regularisation affect long horizon autoregressive forecasting of spray interfaces, particularly conservation. Our principal model is a boundary-conditioned Fourier Neural Operator (FNO) that predicts the evolution of the signed distance function (SDF) from the liquid-gas interface. It is trained on 2D sharp interface Volume-of-Fluid CFD simulations spanning several atomisation regimes. The SDF-FNO retains interface fidelity better than an FNO trained directly on volume fraction, but is outperformed by a U-Net. Objective function ablation shows that a liquid inventory penalty improves conservation at a modest cost to local interface accuracy. We also introduce a physics-informed extension combining an open-domain target-increment liquid balance penalty, a narrowband Eikonal regulariser that preserves signed distance geometry, and a phase-boundedness penalty. Although this model trains stably, it leaves forecast error, interface overlap, and inventory behaviour essentially unchanged relative to the data driven baseline. Finally, we demonstrate the surrogate by ranking injection conditions according to interfacial area generated per unit gas injection power across the operating envelope of a fixed geometry.",
+      "authors": [
+        "Paolo Guida",
+        "Po-Han Chen",
+        "Hong G. Im",
+        "William L. Roberts"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "physics.comp-ph"
+      ],
+      "published": "2026-08-18T14:25:46+00:00",
+      "link": "https://arxiv.org/pdf/2608.17825v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "gas-liquid interface evolution surrogate, Fourier neural operator",
+      "llm_evidence_cn": "气液界面演化代理模型与傅里叶神经算子",
+      "llm_evidence": "气液界面演化代理模型与傅里叶神经算子",
+      "canonical_evidence": "气液界面演化代理模型与傅里叶神经算子",
+      "llm_tldr_en": "Proposes a boundary-conditioned Fourier neural operator surrogate for gas-liquid interface evolution in sprays, with physics-informed regularization for conservation; enables rapid design exploration.",
+      "llm_tldr_cn": "针对喷雾雾化中气液界面演化预测困难、传统CFD成本高的问题，提出基于边界条件傅里叶神经算子的数据驱动代理模型。研究状态表示、神经架构与物理正则化对长时程自回归预测的影响，重点考察守恒特性。结果表明该代理模型能快速预测界面演化，加速喷射器设计空间探索，也为降膜等其他两相流动的CFD代理建模提供了可行思路。",
+      "llm_tldr": "针对喷雾雾化中气液界面演化预测困难、传统CFD成本高的问题，提出基于边界条件傅里叶神经算子的数据驱动代理模型。研究状态表示、神经架构与物理正则化对长时程自回归预测的影响，重点考察守恒特性。结果表明该代理模型能快速预测界面演化，加速喷射器设计空间探索，也为降膜等其他两相流动的CFD代理建模提供了可行思路。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

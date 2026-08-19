@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-19",
+  "date": "2026-08-19",
+  "generated_at": "2026-08-19T20:55:27",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/19/2608.17825v1-towards-rapid-prototyping-of-spray-injectors-a-regime-agnostic-neural-operator-surrogate-for-gas-liquid-interface-evolution",
+      "section": "quick",
+      "title_en": "Towards Rapid Prototyping of Spray Injectors: A Regime-Agnostic Neural Operator Surrogate for Gas-Liquid Interface Evolution",
+      "authors": "Paolo Guida, Po-Han Chen, Hong G. Im, William L. Roberts",
+      "date": "2026-08-18",
+      "pdf": "https://arxiv.org/pdf/2608.17825v1",
+      "score": "7.0",
+      "evidence": "气液界面演化代理模型与傅里叶神经算子",
+      "tldr": "喷雾雾化过程快速形成大面积气液界面，但实验无法覆盖全部区域，高保真CFD在细观结构发展时成本过高。数据驱动代理可学习界面演化，支持快速设计探索与控制。本文提出边界条件傅里叶神经算子（FNO）预测有符号距离函数（SDF）演化，训练于跨雾化状态的二维VOF模拟。结果表明SDF-FNO保真优于直接预测体积分数的FNO，但不及U-Net；液体存量惩罚改善守恒但略降局部精度。物理信息扩展训练稳定却未明显改变预测误差与界面行为，最终实现喷射条件按单位气体功率产界面面积排名。",
+      "tags": "query:falling-film",
+      "abstract_en": "Spray atomisation rapidly creates large liquid-gas interfacial areas and is central to many industrial processes. However, predicting spray behaviour and surface area remains difficult: experiments cannot access all spray regions, while CFD becomes prohibitively expensive as finer structures develop. Data driven surrogates can learn interface evolution, enabling rapid design space exploration, operating condition ranking, and ultimately spray control. We investigate how state representation, neural architecture, and physics-informed regularisation affect long horizon autoregressive forecasting of spray interfaces, particularly conservation. Our principal model is a boundary-conditioned Fourier Neural Operator (FNO) that predicts the evolution of the signed distance function (SDF) from the liquid-gas interface. It is trained on 2D sharp interface Volume-of-Fluid CFD simulations spanning several atomisation regimes. The SDF-FNO retains interface fidelity better than an FNO trained directly on volume fraction, but is outperformed by a U-Net. Objective function ablation shows that a liquid inventory penalty improves conservation at a modest cost to local interface accuracy. We also introduce a physics-informed extension combining an open-domain target-increment liquid balance penalty, a narrowband Eikonal regulariser that preserves signed distance geometry, and a phase-boundedness penalty. Although this model trains stably, it leaves forecast error, interface overlap, and inventory behaviour essentially unchanged relative to the data driven baseline. Finally, we demonstrate the surrogate by ranking injection conditions according to interfacial area generated per unit gas injection power across the operating envelope of a fixed geometry.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
