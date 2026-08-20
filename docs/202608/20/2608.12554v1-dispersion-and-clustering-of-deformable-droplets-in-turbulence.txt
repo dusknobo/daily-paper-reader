@@ -1,0 +1,715 @@
+Title: Dispersion and clustering of deformable droplets in turbulence
+
+URL Source: https://arxiv.org/pdf/2608.12554v1
+
+Published Time: Fri, 14 Aug 2026 00:11:44 GMT
+
+Number of Pages: 36
+
+Markdown Content:
+# Highlights 
+
+Dispersion and clustering of deformable droplets in turbulence 
+
+Yushu Lin, John Palmore Jr 
+
+• Deformation suppresses dispersion while increasing clustering in strongly-inertial droplets. 
+
+• Deformation suppresses both dispersion and clustering in weakly-inertial droplets. 
+
+• Resolving the unsteady effects of deformation is important to predicting droplet dispersion. arXiv:2608.12554v1 [physics.flu-dyn] 12 Aug 2026 Dispersion and clustering of deformable droplets in turbulence 
+
+Yushu Lin, John Palmore Jr 
+
+> Department of Mechanical Engineering, University of Washington, 3900 E Stevens Way NE, Seattle, 98195, WA, USA
+
+Abstract 
+
+Motivated by the application of spray combustion in the aviation industry, this work investigates the dispersion of non-spherical droplets in turbulence. The most common strategy for modeling sprays relies on the Lagrangian particle tracking (LPT) method, which represents the spray as a discrete collection of spherical particles. One limitation of this approach is that it neglects the influence of droplet deformation on the spray dynamics. Prior studies have highlighted the impor-tance of non-sphericity in droplet vaporization, combustion and drag coefficient. However, these works are restricted to idealized configurations such as an isolated droplet in a uniform flow. To study droplet deformation in a more realistic con-figuration, we adopt homogeneous isotropic turbulence (HIT) as the framework to investigate its effect on droplet dispersion. Droplets of various Stokes number are studied to investigate the interplay between deformation and inertia. Analysis of droplet statistics reveals that the impact of droplet deformation on both dispersion and clustering is dependent on the inertia regime. For weakly-inertial droplets, deformation weakens both dispersion and preferential concentration, whereas for strongly-inertial droplets, deformation tends to enhance preferential concentration while weakening dispersion. The results also suggest that to achieve the same level of clustering, deformed droplets require a higher Stokes number. Interestingly, for non-inertial droplets, the deformation seems to induce an effective inertia. This is verified by a comparison between the full unsteady Taylor Analogy Breakup (TAB) model and its steady-state limit, which suggests that unsteady shape dy-namics affect temporal correlation statistics, but leave the mean clustering pattern unchanged. These findings demonstrate that accounting for droplet deformation and its unsteady shape oscillation is essential for accurately predicting droplet dispersion and clustering in turbulence. Keywords: droplet dispersion, droplet deformation, clustering, turbulence, preferential concentration 
+
+1. Introduction 
+
+Droplets appear in a wide range of scenarios in nature and industry, such as spray combustion in gas turbine engines, sea spray generation by wave breaking, and volcanic ash dispersion during eruption. This work is motivated by spray combustion in which a liquid fuel is injected into an engine where it atomizes into droplets. The rates of combustion and energy release in the engine are limited by droplet dispersion and the evaporation rate. In particular, this work investigates the dynamics of droplet motion in turbulence focusing on understanding the im-portance of droplet deformation due to flow shear on the dispersion and clustering behaviors of droplets. The theory of droplet dispersion was pioneered by Taylor [1]. Taylor conducted the first analytical investigation on determining diffusion coefficient of a continuous passive scalar from the Lagrangian velocity autocorrelation. Based on Taylor’s foundational work, Batchelor [2] developed a comprehensive three-dimensional Eulerian framework to describe the diffusion of fluid particles in turbulence. Tchen [3] was the first to extend Taylor’s work to small discrete solid particles. Tchen assumed that particles faithfully follow flow streamlines, in which case particle dispersion will be identical to the fluid dispersion. Gouesbet et al. [4] later generalized Tchen’s one-dimensional theory into a three-dimensional dispersion tensor. Using a reduced dispersion coefficient defined as the ratio of particle to fluid dispersion, Gouesbet et al. showed that while dense particles can initially disperse faster than fluid particles, over longer times fluid dispersion always surpasses that of inertial particles. Subsequent work focused on how particle dispersion deviates from fluid dis-persion due to the effect of inertia and gravity. Friedlander [5] showed that particle inertia leads to a reduction in dispersion at short times, and converges to fluid dispersion at sufficiently long times. Later, a key phenomenon called the crossing trajectory effect was identified by Yudine [6] when a steady drift is present due to gravity. The drift causes heavy particles to continuously cross different fluid eddies, reducing particle dispersion relative to fluid dispersion. This effect was further quantified by Nir and Pismen [7] and explored in theoretical and numerical studies for particles with both finite inertia and gravitational settling [8, 9, 10, 11]. It was further recognized that particle dispersion is influenced by the coherent structures of turbulence [12, 13]. Maxey [14] provided a theoretical derivation 2demonstrating that inertial particles tend to accumulate in high-strain or low-vorticity regions. The first numerical evidence was reported by Squires and Eaton [15], who observed this clustering phenomenon in direct numerical simulations and termed it as preferential concentration. Later, Eaton and Fessler [16] and Balachandar and Eaton [17] reviewed the underlying mechanisms of preferential concentration along with related experimental and numerical studies. For droplet and particulate combustion, this non-uniformity in dispersion is relevant as it affects the vaporization rate [18]. Generally, higher concentrations of droplets have lower evaporation rates and vice versa . Accordingly, measurement of particle clustering is an implicit reflection of evaporation. A simple and widely used method to measure clustering is through tracking variations in the local droplet volume fraction [19]. However, this approach is only meaningful when the droplet volume fraction is sufficiently large. For dilute flows, a Voronoi analysis approach was popularized by Monchaux et al. [20]. Most of the studies on particle dispersion in turbulence appear to be for spher-ical particles. For non-spherical particles, a significant portion of the fundamental research literature focuses on particle orientation and rotation dynamics in turbu-lent flows. Marchioli et al. [21], Siewert et al. [22], and Njobuenwu and Fairweather [23] examined the orientation and translation of ellipsoidal particles in turbulent channel flow and decaying isotropic turbulence. Jie et al. [24] further showed that preferential orientation exists even for inertialess spheroids. Giahi and Bergstrom [25] performed fully resolved simulations of spherical and non-spherical particles in turbulent channel flow, showing that shape significantly alters particle trajec-tories, rotation, and wake structures, demonstrating that a simple drag correction based on the equivalent sphere assumption is insufficient. The review by Voth and Soldati [26] summarized anisotropic particle orientation and rotation dynamics in turbulence. The significant impact of non-sphericity on bulk particle motion has also been recognized and has been investigated by researchers. Brenner [27, 28] investigated non-spherical Brownian particles, and found that particle dispersion is propor-tional to the diameter. Experimental work by Dubé et al. [29] on non-spherical particles in rotating drums revealed that non-spherical particles have lower axial dispersion than spherical ones due to preferential orientation. Saxby et al. [30] modeled atmospheric volcanic ash dispersion, and observed that non-spherical particles travel further than spherical particles, and the sensitivity of dispersion to particle shape is dependent on particle diameter. Elshorbagy et al. [31] performed simulations of non-spherical particles in a cyclone separator, and the results show higher tangential velocities of non-spherical particles in rotating flows. Yang et al. 3[32] explored the mixing and dispersion behavior of non-spherical particles in a bubbling fluidized bed, and concluded that particle dispersion is a non-linear func-tion of aspect ratio, peaking at around 0.75. However, these investigations are for either non-turbulent flows or for specific scientific and engineering configurations. Fundamental studies in canonical turbulence configurations should be performed to characterize the importance of these effects in more general contexts. A common feature across these studies is that they focused on rigid non-spherical particles with fixed shapes. Consequently, the central question becomes how particles orient relative to the local flow gradient. For liquid droplets, this framework is not directly applicable, as droplet shape changes dynamically under the competing influences of aerodynamic stress and surface tension, resulting in unsteady oscillations absent in rigid particles. The primary effect of non-sphericity in droplets therefore does not originate from the orientation but from the instantaneous shape dynamics and the resulting modification of drag. Recent work by Lin and Palmore Jr. [33] on non-spherical droplets in homogeneous isotropic turbulence has begun to explore this aspect. However, that study only considered a single combination of droplet diameter and density, leaving the effects of inertia and variations in droplet deformation underexplored. Furthermore, it did not account for transient droplet deformation, which the authors noted as physically inaccurate due to the relatively large capillary time of the droplets. When extending the analysis from solid particles to liquid droplets, the phys-ical complexity increases significantly due to the effect of droplet deformation. For solid particles with different fixed geometries, drag coefficient varies with shape. For example, Clift et al. [34] reported oblate particles exhibit lower drag than rigid spheres at Reynolds number 𝑅𝑒 < 37 but higher drag at 𝑅𝑒 > 37. For liquid droplets, however, droplet shape deforms dynamically due to the capillarity effect, which provides a restoring surface tension force to resist the deforming aerodynamic force. The competition between the two forces gives rise to unsteady shape oscillation that is absent in rigid particles, as described by the Taylor Anal-ogy Breakup (TAB) model [35]. In addition to the change of droplet shape, the viscous droplet interface couples the gaseous and liquid phases, inducing an inter-nal circulation that forms a boundary layer at the interface and alters the overall drag. Early studies on viscous spherical droplets, such as Harper and Moore [36], modeled the internal circulation as Hill’s vortex at high Reynolds numbers, while Rivkind and Ryskin [37] solved the axisymmetric stream-function and vorticity equations to capture internal circulation at intermediate Reynolds numbers. Fur-ther, Feng [38] introduced a two-layer concept to capture the boundary layer at droplet interface and established a drag correlation for viscous spherical droplets 4at intermediate viscosity ratios. Lin et al. [39] performed DNS to quantify in-ternal circulation of deformed droplets. The work showed that higher pressure strengthens circulation while larger deformation accelerates its decay, and that circulation can be quantified via the liquid-to-gas density ratio. More recently, Ni [40] provided a comprehensive review, showing that deformation fundamentally alters hydrodynamic forces, leading to drag reduction, turbulence modulation, and enhanced interfacial heat and mass transfer. For studies on drag coefficient of deformed droplets, Haywood et al. [41] em-ployed a finite-volume non-orthogonal adaptive-grid system to study evaporating deformed droplets; Helenbrook and Edwards [42] examined the combined effects of deformation and internal circulation, identifying oblate, prolate, and dimpled shapes and proposing an aspect-ratio correlation for spheroidal droplets; Loth [43] comprehensively reviewed drag coefficient of different particle types, including solid particles, viscous spherical drops/bubbles and deformed drops/bubbles, and established a unified drag correlation. More recently, Lin and Palmore [44] used direct numerical simulations to investigate the coupled effects of deformation and internal circulation on droplet drag at high pressure, finding that the drag coeffi-cient increases with increasing Weber number and decreasing liquid-to-gas density ratio, and deriving an analytical expression to explain these trends; Guglietta et al. [45] used more complex droplet deformation models to assess model accuracy, and it was suggested that simple models are sufficient for slightly deformed droplets, while more advanced ellipsoidal models are required for highly deformed droplets. In this work, we employ numerical approaches to investigate how droplet dispersion and clustering are affected by droplet deformation. An in-house code developed for simulating multiphase flows is adopted to simulate polydisperse droplets at different diameters in turbulence. Considering that the homogeneous isotropic turbulence is a canonical framework to study turbulence in a simplified and well-controlled manner, it is adopted in our study as the carrier phase. The carrier phase is modeled by using an in-house solver developed by Palmore and Desjardins [46] for solving high Reynolds number turbulent flows. Droplets are modeled by using a Lagrangian particle tracking (LPT) solver designed to simulate the full range of dilute-to-dense particle laden flows [47]. The unsteady deformation of droplets is modeled by the TAB model proposed by O’Rourke and Amsden [35], and the drag coefficient of droplets is modeled by the Dynamic Drag Model (DDM) proposed by Liu et al. [48]. Our analysis of droplet dispersion compares the parameters developed by Taylor [1], including the droplet velocity autocorrelation, droplet Lagrangian integral time scale, and droplet dispersion coefficient. We also develop a local vortex coordinate system to decompose droplet 5velocity to reveal the interaction between droplets and the vortical structures of the flow. Furthermore, droplet clustering is analyzed using the Voronoi approach [20]. The remainder of the paper is organized as follows. We begin in Section 2 with a detailed description of numerical methods used in this study, including the flow solver for the carrier phase in Section 2.2 and the LPT droplet model for solving droplets in Section 2.3. Section 3 introduces methods used for quantifying droplet dispersion and clustering in turbulence. In Section 4 we present results on droplet dispersion and clustering by using methods introduced in Section 3. Finally in Section 5 we offer conclusions on how droplet dispersion and clustering are affected by droplet deformation for advanced spray modeling in turbulent combustion applications. 
+
+2. Numerical methods 
+
+An Eulerian–Lagrangian framework is adopted to perform numerical simula-tions. The carrier fluid phase is solved on an Eulerian mesh, while the dispersed droplets are tracked as Lagrangian point particles. Details of the carrier phase and dispersed phase solvers are discussed in Section 2.2 and Section 2.3. 
+
+2.1. Problem Formulation 
+
+We simulate forced homogeneous isotropic turbulence in a cubic box with periodic boundary conditions, and add one-way coupled droplets to the dispersed phase. The controlling parameters of the problem are the Stokes number and Weber number, defined as St = 𝜏 d
+
+𝜏 𝜂 
+
+, We = 𝜌 f Δu2𝑑 𝜎 , (1) where 𝜏 d is droplet relaxation time defined as 𝜏 d = 𝜌 d 
+
+> 𝜌 f
+> 43
+> 𝑑 𝐶 D
+> 1
+> |Δu|
+
+, 𝜏 𝜂 is Kolmogorov time scale of turbulence, Δu = ud − uf (xd) is the relative velocity between droplets and the flow, 𝑑 is droplet diameter, 𝑢 d is droplet velocity, and 𝜎 is droplet surface tension. The Stokes number reflects the inertia of droplets, while the Weber number reflects the deformation of droplets. Figure 1 depicts a highly deformed droplet at high We [44]. Due to the relatively high aerodynamics stresses, the droplet deforms into an oblate spheroidal shape. This changes the streamlines of the flow around the droplet and alters the drag profile. A secondary flow is generated inside the droplet which further affects the droplet drag. 6Figure 1: Highly deformed droplet with internal circulation obtained from three-dimensional simulation. Original image from authors. Also used as graphical abstract for [44]. 
+
+2.2. Flow Solver 
+
+The fluid phase is resolved by using an in-house code developed by Palmore and Desjardins [46] for direct numerical simulation of high Reynolds number turbulent flow in a Eulerian framework, and modified for particle-laden flow by Miranda and Palmore Jr. [19]. The flow is governed by the Navier-Stokes equations 
+
+𝜕 (𝜌 u)
+
+𝜕𝑡 + ∇ · ( 𝜌 u ⊗ u) = −∇ 𝑝 + ∇ 
+
+h
+
+𝜇 
+
+
+
+∇u + (∇ u)𝑇 i 
+
++ f Sd + f , (2) where f Sd represents the momentum exchange between fluid and particles. Because the current study focuses on how turbulence disperses droplets, we isolate the effect of turbulence on deformed droplets by using one-way coupling droplet-laden flow simulations, i.e. f 𝑆  
+
+> d
+
+= 0. The volume fraction of droplets in our simulations is on the order of 10 −8, which is far below the threshold for the one-way coupling regime identified by Elghobashi [49]. Although high-St droplets may have a relatively large reaction force on the flow, the small mass loading (around 0.259% at most) of droplets suggests that the overall effect of the dispersed phase on the flow is still small. The final term, f , is an external forcing used to maintain the statistical steadi-ness of turbulence. To balance the decay of turbulent kinetic energy due to viscous 7dissipation, a filtered linear forcing strategy developed by Palmore and Desjardins [46] is adopted for f . The forcing term Equation (3) is applied in physical space and is proportional to a low-pass filtered velocity field for linear forcing, 
+
+f = 𝜌 𝐴 ˆu, (3) where 𝐴 is an arbitrary constant, and ˆ u is the filtered velocity field. 𝐴 is chosen such that the forcing term will enforce turbulence to maintain its initial properties and become statistically steady. The procedure for determining 𝐴 is referenced to Miranda and Palmore Jr. [19]. 
+
+2.3. Droplet Solver 
+
+The initial spatial distribution and velocity of the droplets are obtained from a precursor simulation, where droplets are initialized with zero velocity and a uniform distribution. The droplets are tracked using the Lagrangian particle tracking method. Each droplet is treated as a Lagrangian particle and is governed by 𝑑 xd
+
+𝑑𝑡 = ud, (4) 
+
+𝑚 𝑑 ud
+
+𝑑𝑡 = F Sd , (5) where F Sd is the surface force acting on the droplet. In our simulations, F 𝑆  
+
+> d
+
+is the drag force of droplets. Due to the low volume fraction, droplet-to-droplet collisions are not considered. In this study, we employ the dynamic drag coefficient correlation proposed by Liu et al. [48], which accounts for the correction of droplet shape change. The shape of deformed droplets is assumed to be oblate spheroids, and the equatorial plane of the oblate droplets is perpendicular to the local flow direction. Then the DDM drag correlation is 
+
+𝐶 D = 𝐶 D,sphere (1 + 2.632 𝑦 ) , (6) where 𝐶 D,sphere is the drag correlation of rigid spheres given by 
+
+𝐶 D,sphere = 24 
+
+𝑅𝑒 d
+
+
+
+1 + 16 𝑅𝑒 2/3d
+
+
+
+, (7) 
+
+𝑅𝑒 d is droplet Reynolds number, and 𝑦 in Equation (6) is the non-dimensionalized distortion of droplets defined as 𝑦 = 2Δ𝑟 /𝑟 , where 𝑟 is original droplet radius 8and Δ𝑟 is the displacement of the droplet equator from its equilibrium position. 
+
+𝑦 is obtained by solving the equation of droplet distortion given by TAB model proposed by O’Rourke and Amsden [35] in Equation (8), 
+
+¥𝑦 = 2𝜌 f
+
+3𝜌 d
+
+𝑢 2
+
+𝑟 2 − 8𝜎 𝜌 d𝑟 3 𝑦 − 5𝜇 d
+
+𝜌 d𝑟 2 ¤𝑦. (8) 
+
+3. Measurements of Droplet Motion 
+
+3.1. Quantification of droplet dispersion 
+
+The mean-square displacement ⟨𝑋 2⟩ is representative to quantify droplet dis-persion in homogeneous isotropic turbulence. A more commonly used parameter is the time derivative of ⟨𝑋 2⟩, named as dispersion coefficient 𝐾 = 𝑑 𝑑𝑡 ⟨𝑋 2⟩, which represents the statistical rate at which droplets are conveyed away from their orig-inal positions. The pioneering work by Taylor [1] demonstrated that for homogeneous isotropic turbulence, dispersion can be fully characterized from the autocorrelation of La-grangian particle velocity, 𝑅 𝑖 𝑗 , as defined in Equation (9), where 𝑖, 𝑗 refers to the directions of droplet velocity. 
+
+𝑅 𝑖 𝑗 (𝑡 ) = ⟨𝑢 d,𝑖 (𝑡 0) 𝑢 d, 𝑗 (𝑡 0 + 𝑡 )⟩ √︃ 
+
+⟨𝑢 2d,𝑖 (𝑡 0)⟩ √︃ ⟨𝑢 2d, 𝑗 (𝑡 0)⟩ 
+
+(9) The mean-square displacement of a particle within a certain time interval can be calculated from the autocorrelation, as shown in Equation (10), and similarly for the dispersion coefficient 𝐾 using Equation (11). 
+
+⟨𝑋 2 
+
+> 𝑖
+
+⟩ = 2⟨𝑢 2d,𝑖 ⟩
+
+∫ 𝑡 
+
+> 0
+
+∫ 𝜏 
+
+> 0
+
+𝑅 𝑖𝑖 (𝜉 ) 𝑑𝜉𝑑𝜏 (10) 
+
+𝐾 (𝑡 ) = 𝑑 𝑑𝑡 ⟨𝑋 2⟩ = 23∑︁ 𝑖 
+
+⟨𝑢 2d,𝑖 (𝑡 )⟩ 
+
+∫ 𝑡 
+
+> 0
+
+𝑅 𝑖𝑖 (𝜉 ) 𝑑𝜉 (11) Another important parameter is the Lagrangian time, 𝜏 𝐿 . It is a characteristic dispersion time defined in terms of the autocorrelation, and it represents the time for droplet motion to decorrelate from its initial position. 
+
+𝜏 𝐿 =∑︁ 
+
+> 𝑖
+
+∫ ∞
+
+> 0
+
+𝑅 𝑖𝑖 (𝑡 ) 𝑑𝑡, (12) 9It distinguishes the behavior of droplet dispersion under two distinct asymptotic regimes, derived by Taylor [1]. When 𝑡 ≪ 𝜏 L, droplet velocity autocorrelation does not significantly drop from unity, and the mean-square displacement of droplets is under the ballistic regime and is proportional to 𝑡 2. When 𝑡 ≫ 𝜏 L, the mean-square displacement transitions to the diffusive regime and grows linearly with time. At sufficiently long times where 𝑡 ≫ 𝜏 L, Equation (11) reduces to Equation (13), where 𝜏 L is the Lagrangian time scale defined in Equation (12). 
+
+𝐾 = 2⟨𝑢 2d⟩𝜏 L (13) A final measure of dispersion is the particle-to-fluid relative dispersion. Goues-bet et al. [4] defined the reduced dispersion coefficient 𝑆 to measure how the particles dispersion deviates from the fluid flow, 
+
+𝑆 = 𝐾 (𝑡 )
+
+𝐾 f (𝑡 ) , (14) 
+
+𝑆 ∞ = 𝐾 (𝑡 )
+
+𝐾 f (𝑡 → ∞) , (15) where 𝐾 is the droplet dispersion coefficient of droplets, and 𝐾 f is the dispersion coefficient of fluid particles. In this study, we use the dispersion coefficient of tracer particles as an estimate of 𝐾 f .
+
+𝑆 represents the instantaneous comparison between the particle dispersion and the fluid particle diffusion, while 𝑆 ∞ represents the asymptotic behavior of particle dispersion and determines how fast the dispersion occurs. If 𝑆 > 1, it means particles are dispersing more rapidly than fluid particles; if 𝑆 < 1, then it means particles are lagging behind the flow. 𝑆 ∞ determines the eventual dispersion of particles compared to the fluid. 
+
+3.2. Quantification of Preferential Concentration 
+
+In turbulent flow, the interaction between droplets and vortices is an essential factor that alters the spatial distribution of droplets. The Stokes number quantifies the competition of inertia between droplets and the fluid. When St ≪ 1, droplets behave like tracer particles that faithfully follow fluid streamlines. Conversely, if St ≫ 1, droplets are largely unaffected by the flow, but maintain their own trajectories. For intermediate St ≈ 1, droplets tend to cluster in regions of low vorticity and high strain rate. In particular, the preferential concentration phe-nomenon predicts that droplets will centrifuge out of vortices, i.e. preferentially move away from the center of vortices [17]. Based upon these physical regimes, this article will use the terms non-inertial ( 𝑆𝑡 ≪ 1), weakly-inertial ( 𝑆𝑡 ∼ 1), and strongly-inertial ( 𝑆𝑡 ≫ 1). 10 3.2.1. Velocity decomposition in local vortex coordinate 
+
+To better investigate the effect of droplet-vortex interaction, we introduce a local vortex coordinate system motivated by the kinematics of a line vortex. For an ideal line vortex, the flow can be decomposed into a swirling motion, a translational motion parallel to the vorticity direction, and a translational motion perpendicular to the vortex line. Such decomposition of the flow field intuitively illustrates the motion of the flow relative to the vortex line. In our case, to describe droplet motion relative to local vortical structures in a complex turbulent flow, we generalize this method by decomposing relative velocity Δu into three directions defined by three orthogonal unit vectors ˆ p, ˆt, ˆn, corresponding to directions: 1) parallel to local vortex, 2) tangent to local streamline, 3) and normal to local vortex, as illustrated in Figure 2. The unit vectors are defined as ˆp = ω
+
+|ω| , (16) ˆt = uf
+
+|uf | , (17) ˆn = ˆt × ˆp, (18) where ω = ∇ × uf . These velocity components are then normalized by the magnitude of Δu, yielding the direction cosines cos 𝜃 rel ,p, cos 𝜃 rel ,t and cos 𝜃 rel ,n
+
+of Δu with respect to ˆ p, ˆ t, and ˆ n. In the remainder of the paper, we refer to droplet velocity components in these three directions as 𝑝 -, 𝑡 - and 𝑛 -components respectively. The choice of such coordinate helps determine whether or not a droplet is moving toward or away from a vortex depending only on the sign of 
+
+𝑛 -component velocity. ˆp ˆn   
+
+> ˆtuf
+> ud
+> Figure 2: local vortex coordinate system; the sign ⊙at the center represents ˆ ppointing out of the plane toward reader
+
+3.2.2. Voronoi analysis 
+
+Measurement of 𝑛 -component velocity only implies that preferential motion occurs, it does not quantify the amount of this motion. To quantify the amount of 11 preferential motion, we use Voronoi analysis developed by Monchaux et al. [20]. A Voronoi cell is defined as a region surrounding a specific “seed” point, such that any other points within the region is closer to any other seed points. In our case, the seed point is the droplet. It is intuitive that a larger Voronoi cell corresponds to a region of lower particle concentration. Thus, the inverse of Voronoi cell volume represents the local concentration of particles. By comparing the probability density function of Voronoi cell volume and its standard deviation across different cases, we can effectively quantify the strength of droplet clustering. 
+
+4. Results 
+
+We solve the turbulent flow in a cubic domain with side length 𝐿 = 0.044 m. The computational domain is discretized into 𝑁 = 256 cells along each direction. Parameters of the flow are listed in Table 1. In the table, rms (𝑢 ) refers to the root-mean-square fluid velocity, 𝜈 is fluid viscosity, and 𝜂 is the Kolmogorov length scale which characterizes the smallest eddy size in turbulence. The ratio of the Kolmogorov length scale to the grid spacing is 𝜂  
+
+> Δ
+
+≈ 0.462 where Δ = 𝐿 /𝑁 ,indicating that the DNS is resolved [50]. Furthermore, Figure 3 shows the energy spectrum exhibits a distinct inertial subrange, as seen by the region with -5/3 slope. This verifies the physical validity of our homogeneous isotropic turbulence simulation. 𝑅𝑒 𝜆 refers to the Taylor-microscale based Reynolds number, and 𝜅 Δ is the largest resolvable wavenumber on the grid. 12 10 2 10 1 10 0  
+
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> E/(  5
+> g )1/4
+
+5/3 slope Figure 3: Energy spectrum of the HIT flow. 
+
+𝑁 rms (𝑢 ) (m /s) 𝜈 (m 2/s) 𝜂 (m) 𝑅𝑒 𝜆 𝜅 Δ𝜂 
+
+256 0.3999 6.024 × 10 −6 7.939 × 10 −5 156 1.451 
+
+> Table 1: Turbulent flow parameters
+
+To systematically investigate the coupled effects of inertia and deformation, the droplet density, viscosity, and surface tension are independently varied to control the Stokes and Weber numbers, while Ohnesorge number is fixed at Oh = 0.1. Droplet density varies between 𝜌 d = 683 .85 kg /m3 and 68 385 kg /m3 across three different diameters at 𝑑 0 = 1.567 × 10 −6 m, 𝑑 1 = 4.957 × 10 −6 m and 𝑑 2 =
+
+1.108 × 10 −5 m. The controlling parameters of droplets are listed in Table 2, where St ∗ is the expected Stokes number calculated based on Stokes’ drag St ∗ = 𝜌 d 𝑑 2 
+
+> 18 𝜇 f
+> 1
+> 𝜏 𝜂
+
+,and We ∗ is the expected Weber number estimated based on Abrahamson [51]’s theory that calculates droplet velocity by using Equation (19). 
+
+⟨𝑢 2d⟩⟨𝑢 2f ⟩ = 11 + 𝜏 d/𝜏 L,f
+
+(19) 13 ⟨St ⟩∗ [0.01 , 0.1, 0.5, 1, 10 , 50 ]⟨We ⟩∗ [0.01 , 4, 9]
+
+Oh 0.1Number of droplets 5000 for each case Initial distribution Uniform random 
+
+> Table 2: Droplet parameters.
+
+4.1. Effect of St and We on droplet dispersion 
+
+Unlike the classically defined Stokes number based on Stokes drag law ( 𝑆𝑡 ∗), the instantaneous Stokes number ( 𝑆𝑡 ) is dynamically evaluated using the instantaneous droplet drag to capture the transient droplet deformation. Written explicitly, it satisfies, 
+
+𝑆𝑡 = 𝜏 𝑑 
+
+𝜏 𝜂 
+
+= 𝜌 d
+
+𝜌 f
+
+43
+
+𝑑 𝐶 D
+
+1
+
+|Δu|
+
+1
+
+𝜏 𝜂 
+
+(20) As illustrated in Figure 4 and listed in Table 3, the average Stokes number, 
+
+⟨St ⟩, monotonically decreases with increasing ⟨We ⟩. While this reduction is insignificant for non-inertial droplets, it is highly pronounced for strongly-inertial droplets. This trend is driven by the increased projected frontal area and higher drag coefficient of the deformed droplets, which together reduce their relaxation times. 14 ⟨St ⟩∗ ⟨We ⟩∗ ⟨St ⟩ ⟨We ⟩ ⟨𝜏 L⟩/ 𝜏 eddy ⟨𝐾 ⟩ ⟨𝑢 2d⟩ 𝜏 decay /⟨ 𝜏 L⟩
+
+0.01 0.01 0.0178 0.00294 0.210 0.0174 0.478 0.0288 0.01 4.0 0.0163 0.782 0.228 0.0183 0.476 0.667 0.01 9.0 0.0153 1.27 0.238 0.0196 0.477 0.833 0.10 0.01 0.176 0.00701 0.197 0.0166 0.486 0.0313 0.10 4.0 0.154 1.66 0.253 0.0204 0.486 0.599 0.10 9.0 0.143 2.74 0.260 0.0222 0.483 0.738 0.50 0.01 0.843 0.0183 0.220 0.0179 0.475 0.0281 0.50 4.0 0.666 3.56 0.261 0.0216 0.484 0.569 0.50 9.0 0.601 5.78 0.254 0.0219 0.484 0.759 1.00 0.01 1.75 0.0298 0.277 0.0208 0.446 0.0224 1.00 4.0 1.32 4.49 0.269 0.0212 0.472 0.567 1.00 9.0 1.13 8.51 0.241 0.0191 0.474 0.873 10.00 0.01 16.4 0.0199 0.500 0.0214 0.260 0.0144 10.00 4.0 12.1 4.64 0.380 0.0199 0.326 0.460 10.00 9.0 10.4 9.05 0.354 0.0190 0.336 0.702 50.00 0.01 74.5 0.0164 1.14 0.0215 0.118 0.00924 50.00 4.0 54.2 5.00 0.676 0.0191 0.181 0.376 50.00 9.0 44.9 10.5 0.638 0.0195 0.197 0.565 
+
+Table 3: Time-averaged statistics for 𝑡 /𝜏 eddy > 5 (except ⟨𝜏 L⟩/ 𝜏 eddy ). 0 2 4 6 8                         
+
+> t/eddy
+> 020 40 60
+> St
+> St *= 0.01
+> St *= 0.10 Tracers
+> (a) non-inertial 02468
+> t/eddy
+> 020 40 60
+> St
+> St *= 0.50
+> St *= 1 Tracers (b) weakly-inertial 02468
+> t/eddy
+> 020 40 60
+> St  St *= 10
+> St *= 50 Tracers (c) strongly-inertial
+
+Figure 4: Mean Stokes number of droplets. Solid, dashed, and dotted lines correspond to We ∗ =
+
+0.01 , 4, 9, respectively. The line-styles and color codes of other figures in Section 4.1 follow the conventions established in this figure. 
+
+4.1.1. Statistics of Droplet Dispersion 
+
+The temporal autocorrelation of droplet velocity evaluated at different St ∗ and We ∗ is presented in Figure 5 and Figure 6. 𝑅 is defined as the average of diagonal 15 elements of autocorrelation tensor 𝑅 𝑖 𝑗 . This metric quantifies the rate at which droplets lose memory of their initial velocities. As shown in Figure 5, for non-inertial droplets, 𝑅 exhibits negligible differences across various We ∗, behaving closely to tracer particles. For weakly- and strongly-inertial droplets, droplets with higher St ∗ show a slower decay of 𝑅 compared to those with lower St ∗. Regarding the effect of deformation, strongly-inertial droplets with larger We ∗ show a faster decay of 𝑅 compared to those with smaller We ∗. This occurs because deformation increases aerodynamic drag, forcing the droplets to follow the local fluid motion more closely and consequently reducing the temporal velocity correlation. The effect of deformation is diminished for non- and weakly-inertial droplets, as they are less sensitive to changes of the drag force. 0 2 4 6 8                         
+
+> t/eddy
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> R
+> St *= 0.01
+> St *= 0.10 Tracers
+> (a) non-inertial 02468
+> t/eddy
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> R
+> St *= 0.50
+> St *= 1 Tracers (b) weakly-inertial 02468
+> t/eddy
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> R
+> St *= 10
+> St *= 50 Tracers (c) strongly-inertial
+
+Figure 5: Temporal autocorrelation of droplet velocity averaged over principal directions; time is normalized by the eddy turnover time 𝜏 eddy .
+
+The Lagrangian time scale serves as a macroscopic measure of droplet velocity memory, quantifying the time required for its velocity to completely de-correlate from its initial state. From Table 3 we can observe that 𝜏 L generally increases with increasing St ∗, which is consistent with the observation of 𝑅 . The reason is that droplets with larger inertia are less responsive to high-frequency turbulent fluctuations [10], resulting in a longer droplet Lagrangian time scale. Since the velocity autocorrelation 𝑅 decays to 0 before 𝑡 /𝜏 eddy = 5 across all cases, long term statistics for all variables can be computed based on 𝑡 > 5𝜏 eddy .Regarding the effect of deformation, we note that for droplets with St ∗ < 0.5, 𝜏 L
+
+increases as ⟨We ⟩ increases, while for droplets with St ∗ > 0.5, 𝜏 L decreases as 
+
+⟨We ⟩ increases. At the transition point St ∗ = 0.5, it exhibits a non-monotonic dependence on ⟨We ⟩ where 𝜏 L/𝜏 eddy first increases to a peak value around 0.265 and then decreases. In addition, as shown in Figure 6, when time is normalized by 
+
+𝜏 L, the curves of 𝑅 at different St ∗ and We ∗ collapse to a nearly universal curve with slight deviations. This result indicates that the Lagrangian time scale effectively 16 captures the velocity memory of droplets across different cases, but it cannot fully account for the effect of droplet inertia and deformation, particularly for strongly inertial droplets. 0 2 4 6 8     
+
+> t/L
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> R
+> St *= 0.01
+> St *= 0.10 Tracers
+
+(a) non-inertial 0 2 4 6 8      
+
+> t/L
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> R
+> St *= 0.50
+> St *= 1 Tracers
+
+(b) weakly-inertial 0 2 4 6 8      
+
+> t/L
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> R
+> St *= 10
+> St *= 50 Tracers
+
+(c) strongly-inertial 
+
+Figure 6: Temporal autocorrelation of droplet velocity averaged over principal directions; time is normalized by droplet Lagrangian time scale 𝜏 L.
+
+The droplet dispersion coefficient 𝐾 evaluated via Equation (11) is presented in Figure 7. The asymptotic values of 𝐾 at diffusive regime are summarized in Table 3. Consistent with the trends observed for ⟨𝜏 L⟩, ⟨𝐾 ⟩ increases as ⟨We ⟩
+
+increases for non-inertial droplets, but decreases for strongly-inertial droplets. The crossover in the Weber number dependency occurs in the weakly-inertial regime at 
+
+⟨St ⟩∗ = 1. However, the deformation effect is less pronounced for strongly-inertial droplets due to a compensation mechanism between droplet velocity statistics and droplet Lagrangian time scale. According to Equation (13), although 𝜏 L
+
+is reduced significantly due to deformation, the increased drag simultaneously increases mean-square droplet velocity as shown in Table 3, and therefore the product of these two competing factors ultimately results in a relatively weak sensitivity of 𝐾 to droplet deformation. 0 2 4 6 8         
+
+> t/L
+> 10 5
+> 10 4
+> 10 3
+> 10 2
+> K
+> St *= 0.01
+> St *= 0.10 Tracers
+
+(a) non-inertial 0 2 4 6 8          
+
+> t/L
+> 10 5
+> 10 4
+> 10 3
+> 10 2
+> K
+> St *= 0.50
+> St *= 1 Tracers
+
+(b) weakly-inertial 0 2 4 6 8          
+
+> t/L
+> 10 5
+> 10 4
+> 10 3
+> 10 2
+> K
+> St *= 10
+> St *= 50 Tracers
+
+(c) strongly-inertial 
+
+Figure 7: Droplet dispersion coefficient. 
+
+17 To quantify the macroscopic transport of droplets relative to the turbulent flow, we evaluate reduced dispersion coefficient defined in Equation (14) and Equation (15), following the theoretical framework developed by Gouesbet et al. [4]. The results of ⟨𝑆 ∞⟩ suggest that for droplets with St ∗ < 1, deformation will monotonically enhance droplet dispersion to make them disperse more rapidly than fluid particles. For St ∗ ≥ 1, deformation will suppress droplet dispersion, but the dependence on Weber number is non-monotonic. Since results of ⟨𝑆 ⟩ have the same trend as ⟨𝑆 ∞⟩, it is omitted for brevity. 0 2 4 6 8                         
+
+> t/L
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4
+> S
+> St *= 0.01
+> St *= 0.10
+> (a) non-inertial 02468
+> t/L
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4
+> S
+> St *= 0.50
+> St *= 1 (b) weakly-inertial 02468
+> t/L
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4
+> S
+> St *= 10
+> St *= 50 (c) strongly-inertial
+
+Figure 8: Reduced dispersion coefficient 𝑆 ∞.
+
+It is noteworthy that for non-inertial droplets, the dispersion is enhanced by deformation even with a decreased Stokes number, as shown in Table 3 and Figure 7a. This result appears to contradict the classical linear theory [9], where a smaller Stokes number decreases the Lagrangian time scale for St → 0. To understand this, we examine the unsteady deformation dynamics. The TAB model describes a damped linear oscillator with a damping ratio 𝜁 𝜁 = 54Oh , (21) which equals 0.125 across all cases. The characteristic decay time 𝜏 decay of the shape oscillation is therefore 𝜏 decay = 𝜏 n/𝜁 , where 𝜏 n is the undamped natural period associated to Equation (8). The ratio 𝜏 decay /⟨ 𝜏 L⟩ is listed in the last column of Table 3. For a fixed St ∗, 𝜏 decay /⟨ 𝜏 L⟩ increases as the Weber number increases, and the value lies between 0.3 to 0.9 for deformed droplets. The results indicate that the oscillation decay time for deformed droplets is comparable to the droplet Lagrangian time scale. For non-inertial droplets, the damped shape oscillation acts as a persistent perturbation that prolongs the velocity decorrelation process, leading to an increased Lagrangian time scale. This effect is negligible for strongly-inertial droplets, because the decorrelation is dominated by the drastic reduction of 18 the droplet relaxation time. However, the re-introduction of inertia due to surface tension could potentially explain some of the non-monotonic Weber number trends previously observed and it will be further investigated in Section 4.3. 
+
+4.2. Clustering and droplet-vortex interaction 
+
+The macroscopic dispersion statistics reported in Section 4.1 alone do not describe the uniformity of spatial distribution of droplets. As introduced in Sec-tion 3.2.2, inertial droplets tend to cluster in regions of low vorticity and high strain rate, which is known as preferential concentration. In this section, we use the method introduced in Section 3.2.1 as well as Voronoi analysis to investigate the mechanisms of clustering and how it is modulated by droplet deformation. 
+
+4.2.1. Statistics of Direction Cosines in Local Vortex Coordinate 
+
+Direction cosines of droplet relative velocity in the local vortex coordinate system provide deeper insights into droplet dispersion mechanisms. The direction cosines in 𝑡 -direction are plotted in Figure 9. The statistics are presented using whisker-box plots, where the central box represents the inter-quartile range (IQR) and the whiskers extend from the box to the furthest data point lying within 1.5 times the IQR from the box. The results show that for non-inertial and weakly-inertial droplets ⟨cos 𝜃 rel ,𝑡 ⟩ is close to 0, indicating that these droplets are following the swirling motion of eddies closely. For strongly-inertial droplets, 
+
+⟨cos 𝜃 rel ,𝑡 ⟩ becomes substantially negative, in contrast to the near-zero values for lower-inertia droplets. This negative value signifies that strongly-inertial droplets resist the swirling motion of eddies and tend to lag behind the fluid. In addition, we note that increasing Weber number makes ⟨cos 𝜃 rel ,𝑡 ⟩ less negative for strongly-inertial droplets. The enhanced drag associated with deformation allows these droplets to respond more readily to the swirling flow, driving ⟨cos 𝜃 rel ,𝑡 ⟩ toward zero. In addition, the small range of IQR and short whiskers indicate that the statistics of ⟨cos 𝜃 rel ,𝑡 ⟩ is very stable. 19 0 2 4 6 8 10     
+
+> We
+> 0.6
+> 0.5
+> 0.4
+> 0.3
+> 0.2
+> 0.1
+> 0.0
+> cos  rel,  t
+> St *= 0.01
+> St *= 0.10
+
+(a) non-inertial 0 2 4 6 8 10      
+
+> We
+> 0.6
+> 0.5
+> 0.4
+> 0.3
+> 0.2
+> 0.1
+> 0.0
+> cos  rel,  t
+> St *= 0.50
+> St *= 1
+
+(b) weakly-inertial 0 2 4 6 8 10      
+
+> We
+> 0.6
+> 0.5
+> 0.4
+> 0.3
+> 0.2
+> 0.1
+> 0.0
+> cos  rel,  t
+> St *= 10
+> St *= 50
+
+(c) strongly-inertial 
+
+Figure 9: Time-averaged relative droplet velocity component tangential to the local fluid flow (𝑡 -direction). 
+
+The normal direction cosine ⟨cos 𝜃 rel ,𝑛 ⟩ shown in Figure 10 decreases monoton-ically with Stokes number. Both non-inertial and weakly-inertial droplet demon-strate an outward centrifuging response to the vortex, as expected. The peak relative centrifuging velocity appears to occur for the non-inertial droplets. How-ever it is important to note that this quantity is normalized in terms of vanishingly small relative velocity. Accordingly, the absolute value of this preferential motion is small for these droplets. For strongly-inertial droplets, ⟨cos 𝜃 rel ,𝑛 ⟩ becomes a small negative value but is statistically distinguishable from 0, indicating that centrifugal effect is signif-icantly suppressed, and strongly-inertial droplets slightly lag behind the outward centrifuging fluids. The effect of deformation on ⟨cos 𝜃 rel ,𝑛 ⟩ is almost negligible, although we note a slight enhancement on ⟨cos 𝜃 rel ,𝑛 ⟩ for non-inertial and weakly-inertial droplets, and slight suppression for strongly-inertial droplets. The statistics of ⟨cos 𝜃 rel ,𝑛 ⟩ is very stable as well. 0 2 4 6 8 10     
+
+> We
+> 0.0 0.1 0.2 0.3 0.4 0.5
+> cos  rel,  n
+> St *= 0.01
+> St *= 0.10
+
+(a) non-inertial 0 2 4 6 8 10      
+
+> We
+> 0.0 0.1 0.2 0.3 0.4 0.5
+> cos  rel,  n
+> St *= 0.50
+> St *= 1
+
+(b) weakly-inertial 0 2 4 6 8 10      
+
+> We
+> 0.0 0.1 0.2 0.3 0.4 0.5
+> cos  rel,  n
+> St *= 10
+> St *= 50
+
+(c) strongly-inertial 
+
+Figure 10: Time-averaged relative droplet velocity component normal to the other two components (𝑛 -direction). 
+
+Along the 𝑝 -direction shown in Figure 11, the distributions of ⟨cos 𝜃 rel ,𝑝 ⟩
+
+20 for the non-inertial and weakly-inertial droplets remain centered near zero across all Weber number cases. However, their whiskers are noticeably longer than those of ⟨cos 𝜃 rel ,𝑡 ⟩ and ⟨cos 𝜃 rel ,𝑛 ⟩, indicating stronger fluctuations of the relative motion along the vortex axis. For strongly-inertial droplets, the distribution of 
+
+⟨cos 𝜃 rel ,𝑝 ⟩ deviates slightly from zero and exhibits even longer whiskers than the lower-inertia cases, suggesting enhanced axial dispersion. The near-zero central tendency indicates that these axial motions do not correspond to a persistent directional drift. 0 2 4 6 8 10                         
+
+> We
+> 0.06
+> 0.04
+> 0.02
+> 0.00 0.02 0.04
+> cos  rel,  p
+> St *= 0.01
+> St *= 0.10
+> (a) non-inertial 0246810
+> We
+> 0.06
+> 0.04
+> 0.02
+> 0.00 0.02 0.04
+> cos  rel,  p
+> St *= 0.50
+> St *= 1 (b) weakly-inertial 0246810
+> We
+> 0.06
+> 0.04
+> 0.02
+> 0.00 0.02 0.04
+> cos  rel,  p
+> St *= 10
+> St *= 50 (c) strongly-inertial
+
+Figure 11: Time-averaged relative droplet velocity component parallel to the local vorticity vector (𝑝 -direction). 
+
+4.2.2. Voronoi Analysis 
+
+To examine the strength of clustering, the probability density function (PDF) of the normalized Voronoi cell volume 𝑉 /⟨ 𝑉 ⟩ is shown in Figure 12. For non-inertial droplets, the clustering is weak, as their PDFs are nearly identical to those of the fluid particles. For weak- and strongly-inertial droplets, preferential concentration becomes evident, as the PDFs exceed those of the fluid particle at small 𝑉 /⟨ 𝑉 ⟩.Deformation is observed to weaken preferential concentration for weakly-inertial droplets, while enhancing it for strongly-inertial droplets. This indicates that deformation effect on clustering is dependent on droplet inertia. It suppresses clustering in the weakly-inertial regime but enhances it in strongly-inertial regime. 21 10 1 10 0                              
+
+> V/V
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> PDF
+> St *= 0.01
+> St *= 0.10 Tracer (a) non-inertial 10 110 0
+> V/V
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> PDF
+> St *= 0.50
+> St *= 1 Tracer (b) weakly-inertial 10 110 0
+> V/V
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> PDF
+> St *= 10
+> St *= 50 Tracer (c) strongly-inertial
+
+Figure 12: Probability density function of Voronoi cell volume. 
+
+To more accurately analyze clustering, we quantitatively evaluate it by the standard deviation of 𝑉 /⟨ 𝑉 ⟩ distribution. std (V/⟨ V⟩) is shown in Figure 13. In Voronoi analyses of particle-laden flows, the random Poisson process (RPP) is commonly used as the baseline. For three-dimensional RPP, std (𝑉 /⟨ 𝑉 ⟩) is approximately 0.42 [52]. As shown in Figure 13, std (V/⟨ V⟩) for non-inertial droplets is very close to the value for three-dimensional RPP, indicating negligible clustering, while the strongest clustering is observed at St ∗ = 10. Droplet defor-mation further modulates the clustering behavior. To achieve the same level of clustering, deformed droplets require a higher Stokes number. If St ∗ is fixed, then for droplets with St ∗ ≤ 1, deformation reduces the strength of clustering almost monotonically with increasing Weber number, whereas for droplets at St ∗ = 50, clustering is monotonically enhanced. At St ∗ = 10, the effect of deformation is non-monotonic. The clustering is enhanced by deformation at We ∗ = 4, but is suppressed at We ∗ = 9 compared to We ∗ = 4. The Weber number dependency for droplets at St ∗ = 50 is further visually corroborated by the two-dimensional Voronoi diagram in Figure 14, which are extracted from a thin slice at the most representative plane in the domain. The representative slice is selected from 33 equally spaced slices, such that its standard deviation of the normalized Voronoi cell area is the closest to the value in Figure 13. 22 10 2 10 1 10 0 10 1
+
+St *
+
+0.45 0.50 0.55 0.60 0.65 0.70       
+
+> std( V/ V )
+> We *= 0 We *= 4 We *= 9
+
+Figure 13: Standard deviation of normalized Voronoi cell volume. 0.000 0.011 0.022 0.033 0.044     
+
+> x(m)
+> 0.000 0.011 0.022 0.033 0.044
+> y (m)
+> n=90
+> Representative slice: z/L= 0.9688 (slice 32/33)
+> 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 1e 5
+
+(a) We ∗ = 0.01 0.000 0.011 0.022 0.033 0.044      
+
+> x(m)
+> 0.000 0.011 0.022 0.033 0.044
+> y (m)
+> n=104
+> Representative slice: z/L= 0.4688 (slice 16/33)
+> 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 1e 5
+
+(b) We ∗ = 40.000 0.011 0.022 0.033 0.044      
+
+> x(m)
+> 0.000 0.011 0.022 0.033 0.044
+> y (m)
+> n=124
+> Representative slice: z/L= 0.8438 (slice 28/33)
+> 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 1e 5
+
+(c) We ∗ = 9
+
+Figure 14: Two-dimensional Voronoi diagram of the most representative plane of the domain for droplets at St ∗ = 50. 
+
+These results are consistent with our previous analysis in Section 4.2.1. Overall, deformation increases the drag coefficient, thereby reducing the droplet relaxation time and shifting the Stokes number toward lower values. For non-inertial droplets, which already behave as tracer particles, the effect of deformation is negligible. For weakly-inertial droplets, ⟨cos 𝜃 rel ,𝑛 ⟩ is significantly reduced compared to non-inertial droplets, indicating that they are less effectively expelled by centrifugal forces. The reduction in Stokes number caused by deformation then enhances their centrifugal expulsion, increasing the outward normal velocity component and driving them further from vortices, which consequently weakens the preferential concentration. For strongly-inertial droplets, the increased drag due to deformation allows them to respond more actively to the swirling motion of vortices. This is reflected in the less negative tangential direction cosine, indicating a reduced lag behind the swirling motion of vortices. Consequently, these droplets are more 23 readily entrained into the vortex periphery, resulting in an enhanced preferential concentration. It is interesting to consider the implications of this on the application of spray and droplet combustion. Concentrating droplets closely together tends to decrease the rate of evaporation, and therefore combustion of fuel droplets. However, shearing droplets tends to increase the rate of evaporation, leading to a confounding effect. Furthermore, recent work has also demonstrated that droplet evaporation and combustion rates of deformed droplets differ from those of spherical ones [53, 54, 55, 56, 57] which further complicates predictions of this phenomena. 
+
+4.3. Comparison between steady and unsteady deformation models 
+
+To assess the importance of unsteady deformation, we compare the full time-dependent TAB model used throughout Section 4.1 with a steady-state approxi-mation. The unsteady model advances the distortion 𝑦 by evaluating the analytical solution of Equation (8) at the discrete simulation timestep Δ𝑡 , thereby preserv-ing the memory of past deformation and transient shape oscillations. The steady model instead uses the long-time limit of the same solution, obtained by taking 
+
+𝑡 → ∞ , which eliminates the transient contributions. In this subsection we ex-amine the droplet statistics of the mean Stokes number, Lagrangian time scale, mean-square velocity, droplet dispersion coefficient, and the PDF of Voronoi cell volumes for both models across different droplet inertia at each ⟨We ⟩∗ = 9. The goal is to determine whether the transient behavior predicted by the full TAB model produces a statistically distinguishable effect on dispersion relative to the steady approximation. In Figure 15a and Figure 15c, we observe that ⟨St ⟩ and ⟨𝑢 2d⟩ are insensitive to unsteady/steady deformation models. This can be understood by the fact that the mean Stokes number is primarily determined by the time-averaged drag coefficient, therefore the transient shape oscillation has negligible effect on ⟨St ⟩. Similarly, the mean-square velocity is primarily governed by the response to the mean drag force, and therefore the effect of unsteady shape oscillations on ⟨𝑢 2d⟩ is largely averaged out over time. The PDF of Voronoi cell volumes plotted in Figure 16 also suggests that the clustering of droplets is unaffected by the unsteady/steady defor-mation models, as the two PDFs are nearly identical, indicating that preferential concentration is primarily determined by the mean Stokes number. However, the Lagrangian time scale 𝜏 L and droplet dispersion coefficient 𝐾 shown in Figure 15b and Figure 15d are significantly affected by the choice of the two models. The steady model predicts a much larger ⟨𝜏 L⟩ and ⟨𝐾 ⟩ than the unsteady model. This 24 discrepancy arises because the transient shape oscillations captured by the un-steady model have introduced additional fluctuations in the drag force, enhancing the decorrelation of droplet velocity, and consequently reducing ⟨𝜏 L⟩. Then, since 
+
+⟨𝑢 2d⟩ remains identical between the two deformation models, the reduction of ⟨𝜏 L⟩
+
+directly leads to the reduction of ⟨𝐾 ⟩ according to Taylor’s dispersion theory. 0 2 4 6 8
+
+t/ eddy       
+
+> 010 20 30 40
+> St  St *= 1
+> St *= 10
+> St *= 50
+
+(a) Mean Stokes number of droplets. 0 2 4 6 8
+
+t/ L       
+
+> 0.0 0.2 0.4 0.6 0.8
+> L / eddy
+> St *= 1
+> St *= 10
+> St *= 50
+
+(b) Droplet Lagrangian time scale. 0 2 4 6 8
+
+t/ L      
+
+> 0.20 0.25 0.30 0.35 0.40 0.45 0.50
+> u2d
+> St *= 1
+> St *= 10
+> St *= 50
+
+(c) Mean-square droplet velocity. 0 2 4 6 8
+
+t/ L       
+
+> 0.00 0.01 0.02 0.03 0.04
+> K
+> St *= 1
+> St *= 10
+> St *= 50
+
+(d) Droplet dispersion coefficient. 
+
+Figure 15: Comparison of droplet statistics between unsteady and steady deformation models. Solid lines correspond to the unsteady model, while dashed lines correspond to the steady model. 
+
+25 10 1 10 0                                   
+
+> V/V
+> 10 2
+> 10 1
+> 10 0
+> PDF
+> St *= 1
+> St *= 1 (steady) (a) St ∗=110 110 0
+> V/V
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> PDF
+> St *= 10
+> St *= 10 (steady) (b) St ∗=10 10 110 0
+> V/V
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> PDF
+> St *= 50
+> St *= 50 (steady) (c) St ∗=50
+
+Figure 16: Probability density function of Voronoi cell volume for deformed droplets at We ∗ = 9. 
+
+5. Conclusion 
+
+This study reveals the coupled effect of droplet deformation and inertia on droplet dispersion and clustering in homogeneous isotropic turbulence via direct numerical simulation with Lagrangian particle tracking method. By systematically varying the Stokes number and the Weber number of droplets, we quantify droplet dispersion through the classical Taylor’s dispersion theory framework, a local vortex coordinate decomposition analysis, and Voronoi analysis. The principal findings are summarized as follows. Deformation increases the drag coefficient and therefore shortens the droplet relaxation time, shifting the instantaneous Stokes number toward smaller values. This effect is substantial for strongly-inertial droplets but negligible for non-inertial droplets. For droplet dispersion, the effect of deformation is dependent on the inertia regime. For non-inertial droplets, deformation enhances dispersion, while for strongly-inertial droplets, dispersion is suppressed. The change of droplet dispersion coefficient due to deformation is much smaller than that of droplet Lagrangian time scale. This is because for strongly-inertial droplets, deformation reduces droplet Lagrangian time scale but simultaneously increases the mean-square velocity, making the dispersion coefficient less sensitive to changes in the Weber number. Analysis of direction cosines in local vortex coordinates and Voronoi analysis reveals that the effect of deformation on clustering is inertia regime dependent as well. For non-inertial droplets, deformation enhances the centrifugal expulsion effect of vortices, driving droplets further away from vortices and consequently weakening clustering. For strongly-inertial droplets, deformation allows them to respond more actively to the swirling motion of vortices, which makes them more readily entrained into the vortex periphery and results in an enhanced preferential concentration. 26 A comparison of the full time-dependent TAB model with its steady-state limit further shows that the Lagrangian time scale and droplet dispersion coefficient are sensitive to the unsteady shape dynamics retained by the model, whereas the mean Stokes number, mean-square velocity, and Voronoi clustering patterns are not. This indicates that the transient oscillations captured by the TAB model primarily affect temporal correlation statistics, while the energy-related properties and the spatial distribution governed by the time-averaged drag are less sensitive to the unsteady deformation dynamics. Overall, these results demonstrate that droplet deformation fundamentally al-ters the dispersion and clustering of droplets in turbulence through a combined modulation of drag, inertia, and vortex interaction. Accounting for deformation is therefore essential for predictive spray modeling in turbulent combustion applica-tions. Future work should investigate how these phenomena interplay with droplet evaporation and heat release. 
+
+Acknowledgments 
+
+This work was performed as part of the Space Ignite Center for Advanced Research-Education in Combustion (SPARC) [NASA Award 80NSSC24M0173]. Parts of this work were completed on Hyak , UW’s high performance computing cluster. This work used the NSF ACES supercomputer at Texas A&M High Perfor-mance Research Computing through allocation MCH240016 from the Advanced Cyberinfrastructure Coordination Ecosystem: Services & Support (ACCESS) pro-gram, which is supported by U. S. National Science Foundation grants #2138259, #2138286, #2138307, #2137603, and #2138296. 
+
+References 
+
+[1] G. I. Taylor, Diffusion by continuous movements, Proceedings of the London Mathematical Society s2-20 (1922) 196–212. URL: http://doi.wiley. com/10.1112/plms/s2-20.1.196 . doi: 10.1112/plms/s2-20.1.196 .[2] G. Batchelor, Diffusion in a field of homogeneous turbulence. I. Eulerian analysis, Australian Journal of Scientific Research Series A: Physical Sci-ences 2 (1949) 437–450. URL: https://doi.org/10.1071/CH9490437 .doi: 10.1071/CH9490437 .[3] C. M. Tchen, Mean value and correlation problems connected with the motion of small particles suspended in a turbulent 27 fluid (1947). URL: https://repository.tudelft.nl/record/uuid: 65d1454c-e070-44f3-a28a-9c03cc9868ef .[4] G. Gouesbet, A. Berlemont, A. Picart, Dispersion of dis-crete particles by continuous turbulent motions. Extensive discus-sion of the tchen’s theory, using a two-parameter family of la-grangian correlation functions, Physics of Fluids 27 (1984) 827– 837. URL: https://pubs.aip.org/pfl/article/27/4/827/ 812968/Dispersion-of-discrete-particles-by-continuous .doi: 10.1063/1.864711 .[5] S. K. Friedlander, Behavior of suspended particles in a tur-bulent fluid, AIChE Journal 3 (1957) 381–385. URL: https: //aiche.onlinelibrary.wiley.com/doi/10.1002/aic.690030318 .doi: 10.1002/aic.690030318 .[6] M. I. Yudine, Physical Considerations on Heavy-Particle Diffusion, in: H. E. Landsberg, J. Van Mieghem (Eds.), Advances in Geophysics, volume 6, Elsevier, 1959, pp. 185–191. URL: https://www.sciencedirect.com/ science/article/pii/S0065268708601065 .[7] A. Nir, L. M. Pismen, The effect of a steady drift on the disper-sion of a particle in turbulent fluid, Journal of Fluid Mechanics 94 (1979) 369–381. URL: https://www.cambridge.org/core/ product/identifier/S0022112079001075/type/journal_article .doi: 10.1017/S0022112079001075 .[8] M. W. Reeks, On the dispersion of small particles suspended in an isotropic turbulent fluid, Journal of Fluid Mechanics 83 (1977) 529–546. URL: https://www.cambridge.org/core/ product/identifier/S0022112077001323/type/journal_article .doi: 10.1017/S0022112077001323 .[9] L.-P. Wang, D. E. Stock, Dispersion of heavy particles by turbulent motion, Journal of the Atmospheric Sciences 50 (1993) 1897–1913. URL: http://journals.ametsoc.org/doi/10. 1175/1520-0469(1993)050<1897:DOHPBT>2.0.CO;2 . doi: 10.1175/ 1520-0469(1993)050<1897:DOHPBT>2.0.CO;2 .28 [10] K. D. Squires, J. K. Eaton, Measurements of particle dispersion obtained from direct numerical simulations of isotropic turbulence, Journal of Fluid Mechanics 226 (1991) 1–35. URL: https://www.cambridge.org/core/ product/identifier/S0022112091002276/type/journal_article .doi: 10.1017/S0022112091002276 .[11] A. J. Banko, J. K. Eaton, Particle dispersion and preferential concentration in particle-laden turbulence, in: Modeling Approaches and Computational Methods for Particle-laden Turbulent Flows, Computation and Analysis of Turbulent Flows, Elsevier, 2023, pp. 43–79. URL: https://linkinghub. elsevier.com/retrieve/pii/B9780323901338000116 .[12] C. T. Crowe, R. A. Gore, T. R. Troutt, Particle dispersion by coher-ent structures in free shear flows, Particulate Science and Technology 3 (1985) 149–158. URL: http://www.tandfonline.com/doi/abs/10. 1080/02726358508906434 . doi: 10.1080/02726358508906434 .[13] R. A. Gore, C. T. Crowe, N. Kamalu, T. R. Troutt, J. J. Riley, Particle dis-persion by large scale vortex structures, Particulate Science and Technology 7 (1989) 201–207. URL: http://www.tandfonline.com/doi/abs/10. 1080/02726358908906537 . doi: 10.1080/02726358908906537 .[14] M. R. Maxey, The gravitational settling of aerosol particles in homoge-neous turbulence and random flow fields, Journal of Fluid Mechanics 174 (1987) 441–465. URL: https://www.cambridge.org/core/ product/identifier/S0022112087000193/type/journal_article .doi: 10.1017/S0022112087000193 .[15] K. D. Squires, J. K. Eaton, Preferential concentration of particles by tur-bulence, Physics of Fluids A: Fluid Dynamics 3 (1991) 1169–1178. URL: 
+
+https://doi.org/10.1063/1.858045 . doi: 10.1063/1.858045 .[16] J. Eaton, J. Fessler, Preferential concentration of particles by turbulence, International Journal of Multiphase Flow 20 (1994) 169–209. URL: https://linkinghub.elsevier.com/retrieve/pii/ 0301932294900728 . doi: 10.1016/0301-9322(94)90072-8 .[17] S. Balachandar, J. K. Eaton, Turbulent dispersed multiphase flow, Annual Review of Fluid Mechanics 42 (2010) 111–133. URL: https://www. 
+
+29 annualreviews.org/doi/10.1146/annurev.fluid.010908.165243 .doi: 10.1146/annurev.fluid.010908.165243 .[18] G. Chen, H. Wang, K. Luo, J. Fan, A DNS study of pulverized coal combus-tion in a hot turbulent environment: Effects of particle size, mass loading and preferential concentration, Combustion and Flame 254 (2023) 112839. URL: https://www.sciencedirect.com/science/article/pii/ S0010218023002201 . doi: 10.1016/j.combustflame.2023.112839 .[19] C. Miranda, J. Palmore Jr., High stokes number droplets in homogeneous isotropic turbulent flow, in: Eastern States Sections of the Combustion Institute, 2020. [20] R. Monchaux, M. Bourgoin, A. Cartellier, Preferential concentration of heavy particles: A voronoï analysis, Physics of Fluids 22 (2010) 103304. URL: 
+
+https://doi.org/10.1063/1.3489987 . doi: 10.1063/1.3489987 .[21] C. Marchioli, M. Fantoni, A. Soldati, Orientation, distribution, and de-position of elongated, inertial fibers in turbulent channel flow, Physics of Fluids 22 (2010) 33301. URL: https://doi.org/10.1063/1.3328874 .doi: 10.1063/1.3328874 .[22] C. Siewert, R. P. J. Kunnen, M. Meinke, W. Schröder, Orienta-tion statistics and settling velocity of ellipsoids in decaying turbu-lence, Atmospheric Research 142 (2014) 45–56. URL: https://www. sciencedirect.com/science/article/pii/S0169809513002378 .doi: 10.1016/j.atmosres.2013.08.011 .[23] D. O. Njobuenwu, M. Fairweather, Dynamics of single, non-spherical ellipsoidal particles in a turbulent channel flow, Chemi-cal Engineering Science 123 (2015) 265–282. URL: https://www. sciencedirect.com/science/article/pii/S0009250914006666 .doi: 10.1016/j.ces.2014.11.024 .[24] Y. Jie, L. Zhao, C. Xu, H. I. Andersson, Preferential orientation of tracer spheroids in turbulent channel flow, Theoretical and Ap-plied Mechanics Letters 9 (2019) 212–214. URL: https://www. sciencedirect.com/science/article/pii/S2095034919300376 .doi: 10.1016/j.taml.2019.03.010 .30 [25] M. Giahi, D. Bergstrom, Fully resolved simulation of spherical and non-spherical particles in a turbulent channel flow, Physics of Fluids 36 (2024) 43324. URL: https://doi.org/10.1063/5.0195317 . doi: 10.1063/5. 0195317 .[26] G. A. Voth, A. Soldati, Anisotropic particles in turbulence, Annual Review of Fluid Mechanics 49 (2017) 249–276. URL: https://www. annualreviews.org/doi/10.1146/annurev-fluid-010816-060135 .doi: 10.1146/annurev-fluid-010816-060135 .[27] H. Brenner, Taylor dispersion in systems of sedimenting nonspheri-cal brownian particles. I. Homogeneous, centrosymmetric, axisymmet-ric particles, Journal of Colloid and Interface Science 71 (1979) 189– 208. URL: https://www.sciencedirect.com/science/article/ pii/0021979779902327 . doi: 10.1016/0021-9797(79)90232-7 .[28] H. Brenner, Taylor dispersion in systems of sedimenting non-spherical brownian particles: II. Homogeneous ellipsoidal parti-cles, Journal of Colloid and Interface Science 80 (1981) 548– 588. URL: https://www.sciencedirect.com/science/article/ pii/0021979781902149 . doi: 10.1016/0021-9797(81)90214-9 .[29] O. Dubé, E. Alizadeh, J. Chaouki, F. Bertrand, Dynamics of non-spherical particles in a rotating drum, Chemical Engineering Science 101 (2013) 486– 502. URL: https://www.sciencedirect.com/science/article/ pii/S0009250913005034 . doi: 10.1016/j.ces.2013.07.011 .[30] J. Saxby, F. Beckett, K. Cashman, A. Rust, E. Tennant, The impact of particle shape on fall velocity: Implications for volcanic ash dispersion mod-elling, Journal of Volcanology and Geothermal Research 362 (2018) 32– 48. URL: https://www.sciencedirect.com/science/article/pii/ S037702731830177X . doi: 10.1016/j.jvolgeores.2018.08.006 .[31] K. A. Elshorbagy, Y. El Ashry, A. M. Abdelrazek, On the effect of solid particle sphericity on the tangential velocity in a cyclone separa-tor, Aerosol Science and Technology 56 (2022) 323–336. URL: https:// doi.org/10.1080/02786826.2021.2016595 . doi: 10.1080/02786826. 2021.2016595 .31 [32] S. Yang, S. Hu, W. Zhang, Mixing and dispersion behaviours of el-lipsoid particles in a bubbling fluidized bed, Powder Technology 396 (2022) 210–223. URL: https://www.sciencedirect.com/science/ article/pii/S0032591021009177 . doi: 10.1016/j.powtec.2021.10. 036 .[33] Y. Lin, J. Palmore Jr., Non-spherical droplet dispersion in homogeneous isotropic turbulent flow, in: Proceedings of the ASME 2024, Oregon, 2024. [34] R. Clift, J. R. Grace, M. E. Weber, Bubbles, Drops, and Particles, 3. print ed., Acad. Press, New York, NY, 1992. [35] P. J. O’Rourke, A. A. Amsden, The tab method for numerical calculation of spray droplet breakup, in: SAE Technical Papers, Toronto, Canada, 1987, p. 872089. URL: https://saemobilus.sae.org/papers/ tab-method-numerical-calculation-spray-droplet-breakup-872089 .doi: 10.4271/872089 .[36] J. F. Harper, D. W. Moore, The motion of a spherical liq-uid drop at high reynolds number, Journal of Fluid Mechanics 32 (1968) 367–391. URL: https://www.cambridge.org/core/ product/identifier/S0022112068000789/type/journal_article .doi: 10.1017/S0022112068000789 .[37] V. Ya. Rivkind, G. M. Ryskin, Flow structure in motion of a spheri-cal drop in a fluid medium at intermediate reynolds numbers, Fluid Dy-namics 11 (1977) 5–12. URL: http://link.springer.com/10.1007/ BF01023387 . doi: 10.1007/BF01023387 .[38] J. Q. Feng, A deformable liquid drop falling through a quies-cent gas at terminal velocity, Journal of Fluid Mechanics 658 (2010) 438–462. URL: https://www.cambridge.org/core/ product/identifier/S0022112010001825/type/journal_article .doi: 10.1017/S0022112010001825 .[39] Y. Lin, M. Setiya, J. A. Palmore, A numerical strategy for investigat-ing internal circulation in droplets, in: AIAA SCITECH 2022 Forum, American Institute of Aeronautics and Astronautics, San Diego, CA & Vir-tual, 2022. URL: https://arc.aiaa.org/doi/10.2514/6.2022-1443 .doi: 10.2514/6.2022-1443 .32 [40] R. Ni, Deformation and breakup of bubbles and drops in turbulence, Annual Review of Fluid Mechanics 56 (2024) 319–347. URL: https://www. annualreviews.org/doi/10.1146/annurev-fluid-121021-034541 .doi: 10.1146/annurev-fluid-121021-034541 .[41] R. J. Haywood, M. Renksizbulut, G. D. Raithby, Numerical solu-tion of deforming evaporating droplets at intermediate reynolds num-bers, Numerical Heat Transfer Part A: Applications 26 (1994) 253–272. URL: http://www.tandfonline.com/doi/abs/10.1080/ 10407789408955991 . doi: 10.1080/10407789408955991 .[42] B. Helenbrook, C. Edwards, Quasi-steady deformation and drag of uncon-taminated liquid drops, International Journal of Multiphase Flow 28 (2002) 1631–1657. URL: https://linkinghub.elsevier.com/retrieve/ pii/S0301932202000733 . doi: 10.1016/S0301-9322(02)00073-3 .[43] E. Loth, Quasi-steady shape and drag of deformable bubbles and drops, International Journal of Multiphase Flow 34 (2008) 523–546. URL: https: //linkinghub.elsevier.com/retrieve/pii/S0301932207001711 .doi: 10.1016/j.ijmultiphaseflow.2007.08.010 .[44] Y. Lin, J. Palmore, Effect of droplet deformation and in-ternal circulation on drag coefficient, Physical Review Flu-ids 7 (2022) 123602. URL: https://link.aps.org/doi/10.1103/ PhysRevFluids.7.123602 . doi: 10.1103/PhysRevFluids.7.123602 .[45] F. Guglietta, D. Taglienti, M. Sbragaglia, Deformation of ellipsoidal droplets in homogeneous and isotropic turbulence, Physical Review Fluids 10 (2025) 93601. URL: https://link.aps.org/doi/10.1103/ zhzf-q2b9 . doi: 10.1103/zhzf-q2b9 .[46] J. A. Palmore, O. Desjardins, Technique for forcing high reynolds number isotropic turbulence in physical space, Physical Review Fluids 3 (2018) 34605. URL: https://link.aps.org/doi/10.1103/PhysRevFluids. 3.034605 . doi: 10.1103/PhysRevFluids.3.034605 .[47] J. Capecelatro, O. Desjardins, An euler–lagrange strategy for sim-ulating particle-laden flows, Journal of Computational Physics 238 (2013) 1–31. URL: https://linkinghub.elsevier.com/retrieve/ pii/S0021999112007462 . doi: 10.1016/j.jcp.2012.12.015 .33 [48] A. B. Liu, D. Mather, R. D. Reitz, Modeling the effects of drop drag and breakup on fuel sprays, in: International Congress & Exposition, Detroit, Michigan, United States, 1993, p. 930072. URL: https://saemobilus.sae.org/papers/ modeling-effects-drop-drag-breakup-fuel-sprays-930072 .doi: 10.4271/930072 .[49] S. Elghobashi, Particle-laden turbulent flows: Direct simulation and closure models, Applied Scientific Research 48 (1991) 301–314. URL: https: //doi.org/10.1007/BF02008202 . doi: 10.1007/BF02008202 .[50] S. B. Pope, Direct numerical simulation, Cambridge University Press, 2000, p. 344–357. [51] J. Abrahamson, Collision rates of small particles in a vigorously turbulent fluid, Chemical Engineering Science 30 (1975) 1371– 1379. URL: https://www.sciencedirect.com/science/article/ pii/0009250975850676 . doi: 10.1016/0009-2509(75)85067-6 .[52] S. Kumar, S. K. Kurtz, J. R. Banavar, M. G. Sharma, Properties of a three-dimensional poisson-voronoi tesselation: A monte carlo study, Journal of Statistical Physics 67 (1992) 523–551. URL: https://doi.org/10.1007/ BF01049719 . doi: 10.1007/BF01049719 .[53] F. Mashayek, Dynamics of evaporating drops. Part I: Formu-lation and evaporation model, International Journal of Heat and Mass Transfer 44 (2001) 1517–1526. URL: https://www. sciencedirect.com/science/article/pii/S001793100000199X .doi: 10.1016/S0017-9310(00)00199-X .[54] S. Tonini, G. E. Cossali, An exact solution of the mass transport equations for spheroidal evaporating drops, International Journal of Heat and Mass Transfer 60 (2013) 236–240. URL: https://www. sciencedirect.com/science/article/pii/S0017931013000033 .doi: 10.1016/j.ijheatmasstransfer.2013.01.001 .[55] M. Setiya, J. Palmore Jr., Quasi-steady evaporation of deformable liquid fuel droplets, International Journal of Multiphase Flow 164 (2023) 104455. URL: https://linkinghub.elsevier.com/retrieve/ 
+
+34 pii/S0301932223000769 . doi: 10.1016/j.ijmultiphaseflow.2023. 104455 .[56] M. Setiya, J. Palmore Jr., Combustion and evaporation of de-formable fuel droplets, ASME Journal of Heat and Mass Transfer 145 (2023) 101006. URL: https://asmedigitalcollection. asme.org/heattransfer/article/145/10/101006/1164069/ Combustion-and-Evaporation-of-Deformable-Fuel . doi: 10. 1115/1.4062784 .[57] B. Boyd, S. Becker, Y. Ling, Simulation and modeling of the vaporization of a freely moving and deforming drop at low to moderate weber numbers, International Journal of Heat and Mass Transfer 218 (2024) 124735. URL: https://linkinghub. elsevier.com/retrieve/pii/S0017931023008803 . doi: 10.1016/j. ijheatmasstransfer.2023.124735 .35

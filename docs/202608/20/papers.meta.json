@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-20",
+  "date": "2026-08-20",
+  "generated_at": "2026-08-20T20:58:40",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/20/2608.12554v1-dispersion-and-clustering-of-deformable-droplets-in-turbulence",
+      "section": "quick",
+      "title_en": "Dispersion and clustering of deformable droplets in turbulence",
+      "authors": "Yushu Lin, John Palmore",
+      "date": "2026-08-12",
+      "pdf": "https://arxiv.org/pdf/2608.12554v1",
+      "score": "6.0",
+      "evidence": "湍流中可变形液滴弥散",
+      "tldr": "航空喷雾燃烧中，液滴变形常被忽略，传统拉格朗日粒子追踪法假设球形颗粒。本文在均匀各向同性湍流中模拟不同Stokes数的可变形液滴，分析其分散和聚集统计特性。结果发现变形影响依赖惯性：弱惯性液滴变形减弱分散和优先聚集，强惯性液滴变形增强聚集但减弱分散；非惯性液滴变形诱导有效惯性。该工作强调考虑液滴变形和非稳态振荡对准确预测湍流中液滴行为至关重要。",
+      "tags": "query:falling-film",
+      "abstract_en": "Motivated by the application of spray combustion in aviation industry, this work investigates the dispersion of non-spherical droplets in turbulence. The most common strategy for modeling sprays relies on LPT method, which represents the spray as a discrete collection of spherical particles. One limitation of LPT is that it neglects the influence of droplet deformation on spray dynamics. Prior studies have highlighted the importance of non-sphericity in droplet vaporization, combustion and drag coefficient. However, these works are restricted to idealized configurations such as an isolated droplet in a uniform flow. To study droplet deformation in a more realistic configuration, we adopt homogeneous isotropic turbulence (HIT) as the framework to investigate its effect on droplet dispersion. Droplets of various Stokes number are studied to investigate the interplay between deformation and inertia. Analysis of droplet statistics reveals that the impact of droplet deformation on both dispersion and clustering is dependent on the inertia regime. For weakly-inertial droplets, deformation weakens both dispersion and preferential concentration, whereas for strongly-inertial droplets, deformation tends to enhance preferential concentration while weakening dispersion. The results also suggest that to achieve the same level of clustering, deformed droplets require a higher Stokes number. Interestingly, for non-inertial droplets, the deformation seems to induce an effective inertia. This is verified by a comparison between the full unsteady TAB model and its steady-state limit, which suggests that unsteady shape dynamics affect temporal correlation statistics, but leave the mean clustering pattern unchanged. These findings demonstrate that accounting for droplet deformation and its unsteady shape oscillation is essential for accurately predicting droplet dispersion and clustering in turbulence.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/20/2608.17537v1-energy-dissipation-and-stability-of-a-finite-volume-scheme-for-two-phase-flow-models-with-dynamic-capillary-pressure",
+      "section": "quick",
+      "title_en": "Energy dissipation and stability of a finite-volume scheme for two-phase flow models with dynamic capillary pressure",
+      "authors": "Ansgar Jüngel, Josipa-Pina Milišić, Sara Xhahysa",
+      "date": "2026-08-18",
+      "pdf": "https://arxiv.org/pdf/2608.17537v1",
+      "score": "6.0",
+      "evidence": "动态毛管压力两相流有限体积格式",
+      "tldr": "针对多孔介质中具有动态毛细管压力的不饱和两相流，其模型为退化伪抛物线交叉扩散方程，传统格式难以同时保证物理约束。本文提出隐式Euler有限体积格式，采用两点通量逼近并精心选取非线性均值函数，严格保持能量耗散结构、总质量守恒及饱和度正性与有界性。进一步证明离散解存在唯一且具有网格一致界。该工作为动态毛细管压力两相流模拟提供了保结构、稳定的数值方法，并通过二维算例揭示动态毛细管压力的影响。",
+      "tags": "query:falling-film",
+      "abstract_en": "An implicit Euler finite-volume scheme for degenerate pseudo-parabolic cross-diffusion equations is proposed and analyzed. The system describes the dynamics of an unsaturated two-phase flow mixture with dynamic capillary pressure in a porous medium. The numerical scheme is based on a two-point flux approximation that preserves the energy structure, ensures the conservation of total mass, and guarantees strict positivity and boundedness of the water saturation. These properties rely on carefully selected mean functions for the nonlinear components. The existence and uniqueness of a discrete solution and additional mesh-uniform bounds are proved. Numerical experiments in two space dimensions illustrate the effects of the dynamic capillary pressure.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

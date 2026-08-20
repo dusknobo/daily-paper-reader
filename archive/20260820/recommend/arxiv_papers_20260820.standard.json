@@ -1,0 +1,90 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-20T20:55:53.877166+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.12554v1",
+      "source": "arxiv",
+      "title": "Dispersion and clustering of deformable droplets in turbulence",
+      "abstract": "Motivated by the application of spray combustion in aviation industry, this work investigates the dispersion of non-spherical droplets in turbulence. The most common strategy for modeling sprays relies on LPT method, which represents the spray as a discrete collection of spherical particles. One limitation of LPT is that it neglects the influence of droplet deformation on spray dynamics. Prior studies have highlighted the importance of non-sphericity in droplet vaporization, combustion and drag coefficient. However, these works are restricted to idealized configurations such as an isolated droplet in a uniform flow. To study droplet deformation in a more realistic configuration, we adopt homogeneous isotropic turbulence (HIT) as the framework to investigate its effect on droplet dispersion. Droplets of various Stokes number are studied to investigate the interplay between deformation and inertia. Analysis of droplet statistics reveals that the impact of droplet deformation on both dispersion and clustering is dependent on the inertia regime. For weakly-inertial droplets, deformation weakens both dispersion and preferential concentration, whereas for strongly-inertial droplets, deformation tends to enhance preferential concentration while weakening dispersion. The results also suggest that to achieve the same level of clustering, deformed droplets require a higher Stokes number. Interestingly, for non-inertial droplets, the deformation seems to induce an effective inertia. This is verified by a comparison between the full unsteady TAB model and its steady-state limit, which suggests that unsteady shape dynamics affect temporal correlation statistics, but leave the mean clustering pattern unchanged. These findings demonstrate that accounting for droplet deformation and its unsteady shape oscillation is essential for accurately predicting droplet dispersion and clustering in turbulence.",
+      "authors": [
+        "Yushu Lin",
+        "John Palmore"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-12T19:48:54+00:00",
+      "link": "https://arxiv.org/pdf/2608.12554v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "deformable droplet dispersion in turbulent flow",
+      "llm_evidence_cn": "湍流中可变形液滴弥散",
+      "llm_evidence": "湍流中可变形液滴弥散",
+      "canonical_evidence": "湍流中可变形液滴弥散",
+      "llm_tldr_en": "The paper investigates dispersion and clustering of deformable droplets in homogeneous isotropic turbulence using direct numerical simulation, motivated by spray combustion; it extends Lagrangian particle tracking beyond spherical assumptions to include droplet deformation effects.",
+      "llm_tldr_cn": "针对航空喷雾燃烧中液滴变形对弥散的影响，采用均匀各向同性湍流直接数值模拟研究可变形液滴的弥散与聚集。传统拉格朗日点粒子方法忽略变形，该工作通过耦合界面变形模型考虑非球形效应，分析液滴在湍流中的统计行为。结果表明变形显著影响液滴空间分布和聚集特性，为改进喷雾模型提供了依据。",
+      "llm_tldr": "针对航空喷雾燃烧中液滴变形对弥散的影响，采用均匀各向同性湍流直接数值模拟研究可变形液滴的弥散与聚集。传统拉格朗日点粒子方法忽略变形，该工作通过耦合界面变形模型考虑非球形效应，分析液滴在湍流中的统计行为。结果表明变形显著影响液滴空间分布和聚集特性，为改进喷雾模型提供了依据。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.17537v1",
+      "source": "arxiv",
+      "title": "Energy dissipation and stability of a finite-volume scheme for two-phase flow models with dynamic capillary pressure",
+      "abstract": "An implicit Euler finite-volume scheme for degenerate pseudo-parabolic cross-diffusion equations is proposed and analyzed. The system describes the dynamics of an unsaturated two-phase flow mixture with dynamic capillary pressure in a porous medium. The numerical scheme is based on a two-point flux approximation that preserves the energy structure, ensures the conservation of total mass, and guarantees strict positivity and boundedness of the water saturation. These properties rely on carefully selected mean functions for the nonlinear components. The existence and uniqueness of a discrete solution and additional mesh-uniform bounds are proved. Numerical experiments in two space dimensions illustrate the effects of the dynamic capillary pressure.",
+      "authors": [
+        "Ansgar Jüngel",
+        "Josipa-Pina Milišić",
+        "Sara Xhahysa"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-08-18T08:58:23+00:00",
+      "link": "https://arxiv.org/pdf/2608.17537v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "finite-volume scheme for two-phase flow with dynamic capillary pressure",
+      "llm_evidence_cn": "动态毛管压力两相流有限体积格式",
+      "llm_evidence": "动态毛管压力两相流有限体积格式",
+      "canonical_evidence": "动态毛管压力两相流有限体积格式",
+      "llm_tldr_en": "The paper proposes and analyzes an implicit Euler finite-volume scheme for a degenerate pseudo-parabolic cross-diffusion system modeling unsaturated two-phase flow with dynamic capillary pressure, proving energy dissipation, mass conservation, positivity, and boundedness.",
+      "llm_tldr_cn": "针对多孔介质中非饱和两相流与动态毛管压力耦合的退化伪抛物交叉扩散方程，提出隐式Euler有限体积格式。该格式采用两点通量近似，保持能量结构、总质量守恒以及饱和度正性与有界性。证明了解的存在唯一性和网格一致有界性，并通过二维数值实验验证了有效性。该工作为多孔介质多相流模拟提供了稳定的数值方法。",
+      "llm_tldr": "针对多孔介质中非饱和两相流与动态毛管压力耦合的退化伪抛物交叉扩散方程，提出隐式Euler有限体积格式。该格式采用两点通量近似，保持能量结构、总质量守恒以及饱和度正性与有界性。证明了解的存在唯一性和网格一致有界性，并通过二维数值实验验证了有效性。该工作为多孔介质多相流模拟提供了稳定的数值方法。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
