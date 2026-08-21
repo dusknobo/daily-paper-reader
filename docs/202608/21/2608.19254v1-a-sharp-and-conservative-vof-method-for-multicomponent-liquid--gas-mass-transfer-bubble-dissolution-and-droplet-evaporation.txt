@@ -1,0 +1,1958 @@
+Title: A Sharp and Conservative VOF Method for Multicomponent Liquid–Gas Mass Transfer: Bubble Dissolution and Droplet Evaporation
+
+URL Source: https://arxiv.org/pdf/2608.19254v1
+
+Published Time: Fri, 21 Aug 2026 00:05:17 GMT
+
+Number of Pages: 37
+
+Markdown Content:
+Journal of Computational Physics (2026) 
+
+Contents lists available at ScienceDirect 
+
+# Journal of Computational Physics 
+
+journal homepage: www.elsevier.com/locate/jcp 
+
+# A Sharp and Conservative VOF Method for Multicomponent Liquid–Gas Mass Transfer: Bubble Dissolution and Droplet Evaporation 
+
+Shuo Zhao a,c , Jie Zhang b, ∗, Ming-Jiu Ni a,b, ∗ 
+
+> a
+
+School of Engineering Science, University of Chinese Academy of Sciences, Beijing 101408, China  
+
+> b
+
+State Key Laboratory for Strength and Vibration of Mechanical Structures, School of Aerospace, Xi’an Jiaotong University, Xi’an, Shaanxi 710049, China 
+
+> c
+
+Institute of Applied Physics and Computational Mathematics, Beijing 100094, China 
+
+A R T I C L E I N F O 
+
+Article history :
+
+Keywords: 
+
+Multi-component Evaporation Dissolution Volume of fluid method Embedded boundary method 
+
+A B S T R A C T We present a sharp and conservative geometrical VOF–finite-volume method for multicomponent liquid–gas mass transfer across deformable interfaces. The method solves problems in which multiple species are coupled through interfacial mass balances, latent-heat exchange, and vapor–liquid equilibrium. The key novelty is a fully sharp two-field treatment of scalar transport: the species and temperature equations are solved separately in the liquid and gas phases, while the one-sided Robin conditions for species and the two-sided flux jump for temperature are imposed directly on the reconstructed inter-face through an embedded-boundary discretization. This avoids both volu-metric regularization of interfacial source terms and explicit coupling based on previous-time-step interfacial data. A consistent geometrical advection scheme is used for volume, momentum, energy, and species transport, and a sequential coupling strategy is developed to determine the partial interfacial mass fluxes, close the temperature equation, and update the thermodynamic-equilibrium state. The method is validated through single- and multicom-ponent bubble dissolution, single-component droplet evaporation, non-ideal ethanol–isooctane droplet evaporation, and sessile water–glycerol droplet evap-oration. The results demonstrate second-order accuracy, accurate interfacial flux prediction, good mass and energy conservation, and the ability to capture complex multicomponent e ff ects such as gas replacement, azeotropic volatil-ity reversal, and composition-driven Marangoni flow. 
+
+© 2026 Elsevier Inc. All rights reserved. 
+
+> ∗
+
+Corresponding author: 
+
+e-mail: j_zhang@xjtu.edu.cn (Jie Zhang), mjni@ucas.as.cn (Ming-Jiu Ni) arXiv:2608.19254v1 [physics.flu-dyn] 17 Aug 2026 2 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+1. Introduction 
+
+Multiphase flows involving liquid–gas interfaces arise widely in both natural environments and engineering ap-plications, and in many such systems both phases contain multiple chemical components. Representative examples include dissolving gas bubbles composed of CO 2, N 2, and O 2, as well as evaporating fuel droplets consisting of hydrocarbon mixtures and oxygenated additives. In these problems, mass transfer across the liquid–gas interface is essentially multicomponent: di ff erent species evaporate or dissolve at di ff erent rates according to their own trans-port properties and thermodynamic a ffi nities, while the associated latent-heat exchange couples species transport to the temperature field. Consequently, multicomponent liquid–gas mass transfer is substantially more complex than its single-component counterpart. Although experiments provide valuable macroscopic observations, they generally cannot resolve the detailed interfacial transport processes and local flow structures with su ffi cient spatio-temporal resolution. Direct numerical simulation (DNS), by contrast, o ff ers a powerful framework for examining the coupled dynamics of flow, heat transfer, and multicomponent mass transfer in a fully resolved manner. From the numerical viewpoint, phase-change problems driven by simultaneous heat and mass transfer involve two closely related di ffi culties. The first is the treatment of the discontinuous flow field induced by interfacial mass transfer, since the singular mass source localized at the moving interface generates a jump in the normal velocity and may lead to numerical instability if it is not handled properly. The second is the accurate imposition of the interfacial thermodynamic conditions. In the single-component case, such as pure-droplet evaporation, the interface acts as a moving internal boundary for the temperature and vapor-concentration fields, and the interfacial closure can often be formulated through a Dirichlet condition for temperature and a Robin condition for vapor concentration [1]. A widely adopted strategy is then to regularize these discontinuities into volumetric source terms distributed over several grid cells near the interface [2–5]. While such di ff usive treatments are attractive because of their simplicity and robustness, they inevitably smear the interfacial jumps and thus degrade the local physical fidelity. Sharp-interface methods, in contrast, seek to impose the interfacial conditions directly without introducing an artificial interface thickness. Among them, the ghost-fluid method (GFM) combined with the level-set (LS) approach has become one of the most widely used frameworks [6–9]. More recently, genuinely sharp treatments within a geometrical volume-of-fluid (VOF) framework have also begun to emerge. In particular, as a precursor to the present study, Zhao et al. [1] developed a sharp and conservative finite-volume method based on geometrical VOF and an embedded-boundary method (EBM), in which the interfacial Dirichlet and Robin conditions are incorporated directly into the implicit flux discretization. This formulation combines the conservation advantages of VOF with a sharp treatment of the interfacial transport, and therefore provides a natural starting point for extension to multicomponent problems. Extending such a sharp VOF formulation from single-component to multicomponent mass transfer is, however, far from straightforward. The essential di ffi culty is that the interfacial closure changes fundamentally. In the single-component problem, the interfacial thermodynamic state is governed by only one thermal condition and one species relation. In the multicomponent case, by contrast, both parts of the closure become considerably more involved. First, the interfacial temperature is no longer associated with a single latent-heat contribution, but is coupled to the combined eff ect of all transferring species. Second, each species satisfies its own interfacial mass-balance condition, while the liquid-side and gas-side interfacial compositions are linked by species-dependent vapor–liquid equilibrium relations. As a result, the interfacial temperature, the interfacial species concentrations on both sides of the interface, and the partial mass fluxes must be determined as a coupled, generally nonlinear system. This complexity largely explains why di ff usive-interface treatments remain prevalent in VOF-based simulations of multicomponent phase change and mass transfer. For example, Haroun et al. [10] proposed a CSF-like treatment in which the interfacial mass flux is introduced into the concentration equation as a distributed source term. Algebraic VOF methods have also been widely adopted because of their relative simplicity and their natural compatibility with smeared-interface formulations; see, for instance, Graveleau et al. [11], Maes and Soulaine [12, 13], and Zanutto et al. [14, 15]. Di ff usive treatments have likewise been combined with geometrical VOF formulations for interfacial heat and mass transfer [16–18]. Although these approaches are often e ff ective, their reliance on interfacial smearing becomes a serious limitation in problems featuring very thin concentration boundary layers on the liquid side, where accurate evaluation of the interfacial flux requires extremely fine grids. Two recent VOF-based multicomponent studies are particularly relevant to the present work. Cipriano et al. [19] proposed a second-order procedure in which the partial and total interfacial mass fluxes are evaluated from interfacial information at the previous time step. This treatment avoids solving the fully coupled interfacial problem at the current time level, but e ff ectively relaxes the original implicit coupling into an explicit one. Salimi et al. [20] introduced implicit Robin conditions for di ff erent species through a ghost-fluid-type strategy; however, the interfacial S. Zhao et al. / Journal of Computational Physics (2026) 3
+
+Ω   
+
+> Ωg
+> Γplpg
+> pugul
+> urΓ
+> rΓ
+> cl,k cg,k
+> ck
+> TgTl
+> TrΓ
+> rΓ
+
+(a) (b)            
+
+> Fig. 1. Schematic of multicomponent droplet evaporation. (a) Problem configuration. (b) Interfacial jump conditions induced by liquid–gas mass transfer, where Γdenotes the interface, uthe normal velocity component, pthe pressure, Tthe temperature, and ckthe concentration of the k-th species.
+
+heat-flux jump in the temperature equation is still treated by a di ff usive one-field formulation. Therefore, despite these important advances, a sharp and conservative VOF method that treats both the species fields and the temperature field in a fully consistent manner is still lacking. In this paper, we develop such a method within a geometrical VOF–finite-volume framework. The key idea is to retain the conservative and non-di ff usive interface transport of geometrical VOF, while imposing the multicomponent interfacial conditions sharply through an embedded-boundary discretization of the di ff usion terms. Specifically, the species equations are solved separately in the two phases, with phase-wise Robin conditions imposed sharply at the interface. The temperature equation is also treated in a fully two-field manner, so that the liquid-side and gas-side dif-fusion problems are coupled directly through the interfacial heat-flux jump. A coupling strategy is further introduced to determine the partial interfacial mass fluxes from the phase-wise species fields and to use these fluxes consistently in closing the temperature equation and the thermodynamic-equilibrium relations. The resulting framework is sharp, conservative, and provides a unified treatment for dissolving bubbles and evaporating droplets. The remainder of the paper is organized as follows. Section 2 presents the governing equations together with the interfacial jump and thermodynamic-equilibrium conditions. Section 3 describes the numerical treatment of the flow field and interface transport. Section 4 details the numerical method for the temperature and species equations, with emphasis on the sharp di ff usion discretization and the coupling strategy. Section 5 then presents a series of validation and application examples, including static and freely rising bubbles with dissolution, multicomponent dissolution of carbon-dioxide bubbles, evaporation of single-component n-heptane droplets, evaporation of non-ideal ethanol– isooctane droplets, and evaporation of sessile water–glycerol droplets. Finally, the main conclusions are summarized in Section 6. 
+
+2. Problem statement and governing equations 
+
+We consider incompressible two-phase flows involving multicomponent mass transfer across a deformable liquid– gas interface. Depending on the physical configuration, the dispersed phase may be either a multicomponent liquid droplet undergoing evaporation or a multicomponent gas bubble undergoing dissolution. For clarity, Fig. 1(a) illus-trates the evaporation of a multicomponent droplet, but the formulation developed below applies equally to bubble-dissolution problems. The computational domain, denoted by Ω, consists of a liquid region Ωl and a gas region 
+
+Ωg, separated by a deformable zero-thickness interface Γ. The subscripts l and g are used for liquid- and gas-phase quantities, respectively. The liquid phase contains Nl chemical species, while the gas phase is modeled as an ideal mixture composed of Nv vapor species and an inert gas. Owing to interfacial mass transfer, mass, momentum, and energy are continuously exchanged across Γ, so that the two phases are coupled through both transport processes and thermodynamic equilibrium at the interface. 4 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+2.1. Governing equations 
+
+The present multicomponent phase-change problem follows the same hydrodynamic framework as the single-component formulation developed in our previous work [1]. The main additional complexity lies in the scalar transport and interfacial closure, because multiple species are exchanged across the liquid–gas interface and are coupled to the temperature field through thermodynamic equilibrium and latent-heat e ff ects. Over the entire fluid domain Ω = Ωl ∪ Ωg, the flow field is governed by the one-fluid incompressible Navier–Stokes equations, 
+
+ρ
+
+( ∂u
+
+∂t + u · ∇ u
+
+)
+
+= −∇ p + ∇ · [μ (∇u + ∇uT )] + ρg + σκδ s n + ∇tσ δ s, (1) together with the divergence constraint 
+
+∇ · u =
+
+( 1
+
+ρg
+
+− 1
+
+ρl
+
+)
+
+¨m. (2) Here, u is the velocity (m /s), p the pressure (Pa), ρ the density (kg /m3), μ the dynamic viscosity (Pa · s), and g the gravitational acceleration (m /s2). The last two terms in Eq. (1) represent the normal capillary force and the tangential Marangoni stress, respectively, where σ is the surface-tension coe ffi cient (N /m), κ the interface curvature (m −1), n
+
+the unit normal vector pointing from the gas phase to the liquid phase, ∇tσ the surface gradient of σ, and δs the Dirac distribution concentrated on the interface. In Eq. (2), ¨ m = ˙mS Γ/V is the volumetric mass source in an interfacial cell, with ˙ m the interfacial mass flux (kg /(m 2 s)), S Γ the interfacial length in two dimensions or area in three dimensions, and V the cell volume. Since ˙ m is localized on Γ, the divergence-free condition is recovered in pure liquid and pure gas cells, consistently with the incompressibility of each bulk phase. The interface Γ is tracked by a geometrical volume-of-fluid (VOF) method. The liquid volume fraction in a control volume is denoted by f , and the material properties are defined through the one-fluid interpolation 
+
+ρ = f ρl + (1 − f )ρg, μ = f μl + (1 − f )μg,
+
+where the latter is used as a practical mixture law for the viscosity. The volume fraction evolves according to 
+
+∂ f
+
+∂t + (u · ∇ ) f = − ¨m
+
+ρ , (3) where the right-hand side accounts for the displacement of the interface induced by interfacial mass transfer. In addition to the flow field, one must also advance the species concentrations and the temperature field. For the 
+
+k-th species, the concentration field satisfies 
+
+∂ck
+
+∂t + u · ∇ ck = ∇ · (Dk∇ck) + Rk, (4) while the temperature field obeys 
+
+ρcp
+
+( ∂T
+
+∂t + u · ∇ T
+
+)
+
+= ∇ · (λ∇T ) + Q. (5) Here, ck denotes the concentration of the k-th species (kg /m3), Dk its di ff usion coe ffi cient (m 2/s), T the temperature (K), cp the specific heat capacity (J /(kg · K)), and λ the thermal conductivity (W /(m · K)). The source terms Rk and 
+
+Q may account for additional e ff ects such as chemical reactions or volumetric heat release, but are set to zero in the present study. A key point is that Eqs. (4) and (5) are not solved in a one-fluid form, unlike the momentum equation. Instead, the species and temperature equations are solved separately in Ωl and Ωg, and the two phase-wise scalar fields are coupled only through boundary and jump conditions imposed on the moving interface Γ. The formulation is therefore one-fluid for hydrodynamics but two-field for scalar transport. This distinction is essential: the interfacial conditions for temperature and species are enforced directly on the reconstructed interface, rather than being regularized as volumetric source terms. Consequently, the main additional di ffi culty of the multicomponent problem does not lie in the bulk advection–di ff usion equations themselves, but in the interfacial closure that couples temperature, species concentrations, and partial mass fluxes. We now turn to these interfacial conditions. S. Zhao et al. / Journal of Computational Physics (2026) 5
+
+2.2. Jump conditions across the interface 
+
+Interfacial mass transfer gives rise to discontinuities in both kinematic and thermodynamic quantities across the moving interface Γ. These discontinuities, sketched in Fig. 1(b), cannot be recovered from the bulk equations alone and must instead be imposed through interfacial jump conditions. In the present multicomponent problem, the relevant conditions involve the velocity and stress fields, the temperature field, and the concentration fields of all transferring species. Unless otherwise stated, the jump of a quantity φ is defined as [ φ]Γ = φg − φl across the interface. 
+
+Velocity jump. The kinematic condition at the interface follows from conservation of mass across Γ. The interfa-cial mass flux satisfies ˙m = ρl(ul − uΓ) · n = ρg(ug − uΓ) · n, (6) where uΓ is the interface velocity. Eq. (6) directly yields the jump in the normal velocity, [u · n]Γ =
+
+( 1
+
+ρg
+
+− 1
+
+ρl
+
+)
+
+˙m. (7) Thus, even though each bulk phase is incompressible, the one-fluid velocity field is not divergence-free at the interface when ˙ m , 0. This velocity jump is the origin of the singular source term in Eq. (2) and must be treated consistently in the VOF transport equation. 
+
+Stress jump. Momentum conservation across the interface gives the normal and tangential stress balances [n · T · n]Γ = σκ + ˙m[u · n]Γ, (8) and [n · T · t]Γ = ∇tσ, (9) where T = −pI + μ(∇u + ∇uT ) is the stress tensor, I is the identity tensor, and t denotes a unit tangent vector along the interface. In Eq. (8), the first term on the right-hand side is the Laplace contribution, while the second term represents the vapor-recoil e ff ect induced by interfacial mass transfer. Eq. (9) expresses the tangential stress balance, where the Marangoni stress arises from non-uniform temperature or composition along Γ.
+
+Thermal condition. The temperature is assumed to be continuous across the interface, whereas the conductive heat flux generally exhibits a jump owing to the latent heat carried by the transferring species. The corresponding interfacial conditions are [T ]Γ = 0, (10) and [λ∇T · n]Γ =
+
+> Nt
+
+∑
+
+> k=1
+
+˙mkLk, (11) where Nt denotes the number of transferring species, ˙ mk is the partial mass flux of the k-th species, and Lk is the corresponding latent heat (J /kg). Unlike in the single-component case, the thermal jump in a multicomponent system is not determined by a single mass flux, but by the combined latent-heat contribution of all partial interfacial fluxes. This coupling is one of the reasons why the temperature equation cannot be closed independently of the species transport. 
+
+Species mass balance. In contrast to the temperature, the concentration of each species is generally discontin-uous across the interface. The liquid-side and gas-side interfacial concentrations are determined by thermodynamic equilibrium and may di ff er significantly. What must be conserved at Γ is therefore not the concentration itself, but the partial mass flux of each transferring species. For the k-th species, this interfacial mass balance reads ˙mk = cl,k(ul,k − uΓ) · n = cg,k(ug,k − uΓ) · n, (12) where cl,k and cg,k are the liquid-side and gas-side concentrations, respectively, and ul,k and ug,k are the corresponding species velocities. Since the species velocity generally di ff ers from the bulk velocity, Eq. (12) can be decomposed into convective and di ff usive contributions as ˙mk = ck(uk − uΓ) · n
+
+= ck(u − uΓ) · n + ck(uk − u) · n
+
+= ck
+
+ρ ˙m + Jk · n,
+
+(13) 6 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+where the first term on the right-hand side represents convection induced by the total interfacial mass flux ˙ m, and the second term represents di ff usion relative to the bulk motion. In a general multicomponent mixture, Jk should be described by the Maxwell–Stefan formulation [21]. In the present study, we restrict attention to cases in which Fickian di ff usion provides an acceptable approximation, so that Jk = −Dk∇ck. The interfacial condition for the k-th species then becomes ˙mk = cl,k
+
+ρl
+
+˙m − Dl,k
+
+( ∂cl,k
+
+∂n
+
+)
+
+> Γ
+
+= cg,k
+
+ρg
+
+˙m − Dg,k
+
+( ∂cg,k
+
+∂n
+
+)
+
+> Γ
+
+. (14) Eq. (14) is a Robin-type condition for the phase-wise concentration fields. It states that the partial interfacial flux of each species results from the balance between convection associated with the total phase-change flux and di ff usion driven by the normal concentration gradient. In a multicomponent system, such Robin conditions must be satisfied simultaneously for all transferring species, while the total flux ˙ m = ∑Nt 
+
+> k=1
+
+˙mk depends on the same unknown partial fluxes. This mutual dependence is the main source of the strong coupling between interfacial concentrations and interfacial mass fluxes. 
+
+2.3. Thermodynamic equilibrium conditions 
+
+The interfacial mass-balance conditions introduced above do not determine the interfacial concentrations by them-selves. In a multicomponent system, the concentration of each species is generally discontinuous across Γ, and the liquid-side and gas-side interfacial values must be related through local vapor–liquid equilibrium. This equilibrium depends on the interfacial temperature, pressure, and composition. Therefore, in addition to the flux-balance condi-tions, thermodynamic closure relations are required to determine the interfacial species concentrations. Since vapor–liquid equilibrium is more naturally expressed in terms of mole fractions, we denote by ζα, k the mole fraction of species k in phase α, where α = l or g. The interfacial mole fractions are related to the interfacial mass concentrations through 
+
+˜ζα, k = ˜nα, k
+
+∑i ˜nα, i
+
+= ˜cα, k/Mk
+
+∑i ˜cα, i/Mi
+
+, (15) where ˜(·) denotes an interfacial value ( ·)Γ, ˜nα, k is the molar amount of species k in phase α, and Mk is its molar mass (kg /kmol). The summation is taken over all species present in the corresponding phase, including non-transferring components such as the solvent in the liquid phase or the inert gas in the gas phase. For the systems considered in this study, the gas phase is assumed to behave as an ideal gas mixture at atmospheric pressure. Under this assumption, the interfacial vapor–liquid equilibrium for an evaporating liquid mixture can be described by the modified Raoult’s law [22, 23], 
+
+˜ζg,k P = γk˜ζl,k Psat k (˜T ), (16) where P is the total pressure, Psat k (˜T ) is the saturation vapor pressure of species k at the interfacial temperature ˜T , and 
+
+γk is the liquid-phase activity coe ffi cient. The latter accounts for the non-ideal behavior of real liquid mixtures caused by di ff erences in molecular size and intermolecular interactions among the components. In droplet-evaporation problems, including single-component droplets and non-dilute liquid mixtures, Eq. (16) is recast as a gas-side interfacial concentration determined by the liquid-side interfacial composition and temperature. Using the ideal-gas relation for species k in the gas phase, one obtains 
+
+˜cg,k = Mk P
+
+R˜T
+
+˜ζg,k = Mkγk Psat k (˜T )
+
+R˜T
+
+˜ζl,k, (17) where R is the universal gas constant (J /(mol · K)). Eq. (17) provides the gas-side equilibrium concentration of each evaporating species from the liquid-side interfacial composition and the interfacial temperature, and is therefore used as the thermodynamic closure for droplet evaporation. For bubble-dissolution problems, on the other hand, the transferred gases are usually dilute in the liquid phase, as in the dissolution of O 2, N 2, or CO 2 in water under ambient conditions. In this limit, the equilibrium relation is more conveniently expressed by Henry’s law [22, 23]. Using a pressure-based convention for Henry’s constant, the gas-side partial pressure of species k satisfies 
+
+˜pg,k = ˜ζg,k P = Hk(˜T )˜ζl,k, (18) S. Zhao et al. / Journal of Computational Physics (2026) 7
+
+where ˜pg,k is the gas-side partial pressure and Hk(˜T ) is Henry’s constant in pressure units (Pa). Combining Eq. (18) with the ideal-gas relation gives 
+
+˜cg,k = MkHk(˜T )
+
+R˜T
+
+˜ζl,k ≈ MsHk(˜T )
+
+ρlR˜T ˜cl,k, (19) where Ms is the molar mass of the solvent, and the liquid-side mole fraction is approximated as ˜ζl,k ≈ ˜cl,k /Mk 
+
+> ρl/Ms
+
+= 
+
+> Ms
+> ρlMk
+
+˜cl,k. In the numerical tests below, it is convenient to introduce the dimensionless concentration partition coe ffi cient 
+
+Hk = ρlR˜T
+
+MsHk(˜T ) , (20) so that the dilute gas–liquid equilibrium condition can be written simply as 
+
+˜cl,k = Hk˜cg,k. (21) It should be noted that di ff erent conventions for Henry’s constant exist in the literature, which may lead to al-gebraically di ff erent but equivalent forms of the gas–liquid equilibrium relation [13, 16, 17, 24, 25]. In the present study, Eq. (17) is used for droplet evaporation, whereas Eq. (21) is adopted for bubble dissolution. Together with the interfacial flux balances in Section 2.2, these equilibrium relations determine the interfacial temperature, species concentrations, and partial mass fluxes, thereby closing the multicomponent phase-change problem. 
+
+2.4. Di ffi culties in numerical implementation 
+
+The numerical di ffi culty of the present problem is twofold. At the hydrodynamic level, interfacial mass transfer introduces a singular volumetric source term in the projection step and a jump in the normal velocity across Γ, which makes the construction of a continuous VOF advection velocity nontrivial. These issues are already present in single-component phase-change problems and can be treated within the sharp VOF framework developed in our previous work [1]. They will therefore only be briefly recalled in Section 3. The genuinely new di ffi culty lies in the scalar interfacial closure. In a multicomponent system, each transferring species satisfies a Robin-type interfacial mass balance, Eq. (14), while the temperature field satisfies the heat-flux jump condition (11). These conditions are not independent: the thermal jump depends on the sum of all partial mass fluxes ˙ mk, whereas each ˙ mk depends on the phase-wise concentration fields and on the interfacial equilibrium state. In addition, the liquid-side and gas-side interfacial concentrations are generally discontinuous and must be linked through thermodynamic-equilibrium relations such as Eqs. (17) and (21). Thus, the interfacial temperature, the phase-wise interfacial concentrations, and the partial mass fluxes form a coupled local closure problem. This coupling prevents a direct extension of single-component phase-change algorithms. In particular, the heat-flux jump cannot determine the individual partial mass fluxes, and the species equations cannot be closed without the thermodynamic interfacial state. The objective of the present work is to construct a sharp two-field formulation in which the species Robin conditions, the thermal flux jump, and the thermodynamic-equilibrium relations are imposed directly on the reconstructed interface. 
+
+3. Numerical methods for fluid flow and interface transport 
+
+The numerical method is implemented in the open-source framework Basilisk , originally developed by Popinet [26–28]. Basilisk discretizes the governing equations by a finite-volume method on Cartesian meshes. In the present implementation, the primary variables, including the velocity u, pressure p, temperature T , and species concentrations 
+
+ck, are stored at cell centers. The liquid–gas interface is represented by a geometrical volume-of-fluid (VOF) method based on piecewise-linear interface construction (PLIC), which preserves a sharp interface and ensures conservation of the phase volume. The quad-/octree adaptive mesh refinement (AMR) capability of Basilisk is also used to refine the grid locally near the interface and in regions of strong vortical or scalar-gradient activity, thereby improving computational e ffi ciency without sacrificing local resolution. The present multicomponent formulation builds on our previous sharp-interface method for single-component phase change [1]. At the hydrodynamic level, the same one-fluid projection framework is retained. Nevertheless, interfacial mass transfer introduces two issues that must be treated consistently before the phase-wise scalar equations 8 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+can be solved sharply. First, the interfacial mass flux appears as a singular volumetric source term and generates a jump in the normal velocity across Γ, as expressed by Eq. (7). This modifies both the divergence constraint and the pressure projection. Second, the same velocity jump makes the VOF transport nontrivial, because geometrical interface advection requires a continuous velocity field. Any inconsistency in the evaluation or incorporation of the interfacial mass flux would immediately a ff ect the interface position, and would subsequently contaminate the transport of temperature and species. Therefore, although the main methodological contribution of the present work lies in the sharp treatment of the scalar equations, the flow solver and the interface-transport algorithm form the necessary conservative foundation of the method. For this reason, the present section briefly recalls the numerical treatment of the flow field and of the VOF equa-tion in the presence of phase change. Particular emphasis is placed on the construction of a consistent geometrical advection strategy, because the same phase fluxes and reconstructed interface geometry will later be used to advect momentum, thermal energy, and species mass in Section 4. This consistency is essential for maintaining conservation across the coupled interface-motion, flow, heat-transfer, and multicomponent mass-transfer problems. 
+
+3.1. Flow field 
+
+As shown by Eqs. (6)–(9), interfacial mass transfer induces jumps in both the normal velocity and the interfacial stress. At the hydrodynamic level, these e ff ects are treated within the same one-fluid projection framework as in our previous single-component formulation [1]. The bulk properties of each phase are assumed to remain constant during phase change, while the surface-tension coe ffi cient may vary along the interface owing to local temperature and composition variations. Under these assumptions, the Navier–Stokes equations (1) are advanced by a second-order time-staggered approximate projection method. Since the overall procedure follows Zhao et al. [1], only the main update steps are recalled here: 
+
+ρn+ 12
+
+> c
+
+( u∗ − un
+
+∆t + un+ 12 · ∇ un+ 12
+
+)
+
+> c
+
+= ∇c ·
+
+[
+
+μn+ 12 
+
+> f
+
+(∇u + ∇uT )∗
+
+]
+
++ [(σκδ s n + ∇tσδ s)n− 12 − ∇ pn]  
+
+> f→c
+
+, (22) 
+
+u∗∗  
+
+> c
+
+= u∗ 
+
+> c
+
+− ∆t
+
+ρn+ 12
+
+> c
+
+[(σκδ s n + ∇tσδ s)n− 12 − ∇ pn]  
+
+> f→c
+
+, (23) 
+
+un+1 
+
+> f
+
+= u∗∗   
+
+> c→f
+
++ ∆t
+
+ρn+ 12
+
+> f
+
+[(σκδ s n + ∇tσδ s)n+ 12 − ∇ pn+1] 
+
+> f
+
+, (24) 
+
+un+1 
+
+> c
+
+= u∗∗  
+
+> c
+
++ ∆t
+
+ρn+ 12
+
+> c
+
+[(σκδ s n + ∇tσδ s)n+ 12 − ∇ pn+1]  
+
+> f→c
+
+. (25) Here, the velocity and pressure are advanced from time level n to n+1. The subscripts c and f denote cell-centered and face-centered quantities, respectively, while the notation f → c represents second-order arithmetic interpolation from face centers to cell centers. The viscous term is treated implicitly using a standard finite-volume discretization and is not repeated here. When Marangoni e ff ects are considered, the tangential surface-tension force is discretized consistently with the height-function-based formulation proposed by Seric et al. [29] and further developed by Tripathi and Sahu [30]; the corresponding implementation details are summarized in Appendix A. A point that deserves emphasis is the treatment of advection. In the present method, the convective transport in the momentum equation is discretized by the same geometrical advection strategy as that used for the VOF equation. This idea is later extended to the temperature and species equations. Such consistency is important because, in the presence of phase change, the interface motion, the flow field, and the scalar transport are all driven by the same interfacial mass flux. Using compatible conservative advection schemes for all transported quantities prevents spurious inconsistencies among the volume, momentum, energy, and species balances, and improves the overall conservation properties of the method [1, 19]. The geometrical advection scheme is briefly introduced in Section 3.2 for the VOF field and then revisited in Section 4.1 for the conservative transport of momentum, thermal energy, and species mass. Because a collocated arrangement is employed, both velocity and pressure are stored at cell centers, whereas the pressure gradient and surface-tension force are evaluated at cell faces. Following the balanced-force formulation of Francois et al. [31], the capillary force is discretized at the same location and time level as the pressure gradient, S. Zhao et al. / Journal of Computational Physics (2026) 9
+
+thereby minimizing parasitic currents near the interface. The interface curvature is computed by the height-function technique. Taking the discrete divergence of Eq. (24) yields the Poisson equation for the updated pressure, 
+
+∇c ·
+
+ ∆t
+
+ρn+ 12
+
+((σκδ s n + ∇tσδ s)n+ 12 − ∇ pn+1) f
+
+= ∇c · un+1 
+
+> f
+
+− ∇ c · u∗∗   
+
+> c→f
+
+, (26) where the capillary and Marangoni terms, as well as the intermediate velocity u∗∗   
+
+> c→f
+
+, are already known. The remaining term ∇c ·un+1 
+
+> f
+
+is prescribed by the continuity constraint (2), in which the non-zero divergence arises from the interfacial mass-transfer source. The resulting Poisson equation is solved by the multigrid algorithm available in Basilisk . It is worth recalling that, in the presence of phase change, the approximate projection commonly used on collocated grids may generate spurious oscillations in the cell-centered velocity field. This occurs because the divergence constraint is no longer zero but contains a singular interfacial source. The correction proposed in Zhao et al. [1] is adopted here without modification, and the reader is referred to that work for implementation details. 
+
+3.2. Interface tracking 
+
+The interface position is updated by solving the VOF equation (3). In the presence of phase change, however, this update is more delicate than in ordinary incompressible two-phase flows. As discussed in Section 2.2, the interfacial mass flux generates a jump in the normal velocity across Γ, so that the one-fluid velocity u is not directly suitable for advecting the VOF field. In addition, the source term associated with interfacial mass transfer may drive the volume fraction outside the admissible range 0 ≤ f ≤ 1 if it is not incorporated carefully. Both issues may compromise the robustness of interface transport and the conservation of the phase volume. To overcome these di ffi culties, we adopt the velocity-decomposition strategy used by Scapin et al. [32], Malan et al. [33], and Zhao et al. [1]. The basic idea is to separate from the one-fluid velocity the irrotational contribution associated with the Stefan flow, so as to construct a continuous advection velocity near the interface. Specifically, the velocity field is decomposed as u = uD + uS , where uS denotes the Stefan velocity induced by the interfacial mass flux and uD is the remaining phase velocity. The Stefan velocity is obtained from a velocity potential ψ satisfying 
+
+∇2ψ =
+
+( 1
+
+ρg
+
+− 1
+
+ρl
+
+)
+
+¨m, (27) 
+
+uS = ∇ψ. (28) Once uS has been computed throughout the domain, the phase velocity uD = u − uS becomes continuous across the interface and may be used to define a geometrically consistent interface transport velocity. A further complication is that the source term in Eq. (3) directly modifies the phase volume inside interfacial cells. To avoid treating this source term explicitly in the transport step, we define the interface velocity as 
+
+uΓ = uD + ˙m
+
+ρ n,
+
+so that the VOF equation can be recast into the pure advection form 
+
+∂ f
+
+∂t + uΓ · ∇ f = 0. (29) The interface can then be advanced by the standard geometrical VOF procedure using the continuous velocity uΓ.Equivalently, one may advect f with uD and account for the interface displacement induced by the right-hand side of Eq. (3) through a geometrical correction during reconstruction [33]. In the present implementation, these two viewpoints are consistent and lead to the same interface update. Equation (29) is discretized by the conservative directional-splitting scheme of Weymouth and Yue [34]. For a two-dimensional cell ( i, j), the update of the volume fraction from time level n − 1/2 to n + 1/2 reads 
+
+f ∗  
+
+> i,j
+
+− f n− 12 
+
+> i,j
+
+∆t +
+
+Fni+ 12 , j − Fni− 12 , j
+
+∆x = fc
+
+uni+ 12 , j − uni− 12 , j
+
+∆x , (30a) 
+
+f n+ 12  
+
+> i,j
+
+− f ∗ 
+
+> i,j
+
+∆t +
+
+G∗  
+
+> i,j+12
+
+− G∗  
+
+> i,j−12
+
+∆y = fc
+
+vni, j+ 12
+
+− vni, j− 12
+
+∆y . (30b) 10 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+ui-1/2 ui+1/2 
+
+ui+1/2 tui-1/2 t[ f, f u, f cpT, fc k ]       
+
+> g
+>  l
+> Fig. 2. Schematic of the geometrical conservative transport used in the direction-split advection step, illustrated here for the xdirection. The red dashed strips denote the swept liquid volumes associated with the face displacements ui−12
+> ∆tand ui+12
+> ∆t. The bracketed quantities indicate that the same geometrically reconstructed phase fluxes are used consistently to transport volume, momentum, thermal energy, and species mass.
+
+Here, F and G are the geometrical volume fluxes through the cell faces in the x- and y-directions, respectively, computed from the reconstructed interface and the normal face velocities ( u f , v f ). The terms on the right-hand side account for the local volume variation associated with the non-zero discrete divergence that appears during directional splitting. Following Weymouth and Yue [34], the quantity fc is chosen according to the upwind phase indicator: fc = 1when f n−1/2  
+
+> i,j
+
+> 0.5, and fc = 0 otherwise. This choice guarantees exact conservation in the incompressible limit and improves the robustness of the VOF update in the presence of phase change. Figure 2 illustrates the geometrical transport procedure for liquid-phase advection in the x− direction. The red dashed strips denote the liquid volumes swept through the left and right cell faces during one direction-split advection substep. The consistent geometrical construction is subsequently used to transport other conservative quantities, as indicated in the figure. Before each substep, the interface is reconstructed from the most recent volume-fraction field by the PLIC method, and the fluxes 
+
+F and G are then evaluated geometrically from the reconstructed interface [26]. This geometrical procedure has been extended in Basilisk to adaptive Cartesian meshes. Specifically, the same geometrical transport philosophy is also used, in a consistent manner, for the advection terms appearing in the momentum, temperature, and species equations. This consistency is particularly important in the present phase-change problem, because the interface motion and the transport of all conserved quantities are controlled by the same phase fluxes and the same reconstructed interfacial geometry. As a result, numerical di ff usion of the interface is avoided, and the conservation properties of the coupled volume, momentum, energy, and species transport are improved. Finally, in order to reduce the splitting error, the sequence of advection directions is alternated from one time step to the next. Having introduced the numerical treatment of the flow field and interface transport, we now turn to the temperature and species equations, where the principal di ffi culties identified in Section 2.4 arise and where the main methodological contribution of the present work lies. 
+
+4. Numerical method for the temperature and species equations 
+
+We now turn to the central part of the present methodology: the sharp and conservative treatment of the temper-ature and species equations in multicomponent phase change. As discussed in Sections 1 and 2, many VOF-based methods avoid imposing the interfacial scalar conditions directly by regularizing the jump conditions into volumetric source terms distributed over several grid cells near the interface. Such di ff usive treatments have been used for species transport [10, 24, 35] and for the interfacial heat-flux jump [32, 36]. Although these approaches are often robust and relatively simple to implement, they inevitably smear the interfacial transport and may weaken both local accuracy and scalar conservation near Γ. This limitation becomes particularly restrictive in multicomponent problems, where the interfacial mass flux is not a single quantity but the sum of several partial species fluxes coupled to the temperature field through latent-heat exchange and thermodynamic equilibrium. The objective of this section is therefore to develop a genuinely sharp two-field formulation for scalar transport. In contrast to the one-fluid treatment used for the hydrodynamics, the temperature and species equations are solved separately in the liquid and gas phases. The two phase-wise scalar fields are then coupled only through boundary and jump conditions imposed directly on the reconstructed moving interface. In this way, the interface remains S. Zhao et al. / Journal of Computational Physics (2026) 11    
+
+> Fig. 3. Schematic of the sharp two-field scalar formulation. The temperature and species, denoted by Φhere, are solved separately in the liquid and gas phases, and the two phase-wise fields are coupled only through interfacial jump conditions and thermodynamic-equilibrium relations imposed directly on the reconstructed interface Γ.
+
+sharp not only in the VOF representation, but also in the transport of temperature and species concentrations. The main numerical di ffi culty arises in the di ff usion step, where the heat-flux jump condition for temperature, the Robin conditions for species concentrations, and the thermodynamic-equilibrium relations must be incorporated consistently into the finite-volume discretization. Within the present framework, the temperature and species equations are solved separately in Ωl and Ωg, as sketched in Fig. 3. After rewriting the convective terms in conservative form and accounting for the non-zero diver-gence induced by interfacial mass transfer, the phase-wise temperature equation can be written as 
+
+T n+ 12 
+
+> c
+
+− T n− 12
+
+> c
+
+∆t + ∇c · (T u)n = ∇c ·
+
+( λρcp
+
+)
+
+> f
+
+∇ f T
+
+ 
+
+> n+12
+
++
+
+( ¨m
+
+ρ TΓ
+
+)n− 12
+
+, in Ωl and Ωg, (31) and, for the k-th species concentration, 
+
+cn+ 12 
+
+> k,c
+
+− cn− 12
+
+> k,c
+
+∆t + ∇c · (cku)n = ∇c · [(Dk) f ∇ f ck
+
+]n+ 12 +
+
+( ¨m
+
+ρ ck,Γ
+
+)n− 12
+
+, in Ωl and Ωg. (32) In both equations, the last term originates from rewriting the convective derivative in conservative form when 
+
+∇ · u , 0. Physically, it accounts for the scalar transport associated with the local volume variation generated by interfacial mass transfer. The interfacial values TΓ and ck,Γ are used because this volume variation is localized at the moving interface. 12 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+Although Eqs. (31) and (32) have similar conservative forms, their numerical treatment is not a standard advection– di ff usion problem. The advection terms must be discretized consistently with the geometrical VOF transport intro-duced in Section 3, so that the transport of volume, momentum, thermal energy, and species mass relies on the same reconstructed interface and phase fluxes. More importantly, the di ff usion terms must be discretized together with the interfacial conditions, because the thermal flux jump and the species Robin conditions enter the finite-volume formulation through the di ff usive fluxes at Γ. This is the point at which the present method di ff ers most clearly from di ff usive-interface formulations and from partially sharp VOF approaches. Accordingly, the remainder of this section is organized around three ingredients. Section 4.1 describes the geomet-rical conservative discretization of the advection terms. Section 4.2 presents the embedded-boundary discretization of the di ff usion operator, with emphasis on the sharp treatment of both Robin and flux-jump conditions. Section 4.3 then introduces the coupling strategy used to determine the partial interfacial mass fluxes and to close the thermodynamic-equilibrium relations. Together, these ingredients form a sharp and conservative scalar-transport framework for mul-ticomponent liquid–gas phase change. 
+
+4.1. Geometrical conservative discretization of the advection term 
+
+As discussed in Section 3.2, the geometrical VOF algorithm provides a conservative and non-di ff usive update of the phase volume. In the present method, the same geometrical transport principle is extended to the advection of momentum, thermal energy, and species mass. This consistency is essential once the temperature and species equations are solved separately in the liquid and gas phases: the scalar fields must be transported with the same phase fluxes and the same reconstructed interface geometry as the VOF field. Otherwise, inconsistencies may arise near Γ,thereby degrading both interface sharpness and conservation. To this end, we introduce the phase-wise conservative variables 
+
+ϑ = [ f ρlul, (1 − f )ρgug, f ρlcp,lTl, (1 − f )ρgcp,gTg, f c l,k , (1 − f )cg,k
+
+] ,
+
+which respectively represent the momentum, thermal energy, and species mass carried by the two phases. For all these quantities, the advection operator is discretized in the same directional-splitting form as that used for the VOF equation. In two dimensions, the update from time level n − 1/2 to the intermediate advected state is written as 
+
+ϑ∗  
+
+> i,j
+
+− ϑn− 12 
+
+> i,j
+
+∆t +
+
+F ni+ 12 , j − F ni− 12 , j
+
+∆x = ϑc
+
+uni+ 12 , j − uni− 12 , j
+
+∆x , (33a) 
+
+ϑ∗∗   
+
+> i,j
+
+− ϑ∗ 
+
+> i,j
+
+∆t +
+
+G∗  
+
+> i,j+12
+
+− G ∗  
+
+> i,j−12
+
+∆y = ϑc
+
+vni, j+ 12
+
+− vni, j− 12
+
+∆y , (33b) where F = u f ϑ and G = v f ϑ denote the conservative fluxes through the cell faces in the x- and y-directions, respectively. The face velocities ( u f , v f ) are the same as those used in the VOF update, and the volume fraction f has already been advanced by the geometrical scheme described in Section 3.2. Thus, the transport of all conservative quantities is based on exactly the same phase fluxes as the transport of the interface itself. As illustrated in Fig. 2, the same geometrically swept phase volumes are used to advect the phase-wise conser-vative variables ϑ. Thus, the swept liquid volume carries not only liquid volume, but also the corresponding liquid momentum, thermal energy, and species mass. The primitive variables required at the cell faces are reconstructed by the second-order Bell–Colella–Glaz (BCG) upwind scheme [37], whereas the transported conservative quantities are evaluated from the geometrically reconstructed phase fluxes. In this way, the advection of all variables remains fully compatible with the PLIC reconstruction of the interface. The quantity ϑc on the right-hand side of Eq. (33) plays the same role as fc in the Weymouth–Yue VOF scheme: it accounts for the local volume variation associated with a non-zero discrete divergence during directional splitting. Its value is chosen according to the phase to which the conservative variable belongs. For liquid-phase quantities, ϑc = ϑn−1/2 when f n−1/2  
+
+> i,j
+
+> 0.5, and ϑc = 0 otherwise. For gas-phase quantities, ϑc = ϑn−1/2 when 1 − f n−1/2  
+
+> i,j
+
+> 0.5, and ϑc = 0 otherwise. This choice applies the compressibility correction consistently with the locally dominant phase and preserves the conservative character of the split update. After advection has been completed in all directions, the intermediate conservative variables ϑ∗∗ are converted back to primitive variables by dividing by the updated phase fraction, namely by f n+1/2 for liquid-phase quantities and by 1 − f n+1/2 for gas-phase quantities. This gives the intermediate fields [ ul, ug, Tl, Tg, cl,k, cg,k]∗∗ . For the momentum S. Zhao et al. / Journal of Computational Physics (2026) 13 
+
+equation, however, the hydrodynamic update is ultimately performed in one-fluid form. The mass-averaged velocity entering the projection step is therefore reconstructed as 
+
+u = f ρlul + (1 − f )ρgug
+
+f ρl + (1 − f )ρg
+
+, (34) after which the projection method described in Section 3.1 is used to obtain un+1 and pn+1.The above geometrical advection scheme ensures that the transport of momentum, thermal energy, and species mass is fully consistent with the transport of the interface. This consistency is a key ingredient of the present method, because it preserves conservation and avoids introducing additional numerical di ff usion near Γ before the interfacial conditions are imposed through the di ff usion operator. Once the advection step has been completed, the remaining task is to discretize the di ff usion terms in Eqs. (31) and (32), thereby correcting the intermediate scalar fields to their values at time level n + 1/2, i.e. T ∗∗ → T n+1/2 and c∗∗  
+
+> k
+
+→ cn+1/2 
+
+> k
+
+. It is precisely in this di ff usion step that the thermal and species interfacial conditions are imposed sharply. 
+
+4.2. Sharp and conservative discretization of the di ff usion term 
+
+We now arrive at the core of the present numerical method. After the conservative advection step described above, the remaining task is to solve the di ff usion part of the temperature and species equations while enforcing the interfacial conditions sharply on the moving VOF interface. This step is the essential di ffi culty of the multicomponent phase-change problem, because the interfacial conditions are not regularized as volumetric source terms, but are incorporated directly into the finite-volume discretization on the geometrically reconstructed interface. The key point is that the scalar transport equations are solved separately in the liquid and gas phases. Conse-quently, the reconstructed VOF interface Γ acts as an embedded internal boundary for each phase, and the di ff usion operator must be discretized in the presence of this boundary. In the present multicomponent problem, two types of interfacial conditions must be handled. For each species equation, the interface imposes a Robin condition on the phase-wise concentration field. For the temperature equation, the interface imposes the continuity of temperature together with a two-sided heat-flux jump. The latter case is more demanding, because the liquid-side and gas-side di ff usion problems are coupled through the interfacial heat fluxes. This is precisely the obstacle that is avoided in existing VOF-based multicomponent methods. As illustrated in Fig. 3, the scalar field is split into two phase-wise fields. This phase-wise representation provides a natural way to distinguish the two types of interfacial conditions treated in this section. A Robin condition closes a one-sided boundary-value problem: depending on which phase is solved, only the field in Fig. 3(b) or that in Fig. 3(c) is involved. By contrast, a jump condition closes a two-sided 
+
+coupled problem: the gas-side and liquid-side fields in Figs. 3(b) and 3(c) must be solved together, because the inter-facial values and the one-sided normal fluxes are linked by the jump relations. For both the temperature and species equations, the di ff usion correction step can be written in the generic form 
+
+φn+ 12 − φ∗∗ 
+
+∆t = ∇ · (D∇ φ)n+ 12 , (35) where φ∗∗ denotes the primitive variable after the advection step, and D is the di ff usion coe ffi cient appearing in the bulk scalar equation. For a species equation, φ = ck and D = Dk, whereas for the temperature equation, φ = T and 
+
+D = λ/ (ρcp). For a species equation, the interfacial mass balance can be cast into the one-sided Robin form 
+
+K ∂φ ∂n
+
+∣∣∣∣∣Γ
+
++ αφ Γ = β, on Γ, (36) where α and β are known coe ffi cients once the interfacial coupling quantities have been specified, and K is the coe ffi cient entering the interfacial flux condition. The normal derivative is taken along the outward normal of the corresponding phase-wise control volume. This condition closes a one-sided boundary-value problem: once α and β
+
+are specified, the di ff usion solve in a given phase involves only unknowns from that phase. For the present species equations, K = Dk, α = − ˙m/ρ , β = − ˙mk, and Eq. (36) represents the generic Robin form of the interfacial mass-balance condition derived from Eq. (14). 14 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+## (b) (a)     
+
+> Fig. 4. Schematic of the embedded-boundary treatment for a Robin condition. (a) Phase-wise finite-volume discretization in an interfacial cell (i,j)cut by Γ. (b) One-sided second-order reconstruction of the normal derivative at the embedded boundary.
+
+For the temperature equation, the interface instead imposes two-sided jump conditions, 
+
+
+
+φl,Γ − φg,Γ = α, 
+
+Kl
+
+∂φ l
+
+∂n
+
+∣∣∣∣∣Γ
+
+− K g
+
+∂φ g
+
+∂n
+
+∣∣∣∣∣∣Γ
+
+= β, on Γ. (37) These conditions define a two-sided coupled boundary-value problem, because the liquid- and gas-side interfacial values and one-sided normal fluxes must be determined simultaneously. In the present work, Kl = λl, Kg = λg, α = 0, and β = ∑Nt 
+
+> k=1
+
+˙mkLk. Therefore, Eq. (37) enforces temperature continuity and the latent-heat-induced jump of the physical conductive heat flux. 
+
+4.2.1. Discretization of the species equations 
+
+We first consider the species equations. For each transferring species, the concentration field is solved in one phase at a time, and the reconstructed interface Γ provides a Robin boundary condition of the form (36). The task is therefore to construct a phase-wise finite-volume di ff usion operator that incorporates the Robin condition sharply at the reconstructed interface, rather than replacing it by a smeared volumetric source term. Consider one phase, denoted by Ωα with α = l or g, in an interfacial cell cut by the reconstructed interface Γ.Integrating Eq. (35) over the phase-wise control volume dΩα and applying Gauss’s theorem gives 
+
+∫
+
+> dΩα
+
+∇ · (D∇ φ) dV =
+
+∫
+
+> d∂Ωα
+
+D∇ φ · n dS =
+
+
+
+> n f
+
+∑ 
+
+> f=1
+
+(D∇ φ) f · nf S f
+
+︸ ︷︷ ︸
+
+> cell faces
+
++ (D∇ φ)Γ · nΓS Γ
+
+︸ ︷︷ ︸
+
+> embedded boundary
+
+
+
+, (38) where nf and nΓ are the outward unit normals of the Cartesian face and the embedded boundary, respectively, S f and 
+
+S Γ are the corresponding surface measures, and n f denotes the number of Cartesian faces intersecting the phase-wise control volume. The embedded boundary is the piecewise-linear interface reconstructed by the PLIC algorithm; hence its centroid, normal direction, and surface measure are all known geometrically. For cells away from the interface, Eq. (38) reduces to the standard second-order central-di ff erence discretization. The nontrivial case is an interfacial cell, where the phase-wise control volume is bounded by full Cartesian faces, partial Cartesian faces, and the embedded boundary, as illustrated in Fig. 4(a). The corresponding fluxes are evaluated as follows. 
+
+• Full cell faces. For a complete Cartesian face, such as ( i, j + 1/2), the gradient is evaluated by the standard second-order central di ff erence. S. Zhao et al. / Journal of Computational Physics (2026) 15 
+
+• Partial cell faces. For a cut Cartesian face, such as ( i ± 1/2, j), the flux must be evaluated at the centroid of the 
+
+partial face rather than at the center of the original full face. Denoting by θ the o ff set between these two points in the transverse direction, a second-order interpolation gives 
+
+( ∂φ ∂n
+
+)   
+
+> i+12,j
+
+=
+
+(
+
+1 − θ
+
+∆y
+
+) φi+1, j − φi, j
+
+∆x + θ
+
+∆y
+
+φi+1, j+1 − φi, j+1
+
+∆x + O(∆2), (39) where the normal direction corresponds to the local face-normal direction. 
+
+• Embedded boundary. The flux through the reconstructed interface cannot be obtained from a standard finite-di ff erence stencil, because the interfacial value φΓ is not known a priori . Instead, a one-sided second-order interpolation is constructed along the local normal direction. As sketched in Fig. 4(b), a line normal to the interface is extended into the interior of the same phase, and two auxiliary values φ1 and φ2 are reconstructed from neighboring cell-centered values by second-order interpolation. Denoting by d1 and d2 the distances from the interface centroid to these two auxiliary points, the normal derivative along the outward normal at the embedded boundary is approximated by 
+
+∂φ ∂n
+
+∣∣∣∣∣Γ
+
+= 1
+
+d2 − d1
+
+[ d2
+
+d1
+
+(φΓ − φ1) − d1
+
+d2
+
+(φΓ − φ2)
+
+]
+
++ O(∆2). (40) The Robin boundary condition is imposed by combining Eq. (40) with Eq. (36). For a species equation, the interfacial flux coe ffi cient in Eq. (36) is identical to the di ff usion coe ffi cient, namely K = D = Dk. The local system is therefore 
+
+D ∂φ ∂n
+
+∣∣∣∣∣Γ
+
++ αφ Γ = β, ∂φ ∂n
+
+∣∣∣∣∣Γ
+
+= 1
+
+d2 − d1
+
+[ d2
+
+d1
+
+(φΓ − φ1) − d1
+
+d2
+
+(φΓ − φ2)
+
+]
+
+,
+
+(41) where φ1 and φ2 are reconstructed from cell-centered values in the same phase. Eq. (41) provides a local algebraic relation between the unknown interfacial value φΓ and the one-sided normal derivative. Eliminating φΓ from Eq. (41) gives the embedded-boundary flux directly as 
+
+D ∂φ ∂n
+
+∣∣∣∣∣Γ
+
+= D Aβ − αB
+
+α + DA , (42) where the reconstruction coe ffi cients are defined by 
+
+A = 1
+
+d2 − d1
+
+( d2
+
+d1
+
+− d1
+
+d2
+
+)
+
+, B = 1
+
+d2 − d1
+
+( d2
+
+d1
+
+φ1 − d1
+
+d2
+
+φ2
+
+)
+
+. (43) Therefore, the embedded-boundary contribution in Eq. (38) is expressed entirely in terms of phase-wise unknowns and can be incorporated directly into the implicit finite-volume di ff usion operator. Two remarks are worth emphasizing. First, the scheme remains sharp because the reconstruction of φ1 and φ2
+
+uses only information from the same phase, and no interpolation across the interface is involved. Second, the scheme remains conservative because the interfacial contribution enters Eq. (38) as an actual flux through the reconstructed embedded boundary, rather than as a regularized source distributed over neighboring cells. 
+
+4.2.2. Discretization of the temperature equation 
+
+We next consider the temperature equation, for which the interfacial conditions in Eq. (37) define a two-sided coupled problem. Unlike the Robin case, the liquid- and gas-side di ff usion operators cannot be closed independently, because the interfacial temperature and the one-sided conductive fluxes must be determined simultaneously. We therefore construct the embedded-boundary fluxes on the two sides of Γ in a coupled manner. 16 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+> Φg, ΓΦg1
+> Φg2
+> Φl1
+> Φl2
+
+## Ωg
+
+## Ωl
+
+> Φl, Γ
+
+## (b) (a) Φg, i, j+1 Φg, i+1, j+1 
+
+Φl/g, i+1, j 
+
+Φg, i-1, j+1 
+
+Φl/g, i, j 
+
+Φl/g, i-1, j 
+
+Φl, i, j-1 Φl/g, i+1, j-1 Φl, i-1, j-1 
+
+## Ωl
+
+## Ωg    
+
+> Fig. 5. Schematic of the embedded-boundary treatment for a flux-jump condition. (a) Phase-wise finite-volume discretization in an inter-facial cell (i,j)cut by Γ. (b) Two-sided second-order reconstruction of the normal derivatives at the embedded boundary, where the liquid-and gas-side reconstructions are coupled simultaneously through the interfacial jump conditions.
+
+For a cell cut by Γ, the di ff usion operator is integrated separately over the liquid and gas portions, as illustrated in Fig. 5(a). Adding the liquid- and gas-side finite-volume balances over the cell gives 
+
+∫
+
+> dΩ
+
+∇ · (D∇ φ) dV =
+
+∫
+
+> dΩl
+
+∇ · (Dl∇φl) dV +
+
+∫
+
+> dΩg
+
+∇ · (Dg∇φg) dV 
+
+=
+
+∫
+
+> d∂Ωl
+
+Dl∇φl · n dS +
+
+∫
+
+> d∂Ωg
+
+Dg∇φg · n dS 
+
+=
+
+∑ 
+
+> f∈∂dΩl
+
+(Dl∇φl) f · nf S f +
+
+∑ 
+
+> f∈∂dΩg
+
+(Dg∇φg) f · nf S f
+
+︸ ︷︷ ︸
+
+> cell faces
+
++ (Dg∇φg)Γ · nΓS Γ − (Dl∇φl)Γ · nΓS Γ
+
+︸ ︷︷ ︸
+
+> embedded boundary
+
+
+
+.
+
+(44) At first sight, it may be tempting to merge the liquid- and gas-side di ff usion contributions within the same interfacial cell and to combine the two embedded-boundary contributions, shown by the second lower bracket in Eq. (44), into a single net interfacial term [ D∇ φ · n]ΓS Γ, which is exactly prescribed by the jump condition. Such a treatment would greatly simplify the discretization by collapsing the two phase-wise di ff usion problems into a single control-volume balance. The interfacial jump would then be represented only through a net cell-wise contribution, which is essentially the idea behind di ff usive-interface or smeared-source treatments. Although the jump condition can be enforced in an integral sense, the sharp separation between the two phase-wise scalar fields is lost on the remaining cell faces. Therefore, this treatment destroys the two-field character of the formulation and fails to preserve sharp scalar discontinuities across the interface. For a genuinely sharp scheme, the liquid and gas di ff usion operators must be discretized independently. The full and partial Cartesian faces are treated in the same way as in the Robin case, using only phase-consistent stencils. The essential di ffi culty lies in the embedded-boundary fluxes on the two sides of Γ: neither the interfacial values φl,Γ
+
+and φg,Γ nor the one-sided normal derivatives ( ∂φ l/∂ n)Γ and ( ∂φ g/∂ n)Γ are known a priori . To close the problem, we combine the interfacial jump conditions with the one-sided second-order reconstructions from both phases, as sketched in Fig. 5(b). All normal derivatives in the following local system are taken along the same normal direction S. Zhao et al. / Journal of Computational Physics (2026) 17 
+
+as in Eq. (37), namely from the gas phase to the liquid phase: 
+
+
+
+φl,Γ − φg,Γ = α, 
+
+Kl
+
+∂φ l
+
+∂n
+
+∣∣∣∣∣Γ
+
+− K g
+
+∂φ g
+
+∂n
+
+∣∣∣∣∣∣Γ
+
+= β, ∂φ l
+
+∂n
+
+∣∣∣∣∣Γ
+
+= −1
+
+dl,2 − dl,1
+
+[ dl,2
+
+dl,1
+
+(φl,Γ − φl,1) − dl,1
+
+dl,2
+
+(φl,Γ − φl,2)
+
+]
+
+,∂φ g
+
+∂n
+
+∣∣∣∣∣∣Γ
+
+= 1
+
+dg,2 − dg,1
+
+[ dg,2
+
+dg,1
+
+(φg,Γ − φg,1) − dg,1
+
+dg,2
+
+(φg,Γ − φg,2)
+
+]
+
+.
+
+(45) Here, φα, 1 and φα, 2 are reconstructed from cell-centered values in phase α, and dα, 1 and dα, 2 are the corresponding distances from the interface centroid along the one-sided normal reconstruction line. Eq. (45) forms a local algebraic system for the interfacial values φl,Γ and φg,Γ together with the two one-sided normal derivatives. For compactness, we introduce the coe ffi cients Aα and Bα associated with the one-sided reconstructions, 
+
+Aα = 1
+
+dα, 2 − dα, 1
+
+( dα, 2
+
+dα, 1
+
+− dα, 1
+
+dα, 2
+
+)
+
+, Bα = 1
+
+dα, 2 − dα, 1
+
+( dα, 2
+
+dα, 1
+
+φα, 1 − dα, 1
+
+dα, 2
+
+φα, 2
+
+)
+
+. (46) Eliminating the interfacial values from Eq. (45) gives the normal di ff usive fluxes directly as 
+
+
+
+Dl
+
+∂φ l
+
+∂n
+
+∣∣∣∣∣Γ
+
+= Dl
+
+Alβ + Kg
+
+(Ag Bl − Al Bg − AlAgα)
+
+Kl Al + Kg Ag
+
+,
+
+Dg
+
+∂φ g
+
+∂n
+
+∣∣∣∣∣∣Γ
+
+= Dg
+
+Kl
+
+(Ag Bl − Al Bg − AlAgα) − Agβ
+
+KlAl + Kg Ag
+
+.
+
+(47) The two embedded-boundary contributions obtained from Eq. (47) are then inserted separately into the liquid-and gas-side di ff usion operators, with the signs determined by the corresponding phase-wise outward normals. This construction solves the jump-condition problem without collapsing the two phases into a single scalar field. The coupling between the phases enters only through the interfacial jump relations, while each phase-wise di ff usion op-erator remains sharply separated. Since the one-sided reconstructions use only same-phase cell-centered values, no cross-interface averaging or volumetric regularization is introduced. This is fundamentally di ff erent from a di ff usive one-field treatment and also more rigorous than an explicit coupling based on previous-time-step interfacial data. Once the fluxes through full cell faces, partial cell faces, and the embedded boundary have been evaluated, the di ff usion correction step for both the temperature and species equations is completed, and the intermediate variables are updated from φ∗∗ to φn+1/2. The extension of the above discretization to three dimensions is straightforward in principle: the same embedded-boundary formulation applies, while the second-order interpolations on partial faces and along the interface normal are generalized in the corresponding geometrical manner. 
+
+4.3. Coupling strategy for the species and temperature equations 
+
+We now describe how the phase-wise species equations and the temperature equation are coupled through the in-terfacial mass fluxes and thermodynamic-equilibrium relations. This coupling step closes the sharp two-field formula-tion developed in Sections 4.1 and 4.2, and provides the remaining ingredient required to advance the multicomponent phase-change problem over one time step. For single-component phase change, the interfacial mass flux may often be determined either from the temper-ature gradients near the interface or from the vapor-concentration field. In the present multicomponent problem, however, the temperature equation is not a convenient primary closure for the individual species fluxes. The heat-flux jump condition constrains only the combined latent-heat contribution of all transferring species, and therefore cannot uniquely determine the partial mass fluxes ˙ mk. Moreover, in many bubble-dissolution problems, the temperature vari-ation induced by interfacial mass transfer is negligible and the process may be treated as nearly isothermal. For these reasons, the present method first determines the partial interfacial mass fluxes from the species fields, and then uses the resulting ˙ mk to close the temperature equation and update the thermodynamic-equilibrium state. 18 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+To formulate this procedure in a unified way for both bubble dissolution and droplet evaporation, we distinguish between the continuous phase and the dispersed phase . The continuous phase is the phase that contains at least one non-transferring component, so that the interfacial concentrations of the transferring species can be prescribed there through thermodynamic equilibrium. In bubble dissolution, the continuous phase is the liquid, which contains the solvent. In droplet evaporation, the continuous phase is the gas, which contains the inert gas. The dispersed phase is the complementary phase. With this convention, the coupling procedure within one time step is organized as follows. 
+
+Step 1 : solve the species equations in the continuous phase.. At the beginning of the time step, the interfacial con-centrations of the transferring species on the continuous-phase side are known from the previous thermodynamic-equilibrium update. They are imposed as Dirichlet conditions on Γ, namely cc,k,Γ, where the subscript c denotes the continuous phase in this subsection. The species equations are then solved in the continuous phase using the sharp embedded-boundary discretization described in Section 4.2. Once the continuous-phase concentration fields have been updated, the one-sided normal gradients at the interface are reconstructed and used to evaluate the correspond-ing di ff usive fluxes. 
+
+Step 2 : compute the partial mass fluxes ˙mk.. For each transferring species, the continuous-phase interfacial mass balance follows from Eq. (14). Using ˙ m = ∑Nt 
+
+> i=1
+
+˙mi, where Nt denotes the number of transferring species, the balance can be written as the linear system ˙mk − cc,k,Γ
+
+ρcNt∑
+
+> i=1
+
+˙mi = −Dc,k
+
+∂cc,k
+
+∂n
+
+∣∣∣∣∣Γ
+
+, k = 1, . . . , Nt. (48) All partial mass fluxes ˙ mk are therefore obtained simultaneously from the continuous-phase concentration gradients. The system is well posed because the continuous phase contains at least one non-transferring component; hence the sum of the interfacial concentrations of the transferring species does not exhaust the total density of that phase. 
+
+Step 3 : solve the species equations in the dispersed phase.. Once the partial fluxes ˙ mk and the total flux ˙ m are known, the interfacial condition on the dispersed-phase side becomes a Robin condition, ˙mk = cd,k,Γ
+
+ρd
+
+˙m − Dd,k
+
+∂cd,k
+
+∂n
+
+∣∣∣∣∣Γ
+
+, (49) where the subscript d denotes the dispersed phase. This condition is imposed sharply through the embedded-boundary formulation of Section 4.2.1, and the dispersed-phase concentration field is updated accordingly. The corresponding interfacial concentrations cd,k,Γ are reconstructed as part of the Robin boundary treatment. 
+
+Step 4 : solve the temperature equation.. The partial mass fluxes obtained in Step 2 determine the interfacial heat-flux jump through [λ∇T · n]Γ =
+
+> Nt
+
+∑
+
+> k=1
+
+˙mkLk.
+
+The temperature equation is then solved separately in the liquid and gas phases using the sharp two-sided flux-jump treatment developed in Section 4.2.2. In this way, the temperature field is updated consistently with the same set of interfacial mass fluxes that closes the species equations. 
+
+Step 5 : update the interfacial equilibrium state.. After the dispersed-phase concentrations and, when needed, the temperature field have been updated, the interfacial values on the dispersed-phase side are available from the sharp boundary treatment. The interfacial temperature TΓ and the dispersed-phase interfacial compositions are then substi-tuted into the thermodynamic-equilibrium relations introduced in Section 2.3, namely Eq. (17) for droplet evaporation or Eq. (21) for bubble dissolution. This gives the updated interfacial concentrations on the continuous-phase side, which will be used as Dirichlet conditions in Step 1 of the next time step. Thus, the species equations, the temperature equation, the interfacial mass balances, and the thermodynamic-equilibrium relations are closed consistently within a sequential sharp-interface coupling procedure. For bubble-dissolution problems at normal temperature and pressure, the temperature variation induced by inter-facial mass transfer is often negligible. In the absence of external heat sources or imposed thermal boundary fluxes, S. Zhao et al. / Journal of Computational Physics (2026) 19 
+
+the system may then be treated as isothermal, and Step 4 can be omitted without modifying the species-coupling pro-cedure. Finally, because the dispersed phase is treated as incompressible in the present study, its density must remain constant at the discrete level. When applying the Robin condition (49), the density appearing in the dispersed-phase boundary condition is therefore evaluated from the sum of the interfacial species concentrations obtained from the previous time step. This treatment keeps the total concentration in the dispersed phase consistent with the imposed constant density. 
+
+4.4. Overall solution procedure 
+
+The complete algorithm within one time step is summarized below. The ordering is chosen according to the coupling structure of the problem: the interface geometry is first updated, the species equations are then used to determine the interfacial mass fluxes, and these fluxes are subsequently used to close the temperature equation and the flow-field update. 1. Interface update. Using the velocity field at time level n, solve the VOF transport equation as described in Section 3.2 to obtain the updated volume fraction f n+1/2 and reconstruct the interface Γn+1/2.2. Material-property update. Update the phase indicator, density, viscosity, and other piecewise-constant mate-rial properties from the new volume fraction field f n+1/2.3. Species transport in the continuous phase. For each transferring species, solve Eq. (32) in the continuous phase using the interfacial concentrations provided by the thermodynamic-equilibrium relation from the pre-vious coupling update. These values are imposed as Dirichlet conditions at Γn+1/2, and the continuous-phase concentration field is updated to cn+1/2 
+
+> c,k
+
+.4. Evaluation of interfacial mass fluxes. Reconstruct the one-sided concentration gradients on the continuous-phase side of the interface and solve the coupled interfacial system (48) to obtain the partial mass fluxes ˙ m n+1/2
+
+> k
+
+and the total mass flux ˙ m n+1/2 = ∑Nt 
+
+> k=1
+
+˙m n+1/2 
+
+> k
+
+, where Nt is the number of transferring species. 5. Species transport in the dispersed phase. With the interfacial mass fluxes now known, solve Eq. (32) in the dispersed phase by imposing the corresponding Robin conditions (49). The dispersed-phase concentration field is updated to cn+1/2 
+
+> d,k
+
+, and the dispersed-phase interfacial concentrations are reconstructed from the sharp embedded-boundary treatment. 6. Temperature update. If thermal e ff ects are considered, solve Eq. (31) in the liquid and gas phases using the interfacial temperature-continuity condition and the heat-flux jump condition (10)–(11), whose right-hand side is determined by the partial mass fluxes obtained in Step 4. This gives the temperature field T n+1/2 and the interfacial temperature T n+1/2 
+
+> Γ
+
+. If the process is treated as isothermal, this step is omitted. 7. Update of the interfacial equilibrium state. Use the reconstructed interfacial temperature and dispersed-phase interfacial concentrations together with the thermodynamic-equilibrium relation, for example Eq. (17) for droplet evaporation or Eq. (21) for bubble dissolution, to update the interfacial concentrations on the continuous-phase side. These values serve as Dirichlet conditions for the next time step. 8. Flow-field update. With the interfacial mass fluxes known, solve the one-fluid momentum equations and apply the projection step described in Section 3.1 to update the velocity and pressure fields from ( un, pn) to (un+1, pn+1). 9. Advance to the next time step. Proceed to the next step in time and repeat the above procedure. The above sequence highlights the coupling logic of the method. The continuous-phase species equations first provide the one-sided concentration gradients needed to determine the partial interfacial mass fluxes. These fluxes then close the dispersed-phase species equations, the temperature equation, and finally the hydrodynamic update. This ordering keeps interface motion, multicomponent mass transfer, heat transfer, and flow evolution consistent within the same geometrical VOF–finite-volume framework. 
+
+5. Numerical tests 
+
+In this section, a series of numerical tests is presented to validate the proposed sharp-interface method and to demonstrate its applicability to representative liquid–gas mass-transfer problems. The tests are organized progres-sively. We first isolate the sharp treatment of the species equation using a static dissolving bubble with an analytical solution. We then consider moving and deformable interfaces, multicomponent bubble dissolution, and droplet evap-oration, in order to assess the coupled treatment of interface transport, species transfer, heat transfer, and thermody-namic equilibrium. 20 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+5.1. Dissolution of a static bubble with a single transferring component 
+
+We first consider the dissolution of a static spherical bubble involving a single transferring component. This test is designed to validate the embedded-boundary treatment developed in Sections 4.2 and 4.3 for the species equation, with particular emphasis on two aspects: the second-order discretization of the di ff usion operator in the presence of a sharp interface, and the accurate evaluation of the interfacial mass flux from one-sided concentration gradients. Since the bubble remains fixed and no thermal coupling is involved, this benchmark isolates the interfacial mass-transfer process from the additional complications associated with interface advection, hydrodynamic motion, and temperature evolution. It therefore provides a clean test of the phase-wise concentration solver before more complex multicomponent and thermally coupled configurations are considered. Consider a spherical bubble of radius R0, initially at rest in an unbounded liquid. The concentration inside the bubble is initially higher than that in the surrounding liquid, so that the transferring component di ff uses outward across the interface. Under spherical symmetry, the gas-side and liquid-side concentration fields satisfy 
+
+∂cg
+
+∂t = Dg
+
+1
+
+r2
+
+∂∂r
+
+(
+
+r2 ∂cg
+
+∂r
+
+)
+
+, in Ωg, (50a) 
+
+∂cl
+
+∂t = Dl
+
+1
+
+r2
+
+∂∂r
+
+(
+
+r2 ∂cl
+
+∂r
+
+)
+
+, in Ωl, (50b) subject to the interfacial, initial, and far-field conditions 
+
+
+
+cl = Hc g, on Γ,
+
+Dg
+
+∂cg
+
+∂r = Dl
+
+∂cl
+
+∂r , on Γ,
+
+cg(r, t = 0) = cg,0, r < R0,
+
+cl(r, t = 0) = cl,0, r > R0,
+
+cl(r → ∞ , t) = 0, t > 0.
+
+(51) Here, H is the concentration partition coe ffi cient linking the liquid-side and gas-side interfacial concentrations. For this problem, Farsoiya et al. [25] derived an analytical solution for the transient concentration fields inside and outside the bubble using the residue theorem. The solution reads 
+
+cg(r, t) = − 2cg,0
+
+πr
+
+∫ ∞
+
+> 0
+
+1
+
+x Im 
+
+[ sinh( λg(−x)r)
+
+ζ(−x)
+
+]
+
+e−xt dx , in Ωg, (52a) 
+
+cl(r, t) = − cg,0
+
+πr
+
+∫ ∞
+
+> 0
+
+1
+
+x Im 
+
+[ ξ(−x)
+
+ζ(−x) e−λl(−x)r
+
+]
+
+e−xt dx , in Ωl, (52b) where 
+
+λg/l(s) =
+
+√ sDg/l
+
+,ζ(s) = ξ(s) exp[ −λl(s)R0]
+
+HR 0
+
++ 2
+
+R0
+
+sinh[ λg(s)R0],ξ(s) = 2Dg
+
+[λg(s)R0 cosh[ λg(s)R0] − sinh[ λg(s)R0]]
+
+Dl exp[ −λl(s)R0][1 + λl(s)R0] .
+
+(53) Here, Im( ·) denotes the imaginary part of a complex number. To validate the present method, simulations are performed in a two-dimensional axisymmetric domain, as shown in Fig. 6. The bubble radius is R0, and the computational domain size is 10 R0 × 10 R0. The parameters are chosen as 
+
+cg,0 = 1, cl,0 = 0, Dl = 0.1, Dg = 1, and H = 0.001. This configuration is demanding because the equilibrium relation imposes a sharp concentration discontinuity at the interface, while the di ff usivities on the two sides of the interface di ff er by one order of magnitude. Figure 7 presents the temporal evolution of the concentration at two representative S. Zhao et al. / Journal of Computational Physics (2026) 21 
+
+locations, r = 0.5R0 inside the bubble and r = 1.5R0 in the surrounding liquid. Three spatial resolutions are consid-ered, corresponding to d/∆ = 13, 25, and 51, where d = 2R0 is the bubble diameter and ∆ is the minimum cell size near the interface. Even on the coarsest mesh, the numerical solution captures the transient evolution reasonably well. As the mesh is refined, the numerical results converge systematically toward the analytical solution on both sides of the interface. To quantify the spatial accuracy, Fig. 8(a) shows the relative error at the final time, defined as |(csim − ctheo )/ctheo |,where csim and ctheo denote the numerical and analytical concentrations, respectively. For comparison, the results obtained by the one-fluid formulation of Farsoiya et al. [25] are also shown. The present sharp two-field method exhibits a clear second-order convergence trend, whereas the one-fluid formulation is only first-order accurate. This improvement confirms that the embedded-boundary discretization provides a substantially more accurate treatment of the interfacial concentration jump and the associated di ff usive flux. Finally, we assess global mass conservation. The relative mass error is defined as 
+
+εmass =
+
+∣∣∣∣∣
+
+Ml + Mg + Mout − M0
+
+M0
+
+∣∣∣∣∣ , (54) where 
+
+Mg =
+
+∫
+
+> Ωg
+
+cg dV , Ml =
+
+∫
+
+> Ωl
+
+cl dV , Mout =
+
+∫ t
+
+> 0
+
+∫
+
+> ∂Ω
+
+(clu · n − Dl∇cl · n) dS dt ′, (55) and M0 is the initial total mass of the transferring component in the computational domain. The outward normal on the outer boundary is denoted by n. The results shown in Fig. 8(b) indicate excellent mass conservation: the mass error remains below 0 .002% and decreases monotonically with mesh refinement.     
+
+> Gas Liquid
+> Symmetric boundary condition Axi
+> Fig. 6. Axisymmetric configuration for the dissolution of a static spherical bubble with a single transferring component. The initial bubble radius is R0, and the computational domain size is 10 R0×10 R0.
+
+5.2. Rising bubble with dissolution 
+
+We next consider the dissolution of a freely rising bubble with its volume kept constant. This test is intended to validate the coupled flow–mass-transfer solver developed in Sections 3 and 4 in a configuration where interfacial transport is governed simultaneously by convection and di ff usion. Compared with the static-bubble benchmark in Section 5.1, the present problem involves a moving interface, a wake-induced concentration field, and a concentration boundary layer whose thickness depends strongly on the Schmidt number. It therefore provides a more stringent assessment of the sharp treatment of the species equation and of the evaluation of the interfacial mass flux in a hydrodynamically evolving flow. The problem is solved in a two-dimensional axisymmetric domain, as sketched in Fig. 9(a). A spherical bubble of initial radius R0 rises freely in an initially quiescent liquid, while one transferring component dissolves from the bubble into the surrounding liquid. The computational domain size is chosen as 20 R0 × 20 R0, which is su ffi ciently large to avoid any significant influence of the outer boundaries on the bubble motion and on the concentration field during the time interval of interest. 22 S. Zhao et al. / Journal of Computational Physics (2026)                   
+
+> (    ( 
+> 0.98 0.985 0.99 0.995 100.2 0.4 0.6 0.8 11.2 ctD l/d 2
+> d/  x = 13 d/  x = 25 d/  x = 51 Analytic 012345600.2 0.4 0.6 0.8 11.2 x10 -4
+> ctD l/d 2
+> d/  x = 13 d/  x = 25 d/  x = 51 Analytic
+
+Fig. 7. Temporal evolution of the concentration at two representative locations for di ff erent spatial resolutions: (a) r = 0.5R0 inside the bubble and (b) r = 1.5R0 in the surrounding liquid. Symbols denote the numerical results, and solid lines denote the analytical solution.             
+
+>  
+> 00.5 11.5 200.2 0.4 0.6 0.8 11.2 x10 -5
+> ε mass
+> tD l/d 2
+> d/Δ x = 51 d/Δ x = 102 d/Δ x = 205
+> 1e-03 1e-02 1e-01 1e+00 1e+01 1e+02 816 32 64 128 Error (%) d/Δ x Numerical Farsoiya2021 O(2.29) O(1.05)
+
+Fig. 8. Validation of the static-bubble dissolution problem. (a) Relative concentration error at the final time as a function of grid resolution, compared with the one-fluid formulation of Farsoiya et al. [25]. (b) Global mass-conservation error, defined by Eq. (54) , for di ff erent grid resolutions. Table 1. Test cases for the dissolution of a freely rising bubble considered in Section 5.2. 
+
+Case Mo Bo Sc 1 10 −4 1 12 5 × 10 −4 3.125 13 5 × 10 −7 3.125 14 5 × 10 −7 3.125 10 5 5 × 10 −7 3.125 100 
+
+The bubble dynamics are characterized by the Morton number Mo = gμ4 
+
+> l
+
+/(ρlσ3) and the Bond number Bo =
+
+ρlgd 20 /σ , where d0 = 2R0 is the initial bubble diameter. The mass-transfer process is characterized by the Schmidt number S c = νl/Dl and the Peclet number Pe = Ud /Dl, where U and d denote the instantaneous bubble velocity and equivalent diameter, respectively. To enable direct comparison with previous numerical studies [24, 25], we consider the set of cases listed in Table 1. In all cases, the di ff usivity ratio and the concentration partition coe ffi cient are fixed as Dg/Dl = 100 and H = 1/30, respectively. The dissolution rate is quantified by the Sherwood number, S h = kLd/Dl, where kL is the liquid-side mass-transfer coe ffi cient. In the present simulations, kL is evaluated from the total interfacial mass flux as kL = ∫ 
+
+> Γ
+
+˙m dA /A(Hc g,in −
+
+cl,bulk ), where A is the bubble surface area, and cg,in and cl,bulk denote the average concentration inside the bubble and the bulk concentration in the surrounding liquid, respectively. S. Zhao et al. / Journal of Computational Physics (2026) 23           
+
+> Gas Liquid
+> Axi
+> S S 
+> (a)  
+> Fig. 9. Dissolution of a freely rising bubble. (a) Axisymmetric computational configuration. (b) Instantaneous concentration contours for case 3 with S c =1(left) and case 4 with S c =10 (right), showing the thinning of the concentration boundary layer with increasing S c .
+
+Figure 9(b) first illustrates the influence of the Schmidt number on the concentration boundary layer. At the same instant, the case with S c = 10 exhibits a much thinner concentration boundary layer than that with S c = 1, as expected. This trend is numerically important, because a larger Schmidt number produces a sharper interfacial concentration gradient and therefore requires a finer mesh for accurate flux evaluation. In the present simulations, a resolution of 
+
+d/∆ = 102 is employed for S c = 1, whereas a finer resolution of d/∆ = 205 is used for the higher-Schmidt-number cases with S c = 10 and 100. Figure 10 shows the temporal evolution of S h for case 3. After a short transient, the Sherwood number gradu-ally approaches a nearly constant value as the bubble reaches its terminal rising velocity. The figure also compares the present sharp two-field results, shown in Fig. 10(a), with the one-fluid results of Farsoiya et al. [25], shown in Fig. 10(b). As in the static-bubble benchmark, the present method exhibits a noticeably faster convergence under mesh refinement, indicating that the interfacial mass flux is resolved more accurately by the sharp embedded-boundary treatment. For additional verification, a three-dimensional simulation at the coarsest resolution is also included in Fig. 10(a) using circles. The resulting values agree closely with the corresponding axisymmetric results, further supporting the consistency of the present formulation.               
+
+> 910 11 12 13 14 15 0123456
+> Sh tU/d d/Δ x   
+> d/Δ x   
+> d/Δ x  
+> d/Δ x         
+> Sh tU/d d/Δ x   
+> d/Δ x   
+> d/Δ x  
+> d/Δ x         ! ! "  #
+
+(a) (b)      
+
+> Fig. 10. Temporal evolution of the Sherwood number for case 3 at di ff erent grid resolutions: (a) present sharp two-field method and (b) one-fluid formulation of Farsoiya et al. [25]. In panel (a), circles denote the corresponding three-dimensional results at the coarsest resolution, and the inset provides an enlarged view for 3≤tU /d≤4. Time is normalized by the bubble equivalent diameter and terminal rising velocity.
+
+For comparison with theory, we recall that Boussinesq [38], Leviˇ c [39] derived, in the potential-flow limit, the 24 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+classical prediction S h = 2 √Pe /π . Figure 11 compares the steady Sherwood numbers obtained from the simulations with this theoretical prediction, where Pe is evaluated using the terminal bubble velocity. The numerical results from both the axisymmetric and three-dimensional simulations collapse well in the S h –Pe plane and agree closely with the theoretical scaling. This demonstrates that the present method accurately captures the coupled convection–di ff usion mass-transfer process over a broad range of flow and transport conditions.    
+
+> $$ % $ % % $ $ % $ %% $ %%% $ % %% %
+> Sh Pe Le&  ') *+ $ , -. /
+> AXI
+> 3 0
+> Fig. 11. Steady Sherwood number as a function of the Peclet number for all simulated cases, compared with the theoretical prediction
+> S h =2√Pe /π .
+
+Finally, global mass conservation is examined in Fig. 12, with panel (a) showing the axisymmetric results and panel (b) the three-dimensional results. In all cases, the overall mass error remains below 0 .008% and decreases monotonically as the mesh is refined. This confirms that the present sharp interfacial treatment preserves not only the local accuracy of the mass-transfer rate, but also the global conservation property of the concentration field. 
+
+(a) (b)               
+
+> 0
+> 24680123456x10 -5
+> ε mass
+> tU/d
+> Pe = 11.02 Pe = 105.25 Pe = 1052.55 Pe = 10525.49 01230123456x10 -5
+> ε mass
+> tU/d
+> Pe = 11.02 Pe = 105.25 Pe = 1052.55 Pe = 10525.49
+> Fig. 12. Global mass-conservation error for the rising-bubble dissolution problem: (a) axisymmetric simulations and (b) three-dimensional simulations.
+
+5.3. Dissolution of a freely rising carbon-dioxide bubble 
+
+We now consider a more practical multicomponent mass-transfer problem, namely the dissolution of a carbon-dioxide bubble rising in water. This example is designed to assess the full coupling strategy developed in Sections 4.2– 4.4. Unlike the preceding single-component tests, the present case involves several species that may be transferred in opposite directions across the same interface: CO 2 dissolves from the bubble into the surrounding water, whereas dissolved N 2 and O 2 in the liquid may di ff use into the bubble. The bubble volume also evolves continuously during the dissolution process. This test therefore involves multicomponent interfacial equilibrium, phase-wise concentration fields, multiple partial mass fluxes, and their feedback on the bubble dynamics. It provides a demanding and prac-tically relevant validation case, since the dissolution of carbon-dioxide bubbles is important in many environmental and industrial processes. S. Zhao et al. / Journal of Computational Physics (2026) 25                                 
+
+> Table 2. Physical properties of the liquid–gas system used in the carbon-dioxide bubble dissolution problem of Section 5.3.
+> Phase ρ(kg /m3)μ(Pa ·s) D(m 2/s) σ(N /m) HCO 2/N2/O2
+> Gas 1.8 7×10 −51.7×10 −50.07 0.827 /0.016 /0.031 Liquid 1000 10 −32×10 −8
+
+Carbon dioxide is highly soluble in water. However, experiments by Hosoda et al. [40, 41] showed that a pure carbon-dioxide bubble does not simply disappear monotonically. Instead, after a long dissolution process, the bubble may approach a quasi-equilibrium state in which its volume decreases only very slowly. The physical reason is that, while CO 2 leaves the bubble and dissolves into the surrounding liquid, trace amounts of dissolved N 2 and O 2 in water enter the bubble through the same interface. As a result, N 2 and O 2 gradually replace CO 2 and eventually become the dominant components inside the bubble. This behavior is particularly suitable for testing the present method, because it requires the accurate prediction of three species, opposite transfer directions, and long-time evolution of the interfacial composition. Earlier numerical attempts, such as that of Fleckenstein and Bothe [17], did not yet provide fully satisfactory results for this problem. We therefore re-examine it here using the present sharp and conservative multicomponent framework. As an independent reference for the present simulations, we use the semi-empirical model of Hosoda et al. [40, 41], which has been extensively compared with experimental measurements. Assuming that the process is isothermal, the molar amount ni of component i inside the bubble may be estimated from 
+
+dn i
+
+dt = − πd2kL,i
+
+Mi
+
+(cl,i,Γ − cl,i,bulk 
+
+) , (56) and the bubble diameter is evaluated as 
+
+d =
+
+
+
+6
+
+π
+
+
+
+> Nt
+
+∑
+
+> i=1
+
+niMi
+
+ρg
+
+
+
+> 1/3
+
+, (57) where Mi is the molar mass of component i, and Nt = 3 is the number of transferring species in the present prob-lem. For small bubbles with limited deformation, the liquid-side mass-transfer coe ffi cient is estimated by kL,i =
+
+2 √UD l,i/π d, which corresponds to the classical convection–di ff usion correlation introduced in Section 5.2. The liquid-side interfacial concentration is approximated by the equilibrium relation cl,i,Γ ≈ cLMiζg,iP/Hi, where cL =
+
+55 .4 kmol /m3 is the molar concentration of pure water, ζg,i is the mole fraction of component i inside the bubble, P is the pressure, and Hi is Henry’s constant. In the reduced model, the bubble rise velocity is estimated from 
+
+U =
+
+√
+
+4( ρl − ρg)gd 
+
+3CDρl
+
+, CD = max 
+
+[
+
+min 
+
+( 16 
+
+Re 
+
+(1 + 0.15 Re 0.687 ) , 48 
+
+Re 
+
+)
+
+, 83
+
+Eo Eo + 4
+
+]
+
+, (58) where CD is the drag coe ffi cient. It should be emphasized that the reduced model used in the experiments accounts for gas compressibility through an equation of state, whereas the present simulations assume a constant gas density and do not solve a gas equation of state. Therefore, a direct quantitative comparison with the experimental measurements themselves is not attempted here. Instead, the reduced model is used as a reference to assess whether the present numerical method captures the dominant multicomponent dissolution mechanism. The numerical simulations are performed in a two-dimensional axisymmetric domain similar to that used in Sec-tion 5.2, except that the domain is enlarged to 80 d0 × 80 d0 in order to capture the long-time dissolution dynamics. The initial bubble diameter is d0 = 1 mm. Before considering the full three-component problem, we first examine the dissolution of a pure carbon-dioxide bubble using the physical parameters listed in Table 2. This preliminary step serves two purposes: it validates the present method in a simpler configuration with variable bubble volume, and it helps identify the grid resolution required for the high-Schmidt-number transport in the liquid phase. Figure 13(a) shows the bubble shape at several instants during the rise of an initially stationary carbon-dioxide bubble in water. The bubble shrinks continuously as CO 2 dissolves into the surrounding liquid. Figure 13(b) presents the corresponding time evolution of the Sherwood number for several grid resolutions. Because of the high Schmidt number in the liquid phase, accurate convergence requires a fine mesh; the present results indicate that approximately 200 grid points per initial bubble diameter are su ffi cient. During the initial acceleration stage, the Sherwood number 26 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+rises rapidly and di ff ers noticeably from the semi-empirical prediction. This discrepancy is expected for two reasons. First, the bubble is initially at rest and undergoes a finite acceleration process, whereas the reduced model uses a quasi-steady estimate of the bubble rise velocity. Second, the liquid-side concentration boundary layer has not yet fully developed, so the quasi-steady mass-transfer correlation used for kL,i is not immediately applicable. After this initial transient, the numerical results agree well with the reduced model obtained by solving Eqs. (56)–(58), confirming that the present method captures the coupling between bubble shrinkage and interfacial mass transfer. The small oscillations visible in the numerical curves are associated with weak surface disturbances and with variations in the discrete interfacial gradient as the bubble crosses successive grid layers. Their period decreases under mesh refinement, which is consistent with a discretization-induced e ff ect. 
+
+> t = 0s t = 0.065s t = 0.125s t = 0.19s t = 0.25s
+
+(a) (b)      
+
+> 121415167 1 68 1 1 1 9 1 8  1 9  6 1 9  68 1 9 7 19 78
+> Sh
+> t :; <
+> d/Δ = > 8 6
+> d/Δ = > 61 7
+> d/Δ = > 6 2 ?
+> d/Δ = > 7 1 8 M @A B C
+> Fig. 13. Dissolution of a pure carbon-dioxide bubble. (a) Bubble shapes at selected instants during the free-rise dissolution process. (b) Temporal evolution of the Sherwood number for di ff erent grid resolutions; circles denote the reduced-model prediction obtained from Eqs. (56) –(58) .
+
+Having established the resolution requirement for the pure carbon-dioxide case, we next consider the full three-component problem with a fixed resolution of d/∆ = 205. Initially, the carbon-dioxide concentration inside the bubble is set to cg,CO 2 = 1.8 kg /m3 and to zero in the surrounding liquid. Conversely, nitrogen and oxygen are absent from the bubble initially, while their liquid-phase concentrations are set to cl,N2 = 0.00714 kg /m3 and cl,O2 = 0.00864 kg /m3,corresponding to equilibrium with air at standard atmospheric pressure. All other physical parameters are the same as those listed in Table 2. Since the pure-carbon-dioxide results show that the early transient is a ff ected by both the initial acceleration of the bubble and the development of the liquid-side concentration boundary layer, a preprocessing stage is first performed. During this stage, the gas composition and bubble volume are kept fixed, while the flow and concentration fields are allowed to develop. The full dissolution process is activated only after the bubble reaches a nearly steady rise velocity. Figure 14 presents the temporal evolution of the mole fractions of the three gas components inside the bubble and of the bubble radius. As CO 2 dissolves into the surrounding liquid, Fig. 14(a) shows that its mole fraction decreases rapidly. At the same time, N 2 and O 2 enter the bubble from the liquid phase, and their mole fractions increase continuously. The corresponding bubble shrinkage is shown in Fig. 14(b). Once most of the CO 2 has been depleted, N2 and O 2 become the dominant components inside the bubble, and the rate of volume reduction decreases markedly. Eventually, the CO 2 content becomes very small, while the mole fractions of N 2 and O 2 approach approximately 78% and 22%, respectively. Correspondingly, the bubble radius tends toward a nearly constant value. This behavior is consistent with the experimentally observed long-time replacement of carbon dioxide by nitrogen and oxygen [40, 41]. The numerical predictions of both the gas composition and the bubble radius agree well with the reduced model over most of the dissolution process. The discrepancy becomes more visible only in the final stage, when the bubble has lost most of its initial volume. This deviation is expected, because the number of grid cells inside the bubble then becomes limited, while the simplifying assumptions underlying the reduced model also become less accurate in this regime. Finally, we evaluate the global mass-conservation error of carbon dioxide over the whole computational domain. During the entire dissolution process, the relative error remains below 0 .02%, which further demonstrates that the present multicomponent sharp-interface method preserves the conservation of the transferred species even in a long-S. Zhao et al. / Journal of Computational Physics (2026) 27 
+
+(a) (b)                                     
+
+> DDE F DEGDE H DE I JD DE F  D EG D EH D EI JRKR
+> 0
+> L NO P
+> Numerical Model 00.2 0.4 0.6 0.8 100.2 0.4 0.6 0.8 1
+> Q
+> t (s) CO 2
+> N2
+> O2
+> Fig. 14. Dissolution of a three-component carbon-dioxide bubble. Temporal evolution of (a) the mole fractions of CO 2,N2, and O2inside the bubble and (b) the bubble radius. Symbols denote the reduced-model prediction obtained from Eqs. (56) –(58) .Table 3. Physical properties of the n-heptane droplet and surrounding gas used in Section 5.4.
+> ρ
+> (kg /m3)
+> μ
+> (Pa ·s)
+> cp
+> (J /(kg K))
+> λ
+> (W /(m K))
+> M
+> (kg /kmol)
+> L
+> (J /kg)
+> σ
+> (N /m)
+> D
+> (m 2/s) Gas 17.51 1×10 −51053 0.04428 29 6.77 ×10 −7
+> Liquid 626.7 1×10 −32505 0.1121 100 3.23 ×10 50.02
+
+time simulation involving evolving bubble composition and changing bubble volume. 
+
+5.4. Evaporation of an n-heptane droplet 
+
+We next turn to droplet evaporation. Unlike the bubble-dissolution cases considered above, droplet evapora-tion involves a strong coupling between vapor transport and heat transfer: the interfacial mass flux is controlled by vapor–liquid equilibrium, while the latent heat of evaporation modifies the temperature field and feeds back on the evaporation rate. This test follows the finite-domain droplet-evaporation benchmark of Pathak and Raessi [42], whose transient solutions are used as reference data for the droplet radius, temperature field, and vapor-concentration field. The benchmark is therefore used here to validate the thermally coupled evaporation formulation before considering multicomponent liquid mixtures. We consider the evaporation of a stationary spherical droplet in the absence of gravity. The problem is solved in a two-dimensional axisymmetric domain, as shown in Fig. 15(a). The initial droplet radius is R0 = 5 μm, and the computational domain size is 4 R0 × 4R0. To reduce boundary-induced anisotropy, a circular outer boundary of radius 4 R0 is used to impose the far-field conditions. The initial droplet temperature is 363 K, whereas the ambient gas temperature is 536 K. The far-field temperature and vapor concentration are fixed at T∞ = 536 K and cv,∞ = 0, respectively. The physical properties are listed in Table 3. The saturation vapor pressure of n-heptane is evaluated from the Antoine correlation listed in Appendix B. Figure 15(b) compares the temporal evolution of the droplet radius obtained at di ff erent spatial resolutions with the reference solution of Pathak and Raessi [42]. The numerical results agree well with the reference prediction, and the agreement improves systematically as the mesh is refined. This confirms that the present method accurately captures the evaporation rate of a thermally coupled single-component droplet. Figure 16 further compares the cross-sectional distributions of temperature and vapor concentration with the reference solutions at several representative times. The numerical profiles reproduce the reference results very well for both the thermal field and the vapor-concentration field. These results demonstrate that the coupled solution of heat conduction, vapor di ff usion, and interfacial evaporation is accurately captured by the present sharp-interface formulation. Finally, we examine the conservation of mass and energy during the evaporation process. The relative total-energy error is defined as 
+
+εenergy =
+
+∣∣∣∣∣
+
+El + Eg + Epc + Eout − Ein − E0
+
+E0
+
+∣∣∣∣∣ , (59) 28 S. Zhao et al. / Journal of Computational Physics (2026)  
+
+> TU TVWX YW Z[\ ] ^ree _ o `  boundary
+> Symmetric boundary condition Axi
+> a
+> ck=c k, a
+
+00.2 0.4 0.6 0.8 10 25 50 75 100 125 150 (R/R 0)2
+
+t ( b s) d/ c x = 32 d/ c x = 64 d/ c x = 128 Pathak(2018) 
+
+(a) (b) 
+
+Fig. 15. Evaporation of a single-component n-heptane droplet. (a) Axisymmetric computational configuration. (b) Temporal evolution of the droplet radius at di ff erent spatial resolutions, compared with the reference solution of Pathak and Raessi [42]. 
+
+(a) (b)                 
+
+> d
+> 0.2 0.4 0.6 0.8 101234
+> fr h i 0
+> t = 3.29 j s
+> t = 30.0 j s
+> t = 105 j s
+> t = 150 j s
+> 350 400 450 500 550 600 01234
+> klmnr h i 0
+> t = 3.29 j s
+> t = 30.0 j s
+> t = 105 j s
+> t = 150 j s
+
+Fig. 16. Cross-sectional distributions of (a) temperature and (b) vapor concentration during n-heptane droplet evaporation at selected times. Solid lines denote the numerical results, and symbols denote the reference solutions of Pathak and Raessi [42]. 
+
+where 
+
+El =
+
+∫
+
+> Ωl
+
+ρlcp,lT dV ,
+
+Eg =
+
+∫
+
+> Ωg
+
+ρgcp,gT dV ,
+
+Epc =
+
+∫ t
+
+> 0
+
+∫
+
+> Γ
+
+
+
+> Nt
+
+∑
+
+> k=1
+
+˙mkLk + ˙m(cp,l − cp,g)TΓ
+
+ dS dt ′,
+
+Eout =
+
+∫ t
+
+> 0
+
+∫
+
+> ∂Ω
+
+ρgcp,gT u · n dS dt ′,
+
+Ein =
+
+∫ t
+
+> 0
+
+∫
+
+> ∂Ω
+
+λg
+
+∂T
+
+∂n dS dt ′.
+
+(60) Here, El and Eg are the total internal energies of the liquid and gas phases, respectively, Epc is the energy consumed by phase change, Eout is the energy leaving the computational domain through convection, Ein is the energy entering the domain through thermal conduction, and E0 is the initial total internal energy. For the present single-component case, Nt = 1. S. Zhao et al. / Journal of Computational Physics (2026) 29                                                      
+
+> Table 4. Physical properties of the ethanol–isooctane droplets and the surrounding gas used in Section 5.5.
+> Phase ρ(kg /m3)μ(Pa ·s) cp(J /(kg ·K)) λ(W /(m ·K)) D(m 2/s) Y90 730 1.0×10 −32800 0.155 2.5×10 −9
+> Y35 700 1.0×10 −32500 0.110 2.0×10 −9
+> Y10 670 1.0×10 −32250 0.095 2.9×10 −9
+> Gas 1.0 1.8×10 −51010 0.030 1.0×10 −5
+
+Figure 17 shows the temporal evolution of the relative mass and energy errors for di ff erent spatial resolutions. Both errors remain small throughout the simulation, confirming that the present method preserves the conservative properties of the thermally coupled single-component evaporation problem. 
+
+(a) (b)      
+
+> pquvwp u y yp z y qp p qu y q yp
+> x10 -3
+> {|}|~
+> t (  s)
+>    x = 32 d/  x = 64 d/  x = 128 01234025 50 z y  100 qu y q yp
+> x10 -2
+> {
+> mass
+> t (  s)
+> d/  x = 32 d/  x = 64 d/  x = 128
+> Fig. 17. Temporal evolution of the (a) relative mass error and (b) relative energy error for di ff erent spatial resolutions during n-heptane droplet evaporation.
+
+5.5. Evaporation of ethanol–isooctane mixture droplets 
+
+We now turn to the evaporation of multicomponent droplets. This example is intended to validate the thermo-dynamic coupling strategy developed in Sections 4.2–4.4 for non-ideal liquid mixtures. Compared with the single-component n-heptane case considered in Section 5.4, the present problem involves two volatile liquid components whose relative evaporation rates are determined not only by their saturation vapor pressures, but also by the activity coe ffi cients associated with liquid-mixture non-ideality. The ethanol–isooctane system provides a representative test case, since isooctane is a major component of gasoline, ethanol is a widely used fuel additive, and their mixture exhibits pronounced non-ideal behavior with an azeotropic point. To isolate the interfacial mass-transfer characteristics of the non-ideal mixture, we consider stationary droplets and neglect gravity. The problem is solved in a two-dimensional axisymmetric domain, following the same configuration as in the preceding droplet-evaporation case. The initial droplet radius is R0 = 150 μm, and the computational domain size is 10 R0 × 10 R0. The spatial resolution corresponds to approximately 102 grid cells across the initial droplet diameter, namely d/∆ = 102, where d = 2R0. The initial temperatures of the liquid and gas phases are set to 331 K and 372 K, respectively, while the far-field conditions are prescribed as T∞ = 372 K and ck,∞ = 0. Three initial ethanol mass fractions are considered, namely Ye = 0.9, 0 .35, and 0 .1, which are denoted hereafter by Y90, Y35, and Y10, respectively. The corresponding material properties are listed in Table 4. In all cases, the latent heats of vaporization are taken as Le = 8.5×10 5 J/kg for ethanol and Liso = 3×10 5 J/kg for isooctane, and the surface-tension coe ffi cient is fixed at σ = 0.02 N /m. The saturation vapor pressures of ethanol and isooctane are evaluated from the Antoine correlations listed in Appendix B. The liquid-phase activity coe ffi cients are evaluated using the UNIFAC group-contribution method [22, 23]. Figure 18(a) shows the temporal evolution of the droplet radius for the three initial compositions. The evaporation rate depends strongly on the initial mixture composition, with the Y10 droplet evaporating significantly faster than 30 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+the Y90 droplet. To understand the origin of this behavior, Fig. 18(b) displays the ethanol mass-fraction field inside the liquid phase at three representative times, t = 0.2 s, 0 .6 s, and 1 s, for the two limiting cases Y90 and Y10. These results reveal two qualitatively di ff erent evaporation processes. In the Y90 case, the average ethanol mass fraction inside the droplet increases with time, indicating that isooctane evaporates preferentially. In contrast, in the Y10 case, the average ethanol mass fraction decreases continuously, showing that ethanol is then the more volatile component.       
+
+> 00.2 0.4 0.6 0.8 100.5 11.5 2
+> (R/R 0)2
+> t (s)
+>   
+> Y35 Y10
+> Y90 Y10
+> 00.02 0.04 0.06 0.08 0.10
+>         
+> 1.0
+> Ye
+> t = 0.2 s t = 0.6 s t = 1 s
+
+(a) (b)      
+
+> Fig. 18. Evaporation of ethanol–isooctane mixture droplets. (a) Temporal evolution of the droplet radius for the three initial compositions. (b) Ethanol mass-fraction field inside the liquid droplet for cases Y90 and Y10 at t=0.2 s ,0.6 s , and 1 s .
+
+At first sight, this result may appear counterintuitive, since pure ethanol is more volatile than pure isooctane. The explanation lies in the non-ideal thermodynamic behavior of the ethanol–isooctane mixture. Because ethanol is strongly polar whereas isooctane is non-polar, the mixture exhibits pronounced non-ideality and possesses an azeotropic point. The corresponding phase diagram at 1 bar is shown in Fig. 19. The black solid curves denote the vapor–liquid equilibrium boundaries obtained using the UNIFAC activity-coe ffi cient model, while the blue dashed curves correspond to the ideal-mixture prediction based on Raoult’s law. The non-ideal phase diagram exhibits an azeotropic point at T az = 343 .86 K and ζaz l,e = 0.631, whereas no such feature exists for the ideal mixture. When the ethanol mole fraction in the liquid exceeds the azeotropic value, i.e. ζl,e > ζ az l,e as in case Y90, the equi-librium vapor at the interface contains a smaller ethanol fraction than the liquid itself. Isooctane therefore evaporates preferentially, and the ethanol concentration inside the droplet increases. Conversely, when ζl,e < ζ az l,e as in case Y10, the equilibrium vapor is enriched in ethanol, so that ethanol evaporates preferentially and its liquid-phase concentra-tion decreases. This interpretation is further clarified by the relative volatility. Defining the equilibrium constant of component i as Ki = ζg,i/ζ l,i = γi psat i /P, the separation factor between ethanol and isooctane is 
+
+αe,iso = Ke
+
+Kiso 
+
+= γe psat e
+
+γiso psat iso 
+
+. (61) Here, αe,iso > 1 indicates that ethanol is more volatile than isooctane, whereas αe,iso < 1 indicates the opposite. In Fig. 19, the black dashed curve marks the locus αe,iso = 1, separating the two evaporation regimes. The initial interfa-cial state of Y90 lies in the region αe,iso < 1, which explains why isooctane evaporates faster. By contrast, Y10 lies in the region αe,iso > 1, so that ethanol evaporates faster. The intermediate case Y35 is particularly interesting: because 
+
+αe,iso depends nonlinearly on both temperature and composition, the interfacial state evolves during evaporation and may cross from the region αe,iso > 1 into the region αe,iso < 1. As a result, the ethanol mass fraction first decreases and then increases, which is a distinctive signature of the fully coupled non-ideal multicomponent behavior. Finally, we assess the overall conservation of mass and energy during the evaporation process. Figure 20 shows that both the mass and energy errors remain small for all three initial compositions, with errors below 0 .8% throughout the simulations. This confirms that the present numerical method preserves the conservative properties of the coupled multicomponent evaporation problem, even when non-ideal thermodynamic equilibrium strongly modifies the relative evaporation rates of the two components. 
+
+5.6. Evaporation of a sessile water–glycerol droplet 
+
+Finally, we consider the evaporation of a sessile water–glycerol droplet, a configuration that is widely used in experiments and has become a standard benchmark for multicomponent droplet evaporation. This test is intended S. Zhao et al. / Journal of Computational Physics (2026) 31                
+
+> 280 300 320 340 360 380 00.2 0.4 0.6 0.8 1
+> 
+> e
+> α 
+> α 
+> Y35 Y10
+> 
+> Fig. 19. Interfacial thermodynamic states of the evaporating ethanol–isooctane droplets in the vapor–liquid equilibrium diagram. The black solid curves denote the equilibrium boundaries predicted by the UNIFAC activity-coe ffi cient model, the blue dashed curves denote the ideal-mixture prediction from Raoult’s law, and the black dashed curve marks αe,iso =1. The markers show the trajectories of the interfacial states for the three initial droplet compositions.
+> 0246800.5 11.5 2x10 -3
+> εmass
+> t (s)
+
+(a)     
+
+> 
+> Y35 Y10
+> 024600.5 11.5 2x10 -3
+> ε ener 
+> t (s)
+
+(b) 
+
+> 
+> Y35 Y10
+> Fig. 20. Conservation errors for ethanol–isooctane droplet evaporation with di ff erent initial compositions: (a) relative mass error and (b) relative energy error.
+
+to validate the present method in a more realistic setting involving a pinned contact line, composition-dependent liquid properties, non-uniform interfacial evaporation, and Marangoni flow driven by composition gradients. Since the volatility of glycerol is negligible compared with that of water, only water is treated as a transferring species. The present case therefore provides a stringent test of the coupled solution of the water-concentration field, the temperature field, and the interfacial mass flux, while retaining the essential physics of a non-ideal multicomponent sessile droplet. Figure 21 shows the computational configuration. In a two-dimensional axisymmetric coordinate system, a spherical-cap droplet with an initial volume of 50 nL, an initial water mass fraction of 90%, and an initial con-tact angle of θ = 120 ◦ is placed on a solid substrate. The computational domain is 2 .4 mm × 2.4 mm. To better approximate an unbounded ambient environment, an additional circular outer boundary defined by x2 + y2 = R2
+
+> ∞
+
+with R∞ = 2.4 mm is used to impose the far-field conditions. The wall and ambient temperatures are both fixed at 
+
+Twall = T∞ = 25 ◦C, while the ambient water-vapor concentration is taken as cv,∞ = 0, corresponding to zero relative humidity. Following the Dirichlet-to-Neumann mapping approach [43], Robin conditions are imposed on the outer boundary in the form 
+
+T + R∞
+
+∂T
+
+∂n = T∞, cv + R∞
+
+∂cv
+
+∂n = cv,∞.
+
+The spatial resolution corresponds to approximately 206 grid cells across the initial droplet diameter, namely 32 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+d/∆ = 206. A pinned-contact-line model is adopted throughout the simulation, so that the contact-line position remains fixed while the contact angle and the interface shape evolve. The gas-phase properties are prescribed as 
+
+ρg = 1.2 kg /m3, μg = 1.8 × 10 −5 Pa · s, cp,g = 1006 J /(kg · K), λg = 0.026 W /(m · K), and Dg = 2.6 × 10 −5 m2/s. By contrast, the liquid-phase properties are allowed to depend on the local water–glycerol composition and are updated during evaporation. The corresponding correlations are taken from the model used by Diddens [44] and from standard property data for aqueous glycerol solutions [45, 46].  
+
+> Drop
+> Wall Axi
+> ck+ =c k,
+> ¡ck
+> ¡ nT+ R=T
+> ¡ T
+> ¡n
+> Fig. 21. Computational configuration for sessile water–glycerol droplet evaporation. The droplet is modeled in an axisymmetric domain with a pinned contact line, a constant-temperature solid substrate, and an outer circular boundary for imposing far-field thermal and water-vapor concentration conditions.
+
+Figure 22 presents the droplet shape together with the temperature field and water-vapor concentration field at three representative times, t = 1, 40, and 55 s. At the early stage, the contact angle is larger than 90 ◦, so vapor di ff usion near the substrate is geometrically hindered and the local evaporation rate near the contact line is lower than that near the apex of the droplet. As a consequence, evaporative cooling is stronger near the top of the droplet, leading to a lower local temperature and a pronounced vertical temperature gradient, as shown in Fig. 22(a,d). As evaporation proceeds, the water content inside the droplet decreases continuously. The water-vapor concentration in the surrounding gas and the local evaporation rate both decrease gradually, as shown in Fig. 22(e,f). Meanwhile, heat supplied from the substrate and the ambient gas progressively compensates for the evaporative cooling, so that the droplet temperature increases again during the later stage, as shown in Fig. 22(b,c). To further clarify the internal transport mechanism, Fig. 23(a,b) shows the water mass-fraction field and the streamlines inside the droplet at t = 1 s and 50 s. At the beginning of evaporation, the weaker evaporation near the contact line leads to a higher local water concentration there than near the apex, thereby creating a tangential concentration gradient along the interface. Since the surface tension of a water–glycerol mixture increases with the water concentration, the larger surface tension near the contact line drives a Marangoni flow from the apex toward the contact line, as shown in Fig. 23(a). As the droplet evaporates and the contact angle decreases below 90 ◦, the evaporation rate becomes larger near the contact line than near the apex, and the Marangoni circulation reverses direction. At later times, the water content becomes small and the viscosity of the mixture rises rapidly, which suppresses both the internal circulation and the overall evaporation rate. Figure 23(c,d) further shows the temporal evolution of the droplet volume and contact angle for three model set-tings: a non-isothermal case, an isothermal case with constant liquid density, and an isothermal case with composition-dependent liquid density. In the isothermal variable-density case, the density treatment follows the same assumptions as those used in the reference finite-element simulations of Diddens [44], and therefore provides a direct comparison with the reference results. The present isothermal variable-density results agree well with the reference data, con-firming that the present Cartesian-grid formulation accurately captures the coupled composition transport and shape evolution of the pinned sessile droplet. The comparison among the three cases further shows that both thermal e ff ects and composition-induced density variations have a noticeable influence on the evaporation dynamics. S. Zhao et al. / Journal of Computational Physics (2026) 33 
+
+> 294
+> 295
+> 296
+> 297
+> 298
+> 0.002
+> 0.004
+> 0.008
+> 0.014
+> 0.018
+
+T ¢ £ ¤
+
+(a) (b) (¥)
+
+> ¦§ ¨
+
+(©) (ª) 
+
+> «g
+
+(kg/m 3)
+
+t = 1 s t = 40 s t = 55 s 
+
+Fig. 22. Evaporation of a sessile water–glycerol droplet. Droplet shape, temperature field, and water-vapor concentration field are shown at t = 1, 40 , and 55 s , illustrating the evolution of evaporative cooling and vapor transport in the surrounding gas.            
+
+> 0.89 0.892 0.894 0.896 0.898 0.9
+> 0.3 0.35 0.4 0.45 0.5 0.55 0.6
+> ¬®
+
+(b) 
+
+> ¯
+
+(c) (d)           
+
+> 40 60 80 100 120 010 20 30 40 50
+> °±²³´μ¶
+> t (s)
+> ·¸¹ º »¼¸½ ¾ ¿ÀÁÂÃ
+> isother ÁÂÃ ÄÂÀ Å»¹ Æ Ç ¿¹ ¼»½ Å È»Ç  Ç¿ ¹¼É Ê Ë Ì
+> 010 20 30 40 50 010 20 30 40 50
+> ÍÎÏÐÑ
+> t (s)
+> ÒÓÔ Õ Ö×ÓØ Ù ÚÛÜÝÞ
+> isother ÜÝÞ ßÝÛ àÖÔ á â Ú Ô ×Ö Ø à ãÖâ â Ú Ô×ä å æ ç
+
+Fig. 23. Internal transport and global evolution of the sessile water–glycerol droplet. (a,b) Water mass-fraction field and streamlines inside the droplet at t = 1 s and t = 50 s . (c,d) Temporal evolution of the droplet volume and contact angle, compared with reference results that account for composition-dependent density variation. 34 S. Zhao et al. / Journal of Computational Physics (2026) 
+
+6. Remarks and Conclusions 
+
+In this work, we have developed a sharp and conservative VOF–finite-volume method for multicomponent liquid– gas mass transfer with deformable interfaces. The method extends our previous single-component phase-change framework to problems in which several species are transferred across the interface and are coupled to the temperature field through latent heat and vapor–liquid equilibrium. The central di ffi culty is that the interfacial closure is no longer determined by a single mass flux, but by multiple species balances, thermodynamic-equilibrium relations, and a thermal flux-jump condition that must be satisfied simultaneously. The main contribution of the present work is a fully sharp two-field treatment of both species and temperature transport. The species equations are solved separately in the two phases, and their Robin-type interfacial conditions are imposed directly on the reconstructed VOF interface through an embedded-boundary discretization. More impor-tantly, the temperature equation is also solved in a two-field manner: the liquid-side and gas-side embedded-boundary heat fluxes are coupled through the interfacial flux-jump condition, rather than being regularized into a di ff usive one-field source term. This distinguishes the present method from previous VOF-based multicomponent approaches, in which either the interfacial coupling is evaluated explicitly from previous-time-step information or the temperature equation remains treated in a smeared one-field form. A sequential coupling strategy has also been proposed to close the multicomponent interfacial problem. The partial mass fluxes are first determined from the phase-wise concentration fields; these fluxes are then used to im-pose the dispersed-phase species conditions, close the heat-flux jump in the temperature equation, and update the thermodynamic-equilibrium state. Together with the geometrical conservative advection of volume, momentum, en-ergy, and species, this formulation preserves the sharpness of interfacial discontinuities while maintaining good mass and energy conservation. The method has been validated through a set of increasingly complex tests. For static and freely rising dissolv-ing bubbles, it achieves second-order accuracy and accurately predicts the Sherwood number. For multicomponent carbon-dioxide bubble dissolution, it captures the long-time replacement of CO 2 by N 2 and O 2 and agrees well with reduced-model predictions. For n-heptane droplet evaporation, the computed droplet radius, temperature field, and vapor-concentration field agree closely with reference solutions. For ethanol–isooctane droplets, the method repro-duces the non-ideal azeotropic behavior and the composition-dependent reversal of relative volatility. Finally, for sessile water–glycerol droplets, it captures the coupled evolution of composition, temperature, evaporation flux, and Marangoni flow in good agreement with reference simulations. In all numerical tests, the conservative character of the method is confirmed by the small mass and energy errors. Overall, the present results demonstrate that the proposed method provides an accurate, conservative, and robust sharp-interface framework for multicomponent liquid–gas mass transfer. Its main advantage lies in resolving interfa-cial fluxes and thin concentration or thermal boundary layers without smearing the scalar fields across the interface. The method therefore o ff ers a useful basis for direct numerical simulations of multicomponent bubble dissolution, droplet evaporation, and related interfacial transport problems in environmental, chemical, and energy applications. 
+
+Acknowledgments 
+
+The authors gratefully acknowledge the support of the National Key R& D Program of China (2022YFE03130000, 2023YFA1011000), and that of the NSFC (W2511004, 12588201 and 12472256). 
+
+References        
+
+> [1] S. Zhao, J. Zhang, M.-J. Ni, Boiling and evaporation model for liquid-gas flows: A sharp and conservative method based on the geometrical vof approach, Journal of Computational Physics 452 (2022) 110908. [2] M. Irfan, M. Muradoglu, A front tracking method for direct numerical simulation of evaporation process in a multiphase system, Journal of Computational Physics 337 (2017) 132–153. [3] Y. Wang, V. Yang, Vaporization of liquid droplet with large deformation and high mass transfer rate, i: Constant-density, constant-property case, Journal of Computational Physics 392 (2019) 56–70. [4] J. Palmore Jr, O. Desjardins, A volume of fluid framework for interface-resolved simulations of vaporizing liquid-gas flows, Journal of Computational Physics 399 (2019) 108954. [5] C. Kunkelmann, P. Stephan, Cfd simulation of boiling flows using the volume-of-fluid method within openfoam, Numerical Heat Transfer, Part A: Applications 56 (2009) 631–646.
+
+S. Zhao et al. / Journal of Computational Physics (2026) 35 [6] R. P. Fedkiw, T. Aslam, B. Merriman, S. Osher, et al., A non-oscillatory eulerian approach to interfaces in multimaterial flows (the ghost fluid method), Journal of computational physics 152 (1999) 457–492. [7] S. Tanguy, M. Sagan, B. Lalanne, F. Couderc, C. Colin, Benchmarks and numerical methods for the simulation of boiling flows, Journal of Computational Physics 264 (2014) 1–22. [8] F. Gibou, L. Chen, D. Nguyen, S. Banerjee, A level set based sharp interface method for the multiphase incompressible navier–stokes equations with phase change, Journal of Computational Physics 222 (2007) 536–555. [9] L. R. Villegas, R. Alis, M. Lepilliez, S. Tanguy, A ghost fluid /level set method for boiling flows and liquid evaporation: application to the leidenfrost e ff ect, Journal of Computational Physics 316 (2016) 789–813. [10] Y. Haroun, D. Legendre, L. Raynal, Volume of fluid method for interfacial reactive mass transfer: Application to stable liquid film, Chemical Engineering Science 65 (2010) 2896–2909. [11] M. Graveleau, C. Soulaine, H. A. Tchelepi, Pore-scale simulation of interphase multicomponent mass transfer for subsurface flow, Transport in porous media 120 (2017) 287–308. [12] J. Maes, C. Soulaine, A new compressive scheme to simulate species transfer across fluid interfaces using the volume-of-fluid method, Chemical Engineering Science 190 (2018) 405–418. [13] J. Maes, C. Soulaine, A unified single-field volume-of-fluid-based formulation for multi-component interfacial transfer with local volume changes, Journal of Computational Physics 402 (2020) 109024. [14] C. P. Zanutto, E. E. Paladino, F. Evrard, B. van Wachem, F. Denner, Modeling of interfacial mass transfer based on a single-field formulation and an algebraic vof method considering non-isothermal systems and large volume changes, Chemical Engineering Science 247 (2022) 116855. [15] C. P. Zanutto, F. Evrard, B. van Wachem, F. Denner, E. E. Paladino, Modeling interfacial mass transfer of highly non-ideal mixtures using an algebraic vof method, Chemical Engineering Science 251 (2022) 117458. [16] D. Bothe, S. Fleckenstein, A volume-of-fluid-based method for mass transfer processes at fluid particles, Chemical Engineering Science 101 (2013) 283–302. [17] S. Fleckenstein, D. Bothe, A volume-of-fluid-based numerical method for multi-component mass transfer with local volume changes, Journal of Computational Physics 301 (2015) 35–58. [18] P. K. Farsoiya, Q. Magdelaine, A. Antkowiak, S. Popinet, L. Deike, Direct numerical simulations of bubble-mediated gas transfer and dissolution in quiescent and turbulent flows, Journal of Fluid Mechanics 954 (2023) A29. [19] E. Cipriano, A. Frassoldati, T. Faravelli, S. Popinet, A. Cuoci, et al., Multicomponent droplet evaporation in a geometric volume-of-fluid framework, Journal of Computational Physics (2024) 112955. [20] S. Z. Salimi, N. Scapin, E.-R. Popescu, P. Costa, L. Brandt, A volume-of-fluid method for multicomponent droplet evaporation with robin boundary conditions, Journal of Computational Physics 514 (2024) 113211. [21] R. Krishna, J. A. Wesselingh, The maxwell-stefan approach to mass transfer, Chemical engineering science 52 (1997) 861–911. [22] B. E. Poling, J. M. Prausnitz, J. P. O’connell, Properties of gases and liquids, McGraw-Hill Education, 2001. [23] J. M. Smith, H. C. Van Ness, M. M. Abbott, M. T. Swihart, Introduction to Chemical Engineering Thermodynamics, 8 ed., McGraw-Hill Education, 2018. [24] D. Deising, H. Marschall, D. Bothe, A unified single-field model framework for volume-of-fluid simulations of interfacial species transfer applied to bubbly flows, Chemical Engineering Science 139 (2016) 173–195. [25] P. K. Farsoiya, S. Popinet, L. Deike, Bubble-mediated transfer of dilute gas in turbulence, Journal of Fluid Mechanics 920 (2021) A34. [26] S. Popinet, An accurate adaptive solver for surface-tension-driven interfacial flows, Journal of Computational Physics 228 (2009) 5838–5866. [27] S. Popinet, Basilisk, URl:http: // basilisk.fr.(accessed:10.21.2019) (2014). [28] S. Popinet, A quadtree-adaptive multigrid solver for the serre–green–naghdi equations, Journal of Computational Physics 302 (2015) 336– 358. [29] I. Seric, S. Afkhami, L. Kondic, Direct numerical simulation of variable surface tension flows using a volume-of-fluid method, Journal of Computational Physics 352 (2018) 615–636. [30] M. K. Tripathi, K. C. Sahu, Motion of an air bubble under the action of thermocapillary and buoyancy forces, Computers & Fluids 177 (2018) 58–68. [31] M. M. Francois, S. J. Cummins, E. D. Dendy, D. B. Kothe, J. M. Sicilian, M. W. Williams, A balanced-force algorithm for continuous and sharp interfacial surface tension models within a volume tracking framework, Journal of Computational Physics 213 (2006) 141–173. [32] N. Scapin, P. Costa, L. Brandt, A volume-of-fluid method for interface-resolved simulations of phase-changing two-fluid flows, Journal of Computational Physics 407 (2020) 109251. [33] L. Malan, A. Malan, S. Zaleski, P. Rousseau, A geometric vof method for interface resolved phase change and conservative thermal energy advection, Journal of Computational Physics 426 (2021) 109920. [34] G. D. Weymouth, D. K.-P. Yue, Conservative volume-of-fluid method for free-surface simulations on cartesian-grids, Journal of Computa-tional Physics 229 (2010) 2853–2865. [35] H. Marschall, K. Hinterberger, C. Sch¨ uler, F. Habla, O. Hinrichsen, Numerical simulation of species transfer across fluid interfaces in free-surface flows using openfoam, Chemical engineering science 78 (2012) 111–127. [36] Y. Sato, B. Niˇ ceno, A sharp-interface phase change model for a mass-conservative interface tracking method, Journal of Computational Physics 249 (2013) 127–161. [37] J. B. Bell, P. Colella, H. M. Glaz, A second-order projection method for the incompressible navier-stokes equations, Journal of Computational Physics 85 (1989) 257–283. [38] J. Boussinesq, Calcul du pouvoir refroidissant des courants fluides, Journal de mathematiques pures et appliquees 1 (1905) 285–332. [39] V. G. Leviˇ c, Physicochemical hydrodynamics, Prentice-Hall, 1962. [40] S. Hosoda, S. Abe, S. Hosokawa, A. Tomiyama, Mass transfer from a bubble in a vertical pipe, INTERNATIONAL JOURNAL OF HEAT AND MASS TRANSFER 69 (2014) 215–222. [41] S. Hosoda, G. Tryggvason, S. Hosokawa, A. Tomiyama, Dissolution of single carbon dioxide bubbles in a vertical pipe, Journal of Chemical Engineering of Japan 48 (2015) 418–426. [42] A. Pathak, M. Raessi, Steady-state and transient solutions to drop evaporation in a finite domain: Alternative benchmarks to the d2 law, 36 S. Zhao et al. / Journal of Computational Physics (2026) International Journal of Heat and Mass Transfer 127 (2018) 1147–1158. [43] D. Givoli, Numerical methods for problems in infinite domains, Elsevier, 2013. [44] C. Diddens, Detailed finite element method modeling of evaporating multi-component droplets, Journal of Computational Physics 340 (2017) 670–687. [45] K. Takamura, H. Fischer, N. R. Morrow, Physical properties of aqueous glycerol solutions, Journal of Petroleum Science and Engineering 98 (2012) 50–60. [46] G. D’Errico, O. Ortona, F. Capuano, V. Vitagliano, Di ff usion coe ffi cients for the binary system glycerol + water at 25 c. a velocity correlation study, Journal of Chemical & Engineering Data 49 (2004) 1665–1670. 
+
+Appendix A. Tangential surface-tension gradient 
+
+A direct way to compute the tangential surface-tension gradient is to use 
+
+∇tσ = ∇σ − n(n · ∇ σ), (A.1) where n is the unit normal vector of the interface. In interfacial flows, however, this formulation may be inaccurate. When σ depends on temperature, the large contrast of thermal properties across the liquid–gas interface may produce a discontinuous temperature gradient, which contaminates the evaluation of ∇σ. When σ depends on composition, the concentration field is also generally discontinuous across the interface, leading to a similar di ffi culty. To avoid di ff erentiating discontinuous bulk fields, we compute the tangential gradient of σ directly along the reconstructed interface, following the height-function-based approaches of Seric et al. [29], Tripathi and Sahu [30]. In two dimensions, the interface has a single tangential direction. The Marangoni force can therefore be written as 
+
+Fst = ∂σ ∂s tδs, (A.2) where t is the unit tangent vector, s is the arclength along the interface, and δs is the surface delta function. Within the VOF framework, the interface normal and curvature are evaluated by the height-function method. The same geometrical information is used here to approximate ∂σ/∂ s.     
+
+> i, j+1 i, j-1 i-1, j+1 i, j i-2, j i-1, j i+1, j i-2, j+1 i, j i+1, j-1
+> èéê  (b)
+> Fig. A.24. Schematic of the height-function-based evaluation of the cell-averaged surface-tension coe ffi cient σcin interfacial cells, using (a)
+> x-oriented and (b) y-oriented height functions.
+
+As illustrated in Fig. A.24, we first define a volume-fraction-weighted average surface-tension coe ffi cient along a row or a column of interfacial cells, 
+
+σc,x( j) =
+
+∑i σi, j fi, j
+
+∑i fi, j
+
+, σc,y(i) =
+
+∑ j σi, j fi, j
+
+∑ j fi, j
+
+, (A.3) where σi, j and fi, j are the local surface-tension coe ffi cient and volume fraction, respectively. Thus, all interfacial cells in the same row or column share the same averaged value. If only one interfacial cell is present in a given row or column, the averaged value reduces to the local surface-tension coe ffi cient in that cell. The choice between σc,x and σc,y follows the same orientation criterion as the height-function curvature calcula-tion. If |nx| > |ny|, the interface is represented locally by an x-oriented height function x = hx(y), and σc,x is used. The tangential derivative is then approximated by 
+
+( ∂σ ∂s
+
+) 
+
+> i,j
+
+= (σc,x) j+1 − (σc,x) j−1
+
+ds , ds = 2∆
+
+√
+
+1 +
+
+( ∂hx
+
+∂y
+
+)2
+
+. (A.4) S. Zhao et al. / Journal of Computational Physics (2026) 37 
+
+Conversely, if |ny| > |nx|, the interface is represented locally by a y-oriented height function y = hy(x), and σc,y is used: 
+
+( ∂σ ∂s
+
+) 
+
+> i,j
+
+= (σc,y)i+1 − (σc,y)i−1
+
+ds , ds = 2∆
+
+√
+
+1 +
+
+( ∂hy
+
+∂x
+
+)2
+
+. (A.5) Here, ∆ is the grid size, and ds is the corresponding interfacial arclength between the two neighboring height-function positions. Finally, the scalar tangential derivative is projected onto the Cartesian components of the unit tangent vector. For the x-oriented height function, the tangent vector is chosen along the positive y direction as t = (∂hx/∂ y, 1) / √1 + (∂hx/∂ y)2,whereas for the y-oriented height function it is chosen along the positive x direction as t = (1, ∂ hy/∂ x) / √1 + (∂hy/∂ x)2.The Marangoni force is then decomposed into its Cartesian components and added to the momentum equation as 
+
+Fst ,x = ∂σ ∂s txδs, (A.6) and 
+
+Fst ,y = ∂σ ∂s tyδs, (A.7) where tx and ty are the two components of t. This procedure evaluates the surface-tension gradient along the interface itself and avoids di ff erentiating discontinuous temperature or concentration fields across the liquid–gas interface. 
+
+Appendix B. Saturation vapor-pressure correlations 
+
+The saturation vapor pressures used in the droplet-evaporation simulations are evaluated from the Antoine equa-tions, n-heptane : log 10 Psat = 4.02832 − 1268 .636 
+
+T − 56 .199 , (B.1a) ethanol : log 10 Psat = 5.33675 − 1648 .22 
+
+T + 230 .918 − 273 .15 , (B.1b) isooctane : log 10 Psat = 3.93646 − 1257 .85 
+
+T + 220 .767 − 273 .15 . (B.1c) Here, Psat is expressed in bar and T in Kelvin.

@@ -41,7 +41,7 @@
 <section class="dpr-home-dashboard-card dpr-home-report-card">
   <div class="dpr-home-dashboard-header">
     <div>
-      <span class="dpr-home-dashboard-kicker">2026-08-20</span>
+      <span class="dpr-home-dashboard-kicker">2026-08-21</span>
       <h3 class="dpr-home-dashboard-title">今日汇总</h3>
     </div>
     <strong class="dpr-home-dashboard-count">共 2 篇</strong>
@@ -51,7 +51,7 @@
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>2</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-20 20:58:24 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-21 20:59:56 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,8 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日共生成 2 篇推荐（精读 0 篇，速读 2 篇）</p>
-<p>速读：《Dispersion and clustering of deformable droplets in turbulence》（6.0/10）, 《Energy dissipation and stability of a finite-volume scheme for two-phase flow models with dynamic capillary pressure》（6.0/10）</p>
-<p>这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。</p>
+<p>今日速读两篇多相流论文，聚焦液气质量传递的锐利守恒VOF方法，以及垂直管内三层粘性膜的稳定性与非线性动力学。</p>
+<p>最值得关注：气泡溶解与液滴蒸发的数值模拟新方法，以及三层粘性</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
@@ -89,7 +88,7 @@
     <strong class="dpr-home-dashboard-count">2 篇</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="Dispersion and clustering of deformable droplets in turbulence">Dispersion and clustering of deformable droplets in turbulence</span></li><li><span class="dpr-home-dashboard-paper-title" title="Energy dissipation and stability of a finite-volume scheme for two-phase flow models with dynamic capillary pressure">Energy dissipation and stability of a finite-volume scheme for two-phase flow models with dynamic capillary pressure</span></li></ul>
+<ul class="dpr-home-dashboard-paper-list"><li><span class="dpr-home-dashboard-paper-title" title="A Sharp and Conservative VOF Method for Multicomponent Liquid--Gas Mass Transfer: Bubble Dissolution and Droplet Evaporation">A Sharp and Conservative VOF Method for Multicomponent Liquid--Gas Mass Transfer: Bubble Dissolution and Droplet Evaporation</span></li><li><span class="dpr-home-dashboard-paper-title" title="Stability and nonlinear dynamics of three-layer viscous films inside a vertical cylindrical tube">Stability and nonlinear dynamics of three-layer viscous films inside a vertical cylindrical tube</span></li></ul>
   </div>
   <div class="dpr-home-dashboard-tags"><span class="dpr-home-dashboard-tag">falling-film <strong>2</strong></span></div>
 </section>

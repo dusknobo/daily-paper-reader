@@ -1,0 +1,90 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-21T20:56:59.694524+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.19254v1",
+      "source": "arxiv",
+      "title": "A Sharp and Conservative VOF Method for Multicomponent Liquid--Gas Mass Transfer: Bubble Dissolution and Droplet Evaporation",
+      "abstract": "We present a sharp and conservative geometrical VOF--finite-volume method for multicomponent liquid--gas mass transfer across deformable interfaces. The method solves problems in which multiple species are coupled through interfacial mass balances, latent-heat exchange, and vapor--liquid equilibrium. The key novelty is a fully sharp two-field treatment of scalar transport: the species and temperature equations are solved separately in the liquid and gas phases, while the one-sided Robin conditions for species and the two-sided flux jump for temperature are imposed directly on the reconstructed interface through an embedded-boundary discretization. This avoids both volumetric regularization of interfacial source terms and explicit coupling based on previous-time-step interfacial data. A consistent geometrical advection scheme is used for volume, momentum, energy, and species transport, and a sequential coupling strategy is developed to determine the partial interfacial mass fluxes, close the temperature equation, and update the thermodynamic-equilibrium state. The method is validated through single- and multicomponent bubble dissolution, single-component droplet evaporation, non-ideal ethanol--isooctane droplet evaporation, and sessile water--glycerol droplet evaporation. The results demonstrate second-order accuracy, accurate interfacial flux prediction, good mass and energy conservation, and the ability to capture complex multicomponent effects such as gas replacement, azeotropic volatility reversal, and composition-driven Marangoni flow.",
+      "authors": [
+        "Shuo Zhao",
+        "Jie Zhang",
+        "Ming-Jiu Ni"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-17T00:52:40+00:00",
+      "link": "https://arxiv.org/pdf/2608.19254v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Sharp VOF method for multicomponent liquid-gas mass transfer across interfaces",
+      "llm_evidence_cn": "尖锐VOF方法处理多组分液气质量传递跨界面",
+      "llm_evidence": "尖锐VOF方法处理多组分液气质量传递跨界面",
+      "canonical_evidence": "尖锐VOF方法处理多组分液气质量传递跨界面",
+      "llm_tldr_en": "Presents a sharp and conservative VOF-finite-volume method for multicomponent liquid-gas mass transfer with latent-heat exchange, applicable to falling film CFD.",
+      "llm_tldr_cn": "针对多组分液气两相流中变形界面的质量传递与潜热交换问题，提出尖锐且守恒的VOF-有限体积法。该方法对液相和气相分别求解组分和温度方程，在重构界面上直接施加Robin条件与温度通量跳跃，避免体积正则化。数值结果表明该方法能准确模拟气泡溶解和液滴蒸发等过程。该技术可推广至垂直降膜等含相变的多相流传热传质CFD模拟。",
+      "llm_tldr": "针对多组分液气两相流中变形界面的质量传递与潜热交换问题，提出尖锐且守恒的VOF-有限体积法。该方法对液相和气相分别求解组分和温度方程，在重构界面上直接施加Robin条件与温度通量跳跃，避免体积正则化。数值结果表明该方法能准确模拟气泡溶解和液滴蒸发等过程。该技术可推广至垂直降膜等含相变的多相流传热传质CFD模拟。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.19417v1",
+      "source": "arxiv",
+      "title": "Stability and nonlinear dynamics of three-layer viscous films inside a vertical cylindrical tube",
+      "abstract": "We investigate the dynamics and stability of three immiscible viscous liquid layers coating the interior of a vertical cylindrical tube, a configuration relevant to stratified core--annular transport processes. A long-wave asymptotic analysis yields a coupled system of nonlinear evolution equations governing the motion of the three interfaces. Linear stability analysis predicts a persistent long-wave instability, the capillary (Rayleigh--Plateau) instability of the air--core interface, together with secondary finite-wavenumber instability bands that emerge from interfacial coupling in certain parameter regimes. These stability characteristics depend sensitively on the layer thicknesses, viscosity ratios, and surface tension parameters, and include mode-switching associated with competing maxima in the dispersion relation. Nonlinear simulations reveal three distinct dynamical outcomes: saturation to finite-amplitude travelling waves, air-core closure through plug formation, and rupture of the intermediate liquid layer while the air core remains open. The intermediate-layer rupture mechanism is unique to the three-layer configuration which has no analogue in one- or two-interface cylindrical film flows. Numerical continuation is used to compute branches of travelling-wave solutions and their associated limit points. Comparison with time-dependent simulations shows that travelling-wave branches successfully predict the transition from saturated waves to plug formation, but do not capture the distinct rupture mechanism associated with collapse of the intermediate layer.",
+      "authors": [
+        "David Halpern",
+        "Awa Traore"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-19T20:04:56+00:00",
+      "link": "https://arxiv.org/pdf/2608.19417v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Three-layer viscous films inside a vertical cylindrical tube, a falling film on vertical tube configuration",
+      "llm_evidence_cn": "垂直圆柱管内三层粘性薄膜，对应垂直管降膜配置",
+      "llm_evidence": "垂直圆柱管内三层粘性薄膜，对应垂直管降膜配置",
+      "canonical_evidence": "垂直圆柱管内三层粘性薄膜，对应垂直管降膜配置",
+      "llm_tldr_en": "Three-layer viscous films inside a vertical tube are studied via long-wave analysis, yielding coupled nonlinear evolution equations. Linear stability shows capillary and secondary instabilities depending on thickness, viscosity, and surface tension, informing falling film dynamics.",
+      "llm_tldr_cn": "该论文研究垂直圆柱管内三种互不相溶粘性液体层（即多层降膜）的稳定性与非线性动力学。通过长波渐近分析导出三个界面运动耦合的非线性演化方程。线性稳定性分析表明，空气芯界面存在毛细不稳定性，并在参数耦合下出现二次有限波数不稳定带，其特性取决于层厚、粘度比和表面张力。这项工作为垂直管内降膜流动的机理理解提供了理论支撑。",
+      "llm_tldr": "该论文研究垂直圆柱管内三种互不相溶粘性液体层（即多层降膜）的稳定性与非线性动力学。通过长波渐近分析导出三个界面运动耦合的非线性演化方程。线性稳定性分析表明，空气芯界面存在毛细不稳定性，并在参数耦合下出现二次有限波数不稳定带，其特性取决于层厚、粘度比和表面张力。这项工作为垂直管内降膜流动的机理理解提供了理论支撑。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "falling film on vertical tube",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

@@ -1,0 +1,3179 @@
+Title: Stability and nonlinear dynamics of three-layer viscous films inside a vertical cylindrical tube
+
+URL Source: https://arxiv.org/pdf/2608.19417v1
+
+Published Time: Fri, 21 Aug 2026 00:11:48 GMT
+
+Number of Pages: 36
+
+Markdown Content:
+> Under consideration for publication in J. Fluid Mech.
+
+Banner appropriate to article type will appear here in typeset article 
+
+# Stability and nonlinear dynamics of three-layer viscous films inside a vertical cylindrical tube 
+
+Awa Traore 1 and David Halpern 1 
+
+> 1Department of Mathematics, University of Alabama, Tuscaloosa, AL 35487, USA
+> Corresponding author: David Halpern, dhalpern@ua.edu (Received xx; revised xx; accepted xx)
+
+We investigate the dynamics and stability of three immiscible viscous liquid layers coating the interior of a vertical cylindrical tube, a configuration relevant to stratified core–annular transport processes. A long-wave asymptotic analysis yields a coupled system of nonlinear evolution equations governing the motion of the three interfaces. Linear stability analysis predicts a persistent long-wave instability, the capillary (Rayleigh–Plateau) instability of the air–core interface, together with secondary finite-wavenumber instability bands that emerge from interfacial coupling in certain parameter regimes. These stability characteristics depend sensitively on the layer thicknesses, viscosity ratios, and surface tension parameters, and include mode-switching associated with competing maxima in the dispersion relation. Nonlinear simulations reveal three distinct dynamical outcomes: saturation to finite-amplitude travelling waves, air-core closure through plug formation, and rupture of the intermediate liquid layer while the air core remains open. The intermediate-layer rupture mechanism is unique to the three-layer configuration which has no analogue in one- or two-interface cylindrical film flows. Numerical continuation is used to compute branches of travelling-wave solutions and their associated limit points. Comparison with time-dependent simulations shows that travelling-wave branches successfully predict the transition from saturated waves to plug formation, but do not capture the distinct rupture mechanism associated with collapse of the intermediate layer. 
+
+1. Introduction 
+
+Multi-layer viscous films are a defining feature of systems ranging from the micro-scale mechanics of human lungs to the macro-scale transport of multiphase fluids in industrial pipelines. Recent reviews have highlighted the central role of interfacial dynamics in both pulmonary airway function and stratified industrial flows (Roman` o 2026; Peng et al. 
+
+2025). In human bronchioles, the airway surface liquid is described by a low-viscosity periciliary layer beneath an overlying mucus layer, together with a surfactant film at the air –liquid interface (Heil et al. 2008). Analogous multilayer configurations arise in water-lubricated core –annular transport of heavy crude oils, in which a viscous oil core is conveyed within a lubricating annulus, and in multilayer co-extrusion and coating processes 
+
+Abstract must not spill onto p.2 0 X0-1 arXiv:2608.19417v1 [physics.flu-dyn] 19 Aug 2026 Traore and Halpern 
+
+used to manufacture fibres, films, and encapsulated microstructures (Joseph et al. 1997; Lamnawar et al. 2013; Peng et al. 2025). In these systems, the dynamics are governed by the interaction of multiple deformable interfaces, whose evolution controls flow stability and transport. In both settings, sufficiently large interfacial deformations may obstruct the flow by producing airway closure or pipeline blockage, motivating the study of coupled interfacial instabilities. Beyond any single application, the three-layer configuration is the minimal setting in which two deformable internal interfaces interact within a confining geometry, making it a natural framework for asking whether the multiplicity of interfaces produces qualitatively new instability and rupture mechanisms rather than merely quantitative modifications of the two-layer problem. In planar and inclined geometries this question has received some attention. Early studies established that viscosity stratification can destabilise interfaces even in the absence of inertia (Kao 1965 b,a; Loewenherz & Lawrence 1989; Chen 1993). Building on this foundation, Jiang et al. (2005) showed that viscosity-stratified three-layer flow down an inclined wall can support inertialess instabilities with growth rates orders of magnitude larger than those of comparable two-layer flows, while the nonlinear evolution of the interfaces remains well described by linear theory even at large amplitude, a picture supported by their own experimental observations of three-layer gelatine flows. Henry et al. (2014) complement this with a systematic experimental validation of the single-layer thickness and velocity approximation across two- and three-layer falling films, confirming that the base-flow description underlying such stability analyses remains robust even when the layers differ substantially in viscosity. Together, such studies confirm that additional interfaces enrich the instability structure while the underlying base flow remains well characterised experimentally, but the planar setting lacks the azimuthal curvature responsible for the capillary instability and plug formation that are central to cylindrical confinement. Despite this, the stability of three -layer immiscible films inside a vertical cylindrical tube has received little attention to date. The study of capillary instability in cylindrical geometries dates back to Rayleigh (1878), who analysed the instability of liquid jets, and Tomotika (1935), who considered a viscous liquid thread surrounded by another viscous fluid. Goren (1962) subsequently investigated the instability of annular liquid coatings, including films coating the inside of a small tube. Building on these classical studies, Hammond (1983) analysed the nonlinear evolution of a thin liquid film coating the inner surface of a cylindrical tube using a long-wave approximation. Later, Gauglitz & Radke (1988, 1990) retained higher-order curvature contributions in the evolution equation and demonstrated conditions under which finite-time plug formation can occur. More recently, two-layer systems have received increasing attention (Ogrosky 2021; Erken et al. 
+
+2022). In particular, Erken et al. (2022) investigated capillary instability and airway closure in a two-layer annular film model motivated by pulmonary airway occlusion.The additional viscosity ratios and interfaces introduced by a third layer, however, can give rise to coupled interfacial modes and nonlinear rupture mechanisms that are absent in both single- and two-layer systems. In this work we address this gap by deriving a long-wave evolution model for a three-layer concentric configuration and conducting systematic linear and nonlinear stability analyses across the parameter space of viscosity ratios, surface tension ratios, and layer thicknesses. Preliminary long-wave modelling and nonlinear simulations for related three-layer cylindrical configurations were reported in the doctoral thesis of Traore (2024). The present paper extends that work through the inclusion of arbitrary-wavenumber linear stability analysis, nonlinear travelling-wave computations, numerical continuation, and a systematic comparison between travelling-wave structure and time-dependent rupture dynamics.  
+
+> 0X0-2
+
+Journal of Fluid Mechanics 𝑅 1     
+
+> ∗
+> 𝑅 2
+> ∗
+> 𝑅 3∗
+> Region 1
+> Region 2
+> Region 3
+> 𝑅 1∗𝑧 ∗, 𝑡 ∗ℎ1∗
+> 𝑅 2∗𝑧 ∗, 𝑡 ∗
+> 𝑅 3
+> ∗𝑧 ∗, 𝑡 ∗
+> ℎ2
+> ∗
+> ℎ3
+> ∗
+> 𝑤 ∗
+> 𝑢 ∗
+> 𝑧 ∗
+> 𝑟 ∗
+> Air
+> 𝑎 ∗
+> 𝑔 ∗
+> Figure 1. Falling three-layer fluid system inside a cylinder with concentric annular fluid layers and a passive air core.
+
+The governing evolution equations are derived in Section 2 from the axisymmetric Navier–Stokes equations using the outer-layer viscosity, thickness, and surface tension as reference scales. In Sections 3 and 4.2 we investigate the linear stability problem and determine how the instability characteristics depend on the layer thicknesses, viscosity ratios, and surface tension ratios. The analysis characterises the instability bands and determines how they depend on the layer thicknesses, viscosity ratios, and surface tension ratios. In Section 5 we solve the nonlinear evolution equations numerically and identify three qualitatively distinct outcomes: saturation to finite-amplitude travelling waves, plug formation through closure of the air core, and rupture of the intermediate liquid layer. We then compute nonlinear travelling-wave solutions and employ numerical continuation to determine how the solution branches and their limit points vary with viscosity ratio and mean layer thickness. Comparison with time-dependent simulations demonstrates that the travelling-wave solutions provide useful insight into the onset and character of strongly nonlinear deformation, while revealing how various rupture mechanisms dominate in different parameter regimes. Conclusions and directions for future work are presented in Section 6. 
+
+2. Model Equations 
+
+2.1. Problem setup and geometry 
+
+We consider the axisymmetric flow of three immiscible fluids down the interior of a rigid vertical tube of radius 𝑎 ∗. The fluids form concentric annular layers surrounding a passive air core, as illustrated in figure 1. Cylindrical coordinates (𝑟 ∗, 𝑧 ∗, 𝜃 ∗) are used, with 𝑧 ∗ directed downward (the direction of gravity), 𝑟 ∗ the radial coordinate, and no azimuthal dependence. Starred quantities denote dimensional variables, unstarred quantities dimensionless variables, and overbars unperturbed base-state values. The domain is divided by three interfaces at 𝑟 ∗ = 𝑅 ∗
+
+> 1
+
+, 𝑅 ∗
+
+> 2
+
+, 𝑅 ∗ 
+
+> 3
+
+(all functions of 𝑧 ∗, 𝑡 ∗): the air core lies in 0 < 𝑟 ∗ < 𝑅 ∗
+
+> 1
+
+,and fluid layers 1, 2, and 3 fill the successive annular regions 𝑅 ∗ 
+
+> 1
+
+< 𝑟 ∗ < 𝑅 ∗
+
+> 2
+
+, 𝑅 ∗ 
+
+> 2
+
+< 𝑟 ∗ < 𝑅 ∗
+
+> 3
+
+,and 𝑅 ∗ 
+
+> 3
+
+< 𝑟 ∗ < 𝑎 ∗, respectively. Each liquid layer 𝑗 ( 𝑗 = 1, 2, 3) has constant viscosity 𝜇 ∗
+
+> 𝑗
+
+0 X0-3 Traore and Halpern 
+
+and surface tension 𝜎 ∗ 
+
+> 𝑗
+
+at its outer boundary. The layer thickness is denoted by ℎ∗ 
+
+> 𝑗
+
+(𝑧 ∗, 𝑡 ∗),with unperturbed value ¯ ℎ∗ 
+
+> 𝑗
+
+. The three fluids are taken to have the same density 𝜌 ∗, and the air core is dynamically passive. In the unperturbed state, ¯ℎ∗ 
+
+> 1
+
++ ¯ℎ∗ 
+
+> 2
+
++ ¯ℎ∗ 
+
+> 3
+
+= 𝑎 ∗ − ¯𝑅 ∗
+
+> 1
+
+.
+
+2.2. Governing equations 
+
+The motion of the viscous fluids in each layer is governed by the axisymmetric Navier–Stokes equations together with the continuity equation. In dimensional form, these are 
+
+𝜌 ∗
+
+> 𝑖
+
+
+
+𝑢 ∗ 
+
+> 𝑖,𝑡 ∗
+
++ 𝑢 ∗ 
+
+> 𝑖
+
+𝑢 ∗ 
+
+> 𝑖,𝑟 ∗
+
++ 𝑤 ∗ 
+
+> 𝑖
+
+𝑢 ∗
+
+> 𝑖,𝑧 ∗
+
+
+
+= −𝑝 ∗ 
+
+> 𝑖,𝑟 ∗
+
++ 𝜇 ∗
+
+> 𝑖
+
+ 1
+
+𝑟 ∗ (𝑟 ∗𝑢 ∗ 
+
+> 𝑖,𝑟 ∗
+
+)𝑟 ∗ + 𝑢 ∗  
+
+> 𝑖,𝑧 ∗𝑧 ∗
+
+− 𝑢 ∗
+
+> 𝑖
+
+𝑟 ∗2
+
+
+
+, (2.1) 
+
+𝜌 ∗
+
+> 𝑖
+
+
+
+𝑤 ∗ 
+
+> 𝑖,𝑡 ∗
+
++ 𝑢 ∗ 
+
+> 𝑖
+
+𝑤 ∗ 
+
+> 𝑖,𝑟 ∗
+
++ 𝑤 ∗ 
+
+> 𝑖
+
+𝑤 ∗
+
+> 𝑖,𝑧 ∗
+
+
+
+= −𝑝 ∗ 
+
+> 𝑖,𝑧 ∗
+
++ 𝜇 ∗
+
+> 𝑖
+
+ 1
+
+𝑟 ∗ (𝑟 ∗𝑤 ∗ 
+
+> 𝑖,𝑟 ∗
+
+)𝑟 ∗ + 𝑤 ∗ 
+
+> 𝑖,𝑧 ∗𝑧 ∗
+
+
+
++ 𝜌 ∗ 
+
+> 𝑖
+
+𝑔 ∗, (2.2) 1
+
+𝑟 ∗ (𝑟 ∗𝑢 ∗ 
+
+> 𝑖
+
+)𝑟 ∗ + 𝑤 ∗ 
+
+> 𝑖,𝑧 ∗
+
+= 0, (2.3) for 𝑖 = 1, 2, 3, where (𝑢 ∗ 
+
+> 𝑖
+
+, 𝑤 ∗ 
+
+> 𝑖
+
+) are the radial and axial velocity components and 𝑝 ∗ 
+
+> 𝑖
+
+is the pressure in layer 𝑖 . Subscripts after the comma denote partial differentiation. 2.3. Boundary conditions 
+
+At the tube wall 𝑟 ∗ = 𝑎 ∗, no-slip and no-penetration conditions are imposed: 
+
+𝑢 ∗ 
+
+> 3
+
+= 0, 𝑤 ∗ 
+
+> 3
+
+= 0. (2.4) At the internal interfaces 𝑟 ∗ = 𝑅 ∗ 
+
+> 𝑗
+
+(𝑧 ∗, 𝑡 ∗), 𝑗 = 2, 3, we apply continuity of velocity, tangential stress balance, normal stress balance, and the kinematic condition. Below, we use the notation [·] 𝑖 = 𝑗 𝑖 = 𝑗 −1 to denote the jump in a quantity across the interface, i.e. the value in layer 𝑗 minus that in layer 𝑗 − 1. 
+
+𝑢 ∗  
+
+> 𝑗 −1
+
+= 𝑢 ∗ 
+
+> 𝑗
+
+, 𝑤 ∗  
+
+> 𝑗 −1
+
+= 𝑤 ∗ 
+
+> 𝑗
+
+, (2.5) 
+
+ (1 − ( 𝑅 ∗ 
+
+> 𝑗,𝑧 ∗
+
+)2)  𝑤 ∗ 
+
+> 𝑖,𝑟 ∗
+
++ 𝑢 ∗
+
+> 𝑖,𝑧 ∗
+
+
+
++ 2𝑅 ∗
+
+> 𝑗,𝑧 ∗
+
+ 𝑢 ∗ 
+
+> 𝑖,𝑟 ∗
+
+− 𝑤 ∗
+
+> 𝑖,𝑧 ∗
+
+  𝑖 = 𝑗 𝑖 = 𝑗 −1 = 0, (2.6) 
+
+ 2𝜇 ∗
+
+> 𝑖
+
+ 𝑢 ∗ 
+
+> 𝑖,𝑟 ∗
+
++ 𝑤 ∗ 
+
+> 𝑖,𝑧 ∗
+
+(𝑅 ∗ 
+
+> 𝑗,𝑧 ∗
+
+)2 − 𝑅 ∗ 
+
+> 𝑗,𝑧 ∗
+
+(𝑤 ∗ 
+
+> 𝑖,𝑟 ∗
+
++ 𝑢 ∗ 
+
+> 𝑖,𝑧 ∗
+
+)
+
+−  1 + ( 𝑅 ∗ 
+
+> 𝑗,𝑧 ∗
+
+)2 𝑝 ∗
+
+> 𝑖
+
+𝑖 = 𝑗 𝑖 = 𝑗 −1
+
+= 𝜎 ∗
+
+> 𝑗
+
+©«1 + ( 𝑅 ∗ 
+
+> 𝑗,𝑧 ∗
+
+)21/2
+
+𝑅 ∗
+
+> 𝑗
+
+− 𝑅 ∗ 
+
+> 𝑗,𝑧 ∗𝑧 ∗
+
+1 + ( 𝑅 ∗ 
+
+> 𝑗,𝑧 ∗
+
+)21/2
+
+ª®¬
+
+,
+
+(2.7) 
+
+𝑢 ∗ 
+
+> 𝑗
+
+(𝑅 ∗ 
+
+> 𝑗
+
+, 𝑧 ∗, 𝑡 ∗) = 𝜕𝑅 ∗
+
+> 𝑗
+
+𝜕𝑡 ∗ + 𝑤 ∗ 
+
+> 𝑗
+
+(𝑅 ∗ 
+
+> 𝑗
+
+, 𝑧 ∗, 𝑡 ∗) 𝜕𝑅 ∗
+
+> 𝑗
+
+𝜕𝑧 ∗ . (2.8) At the free surface 𝑟 ∗ = 𝑅 ∗ 
+
+> 1
+
+(𝑧 ∗, 𝑡 ∗), the air viscosity is neglected. The kinematic condition, vanishing tangential stress, and normal stress balance are 
+
+𝑢 ∗ 
+
+> 1
+
+(𝑅 ∗
+
+> 1
+
+, 𝑧 ∗, 𝑡 ∗) = 𝜕𝑅 ∗
+
+> 1
+
+𝜕𝑡 ∗ + 𝑤 ∗ 
+
+> 1
+
+(𝑅 ∗
+
+> 1
+
+, 𝑧 ∗, 𝑡 ∗) 𝜕𝑅 ∗
+
+> 1
+
+𝜕𝑧 ∗ , (2.9) 
+
+0 X0-4 Focus on Fluids articles must not exceed this page length Journal of Fluid Mechanics 
+
+(1 − ( 𝑅 ∗ 
+
+> 1,𝑧 ∗
+
+)2)  𝑤 ∗ 
+
+> 1,𝑟 ∗
+
++ 𝑢 ∗
+
+> 1,𝑧 ∗
+
+
+
++ 2𝑅 ∗
+
+> 1,𝑧 ∗
+
+ 𝑢 ∗ 
+
+> 1,𝑟 ∗
+
+− 𝑤 ∗
+
+> 1,𝑧 ∗
+
+ = 0, (2.10) 2𝜇 ∗
+
+> 1
+
+
+
+𝑢 ∗ 
+
+> 1,𝑟 ∗
+
++ 𝑤 ∗ 
+
+> 1,𝑧 ∗
+
+(𝑅 ∗ 
+
+> 1,𝑧 ∗
+
+)2 − 𝑅 ∗
+
+> 1,𝑧 ∗
+
+ 𝑤 ∗ 
+
+> 1,𝑟 ∗
+
++ 𝑢 ∗
+
+> 1,𝑧 ∗
+
+
+
+−  1 + ( 𝑅 ∗ 
+
+> 1,𝑧 ∗
+
+)2 𝑝 ∗
+
+> 1
+
+= 𝜎 ∗
+
+> 1
+
+©« 1 + ( 𝑅 ∗ 
+
+> 1,𝑧 ∗
+
+)21/2
+
+𝑅 ∗
+
+> 1
+
+− 𝑅 ∗ 
+
+> 1,𝑧 ∗𝑧 ∗
+
+ 1 + ( 𝑅 ∗ 
+
+> 1,𝑧 ∗
+
+)21/2
+
+ª®¬
+
+.
+
+(2.11) 2.4. Scalings 
+
+We introduce, as in Ogrosky (2021), a characteristic axial length scale 𝜆 ∗ associated with the typical wavelength of interfacial disturbances, and scale radial lengths with the unperturbed outer-layer thickness ¯ ℎ∗
+
+> 3
+
+. The dimensionless parameter 
+
+𝜖 =
+
+¯ℎ∗
+
+> 3
+
+𝜆 ∗ (2.12) represents the long-wave (“thin-film”) aspect ratio. In the long-wave regime considered later, we assume 𝜖 ≪ 1, so that axial variations occur over length scales much larger than the film thickness. The characteristic axial velocity scale is chosen to be the gravitational drainage velocity in the outer layer, 
+
+𝑊 ∗ = 𝜌 ∗𝑔 ∗ ( ¯ℎ∗
+
+> 3
+
+)2
+
+𝜇 ∗
+
+> 3
+
+. (2.13) The radial velocity scale then follows from the continuity equation and is smaller by a factor of 𝜖 , giving 
+
+𝑈 ∗ = 𝜖𝑊 ∗. (2.14) The nondimensional variables are defined by 
+
+𝑟 = 𝑟 ∗
+
+¯ℎ∗
+
+> 3
+
+, 𝑧 = 𝑧 ∗
+
+𝜆 ∗ , 𝑢 𝑖 = 𝑢 ∗
+
+> 𝑖
+
+𝑈 ∗ , 𝑤 𝑖 = 𝑤 ∗
+
+> 𝑖
+
+𝑊 ∗ , 𝑡 = 𝑡 ∗𝑊 ∗
+
+𝜆 ∗ , 𝑝 = 𝑝 ∗ ¯ℎ∗
+
+> 3
+
+𝜇 ∗
+
+> 3
+
+𝑊 ∗ . (2.15) As a result of (2.15), we introduce the parameters listed below: 
+
+𝑎 = 𝑎 ∗
+
+¯ℎ∗
+
+> 3
+
+, ¯ℎ 𝑗 =
+
+¯ℎ∗
+
+> 𝑗
+
+¯ℎ∗
+
+> 3
+
+, ¯𝑅 𝑗 =
+
+¯𝑅 ∗
+
+> 𝑗
+
+¯ℎ∗
+
+> 3
+
+,𝑚 1 = 𝜇 ∗
+
+> 3
+
+𝜇 ∗
+
+> 1
+
+, 𝑚 2 = 𝜇 ∗
+
+> 3
+
+𝜇 ∗
+
+> 2
+
+,𝜎 1 = 𝜎 ∗
+
+> 3
+
+𝜎 ∗
+
+> 1
+
+, 𝜎 2 = 𝜎 ∗
+
+> 3
+
+𝜎 ∗
+
+> 2
+
+,𝐶 = 𝜇 ∗
+
+> 3
+
+𝑊 ∗
+
+𝜎 ∗
+
+> 3
+
+, 𝑅𝑒 = 𝜌 ∗𝑊 ∗ ¯ℎ∗
+
+> 3
+
+𝜇 ∗
+
+> 3
+
+.
+
+(2.16) 
+
+0 X0-5 Traore and Halpern 
+
+Here 𝑚 1, 𝑚 2 are viscosity ratios, 𝜎 1, 𝜎 2 are surface-tension ratios, 𝐶 is a capillary number, and 𝑅𝑒 is a Reynolds number. Below, we also use the parameter 𝑚 3 = 𝜇 ∗
+
+> 3
+> 𝜇 ∗
+> 3
+
+= 1 for convenience. 2.5. Basic-state quantities 
+
+For the steady concentric base state with interface radii ¯ 𝑅 1, ¯𝑅 2, ¯𝑅 3, the axial base velocities take the form ¯𝑤 𝑗 (𝑟 ) = − 𝑚 𝑗 
+
+4 𝑟 2 + 𝑎 𝑗 ln 𝑟 + 𝑏 𝑗 , 𝑗 = 1, 2, 3, (2.17) where the constants 𝑎 𝑗 and 𝑏 𝑗 are determined by the interfacial and boundary conditions listed in Appendix A. We denote the base velocities at the three interfaces by ¯ 𝑤 1 = ¯𝑤 1 ( ¯𝑅 1),¯𝑤 2 = ¯𝑤 1 ( ¯𝑅 2) = ¯𝑤 2 ( ¯𝑅 2), and ¯ 𝑤 3 = ¯𝑤 2 ( ¯𝑅 3) = ¯𝑤 3 ( ¯𝑅 3). We also write 
+
+𝜏 𝑗 (𝑟 ) = ¯𝑤 𝑗,𝑟 (𝑟 ), 𝜏 ′ 
+
+> 𝑗
+
+(𝑟 ) = ¯𝑤 𝑗,𝑟𝑟 (𝑟 ).
+
+The quantities 𝜏 𝑗 ( ¯𝑅 𝑖 ) and 𝜏 ′ 
+
+> 𝑗
+
+( ¯𝑅 𝑖 ) enter the linearised interfacial conditions given in the next section which describes the linear stability for arbitrary wavelengths. 
+
+3. Arbitrary-wavenumber linear stability formulation 
+
+We consider the linear stability of the steady concentric base state with constant interface radii ¯𝑅 1 < ¯𝑅 2 < ¯𝑅 3 < 𝑎. 
+
+We restrict attention to the Stokes (inertialess) limit, 𝑅𝑒 ≪ 1, which is appropriate for the thin, highly viscous films considered here and in which the inertial terms in (2.1)–(2.2) are negligible. Axisymmetric disturbances with axial wavenumber 𝑘 are introduced, and the resulting Stokes equations are linearised about the base state. Eliminating the pressure and axial velocity leads to a fourth-order equation for the radial velocity in each layer, together with interfacial and wall conditions that couple the three layers. The resulting system yields a dispersion relation between the complex growth rate 
+
+𝑠 and the wavenumber 𝑘 . The formulation is presented in terms of the radial velocity amplitudes, which provides a convenient framework for enforcing the interfacial conditions and constructing the dispersion relation. We seek axisymmetric normal modes of the form 
+
+
+
+𝑢 ′ 
+
+> 𝑗
+
+, 𝑤 ′ 
+
+> 𝑗
+
+, 𝑝 ′
+
+> 𝑗
+
+
+
+=   ˆ𝑢 𝑗 (𝑟 ), ˆ𝑤 𝑗 (𝑟 ), ˆ𝑝 𝑗 (𝑟 )𝑒 i𝑘𝑧 +𝑠𝑡 , 𝑅 𝑗 (𝑧, 𝑡 ) = ¯𝑅 𝑗 +𝜂 𝑗 𝑒 i𝑘𝑧 +𝑠𝑡 , 𝑗 = 1, 2, 3,
+
+(3.1) where the prime quantities are disturbances from the base state. 3.1. Radial-velocity formulation and the cylindrical Orr–Sommerfeld equations 
+
+The incompressibility condition (2.3) gives ˆ𝑢 𝑗,𝑟 + ˆ𝑢 𝑗 
+
+𝑟 + i𝑘 ˆ𝑤 𝑗 = 0, (3.2) so that ˆ𝑤 𝑗 (𝑟 ) = − 1i𝑘 
+
+
+
+ˆ𝑢 𝑗,𝑟 + ˆ𝑢 𝑗 
+
+𝑟 
+
+
+
+. (3.3) The linearised Stokes equations (2.1) and (2.2) in each layer are 
+
+− 𝜕 ˆ𝑝 𝑗 
+
+𝜕𝑟 + 1
+
+𝑚 𝑗 
+
+L1 ˆ𝑢 𝑗 = 0, (3.4) 
+
+0 X0-6 Journal of Fluid Mechanics 
+
+and 
+
+−i𝑘 ˆ𝑝 𝑗 + 1
+
+𝑚 𝑗 
+
+
+
+L1 + 1
+
+𝑟 2
+
+
+
+ˆ𝑤 𝑗 = 0, (3.5) where the differential operator L1 is defined by 
+
+L1 := 𝜕 2
+
+𝜕𝑟 2 𝑔 + 1
+
+𝑟 𝜕 𝜕𝑟 − 1
+
+𝑟 2 − 𝑘 2. (3.6) Eliminating ˆ 𝑤 𝑗 using (3.3) and then eliminating ˆ 𝑝 𝑗 from (3.4)–(3.5) yields the fourth-order equation 
+
+L21 ˆ𝑢 𝑗 = 0, ¯𝑅 𝑗 −1 < 𝑟 < ¯𝑅 𝑗 , (3.7) with the convention ¯ 𝑅 0 := 0 and ¯ 𝑅 4 := 𝑎 where needed. The general solution for (3.7) is ˆ𝑢 𝑗 (𝑟 ) = 𝐴 𝑗 𝐼 1 (𝑘𝑟 ) + 𝐵 𝑗 𝐾 1 (𝑘𝑟 ) + 𝐶 𝑗 𝑟 𝐼 0 (𝑘𝑟 ) + 𝐷 𝑗 𝑟𝐾 0 (𝑘𝑟 ), 𝑗 = 1, 2, 3, (3.8) where 𝐼 𝑛 and 𝐾 𝑛 are modified Bessel functions. Substituting (3.8) into (3.3) gives the axial velocity amplitudes. The pressure amplitudes follow from the radial momentum equation (3.4) as ˆ𝑝 𝑗 (𝑟 ) = 2
+
+𝑚 𝑗 
+
+ 𝐶 𝑗 𝐼 0 (𝑘𝑟 ) + 𝐷 𝑗 𝐾 0 (𝑘𝑟 ). (3.9) 3.2. Wall and interfacial conditions in terms of ˆ𝑢 𝑗 
+
+At the wall 𝑟 = 𝑎 , the no-slip condition (2.4) gives ˆ𝑢 3 (𝑎 ) = 0, ˆ𝑤 3 (𝑎 ) = 0. (3.10) At the inner interface 𝑟 = ¯𝑅 1, the tangential stress condition (2.10) yields i𝑘 ˆ𝑢 1 ( ¯𝑅 1) + ˆ𝑤 1,𝑟 ( ¯𝑅 1) + 𝜏 ′ 
+
+> 1
+
+( ¯𝑅 1)𝜂 1 = 0. (3.11) The corresponding normal stress condition, (2.11), is 
+
+− ˆ𝑝 1 ( ¯𝑅 1) + 2
+
+𝑚 1
+
+  ˆ𝑢 1,𝑟 ( ¯𝑅 1) − i𝑘𝜏 1 ( ¯𝑅 1)𝜂 1
+
+ − 1
+
+𝜎 1𝐶 𝑘 2 − 1¯𝑅 21
+
+!
+
+𝜂 1 = 0. (3.12) At 𝑟 = ¯𝑅 2 we impose continuity of radial velocity, (2.5), ˆ𝑢 1 ( ¯𝑅 2) − ˆ𝑢 2 ( ¯𝑅 2) = 0, (3.13) continuity of axial velocity, (2.5), ˆ𝑤 1 ( ¯𝑅 2) − ˆ𝑤 2 ( ¯𝑅 2) +  𝜏 1 ( ¯𝑅 2) − 𝜏 2 ( ¯𝑅 2)𝜂 2 = 0, (3.14) continuity of tangential stress, (2.6), 
+
+𝑚 2
+
+ i𝑘 ˆ𝑢 1 ( ¯𝑅 2) + ˆ𝑤 1,𝑟 ( ¯𝑅 2) − 𝑚 1
+
+ i𝑘 ˆ𝑢 2 ( ¯𝑅 2) + ˆ𝑤 2,𝑟 ( ¯𝑅 2) +  𝑚 2𝜏 ′ 
+
+> 1
+
+( ¯𝑅 2) − 𝑚 1𝜏 ′ 
+
+> 2
+
+( ¯𝑅 2)𝜂 2 = 0,
+
+(3.15) and continuity of normal stress, (2.7), 
+
+
+
+− ˆ𝑝 2 + 2
+
+𝑚 2
+
+  ˆ𝑢 2,𝑟 − i𝑘𝜏 2𝜂 2
+
+ 
+
+> 𝑟 =¯𝑅 2
+
+−
+
+
+
+− ˆ𝑝 1 + 2
+
+𝑚 1
+
+  ˆ𝑢 1,𝑟 − i𝑘𝜏 1𝜂 2
+
+ 
+
+> 𝑟 =¯𝑅 2
+
+− 1
+
+𝜎 2𝐶 𝑘 2 − 1¯𝑅 22
+
+!
+
+𝜂 2 = 0.
+
+(3.16) At 𝑟 = ¯𝑅 3 the corresponding conditions are ˆ𝑢 2 ( ¯𝑅 3) − ˆ𝑢 3 ( ¯𝑅 3) = 0, (3.17) 
+
+0 X0-7 Traore and Halpern 
+
+ˆ𝑤 2 ( ¯𝑅 3) − ˆ𝑤 3 ( ¯𝑅 3) +  𝜏 2 ( ¯𝑅 3) − 𝜏 3 ( ¯𝑅 3)𝜂 3 = 0, (3.18) 
+
+ i𝑘 ˆ𝑢 2 ( ¯𝑅 3) + ˆ𝑤 2,𝑟 ( ¯𝑅 3) −𝑚 2
+
+ i𝑘 ˆ𝑢 3 ( ¯𝑅 3) + ˆ𝑤 3,𝑟 ( ¯𝑅 3) +  𝜏 ′ 
+
+> 2
+
+( ¯𝑅 3) − 𝑚 2𝜏 ′ 
+
+> 3
+
+( ¯𝑅 3)𝜂 3 = 0, (3.19) and 
+
+
+
+− ˆ𝑝 3 + 2
+
+𝑚 3
+
+  ˆ𝑢 3,𝑟 − i𝑘𝜏 3𝜂 3
+
+ 
+
+> 𝑟 =¯𝑅 3
+
+−
+
+
+
+− ˆ𝑝 2 + 2
+
+𝑚 2
+
+  ˆ𝑢 2,𝑟 − i𝑘𝜏 2𝜂 3
+
+ 
+
+> 𝑟 =¯𝑅 3
+
+− 1
+
+𝐶 𝑘 2 − 1¯𝑅 23
+
+!
+
+𝜂 3 = 0.
+
+(3.20) The twelve non-kinematic conditions (3.10)–(3.20) form a linear system for the coefficients 
+
+( 𝐴 1, 𝐵 1, 𝐶 1, 𝐷 1, . . . , 𝐴 3, 𝐵 3, 𝐶 3, 𝐷 3)𝑇 ,
+
+in which the interface amplitudes 𝜂 1, 𝜂 2, 𝜂 3 appear as forcing terms. 3.3. Kinematic closure and dispersion relation 
+
+The coefficients in (3.8) have been expressed in §3.2 as linear functions of the interface amplitudes 𝜂 1, 𝜂 2, 𝜂 3. Substituting these expressions into the kinematic conditions 
+
+𝑠𝜂 𝑗 − ˆ𝑢 𝑗 ( ¯𝑅 𝑗 ) + i𝑘 ¯𝑤 𝑗 𝜂 𝑗 = 0, 𝑗 = 1, 2, 3, (3.21) yields a closed linear system for (𝜂 1, 𝜂 2, 𝜂 3) of the form 
+
+M(𝑘, 𝑠 ) ©«
+
+𝜂 1
+
+𝜂 2
+
+𝜂 3
+
+ª®¬
+
+= 0, (3.22) where M(𝑘, 𝑠 ) is a 3 × 3 matrix. Non-trivial solutions exist only if det M(𝑘, 𝑠 ) = 0, (3.23) which defines the dispersion relation. Since the Stokes problem is inertialess, the growth rate 𝑠 enters only through the kinematic conditions, and (3.23) is cubic in 𝑠 for each fixed wavenumber 𝑘 .The results of the arbitrary wavenumber formulation presented here have been checked by comparison with a numerical solution of the linearised problem using a Chebyshev collocation method. Excellent agreement is obtained across the range of parameters considered. 3.4. Influence of the middle-layer thickness ¯ℎ2
+
+The effect of the middle-layer thickness ¯ ℎ2 on the linear stability is examined. Throughout this section, the total thickness of the inner and middle layers is fixed such that ¯ℎ1 + ¯ℎ2 = 1, (3.24) so that increasing ¯ ℎ2 corresponds to a decrease in ¯ ℎ1. This parametrisation isolates the effect of redistributing fluid between the inner and middle layers while keeping their combined thickness fixed. For each value of ¯ ℎ2 and each wavenumber 𝑘 , the dispersion relation (3.23) yields three eigenvalues 𝑠 𝑗 (𝑘 ), 𝑗 = 1, 2, 3, corresponding to distinct modes of disturbance. We define 
+
+𝑠 max (𝑘 ) := max    
+
+> 1≤𝑗 ≤3
+
+Re  𝑠 𝑗 (𝑘 ), (3.25) and refer to the mode attaining this maximum as the dominant mode. The sign and magnitude of 𝑠 max (𝑘 ) determine the linear stability characteristics of the flow. The identity of the 
+
+0 X0-8 Journal of Fluid Mechanics 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8                          
+
+> k
+> −0.02 0.00 0.02 0.04 0.06 0.08 0.10
+> smax
+> ¯h2= 0 .2¯h2= 0 .4¯h2= 0 .6¯h2= 0 .8
+> Figure 2. Largest growth rate 𝑠 max versus wavenumber 𝑘 for different values of ¯ ℎ2, with 𝑚 1=50 and 𝑚 2=0.33. The other parameters are 𝑎 =5, 𝜎 1=𝜎 2=1 and 𝐶 =0.3169.
+
+dominant mode may vary with 𝑘 , reflecting a transition between modes associated with different interfaces and hence a change in the underlying instability mechanism. Figure 2 shows 𝑠 max as a function of 𝑘 for several values of ¯ ℎ2, with 𝑚 1 = 50 and 
+
+𝑚 2 = 0.33. In this parameter regime the unstable band is narrow and its location is nearly unchanged as fluid is redistributed between layers 1 and 2. Both the cut-off wavenumber and the most unstable wavenumber vary only weakly with ¯ ℎ2; the principal effect of changing ¯ℎ2 is instead to alter the magnitude of the growth rate. To examine the role of viscosity contrast, we consider a second set of parameters with 
+
+𝜇 ∗ 
+
+> 1
+
+= 2 P, 𝜇 ∗ 
+
+> 2
+
+= 0.5 P, and 𝜇 ∗ 
+
+> 3
+
+= 1 P, corresponding to 𝑚 1 = 0.5 and 𝑚 2 = 2. The resulting growth rates are shown in figure 3, where the dependence on ¯ ℎ2 is significantly more pronounced. For larger values of ¯ ℎ2 (approximately ¯ ℎ2 ≳ 0.4), the most unstable disturbances occur at small wavenumbers, with a peak near 𝑘 ≈ 0.2, indicating predominantly long-wave behaviour. As ¯ ℎ2 decreases, the most unstable wavenumber shifts to larger values, and shorter-wavelength disturbances become increasingly important. At the same time, the maximum growth rate varies non-monotonically with ¯ ℎ2, indicating a change in the underlying instability mechanism. The transition occurs near ¯ ℎ2 ≈ 0.35. For smaller values of ¯ ℎ2, the instability extends over a broad range of wavenumbers and is dominated by shorter-wavelength disturbances, whereas for larger values of ¯ ℎ2 it becomes increasingly confined to the long-wave regime. To characterise the stability boundaries, we compute the cut-off wavenumber 𝑘 0 defined by 𝑠 max (𝑘 0) = 0. The resulting stability diagram in the ( ¯ℎ2, 𝑘 )-plane is shown in figure 4. The parameters are 𝑎 = 5, ¯ ℎ1 = 0.8, ¯ ℎ3 = 1, 𝑚 1 = 0.5, 𝑚 2 = 2, 𝜎 1 = 𝜎 2 = 1, with ¯ℎ2 ∈ [ 0.01 , 0.8]. The system is unstable for sufficiently small wavenumbers, 0 < 𝑘 < 𝑘 0𝑙 
+
+with 𝑘 0𝑙 ≈ 0.3, for all values of ¯ ℎ2, indicating a robust long-wave instability. For larger wavenumbers, the stability boundary depends on ¯ ℎ2. In particular, for smaller values of ¯ ℎ2
+
+(approximately ¯ ℎ2 ≲ 0.35), the cut-off wavenumber increases, leading to a broader unstable band. As ¯ ℎ2 increases, this band contracts and the instability becomes confined primarily to the long-wave regime. The robustness of this long-wave band, and in particular the near-constancy of its lower cut-off 𝑘 0𝑙 , has a simple capillary origin. Under the constraint ¯ ℎ1 + ¯ℎ2 = 1 (with ¯ ℎ3 = 1and 𝑎 = 5), redistributing fluid between layers 1 and 2 leaves the inner and outer interface radii fixed, ¯ 𝑅 1 = 𝑎 − ( ¯ℎ1 + ¯ℎ2 + ¯ℎ3) = 3 and ¯ 𝑅 3 = 𝑎 − ¯ℎ3 = 4, and moves only the middle interface ¯ 𝑅 2 = 4 − ¯ℎ2. For an air–liquid interface of radius ¯ 𝑅 1, azimuthal (Rayleigh–Plateau) 
+
+0 X0-9 Traore and Halpern 0.0 0.2 0.4 0.6 0.8 1.0    
+
+> k
+> −0.03
+> −0.02
+> −0.01 0.00 0.01 0.02 0.03
+> smax
+> ¯h2= 0 .2¯h2= 0 .3¯h2= 0 .5¯h2= 0 .6
+
+Figure 3. Largest growth rate 𝑠 max versus wavenumber 𝑘 for different values of ¯ ℎ2, with 𝑚 1 = 0.5 and 𝑚 2 = 2. The other parameters are the same as in figure 2. 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 
+
+> k
+> 0.00.20.40.60.81.0
+> ¯h2
+
+Unstable Stable 
+
+Figure 4. Stability diagram in the ( ¯ℎ2, 𝑘 )-plane showing the cut-off wavenumber separating stable and unstable regions. The flow is unstable for wavenumbers below the cut-off curve and stable above it. Parameters are 𝑎 = 5, 
+
+𝑚 1 = 0.5, 𝑚 2 = 2, and 𝜎 1 = 𝜎 2 = 1. 
+
+curvature destabilises disturbances with 𝑘 < 1/ ¯𝑅 1, the neutral wavenumber 𝑘 = 1/ ¯𝑅 1
+
+marking the balance between the destabilising azimuthal curvature 1 / ¯𝑅 21 and the stabilising axial curvature 𝑘 2 (Goren 1962; Hammond 1983). The computed lower cut-off lies just below this value throughout, 𝑘 0𝑙 ≈ 0.323–0 .330 against 1 / ¯𝑅 1 ≈ 0.333, varying by only a few percent; the small offset and weak, non-monotonic dependence on ¯ ℎ2 reflects the residual coupling to the middle interface, whose radius ¯ 𝑅 2 is the only one that changes under the constraint. The persistent long-wave band is therefore the capillary instability of the air–core interface, essentially pinned by the fixed inner radius ¯ 𝑅 1, while the structure at larger 𝑘 , including the narrow secondary band near ¯ ℎ2 ≈ 0.345, which marks the transition to the broad-band regime at smaller ¯ ℎ2, is consistent with the increasing influence of interfacial coupling. 3.5. Influence of the viscosity ratio 𝑚 1
+
+We examine the influence of the viscosity ratio 𝑚 1 = 𝜇 ∗
+
+> 3
+
+/𝜇 ∗
+
+> 1
+
+, which measures the relative viscosity of the outer layer (layer 3) to that of the inner layer (layer 1). The chosen 
+
+0 X0-10 Rapids articles must not exceed this page length Journal of Fluid Mechanics 0.0 0.2 0.4 0.6 0.8 1.0                          
+
+> k
+> −0.05
+> −0.04
+> −0.03
+> −0.02
+> −0.01 0.00 0.01 0.02 0.03 0.04
+> smax
+> m1= 0 .1
+> m1= 0 .5
+> m1= 1 .0
+> m1= 1 .5
+> m1= 2 .0
+> Figure 5. Largest growth rate 𝑠 max versus wavenumber 𝑘 for different values of 𝑚 1, with 𝑎 =5, ¯ ℎ1=0.8, ¯ℎ2=0.2, ¯ ℎ3=1, 𝐶 =0.3169, and 𝑚 2=2.
+
+dimensional parameters are 𝑎 ∗ = 0.5 cm, ¯ ℎ∗ 
+
+> 1
+
+= 0.08 cm, ¯ ℎ∗ 
+
+> 2
+
+= 0.02 cm, ¯ ℎ∗ 
+
+> 3
+
+= 0.1 cm, 
+
+𝜎 ∗ 
+
+> 1
+
+= 𝜎 ∗ 
+
+> 2
+
+= 𝜎 ∗ 
+
+> 3
+
+= 21 .5 dyn cm −1, 𝜌 ∗ = 0.97 g cm −3, 𝜇 ∗ 
+
+> 3
+
+= 4 P, and 𝜇 ∗ 
+
+> 2
+
+= 2 P. The viscosity ratio 𝑚 1 is varied through 𝜇 ∗
+
+> 1
+
+, with all other parameters fixed. The corresponding dimensionless parameters are 𝑎 = 5, ¯ ℎ1 = 0.8, ¯ ℎ2 = 0.2, ¯ ℎ3 = 1, 𝐶 = 0.3169, and 𝑚 2 = 2. Figure 5 shows 𝑠 max (𝑘 ) for several values of 𝑚 1. The effect of 𝑚 1 depends strongly on whether its value is less than or greater than unity. For 𝑚 1 ≲ 1, corresponding to an inner layer more viscous than the outer layer, decreasing 𝑚 1 leads to a pronounced increase in the maximum growth rate and a widening of the unstable wavenumber range. In this regime, the instability extends to larger 𝑘 , indicating increased sensitivity to shorter-wavelength disturbances. For 𝑚 1 ≳ 1, corresponding to a less viscous inner layer, the growth rate curves depend only weakly on 𝑚 1. Both the maximum growth rate and the most unstable wavenumber vary only modestly as 𝑚 1 increases.These results indicate that the instability is considerably more sensitive to changes in 𝑚 1 when the inner layer is more viscous than the outer layer ( 𝑚 1 < 1). Figure 6 gives a summary of the influence of 𝑚 1 on both the unstable wavenumber range and the dominant growth rate. Panel (a) shows that the system is unstable for sufficiently small wavenumbers, 0 < 𝑘 < 𝑘 0𝑙 with 𝑘 0𝑙 ≈ 0.3, for all values of 𝑚 1, indicating a robust long-wave instability. As 𝑚 1 decreases from values near unity, the unstable wavenumber interval expands, reaching its widest extent near 𝑚 1 ≈ 0.5, before shrinking again for smaller 𝑚 1. Thus the dependence of the cut-off wavenumber on 𝑚 1 is non-monotonic. Panels (b) and (c) show that 𝑠 max varies smoothly with 𝑚 1, attaining its largest values for intermediate 𝑚 1 ≈ 0.2–0 .3, and decreasing toward a minimum near 𝑚 1 ≈ 1. In contrast, the most unstable wavenumber, 𝑘 max , exhibits a sharp transition near 𝑚 1 ≈ 1. Specifically, 
+
+𝑘 max decreases gradually as 𝑚 1 increases from small values, but undergoes a rapid shift from 𝑘 max ≈ 0.32 to 𝑘 max ≈ 0.21 as 𝑚 1 approaches unity. The abrupt transition in 𝑘 max is a consequence of the coexistence of two competing local maxima of 𝑠 max (𝑘 ). For 𝑚 1 slightly below unity, the growth-rate curve exhibits two peaks of comparable magnitude at different wavenumbers. As 𝑚 1 varies, the global maximum switches between these peaks, leading to a discontinuous change in 𝑘 max while 𝑠 max remains continuous. Overall, varying the viscosity ratio 𝑚 1 modifies both the strength and the character of the instability. In addition to changing the maximum growth rate and the extent of the unstable wavenumber range, it can also produce an abrupt transition in the dominant unstable wavelength through competition between distinct instability modes. These results 
+
+0 X0-11 Traore and Halpern 0.4 0.6 0.8 1.0                
+
+> k
+> 01234
+> m1
+> (a)
+> 0.00.51.01.52.0
+> m1
+> 0.020 0.025 0.030 0.035 0.040
+> smax
+> (b)
+> 0.00.51.01.52.0
+> m1
+> 0.20.30.4
+> kmax
+> (c)
+> Figure 6. (a) Stability regions in the (𝑚 1, 𝑘 )-plane. (b) Maximum growth rate 𝑠 max as a function of 𝑚 1. (c) Most unstable wavenumber 𝑘 max as a function of 𝑚 1.
+
+demonstrate that the viscous contrast between the inner and outer liquid layers plays a central role in determining both the dominant instability mechanism and the resulting linear stability characteristics. 3.6. Influence of the surface tension ratio 𝜎 1
+
+We examine the influence of the surface tension ratio 𝜎 1 = 𝜎 ∗ 
+
+> 3
+
+/𝜎 ∗ 
+
+> 1
+
+, which measures the relative strength of surface tension at the inner interface compared to that at the outer interface. The analysis is performed for three representative viscosity pairs (𝑚 1, 𝑚 2)
+
+spanning the principal regimes identified in the previous subsection. The dimensional surface tensions are chosen such that 𝜎 ∗ 
+
+> 2
+
+= 𝜎 ∗ 
+
+> 3
+
+= 21 .5 dyn cm −1, while 𝜎 ∗ 
+
+> 1
+
+is varied over a physically relevant range corresponding to 𝜎 1 ∈ [ 0.05 , 10 ]. The remaining parameters are 𝑎 = 5, ℎ1 = 0.8, ℎ2 = 0.2, and ℎ3 = 0.1. Three different pairs of viscosity ratios are considered here: (𝑚 1, 𝑚 2) = (2, 2); (0.5, 2); and (0.5, 0.5).For all three viscosity configurations shown in figure 7, increasing 𝜎 1 reduces the growth rate across much of the unstable wavenumber range, but the response depends strongly on the viscosity ratios. In panel (a), where (𝑚 1, 𝑚 2) = (2, 2), the instability is concentrated at small wavenumbers, with the largest growth rates occurring near the long-wave end of the spectrum. In panel (b), where (𝑚 1, 𝑚 2) = (0.5, 2), the unstable interval is much broader, with marginal stability occurring near 𝑘 ≃ 1 for the smaller values of 𝜎 1. Thus, in this viscosity regime, intermediate-wavelength disturbances remain important even though increasing 𝜎 1 reduces the growth rate. The case (𝑚 1, 𝑚 2) = (0.5, 0.5), shown in panel (c), exhibits a different structure. For sufficiently small 𝜎 1, the growth-rate curve contains both the long-wave unstable band and an additional unstable window at moderate wavenumbers. Increasing 𝜎 1 suppresses this secondary window, so that the instability becomes confined primarily to the long-wave regime. Thus the surface-tension ratio does not merely change the magnitude of the growth rate; it can also change the number and location of unstable bands. To quantify the stability boundaries, we compute the cut-off wavenumber 𝑘 0 defined by 𝑠 max (𝑘 0) = 0. The dependence of 𝑘 0 on 𝜎 1 is shown in figure 8 for the representative case (𝑚 1, 𝑚 2) = (0.5, 0.5). The system is unstable for sufficiently small wavenumbers, 0 < 𝑘 < 𝑘 0𝑙 with 𝑘 0𝑙 ≈ 0.33, for all values of 𝜎 1, indicating a robust long-wave instability. For sufficiently small 𝜎 1, a second, disconnected unstable band appears at moderate 
+
+0 X0-12 Journal of Fluid Mechanics 0.0 0.5 1.0 1.5
+
+k
+
+> 0.00.10.20.30.40.5
+> smax
+
+(a) m1 = 2 , m 2 = 2    
+
+> 0.00.51.01.5
+
+k
+
+> 0.00.10.20.30.40.5
+> smax
+
+(b) m1 = 0 .5, m 2 = 2    
+
+> 0.00.51.01.5
+
+k
+
+> 0.00.10.20.30.40.5
+> smax
+
+(c) m1 = 0 .5, m 2 = 0 .5     
+
+> σ1= 0 .05
+> σ1= 0 .1
+> σ1= 0 .5
+> σ1= 1
+> σ1= 10
+
+Figure 7. Largest growth rate 𝑠 max versus wavenumber 𝑘 for different values of 𝜎 1 and viscosity ratios: (a) 
+
+(𝑚 1, 𝑚 2) = (2, 2), (b) (𝑚 1, 𝑚 2) = (0.5, 2), and (c) (𝑚 1, 𝑚 2) = (0.5, 0.5).0.32 0.33 0.34 0.35 0.36 0.37 0.38 0.39 0.40  
+
+> k
+> 0.00.20.40.60.81.01.2
+> σ1
+> UStable U
+
+Figure 8. Stability regions in the (𝜎 1, 𝑘 )-plane for (𝑚 1, 𝑚 2) = (0.5, 0.5).
+
+wavenumbers, giving rise to two distinct instability regions. This secondary instability is not observed for the viscosity configurations in figure 7(a) and (b), and appears to be specific to 
+
+(𝑚 1, 𝑚 2) = (0.5, 0.5). As 𝜎 1 increases, this secondary unstable band disappears and the instability becomes restricted to the long-wave regime. Overall, increasing the surface tension at the inner interface suppresses short- and intermediate-wavelength disturbances and eventually eliminates the secondary instability altogether, leaving only the robust long-wave instability. 
+
+0 X0-13 Traore and Halpern 
+
+3.7. Summary of arbitrary-wavenumber results 
+
+The arbitrary-wavenumber analysis reveals the distinct roles played by layer thickness, viscosity contrast, and surface tension in determining the linear stability characteristics of the three-layer flow. Variations in the middle-layer thickness ¯ ℎ2 primarily affect the coupling between the two liquid interfaces. Increasing ¯ ℎ2 suppresses the broad-band instability at moderate and large wavenumbers, leaving the persistent long-wave instability as the dominant mode. The viscosity ratio 𝑚 1 controls the strength of viscous coupling at the inner interface and produces a strongly asymmetric response. For 𝑚 1 ≲ 1, decreasing 𝑚 1 enhances both the growth rate and the range of unstable wavenumbers, while for 𝑚 1 ≳ 1 the dependence is comparatively weak. Near 𝑚 1 ≈ 1, competing local maxima in the growth rate lead to a transition in the most unstable wavenumber, associated with a change in the dominant instability mode. Overall, variations in the surface tension ratio 𝜎 1 influence both the strength and the structure of the instability. Since 𝜎 1 = 𝜎 ∗ 
+
+> 3
+
+/𝜎 ∗ 
+
+> 1
+
+, increasing 𝜎 1 corresponds to decreasing the surface tension at the air–core interface. Over the parameter range considered, this leads to a reduction in the maximum growth rate and progressively suppresses the secondary finite-wavenumber unstable band, leaving only the persistent long-wave instability for sufficiently large 𝜎 1. Thus, increasing 𝜎 1 both weakens the instability and contracts the unstable spectrum towards the long-wave regime. Taken together, these results indicate that the instability arises from a balance between viscous stratification, interfacial coupling, and capillary effects. Despite the complexity of the finite-wavenumber structure, including mode switching and secondary unstable bands, a robust long-wave instability persists across all parameter regimes considered. The persistence of the long-wave instability throughout the parameter space suggests that a reduced asymptotic description in the long-wavelength limit should capture the principal instability responsible for the onset of nonlinear evolution, while the arbitrary-wavenumber analysis identifies additional finite-wavenumber features that lie beyond the scope of the asymptotic theory. 
+
+> 4. Long-wave approximation
+
+The arbitrary-wavenumber analysis in §3 shows that the dominant instability is typically associated with small axial wavenumbers across a broad range of parameter values. This motivates the development of a reduced asymptotic model in the long-wave limit. Using the long-wave parameter 𝜖 ≪ 1 introduced in §2.4, we now derive an evolution system describing the weakly varying interfacial dynamics. We seek asymptotic expansions of the dependent variables in powers of 𝜖 :
+
+𝑢 𝑗 = 𝑢 (0) 
+
+> 𝑗
+
++ 𝜖𝑢 (1) 
+
+> 𝑗
+
++ 𝜖 2𝑢 (2) 
+
+> 𝑗
+
++ · · · ,𝑤 𝑗 = 𝑤 (0) 
+
+> 𝑗
+
++ 𝜖 𝑤 (1) 
+
+> 𝑗
+
++ 𝜖 2𝑤 (2) 
+
+> 𝑗
+
++ · · · ,𝑝 𝑗 = 𝑝 (0) 
+
+> 𝑗
+
++ 𝜖 𝑝 (1) 
+
+> 𝑗
+
++ 𝜖 2 𝑝 (2) 
+
+> 𝑗
+
++ · · · .
+
+At leading order, the pressure is independent of the radial coordinate in each layer, while the axial velocity is determined by a balance between viscous stresses and the gravitational body force. This yields lubrication-type flow profiles in each layer. Substituting these expansions into the governing equations and retaining the leading-order terms, we obtain,  
+
+> 0X0-14
+
+Journal of Fluid Mechanics 
+
+for 𝑗 = 1, 2, 3, 
+
+𝑝 (0) 
+
+> 𝑗,𝑟
+
+= 0, 1
+
+𝑟 𝜕 𝑟 
+
+
+
+𝑟𝑤 (0)
+
+> 𝑗,𝑟
+
+
+
+= −𝑚 𝑗 , 1
+
+𝑟 𝜕 𝑟 
+
+
+
+𝑟𝑢 (0)
+
+> 𝑗
+
+
+
++ 𝑤 (0) 
+
+> 𝑗,𝑧
+
+= 0. (4.1) Here the constant right-hand side of (4.1) 𝑏 arises from gravity after nondimensionalisation. The corresponding leading-order boundary and interfacial conditions are as follows. At the tube wall 𝑟 = 𝑎 , the no-slip and no-penetration conditions are 
+
+𝑢 (0) 
+
+> 3
+
+= 0, 𝑤 (0) 
+
+> 3
+
+= 0. (4.2) At the outer interface 𝑟 = 𝑅 3 (𝑧, 𝑡 ), we impose continuity of tangential stress, the normal-stress jump, the kinematic condition, and continuity of velocity: 
+
+𝑚 2𝑤 (0) 
+
+> 3,𝑟
+
+= 𝑤 (0) 
+
+> 2,𝑟
+
+, 𝑝 (0) 
+
+> 2
+
+− 𝑝 (0) 
+
+> 3
+
+= 1
+
+𝐶 
+
+ 1
+
+𝑅 3
+
+− 𝜖 2 𝑅 3,𝑧𝑧 
+
+
+
+, (4.3) 
+
+𝑢 (0) 
+
+> 2
+
+= 𝑅 3,𝑡 + 𝑤 (0) 
+
+> 2
+
+𝑅 3,𝑧 , 𝑢 (0) 
+
+> 2
+
+= 𝑢 (0) 
+
+> 3
+
+, 𝑤 (0) 
+
+> 2
+
+= 𝑤 (0) 
+
+> 3
+
+. (4.4) Similar conditions are applied at the interface 𝑟 = 𝑅 2 (𝑧, 𝑡 ):
+
+𝑚 1𝑤 (0) 
+
+> 2,𝑟
+
+= 𝑚 2𝑤 (0) 
+
+> 1,𝑟
+
+, 𝑝 (0) 
+
+> 1
+
+− 𝑝 (0) 
+
+> 2
+
+= 1
+
+𝜎 2𝐶 
+
+ 1
+
+𝑅 2
+
+− 𝜖 2 𝑅 2,𝑧𝑧 
+
+
+
+, (4.5) 
+
+𝑢 (0) 
+
+> 1
+
+= 𝑅 2,𝑡 + 𝑤 (0) 
+
+> 1
+
+𝑅 2,𝑧 , 𝑢 (0) 
+
+> 1
+
+= 𝑢 (0) 
+
+> 2
+
+, 𝑤 (0) 
+
+> 1
+
+= 𝑤 (0) 
+
+> 2
+
+. (4.6) Finally, at the free surface 𝑟 = 𝑅 1 (𝑧, 𝑡 ), the conditions are 
+
+𝑤 (0) 
+
+> 1,𝑟
+
+= 0, −𝑝 (0) 
+
+> 1
+
++ 𝑝 atm = 1
+
+𝜎 1𝐶 
+
+ 1
+
+𝑅 1
+
+− 𝜖 2 𝑅 1,𝑧𝑧 
+
+
+
+, 𝑢 (0) 
+
+> 1
+
+= 𝑅 1,𝑡 + 𝑤 (0) 
+
+> 1
+
+𝑅 1,𝑧 . (4.7) As in Ogrosky (2021), we retain the formally higher-order curvature terms 𝜖 2 𝑅 𝑖,𝑧𝑧 in the normal-stress conditions. These terms are required to capture the stabilising effect of surface tension at shorter wavelengths and, in particular, to recover a finite cut-off wavenumber in the linear theory. The leading-order axial velocities are obtained by integrating the axial momentum equations (4.1) 𝑏 subject to the wall, interfacial, and continuity conditions. The corresponding radial velocities are then determined from the continuity equations (4.1) 𝑐 
+
+together with the kinematic and no-penetration conditions. The resulting leading-order velocity fields are 
+
+𝑢 (0) 
+
+> 1
+
+= 𝑅 1 𝑅 1,𝑧 
+
+4𝑟 
+
+"
+
+− 𝑎 2 + 𝑚 1𝑟 2 + ( 𝑚 2 − 𝑚 1)𝑅 22 − ( 𝑚 2 − 1)𝑅 23
+
++ 2𝑟 2 (ln 𝑎 − 𝑚 1 ln 𝑟 + ( 𝑚 1 − 𝑚 2) ln 𝑅 2 + ( 𝑚 2 − 1) ln 𝑅 3)
+
+#
+
++ (𝑚 1 − 𝑚 2)( 𝑟 2 − 𝑅 22)( 𝑅 21 − 𝑅 22)
+
+4𝑟 𝑅 2
+
+𝑅 2,𝑧 
+
++ (𝑚 2 − 1)( 𝑟 2 − 𝑅 23)( 𝑅 21 − 𝑅 23)
+
+4𝑟 𝑅 3
+
+𝑅 3,𝑧 , (4.8) 
+
+0 X0-15 Traore and Halpern 
+
+𝑤 (0) 
+
+> 1
+
+= 14
+
+𝑎 2 + ( 𝑚 2 − 1)𝑅 23 + ( 𝑚 1 − 𝑚 2)𝑅 22 − 𝑚 1𝑟 2
+
++ 𝑚 1 𝑅 21
+
+2 ln 𝑟 𝑅 2
+
++ 𝑚 2 𝑅 21
+
+2 ln 𝑅 2
+
+𝑅 3
+
++ 𝑅 21
+
+2 ln 𝑅 3
+
+𝑎 , (4.9) 
+
+𝑢 (0) 
+
+> 2
+
+= 𝑅 1 𝑅 1,𝑧 
+
+4𝑟 
+
+"
+
+− 𝑎 2 + 𝑚 2𝑟 2 − ( 𝑚 2 − 1)𝑅 23
+
++ 2𝑟 2 (ln 𝑎 − 𝑚 2 ln 𝑟 + ( 𝑚 2 − 1) ln 𝑅 3)
+
+#
+
++ (𝑚 2 − 1)( 𝑟 2 − 𝑅 23)( 𝑅 21 − 𝑅 23)
+
+4𝑟 𝑅 3
+
+𝑅 3,𝑧 . (4.10) 
+
+𝑤 (0) 
+
+> 2
+
+= 14
+
+𝑎 2 + ( 𝑚 2 − 1)𝑅 23 − 𝑚 2𝑟 2 + 𝑚 2 𝑅 21
+
+2 ln 𝑟 𝑅 3
+
++ 𝑅 21
+
+2 ln 𝑅 3
+
+𝑎 , (4.11) 
+
+𝑢 (0) 
+
+> 3
+
+= − 14𝑟 
+
+
+
+𝑎 2 − 𝑟 2 + 2𝑟 2 ln 𝑟 𝑎 
+
+
+
+𝑅 1 𝑅 1,𝑧 , (4.12) 
+
+𝑤 (0) 
+
+> 3
+
+= 14
+
+
+
+𝑎 2 − 𝑟 2
+
++ 𝑅 21
+
+2 ln 𝑟 𝑎 . (4.13) The axial velocity fields correspond to generalised Poiseuille profiles modified by the interfacial geometry and viscous coupling between the liquid layers. In the special case 
+
+𝑚 1 = 𝑚 2 = 1, the velocity fields reduce to the corresponding single-viscosity expressions. The leading-order pressures follow directly from the normal-stress balances (4.3) 𝑏 ,(4.5) 𝑏 , and (4.7) 𝑏 .
+
+𝑝 (0) 
+
+> 1
+
+= 𝑝 atm − 1
+
+𝜎 1𝐶 
+
+ 1
+
+𝑅 1
+
+− 𝜖 2 𝑅 1,𝑧𝑧 
+
+
+
+, (4.14) 
+
+𝑝 (0) 
+
+> 2
+
+= 𝑝 (0) 
+
+> 1
+
+− 1
+
+𝜎 2𝐶 
+
+ 1
+
+𝑅 2
+
+− 𝜖 2 𝑅 2,𝑧𝑧 
+
+
+
+, (4.15) 
+
+𝑝 (0) 
+
+> 3
+
+= 𝑝 (0) 
+
+> 2
+
+− 1
+
+𝐶 
+
+ 1
+
+𝑅 3
+
+− 𝜖 2 𝑅 3,𝑧𝑧 
+
+
+
+. (4.16) We now consider the 𝑂 (𝜖 ) problem, which provides the corrections required to determine the evolution of the interfaces. At this order, the velocity and pressure fields satisfy, for 
+
+𝑗 = 1, 2, 3, 
+
+𝑚 𝑗 𝑝 (1) 
+
+> 1,𝑟
+
+= 1
+
+𝑟 𝜕 𝑟 
+
+
+
+𝑢 (0)
+
+> 𝑗,𝑟
+
+
+
+− 𝑢 (0)
+
+> 𝑗
+
+𝑟 2 , 1
+
+𝑟 𝜕 𝑟 
+
+
+
+𝑤 (1)
+
+> 𝑗,𝑟
+
+
+
+= 𝑚 𝑗 𝑝 (0) 
+
+> 𝑗,𝑧
+
+, 1
+
+𝑟 𝜕 𝑟 
+
+
+
+𝑢 (1)
+
+> 𝑗
+
+
+
++ 𝑤 (1) 
+
+> 𝑗,𝑧
+
+= 0. (4.17) The corresponding boundary conditions are obtained by expanding the stress and kinematic conditions to 𝑂 (𝜖 ). At the wall 𝑟 = 𝑎 ,
+
+𝑢 (1) 
+
+> 3
+
+= 0, 𝑤 (1) 
+
+> 3
+
+= 0. (4.18) At 𝑟 = 𝑅 3 (𝑧, 𝑡 ), the first-order conditions are 
+
+𝑚 2𝑤 (1) 
+
+> 3,𝑟
+
+= 𝑤 (1) 
+
+> 2,𝑟
+
+, 𝑝 (1) 
+
+> 2
+
+− 𝑝 (1) 
+
+> 3
+
+= 2
+
+𝑚 2
+
+
+
+𝑢 (0) 
+
+> 2,𝑟
+
+− 𝑚 2𝑢 (0)
+
+> 3,𝑟
+
+
+
+, (4.19) 
+
+0 X0-16 Journal of Fluid Mechanics 
+
+and 
+
+𝑢 (1) 
+
+> 2
+
+= 𝑅 3,𝑡 + 𝑤 (1) 
+
+> 2
+
+𝑅 3,𝑧 , 𝑢 (1) 
+
+> 2
+
+= 𝑢 (1) 
+
+> 3
+
+, 𝑤 (1) 
+
+> 2
+
+= 𝑤 (1) 
+
+> 3
+
+, (4.20) while at 𝑟 = 𝑅 2 (𝑧, 𝑡 ), they are 
+
+𝑚 1𝑤 (1) 
+
+> 2,𝑟
+
+= 𝑚 2
+
+
+
+𝑤 (1) 
+
+> 1,𝑟
+
++ 𝑢 (0)
+
+> 1,𝑧
+
+
+
+, 𝑝 (1) 
+
+> 1
+
+− 𝑝 (1) 
+
+> 2
+
+= 2
+
+𝑚 1𝑚 2
+
+
+
+𝑚 2𝑢 (0) 
+
+> 1,𝑟
+
+− 𝑚 1𝑢 (0)
+
+> 2,𝑟
+
+
+
+, (4.21) and 
+
+𝑢 (1) 
+
+> 1
+
+= 𝑅 2,𝑡 + 𝑤 (1) 
+
+> 1
+
+𝑅 2,𝑧 , 𝑢 (1) 
+
+> 1
+
+= 𝑢 (1) 
+
+> 2
+
+, 𝑤 (1) 
+
+> 1
+
+= 𝑤 (1) 
+
+> 2
+
+. (4.22) At the free surface, 𝑟 = 𝑅 1 (𝑧, 𝑡 ), the conditions are 
+
+𝑤 (1) 
+
+> 1,𝑟
+
+= 0, 𝑝 (1) 
+
+> 1
+
+= 2
+
+𝑚 1
+
+𝑢 (0) 
+
+> 1,𝑟
+
+, 𝑢 (1) 
+
+> 1
+
+= 𝑅 1,𝑡 + 𝑤 (1) 
+
+> 1
+
+𝑅 1,𝑧 . (4.23) The first-order corrections to the axial velocity are obtained by integrating (4.17) 𝑏 subject to the corresponding boundary and interfacial conditions, and are given by 
+
+𝑤 (1) 
+
+> 1
+
+= 14 𝑝 (0)
+
+> 1,𝑧
+
+
+
+𝑚 1
+
+
+
+𝑟 2 − 𝑅 22 − 2𝑅 21 ln 𝑟 𝑅 2
+
+
+
++ 2
+
+
+
+𝑅 22 − 𝑅 21
+
+ 
+
+𝑚 2 ln 𝑅 2
+
+𝑅 3
+
+− ln 𝑎 𝑅 3
+
+ 
+
++ 14 𝑝 (0)
+
+> 2,𝑧
+
+
+
+𝑚 2
+
+
+
+𝑅 22 − 𝑅 23 + 2𝑅 22 ln 𝑅 3
+
+𝑅 2
+
+
+
++ 2
+
+
+
+𝑅 22 − 𝑅 23
+
+
+
+ln 𝑎 𝑅 3
+
+
+
++ 14 𝑝 (0)
+
+> 3,𝑧
+
+
+
+𝑅 23 − 𝑎 2 + 2𝑅 23 ln 𝑎 𝑅 3
+
+
+
+, (4.24) 
+
+𝑤 (1) 
+
+> 2
+
+= 14 𝑝 (0)
+
+> 1,𝑧
+
+
+
+2
+
+
+
+𝑅 22 − 𝑅 21
+
+ 
+
+𝑚 2 ln 𝑟 𝑅 3
+
+− ln 𝑎 𝑅 3
+
+ 
+
++ 14 𝑝 (0)
+
+> 2,𝑧
+
+
+
+𝑚 2
+
+
+
+𝑟 2 − 𝑅 23 − 2𝑅 22 ln 𝑟 𝑅 3
+
+
+
++ 2
+
+
+
+𝑅 22 − 𝑅 23
+
+
+
+ln 𝑎 𝑅 3
+
+
+
++ 14 𝑝 (0)
+
+> 3,𝑧
+
+
+
+𝑅 23 − 𝑎 2 + 2𝑅 23 ln 𝑎 𝑅 3
+
+
+
+, (4.25) 
+
+𝑤 (1) 
+
+> 3
+
+= 12 𝑝 (0)
+
+> 1,𝑧
+
+
+
+𝑅 22 − 𝑅 21
+
+
+
+ln 𝑟 𝑎 + 12 𝑝 (0)
+
+> 2,𝑧
+
+
+
+𝑅 23 − 𝑅 22
+
+
+
+ln 𝑟 𝑎 + 14 𝑝 (0)
+
+> 3,𝑧
+
+h
+
+𝑟 2 − 𝑎 2 − 2𝑅 23 ln 𝑟 𝑎 
+
+i
+
+.
+
+(4.26) The corresponding radial velocities follow from the continuity equations and are required in establishing the kinematic flux relations, although their explicit forms are not needed in the final evolution equations. 4.1. Evolution equations 
+
+The kinematic conditions are expressed in terms of volumetric fluxes in each liquid layer. We define 
+
+𝑄 𝑗 (𝑧, 𝑡 ) =
+
+∫ 𝑅 𝑗 +1 (𝑧,𝑡 )   
+
+> 𝑅 𝑗 (𝑧,𝑡 )
+
+𝑟 𝑤 𝑗 (𝑟, 𝑧, 𝑡 ) 𝑑𝑟, 𝑗 = 1, 2, 3, 𝑅 4 = 𝑎, (4.27) where 𝑤 𝑗 denotes the axial velocity in layer 𝑗 . Using incompressibility together with the kinematic boundary conditions yields 12 (𝑅 23)𝑡 = (𝑄 3)𝑧 , 12 (𝑅 22 − 𝑅 23)𝑡 = (𝑄 2)𝑧 , 12 (𝑅 21 − 𝑅 22)𝑡 = (𝑄 1)𝑧 . (4.28) 
+
+0 X0-17 Traore and Halpern 
+
+It is convenient to introduce the cumulative fluxes 
+
+𝑄 (3) := 𝑄 3, 𝑄 (2) := 𝑄 2 + 𝑄 3, 𝑄 (1) := 𝑄 1 + 𝑄 2 + 𝑄 3, (4.29) so that 
+
+𝑅 𝑗,𝑡 = 1
+
+𝑅 𝑗 
+
+𝜕 𝑧 𝑄 ( 𝑗 ) , 𝑗 = 1, 2, 3. (4.30) To determine these fluxes, we substitute the asymptotic expansion 
+
+𝑤 𝑗 = 𝑤 (0) 
+
+> 𝑗
+
++ 𝜖 𝑤 (1) 
+
+> 𝑗
+
+, 𝑗 = 1, 2, 3, (4.31) into (4.27). Following Ogrosky (2021), we rescale the axial coordinate so that 𝜖 does not appear explicitly in the resulting evolution equations. After straightforward but lengthy algebra, each cumulative flux may be written in the form 
+
+𝑄 ( 𝑗 ) =
+
+> 3
+
+∑︁ 
+
+> 𝑘 =1
+
+𝐴 𝑗 𝑘 (𝑅 1, 𝑅 2, 𝑅 3) 𝑝 (0) 
+
+> 𝑘,𝑧
+
++ 𝐺 𝑗 (𝑅 1, 𝑅 2, 𝑅 3), 𝑗 = 1, 2, 3, (4.32) where 𝐴 𝑗 𝑘 and 𝐺 𝑗 depend on the interface positions and system parameters. The corresponding axial pressure gradients are obtained by differentiating (4.14)–(4.16) with respect to 𝑧 . Substituting (4.32) into (4.30) yields the closed system 
+
+𝑅 𝑗,𝑡 = 1
+
+𝑅 𝑗 
+
+𝜕 𝑧 
+
+> 3
+
+∑︁ 
+
+> 𝑘 =1
+
+𝐴 𝑗 𝑘 𝑝 (0) 
+
+> 𝑘,𝑧
+
++ 𝐺 𝑗 
+
+!
+
+, 𝑗 = 1, 2, 3. (4.33) Equations (4.33) constitute the long-wave evolution equations governing the three interfaces. Each equation has the form of a conservation law, with fluxes determined by capillary pressure gradients, viscous coupling between the layers, and gravitational drainage. The coefficient functions satisfy several consistency checks. In particular, when 𝑅 2 = 𝑅 1,the inner layer has zero thickness so that 𝑄 1 = 0, implying 𝑄 (1) = 𝑄 (2) . The coefficient functions in Appendix B satisfy this identity through 
+
+𝐴 1𝑘 |𝑅 2=𝑅 1 = 𝐴 2𝑘 |𝑅 2=𝑅 1 , 𝑘 = 1, 2, 3,
+
+together with 
+
+𝐺 1 |𝑅 2=𝑅 1 = 𝐺 2 |𝑅 2=𝑅 1 .
+
+In addition, the uniform base state 𝑅 𝑗 = ¯𝑅 𝑗 recovers the steady concentric drainage solution. 4.2. Linear stability of the long-wave model 
+
+We examine the linear stability of the reduced evolution equations derived in the previous section. This analysis complements the arbitrary-wavenumber formulation of §3. The full Stokes formulation yields a dispersion relation containing modified Bessel functions of the axial wavenumber, whereas the long-wave model gives its small-wavenumber approximation. Specifically, in the limit 𝑘 → 0, the arbitrary-wavenumber dispersion relation reduces to that of the long-wave model, provided the axial curvature contribution is retained. 4.2.1. Linearisation 
+
+We consider perturbations about the uniform base state 
+
+𝑅 𝑗 (𝑧, 𝑡 ) = ¯𝑅 𝑗 , 𝑗 = 1, 2, 3, (4.34) 
+
+0 X0-18 Journal of Fluid Mechanics 
+
+where ¯𝑅 1 < ¯𝑅 2 < ¯𝑅 3 < 𝑎 are constants. Normal-mode perturbations of the form are introduced 
+
+𝑅 𝑗 (𝑧, 𝑡 ) = ¯𝑅 𝑗 + ˆ𝑅 𝑗 𝑒 𝑖𝑘𝑧 +𝑠𝑡 , 𝑗 = 1, 2, 3, (4.35) where, as defined earlier, 𝑘 is the axial wavenumber and 𝑠 is the complex growth rate. Substituting (4.35) into the evolution equations 
+
+𝑅 𝑗,𝑡 = 1
+
+𝑅 𝑗 
+
+𝜕 𝑧 𝑄 ( 𝑗 ) , 𝑗 = 1, 2, 3, (4.36) and linearising about the base state yields 
+
+𝑠 ˆ𝑅 𝑗 = 𝑖𝑘 
+
+¯𝑅 𝑗 
+
+b𝑄 ( 𝑗 ) , 𝑗 = 1, 2, 3, (4.37) where b𝑄 ( 𝑗 ) denotes the linearised flux. 4.2.2. Linearised fluxes 
+
+Linearising (4.32) about the base state and using 𝑝 (0) 
+
+> 𝑘,𝑧
+
+|base = 0 gives 
+
+b𝑄 ( 𝑗 ) =
+
+> 3
+
+∑︁ 
+
+> 𝑘 =1
+
+𝐴 𝑗 𝑘 ( ¯R) b𝑝 (0) 
+
+> 𝑘,𝑧
+
++
+
+> 3
+
+∑︁ 
+
+> ℓ=1
+
+𝜕𝐺 𝑗 
+
+𝜕𝑅 ℓ
+
+( ¯R) ˆ𝑅 ℓ . (4.38) Differentiating the linearised forms of (4.14)–(4.16) yields 
+
+b𝑝 (0) 
+
+> 1,𝑧
+
+= 1
+
+𝜎 1𝐶 
+
+𝑖𝑘 ˆ𝑅 1
+
+¯𝑅 21
+
+− 𝑖𝑘 3 ˆ𝑅 1
+
+!
+
+, (4.39) 
+
+b𝑝 (0) 
+
+> 2,𝑧
+
+= b𝑝 (0) 
+
+> 1,𝑧
+
+− 1
+
+𝜎 2𝐶 
+
+𝑖𝑘 ˆ𝑅 2
+
+¯𝑅 22
+
+− 𝑖𝑘 3 ˆ𝑅 2
+
+!
+
+, (4.40) 
+
+b𝑝 (0) 
+
+> 3,𝑧
+
+= b𝑝 (0) 
+
+> 2,𝑧
+
+− 1
+
+𝐶 
+
+𝑖𝑘 ˆ𝑅 3
+
+¯𝑅 23
+
+− 𝑖𝑘 3 ˆ𝑅 3
+
+!
+
+. (4.41) 4.2.3. Dispersion relation 
+
+Substituting these expressions into (4.37) gives rise to a homogeneous linear system 
+
+M𝐿𝑊 (𝑘, 𝑠 ) ©«
+
+ˆ𝑅 1
+
+ˆ𝑅 2
+
+ˆ𝑅 3
+
+ª®¬
+
+= 0, (4.42) where M𝐿𝑊 (𝑘, 𝑠 ) is a 3 × 3 matrix whose entries depend algebraically on 𝑘 , the base radii, and the physical parameters. Non-trivial solutions exist if and only if det M𝐿𝑊 (𝑘, 𝑠 ) = 0. (4.43) This condition yields a cubic polynomial in 𝑠 ,
+
+𝑠 3 + 𝑎 2 (𝑘 ) 𝑠 2 + 𝑎 1 (𝑘 ) 𝑠 + 𝑎 0 (𝑘 ) = 0, (4.44) where the coefficients 𝑎 𝑗 (𝑘 ) are explicit algebraic functions of 𝑘 , but are too lengthy to be included here. 
+
+0 X0-19 Traore and Halpern 0.0 0.2 0.4 0.6 0.8 1.0                             
+
+> k
+> −0.010
+> −0.005 0.000 0.005 0.010 0.015
+> smax
+> AW LW
+> Figure 9. Comparison of the growth rate 𝑠 as a function of wavenumber 𝑘 for the dominant mode. The arbitrary-wavenumber results (AW) are shown as a solid blue line, while the long-wave approximation (LW) is shown as a solid orange line. The parameter values are 𝑎 =16 .67, ℎ3=1, ℎ2=1, ℎ1=4.67, 𝜎 1=0.1, 𝜎 2=1,
+> 𝐶 =0.4, 𝑚 1=𝑚 2=1.
+
+4.3. Comparison with the arbitrary-wavenumber theory 
+
+We compare the dispersion relation obtained from the long-wave model with the arbitrary-wavenumber formulation of §3 to assess the accuracy and range of validity of the long-wave approximation. Figure 9 shows the growth rate 𝑠 max as a function of the wavenumber 𝑘 for the dominant instability mode. As expected, the long-wave model agrees closely with the arbitrary-wavenumber theory in the limit of small 𝑘 . In particular, the two curves are nearly indistinguishable near 𝑘 = 0. A notable feature of the comparison is the excellent agreement in the cut-off wavenumber. Both formulations predict a transition from instability to stability at approximately 𝑘 ≈ 0.2, indicating that the long-wave model may provide an accurate prediction of the neutral stability boundary. This agreement is significant given that the long-wave model neglects higher-order axial variations. At intermediate wavenumbers the long-wave model slightly over predicts the growth rate, with the largest discrepancy occurring near the peak of the dispersion curve. Nevertheless, the agreement remains good throughout the unstable wavenumber range. Beyond the neutral point, the two models remain qualitatively consistent, although quantitative differences increase as the assumptions underlying the long-wave approximation become less accurate. Additional comparisons for other parameter values (not shown) exhibit similar trends. In particular, the long-wave model consistently captures the small-wavenumber behaviour and accurately predicts the cut-off wavenumber. 
+
+5. Nonlinear evolution 
+
+We now investigate the nonlinear development of disturbances governed by the long-wave evolution equations derived in §4. While the linear stability analysis predicts the initial growth or decay of perturbations, it does not determine the ultimate fate of the flow. The central question is whether unstable disturbances saturate to finite-amplitude states or instead lead to the formation of singular structures in which one or more layers thin to zero. 
+
+0 X0-20 Journal of Fluid Mechanics 
+
+To address this, we integrate the evolution equations (4.33) subject to periodic boundary conditions on the domain 𝑧 ∈ [− 𝐿 /2, 𝐿 /2] of length 𝐿 = 30 𝜋 . The initial condition is a small-amplitude cosine perturbation applied to all three interfaces, 
+
+𝑅 𝑖 (𝑧, 0) = ¯𝑅 𝑖 + 𝐴 𝑖 cos (𝑘 0𝑧 ), 𝑖 = 1, 2, 3, (5.1) with equal amplitudes 𝐴 1 = 𝐴 2 = 𝐴 3 = 0.01 and 𝑘 0 = 4𝜋 /𝐿 , so that the initial wavenumber lies within the unstable long-wave band identified in §3. Spatial derivatives are approximated by fourth-order central finite differences on a uniform grid of 𝑁 points, and the semi-discrete system is advanced by the method of lines using the SUNDIALS CVODE solver, with adaptive backward-differentiation time stepping with relative and absolute tolerances of 10 −10 and 10 −12 respectively. Spatial convergence was confirmed by successively increasing 
+
+𝑁 until the interface profiles and their extrema were insensitive to further refinement; the results below use 𝑁 = 1024. Three qualitatively distinct outcomes are observed. In some parameter regimes the instability saturates, with the system evolving towards a finite-amplitude travelling wave in which all three layer thicknesses remain bounded away from zero. In others the evolution leads to rapid, localised thinning and finite-time breakdown, occurring in one of two ways: closure of the air core, corresponding to plug formation, or collapse of the intermediate liquid layer. To distinguish between these outcomes in the numerical simulations, we adopt the following classification. The flow is taken to saturate when the interface extrema approach constant values with all thicknesses bounded away from zero. Finite-time breakdown is declared when the air-core radius or a layer thickness first falls below 10 −4: the event is plug formation when it is the minimum core radius min 𝑧 𝑅 1 that vanishes, and middle-layer rupture when it is the minimum middle-layer thickness min 𝑧 ℎ2 = min 𝑧 
+
+ 𝑅 3 − 𝑅 2
+
+, with min 𝑧 ℎ1 and min 𝑧 ℎ3 remaining bounded away from zero. As this threshold is approached, the system stiffens and the adaptive CVODE time step method breaks down, consistent with the onset of a finite-time singularity. Where the integration could not be continued to the threshold, the outcome was instead classified from the time histories of min 𝑧 𝑅 1, min 𝑧 ℎ1,min 𝑧 ℎ2 and min 𝑧 ℎ3, by identifying which quantity decreased rapidly toward zero while the others remained finite. Simulations reaching neither condition by 𝑡 = 10 4 are classified as saturated. These behaviours are illustrated for representative parameter values in the following subsections. 5.1. No plug formation 
+
+We first consider a parameter regime in which the instability does not lead to rupture but instead saturates at finite amplitude. The parameter values are 𝑚 1 = 0.5, 𝑚 2 = 0.5, 
+
+𝑎 = 6.25, ¯ ℎ1 = ¯ℎ2 = 0.25, ¯ ℎ3 = 1, 𝜎 1 = 0.1, 𝜎 2 = 1, 𝐿 = 30 𝜋 , and 𝐶 = 0.4. The nonlinear evolution for this parameter set is shown in figures 10 and 11. Following an initial phase of exponential growth, the interface deformations increase smoothly before saturating at finite amplitude. By approximately 𝑡 = 400, the solution has approached has essentially converged to a travelling-wave solution whose shape changes very little thereafter. These travelling-wave solutions are investigated further in §5.3. 5.2. Finite-time rupture 
+
+We next consider parameter regimes in which the nonlinear evolution does not saturate, but instead leads to the rapid thinning of one of the layers. In the three-layer system, finite-time breakdown can occur in more than one way. We first describe a plug-forming case, in which the air core closes, and then present a second example in which the middle liquid layer ruptures.  
+
+> 0X0-21
+
+Traore and Halpern 4.64.85.05.2        
+
+> R
+> (a) t = 100
+> R1
+> R2
+> R3
+> (b) t = 200
+> −40 −20 020 40
+> z
+> 4.64.85.05.2
+> R
+> (c) t = 400
+> −40 −20 020 40
+> z
+> (d) t = 1000
+
+Figure 10. Evolution of the interface profiles in the saturated travelling-wave regime. The panels correspond to (a) 𝑡 = 100, (b) 𝑡 = 200, (c) 𝑡 = 400, and (d) 𝑡 = 1000. The parameter values are 𝑚 1 = 0.5, 𝑚 2 = 0.5, 𝑎 = 6.25, ¯ℎ1 = ¯ℎ2 = 0.25, ¯ ℎ3 = 1, 𝜎 1 = 0.1, 𝜎 2 = 1, 𝐿 = 30 𝜋 , and 𝐶 = 0.4. 
+
+5.2.1. Core collapse and plug formation 
+
+Figure 12 shows the evolution of the interface profiles for a parameter regime in which the nonlinear dynamics lead to plug formation. The panels correspond to times (a) 𝑡 = 0, (b) 
+
+𝑡 = 80, (c) 𝑡 = 115, and (d) 𝑡 = 135. The parameters are the same as in the no-rupture case, except that ¯ ℎ1 = ¯ℎ2 = 0.5. Starting from a nearly uniform state, the disturbances initially grow in a manner consistent with the linear instability. At intermediate times, as shown in figure 12(b), the deformation of each interface remains smooth and even across the domain. As the evolution proceeds, the deformation becomes increasingly localised. By 𝑡 = 115, figure 12(c), the inner interface develops pronounced troughs, while the middle and outer interfaces undergo comparatively smaller deformations. This localisation intensifies further at later times, as shown in figure 12(d). The temporal evolution of the extrema, displayed in figure 13, provides a complementary view of this process. The minimum inner-layer thickness decreases monotonically, while the maxima increase rapidly in time. In particular, the growth accelerates at later times, indicating the absence of nonlinear saturation. Together with the rapid inward motion of the inner interface observed in figure 12, this behaviour is consistent with closure of the air core. This combined behaviour, progressive thinning, rapid amplification of the interface extrema, and collapse of the air-core radius, is characteristic of the onset of a finite-time singularity. We identify this regime with plug formation. 
+
+0 X0-22 Journal of Fluid Mechanics 0 200 400 600 800 1000  
+
+> t
+> 0.20.40.60.81.0
+> h1min
+> h1max
+> h2min
+> h2max
+> h3min
+> h3max
+> Figure 11. Time evolution of the minimum and maximum layer thicknesses for the same parameters as figure 10.
+
+5.2.2. Middle-layer rupture 
+
+A representative example of the second type of finite-time breakdown is shown in figure 14. In this case the air core remains open, but the middle liquid layer thins locally as the interfaces 𝑅 2 and 𝑅 3 approach each other. The early profiles are smooth and resemble a finite-amplitude travelling wave. At later times, however, the deformation becomes increasingly localised, and the coupled evolution of the three interfaces drives the progressive thinning of the middle layer. The inner interface remains separated from the tube axis, while the gap between 𝑅 2 and 𝑅 3 becomes increasingly small in localised regions. This behaviour is quantified in figure 15, which shows the evolution of the minimum layer thicknesses. The middle-layer thickness min (ℎ2) decreases rapidly towards zero, whereas min (ℎ1) and min (ℎ3) remain strictly positive throughout the evolution. Tracking the motion of the interface troughs provides additional insight, as shown in figure 16. After an initial transient, both relative displacements exhibit sustained drift, indicating that the three interfaces propagate with different effective speeds. Throughout the evolution, the separation between the troughs of 𝑅 2 and 𝑅 3 remains considerably smaller than that between 𝑅 1 and 𝑅 2, demonstrating the strong coupling of the outer two interfaces. This differential motion progressively reduces the local thickness of the middle layer and ultimately leads to rupture. To better understand the saturated states observed in the nonlinear simulations, we now compute travelling-wave solutions of the long-wave model. 
+
+0 X0-23 Traore and Halpern 2.53.03.54.04.55.05.5
+
+> R
+
+(a) t = 0 
+
+> R1
+> R2
+> R3
+
+(b) t = 80     
+
+> −40 −20 020 40
+> z
+> 2.53.03.54.04.55.05.5
+> R
+
+(c) t = 115     
+
+> −40 −20 020 40
+> z
+
+(d) t = 135 
+
+Figure 12. Evolution of the interface profiles in the plug-forming regime at selected times. The parameter values are 𝑚 1 = 0.5, 𝑚 2 = 0.5, 𝑎 = 6.25, ¯ ℎ1 = ¯ℎ2 = 0.5, ¯ ℎ3 = 1, 𝜎 1 = 0.1, 𝜎 2 = 1, 𝐿 = 30 𝜋 , and 𝐶 = 0.4. 0 20 40 60 80 100 120 140 
+
+t
+
+0.51.01.52.02.53.0 h1min 
+
+h1max 
+
+h2min 
+
+h2max 
+
+h3min 
+
+h3max 
+
+Figure 13. Time evolution of the minimum and maximum layer thicknesses in the plug-forming regime. The parameter values are identical to those in the previous figure. 
+
+0 X0-24 Journal of Fluid Mechanics 3.54.04.55.05.5        
+
+> R
+> (a) t = 1200
+> R1
+> R2
+> R3
+> (b) t = 1230
+> −40 −20 020 40
+> z
+> 3.54.04.55.05.5
+> R
+> (c) t = 1250
+> −40 −20 020 40
+> z
+> (d) t = 1300
+
+Figure 14. Evolution of the interface profiles in the middle-layer rupture regime. The panels correspond to times (a) 𝑡 = 1200, (b) 𝑡 = 1230, (c) 𝑡 = 1250, and (d) 𝑡 = 1300. In contrast to the plug-forming case, the air-core radius remains bounded away from zero while the middle layer becomes strongly localised and thins near rupture. The parameter values are 𝑚 1 = 0.5, 𝑚 2 = 2, 𝑎 = 6.25, ¯ ℎ1 = ¯ℎ2 = 0.469, ¯ ℎ3 = 1, 𝜎 1 = 0.1, 𝜎 2 = 1, 𝐿 = 30 𝜋 
+
+and 𝐶 = 0.4. 
+
+5.3. Travelling-wave formulation and numerical continuation 
+
+We seek nonlinear travelling-wave solutions of the long-wave evolution equations in the form 
+
+𝑅 𝑗 (𝑧, 𝑡 ) = R 𝑗 (𝑍 ), 𝑍 = 𝑧 − 𝑐𝑡, 𝑗 = 1, 2, 3, (5.2) where 𝑐 is the wave speed and the profiles R 𝑗 are periodic with period 𝐿 . Substituting this ansatz into the long-wave evolution equations (4.33) gives 
+
+−𝑐 R′
+
+𝑗 = 1
+
+R 𝑗 
+
+𝑑𝑄 ( 𝑗 )
+
+𝑑𝑍 , 𝑗 = 1, 2, 3, (5.3) which, upon multiplication by R 𝑗 and integration in 𝑍 , yields 
+
+𝑄 ( 𝑗 ) + 𝑐 
+
+2 R 2
+
+𝑗 = 𝐾 𝑗 , 𝑗 = 1, 2, 3, (5.4) where 𝐾 𝑗 are constants of integration. The travelling-wave profiles therefore satisfy the coupled system 
+
+3∑︁ 
+
+𝑘 =1
+
+𝐴 𝑗 𝑘 (R) 𝑃 𝑘 + 𝐺 𝑗 (R) + 𝑐 
+
+2 R 2
+
+𝑗 − 𝐾 𝑗 = 0, 𝑗 = 1, 2, 3, (5.5) 
+
+0 X0-25 Traore and Halpern 0 200 400 600 800 1000 1200 
+
+t 
+
+> 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 h1min
+> h1max
+> h2min
+> h2max
+> h3min
+> h3max
+
+Figure 15. Time evolution of the minimum layer thicknesses in the middle-layer rupture regime. The middle-layer thickness min ℎ2 decreases rapidly to zero, while min ℎ1 and min ℎ3 remain bounded away from zero, confirming that rupture occurs through collapse of the intermediate layer rather than closure of the air core. 0 200 400 600 800 1000 1200     
+
+> t
+> −1200
+> −1000
+> −800
+> −600
+> −400
+> −200 0
+> relative position
+> xR2−xR1
+> xR3−xR2
+
+Figure 16. Relative displacement of the interface trough locations as a function of time, showing 𝑥 𝑅 2 − 𝑥 𝑅 1
+
+and 𝑥 𝑅 3 − 𝑥 𝑅 2 . After an initial transient, both quantities exhibit sustained drift, indicating that the interfaces propagate at different effective speeds. The separation between 𝑅 2 and 𝑅 3 remains comparatively smaller than that between 𝑅 1 and 𝑅 2, consistent with the strong coupling of the outer two interfaces and the progressive thinning of the middle layer. 
+
+0 X0-26 Journal of Fluid Mechanics 0.25 0.30 0.35 0.40 0.45 0.50              
+
+> ¯h1
+> 4.74.84.95.05.15.25.3
+> max( R1)
+> (a) Maximum core radius
+> 0.25 0.30 0.35 0.40 0.45 0.50
+> ¯h1
+> 1.52.02.53.03.54.04.5
+> min( R1)
+> (b) Minimum core radius
+> 0.25 0.30 0.35 0.40 0.45 0.50
+> ¯h1
+> 2.02.53.03.54.04.55.05.5
+> c
+> (c) Wave speed
+> m2= 0 .5
+> m2= 1
+> m2= 2
+
+Figure 17. Travelling-wave branches obtained by continuation in ¯ ℎ1 with ¯ ℎ2 = ¯ℎ1, for different values of 𝑚 2.Panels show (a) max (𝑅 1), (b) min (𝑅 1), and (c) wave speed 𝑐 as functions of ¯ ℎ1. Filled circles denote the limit points on the corresponding branches. 
+
+where 𝑃 𝑘 = 𝑝 (0)     
+
+> 𝑘,𝑧 𝑅 𝑗 =R𝑗
+
+. Using the expressions for the pressure gradients, (5.5) yields a system of three coupled third-order ordinary differential equations for R1, R2, R3. Periodic travelling waves satisfy 
+
+R 𝑗 (0) = R 𝑗 (𝐿 ), 𝑗 = 1, 2, 3, (5.6) together with constraints fixing the mean cross-sectional areas of each layer. A phase condition is imposed to remove translational invariance. Explicit forms of the governing equations, together with details of the numerical approach, are provided in Appendix B. The formulation above defines a nonlinear periodic boundary-value problem for travelling-wave solutions parameterised by the mean layer thicknesses, viscosity ratios and surface tension ratios. In the computations presented here we restrict attention to the representative family ¯ ℎ2 = ¯ℎ1, so that the two inner liquid layers have the same mean thickness and the branch may be parameterised by a single thickness variable ¯ ℎ1. This choice reduces the dimensionality of the parameter space while allowing the effects of mean film thickness and viscosity ratio 𝑚 2 = 𝜇 3/𝜇 2 to be investigated systematically, although other thickness ratios may modify the quantitative details of the branch structure. Figure 17 shows the travelling-wave solution branches obtained by numerical continuation for 𝑎 = 6.25, ¯ ℎ3 = 1, 𝐶 = 0.4, 𝜎 1 = 0.1, 𝜎 2 = 1, and 𝐿 = 30 𝜋 , using ¯ ℎ1 as the continuation parameter for several values of 𝑚 2. Panels (a)–(c) display the corresponding variations of max (𝑅 1), min (𝑅 1), and the wave speed 𝑐 , respectively. For each value of 𝑚 2, the branch exists over a finite interval of ¯ ℎ1 and folds at a limit point (filled circles). Consequently, for values of ¯ ℎ1 below the fold, two distinct travelling-wave solutions coexist on the same branch projection. The quantities max (𝑅 1) and min (𝑅 1) provide additional measures of the wave shape. The former characterises the largest outward displacement of the core interface, whereas the latter measures the strongest constriction of the air core. As 𝑚 2 increases, the branches extend to larger values of ¯ ℎ1, while the corresponding variation of the wave speed is shown in panel (c). Representative travelling-wave profiles along the branch are displayed in figure 18. For smaller ¯ ℎ1, the waves are of small amplitude and nearly sinusoidal. As ¯ ℎ1 increases, the profiles steepen and develop pronounced localised troughs in 𝑅 1, indicating strong interfacial deformation. Near the limit point, the travelling waves develop strongly localised troughs and lose their nearly sinusoidal character, perhaps reflecting the importance of nonlinear effects. Panel (e) shows the second travelling-wave solution at ¯ ℎ1 = 0.40 on the 
+
+0 X0-27 Traore and Halpern 0123456       
+
+> R
+> (a)
+> ¯h1= 0 .25
+> R1
+> R2
+> R3
+> (b)
+> ¯h1= 0 .30
+> 0123456
+> R
+> (c)
+> ¯h1= 0 .40
+> (d)
+> LP (limit point)
+> 010 π20 π30 π
+> z
+> 0123456
+> R
+> (e)
+> ¯h1= 0 .40 (upper branch)
+
+Figure 18. Representative travelling-wave profiles along the branch. Panels correspond to increasing ¯ ℎ1, including a configuration near the limit point (LP). 
+
+upper branch. Compared with the solution on the lower branch shown in panel (c), the wave exhibits substantially deeper constriction of the air core and stronger localisation. Figure 19 demonstrates the dependence of the travelling-wave limit points on both the viscosity ratio 𝑚 2 and the wave period 𝐿 . For each pair (𝐿, 𝑚 2), a travelling-wave branch was continued in ¯ ℎ1 (with ¯ ℎ2 = ¯ℎ1), and the corresponding limit point was recorded. Thus figure 19 does not show travelling-wave branches themselves, but rather the locus of their turning points in parameter space. The motivation for tracking these limit points is that turning points of travelling-wave branches have been used as indicators of critical film thicknesses for plug formation in related long-wave models. In particular, Ogrosky (2021) used the turning point of a free-surface travelling-wave branch as a proxy for the critical thickness beyond which plugs are expected to form. We interpret ¯ ℎ𝐿 𝑃  
+
+> tot
+
+as an analogous indicator of the critical film thickness for the present three-layer system, while recognising that this must ultimately be validated by the time-dependent simulations presented below. 
+
+0 X0-28 Journal of Fluid Mechanics 0 2 4 6 8 10                 
+
+> m2
+> 46810
+> cLP
+> (a)
+> L= 15 πL= 18 πL= 20 πL= 25 πL= 30 πL= 40 π
+> 0246810
+> m2
+> 1.01.52.02.53.03.54.04.5
+> min( R1)LP
+> (b)
+> 0246810
+> m2
+> 1.50 1.55 1.60 1.65 1.70 1.75 1.80 1.85 1.90
+> ¯hLP
+> tot
+> (c)
+
+Figure 19. Dependence of limit-point quantities on the viscosity ratio 𝑚 2 for travelling waves of different periods 
+
+𝐿 . Each curve is obtained by locating the limit point of a travelling-wave branch continued in ¯ ℎ1 (with ¯ ℎ2 = ¯ℎ1) at fixed 𝑚 2. Panels show (a) the limit-point wave speed 𝑐 𝐿 𝑃 , (b) the limit-point minimum core radius min (𝑅 1)𝐿 𝑃 ,and (c) the corresponding total thickness ¯ ℎ𝐿 𝑃  
+
+> tot
+
+= 1 + 2 ¯ ℎ𝐿 𝑃  
+
+> 1
+
+. For 𝐿 = 30 𝜋 a second limit-point branch is also found, producing the lower curve visible in panels (b) and (c). 
+
+Several trends are apparent. For moderate periods, 15 𝜋 ≤ 𝐿 ≤ 25 𝜋 , the limit-point loci vary smoothly with 𝐿 and remain relatively close to one another. At fixed 𝑚 2, increasing the period generally decreases ¯ ℎ𝐿 𝑃  
+
+> tot
+
+and increases min (𝑅 1)𝐿 𝑃 , indicating that longer waves can persist to smaller film thicknesses before reaching a turning point. A qualitatively different behaviour is observed for 𝐿 = 30 𝜋 , where a second limit-point branch is detected. This branch is characterised by substantially smaller values of ¯ ℎ𝐿 𝑃 
+
+> tot
+
+and min (𝑅 1)𝐿 𝑃 and extends to much larger values of 𝑚 2 than the primary branch. For 
+
+𝐿 = 40 𝜋 , only a single limit-point branch was identified over the range of parameters considered. Its continuation extends to larger values of 𝑚 2 than for the shorter periods, while yielding the smallest values of ¯ ℎ𝐿 𝑃  
+
+> tot
+
+among the branches shown. The emergence of an additional limit-point branch near 𝐿 = 30 𝜋 suggests that the travelling-wave solution structure undergoes a qualitative reorganisation as the period increases. Figure 20 illustrates how the layer-thickness profiles of travelling-wave solutions near the limit point evolve as the viscosity ratio 𝑚 2 increases. For 𝑚 2 = 0.5, the deformation is strongly concentrated in the inner layer, with pronounced peaks and troughs in ℎ1
+
+corresponding to severe constriction of the air core. Increasing 𝑚 2 progressively reduces the amplitude of these variations, while the middle layer undergoes more modest changes and the outer layer remains nearly uniform throughout. This systematic redistribution of the deformation is consistent with the time-dependent simulations, in which smaller 𝑚 2
+
+promotes plug formation through collapse of the air core, whereas larger 𝑚 2 favours rupture of the middle layer. Figure 21 compares the outcomes of the time-dependent simulations with the travelling-wave limit-point locus as the viscosity ratio 𝑚 2 is varied. As in the corresponding two-layer problem, the limit point of the free-surface (air-core) branch seems to serve as a proxy for the critical thickness for plug formation: for smaller 𝑚 2, where breakdown occurs through closure of the air core, cases near and above the locus evolve towards plug formation, consistent with the strong inner-layer deformation seen near the limit point (figure 20). The locus does not, however, mark a sharp boundary between saturation and rupture. For larger 𝑚 2, breakdown instead occurs predominantly through collapse of the middle layer, a route that involves the two internal interfaces and is not represented by the free-surface branch, and these cases (open squares) depart from the locus; a few saturated states are also found below it. The limit-point locus remains a useful indicator of the air-core-closure threshold, as in the corresponding two-layer problem. However, the full rupture behaviour 
+
+0 X0-29 Traore and Halpern 0.00.51.01.5 (a) 
+
+# m2 = 0 .5 h1 = R2 − R1        
+
+> h2=R3−R2
+> h3=a−R3
+
+0.00.51.01.5 (b) 
+
+# m2 = 1 
+
+0.0 0.2 0.4 0.6 0.8 1.0
+
+# z/L 
+
+0.00.51.01.5 (c) 
+
+# m2 = 2 
+
+Figure 20. Layer-thickness profiles of travelling-wave solutions near the limit point for 𝑚 2 = 0.5, 1, and 2 with                     
+
+> 𝑚 1=0.5. The thicknesses are defined by ℎ1=𝑅 2−𝑅 1,ℎ2=𝑅 3−𝑅 2, and ℎ3=𝑎 −𝑅 3. As 𝑚 2increases, the deformation of the inner layer becomes progressively weaker, while the outer layer remains comparatively uniform. The strongest localisation occurs in the inner layer for smaller 𝑚 2, consistent with the plug-forming dynamics observed in the time-dependent simulations.
+
+of the three-layer system, including the transition to middle-layer rupture as 𝑚 2 increases, cannot be inferred from the free-surface limit point alone. 
+
+6. Conclusion 
+
+We have developed and analysed a model for the axisymmetric evolution of three immiscible viscous films lining the interior of a vertical cylindrical tube containing a passive air core. Starting from the axisymmetric Navier–Stokes equations, we first performed an arbitrary-wavenumber linear stability analysis of the full Stokes system. We then derived a reduced long-wave model governing the nonlinear evolution of the three interfaces in the limit where the characteristic layer thickness is small compared with the axial wavelength. The resulting long-wave equations were used to investigate both the linear and nonlinear dynamics of the system, including travelling-wave solutions and rupture behaviour. 
+
+0 X0-30 Journal of Fluid Mechanics 0.0 0.5 1.0 1.5 2.0 2.5 3.0
+
+> m2
+> 1.41.51.61.71.81.92.0
+> ¯htot
+> TW limit point saturation middle-layer rupture plug formation
+
+Figure 21. Comparison between the travelling-wave limit-point locus and the outcomes of time-dependent simulations for 𝑚 1 = 0.5. Filled circles denote cases that evolve towards finite-amplitude saturated states, open circles correspond to plug formation through closure of the air core, and open squares indicate rupture of the middle layer. The solid curve shows the total thickness at the travelling-wave limit point, ¯ ℎ𝐿 𝑃       
+
+> tot =1+2 ¯ ℎ𝐿 𝑃
+> 1, as a function of 𝑚 2.
+
+The arbitrary-wavenumber analysis reveals a persistent long-wave instability together with a finite-wavenumber structure that depends sensitively on the layer thicknesses, viscosity ratios, and surface tension ratios. Variations in these parameters alter the degree of interfacial coupling, producing changes in the unstable wavenumber spectrum, mode switching, and the suppression of short-wave disturbances. The long-wave model accurately reproduces the small-wavenumber behaviour, including the cut-off wavenumber, and provides an effective reduced description of the instability. Results of the numerical integration of the nonlinear evolution equations indicate three qualitatively distinct outcomes. While saturated travelling waves and air-core plug formation are observed (consistent with single- and two-layer studies), we identify a third regime unique to the three-layer configuration: the rupture of the intermediate liquid layer. This occurs while the air core remains open, demonstrating that a second internal interface creates competing routes to finite-time breakdown. Numerical continuation of travelling-wave branches, together with time-dependent simulations, shows that the dominant rupture mechanism depends strongly on the viscosity ratio 𝑚 2. We find that smaller 𝑚 2 values typically lead to air-core closure, whereas larger 𝑚 2 values trigger intermediate layer rupture. The locus of travelling-wave limit points provides a useful framework for interpreting the transition between different nonlinear rupture mechanisms, although it does not constitute a sharp stability boundary. Several directions for future work suggest themselves. The equal-density assumption adopted here could be relaxed to incorporate density stratification, which would introduce additional buoyancy-driven mechanisms. The near-rupture dynamics associated with the intermediate-layer collapse identified here remain largely unexplored. In contrast to the more familiar rupture mechanisms in two-layer thin-film and core–annular flows, the present system permits the localised extinction of the middle layer while both neighbouring layers 
+
+0 X0-31 Traore and Halpern 
+
+remain finite. The numerical results suggest the development of strongly localised thinning regions, raising the possibility of self-similar rupture dynamics analogous to those arising in classical thin-film rupture problems. Determining the asymptotic structure of the thinning profile, the associated scaling laws for the minimum middle-layer thickness, and the extent to which existing rupture theories for lubrication-type free-surface flows can be adapted to this three-layer geometry remain open problems. It would also be of interest to determine whether the rupture exhibits universal similarity exponents or whether the interaction of the two deformable interfaces introduces qualitatively new singular behaviour. The present results demonstrate that introducing a third deformable liquid layer does not merely increase the complexity of the flow, but fundamentally changes its nonlinear dynamics by creating new routes to rupture that are absent in one- and two-layer cylindrical films. These findings provide a framework for understanding the interplay of multiple deformable interfaces in confined geometries relevant to multiphase transport. 
+
+Acknowledgements This work was carried out in partial fulfilment of the requirements for the Ph.D. degree of Awa Traore at the University of Alabama. 
+
+Funding This research received no specific grant from any funding agency, commercial or not-for-profit sectors. 
+
+Declaration of interests The authors report no conflict of interest. 
+
+Data availability statement The data and computer codes supporting the findings of this study, including the figure-generation scripts and a requirements.txt file, are available from the corresponding author upon reasonable request. 
+
+Appendix A. Base-state velocity coefficients 
+
+The base-state velocities are ¯𝑤 𝑗 (𝑟 ) = −𝑚 𝑗 4𝑟 2 + 𝑎 𝑗 ln 𝑟 + 𝑏 𝑗 , 𝑗 = 1, 2, 3.
+
+The coefficients 𝑎 𝑗 and 𝑏 𝑗 are determined from the shear-free condition at the inner interface, continuity of velocity and tangential stress at the two liquid-liquid interfaces, and the no-slip condition at the wall: ¯𝑤 1,𝑟 ( ¯𝑅 1) = 0, (A 1) ¯𝑤 1 ( ¯𝑅 2) = ¯𝑤 2 ( ¯𝑅 2), (A 2) 
+
+𝑚 −11 ¯𝑤 1,𝑟 ( ¯𝑅 2) = 𝑚 −12 ¯𝑤 2,𝑟 ( ¯𝑅 2), (A 3) ¯𝑤 2 ( ¯𝑅 3) = ¯𝑤 3 ( ¯𝑅 3), (A 4) 
+
+𝑚 −12 ¯𝑤 2,𝑟 ( ¯𝑅 3) = ¯𝑤 3,𝑟 ( ¯𝑅 3), (A 5) ¯𝑤 3 (𝑎 ) = 0. (A 6) 
+
+Appendix B. Flux coefficients 
+
+In this appendix we record the coefficient functions appearing in the flux representation of the long-wave evolution equations. As shown in §4.1, the cumulative fluxes may be written as 
+
+𝑄 ( 𝑗 ) =
+
+> 3
+
+∑︁ 
+
+> 𝑘 =1
+
+𝐴 𝑗 𝑘 (𝑅 1, 𝑅 2, 𝑅 3) 𝑝 (0) 
+
+> 𝑘,𝑧
+
++ 𝐺 𝑗 (𝑅 1, 𝑅 2, 𝑅 3), 𝑗 = 1, 2, 3, (B 1) where 
+
+𝑄 (3) := 𝑄 3, 𝑄 (2) := 𝑄 2 + 𝑄 3, 𝑄 (1) := 𝑄 1 + 𝑄 2 + 𝑄 3. (B 2) Here the coefficients 𝐴 𝑗 𝑘 multiply the leading-order pressure gradients, while 𝐺 𝑗 denote the contributions from gravitational drainage. We write 
+
+𝑄 (1) = 𝐴 11 𝑝 (0) 
+
+> 1,𝑧
+
++ 𝐴 12 𝑝 (0) 
+
+> 2,𝑧
+
++ 𝐴 13 𝑝 (0) 
+
+> 3,𝑧
+
++ 𝐺 1. (B 3) 
+
+0 X0-32 Journal of Fluid Mechanics 
+
+The coefficient functions are 
+
+𝐴 11 = 116 
+
+"
+
+2𝑚 2
+
+
+
+𝑅 42 + 𝑅 21 𝑅 23 − 𝑅 21 𝑅 22 − 𝑅 22 𝑅 23 + 2𝑅 21 𝑅 22 ln 𝑅 3
+
+𝑅 2
+
+− 2𝑅 41 ln 𝑅 3
+
+𝑅 2
+
+
+
+− 𝑚 1
+
+
+
+3𝑅 41 + 𝑅 42 − 4𝑅 21 𝑅 22 + 4𝑅 41 ln 𝑅 2
+
+𝑅 1
+
+
+
++ 2(𝑅 21 − 𝑅 22 )
+
+
+
+𝑎 2 − 𝑅 23 − 2𝑅 21 ln 𝑎 𝑅 3
+
+ #
+
+, (B 4) 
+
+𝐴 12 = 𝑚 2 𝑅 21
+
+8
+
+
+
+2𝑅 22 ln 𝑅 2
+
+𝑅 3
+
++ 𝑅 23 − 𝑅 22
+
+
+
++ 𝑅 21 (𝑅 23 − 𝑅 22 )
+
+4 ln 𝑎 𝑅 3
+
+− 𝑚 2 (𝑅 22 − 𝑅 23 )2
+
+16 + (𝑅 22 − 𝑅 23 )( 𝑎 2 − 𝑅 23 )
+
+8 , (B 5) 
+
+𝐴 13 = 116 
+
+
+
+−𝑎 4 − 𝑅 43 + 2𝑎 2 𝑅 21 + 2𝑎 2 𝑅 23 − 2𝑅 21 𝑅 23 − 4𝑅 21 𝑅 23 ln 𝑎 𝑅 3
+
+
+
+, (B 6) 
+
+𝐺 1 = 𝑅 41
+
+4
+
+ 3𝑚 1
+
+4 + 𝑚 1 ln 𝑅 2
+
+𝑅 1
+
++ 𝑚 2 ln 𝑅 3
+
+𝑅 2
+
++ ln 𝑎 𝑅 3
+
+
+
++ 𝑅 21
+
+4
+
+𝑚 2 (𝑅 22 − 𝑅 23 ) − 𝑚 1 𝑅 22 + 𝑅 23 − 𝑎 2 
+
++ 116 
+
+𝑚 1 𝑅 42 + 𝑚 2 (𝑅 43 − 𝑅 42 ) + 𝑎 4 − 𝑅 43
+
+ . (B 7) We next write 
+
+𝑄 (2) = 𝐴 21 𝑝 (0) 
+
+> 1,𝑧
+
++ 𝐴 22 𝑝 (0) 
+
+> 2,𝑧
+
++ 𝐴 23 𝑝 (0) 
+
+> 3,𝑧
+
++ 𝐺 2. (B 8) The corresponding coefficients are 
+
+𝐴 21 = 18
+
+"
+
+𝑚 2
+
+
+
+𝑅 42 + 𝑅 21 𝑅 23 − 𝑅 21 𝑅 22 − 𝑅 22 𝑅 23 + 2𝑅 21 𝑅 22 ln 𝑅 2
+
+𝑅 3
+
+− 2𝑅 42 ln 𝑅 2
+
+𝑅 3
+
+
+
++ ( 𝑅 21 − 𝑅 22 )
+
+
+
+𝑎 2 − 𝑅 23 − 2𝑅 22 ln 𝑎 𝑅 3
+
+ #
+
+, (B 9) 
+
+𝐴 22 = 116 
+
+"
+
+𝑚 2
+
+
+
+4𝑅 22 𝑅 23 − 3𝑅 42 − 𝑅 43 − 4𝑅 42 ln 𝑅 3
+
+𝑅 2
+
+
+
++ 2(𝑅 22 − 𝑅 23 )
+
+
+
+𝑎 2 − 𝑅 23 − 2𝑅 22 ln 𝑎 𝑅 3
+
+ #
+
+, (B 10) 
+
+𝐴 23 = 116 
+
+
+
+−𝑎 4 − 𝑅 43 + 2𝑎 2 𝑅 22 + 2𝑎 2 𝑅 23 − 2𝑅 22 𝑅 23 − 4𝑅 22 𝑅 23 ln 𝑎 𝑅 3
+
+
+
+, (B 11) 
+
+𝐺 2 = 116 
+
+"
+
+𝑚 2
+
+
+
+𝑅 42 + 𝑅 43 + 2𝑅 21 𝑅 22 − 2𝑅 21 𝑅 23 − 2𝑅 22 𝑅 23 + 4𝑅 21 𝑅 22 ln 𝑅 3
+
+𝑅 2
+
+
+
++
+
+
+
+𝑎 4 − 𝑅 43 + 2𝑅 21 𝑅 23 + 2𝑅 22 𝑅 23 − 2𝑎 2 𝑅 21 − 2𝑎 2 𝑅 22 + 4𝑅 21 𝑅 22 ln 𝑎 𝑅 3
+
+ #
+
+. (B 12) Finally, for the outermost cumulative flux, 
+
+𝑄 (3) = 𝐴 31 𝑝 (0) 
+
+> 1,𝑧
+
++ 𝐴 32 𝑝 (0) 
+
+> 2,𝑧
+
++ 𝐴 33 𝑝 (0) 
+
+> 3,𝑧
+
++ 𝐺 3, (B 13) 
+
+0 X0-33 Traore and Halpern 
+
+where 
+
+𝐴 31 = 18 (𝑅 21 − 𝑅 22 )
+
+
+
+𝑎 2 − 𝑅 23 − 2𝑅 23 ln 𝑎 𝑅 3
+
+
+
+, (B 14) 
+
+𝐴 32 = 18 (𝑅 22 − 𝑅 23 )
+
+
+
+𝑎 2 − 𝑅 23 − 2𝑅 23 ln 𝑎 𝑅 3
+
+
+
+, (B 15) 
+
+𝐴 33 = 116 
+
+
+
+−𝑎 4 − 3𝑅 43 + 4𝑎 2 𝑅 23 − 4𝑅 43 ln 𝑎 𝑅 3
+
+
+
+, (B 16) 
+
+𝐺 3 = 116 
+
+
+
+(𝑎 2 − 𝑅 23 )( 𝑎 2 − 2𝑅 21 − 𝑅 23 ) + 4𝑅 21 𝑅 23 ln 𝑎 𝑅 3
+
+
+
+. (B 17) For convenience, the long-wave evolution equations may therefore be written compactly as 
+
+𝑅 𝑗,𝑡 = 1
+
+𝑅 𝑗 
+
+𝜕 𝑧 
+
+> 3
+
+∑︁ 
+
+> 𝑘 =1
+
+𝐴 𝑗 𝑘 𝑝 (0) 
+
+> 𝑘,𝑧
+
++ 𝐺 𝑗 
+
+!
+
+, 𝑗 = 1, 2, 3. (B 18) 
+
+Appendix C. Travelling-wave formulation and numerical implementation 
+
+C.1. Explicit form of the travelling-wave equations 
+
+We consider travelling-wave solutions of the long-wave model in the form 
+
+𝑅 𝑗 (𝑧, 𝑡 ) = R 𝑗 (𝑍 ), 𝑍 = 𝑧 − 𝑐𝑡, 𝑗 = 1, 2, 3,
+
+where 𝑐 is the wave speed. The integrated flux relations (5.4) yield 
+
+𝑄 ( 𝑗 ) + 𝑐 
+
+2 R 2 
+
+> 𝑗
+
+= 𝐾 𝑗 , 𝑗 = 1, 2, 3. (C 1) The cumulative fluxes are 
+
+𝑄 ( 𝑗 ) =
+
+> 3
+
+∑︁ 
+
+> 𝑘 =1
+
+𝐴 𝑗 𝑘 (R 1, R2, R3) 𝑃 𝑘 + 𝐺 𝑗 (R 1, R2, R3), (C 2) where 𝑃 𝑘 = 𝑝 (0) 
+
+> 𝑘,𝑧
+
+. The pressure gradients are given by 
+
+𝑃 1 = 1
+
+𝜎 1𝐶 
+
+R′
+
+> 1
+
+R21
+
+− 𝜀 2R′′′ 
+
+> 1
+
+!
+
+, (C 3) 
+
+𝑃 2 = 𝑃 1 − 1
+
+𝜎 2𝐶 
+
+R′
+
+> 2
+
+R22
+
+− 𝜀 2R′′′ 
+
+> 2
+
+!
+
+, (C 4) 
+
+𝑃 3 = 𝑃 2 − 1
+
+𝐶 
+
+R′
+
+> 3
+
+R23
+
+− 𝜀 2R′′′ 
+
+> 3
+
+!
+
+. (C 5) Substitution yields the coupled system 
+
+> 3
+
+∑︁ 
+
+> 𝑘 =1
+
+𝐴 𝑗 𝑘 (R) 𝑃 𝑘 + 𝐺 𝑗 (R) + 𝑐 
+
+2 R 2 
+
+> 𝑗
+
+− 𝐾 𝑗 = 0, 𝑗 = 1, 2, 3. (C 6) This constitutes a system of three coupled third-order ordinary differential equations. 
+
+C.2. Matrix formulation 
+
+Collecting the highest-derivative terms gives 
+
+M(R 1, R2, R3) ©«
+
+R′′′ 
+
+> 1
+
+R′′′ 
+
+> 2
+
+R′′′ 
+
+> 3
+
+ª®¬
+
+= F(R , R′; 𝑐, 𝐾 1, 𝐾 2, 𝐾 3), (C 7) where M is a 3 × 3 matrix depending on 𝐴 𝑗 𝑘 , and F contains lower-order terms. Provided M is nonsingular, the system may be written as 
+
+R′′′  
+
+> 𝑗
+
+= 𝑓 𝑗 (R , R′; 𝑐, 𝐾 1, 𝐾 2, 𝐾 3), 𝑗 = 1, 2, 3.
+
+0 X0-34 Journal of Fluid Mechanics 
+
+C.3. First-order formulation for continuation 
+
+For numerical continuation, we introduce 
+
+𝑦 1 = R1, 𝑦 2 = R′
+
+> 1
+
+, 𝑦 3 = R′′  
+
+> 1
+
+,𝑦 4 = R2, 𝑦 5 = R′
+
+> 2
+
+, 𝑦 6 = R′′  
+
+> 2
+
+,𝑦 7 = R3, 𝑦 8 = R′
+
+> 3
+
+, 𝑦 9 = R′′  
+
+> 3
+
+.
+
+The system becomes 
+
+𝑦 ′ 
+
+> 1
+
+= 𝑦 2, 𝑦 ′ 
+
+> 2
+
+= 𝑦 3, 𝑦 ′ 
+
+> 3
+
+= 𝑓 1 (𝑦 ; 𝑐, 𝐾 1, 𝐾 2, 𝐾 3), (C 8) 
+
+𝑦 ′ 
+
+> 4
+
+= 𝑦 5, 𝑦 ′ 
+
+> 5
+
+= 𝑦 6, 𝑦 ′ 
+
+> 6
+
+= 𝑓 2 (𝑦 ; 𝑐, 𝐾 1, 𝐾 2, 𝐾 3), (C 9) 
+
+𝑦 ′ 
+
+> 7
+
+= 𝑦 8, 𝑦 ′ 
+
+> 8
+
+= 𝑦 9, 𝑦 ′ 
+
+> 9
+
+= 𝑓 3 (𝑦 ; 𝑐, 𝐾 1, 𝐾 2, 𝐾 3). (C 10) 
+
+C.4. Boundary conditions and constraints 
+
+The travelling waves are periodic: 
+
+𝑦 (0) = 𝑦 (𝐿 ). (C 11) After rescaling to 𝑠 ∈ [ 0, 1],
+
+𝑦 (0) = 𝑦 (1), (C 12) with 𝐿 treated as an unknown. The conservation laws imply constraints on the mean cross-sectional areas: 1
+
+𝐿 
+
+∫ 𝐿 
+
+> 0
+
+(R 22 − R 21 ) 𝑑𝑍 = V1, (C 13) 1
+
+𝐿 
+
+∫ 𝐿 
+
+> 0
+
+(R 23 − R 22 ) 𝑑𝑍 = V2, (C 14) 1
+
+𝐿 
+
+∫ 𝐿 
+
+> 0
+
+(𝑎 2 − R 23 ) 𝑑𝑍 = V3. (C 15) Finally, a phase condition is imposed to remove translational invariance, for example 
+
+∫ 10
+
+⟨𝑦 (𝑠 ) − 𝑦 ref (𝑠 ), 𝑦 ′ 
+
+> ref
+
+(𝑠 )⟩ 𝑑𝑠 = 0. (C 16) 
+
+C.5. Numerical continuation procedure 
+
+The travelling-wave problem formulated above constitutes a nonlinear periodic boundary-value problem with integral constraints and unknown parameters, including the wave speed 𝑐 and the period 𝐿 . The system is solved numerically using the continuation software AUTO (Doedel et al. 2007). The first-order system is discretised internally by AUTO using orthogonal collocation on finite elements, and solution branches are continued using pseudo-arclength continuation. In the computations presented in §5.3, continuation is performed primarily in the mean layer thickness parameter ¯ ℎ1 with ¯ ℎ2 = ¯ℎ1 imposed, while the viscosity ratio 𝑚 2 is treated as a control parameter between branch computations. Limit points along the travelling-wave branches are detected automatically during continuation and are used to characterise the termination of the computed solution families. 
+
+REFERENCES 
+
+Chen, KangPing 1993 Wave formation in the gravity-driven low-Reynolds number flow of two liquid films down an inclined plane. Physics of Fluids 5 (12), 3038–3048. Doedel, Eusebius J., Paffenroth, Randy C., Champneys, Alan R., Fairgrieve, Thomas F., Kuznetsov, Yuri A., Sandstede, Bj ¨ orn & Wang, Xiaonan 2007 AUTO-07P: Continuation and Bifurcation Software for Ordinary Differential Equations . Montreal, Canada: Concordia University, available at http://indy. cs.concordia.ca/auto/ .Erken, O., Roman ` o, F., Grotberg, J.B. & Muradoglu, M. 2022 Capillary instability of a two-layer annular film: an airway closure model. Journal of Fluid Mechanics 934 , A7. Gauglitz, P. A. & Radke, C. J. 1988 An extended evolution equation for liquid film breakup in cylindrical capillaries. Chemical Engineering Science 43 (7), 1457–1465. Gauglitz, P. A. & Radke, C. J. 1990 The dynamics of liquid film breakup in constricted cylindrical capillaries. 
+
+Journal of Colloid and Interface Science 134 (1), 14–40. 
+
+0 X0-35 Traore and Halpern 
+
+Goren, Simon L. 1962 The instability of an annular thread of fluid. Journal of Fluid Mechanics 12 (2), 309–319. Hammond, P. S. 1983 Nonlinear adjustment of a thin annular film of viscous fluid surrounding a thread of another within a circular cylindrical pipe. Journal of Fluid Mechanics 137 , 363–384. Heil, Matthias, Hazel, Andrew L. & Smith, Jaclyn A. 2008 The mechanics of airway closure. Respiratory Physiology & Neurobiology 163 (1–3), 214–221. Henry, D., Uddin, J., Thompson, J., Blyth, M. G., Thoroddsen, S. T. & Marston, J. O. 2014 Multi-layer film flow down an inclined plane: experimental investigation. Experiments in Fluids 55 (12), 1859. Jiang, W. Y., Helenbrook, B. T., Lin, S. P. & Weinstein, S. J. 2005 Low-Reynolds-number instabilities in three-layer flow down an inclined wall. Journal of Fluid Mechanics 539 , 387–416. Joseph, D. D., Bai, R., Chen, K. P. & Renardy, Y. Y. 1997 Core-annular flows. Annual Review of Fluid Mechanics 29 , 65–90. Kao, T. W. 1965 a Role of the interface in the stability of stratified flow down an inclined plane. Physics of Fluids 
+
+8 (12), 2190–2194. Kao, T. W. 1965 b Stability of two-layer viscous stratified flow down an inclined plane. Physics of Fluids 8 (5), 812–820. Lamnawar, K., Zhang, H. & Maazouz, A. 2013 Coextrusion of multilayer structures, interfacial phenomena. In Encyclopedia of Polymer Science and Technology . Wiley. Loewenherz, D. S. & Lawrence, C. J. 1989 The effect of viscosity stratification on the stability of a free surface flow at low Reynolds number. Physics of Fluids A: Fluid Dynamics 1 (10), 1686–1693. Ogrosky, H. Reed 2021 Impact of viscosity ratio on falling two-layer viscous film flow inside a tube. Physical Review Fluids 6 (10). Peng, Jianjun, Feng, Run, Xue, Meng, Zhou, Erhao, Wang, Junhua, Zhong, Zhidan & Ku, Xiangchen 2025 Research progress and engineering applications of viscous fluid mechanics. Applied Sciences 15 (1), 357. Rayleigh, Lord 1878 On the instability of jets. Proceedings of the London Mathematical Society s1-10 (1), 4–13. Roman ` o, Francesco 2026 Human lungs fluid mechanics: an overview of current modelling techniques. The European Physical Journal E 49 (5), 38. Tomotika, S. 1935 On the instability of a cylindrical thread of a viscous liquid surrounded by another viscous fluid. Proceedings of the Royal Society of London. Series A, Mathematical and Physical Sciences 150 (870), 322–337. Traore, Awa 2024 Dynamics of a multi-fluid system: Parallel study of three fluids with a passive core inside a cylinder and three fluids inside a pair of concentric cylinders. PhD thesis, The University of Alabama. 
+
+0 X0-36

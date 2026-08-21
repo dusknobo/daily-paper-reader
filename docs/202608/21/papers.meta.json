@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-21",
+  "date": "2026-08-21",
+  "generated_at": "2026-08-21T21:00:09",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/21/2608.19254v1-a-sharp-and-conservative-vof-method-for-multicomponent-liquid--gas-mass-transfer-bubble-dissolution-and-droplet-evaporation",
+      "section": "quick",
+      "title_en": "A Sharp and Conservative VOF Method for Multicomponent Liquid--Gas Mass Transfer: Bubble Dissolution and Droplet Evaporation",
+      "authors": "Shuo Zhao, Jie Zhang, Ming-Jiu Ni",
+      "date": "2026-08-17",
+      "pdf": "https://arxiv.org/pdf/2608.19254v1",
+      "score": "7.0",
+      "evidence": "尖锐VOF方法处理多组分液气质量传递跨界面",
+      "tldr": "多组分液气质量传递涉及可变形界面、多物种耦合和相变，传统方法常采用体积正则化或显式耦合，导致精度与守恒性受限。本文提出一种尖锐且守恒的几何VOF-有限体积方法，对物种和温度方程进行全尖锐双场处理，通过嵌入式边界离散直接施加界面条件，并采用一致的几何平流和顺序耦合策略。方法在气泡溶解、液滴蒸发等算例中实现二阶精度和良好守恒，成功捕捉气体置换、共沸反转及组分驱动Marangoni流等复杂效应。该工作为多组分相变界面输运提供了高精度数值工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "We present a sharp and conservative geometrical VOF--finite-volume method for multicomponent liquid--gas mass transfer across deformable interfaces. The method solves problems in which multiple species are coupled through interfacial mass balances, latent-heat exchange, and vapor--liquid equilibrium. The key novelty is a fully sharp two-field treatment of scalar transport: the species and temperature equations are solved separately in the liquid and gas phases, while the one-sided Robin conditions for species and the two-sided flux jump for temperature are imposed directly on the reconstructed interface through an embedded-boundary discretization. This avoids both volumetric regularization of interfacial source terms and explicit coupling based on previous-time-step interfacial data. A consistent geometrical advection scheme is used for volume, momentum, energy, and species transport, and a sequential coupling strategy is developed to determine the partial interfacial mass fluxes, close the temperature equation, and update the thermodynamic-equilibrium state. The method is validated through single- and multicomponent bubble dissolution, single-component droplet evaporation, non-ideal ethanol--isooctane droplet evaporation, and sessile water--glycerol droplet evaporation. The results demonstrate second-order accuracy, accurate interfacial flux prediction, good mass and energy conservation, and the ability to capture complex multicomponent effects such as gas replacement, azeotropic volatility reversal, and composition-driven Marangoni flow.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/21/2608.19417v1-stability-and-nonlinear-dynamics-of-three-layer-viscous-films-inside-a-vertical-cylindrical-tube",
+      "section": "quick",
+      "title_en": "Stability and nonlinear dynamics of three-layer viscous films inside a vertical cylindrical tube",
+      "authors": "David Halpern, Awa Traore",
+      "date": "2026-08-19",
+      "pdf": "https://arxiv.org/pdf/2608.19417v1",
+      "score": "7.0",
+      "evidence": "垂直圆柱管内三层粘性薄膜，对应垂直管降膜配置",
+      "tldr": "针对垂直圆柱管内三层不混溶液膜这一分层核心-环空输运构型，本文通过长波渐近分析导出三界面耦合非线性演化方程组。线性稳定性显示空气核心毛细不稳定性及界面耦合引起的次级有限波数不稳定带，非线性模拟揭示饱和行波、空气核心闭合与中间层破裂三种结局。其中中间层破裂为三层构型独有机制，行波分支能预测饱和到堵塞转变但无法捕捉该破裂。",
+      "tags": "query:falling-film",
+      "abstract_en": "We investigate the dynamics and stability of three immiscible viscous liquid layers coating the interior of a vertical cylindrical tube, a configuration relevant to stratified core--annular transport processes. A long-wave asymptotic analysis yields a coupled system of nonlinear evolution equations governing the motion of the three interfaces. Linear stability analysis predicts a persistent long-wave instability, the capillary (Rayleigh--Plateau) instability of the air--core interface, together with secondary finite-wavenumber instability bands that emerge from interfacial coupling in certain parameter regimes. These stability characteristics depend sensitively on the layer thicknesses, viscosity ratios, and surface tension parameters, and include mode-switching associated with competing maxima in the dispersion relation. Nonlinear simulations reveal three distinct dynamical outcomes: saturation to finite-amplitude travelling waves, air-core closure through plug formation, and rupture of the intermediate liquid layer while the air core remains open. The intermediate-layer rupture mechanism is unique to the three-layer configuration which has no analogue in one- or two-interface cylindrical film flows. Numerical continuation is used to compute branches of travelling-wave solutions and their associated limit points. Comparison with time-dependent simulations shows that travelling-wave branches successfully predict the transition from saturated waves to plug formation, but do not capture the distinct rupture mechanism associated with collapse of the intermediate layer.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
