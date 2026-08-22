@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-22T20:23:00.884511+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.15941v1",
+      "source": "arxiv",
+      "title": "An improved phase-field framework for simulating impacts of solidifying metal drops",
+      "abstract": "Here, an improved phase-field method for simulating the impact dynamics of solidifying molten metal droplets is developed using targeted free-energy modifications. Conventional Cahn-Hilliard-Navier-Stokes (CHNS) formulations generally do not capture melt retraction over a solidified portion of the droplet, because the newly formed solid region is not treated as an actual internal boundary in a single-order-parameter diffuse-interface model. As a result, the formulation lacks an internal wetting condition or localized wall-energy mechanism capable of driving melt retraction over a solidified splat. To address this limitation, a diffuse-domain wall-energy term is added to the free energy, with a chemical-potential contribution that is active near the diffuse liquid-solidified-material-gas triple-line region, enabling the remaining melt to retract over a solidified splat. In addition, a solidification penalty term is introduced to immobilize the solidified splat formed during impact and suppress unphysical interface motion caused by residual Cahn-Hilliard diffusion inside the frozen region. The proposed formulation is validated against benchmark experiments on impacts of solidifying tin droplets. The results reveal that the localized wall-energy term captures post-maximum-spread melt retraction, while the penalty term effectively arrests motion of the solidified splat. Qualitative and quantitative comparisons with experiments, volume-of-fluid simulations, and standard phase-field predictions demonstrate that the proposed formulation captures post-maximum-spread melt retraction and provides an accurate estimate of the stabilized final splat diameter.",
+      "authors": [
+        "Ali Mostafavi",
+        "Vitaliy Yurkiv",
+        "Alexander L. Yarin",
+        "Farzad Mashayek"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-08-16T21:49:56+00:00",
+      "link": "https://arxiv.org/pdf/2608.15941v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "phase-field method for multiphase flow simulation with phase change",
+      "llm_evidence_cn": "面向相变多相流模拟的相场方法",
+      "llm_evidence": "面向相变多相流模拟的相场方法",
+      "canonical_evidence": "面向相变多相流模拟的相场方法",
+      "llm_tldr_en": "Proposes an improved phase-field method for simulating impacts of solidifying metal drops. Adds a diffuse-domain wall-energy term to drive melt retraction over solidified regions. Advances multiphase flow simulation with phase change.",
+      "llm_tldr_cn": "该论文针对传统相场方法在模拟凝固金属液滴撞击时无法捕捉熔体在已凝固部分上回缩的不足，提出了一种改进的相场框架。通过在自由能中添加扩散域壁能项，该模型在单序参量扩散界面中引入了内部润湿条件，从而能够驱动熔体在凝固薄片上的回缩。数值实验表明该方法能更准确地模拟金属液滴冲击动力学，为包含相变和固液相互作用的多相流模拟提供了新工具。",
+      "llm_tldr": "该论文针对传统相场方法在模拟凝固金属液滴撞击时无法捕捉熔体在已凝固部分上回缩的不足，提出了一种改进的相场框架。通过在自由能中添加扩散域壁能项，该模型在单序参量扩散界面中引入了内部润湿条件，从而能够驱动熔体在凝固薄片上的回缩。数值实验表明该方法能更准确地模拟金属液滴冲击动力学，为包含相变和固液相互作用的多相流模拟提供了新工具。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,323 @@
+Title: 2608.15941v1.pdf
+
+URL Source: https://arxiv.org/pdf/2608.15941v1
+
+Published Time: Tue, 18 Aug 2026 01:24:11 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# 1
+
+An improved phase-field framework for simulating impacts of solidifying metal drops 
+
+Ali Mostafavi a, Vitaliy Yurkiv a, Alexander L. Yarin b, Farzad Mashayek a, * 
+
+> a
+
+Department of Aerospace and Mechanical Engineering, University of Arizona, Tucson, AZ 85721, USA  
+
+> b
+
+Department of Mechanical and Industrial Engineering, University of Illinois Chicago, Chicago, IL 60607, USA 
+
+Here, an improved phase-field method for simulating the impact dynamics of solidifying molten metal droplets is developed using targeted free-energy modifications. Conventional Cahn–Hilliard–Navier– Stokes (CHNS) formulations generally do not capture melt retraction over a solidified portion of the droplet, because the newly formed solid region is not treated as an actual internal boundary in a single-order-parameter diffuse-interface model. As a result, the formulation lacks an internal wetting condition or localized wall-energy mechanism capable of driving melt retraction over a solidified splat. To address this limitation, a diffuse-domain wall-energy term is added to the free energy, with a chemical-potential contribution that is active near the diffuse liquid–solidified-material–gas triple-line region, enabling the remaining melt to retract over a solidified splat. In addition, a solidification penalty term is introduced to immobilize the solidified splat formed during impact and suppress unphysical interface motion caused by residual Cahn–Hilliard diffusion inside the frozen region. The proposed formulation is validated against benchmark experiments on impacts of solidifying tin droplets. The results reveal that the localized wall-energy term captures post-maximum-spread melt retraction, while the penalty term effectively arrests motion of the solidified splat. Qualitative and quantitative comparisons with experiments, volume-of-fluid simulations, and standard phase-field predictions demonstrate that the proposed formulation captures post-maximum-spread melt retraction and provides an accurate estimate of the stabilized final splat diameter. Keywords: Drop impact, Solidification, Phase-field method, Cahn–Hilliard–Navier–Stokes, Melt retraction 
+
+# 1. Introduction 
+
+Thermal spray coating is a coating-manufacturing process in which metal or ceramic powders are injected into a high-temperature gas jet, where they are melted and propelled toward the substrate to form a coating [1]. Upon impact, the molten droplets spread rapidly, solidify, and form individual splats that collectively build up a coating. The mechanical properties of the final coating, including porosity, microstructure, and adhesion strength, are strongly influenced by the morphology of such splats, which is governed by the coupled impact, spreading, and solidification dynamics of individual droplets and droplet–droplet interactions [2]. Therefore, coating quality depends on many process parameters, including the number of droplets, droplet size distribution, impact velocity, temperature, solidification rate, and thermal contact resistance. Achieving better control over the process outcome requires fundamental understanding of the fluid mechanics and heat transfer processes involved in the impacts of the individual solidifying droplets. Significant analytical and experimental results pertaining impacts of solidifying droplets are discussed in [3]. Various numerical techniques have been developed to model free-surface flows undergoing phase change. Earliest numerical simulations of impacts of solidifying metal drops employed the volume-of-fluid (VOF) method. Using the commercial code FLOW-3D, Trapaga et al. [4] modeled spreading and solidification of molten metal droplets on solid substrates and validated their predictions against high-speed experimental measurements. Another VOF-based study by Liu et al. [5] used the RIPPLE code to simulate droplet impact  
+
+> *Corresponding author.
+> E-mail address : mashayek@arizona.edu (F. Mashayek).
+
+# 2
+
+and freezing, applying a two-phase continuum model for the flow with a growing solid layer. Pasandideh-Fard et al. [2] used a modified SOLA-VOF method for 2D axisymmetric simulations of molten tin droplet impact on stainless steel substrates, with both contact angle and thermal contact resistance determined experimentally and prescribed in the numerical model. Later, Pasandideh-Fard et al. [6] extended the VOF framework to a full 3D model for normal and oblique impacts of molten tin droplets on stainless steel substrates, with the normal-impact simulations validated against the experiments of Aziz and Chandra [1]. More recently, Zhang et al. used the VOF method implemented in ANSYS Fluent in conjunction with an enthalpy-porosity solidification model to simulate sessile water droplet freezing, including conical-tip formation, and impacting-freezing dynamics of supercooled water droplets on cold superhydrophobic flat surfaces [7,8]. 
+
+Compared with the VOF method, phase-field methods avoid explicit interface reconstruction and allow surface tension and wetting effects to be introduced naturally through a free-energy formulation. Jacqmin laid the groundwork for phase-field modeling of isothermal free-surface flows by using a single order parameter governed by a conservative Cahn–Hilliard equation and coupling it to the Navier–Stokes equations through a free-energy-based surface-tension force [9]. In addition, he showed how the wall-free-energy term at the solid boundary can be used to impose wetting effects in diffuse-interface formulations [10]. Solidifying molten drops are inherently three-phase flows involving liquid, solid, and gas phases. Wang et al. developed an energy-stable two-order-parameter phase-field model, in which a non-conservative Allen–Cahn equation describes liquid–solid phase change and a conservative Cahn–Hilliard equation captures the liquid–gas interface [11]. Their model satisfies an energy-dissipation law and captures the pointy-tip formation of frozen sessile droplets, revealing better agreement with experiments than their corresponding ANSYS Fluent VOF predictions. Despite the advantages, using multiple order parameters introduces additional degrees of freedom into the nonlinear system of equations and requires extra model parameters associated with the additional phase-field equation. Shen et al. simulated the normal impact of solidifying droplets using a modified Cahn–Hilliard–Navier– Stokes (CHNS) formulation tailored to droplet impact with solidification [12]. Their formulation uses a single order parameter to distinguish the condensed phase from the gas phase, while the liquid and solid regions within the condensed phase are identified through a temperature-dependent liquid fraction. This liquid fraction varies smoothly across a narrow artificial mushy region, allowing the solidification front to be captured implicitly within the phase-field framework. Compared to the standard CHNS formulation, they added a Kozeny–Carman-type momentum sink term to the momentum balance equation to damp velocity inside the solidified portion of the droplet. Their numerical results for solidifying tin drops are compared with the experiments of Aziz and Chandra [1]. While a reasonable agreement with the experiments is obtained from the moment of impact until the maximum droplet spread, the model does not fully capture some important post-maximum-spread dynamics, such as melt retraction over its own solidified portion. Physically, while velocity-suppression treatments can immobilize the solidified region by driving its velocity toward zero, the remaining melt does not experience itself as sitting atop a solid wall comparable to the substrate. Within the phase-field framework, the solidified region is an evolving part of the computational domain rather than a fixed geometric boundary. As a result, imposing a geometric contact-angle condition along the evolving liquid–solidified-splat–gas region remains an open modeling challenge within this numerical framework. In the present work, inspired by wall-energy treatment at the liquid–solid contact line, this limitation is addressed by incorporating a diffuse-domain wall-energy term into the free energy of the standard CHNS formulation [13,14]. The effect of this term is localized near the diffuse liquid–solidified-material–gas triple-line region and provides an additional energy-driven mechanism that enables the remaining melt to retract or spread over its solidified portion. In addition, Cahn–Hilliard diffusion is known to cause residual interface motion even in regions where fluid motion is suppressed [15]. This becomes problematic near the solidified drop–gas interface, where the solid velocity is arrested, but the phase-field variable can still drift due to the Cahn–Hilliard diffusion. To suppress this artifact, a solidification penalty term is incorporated 3
+
+into the free-energy functional, immobilizing the phase field inside the solidified region without imposing artificial pinning. The article is organized as follows. Section 2 presents the governing equations for heat transfer, the proposed phase-field formulation including the wall-energy and solidification-penalty terms, and fluid flow. Section 3 describes the numerical method, including the finite-element implementation, boundary and initial conditions, and adaptive mesh refinement strategy. Section 4 presents the benchmark one-dimensional Stefan problem and isothermal droplet impact as validation cases, followed by the simulation of solidifying molten tin droplet impact. Finally, Section 5 summarizes the main findings and draws conclusions of the study. 
+
+# 2. Governing equations 
+
+The impact dynamics of solidifying molten metal droplets on a solid surface are governed by the combined effects of fluid flow, wetting, heat transfer, and phase change. As shown in Fig. 1, the solidifying droplet undergoes rapid spreading after impact, followed by basal solidification and contact-line arrest on the substrate. After maximum spread, the remaining melt recoils and retracts over the previously solidified portion, eventually forming a final solidified splat whose morphology is governed by the coupled spreading, recoil, and solidification dynamics. 
+
+Fig. 1. Schematic of an axisymmetric solidifying molten droplet following the normal impact sequence: (a) pre-impact, (b) spreading, (c) maximum spread with contact-line arrest, (d) melt recoil and retraction over the solidified splat, (e) late-stage melt redistribution, and (f) final solidified splat morphology. 
+
+The following subsections present the mathematical model used to describe the problem and introduce the proposed free-energy modifications for capturing melt retraction and enforcing immobilization of the solidified region. 2.1. Heat transfer 
+
+Heat transfer inside the solidifying droplet and the surrounding gas is modeled using an enthalpy-based phase-change formulation, with viscous dissipation neglected [12,16,17]: 
+
+𝜌𝑐 ! #𝜕𝑇 𝜕𝑡 + 𝒖 ∙ 𝛁𝑇+ = 𝛁 ∙ (𝑘𝛁𝑇) − 𝜌𝐿 𝜕𝑓 "
+
+𝜕𝑡 𝐺(𝑐), (1) 4
+
+where 𝜌 is the density, 𝑐 ! is the specific heat, 𝑇 is the temperature, 𝒖 is the velocity vector, 𝑘 is the thermal conductivity, 𝐿 is the latent heat of fusion, 𝑓 " is the liquid fraction defined across the diffuse mushy region, and 𝑐 is the order parameter distinguishing the condensed phase ( 𝑐 = 1 ) from the gas phase (𝑐 = −1) .The latent heat of fusion released during solidification is incorporated as a source term in the energy equation and is active only within the diffuse mushy region near the solidification front. The function 
+
+𝐺(𝑐) = (1 + 𝑐)/2 is a droplet-gate indicator that takes a value of unity in the condensed phase and zero in the gas phase, thereby localizing the latent-heat source to the droplet. The liquid fraction 𝑓 " is defined as a temperature-dependent function across a narrow interval around the melting temperature 𝑇 #. The solidus and liquidus temperatures are defined as 𝑇 $%& = 𝑇 # − 𝛿𝑇/2 and 𝑇 &'( =𝑇 # + 𝛿𝑇/2 , where 𝛿𝑇 is a small temperature offset used to regularize the solid–liquid transition. 
+
+𝑓 "(𝑇) = 9 0, 𝑇 ≤ 𝑇 $%& ,6𝜂 )* − 15𝜂 )+ + 10𝜂 ),, 𝑇 $%& < 𝑇 < 𝑇 &'( ,1, 𝑇 ≥ 𝑇 &'( .𝜂 ) = 𝑇 − 𝑇 $%& 
+
+𝑇 &'( − 𝑇 $%& 
+
+, (2) Inside the condensed phase, 𝑓 " = 0 represents the solid phase and 𝑓 " = 1 represents the liquid phase. The quintic smootherstep interpolation provides a smooth transition between the two limits [18]. Heat transfer within the solid substrate is modeled by pure conduction, since no fluid motion occurs in this region: 
+
+𝜌 -𝑐 !,-
+
+𝜕𝑇 -
+
+𝜕𝑡 = 𝛁 ∙ (𝑘 -𝛁𝑇 -). (3) Here, 𝑇 - is the substrate temperature, while 𝜌 -, 𝑐 !,-, and 𝑘 - denote the density, specific heat, and thermal conductivity of the substrate, respectively. Treating the molten droplet–substrate interface as perfectly thermally coupled is unrealistic [19]. During an impact onto a rough solid surface, incomplete contact and trapped air within surface asperities can form an insulating interfacial layer, whose resistance depends on surface finish, contact pressure, and material properties [19]. This produces a temperature jump between the droplet and substrate, which is represented by a thermal contact resistance 𝑅 /,
+
+𝑅 / = 𝑇 0 − 𝑇 -
+
+𝑞′′ , (4) where 𝑞′′ is the heat flux from the droplet to the substrate. The thermal contact resistance 𝑅 / is prescribed as a model input. Although 𝑅 / may vary spatially and temporally during droplet impact [20], a constant value is assumed in the present simulations. 2.2. Proposed solidification-aware phase-field formulation 
+
+The advective Cahn–Hilliard equation is used to describe the evolution of the free surface [21], 
+
+𝜕𝑐 𝜕𝑡 + 𝒖 ∙ 𝛁𝑐 = 𝛁 ∙ (𝑀𝛁𝜓), (5) where 𝑀 is the phenomenological mobility, and 𝜓 is the chemical potential. The chemical potential 𝜓 is derived from a single-order-parameter Ginzburg-Landau free-energy functional ℱ[𝑐, 𝛁𝑐] defined over the computational domain Ω [22]. For solidifying droplets, this functional is constructed as the sum of four contributions: 5
+
+ℱ[𝑐, 𝛁𝑐] = KL𝑓 1 + 𝑓 # + 𝑓 - + 𝑓 !M
+
+> 3
+
+𝑑Ω. (6) The four free-energy contributions in Eq. (6) are described below. 2.2.1. Classical Cahn–Hilliard formulation 
+
+The first contribution, 𝑓 1, is the bulk double-well free-energy density: 
+
+𝑓 1 = 𝜎 4𝜉 4 (𝑐 4 − 1) 4. (7) This term has minima at 𝑐 = ±1 and represents the phobic contribution to the free energy, favoring separation between the condensed phase ( 𝑐 = 1 ) and the gas phase (𝑐 = −1) . In Eq. (7), 𝜉 controls the diffuse-interface thickness, while 𝜎 denotes the mixing energy density. The second term, 𝑓 #, is the gradient-energy contribution: 
+
+𝑓 # = 12 𝜎|𝛁𝑐| 4. (8) This term represents the philic contribution, since it favors smooth mixing across a finite-thickness diffuse interface. The mixing energy density 𝜎 is related to the interfacial surface-tension coefficient 𝛾 and diffuse-interface thickness 𝜉 through [23,24] 
+
+𝜎 = 32√2 𝛾𝜉. (9) 2.2.2. Diffuse-domain wall-energy term 
+
+The third contribution, 𝑓 -, is introduced as a diffuse-domain wall-energy density to mimic the wetting effect that would normally be imposed through a contact-angle condition at a solid boundary [13,14]. In the classical phase-field contact-line formulation, the wall-energy contribution is defined on the solid boundary and contains the factor 𝛾cos 𝜃 , where 𝛾 is the gas–liquid surface-tension coefficient and 𝜃 is the prescribed contact angle. In the present single-order-parameter formulation, however, the solidified portion of the droplet is not represented as an explicit internal boundary. Instead, it is described by a diffuse thermal solidification indicator. As a result, the interaction between the remaining melt, gas, and solidified material occurs over a finite diffuse region rather than at a sharp contact line. A geometric contact angle is therefore not prescribed explicitly. The classical factor cos 𝜃 is replaced by an effective dimensionless coefficient, 
+
+𝛽 -, while 𝛾 is retained to preserve the physical surface-energy scale. The diffuse-domain wall-energy density is written as 
+
+𝑓 - = 𝜒 5(𝑡)𝛽 -𝛿 67 (𝐱, 𝑡)𝑔 -(𝑐), (10) where 𝜒 5(𝑡) is an activation function that is zero before maximum spreading and becomes unity once the contact-line velocity changes sign, 𝛽 - controls the strength and sign of the effective wetting or dewetting bias, and 𝛿 67 (𝐱, 𝑡) localizes the contribution near the solidification-front region. The wall-energy function 
+
+𝑔 -(𝑐) is defined as [14] 
+
+𝑔 -(𝑐) = −𝛾 𝑐(3 − 𝑐 4)4 . (11) 6
+
+The solidification-front localization function is given by 
+
+𝛿 67 (𝐱, 𝑡) = |𝛁𝑓 "|, (12) which is nonzero only across the diffuse thermal solidification front. Since 𝑓 " is dimensionless, 𝛿 67 (𝐱, 𝑡) 
+
+has units of the inverse length. The wall-energy function 𝑔 -(𝑐) has units of energy per unit area because it is scaled by the surface tension 𝛾 . Therefore, 𝑓 - has units of energy per unit volume. 2.2.3. Solidification-penalty term 
+
+The fourth contribution, 𝑓 !, is introduced as a solidification penalty energy density to immobilize the phase-field variable in regions that have solidified. In the standard Cahn–Hilliard formulation, order-parameter diffusion remains active even after the local material becomes solid. Thus, although the velocity in the solidified region may be suppressed, a residual Cahn–Hilliard diffusion can still cause artificial drift of the gas–solid interface [15]. To suppress this artifact, 𝑐 is penalized toward a stored frozen target value once local solidification is detected, thereby weakly anchoring the phase field inside the solidified region: 
+
+𝑓 ! = 12 Κ7(𝐱, 𝑡)L𝑐−𝑐 89:;<8 M4. (13) Here, 𝑐 89:;<8 is the stored frozen target value and Κ7(𝐱, 𝑡) is the penalty coefficient, defined as 
+
+Κ7(𝐱, 𝑡) = Κ =𝑆 7(𝐱, 𝑡) , (14) where Κ= is the penalty strength and 𝑆 7 is a binary freeze mask defined as: 
+
+𝑆 7>?@ = (1−𝐴 #>?@ ) maxe𝑆 7>, ℐL𝑓 "(𝑇 >) ≤ 𝑓 ",8:'; MℐL𝑐 > ≥ 𝑐 8:'; Mg. (15) The superscript 𝑛 denotes the discrete time level, with 𝑡 >?@ = 𝑡 > + Δ𝑡 , and ℐ(∙) denotes the indicator function, which equals unity when the condition inside the parentheses is satisfied and zero otherwise. The freeze mask 𝑆 7>?@ is updated from its previous value 𝑆 7>, so that once a material element becomes frozen, it remains frozen unless melting is allowed through the remelting indicator 𝐴 #. For irreversible solidification, 
+
+𝐴 # = 0 ; hence, once activated, 𝑆 7 remains a latched freeze mask. Since the liquid fraction satisfies 𝑓 " = 0 
+
+in the solidified region and 𝑓 " = 1 in the liquid region, freezing is detected when 𝑓 "(𝑇 >) ≤ 𝑓 ",8:'; , where 
+
+𝑓 ",8:'; is a prescribed freezing threshold. The condensed-phase indicator, ℐL𝑐 > ≥ 𝑐 8:'; M, prevents the freeze mask from activating in the gas phase by restricting freezing to regions where the phase field corresponds to the condensed phase. The stored frozen target value is updated as 
+
+𝑐 89:;<8  
+
+> >?@
+
+= j 𝑐 6, 𝑆 7> = 0 and 𝑆 7>?@ = 1, 𝑐 89:;<8  
+
+> >
+
+, 𝑆 7> = 1 and 𝑆 7>?@ = 1, 𝑐 >, 𝑆 7>?@ = 0, 
+
+(16) where 𝑐 6 is the prescribed solid-state target value, taken as 𝑐 6 = 1 . Thus, when a material element freezes for the first time, the phase-field variable is anchored toward 𝑐 6. If the material element remains frozen, the previous target value is retained. If the material element is not frozen, the penalty coefficient vanishes because 𝑆 7 = 0 , and the stored value does not affect the solution. This formulation suppresses artificial 7
+
+phase-field drift inside solidified regions while leaving unfrozen and gas-phase regions unaffected, without prescribing a separate contact-line pinning condition after maximum spreading. 2.2.4. Resulting chemical potential 
+
+Having defined the four contributions to the total free-energy functional, the phase-field chemical potential is obtained by taking the variational derivative of the total free energy with respect to the order parameter 𝑐 , such that 𝜓 = 𝛿ℱ/𝛿𝑐 :
+
+𝜓 = 𝜎 k 𝑐 , − 𝑐 𝜉 4 − 𝛁 4𝑐l + 𝜒 5(𝑡)𝛽 -𝛿 67 (𝐱, 𝑡)𝑔 -A (𝑐) + Κ 7(𝐱, 𝑡)L𝑐−𝑐 89:;<8 M. (17) Although the wall-energy density 𝑓 - has nonzero values in the pure phases ( 𝑐 = ±1 ), the quantity that enters the chemical potential equation is its derivative. The corresponding wall-induced chemical-potential contribution is proportional to 𝑔 -A (𝑐) = 𝑑𝑔 -/𝑑𝑐 , which vanishes at 𝑐 = ±1 . Therefore, this contribution does not force the phase field in the pure gas or pure condensed phase. As illustrated in Fig. 2, it is active only where the thermal solidification-front localization 𝛿 67 (𝐱, 𝑡) overlaps the diffuse gas–condensed-phase interface. This localized overlap corresponds to the diffuse liquid–frozen-splat–gas triple-line region, where the remaining melt can retract over the already solidified splat. 
+
+Fig. 2. Localization of the wall-induced chemical-potential contribution near the diffuse liquid–frozen-splat–gas triple-line region. The dashed contours denote the diffuse gas–condensed-phase interface, represented by 𝑐 = ±0.8 . The solid and dotted temperature contours denote 𝑇 $%& and 𝑇 &'( , respectively, marking the lower and upper limits of the thermal mushy region. The highlighted overlap between the diffuse interface band and the mushy band identifies the region where the wall-energy contribution is active. The zoomed inset illustrates that this contribution is confined to the neighborhood of the contact region between the remaining melt, the frozen splat, and the surrounding gas. 2.3. Hydrodynamics 
+
+Assuming laminar incompressible flow and neglecting volume changes associated with solidification, the continuity and momentum balance equations are solved to obtain the pressure and velocity fields: 
+
+𝛁 ∙ 𝒖 = 0, (18) 
+
+𝜌 # 𝜕𝒖 𝜕𝑡 + 𝒖 ∙ 𝛁𝒖+ = −𝛁𝑝 + 𝛁 ∙ 𝝉 B + 𝜓𝛁𝑐 + 𝜌𝒈, (19) where 𝑝 is the modified pressure, 𝝉 B = 𝜇(𝛁𝒖 + 𝛁𝒖 )) is the deviatoric viscous stress tensor, 𝜇 is the viscosity, 𝒈 denotes gravitational acceleration vector, and the term 𝜓𝛁𝑐 is the volume-spread capillary force [25]. Several approaches can be used to arrest fluid motion in the solidified portion of an impacting droplet. Pasandideh-Fard et al. used a modified fixed-velocity treatment, in which the solidified material was assigned zero velocity and treated as a liquid with effectively infinite density [6]. Another approach is to add a Kozeny–Carman-type momentum sink term, which penalizes the velocity toward zero in the solidified 8
+
+region as the liquid fraction approaches zero [7,12,26,27]. In the present work, the solidified region is instead modeled as a liquid with effectively infinite viscosity, thereby suppressing motion without introducing an additional penalty term [11,16,28]. The density, viscosity, thermal conductivity, and specific heat are interpolated using the liquid fraction within the condensed phase and a phase indicator across the diffuse interface. For a generic material property 𝑋 ∈ {𝜌, 𝜇, 𝑘, 𝑐 !}, this blend is written as 
+
+𝑋(𝑐, 𝑇) = [1 − 𝐺(𝑐)]𝑋 C + 𝐺(𝑐)[𝑋 6 + (𝑋 "−𝑋 6)𝑓 "(𝑇)], (20) where 𝑋 C, 𝑋 ", and 𝑋 6 denote the gas, liquid, and solid values of 𝑋 , respectively. 
+
+# 3. Numerical methods 
+
+3.1. Finite element formulation 
+
+The governing equations described in Section 2 are implemented within the Multiphysics Object-Oriented Simulation Environment (MOOSE) finite-element framework [24,29–31]. A Taylor–Hood element pair is used for spatial discretization, with the velocity field approximated using second-order shape functions and all other nonlinear variables interpolated using first-order shape functions. Time integration is performed using a fully implicit second-order backward differentiation formula (BDF2). The weak-form implementation in the fluid domain is described below: 
+
+−(𝛁 ∙ 𝒖, 𝑝̂) 3 = 0, (21) 
+
+#𝜌 D𝒖 D𝑡 , 𝒖 x+ 3
+
+− (𝜓𝛁𝑐 + 𝜌𝒈, 𝒖 x) 3 + (−𝑝𝑰 + 𝝉 B, 𝛁𝒖 x) 3 − (𝒏 ∙ (−𝑝𝑰 + 𝝉 B), 𝒖 x) D = 0, (22) 
+
+#𝜌 #𝑐 ! + 𝐿𝐺 𝑑𝑓 "
+
+𝑑𝑇 + 𝜕𝑇 𝜕𝑡 , 𝑇 {+ 3
+
++ L𝜌𝑐 !𝒖 ∙ 𝛁𝑇, 𝑇 {M 3 + L𝑘𝛁𝑇, 𝛁𝑇 {M 3 − L𝒏 ∙ (𝑘𝛁𝑇), 𝑇 {M D = 0, (23) 
+
+#D𝑐 D𝑡 , 𝜓 {+ 3
+
++ L𝑀𝛁𝜓, 𝛁𝜓 {M 3 − L𝒏 ∙ (𝑀𝛁𝜓), 𝜓 {M D = 0, (24) 
+
+#𝜓 − 𝜕 𝜕𝑐 L𝑓 1 + 𝑓 - + 𝑓 !M, 𝑐̂+ 3
+
+− (𝜎𝛁𝑐, 𝛁𝑐̂) 3 + (𝒏 ∙ (𝜎𝛁𝑐), 𝑐̂) D = 0. (25) Hatted quantities denote the corresponding test functions. The notation (⋅,⋅) 3 denotes the 𝐿 4(Ω) inner product over the computational domain, while (⋅,⋅) D denotes the corresponding boundary inner product over 
+
+Γ = ∂Ω . The vector 𝒏 is the outward unit normal on Γ. The material derivative is defined as D/D𝑡 = ∂/ ∂𝑡 + 𝒖 ∙ 𝛁 . All governing equations in the fluid domain are solved in a fully coupled manner. The resulting nonlinear system is treated using Newton’s method, and the linearized system at each Newton iteration is solved using the MUltifrontal Massively Parallel sparse direct Solver (MUMPS), which uses LU factorization for large sparse systems. 3.2. Boundary and initial conditions 
+
+The schematic representation of the solidifying molten droplet normal impact problem is shown in Fig. 3, including the pre-impact configuration and the maximum-spread state. Here, 𝐷 = is the initial droplet diameter, 𝑈 = is the impact velocity, and 𝑇 = is the initial droplet temperature, which is above the melting temperature 𝑇 #. The cold substrate is initially at 𝑇 =,- < 𝑇 #.The droplet-fluid domain has dimensions 7𝐷 = × 7𝐷 =, while heat transfer in the substrate is calculated separately in the solid domain. Note again that thermal contact resistance is imposed over the wetted droplet-substrate footprint, allowing a finite temperature jump across the droplet-substrate thermal contact interface. Symmetry conditions are applied along the axis of symmetry. A no-slip condition is imposed for the velocity at the substrate ( 𝒖 = 0 ), while the far-field boundaries are placed sufficiently far from the 9
+
+impact region and treated using zero-normal-gradient conditions for the velocity field. Adiabatic thermal conditions are applied to the remaining external boundaries. For the order parameter and chemical potential, zero-flux conditions are imposed on all boundaries, except at the substrate, where a static contact-angle condition is prescribed to account for droplet–substrate wetting [31]. 
+
+Fig. 3. Schematic of the axisymmetric solidifying normal impact problem for a molten droplet in a 
+
+7𝐷 = × 7𝐷 = droplet-fluid domain, including the initial droplet, cold substrate, maximum spread diameter, solidified splat, and thermal contact resistance at the wetted interface. 3.3. Mesh adaptivity 
+
+Adaptive mesh refinement (AMR) is used to efficiently resolve the localized gradients that control the impact and solidification dynamics. Three refinement indicators are employed: 𝛁𝑐 to capture the diffuse gas–condensed-phase interface, 𝛁𝑓 " to resolve the mushy region where the liquid fraction varies rapidly, and near-wall refinement along the cold substrate to capture thermal gradients and hydrodynamic boundary-layer effects. This strategy concentrates resolution near the moving interface, solidification front, and wall regions, while allowing coarser elements away from the droplet-substrate interaction zone. A representative AMR snapshot is shown in Fig. 4, where the inset views illustrate the refined mesh around the gas– condensed-phase interface, the thermal solidification front, and the melt–solidified-droplet–gas triple-line region. 
+
+Fig. 4. Representative adaptive mesh during solidifying normal impact of a molten droplet. The main panel presents the mesh distribution around the deforming droplet, while the insets highlight targeted refinement near the gas–condensed-phase interface, the solidification-front region, and the liquid–solidified-droplet– gas triple-line region. The blue contour denotes 𝑐 = 0 , corresponding to the sharp diffuse gas–condensed interface, while the green contour denotes 𝑇 = 𝑇 #, corresponding to the thermal solidification front. 10 
+
+# 4. Results and discussion 
+
+In this section, three cases are presented. First, the benchmak one-dimensional Stefan problem is used to validate the phase-change heat-transfer model. Next, the isothermal normal impact of a molten tin droplet is simulated and compared with the experiments of Aziz and Chandra [1]. Finally, the normal impact of a solidifying molten tin droplet is simulated using the proposed free-energy modifications, and the results are compared against the experiments of Aziz and Chandra [1] and against other numerical and analytical predictions. The key dimensionless groups for solidifying droplet impact are 
+
+𝑅𝑒 = 𝜌𝑈 =𝐷 =
+
+𝜇 , 𝑊𝑒 = 𝜌𝑈 =4𝐷 =
+
+𝛾 , 𝑆𝑡𝑒 = 𝑐 !(𝑇 # − 𝑇 -)𝐿 , 𝑃𝑟 = 𝜇𝑐 !
+
+𝑘 , (26) where 𝑅𝑒 and 𝑊𝑒 describe the impact hydrodynamics, while 𝑃𝑟 characterizes momentum diffusion relative to thermal diffusion. The Stefan number 𝑆𝑡𝑒 measures the relative magnitude of the charchteristic internal energy to latent heat and therefore characterizes the thermal capacity of the system to drive the solidification process. Properties of molten and solidified tin, the stainless-steel substrate, and the surrounding gas used in the numerical simulations are listed in Table 1. The oxidation effects are neglected, and the surface tension is assumed to remain constant. A finite high effective viscosity is assigned to solidified tin to suppress motion in the solidified region. 
+
+Table 1 . Thermophysical properties of molten tin, solidified tin, air, and stainless steel used in the numerical simulations. 
+
+Phase 𝜌 
+
+(kg ∙ m !" )
+
+𝜇 
+
+(Pa ∙ s) 
+
+𝑐 #
+
+(J ∙ kg !$ ∙ K !$ )
+
+𝑘 
+
+(W ∙ m !$ ∙ K !$ )
+
+𝐿 
+
+(J ∙ kg !$ )
+
+𝛾 
+
+(N ∙ m !$ )
+
+Liquid tin 6979 1.90 × 10 !" 250 32.0 59000 0.560 
+
+Solid tin 7200 ≈ 1.90 × 10 $ 216 60.0 ~ ~
+
+Air 1.18 1.85 × 10 !% 1006 2.63 × 10 !& ~ ~
+
+Stainless steel 7900 ~ 477 14.9 ~ ~
+
+4.1. Stefan problem 
+
+For validation of the phase-change heat-transfer model, solidification in a one-dimensional semi-infinite medium is considered, as sketched in Fig. 5. The domain is initially filled with liquid at temperature 𝑇 = =1. At 𝑡 = 0 , the left wall is suddenly cooled below the melting temperature to the subcooled value 𝑇 - =−1 , while the melting temperature is 𝑇 # = 0 .
+
+Fig. 5. Schematic of the one-dimensional Stefan problem used for validation of the phase-change heat-transfer model. The liquid is initially at 𝑇 =, the left wall is maintained at 𝑇 - < 𝑇 #, and the solid–liquid 11 
+
+interface 𝑠(𝑡) advances into the liquid. The phase change is regularized over a narrow temperature interval around 𝑇 #.Freezing (solidification) begins at the cold wall, and the solid–liquid interface propagates into the liquid phase. The solidification-front position for the two-phase Stefan problem is obtained from the self-similar Neumann solution [32], 
+
+𝑠(𝑡) = 2𝜆𝛼 6𝑡, (27) where 𝑠(𝑡) is the solidification-front location, 𝛼 6 = 𝑘 6/(𝜌 6𝑐 !,6 ) is the thermal diffusivity of the solid phase, and 𝜆 is obtained from [32] 
+
+𝑆𝑡𝑒 6
+
+exp(𝜆 4)erf(𝜆) − 𝑆𝑡𝑒 "𝛼 "/𝛼 6
+
+exp(𝜆 4𝛼 6/𝛼 ")erfcL𝜆𝛼 6/𝛼 "M = 𝜆√𝜋. (28) Here, 𝑆𝑡𝑒 6 = 𝑐 !,6 (𝑇 # − 𝑇 -)/𝐿 and 𝑆𝑡𝑒 " = 𝑐 !," (𝑇 = − 𝑇 #)/𝐿 are the Stefan numbers of the solid and liquid phases, respectively. The analytical temperature field is then given by [32–34] 
+
+𝑇(𝑥, 𝑡) = ⎩⎪⎪⎪⎨⎪⎪⎪⎧𝑇 - + (𝑇 # − 𝑇 -)erf k 𝑥 2𝛼 6𝑡 lerf(𝜆) , 0 ≤ 𝑥 ≤ 𝑠(𝑡), 𝑇 = + (𝑇 # − 𝑇 =)erfc k 𝑥 2𝛼 "𝑡 lerfc #𝜆 𝛼 6
+
+𝛼 "+, 𝑥 > 𝑠(𝑡). 
+
+(29) The analytical solution is used to validate both the predicted temperature field and the evolution of the solidification front. For this benchmark validation case, the parameters are set to 𝑆𝑡𝑒 " = 0.010 , 𝑆𝑡𝑒 6 =0.005 , 𝛼 " = 0.04 , 𝛼 6 = 0.36 , and 𝛿𝑇 = 0.02 . A sufficiently large computational domain is used to approximate the semi-infinite medium. The plots in Fig. 6 compare the numerical predictions with the analytical solutions for the solidification-front position and temperature profiles at selected time instants. The close agreement between the numerical and analytical results verifies that the model accurately captures the coupled conduction and latent-heat effects governing the solidification process. This validates the enthalpy-based treatment of phase change, in which latent heat is incorporated as a volumetric source term in Eq. (1). 12 
+
+Fig. 6. Validation of the phase-change heat-transfer model using the one-dimensional Stefan problem: (a) temporal evolution of the solidification-front position and (b) temperature profiles at selected time moments. Numerical results from the present model are compared with the analytical self-similar solution for a semi-infinite medium. 
+
+4.2. Isothermal normal drop impact 
+
+The isothermal normal impact of a molten tin droplet is numerically simulated using the properties listed in Table 1. Following the experiments of Aziz and Chandra [1], the droplet is maintained at 𝑇 = 240 ∘C,slightly above the melting temperature of tin, 𝑇 # = 232 ∘C. Under these conditions, solidification is not expected during impact, and the problem is treated as isothermal. The static contact angle between the molten tin droplet and the stainless-steel substrate is prescribed as 
+
+140 ∘, consistent with the experimental measurements [1]. The initial droplet diameter is 𝐷 = = 2.7 mm , and the impact velocity is 𝑈 = = 1 m/s , corresponding to 𝑅𝑒 ≈ 9900 and 𝑊𝑒 ≈ 34 . The diffuse-interface thickness is set to 𝜉 = 𝐷 =/120 .The isothermal impact case is used as a baseline validation of the hydrodynamic and capillary components of the CHNS model before introducing solidification. The results in Fig. 7 compare the predicted droplet shapes with the experimental snapshots of Aziz and Chandra [1]. The present model captures the main stages of impact, including the initial spreading, maximum spread, recoil, rebound behavior, and vertical jet formation. This agreement confirms that the phase-field formulation reproduces the essential isothermal impact dynamics of molten tin droplets. 13 
+
+Fig. 7. Comparison of experimental snapshots [1] and present phase-field predictions for the isothermal normal impact of a molten tin droplet on a stainless-steel substrate at 𝑈 = = 1 m/s . The sequence reveals spreading, maximum deformation, recoil, and vertical jet formation at selected time moments. 
+
+The spread factor is defined as 𝜁 = 𝐷(𝑡)/𝐷 =, where 𝐷(𝑡) is the instantaneous wetted diameter and 𝐷 = is the initial droplet diameter. The predicted spread-factor evolution is compared with experimental measurements [1] and previous phase-field simulations of Shen st al. [12] in Fig. 8. The present model captures the rapid initial spreading, maximum spread, and subsequent recoil of the molten tin droplet. In particular, the present model predicts a maximum spread factor of 𝜁 F9G = 2.12 , in close agreement with the experimental value of 𝜁 F9G = 2.20 , with a relative difference of approximately 3.6% . This provides an accurate prediction of the maximum spreading while preserving good agreement with the overall temporal evolution. 14 
+
+Fig. 8 . Temporal evolution of the spread factor for isothermal normal impact of a molten tin droplet. Present phase-field predictions are compared with the experiments [1] and other phase-field results [12]. 
+
+4.3. Drop impact with solidification 
+
+Having demonstrated the accuracy of the phase-change heat-transfer model and the isothermal impact dynamics, the normal impact of a solidifying molten tin droplet is simulated using the same droplet diameter, impact velocity, static contact angle, and the interfacial thickness as in the isothermal case. A constant phase-field mobility, 𝑀 = 10 HI m4/(Pa s) is adopted. All thermophysical properties used in the simulations are listed in Table 1. The substrate is initially at 
+
+𝑇 =,- = 25 ∘C, while the pre-impact molten droplet temperature is maintained at 𝑇 = = 240 ∘C. Consistent with the VOF simulations of Pasandideh-Fard et al. [6], a constant thermal contact resistance of 𝑅 / =5 × 10 HJ m4 K/W is prescribed over the wetted droplet–substrate footprint. The melting temperature of tin is taken as 𝑇 # = 232 ∘C, and the solid–liquid transition is regularized using a temperature offset of 𝛿𝑇 = 2∘C. The low Prandtl number of molten tin, 𝑃𝑟 = 𝒪(10⁻²) , indicates that thermal diffusion dominates momentum diffusion during impact, promoting rapid cooling and solidification. For the solidifying-impact simulations, the internal wall-energy coefficient and solidification penalty strength are set to 𝛽 - = −0.54 and Κ= = 10 * J /m,, respectively. The coefficient 𝛽 - is treated as an effective calibration parameter, similar in role to the wall-energy parameters used in the phase-field contact-angle formulations [13]. Several values are tested, and 𝛽 - = −0.54 is selected because it yields the best agreement between the predicted splat morphology and the experiments. With the present sign convention, negative values of 𝛽 - promote recoil of the remaining melt from the solidified region. The parameter Κ=
+
+controls the strength of the solidification penalty. It is chosen large enough to anchor the phase field in the solidified region, but not so large that the penalty over-constrains the diffuse interface, introduces excessive penalty-induced diffusion, or artificially alters the drop morphology. A baseline 200 × 200 mesh with four levels of adaptive refinement is used to resolve the gas–condensed-phase interface, the thermal solidification front, and the near-substrate boundary-layer region. As the adaptive mesh evolves during the impact, the nonlinear system in the fluid domain contains approximately 
+
+(0.81 − 0.93) × 10⁶ degrees of freedom. This case introduces the coupled effects of droplet deformation, heat transfer, solidification, and the proposed free-energy modifications for melt retraction and solidified-region immobilization. The present simulations are compared with the experimental observations [1,6] in Fig. 9, revealing good qualitative agreement over the full impact sequence. The model reproduces the initial spreading stage and the maximum spread at approximately 𝑡 = 4.5 ms . The main differences among numerical approaches become more pronounced after maximum spread, when surface-tension-driven recoil and melt retraction over the solidified splat dominate the dynamics [35]. In a standard CHNS formulation, suppressing the velocity inside the solidified region is insufficient, because the remaining melt does not experience the solidified portion as a wetting boundary. In the present 15 
+
+formulation, the diffuse-domain wall-energy term provides this missing energetic pathway, enabling the melt to retract over its solidified portion. This behavior is evident at 𝑡 = 8.3 , 11.3 , 15.3 , and 17.3 ms ,where the predicted morphology follows the experimentally observed recoil and retraction sequence. Unlike approaches that prescribe a contact angle for molten tin on its own solidified phase during recoil, the present model does not impose a geometric contact angle at the evolving internal solidified region. Instead, the retraction is driven energetically through the localized wall-energy term, with its strength controlled by the parameter 𝛽 -.
+
+Fig. 9. Comparison of experimental snapshots [1,6] with the present numerical predictions for the normal impact of a solidifying molten tin droplet onto a stainless-steel substrate. The sequence reveals the initial spreading, maximum spread, recoil, and melt retraction over the solidified splat at selected times. 16 
+
+The temperature evolution during solidifying molten tin droplet impact is illustrated in Fig. 10. Immediately after the impact, a large temperature difference between the molten tin droplet and the initially cold substrate drives intense heat transfer across the wetted droplet-substrate contact region. As a result, the strongest cooling within the droplet occurs near the basal contact region, where solidification first initiates. Simultaneously, the substrate is heated locally beneath the wetted footprint, forming a confined thermal penetration region that expands with the spreading droplet. As spreading proceeds, the basal solidified layer grows along the droplet-substrate contact interface and contributes to the contact-line arrest near the maximum-spread stage at 𝑡 ≈ 4.5 ms . After this stage, the solidification front continues to thicken near the substrate while the upper portion of the melt remains above 𝑇 #, leading to a distinct separation between the immobilized solidified splat and the retracting liquid core. 
+
+Fig. 10. Temporal evolution of a solidifying molten tin droplet impact. The panels display droplet morphology and temperature distribution in both the droplet and substrate at selected time moments. The black solid lines denote the gas–condensed-phase interface obtained from the order parameter and the solidification front. The contours illustrate heat extraction into the cold substrate, basal solidification, melt recoil, and retraction over the solidified splat after maximum spreading. The local thermal response is further quantified in Fig. 11(a) using the substrate-side temperature 𝑇 -, and the interfacial heat flux 𝑞 AA = (𝑇 0 − 𝑇 -)/𝑅 / sampled at the center of the wetted interface. The heat flux is initially high because of the significant temperature jump across the thermal contact resistance, but it decreases rapidly as the substrate warms and the droplet cools near the interface. At later times, continued heat transfer into the substrate promotes further growth of the solidified region, while the remaining liquid recoils and retracts over the solidified splat. Yarin et al. [3] predict the solidification height using a Stefan-type self-similarity solution. Assuming perfect thermal contact between the splat and the substrate, the solidification front is located at a constant 17 
+
+similarity coordinate Ξ∗, yielding 𝑍 6 = Ξ ∗𝜈 "𝑡 , where 𝜈 " is liquid kinematic viscosity. The model couples thermal balance to the self-similar viscous flow in the spreading lamella, while assuming one-dimensional heat transfer normal to the wall, semi-infinite liquid and substrate bodies, and constant thermophysical properties. Augmenting their approach to include thermal contact resistance is straightforward. The temperature jump at the contact between the splat and the substrate makes the solid-side temperature-gradient factor time-dependent, and therefore Ξ∗ becomes time-dependent too. The results in Fig. 11(b) compare the solidification height predicted by the extended Yarin et al. model [3] with time-dependent Ξ∗, with the present phase-field results. The solidification-front height profiles in Fig. 11(c) reveal that the solidified splat thickness is spatially nonuniform. Therefore, for the phase-field results in Fig. 11(b), the solidification-front height is reported as a diameter-averaged value over the radial extent of the extracted 𝑇 = 𝑇 # front. The numerical prediction follows the analytical solution well throughout the full spreading phase. The deviation becomes noticeable after 𝑡 ≈ 12 ms , when the numerical result exhibits a reduced growth rate. This late-time behavior coincides with droplet recoil and the development of a radially nonuniform molten region, while the analytical model assumes a one-dimensional, semi-infinite liquid layer above the solidified splat. Thus, the later discrepancy may reflect the effect of recoil-induced morphology on the diameter-averaged front height. 
+
+Fig. 11. Temporal evolution of (a) the substrate-side temperature 𝑇 -, and interfacial heat flux 𝑞 AA at the center of the wetted interface, (b) solidification height 𝑍 6 predicted by the extended analytical model [3] and the present phase-field results, and (c) droplet and solidification-front profiles at selected moments. In panel (c), the shaded regions correspond to newly solidified regions, the solid lines represent the droplet profiles, and the dash-dotted lines indicate the solidification-front profiles. 18 
+
+To isolate the role of the wall-energy term 𝑓 -, Fig. 12 compares post-maximum-spread morphologies obtained with 𝛽 - = −0.54 and 𝛽 - = 0 , while keeping the same solidification penalty treatment. When 
+
+𝛽 - = 0 , the internal wall-energy contribution is inactive, and the formulation behaves like a classical single-order-parameter CHNS model. In this case, the remaining melt stays attached to the solidified splat throughout the post-spreading stage, producing a morphology similar to previous predictions based on the classical CHNS, such as those of Shen et al [12]. This occurs because the liquid and solidified tin are represented by the same condensed-phase order parameter, so the baseline free energy does not distinguish liquid-on-solid wetting from liquid–gas interfacial energy and therefore provides no energetic driving mechanism for melt detachment from the frozen splat. In contrast, 𝛽 - = −0.54 introduces an effective dewetting bias localized near the diffuse melt–solidified-splat–gas triple-line region. This increases the energetic cost of maintaining melt contact with the solidified region and enables the remaining liquid to recoil over the immobilized splat. The comparisons demonstrate that the proposed wall-energy correction supplies the missing energetic mechanism required to capture the recoil of the retracting liquid core over the solidified splat. 
+
+Fig. 12. Effect of the diffuse-domain wall-energy correction during post-maximum-spread melt retraction. Snapshots compare the liquid-fraction field for: (a) 𝛽 - = −0.54 and (b) 𝛽 - = 0.0 . The color field denotes the liquid fraction, where 𝑓 " = 0 corresponds to solidified tin, and 𝑓 " = 1 corresponds to liquid tin. The predicted spread factor is compared with experiments and previous numerical results in Fig. 13. The present phase-field model and the VOF simulations of Pasandideh-Fard et al. [6] use the same thermal contact resistance, 𝑅 / = 5 × 10 HJ m4K/W , whereas the previous phase-field simulation of Shen et al. [12] used a higher value, 𝑅 / = 1 × 10 H* m4K/W . The higher thermal contact resistance reduces heat extraction 19 
+
+into the substrate, delays solidification, and allows a larger maximum spread. Therefore, differences in the prescribed thermal contact resistance should be taken into account when interpreting the predicted maximum spreading. Importantly, the late-stage stabilized spread factor is predicted more accurately than in the previous numerical results. The present model yields 𝜁 ≈ 1.86 , which is closer to the experimental plateau. Together with the splat morphology comparisons, this demonstrates that the proposed numerical framework better captures the coupled spreading, solidification, and post-maximum-spread retraction dynamics of solidifying molten tin droplet impact. 
+
+Fig. 13. Temporal evolution of the spread factor for the normal impact of a solidifying molten tin droplet. Present predictions are compared with the experiments of Aziz and Chandra [1], the VOF results of Pasandideh-Fard et al. [6], and the phase-field results of Shen et al. [12]. 
+
+# 5. Summary and conclusions 
+
+This study presents an improved phase-field framework for simulating the impact and solidification dynamics of molten metal droplets in the high-Weber-number regime. A key limitation of the conventional CHNS formulation is that the solidified portion of the droplet is not treated as an internal wetting boundary. As a result, the remaining melt lacks an energetic pathway to recoil over the frozen splat after maximum spreading. To address this limitation, a diffuse-domain wall-energy term was introduced, with its chemical-potential contribution localized near the liquid–solidified-splat–gas triple-line region. This term provides an effective wetting/dewetting mechanism for the remaining melt without prescribing a geometric contact angle on the evolving internal solidified region. A solidification penalty term is also incorporated into the free-energy functional to suppress artificial motion of the gas–solid interface caused by residual Cahn–Hilliard diffusion. This term anchors the phase-field variable in frozen regions while avoiding ad hoc treatments such as manually pinning the contact line after maximum spreading. The formulation is implemented in a fully coupled finite-element framework with adaptive mesh refinement to resolve the gas–droplet interface, solidification front, and near-wall thermal and hydrodynamic gradients. The model is first validated using the one-dimensional Stefan problem and normal impact of an isothermal droplet. It is then applied to the normal impact of a solidifying molten tin droplet onto a stainless-steel substrate. The proposed formulation reproduces the post-maximum-spread recoil of the remaining melt over the solidified splat and predicts the stabilized final splat diameter with reasonable accuracy. The comparison with the baseline CHNS formulation reveals that without the diffuse-domain wall-energy correction, the remaining melt stays attached to the frozen splat, similarly to previous predictions based on the classical CHNS. Physically, the improvement arises because the added wall-energy term allows the solidified region to act as an effective internal wetting/dewetting surface for the remaining melt, rather than treating liquid and solidified tin as the same condensed phase with no interfacial energetic preference. 20 
+
+The present formulation introduces one additional parameter, 𝛽 -, which controls the localized wetting/dewetting bias near the diffuse triple-line region. Physically, 𝛽 - represents the effective interaction between the remaining melt and its own frozen splat, including the effect of melt-on-solidified-splat wettability. In the present model, it is treated as a tunable parameter, and the calibrated value adopted here enables the model to reproduce the experimentally observed post-maximum-spread droplet profiles in which the remaining melt recoils over the immobilized solidified region. 
+
+Acknowledgements 
+
+The authors acknowledge the financial support from the National Science Foundation award CBET 2312197. Simulations were performed using the High-Performance Computing (HPC) resources supported by the University of Arizona TRIF, UITS, and Research, Innovation, and Impact (RII) and maintained by the University of Arizona Research Technologies team. 
+
+References 
+
+[1] S.D. Aziz, S. Chandra, Impact, recoil and splashing of molten metal droplets, Int. J. Heat Mass Transf. 43 (2000) 2841–2857. https://doi.org/10.1016/S0017-9310(99)00350-6. [2] M. Pasandideh-Fard, R. Bhola, S. Chandra, J. Mostaghimi, Deposition of tin droplets on a steel plate: simulations and experiments, Int. J. Heat Mass Transf. 41 (1998) 2929–2945. https://doi.org/10.1016/S0017-9310(98)00023-4. [3] A.L. Yarin, I.V. Roisman, C. Tropea, Collision phenomena in liquids and solids, Cambridge University Press, Cambridge, 2017. https://doi.org/10.1017/9781316556580. [4] G. Trapaga, E.F. Matthys, J.J. Valencia, J. Szekely, Fluid flow, heat transfer, and solidification of molten metal droplets impinging on substrates: Comparison of numerical and experimental results, Metall. Trans. B 23 (1992) 701–718. https://doi.org/10.1007/BF02656450. [5] H. Liu, E.J. Lavernia, R.H. Rangel, Numerical simulation of substrate impact and freezing of droplets in plasma spray processes, J. Phys. Appl. Phys. 26 (1993) 1900. https://doi.org/10.1088/0022-3727/26/11/010. [6] M. Pasandideh-Fard, S. Chandra, J. Mostaghimi, A three-dimensional model of droplet impact and solidification, Int. J. Heat Mass Transf. 45 (2002) 2229–2242. https://doi.org/10.1016/S0017-9310(01)00336-2. [7] X. Zhang, X. Liu, X. Wu, J. Min, Impacting-freezing dynamics of a supercooled water droplet on a cold surface: Rebound and adhesion, Int. J. Heat Mass Transf. 158 (2020) 119997. https://doi.org/10.1016/j.ijheatmasstransfer.2020.119997. [8] X. Zhang, X. Liu, X. Wu, J. Min, Simulation and experiment on supercooled sessile water droplet freezing with special attention to supercooling and volume expansion effects, Int. J. Heat Mass Transf. 127 (2018) 975–985. https://doi.org/10.1016/j.ijheatmasstransfer.2018.07.021. [9] D. Jacqmin, Calculation of two-phase Navier–Stokes flows using phase-field modeling, J. Comput. Phys. 155 (1999) 96–127. https://doi.org/10.1006/jcph.1999.6332. [10] D. Jacqmin, Contact-line dynamics of a diffuse fluid interface, J. Fluid Mech. 402 (2000) 57–88. https://doi.org/10.1017/S0022112099006874. [11] Z. Wang, L. Zhou, W. Zhang, X. Wang, S. Li, X. Mao, An energy-stable phase-field model for droplet icing simulations, J. Comput. Phys. 526 (2025) 113792. https://doi.org/10.1016/j.jcp.2025.113792. [12] M. Shen, B.Q. Li, Q. Yang, Y. Bai, Y. Wang, S. Zhu, B. Zhao, T. Li, Y. Hu, A modified phase-field three-dimensional model for droplet impact with solidification, Int. J. Multiph. Flow 116 (2019) 51– 66. https://doi.org/10.1016/j.ijmultiphaseflow.2019.04.004. [13] P. Yue, Thermodynamically consistent phase-field modelling of contact angle hysteresis, J. Fluid Mech. 899 (2020) A15. https://doi.org/10.1017/jfm.2020.465. [14] P. Yue, C. Zhou, J.J. Feng, Sharp-interface limit of the Cahn–Hilliard model for moving contact lines, J. Fluid Mech. 645 (2010) 279–294. https://doi.org/10.1017/S0022112009992679. [15] P. Yue, C. Zhou, J.J. Feng, Spontaneous shrinkage of drops and mass conservation in phase-field simulations, J. Comput. Phys. 223 (2007) 1–9. https://doi.org/10.1016/j.jcp.2006.11.020. 21 
+
+[16] S. Alavi, M. Passandideh-Fard, J. Mostaghimi, Simulation of semi-molten particle impacts including heat transfer and phase change, J. Therm. Spray Technol. 21 (2012) 1278–1293. https://doi.org/10.1007/s11666-012-9804-8. [17] V.R. Voller, M. Cross, N.C. Markatos, An enthalpy method for convection/diffusion phase change, Int. J. Numer. Methods Eng. 24 (1987) 271–284. https://doi.org/10.1002/nme.1620240119. [18] Z. Huang, G. Lin, A.M. Ardekani, A consistent and conservative Phase-Field model for thermo-gas-liquid-solid flows including liquid-solid phase change, J. Comput. Phys. 449 (2022) 110795. https://doi.org/10.1016/j.jcp.2021.110795. [19] M. Xue, Y. Heichal, S. Chandra, J. Mostaghimi, Modeling the impact of a molten metal droplet on a solid surface using variable interfacial thermal contact resistance, J. Mater. Sci. 42 (2007) 9–18. https://doi.org/10.1007/s10853-006-1129-x. [20] M. Pasandideh-Fard, V. Pershin, S. Chandra, J. Mostaghimi, Splat shapes in a thermal spray coating process: Simulations and experiments, J. Therm. Spray Technol. 11 (2002) 206–217. https://doi.org/10.1361/105996302770348862. [21] P. Yue, J.J. Feng, C. Liu, J. Shen, A diffuse-interface method for simulating two-phase flows of complex fluids, J. Fluid Mech. 515 (2004) 293–317. https://doi.org/10.1017/S0022112004000370. [22] G. Soligo, A. Roccon, A. Soldati, Coalescence of surfactant-laden drops by Phase Field Method, J. Comput. Phys. 376 (2019) 1292–1311. https://doi.org/10.1016/j.jcp.2018.10.021. [23] H. Ding, P.D.M. Spelt, Wetting condition in diffuse interface simulations of contact line motion, Phys. Rev. E 75 (2007) 046708. https://doi.org/10.1103/PhysRevE.75.046708. [24] A. Mostafavi, M. Ranjbar, V. Yurkiv, A.L. Yarin, F. Mashayek, On the energy analysis of two-phase flows simulated with the diffuse interface method, Phys. Fluids 37 (2025) 072125. https://doi.org/10.1063/5.0276045. [25] J. Kim, A continuous surface tension force formulation for diffuse-interface models, J. Comput. Phys. 204 (2005) 784–804. https://doi.org/10.1016/j.jcp.2004.10.032. [26] A.D. Brent, V.R. Voller, K.J. Reid, Enthalpy-porosity technique for modeling convection-diffusion phase change: application to the melting of a pure metal, Numer. Heat Transf. 13 (1988) 297–318. https://doi.org/10.1080/10407788808913615. [27] V.R. Voller, C. Prakash, A fixed grid numerical modelling methodology for convection-diffusion mushy region phase-change problems, Int. J. Heat Mass Transf. 30 (1987) 1709–1719. https://doi.org/10.1016/0017-9310(87)90317-6. [28] J. Yan, W. Yan, S. Lin, G.J. Wagner, A fully coupled finite element formulation for liquid–solid–gas thermo-fluid flow with melting and solidification, Comput. Methods Appl. Mech. Eng. 336 (2018) 444–470. https://doi.org/10.1016/j.cma.2018.03.017. [29] D. Gaston, C. Newman, G. Hansen, D. Lebrun-Grandié, MOOSE: A parallel computational framework for coupled systems of nonlinear equations, Nucl. Eng. Des. 239 (2009) 1768–1778. https://doi.org/10.1016/j.nucengdes.2009.05.021. [30] A. Mostafavi, M. Ranjbar, V. Yurkiv, A.L. Yarin, F. Mashayek, Capillary breakup of liquid jets in the dripping regime and successive drop impacts on a solid surface, Int. J. Numer. Methods Heat Fluid Flow (2026) 1–26. https://doi.org/10.1108/HFF-10-2025-0768. [31] A. Mostafavi, M. Ranjbar, V. Yurkiv, A.L. Yarin, F. Mashayek, MOOSE-based finite element framework for mass-conserving two-phase flow simulations on adaptive grids using the diffuse interface approach and a Lagrange multiplier, J. Comput. Phys. 527 (2025) 113755. https://doi.org/10.1016/j.jcp.2025.113755. [32] V. Alexiades, Mathematical modeling of melting and freezing processes, Routledge, Boca Raton, 2018. https://doi.org/10.1201/9780203749449. [33] S.-R.( 孙思睿 ) Sun, J.( 张杰) Zhang, M.-J.( 倪明玖 ) Ni, Solidification of liquid metal droplet during impact in the presence of vertical magnetic field, Phys. Fluids 34 (2022) 052106. https://doi.org/10.1063/5.0087443. [34] A.N. Tikhonov, A.A. Samarskii, Equations of mathematical physics, Courier Corporation, 2013. 22 
+
+[35] G. Qiangshun, Z. Haokun, M.D.D. Islam, N. Vahdati, F. Jarrar, Y. Yit Fatt, Numerical study on the spreading and solidification dynamics of ellipsoidal metal droplet impacting on curved solid surfaces, Appl. Therm. Eng. 274 (2025) 126684. https://doi.org/10.1016/j.applthermaleng.2025.126684.

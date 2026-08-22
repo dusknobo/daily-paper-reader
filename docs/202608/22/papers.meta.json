@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-22",
+  "date": "2026-08-22",
+  "generated_at": "2026-08-22T20:24:26",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/22/2608.15941v1-an-improved-phase-field-framework-for-simulating-impacts-of-solidifying-metal-drops",
+      "section": "quick",
+      "title_en": "An improved phase-field framework for simulating impacts of solidifying metal drops",
+      "authors": "Ali Mostafavi, Vitaliy Yurkiv, Alexander L. Yarin, Farzad Mashayek",
+      "date": "2026-08-16",
+      "pdf": "https://arxiv.org/pdf/2608.15941v1",
+      "score": "6.0",
+      "evidence": "面向相变多相流模拟的相场方法",
+      "tldr": "传统CHNS相场模型在模拟凝固金属液滴撞击时，因未把新形成的固相当作内边界，难以捕捉熔体在凝固薄片上的回缩。本文通过在自由能中引入弥散域壁能项和凝固惩罚项，分别激活近三相线区域的化学势贡献以驱动熔体回缩，并固定凝固薄片、抑制残余Cahn-Hilliard扩散。锡液滴撞击基准实验验证表明，新方法能捕获最大铺展后的熔体回缩，并准确估计稳定最终薄片直径。该框架弥补了单序参量弥散界面模型缺乏内部润湿条件的不足，为凝固液滴撞击模拟提供了更准确的工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "Here, an improved phase-field method for simulating the impact dynamics of solidifying molten metal droplets is developed using targeted free-energy modifications. Conventional Cahn-Hilliard-Navier-Stokes (CHNS) formulations generally do not capture melt retraction over a solidified portion of the droplet, because the newly formed solid region is not treated as an actual internal boundary in a single-order-parameter diffuse-interface model. As a result, the formulation lacks an internal wetting condition or localized wall-energy mechanism capable of driving melt retraction over a solidified splat. To address this limitation, a diffuse-domain wall-energy term is added to the free energy, with a chemical-potential contribution that is active near the diffuse liquid-solidified-material-gas triple-line region, enabling the remaining melt to retract over a solidified splat. In addition, a solidification penalty term is introduced to immobilize the solidified splat formed during impact and suppress unphysical interface motion caused by residual Cahn-Hilliard diffusion inside the frozen region. The proposed formulation is validated against benchmark experiments on impacts of solidifying tin droplets. The results reveal that the localized wall-energy term captures post-maximum-spread melt retraction, while the penalty term effectively arrests motion of the solidified splat. Qualitative and quantitative comparisons with experiments, volume-of-fluid simulations, and standard phase-field predictions demonstrate that the proposed formulation captures post-maximum-spread melt retraction and provides an accurate estimate of the stabilized final splat diameter.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
