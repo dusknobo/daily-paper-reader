@@ -1,0 +1,1958 @@
+Title: Weakly Compressible Subcycling for Accelerating Simulations of Surface-Tension-Dominated Incompressible Two-Phase Flows
+
+URL Source: https://arxiv.org/pdf/2608.23110v1
+
+Published Time: Tue, 25 Aug 2026 01:57:01 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Weakly Compressible Subcycling for Accelerating Simulations of Surface-Tension-Dominated Incompressible Two-Phase Flows 
+
+Shu Yamashita a, Shintaro Matsushita a, Tetsuya Suekane a
+
+> aInstitute of Science Tokyo, School of Engineering, 2-12-1, Ookayama, Meguro-ku, Tokyo, 152-8550, Japan
+
+Abstract 
+
+Simulations of surface-tension-dominated incompressible two-phase flows are computationally expensive due to the severe capillary time-step constraint. Although many studies have proposed time-implicit discretizations of sur-face tension to allow larger time-step sizes and accelerate simulations, these methods su ff er from either artificial dissipation or complex implementation. Here, we propose a simple and novel approach: an incompressible solver with weakly compressible subcycling. The proposed approach relaxes the capillary time-step constraint, thereby accelerating simulations by more than 8 .6× without relying on artificially dissipative stabilization or requiring com-plex implementation. The key idea is to introduce lightweight substeps using a weakly compressible solver to assist the main incompressible solver. These substeps enable the main incompressible solver to use accurately computed fluxes and surface tension force, even with large time-step sizes. Numerical tests demonstrate the e ff ectiveness of the proposed approach for practical problems, including the Rayleigh–Plateau instability and two-phase flows in porous media. This study paves the way for a new paradigm in which a weakly compressible solver serves as an assistant to an incompressible solver. 
+
+Keywords: Capillary-driven flows, Capillary time-step constraint, Time-step size, Subcycling, Substeps, Weakly compressible scheme, Porous media 
+
+1. Introduction 
+
+This study focuses on simulations of surface-tension-dominated incompressible two-phase flows. These flows play a critical role in a wide range of applications, including fuel cells [1–3], water electrolysis for hydrogen production [4– 6], geological storage of CO 2 [7, 8], inkjet printing [9], and microfluidics [10, 11]. Numerical simulations are powerful and widely used tools for understanding and optimizing these applications. Therefore, improving the practicality of simulations further advances these fields. For more practical simulations of surface-tension-dominated incompressible flows, reducing computational cost remains a major challenge. Simulating these flows is computationally expensive because the time-explicit discretiza-tion of surface tension imposes a severe capillary time-step constraint [12]. This constraint requires small time-step sizes, thereby increasing the number of times the pressure Poisson equation is solved, which is a major computational cost in incompressible flow simulations [13–15]. Although many studies have developed time-implicit discretizations of surface tension to allow larger time-step sizes, these methods generally su ff er from either artificial dissipation or implementation complexity. For example, Hysing [16] proposed an implicit surface-tension treatment based on the finite element method. Raessi et al. [17] extended this approach to the finite volume method and showed that the capillary time-step constraint could be ex-ceeded by a factor of at least five while maintaining stability. Denner et al. [18] and Popinet [19] pointed out that the stabilization achieved by the implicit surface-tension treatments of Hysing [16] and Raessi et al. [17] is essentially due to artificial dissipation introduced near the interface. Fahsi and Soulaïmani [20] reduced this artificial dissipation using a second-order time-integration scheme. However, the remaining artificial dissipation still degrades accuracy. Denner et al. [21] and Janodet et al. [22] developed fully coupled algorithms. These methods allow time-step sizes larger than the capillary time-step constraint without relying on artificially dissipative stabilization but require com-plex implementations, including linearizing the nonlinear surface tension term and solving a large coupled linear system involving the continuity, momentum, and volume-of-fluid advection equations. arXiv:2608.23110v1 [physics.flu-dyn] 24 Aug 2026 As an alternative approach, Sussman and Ohta [23, 24] used volume-preserving motion by mean curvature to model surface tension. Their method relaxes the capillary time-step constraint but requires the level-set method, its associated reinitialization procedure, and the computation of the average curvature for each connected interface. In this study, we propose a novel approach, an incompressible solver with weakly compressible subcycling ,which is fundamentally di ff erent from time-implicit discretizations of surface tension. Unlike existing methods, the proposed method relaxes the capillary time-step constraint without relying on artificially dissipative stabilization or requiring complex implementations. The key idea is to introduce lightweight substeps using a weakly compressible solver to assist the main incompressible solver. These substeps enable the main incompressible solver to use accurately computed fluxes and surface tension force, even with large time-step sizes. To the best of our knowledge, this is the first study proposing the use of a weakly compressible solver to assist an incompressible solver. 
+
+2. Preliminaries: Standard Incompressible Solver for Two-Phase Flows 
+
+This section presents a standard incompressible solver for two-phase flows, which serves as the baseline for the proposed incompressible solver with weakly compressible subcycling, presented in the next section. In the last part of this section (Section 2.3), we provide an intuitive explanation of the capillary time-step constraint that limits the time-step size of the standard solver. This explanation helps readers understand the key idea underlying the proposed method. 
+
+2.1. Governing Equations 
+
+The Navier–Stokes equations govern the dynamics of incompressible two-phase flows with surface tension: 
+
+∂(ρu)
+
+∂t + ∇ · (ρuu ) = −∇ p + ∇ · μ h∇u + (∇u)⊤i + fσ, (1) 
+
+∇ · u = 0, (2) where ρ is the density, u = (u, v, w) is the velocity, p is the pressure, μ is the viscosity, and fσ = ( fσ x, fσy, fσz) is the surface tension force. For simplicity, gravity is neglected. For the interface-capturing method, we use the phase-field method, specifically the accurate conservative di ff use-interface (ACDI) method [25]. In the ACDI method, the phase at position x is represented by the phase-field variable 
+
+ϕ(x), which takes values in [0 , 1]. ϕ(x) ≈ 0 indicates phase 1, whereas ϕ(x) ≈ 1 indicates phase 2. The interface is represented by a smooth transition region spanning several grid cells. The evolution of the phase-field variable is governed by 
+
+∂ϕ ∂t + ∇ · (uϕ) = ∇ · 
+
+(
+
+Γ
+
+(
+
+ϵ∇ϕ − 14
+
+
+
+1 − tanh 2
+
+ ψ
+
+2ϵ
+
+ ∇ψ
+
+∥∇ ψ∥
+
+)) 
+
+, (3) where Γ is a positive parameter that controls how strongly the right-hand side of Eq. (3) preserves the phase-field profile at the interface, and ϵ is a positive parameter that controls the interface thickness. We set Γ = ∥u∥max and 
+
+ϵ = ∆ x as in [26], where ∥u∥max denotes the maximum velocity magnitude over the domain. The auxiliary signed-distance-like variable ψ is given by ψ = ϵ ln ϕ/ (1 − ϕ).The density and viscosity are computed as ρ = ρ1(1 − ϕ) + ρ2ϕ and μ = μ1(1 − ϕ) + μ2ϕ, where subscripts 1 and 2 denote phases 1 and 2, respectively. To model the surface tension force, we use the localized continuum surface force model [27], fσ = 6ϕ(1 − ϕ)σκ ∇ϕ, where σ is the surface tension coe ffi cient and κ = −∇ · (∇ψ/ ∥∇ ψ∥) is the interface curvature. 
+
+2.2. Numerical Methods 
+
+Here, we present an overview of the numerical procedure for advancing the solution from time step n to n + 1; the detailed implementation is described in Appendix A. For simplicity, the following description is given for the 2D 2case; the extension to 3D is straightforward. For convenience, we rewrite Eqs. (1) and (3) in terms of the momentum fluxes Fρu and Fρv, which include advective and viscous contributions, and the volume flux Fϕ:
+
+∂(ρu)
+
+∂t = ∇ · Fρu − ∂p
+
+∂x + fσ x, where Fρu = −ρuu + μ 2 ∂u
+
+∂x , ∂u
+
+∂y + ∂v
+
+∂x
+
+!
+
+, (4) 
+
+∂(ρv)
+
+∂t = ∇ · Fρv − ∂p
+
+∂y + fσy, where Fρv = −ρvu + μ ∂u
+
+∂y + ∂v
+
+∂x , 2 ∂v
+
+∂y
+
+!
+
+, (5) 
+
+∂ϕ ∂t = ∇ · Fϕ, where Fϕ = −uϕ + Γ 
+
+(
+
+ϵ∇ϕ − 14
+
+
+
+1 − tanh 2
+
+ ψ
+
+2ϵ
+
+ ∇ψ
+
+∥∇ ψ∥
+
+)
+
+. (6) We employ the projection method [28]. The governing equations are discretized with the finite-volume method on a uniform Cartesian grid, and time integration is performed with the first-order explicit Euler method. All scalar variables ( ϕ, ρ, μ, and p) are stored at cell centers, whereas the velocity is stored at both cell centers ( uc) and cell faces ( u f ). In what follows, c → f and f → c denote linear interpolation from cell centers to cell faces and from cell faces to cell centers, respectively. The numerical procedure for advancing the solution from time step n to n + 1 is as follows: 1. Compute the volume flux Fϕ and the momentum fluxes Fρu and Fρv at cell faces using the variables at time step 
+
+n. The momentum fluxes are computed to be consistent with the volume flux [29]. 2. Compute ϕ at time step n + 1: ϕn+1 = ϕn + ∇ · Fϕ∆t.3. Compute the intermediate cell-center velocity: u∗ 
+
+> c
+
+= ρnunc + ∇ · Fρu∆t, ρ nvnc + ∇ · Fρv∆t /ρ n+1.4. Compute the intermediate cell-face velocity u∗ 
+
+> f
+
+by linearly interpolating u∗
+
+> c
+
+.5. Update the intermediate velocities u∗ 
+
+> f
+
+and u∗ 
+
+> c
+
+using the surface tension force: u∗ 
+
+> f
+
+← u∗ 
+
+> f
+
++ fσ∆t/ρ n+1  
+
+> c→f
+
+and 
+
+u∗ 
+
+> c
+
+← u∗ 
+
+> c
+
++  fσ∆t/ρ n+1 
+
+> c→f
+
+ 
+
+> f→c
+
+, where the surface tension force fσ = 6ϕn+1(1 − ϕn+1)σκ n+1∇ϕn+1 is computed at cell faces. 6. Solve the pressure Poisson equation: ∇ · ∇pn+1/ρ n+1 
+
+> c→f
+
+ = ∇ · u∗ 
+
+> f
+
+/∆t. We solve this equation as a linear system by first applying diagonal scaling and then using the FlexGMRES solver with the PFMG preconditioner provided by the hypre library [30, 31], with a convergence tolerance of 10 −7.7. Compute the velocities at time step n + 1: un+1 
+
+> f
+
+= u∗ 
+
+> f
+
+− ∇ pn+1∆t/ρ n+1  
+
+> c→f
+
+and un+1 
+
+> c
+
+= u∗ 
+
+> c
+
+− ∇pn+1/ρ n+1 
+
+> c→f
+
+  
+
+> f→c
+
+∆t.
+
+2.3. Intuitive Explanation of the Capillary Time-Step Constraint 
+
+As we demonstrate later in Section 4.1 (droplet oscillation test), the above standard incompressible solver cannot significantly exceed the capillary time-step constraint [12]: 
+
+∆t ≤
+
+r (ρ1 + ρ2)∆h3
+
+4πσ ≡ ∆tσ, (7) where ∆h = min( ∆x, ∆y, ∆z) is the minimum grid spacing. Here, we provide an intuitive explanation of why using time-step sizes larger than ∆tσ leads to inaccurate or unstable simulations. This explanation helps readers understand the key idea of the proposed method presented in Section 3. The primary reason for inaccurate or unstable simulations is that large time-step sizes prevent accurate computa-tion of the fluxes and the surface tension force. The capillary time-step constraint in Eq. 7 ensures that the time-step size is su ffi ciently small to temporally resolve the propagation of capillary waves [32]. More specifically, even the fastest wave resolvable on the grid, with a wavelength of 2 ∆h, propagates by no more than ∆h/2 (i.e., one-quarter of its wavelength) during a single time step [12]. As a result, each cell can accurately compute the fluxes and the surface tension force because these quantities do not change significantly over such a small time step. However, excessively large time-step sizes allow the fluxes and the surface tension force to change significantly within a single time step; thus, the time-explicit discretization cannot accurately compute these quantities, leading to inaccurate or unstable simulations. 3Proposed Method: Incompressible Solver with Weakly Compressible Subcycling        
+
+> Δ𝑡 ≤ Δ𝑡ఙ
+> time time
+> Δ𝑡 ≥ Δ𝑡ఙ 𝑡 ௡ାଵ 𝑡 ௡𝑡 ௡ିଵ
+> time
+> 𝑡 ௡ାଵ 𝑡 ௡𝑡 ௡ିଵ
+> sum of fluxes
+> sum of forces
+> 𝑡 ௠𝑡 ௠ାଵ Δ𝑡ୱ୳ୠ ≤ Δ𝑡ఙ
+> time Substep Using the
+> Weakly Compressible Solver
+> Incompressible Solver
+> Solve the pressure Poisson equation once per large 𝚫𝒕
+
+Standard Incompressible Solver   
+
+> Solve the pressure Poisson equation once per small 𝚫𝒕 Figure 1: Overview of the proposed incompressible solver with weakly compressible subcycling. The lightweight weakly compressible solver assists the main incompressible solver by computing the fluxes and the surface tension force within each substep. This enables the main incom-pressible solver to exceed the capillary time-step constraint.
+
+3. Proposed Method: Incompressible Solver with Weakly Compressible Subcycling 
+
+Our goal is to develop an incompressible solver that relaxes the capillary time-step constraint without relying on artificially dissipative stabilization or requiring complex implementation. Using larger time-step sizes reduces the number of times the computationally expensive pressure Poisson equation is solved, thereby accelerating simulations. In this section, we propose a novel approach: an incompressible solver with weakly compressible subcycling . Fig-ure 1 provides an overview of the algorithm. The key idea is to use the lightweight weakly compressible solver to assist the incompressible solver: the fluxes Fϕ, Fρu, and Fρv and the surface tension force fσ required by the incom-pressible solver are computed by the weakly compressible solver in substeps. As discussed in Section 2.3, enabling an incompressible solver to use large time-step sizes requires resolving capillary waves in time and, consequently, accurately evaluating the fluxes and the surface tension force acting during a single time step. The proposed method achieves this by temporally resolving the propagation of capillary waves through small substeps within each time step. We present the algorithm from time step n to n+1. The incompressible solver with weakly compressible subcycling comprises the following two stages: 1. Weakly compressible subcycling. From time tn to tn+1, we compute the evolution of the flow (i.e., u, p, and ϕ)using multiple substeps, each of which is solved with a weakly compressible solver. This weakly compressible solver is a lightweight solver that avoids solving the pressure Poisson equation by allowing slight compress-ibility. In this study, we employ a weakly compressible solver based on the evolving pressure projection (EPP) method [29, 33]. The EPP method is similar to the standard incompressible solver in Section 2, except for the pressure computation. Please refer to Appendix A for the detailed implementation of the common parts. The overview of the algorithm from substep m to m + 1 is as follows: (a) Set the substep size ∆tsub = min tn+1 − tm, 0.95 ∆tu, 0.5∆tμ, ∆tσ, 0.5∆tϕ
+
+, where ∆tu = ∆ h/∥umf ∥max , ∆tμ =∆h2/[2 d max( μ1/ρ 1, μ 2/ρ 2)], and ∆tϕ = ∆ h2/(2 dΓϵ) are the time-step constraints for advection, viscosity, and the phase-field method, respectively. d denotes the spatial dimension. (b) Compute the fluxes Fϕ, Fρu, and Fρv using the variables at substep m.(c) Compute ϕ at substep m + 1: ϕm+1 = ϕm + ∇ · Fϕ∆tsub .(d) Compute the intermediate cell-center velocity: u∗ 
+
+> c
+
+= ρmumc + ∇ · Fρu∆tsub , ρ mvmc + ∇ · Fρv∆tsub 
+
+ /ρ m+1.(e) Compute the intermediate cell-face velocity u∗ 
+
+> f
+
+by linearly interpolating u∗
+
+> c
+
+.42 mm          
+
+> liquid gas
+> Density
+> •𝜌୪୧୯ = 998 kg m ଷ⁄
+> •𝜌୥ୟୱ = 1.2 kg m ଷ⁄
+> Viscosity
+> •𝜇୪୧୯ = 𝜇୥ୟୱ = 0 Pa ⋅ s
+> Surface tension coefficient
+> •𝜎 = 7.2 × 10ି ଶN m ⁄
+
+0.6 mm 
+
+⋯𝑡 = 0 ms 𝑡 = 0.6 ms 𝑡 = 1.2 ms Figure 2: Inviscid 2D droplet oscillation test in Section 4.1. 
+
+(f) Update the intermediate velocities u∗ 
+
+> f
+
+and u∗ 
+
+> c
+
+using the surface tension force: u∗ 
+
+> f
+
+← u∗ 
+
+> f
+
++ fσ∆tsub /ρ m+1 
+
+> c→f
+
+and u∗ 
+
+> c
+
+← u∗ 
+
+> c
+
++  fσ∆tsub /ρ m+1 
+
+> c→f
+
+ 
+
+> f→c
+
+, where the surface tension force fσ = 6ϕm+1(1 − ϕm+1)σκ m+1∇ϕm+1 is computed at cell faces. (g) Iteratively update the pressure by solving the pressure evolution equation [29]: 
+
+p∗, i+1 − p∗, i
+
+∆tsub 
+
++ ρm+1c2 
+
+> s
+
+∇ · 
+
+u∗ 
+
+> f
+
+− 1
+
+ρm+1 
+
+> c→f
+
+∇p∗, i∆tsub 
+
+ = 0, (8) where cs is an artificial sound speed, which we set to cs = 0.4∆h/∆tsub . The superscript i (0 ≤ i < NEPP )denotes the iteration count, and p∗, i denotes the pressure at the i-th iteration. The iteration starts from 
+
+p∗, 0 = pm and ends with pm+1 = p∗, NEPP . Increasing the number of iterations NEPP mitigates compress-ibility [33]. We set NEPP = 10 based on our numerical experiments. This iteration is much less expensive than solving the pressure Poisson equation because of its simplicity, even though it does not enforce in-compressibility. (h) Compute the velocities at substep m+1: um+1 
+
+> f
+
+= u∗ 
+
+> f
+
+−∇ pm+1∆tsub /ρ m+1  
+
+> c→f
+
+and um+1 
+
+> c
+
+= u∗
+
+> c
+
+−∇pm+1/ρ m+1 
+
+> c→f
+
+  
+
+> f→c
+
+∆tsub .2. Incompressible solver with fluxes and surface tension forces from subcycling. After the above subcycling, we apply the standard incompressible solver from tn to tn+1, replacing the fluxes and the surface tension force with their sums over all substeps: 
+
+Fϕ∆t =
+
+X
+
+> m
+
+Fϕ∆tsub 
+
+m
+
+, Fρu∆t =
+
+X
+
+> m
+
+Fρu∆tsub 
+
+m
+
+, Fρv∆t =
+
+X
+
+> m
+
+Fρv∆tsub 
+
+m
+
+, fσ∆t =
+
+X
+
+> m
+
+( fσ∆tsub )m .
+
+(9) Notably, the implementation is simple. Both stages can be implemented by reusing the standard incompressible solver, with slight modifications to the pressure computation in stage 1 and to the computation of the fluxes and the surface tension force in stage 2. 
+
+4. Numerical Tests 
+
+4.1. Inviscid 2D Droplet Oscillation Objective. We present simulations of an inviscid droplet oscillating due to surface tension. The objective is to demon-strate that the proposed incompressible solver with weakly compressible subcycling can relax the capillary time-step constraint without relying on artificially dissipative stabilization, unlike existing dissipative approaches [16–18, 20]. 50 2 4 6 8 10 Time [ms] 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 Kinetic Energy [J]            
+
+> ×10 6
+> Standard Incompressible Solver, ∆t= min(∆ tσ,0.5∆ tφ)
+> Standard Incompressible Solver, ∆t= min(5∆ tσ,0.5∆ tφ)
+> Proposed Incompressible Solver, ∆t= 25∆ tσFigure 3: The evolution of kinetic energy for the inviscid 2D droplet oscillation in Section 4.1. The kinetic energy is computed as
+> Pi j
+> 0.5ρ∥u∥2∆x∆y
+> i j . The “Standard Incompressible Solver” denotes the solver in Section 2. For the simulation with the proposed solver (red squares), the kinetic energy is plotted at every time step.
+
+Problem Setup. Figure 2 illustrates the setup for this test. An elliptical liquid droplet is initially positioned at the center of a square domain, [ −1, 1] mm × [−1, 1] mm, and is surrounded by gas. The liquid and gas densities are 
+
+ρliq = 998 kg /m3 and ρgas = 1.2 kg /m3, respectively. Both phases are inviscid, and the surface tension coe ffi cient is 
+
+σ = 7.2 × 10 −2 N/m. Gravity is ignored. Initially, the velocity and pressure are set to u = 0 and p = 0, respectively, and the interface is given by x2/a2 + y2/b2 = 1 with a = 0.3 mm and b = 0.2 mm. Free-slip boundary conditions are applied to all boundaries. The grid resolution is 128 × 128. Under these settings, the dominant time-step constraints are the capillary ( ∆tσ ≈ 2.1 × 10 −6 s) and the phase-field (min t ∆tϕ ≈ 1.2 × 10 −5 s), where min t denotes the minimum over the entire simulation time. 
+
+Results (Kinetic Energy). Figure 3 shows the evolution of kinetic energy over the entire computational domain. Since both phases are inviscid, the oscillation should not dissipate, and the successive peaks of kinetic energy should remain constant. The standard incompressible solver described in Section 2 satisfies this requirement when the time-step size is su ffi ciently small, i.e., ∆t = min( ∆tσ, 0.5∆tϕ). However, using a larger time-step size, ∆t = min(5 ∆tσ, 0.5∆tϕ), leads to a non-physical increase in kinetic energy. This result demonstrates that the standard incompressible solver cannot significantly exceed the capillary time-step constraint, as is well known. In contrast, the proposed method accurately reproduces the kinetic energy evolution even with ∆t = 25 ∆tσ. Notably, this time-step size is more than 4× the constraint of the phase-field method, min t ∆tϕ. The proposed method thus enables such a large time-step size without relying on artificially dissipative stabilization. The absence of artificial dissipation is a key advantage of the proposed method compared with existing artificially dissipative surface tension treatments [16–18, 20]. 
+
+4.2. 2D Rising Bubble Objective. Because the proposed method uses a weakly compressible solver in the substeps, readers may be con-cerned about velocity oscillations caused by acoustic waves, a well-known drawback of weakly compressible solvers [33– 36]. Here, we present 2D simulations of a rising bubble to demonstrate that the proposed method does not exhibit such oscillations. 6𝑡 = 0 s 𝑡 = 0.07 s 10 mm 
+
+ Density 
+
+• 𝜌୪୧୯ = 998 kg m ଷ⁄
+
+• 𝜌୥ୟୱ = 1.2 kg m ଷ⁄
+
+ Viscosity 
+
+• 𝜇୪୧୯ = 1.0 × 10ି ଷ Pa ⋅ s 
+
+• 𝜇୥ୟୱ = 1.8 × 10ି ହ Pa ⋅ s 
+
+ Gravity 
+
+• 𝒈 = 0, −9.8 m/s ଶ
+
+ Surface tension coefficient 
+
+• 𝜎 = 7.2 × 10ି ଶ N m ⁄2.5 mm 
+
+liquid gas Figure 4: 2D rising bubble test in Section 4.2. 0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 Time [s] 0.05 
+
+0.00 0.05 0.10 0.15 0.20 0.25 Rising Velocity [m/s] Standard Incompressible Solver, ∆t = min(∆ tσ, 0.5∆ tφ)
+
+Proposed Incompressible Solver, ∆t = 30∆ tσ
+
+Weakly Compressible Solver, ∆t = min(∆ tσ, 0.5∆ tφ)            
+
+> Figure 5: Bubble rising velocity for the test in Section 4.2. The rising velocity is computed as Pi j
+> (1 −ϕ)vi j
+>  P i j (1 −ϕ)i j . The label “Standard Incompressible Solver” refers to the solver in Section 2. The label “Weakly Compressible Solver” refers to the solver based on the evolving pressure projection method (see [29, 33] and stage 1 in Section 3), with a time-step size of ∆t=min( ∆tσ,0.5∆tϕ) and a sound speed of cs=0.4∆h/∆t.
+
+Problem Setup. Figure 4 illustrates the setup for this test. A gas bubble with a diameter of 2 .5 mm is initially positioned at (5 , 5) mm within a domain of [0 , 10] mm × [0 , 20] mm. The liquid and gas densities are ρliq = 998 kg /m3
+
+and ρgas = 1.2 kg /m3, respectively. The viscosities are μliq = 10 −3 Pa · s and μgas = 1.8 × 10 −5 Pa · s. The surface tension coe ffi cient is σ = 7.2 × 10 −2 N/m. The gravitational acceleration is g = (0 , −9.8) m /s2. Initially, the velocity and pressure are set to u = 0 and p = 0. Free-slip boundary conditions ( u = 0, ∂v/∂ x = 0) are applied at the left and right boundaries, whereas no-slip conditions are applied at the top and bottom boundaries. The grid resolution is 256 × 512. Under these settings, the dominant time-step constraints are the capillary ( ∆tσ ≈ 8.1 × 10 −6 s), the phase-field (min t ∆tϕ ≈ 2.4 × 10 −5 s), and the viscosity ( ∆tμ ≈ 2.5 × 10 −5 s). 7𝑡 = 2.17 × 10ି ଷ s𝑡 = 0 s 𝑡 = 1.7 × 10ି ଷ s         
+
+> 𝑥 𝑧 𝑥 𝑧 𝑦
+> Density
+> •𝜌୪୧୯ = 998 kg m ଷ⁄
+> •𝜌୥ୟୱ = 1.2 kg m ଷ⁄
+> Viscosity
+> •𝜇୪୧୯ = 𝜇୥ୟୱ = 0 Pa ⋅ s
+> Surface tension coefficient
+> •𝜎 = 7.2 × 10ି ଶN m ⁄1 mm 0.5 mm 0.5 mm
+> liquid gas Figure 6: Simulation of the Rayleigh–Plateau instability in Section 4.3.
+
+Results (Rising Velocity). Figure 5 shows the bubble rising velocity. The weakly compressible solver exhibits veloc-ity oscillations due to large acoustic waves generated by the sudden pressure change at the start of the simulation. Although increasing the sound speed cs eff ectively suppresses these oscillations [34], it increases computational cost because the allowable time-step size is reduced ( ∆t < O(∆x/cs)). Another approach is to solve the pressure Poisson equation or to increase the number of iterations NEPP only during the initial stage of the simulation [33, 37]. Although this approach also mitigates oscillations, it requires the timing of the sudden pressure change to be known in advance and is therefore not a general solution. In contrast, the proposed incompressible solver does not exhibit such oscilla-tions, even though the subcycling stage employs a weakly compressible solver. The bubble rising velocity obtained with the proposed method agrees well with that of the standard incompressible solver, even when a large time-step size, ∆t = 30 ∆tσ, is used. Notably, this time-step size is more than 9 × as large as both min t ∆tϕ and ∆tμ. These results demonstrate that the proposed method can relax the capillary time-step constraint without the typical problem of weakly compressible solvers: oscillations caused by acoustic waves. 
+
+4.3. Rayleigh–Plateau Instability Objective. We present simulations of the Rayleigh–Plateau instability. The objective is to demonstrate the applica-bility and reduced computational cost of the proposed method for 3D simulations of capillary-driven instability. 
+
+Problem Setup. Figure 6 shows the setup for this test. A liquid column is initially placed within a 3D domain, h0, 5 × 10 −4i m × h0, 5 × 10 −4i m × h−5 × 10 −4, 5 × 10 −4i m. The liquid column is a perturbed cylinder centered on the z-axis, with radius r(z) = r0 [1 + α sin( kz )], where r0 = 2 × 10 −4 m, α = 0.1, and k = 1000 π rad /m. The surrounding fluid is a gas. The liquid and gas densities are ρliq = 998 kg /m3 and ρgas = 1.2 kg /m3, respectively. Both phases are inviscid. The surface tension coe ffi cient is σ = 7.2 × 10 −2 N/m, and gravity is neglected. Free-slip boundary conditions are applied at x = 0 m, y = 0 m, z = −5 × 10 −4 m, and z = 5 × 10 −4 m, while outflow boundary conditions are applied at x = 5 × 10 −4 m and y = 5 × 10 −4 m. The initial pressure is set to p = 0. Following [38], the initial velocity field is set to 
+
+u = ∇Φ, (10) 
+
+Φ = αr0ckI0(kr )
+
+I1(kr 0) sin( kz ), (11) 
+
+c =
+
+s
+
+σk
+
+ρr20
+
+I1(kr 0)
+
+I0(kr 0)
+
+1 − k2r20
+
+ = 1013 .6, (12) where I0 and I1 are the modified Bessel functions. The grid resolution is 200 × 200 × 400. 810 6 10 5
+
+10 4 10 3
+
+Time to Pinch-Off, tp − t [s] 10 6
+
+10 5
+
+10 4
+
+> Minimum Radius [m]
+
+∆h = 2 .5 × 10 −6
+
+∆t = ∆ tσ
+
+∆t = 16∆ tσ
+
+∆t = 32∆ tσ
+
+10 6 10 5
+
+10 4 10 3
+
+Time to Pinch-Off, tp − t [s] 10 3
+
+10 4
+
+> Pressure [Pa] at  (0 , 0, 9 × 10 −5)
+
+∆t = ∆ tσ
+
+∆t = 16∆ tσ
+
+∆t = 32∆ tσFigure 7: The minimum radius and the pressure near the neck in the simulation of the Rayleigh–Plateau instability in Section 4.3. See also Fig. 8 for the sudden pressure increase. The pinch-o ff time is tp = 2.169 × 10 −3 s. The results are obtained using the proposed method. 𝑥, 𝑦, 𝑧 = 0, 0, 9 × 10ି ହ𝑡௣ − 𝑡 = 3 × 10ି ହ s 𝑡௣ − 𝑡 = 2 × 10ି ହ s 𝑡௣ − 𝑡 = 10ି ହ s𝑦 𝑧 
+
+> Figure 8: Sudden pressure increase near the neck in the simulation of the Rayleigh–Plateau instability in Section 4.3.
+
+Results (Minimum Radius and Pressure). Figure 7 shows the evolution of the minimum radius and the pressure near the neck. The results are obtained using the proposed method with time-step sizes of ∆t = ∆ tσ, 16 ∆tσ, and 32 ∆tσ.The pressure near the neck increases suddenly just before pinch-o ff . This pressure rise is explained in Fig. 8. As the neck radius rneck decreases, the pressure near the neck, p ≈ σ/ rneck , increases. At the same time, the neck position moves in the positive z-direction. The pressure at (0 , 0, 9 × 10 −5) suddenly increases when the point enters the high-pressure region. For both the minimum radius and the pressure, the large time-step sizes (16 ∆tσ and 32 ∆tσ) yield results nearly identical to those obtained with ∆t = ∆ tσ, even when the neck radius is only a few grid cells. These results demonstrate that the proposed method can exceed the capillary time-step constraint by at least 32 times in 3D simulations of Rayleigh–Plateau instability. 91 2 4 8 16 32 
+
+∆t/ ∆tσ
+
+10 0
+
+10 1
+
+10 2
+
+10 3  
+
+> Execution Time [s]
+> 992 s 591 s 353 s 221 s 152 s 116 s
+
+O(∆ tσ/∆t)
+
+Total = Poisson + Subcycling + Others Solving Poisson Weakly Compressible Subcycling Others Figure 9: Execution time of the simulation of the Rayleigh–Plateau instability in Section 4.3 for di ff erent time-step sizes. The execution time is measured up to t = 3 × 10 −4 s. 
+
+Results (Execution Time). Figure 9 shows the execution time of the proposed method for di ff erent time-step sizes. We run the simulations on a single NVIDIA H100 GPU. The execution time decreases as the time-step size increases. Using ∆t = 32 ∆tσ yields an 8 .6× speedup over ∆t = ∆ tσ. The speedup is largest for small time-step sizes, where the pressure Poisson solver dominates the computational cost. As the time-step size increases, the pressure Poisson solver accounts for a smaller fraction of the total execution time, resulting in a lower speedup. 
+
+4.4. Two-Phase Flows in Porous Media Objective. This section presents 2D simulations of two-phase flow in porous media. The objective is to assess the applicability of the proposed method to one of the most important applications of surface-tension-dominated two-phase flow. 
+
+Problem Setup. Figure 10 shows the initial settings for the simulations. Liquid is injected uniformly at 3 mm /s at the left boundary, displacing the gas in the porous medium. No-slip boundary conditions are applied to the top and bottom boundaries, whereas an outflow boundary condition with fixed pressure p = 0 is applied to the right boundary. The porous medium is formed by arranging circular objects as follows: first, arrange them regularly; then, slightly shift five of them in the y-direction to create a single widest path. See Fig. 10 for more details. The liquid and gas densities are 
+
+ρliq = 998 kg /m3 and ρgas = 1.2 kg /m3, respectively. The viscosities are μliq = 10 −3 Pa · s and μgas = 9 × 10 −6 Pa · s. The surface tension coe ffi cient is σ = 7.2 × 10 −2 N/m, and gravity is neglected. The liquid–solid contact angle is 
+
+θliq = 150 ◦; thus, the liquid is a non-wetting phase. The grid resolution is 1250 × 750. The objects are accounted for by the cut-cell method [39] for fluxes, in conjunction with the immersed boundary method [40]. For the contact angle, we extrapolate the phase-field variable into the objects, following [41]. 
+
+Results (Flow Pattern). Figure 11 shows the flow pattern for di ff erent time-step sizes. All time-step sizes yield the same flow pattern, in which the liquid selectively invades the widest path. This flow pattern is a well-known phe-nomenon called capillary fingering [42, 43]. The interface preferentially invades wider throats because the interface curvature is lower there, requiring less liquid-phase pressure to overcome surface tension. The proposed method can accurately reproduce this flow pattern while overcoming the capillary time-step constraint. 
+
+Results (Inlet–Outlet Pressure Di ff erence). Figure 12 shows the inlet–outlet pressure di ff erence. The results exhibit sudden pressure drops at regular intervals. As shown in Fig. 13, these pressure drops occur when the interface passes through a throat and then suddenly expands into a pore. Simulations with time-step sizes up to ∆t = 32 ∆tσ yield 10 3 mm 5 mm 
+
+> uniform injection  𝑢 = 3 mm s ⁄
+> outflow  𝑝 = 0 Pa
+
+widest path 
+
+60 ∘60 ∘60 ∘
+
+0.8 mm 0.6 mm 0.5 mm +0.02 mm 
+
+in 𝑦 
+
+no-slip boundary no-slip boundary  Density 
+
+• 𝜌୪୧୯ = 998 kg m ଷ⁄
+
+• 𝜌୥ୟୱ = 1.2 kg m ଷ⁄
+
+ Viscosity 
+
+• 𝜇୪୧୯ = 10ି ଷ Pa ⋅ s 
+
+• 𝜇୥ୟୱ = 9 × 10ି ଺ Pa ⋅ s 
+
+ Surface tension coefficient 
+
+• 𝜎 = 7.2 × 10ି ଶ N m ⁄
+
+ Contact angle 
+
+• 𝜃୪୧୯ = 150 ∘+0.02 mm 
+
+in 𝑦 +0.02 mm 
+
+in 𝑦 −0.02 mm 
+
+in 𝑦 −0.02 mm 
+
+in 𝑦 
+
+liquid gas Figure 10: Initial settings for the 2D simulations of two-phase flow in porous media in Section 4.4. The gray circles represent the solid objects that make up the porous medium. The objects are first arranged regularly with a spacing of 1 mm between adjacent objects. Then, five objects are shifted by 0 .02 mm in the y direction (black arrows), forming a single widest path (white arrow). Δ𝑡 = Δ𝑡ఙ Δ𝑡 = 16 Δ𝑡ఙ Δ𝑡 = 256 Δ𝑡ఙ 
+
+Figure 11: Flow patterns in porous media at t = 0.18 s obtained using the proposed method with three di ff erent time-step sizes (see Section 4.4). 0.00 0.05 0.10 0.15 Time [s] 0100 200 300 400 500 600 700 Inlet-Outlet Pressure Difference [Pa] 
+
+∆t = ∆ tσ
+
+∆t = 32∆ tσ
+
+∆t = 64∆ tσ
+
+∆t = 128∆ tσ
+
+Figure 12: Inlet–outlet pressure di ff erence in 2D porous media (see Section 4.4). The simulations are performed using the proposed method with various time-step sizes. Figure 13 provides a detailed view of the sudden pressure drop. 
+
+11 𝑡 = 0.1 s 𝑡 = 0.102 s 𝑡 = 0.104 s 𝑡 = 0.106 s 𝑡 = 0.108 s Figure 13: Sudden pressure drop when the liquid passes through the throat. 1 2 4 8 16 32 64 128 256 
+
+∆t/ ∆tσ
+
+10 0
+
+10 1
+
+10 2
+
+10 3    
+
+> Execution Time [s]
+> 1087 s 843 s 482 s 281 s 171 s 111 s 77 s 67 s 52 s
+
+O(∆ tσ/∆t)
+
+Total = Poisson + Subcycling + Others Solving Poisson Weakly Compressible Subcycling Others    
+
+> Figure 14: Execution time for the simulation of two-phase flow in porous media (Section 4.4) with di ff erent time-step sizes. The execution time is measured up to t=0.005 s.
+
+pressure drops of nearly the same magnitude, whereas larger time-step sizes underestimate them. Therefore, the proposed method can exceed the capillary time-step constraint by up to 32 × in this test. 
+
+Results (Execution Time). Figure 14 shows the execution time for di ff erent time-step sizes. We run the simulations on a single NVIDIA H100 GPU. The execution time decreases as the time-step size increases. Using ∆t = 32 ∆tσ
+
+yields a 9 .8× speedup over ∆t = ∆ tσ. This speedup trend is similar to that observed in the previous test (Section 4.3). The speedup is largest for small time-step sizes, where the pressure Poisson solver dominates the computational cost. As the time-step size increases, the pressure Poisson solver accounts for a smaller fraction of the total execution time, resulting in a lower speedup. 12 5. Conclusions 
+
+5.1. Summary 
+
+In this study, we proposed an incompressible solver with weakly compressible subcycling (Fig. 1) to relax the cap-illary time-step constraint, thereby accelerating simulations of surface-tension-dominated incompressible two-phase flows (Section 3). The key advantage of the proposed method is that it relaxes the capillary time-step constraint with-out relying on artificially dissipative stabilization or requiring complex implementation, unlike previous mainstream time-implicit discretizations of surface tension. Our strategy is to introduce lightweight substeps using a weakly com-pressible solver to assist the main incompressible solver. These substeps enable the main incompressible solver to use accurately computed fluxes and surface tension force, even with large time-step sizes. To the best of our knowledge, this is the first study to use a weakly compressible solver as an assistant to a main incompressible solver. We demonstrated the applicability and e ffi ciency of our method for practical 2D and 3D problems. In the simu-lation of inviscid droplet oscillation (Section 4.1), we showed that the proposed method can use ∆t = 25 ∆tσ without relying on artificially dissipative stabilization, whereas the standard incompressible solver cannot use even ∆t = 5∆tσ.In the simulation of a rising bubble (Section 4.2), we showed that the proposed method does not exhibit oscillations caused by acoustic waves, a well-known drawback of weakly compressible solvers. In further practical problems, such as the Rayleigh–Plateau instability (Section 4.3) and two-phase flows in porous media (Section 4.4), the pro-posed method achieves 8 .6× and 9 .8× speedups, respectively, with ∆t = 32 ∆tσ compared with simulations using 
+
+∆t = ∆ tσ.
+
+5.2. Limitations and Future Work Higher-Order Time Integration. We use the first-order explicit Euler method for time integration. This is because this study focuses on constructing a simple base framework and reducing computational cost. We have not investigated extending our method to higher-order time integration methods, which may not be straightforward without increasing computational cost. 
+
+Compressibility. In our method, we compute the fluxes using a weakly compressible solver. Although we have not encountered any serious problems, the weak compressibility may adversely a ff ect the phase-field variables, for example, by causing overshoots and undershoots. Indeed, Fig. 11 shows that the simulation with ∆t = 256 ∆tσ
+
+produces tiny bubbles in the liquid phase. Further improvement is needed to enhance the incompressibility of the computed fluxes. 
+
+Applicability to Broader Regimes. This study focuses solely on surface-tension-dominated flows. However, our method may also apply to other regimes. Indeed, our method exceeds the time-step constraints imposed by the phase-field method and viscosity in simulations of droplet oscillation (Section 4.1) and a rising bubble (Section 4.2). Further research can clarify the applicability of our method not only to surface-tension-dominated cases but also to broader regimes. 
+
+Declaration of Generative AI and AI-Assisted Technologies in the Manuscript Preparation Process 
+
+During the preparation of this work, the authors used ChatGPT and Grammarly solely to improve the readability of the English in this manuscript. Specifically, these tools were used to improve the readability of the original English text written by the authors and to translate the original Japanese text written by the authors into English. The authors reviewed all outputs and revised them as needed. The authors take full responsibility for the content of the manuscript. 
+
+Acknowledgements 
+
+This work was supported by JSPS KAKENHI (Grant Numbers: JP26K21957, JP23K25024, JP25K07582, and JP22K14178), JST ASPIRE (Grant Number: JPMJAP2407), JST SPRING (Grant Number: JPMJSP2180), and Sci-ence Tokyo Support Program for Doctoral Students, funded by the Universities for International Research Excellence. This study was carried out using the TSUBAME4.0 supercomputer at Institute of Science Tokyo. 13 Appendix A. Detailed Implementation of the Standard Incompressible Solver in Section 2 
+
+We present the detailed implementation of the standard incompressible solver described in Section 2. For simplic-ity, we consider the 2D case. Cell centers are denoted by the indices ( i, j), and cell faces are denoted by the indices (i − 12 , j) and ( i, j − 12 ). The variables are the phase-field variable ϕi, j, the cell-center velocity uc = (( uc)i, j, (vc)i, j), the cell-face velocity u f = (( u f )i− 12 , j, (v f )i, j− 12 ), the pressure pi, j, the density ρi, j, the viscosity μi, j, the normal vector 
+
+nϕ = (( nϕ x)i, j, (nϕy)i, j), and the curvature κi, j. We use the notation ⟨q⟩i− 12 , j = 12 (qi−1, j +qi, j) and ⟨q⟩i, j− 12 = 12 (qi, j−1 +qi, j). The numerical procedure from time step n to n + 1 is as follows: 1. Compute the volume flux Fϕ =
+
+ Fϕ x
+
+    
+
+> i−12,j
+
+, Fϕy
+
+  
+
+> i,j−12
+
+
+
+following [25]: 
+
+• Compute ψni, j = ϵ ln clip ϕni, j 
+
+> +10 −100
+> 1−clip ϕni,j
+> +10 −100
+
+!
+
+, where clip ϕni, j
+
+ = max min ϕni, j, 1 , 0.
+
+• Compute Γ = unf max .
+
+• Compute the volume flux Fϕ:
+
+Fϕ x
+
+    
+
+> i−12,j
+
+= − unf
+
+    
+
+> i−12,j
+
+⟨ϕn⟩i− 12 , j + Γ 
+
+ϵ ϕni, j − ϕni−1, j
+
+∆x − 14
+
+1 − tanh 2
+
+
+
+⟨ψn⟩i− 12 , j
+
+2ϵ
+
+Dnn 
+
+> ϕx
+
+E   
+
+> i−12,j
+
+ , (A.1) 
+
+Fϕy
+
+  
+
+> i,j−12
+
+= − vnf
+
+  
+
+> i,j−12
+
+⟨ϕn⟩i, j− 12 + Γ 
+
+ϵ ϕni, j − ϕni, j−1
+
+∆y − 14
+
+1 − tanh 2
+
+
+
+⟨ψn⟩i, j− 12
+
+2ϵ
+
+
+
+nn
+
+> ϕy
+
+  
+
+> i,j−12
+
+ . (A.2) 2. Compute the momentum fluxes Fρu =
+
+ Fρu x
+
+    
+
+> i−12,j
+
+, Fρuy
+
+  
+
+> i,j−12
+
+
+
+and Fρv =
+
+ Fρv x
+
+    
+
+> i−12,j
+
+, Fρvy
+
+  
+
+> i,j−12
+
+
+
+:
+
+• Compute the advective momentum fluxes Fadv  
+
+> ρu
+
+= Fadv  
+
+> ρux
+
+    
+
+> i−12,j
+
+,
+
+
+
+Fadv 
+
+> ρu y
+
+  
+
+> i,j−12
+
+!
+
+and Fadv  
+
+> ρv
+
+= Fadv  
+
+> ρvx
+
+    
+
+> i−12,j
+
+,
+
+
+
+Fadv  
+
+> ρvy
+
+  
+
+> i,j−12
+
+!
+
+to be consistent with the volume flux Fϕ [29]: 
+
+– Compute the mass flux Fρ =
+
+ Fρ x
+
+    
+
+> i−12,j
+
+, Fρy
+
+  
+
+> i,j−12
+
+
+
+:
+
+Fρ x
+
+    
+
+> i−12,j
+
+= −ρ1
+
+unf
+
+    
+
+> i−12,j
+
++ (ρ2 − ρ1) Fϕ x
+
+    
+
+> i−12,j
+
+, (A.3) 
+
+Fρy
+
+  
+
+> i,j−12
+
+= −ρ1
+
+vnf
+
+  
+
+> i,j−12
+
++ (ρ2 − ρ1) Fϕy
+
+  
+
+> i,j−12
+
+. (A.4) 
+
+– Compute the advective momentum fluxes Fadv  
+
+> ρu
+
+and Fadv  
+
+> ρv
+
+:
+
+Fadv  
+
+> ρux
+
+    
+
+> i−12,j
+
+= Fρ x
+
+    
+
+> i−12,j
+
+WENO i− 12 , j
+
+ unc
+
+ , (A.5) 
+
+
+
+Fadv 
+
+> ρu y
+
+  
+
+> i,j−12
+
+= Fρy
+
+  
+
+> i,j−12
+
+WENO i, j− 12
+
+ unc
+
+ , (A.6) 
+
+Fadv  
+
+> ρvx
+
+    
+
+> i−12,j
+
+= Fρ x
+
+    
+
+> i−12,j
+
+WENO i− 12 , j
+
+ vnc
+
+ , (A.7) 
+
+
+
+Fadv  
+
+> ρvy
+
+  
+
+> i,j−12
+
+= Fρy
+
+  
+
+> i,j−12
+
+WENO i, j− 12
+
+ vnc
+
+ , (A.8) where WENO i− 12 , j(q) and WENO i, j− 12 (q) denote the computation of qi− 12 , j and qi, j− 12 using the third-order WENO scheme [44]. 14 • Compute the viscous stress τ = μ h∇u + (∇u)⊤i:(τxx )i− 12 , j = 2μ ∂u
+
+∂x
+
+!ni− 12 , j
+
+= 2 ⟨μn⟩i− 12 , j
+
+ unc
+
+i, j −  unc
+
+i−1, j
+
+∆x , (A.9) 
+
+τxy 
+
+
+
+i, j− 12
+
+=
+
+"
+
+μ ∂u
+
+∂y + ∂v
+
+∂x
+
+!# ni, j− 12
+
+= ⟨μn⟩i, j− 12
+
+ unc
+
+i, j −  unc
+
+i, j−1
+
+∆y + vnc i+1, j− 12
+
+− vnc i−1, j− 12
+
+2∆x
+
+ , (A.10) 
+
+τyx 
+
+
+
+i− 12 , j =
+
+"
+
+μ ∂u
+
+∂y + ∂v
+
+∂x
+
+!# ni− 12 , j
+
+= ⟨μn⟩i− 12 , j
+
+
+
+unc i− 12 , j+1 − unc i− 12 , j−1
+
+2∆y +
+
+ vnc
+
+i, j −  vnc
+
+i−1, j
+
+∆x
+
+ , (A.11) 
+
+τyy 
+
+
+
+i, j− 12
+
+= 2μ ∂v
+
+∂y
+
+!ni, j− 12
+
+= 2 ⟨μn⟩i, j− 12
+
+ vnc
+
+i, j −  vnc
+
+i, j−1
+
+∆y . (A.12) 
+
+• Compute the momentum fluxes Fρu and Fρv:
+
+Fρu x
+
+
+
+i− 12 , j = Fadv 
+
+ρu x
+
+
+
+i− 12 , j + (τxx )i− 12 , j , (A.13) 
+
+Fρuy
+
+
+
+i, j− 12
+
+=
+
+
+
+Fadv 
+
+ρu y
+
+
+
+i, j− 12
+
++ τxy 
+
+
+
+i, j− 12
+
+, (A.14) 
+
+Fρv x
+
+
+
+i− 12 , j = Fadv 
+
+ρv x
+
+
+
+i− 12 , j + τyx 
+
+
+
+i− 12 , j , (A.15) 
+
+Fρvy
+
+
+
+i, j− 12
+
+=
+
+
+
+Fadv 
+
+ρv y
+
+
+
+i, j− 12
+
++ τyy 
+
+
+
+i, j− 12
+
+. (A.16) 3. Compute the phase-field variable ϕn+1
+
+i, j :
+
+ϕn+1
+
+i, j = ϕni, j +
+
+Fϕ x
+
+
+
+i+ 12 , j − Fϕ x
+
+
+
+i− 12 , j
+
+∆x +
+
+Fϕy
+
+
+
+i, j+ 12
+
+− Fϕy
+
+
+
+i, j− 12
+
+∆y
+
+ ∆t. (A.17) 4. Compute the normal vector nn+1
+
+ϕ
+
+
+
+i, j, and the curvature κn+1
+
+i, j :
+
+• Compute ∇ψn+1
+
+i, j =
+
+ ψn+1 
+
+> i+1,j
+
+−ψn+1 
+
+> i−1,j
+
+2∆x , ψn+1 
+
+> i,j+1
+
+−ψn+1 
+
+> i,j−1
+
+2∆y
+
+
+
+, where ψn+1
+
+i, j = ϵ ln clip ϕn+1 
+
+> i,j
+
++10 −100 
+
+1−clip ϕn+1 
+
+> i,j
+
++10 −100 
+
+!
+
+.
+
+• Compute the normal vector ( nn+1
+
+ϕ )i, j = (∇ψn+1)i, j
+
+(∇ψn+1)i, j +10 −100 .
+
+• Compute the curvature κn+1
+
+i, j = − ∇ · nn+1
+
+ϕ
+
+
+
+i, j = −
+
+
+
+nn+1 
+
+> ϕx
+
+ 
+
+> i+1,j
+
+−nn+1 
+
+> ϕx
+
+ 
+
+> i−1,j
+
+2∆x ,
+
+
+
+nn+1 
+
+> ϕy
+
+ 
+
+> i,j+1
+
+−
+
+
+
+nn+1 
+
+> ϕy
+
+ 
+
+> i,j−1
+
+2∆y
+
+.5. Compute the density ρn+1
+
+i, j = ρ1
+
+1 − ϕn+1
+
+i, j
+
+ + ρ2ϕn+1
+
+i, j and the viscosity μn+1
+
+i, j = μ1
+
+1 − ϕn+1
+
+i, j
+
+ + μ2ϕn+1
+
+i, j .6. Compute the intermediate cell-center velocity  u∗
+
+c
+
+i, j =   u∗
+
+c
+
+i, j ,  v∗
+
+c
+
+i, j
+
+:
+
+ u∗
+
+c
+
+i, j =
+
+ρni, j
+
+ unc
+
+i, j +
+
+ (Fρu x )i+ 12 , j−(Fρu x )i− 12 , j
+
+∆x +
+
+Fρuy
+
+  
+
+> i,j+12
+
+−Fρuy
+
+  
+
+> i,j−12
+
+∆y
+
+ ∆t
+
+ρn+1
+
+i, j
+
+, (A.18) 
+
+ v∗
+
+c
+
+i, j =
+
+ρni, j
+
+ vnc
+
+i, j +
+
+ (Fρv x )i+ 12 , j−(Fρv x )i− 12 , j
+
+∆x +
+
+Fρvy
+
+  
+
+> i,j+12
+
+−Fρvy
+
+  
+
+> i,j−12
+
+∆y
+
+ ∆t
+
+ρn+1
+
+i, j
+
+. (A.19) 7. Compute the intermediate cell-face velocity u∗
+
+f =
+
+ u∗
+
+f
+
+
+
+i− 12 , j , v∗
+
+f
+
+
+
+i, j− 12
+
+
+
+=  u∗
+
+c i− 12 , j , v∗
+
+c i, j− 12
+
+.15 8. Update the intermediate velocities u∗ 
+
+> f
+
+and u∗ 
+
+> c
+
+using the surface tension force fσ:
+
+• Compute the surface tension force fσ =
+
+  fσ x
+
+i− 12 , j ,  fσy
+
+  
+
+> i,j−12
+
+
+
+:
+
+  fσ x
+
+i− 12 , j = 6 Dϕn+1E   
+
+> i−12,j
+
+
+
+1 − Dϕn+1E   
+
+> i−12,j
+
+
+
+σ Dκn+1E   
+
+> i−12,j
+
+ϕn+1  
+
+> i,j
+
+− ϕn+1 
+
+> i−1,j
+
+∆x , (A.20) 
+
+ fσy
+
+  
+
+> i,j−12
+
+= 6 Dϕn+1E  
+
+> i,j−12
+
+
+
+1 − Dϕn+1E  
+
+> i,j−12
+
+
+
+σ Dκn+1E  
+
+> i,j−12
+
+ϕn+1  
+
+> i,j
+
+− ϕn+1 
+
+> i,j−1
+
+∆y . (A.21) 
+
+• Update the intermediate velocities: 
+
+u∗ 
+
+> f
+
+←
+
+u∗
+
+> f
+
+    
+
+> i−12,j
+
++
+
+  fσ x
+
+i− 12 , j ∆t
+
+ρn+1 i− 12 , j
+
+, v∗
+
+> f
+
+  
+
+> i,j−12
+
++
+
+ fσy
+
+  
+
+> i,j−12
+
+∆t
+
+ρn+1 i, j− 12
+
+ , (A.22) 
+
+u∗ 
+
+> c
+
+←
+
+ u∗
+
+> c
+
+i, j + 12
+
+  fσ x
+
+i− 12 , j ∆t
+
+ρn+1 i− 12 , j
+
++
+
+  fσ x
+
+i+ 12 , j ∆t
+
+ρn+1 i+ 12 , j
+
+ ,  v∗
+
+> c
+
+i, j + 12
+
+ fσy
+
+  
+
+> i,j−12
+
+∆t
+
+ρn+1 i, j− 12
+
++
+
+ fσy
+
+  
+
+> i,j+12
+
+∆t
+
+ρn+1 i, j+ 12
+
+ . (A.23) 9. Solve the pressure Poisson equation: 
+
+• Compute the velocity divergence ∇ · u∗
+
+> f
+
+  
+
+> i,j
+
+=       
+
+> u∗
+> f
+> 
+> i+12,j−u∗
+> f
+> 
+> i−12,j
+> ∆x
+
++     
+
+> v∗
+> f
+> 
+> i,j+12
+> −v∗
+> f
+> 
+> i,j−12
+> ∆y
+
+.
+
+• Solve the pressure Poisson equation: 
+
+> 1
+
+⟨ρn+1⟩i+ 12 , j   
+
+> pn+1
+> i+1,j−pn+1
+> i,j
+> ∆x
+
+− 1
+
+⟨ρn+1⟩i− 12 , j   
+
+> pn+1
+> i,j−pn+1
+> i−1,j
+> ∆x
+
+∆x +
+
+> 1
+
+⟨ρn+1⟩i, j+ 12   
+
+> pn+1
+> i,j+1−pn+1
+> i,j
+> ∆y
+
+− 1
+
+⟨ρn+1⟩i, j− 12   
+
+> pn+1
+> i,j−pn+1
+> i,j−1
+> ∆y
+
+∆y = ∇ · u∗
+
+> f
+
+  
+
+> i,j
+
+. (A.24) We solve this equation as a linear system by first applying diagonal scaling and then using the FlexGMRES solver with the PFMG preconditioner provided by the hypre library [30, 31], with a convergence tolerance of 10 −7.10. Compute the velocities at time step n + 1: 
+
+un+1 
+
+> f
+
+=
+
+u∗
+
+> f
+
+    
+
+> i−12,j
+
+−   
+
+> pn+1
+> i,j−pn+1
+> i−1,j
+> ∆x
+
+ρn+1 i− 12 , j
+
+∆t, v∗
+
+> f
+
+  
+
+> i,j−12
+
+−   
+
+> pn+1
+> i,j−pn+1
+> i,j−1
+> ∆y
+
+ρn+1 i, j− 12
+
+∆t
+
+ , (A.25) 
+
+un+1 
+
+> c
+
+=
+
+ u∗
+
+> c
+
+i, j − 12
+
+   
+
+> pn+1
+> i,j−pn+1
+> i−1,j
+> ∆x
+
+ρn+1 i− 12 , j
+
++  
+
+> pn+1
+> i+1,j−pn+1
+> i,j
+> ∆x
+
+ρn+1 i+ 12 , j
+
+ ∆t,  v∗
+
+> c
+
+i, j − 12
+
+   
+
+> pn+1
+> i,j−pn+1
+> i,j−1
+> ∆y
+
+ρn+1 i, j− 12
+
++  
+
+> pn+1
+> i,j+1−pn+1
+> i,j
+> ∆y
+
+ρn+1 i, j+ 12
+
+ ∆t,
+
+ . (A.26) 
+
+References 
+
+[1] Z. Lu, C. Rath, G. Zhang, S. G. Kandlikar, Water management studies in pem fuel cells, part iv: Eff ects of channel surface wettability, geometry and orientation on the two-phase flow in parallel gas channels, In-ternational Journal of Hydrogen Energy 36 (16) (2011) 9864–9875, european Fuel Cell 2009. doi:https: //doi.org/10.1016/j.ijhydene.2011.04.226 .URL https://www.sciencedirect.com/science/article/pii/S0360319911011256 
+
+[2] R. Anderson, L. Zhang, Y. Ding, M. Blanco, X. Bi, D. P. Wilkinson, A critical review of two-phase flow in gas flow channels of proton exchange membrane fuel cells, Journal of Power Sources 195 (15) (2010) 4531–4553. 
+
+doi:https://doi.org/10.1016/j.jpowsour.2009.12.123 .URL https://www.sciencedirect.com/science/article/pii/S0378775310000510 
+
+16 [3] D. Yang, H. Garg, M. Andersson, Numerical simulation of two-phase flow in gas di ff usion layer and gas channel of proton exchange membrane fuel cells, International Journal of Hydrogen Energy 48 (41) (2023) 15677–15694. 
+
+doi:https://doi.org/10.1016/j.ijhydene.2023.01.013 .URL https://www.sciencedirect.com/science/article/pii/S0360319923000162 
+
+[4] P. Lettenmeier, S. Kolb, N. Sata, A. Fallisch, L. Zielke, S. Thiele, A. S. Gago, K. A. Friedrich, Comprehensive investigation of novel pore-graded gas di ff usion layers for high-performance and cost-e ff ective proton exchange membrane electrolyzers, Energy Environ. Sci. 10 (2017) 2521–2533. doi:10.1039/C7EE01240C .URL http://dx.doi.org/10.1039/C7EE01240C 
+
+[5] A. Hodges, A. L. Hoang, G. Tsekouras, K. Wagner, C.-Y. Lee, G. F. Swiegers, G. G. Wallace, A high-performance capillary-fed electrolysis cell promises more cost-competitive renewable hydrogen, Nature Com-munications 13 (1) (2022) 1304. doi:10.1038/s41467-022-28953-x .URL https://doi.org/10.1038/s41467-022-28953-x 
+
+[6] D. Kulkarni, R. Ouimet, B. Erb, D. Y. Parkinson, H.-M. Chang, C. Wang, A. Smeltz, C. Capuano, I. V. Zenyuk, Influence of microporous layers on interfacial properties, oxygen flow distribution, and durability of proton exchange membrane water electrolyzers, ACS Applied Materials & Interfaces 15 (41) (2023) 48060–48071. 
+
+doi:10.1021/acsami.3c06899 .URL https://doi.org/10.1021/acsami.3c06899 
+
+[7] S. Krevor, M. J. Blunt, S. M. Benson, C. H. Pentland, C. Reynolds, A. Al-Menhali, B. Niu, Capillary trapping for geologic carbon dioxide storage – from pore scale physics to field scale implications, International Journal of Greenhouse Gas Control 40 (2015) 221–237, special Issue commemorating the 10th year anniversary of the publication of the Intergovernmental Panel on Climate Change Special Report on CO2 Capture and Storage. 
+
+doi:https://doi.org/10.1016/j.ijggc.2015.04.006 .URL https://www.sciencedirect.com/science/article/pii/S1750583615001486 
+
+[8] M. Ali, N. K. Jha, N. Pal, A. Keshavarz, H. Hoteit, M. Sarmadivaleh, Recent advances in carbon dioxide geolog-ical storage, experimental procedures, influencing parameters, and future outlook, Earth-Science Reviews 225 (2022) 103895. doi:https://doi.org/10.1016/j.earscirev.2021.103895 .URL https://www.sciencedirect.com/science/article/pii/S0012825221003962 
+
+[9] B. He, S. Yang, Z. Qin, B. Wen, C. Zhang, The roles of wettability and surface tension in droplet formation during inkjet printing, Scientific Reports 7 (1) (2017) 11841. doi:10.1038/s41598-017-12189-7 .URL https://doi.org/10.1038/s41598-017-12189-7 
+
+[10] A. Olanrewaju, M. Beaugrand, M. Yafia, D. Juncker, Capillary microfluidics in microchannels: from microflu-idic networks to capillaric circuits, Lab Chip 18 (2018) 2323–2347. doi:10.1039/C8LC00458G .URL http://dx.doi.org/10.1039/C8LC00458G 
+
+[11] Z. Jiang, H. Shi, X. Tang, J. Qin, Recent advances in droplet microfluidics for single-cell analysis, TrAC Trends in Analytical Chemistry 159 (2023) 116932. doi:https://doi.org/10.1016/j.trac.2023.116932 .URL https://www.sciencedirect.com/science/article/pii/S0165993623000195 
+
+[12] J. Brackbill, D. Kothe, C. Zemach, A continuum method for modeling surface tension, Journal of Computational Physics 100 (2) (1992) 335–354. doi:https://doi.org/10.1016/0021-9991(92)90240-Y .URL https://www.sciencedirect.com/science/article/pii/002199919290240Y 
+
+[13] M. S. Dodd, A. Ferrante, A fast pressure-correction method for incompressible two-fluid flows, Journal of Com-putational Physics 273 (2014) 416–434. doi:https://doi.org/10.1016/j.jcp.2014.05.024 .URL https://www.sciencedirect.com/science/article/pii/S0021999114003702 
+
+[14] A. Alsalti Baldellou, X. Alvarez-Farre, A. Gorobets, F. X. Trias, A. Oliva, E ffi cient strategies for solving the variable poisson equation with large contrasts in the coe ffi cients, in: Collection of papers presented at the 8th European Congress on Computational Methods in Applied Sciences and Engineering (ECCOMAS Congress 17 2022), 2022. doi:10.23967/eccomas.2022.107 .URL https://hdl.handle.net/2117/384546 
+
+[15] C. Frantzis, D. Grigoriadis, An e ffi cient method for two-fluid incompressible flows appropriate for the immersed boundary method, Journal of Computational Physics 376 (2019) 28–53. doi:https://doi.org/10.1016/j. jcp.2018.09.035 .URL https://www.sciencedirect.com/science/article/pii/S0021999118306375 
+
+[16] S. Hysing, A new implicit surface tension implementation for interfacial flows, International Journal for Numer-ical Methods in Fluids 51 (6) (2006) 659–672. doi:https://doi.org/10.1002/fld.1147 .URL https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.1147 
+
+[17] M. Raessi, M. Bussmann, J. Mostaghimi, A semi-implicit finite volume implementation of the csf method for treating surface tension in interfacial flows, International Journal for Numerical Methods in Fluids 59 (10) (2009) 1093–1110. doi:https://doi.org/10.1002/fld.1857 .URL https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.1857 
+
+[18] F. Denner, F. Evrard, R. Serfaty, B. G. van Wachem, Artificial viscosity model to mitigate numerical artefacts at fluid interfaces with surface tension, Computers & Fluids 143 (2017) 59–72. doi:https://doi.org/10. 1016/j.compfluid.2016.11.006 .URL https://www.sciencedirect.com/science/article/pii/S0045793016303565 
+
+[19] S. Popinet, Numerical models of surface tension, Annual Review of Fluid Mechanics 50 (Volume 50, 2018) (2018) 49–75. doi:https://doi.org/10.1146/annurev-fluid-122316-045034 .URL https://www.annualreviews.org/content/journals/10.1146/ annurev-fluid-122316-045034 
+
+[20] A. Fahsi, A. Soulaïmani, A semi-implicit, second-order time-integration scheme for surface tension modeling in two-dimensional capillary-dominated two-phase flows, Computers & Fluids 304 (2026) 106889. doi:https: //doi.org/10.1016/j.compfluid.2025.106889 .URL https://www.sciencedirect.com/science/article/pii/S0045793025003494 
+
+[21] F. Denner, F. Evrard, B. van Wachem, Breaching the capillary time-step constraint using a coupled vof method with implicit surface tension, Journal of Computational Physics 459 (2022) 111128. doi:https://doi.org/ 10.1016/j.jcp.2022.111128 .URL https://www.sciencedirect.com/science/article/pii/S0021999122001905 
+
+[22] R. Janodet, B. van Wachem, F. Denner, A fully-coupled algorithm with implicit surface tension treatment for interfacial flows with large density ratios, Journal of Computational Physics 520 (2025) 113520. doi:https: //doi.org/10.1016/j.jcp.2024.113520 .URL https://www.sciencedirect.com/science/article/pii/S002199912400768X 
+
+[23] M. Sussman, M. Ohta, A stable and e ffi cient method for treating surface tension in incompressible two-phase flow, SIAM Journal on Scientific Computing 31 (4) (2009) 2447–2471. doi:10.1137/080732122 .URL https://doi.org/10.1137/080732122 
+
+[24] M. Sussman, A method for overcoming the surface tension time step constraint in multiphase flows ii, Interna-tional Journal for Numerical Methods in Fluids 68 (11) (2012) 1343–1361. doi:https://doi.org/10.1002/ fld.2557 .URL https://onlinelibrary.wiley.com/doi/abs/10.1002/fld.2557 
+
+[25] S. S. Jain, Accurate conservative phase-field method for simulation of two-phase flows, Journal of Computational Physics 469 (2022) 111529. doi:https://doi.org/10.1016/j.jcp.2022.111529 .URL https://www.sciencedirect.com/science/article/pii/S0021999122005915 
+
+18 [26] S. Mirjalili, C. B. Ivey, A. Mani, Comparison between the di ff use interface and volume of fluid methods for simulating two-phase flows, International Journal of Multiphase Flow 116 (2019) 221–238. doi:https:// doi.org/10.1016/j.ijmultiphaseflow.2019.04.019 .URL https://www.sciencedirect.com/science/article/pii/S0301932218309030 
+
+[27] S. Mirjalili, M. A. Khanwale, A. Mani, Assessment of an energy-based surface tension model for simulation of two-phase flows using second-order phase field methods, Journal of Computational Physics 474 (2023) 111795. 
+
+doi:https://doi.org/10.1016/j.jcp.2022.111795 .URL https://www.sciencedirect.com/science/article/pii/S0021999122008580 
+
+[28] A. J. Chorin, Numerical solution of the navier-stokes equations, Mathematics of Computation 22 (1968) 745– 762. doi:https://doi.org/10.1090/S0025-5718-1968-0242392-2 .[29] K. Yang, T. Aoki, A momentum-conserving weakly compressible navier–stokes solver for simulation of violent two-phase flows with high density ratio, International Journal of Computational Fluid Dynamics 36 (9) (2022) 776–796. doi:10.1080/10618562.2023.2202391 .URL https://doi.org/10.1080/10618562.2023.2202391 
+
+[30] hypre : High performance preconditioners, https://llnl.gov/casc/hypre , https://github.com/ hypre-space/hypre .[31] R. D. Falgout, U. M. Yang, hypre: A library of high performance preconditioners, in: P. M. A. Sloot, A. G. Hoekstra, C. J. K. Tan, J. J. Dongarra (Eds.), Computational Science — ICCS 2002, Springer Berlin Heidelberg, Berlin, Heidelberg, 2002, pp. 632–641. [32] F. Denner, B. G. van Wachem, Numerical time-step restrictions as a result of capillary waves, Journal of Com-putational Physics 285 (2015) 24–40. doi:https://doi.org/10.1016/j.jcp.2015.01.021 .URL https://www.sciencedirect.com/science/article/pii/S002199911500025X 
+
+[33] K. Yang, T. Aoki, Weakly compressible navier-stokes solver based on evolving pressure projection method for two-phase flow simulations, Journal of Computational Physics 431 (2021) 110113. doi:https://doi.org/ 10.1016/j.jcp.2021.110113 .URL https://www.sciencedirect.com/science/article/pii/S002199912100005X 
+
+[34] S. Matsushita, T. Aoki, A weakly compressible scheme with a di ff use-interface method for low mach number two-phase flows, Journal of Computational Physics 376 (2019) 838–862. doi:https://doi.org/10.1016/ j.jcp.2018.10.019 .URL https://www.sciencedirect.com/science/article/pii/S002199911830682X 
+
+[35] S. Matsushita, T. Aoki, Gas-liquid two-phase flows simulation based on weakly compressible scheme with interface-adapted amr method, Journal of Computational Physics 445 (2021) 110605. doi:https://doi. org/10.1016/j.jcp.2021.110605 .URL https://www.sciencedirect.com/science/article/pii/S0021999121005003 
+
+[36] A. Melvin, J. Mandal, Development of a weakly compressible solver for incompressible two-phase flows, Journal of Computational Physics 538 (2025) 114195. doi:https://doi.org/10.1016/j.jcp.2025.114195 .URL https://www.sciencedirect.com/science/article/pii/S0021999125004784 
+
+[37] S. Yamashita, S. Matsushita, T. Suekane, Conservative transport model for surfactant on the interface based on the phase-field method, Journal of Computational Physics 516 (2024) 113292. doi:https://doi.org/10. 1016/j.jcp.2024.113292 .URL https://www.sciencedirect.com/science/article/pii/S0021999124005400 
+
+[38] S. Popinet, An accurate adaptive solver for surface-tension-driven interfacial flows, Journal of Computational Physics 228 (16) (2009) 5838–5866. doi:https://doi.org/10.1016/j.jcp.2009.04.042 .URL https://www.sciencedirect.com/science/article/pii/S002199910900240X 
+
+19 [39] M. Meyer, A. Devesa, S. Hickel, X. Hu, N. Adams, A conservative immersed interface method for large-eddy simulation of incompressible flows, Journal of Computational Physics 229 (18) (2010) 6300–6317. doi:https: //doi.org/10.1016/j.jcp.2010.04.040 .URL https://www.sciencedirect.com/science/article/pii/S0021999110002275 
+
+[40] R. Mittal, H. Dong, M. Bozkurttas, F. Najjar, A. Vargas, A. von Loebbecke, A versatile sharp interface immersed boundary method for incompressible flows with complex boundaries, Journal of Computational Physics 227 (10) (2008) 4825–4852. doi:https://doi.org/10.1016/j.jcp.2008.01.028 .URL https://www.sciencedirect.com/science/article/pii/S0021999108000235 
+
+[41] K. Yokoi, D. Vadillo, J. Hinch, I. Hutchings, Numerical studies of the influence of the dynamic contact angle on a droplet impacting on a dry surface, Physics of Fluids 21 (7) (2009) 072102. doi:10.1063/1.3158468 .URL https://doi.org/10.1063/1.3158468 
+
+[42] N. B. Lu, C. A. Browne, D. B. Amchin, J. K. Nunes, S. S. Datta, Controlling capillary fingering using pore size gradients in disordered media, Phys. Rev. Fluids 4 (2019) 084303. doi:10.1103/PhysRevFluids.4.084303 .URL https://link.aps.org/doi/10.1103/PhysRevFluids.4.084303 
+
+[43] S. Pavuluri, T. D. Seers, A. Saeibehrouzi, R. Holtzman, S. Abolfathi, P. Denissenko, H. S. Rabbani, Controlling capillary fingering morphology in patterned porous media, Phys. Rev. Fluids 11 (2026) 034001. doi:10.1103/ j3lw-9875 .URL https://link.aps.org/doi/10.1103/j3lw-9875 
+
+[44] G.-S. Jiang, C.-W. Shu, E ffi cient implementation of weighted eno schemes, Journal of Computational Physics 126 (1) (1996) 202–228. doi:https://doi.org/10.1006/jcph.1996.0130 .URL https://www.sciencedirect.com/science/article/pii/S0021999196901308 
+
+20

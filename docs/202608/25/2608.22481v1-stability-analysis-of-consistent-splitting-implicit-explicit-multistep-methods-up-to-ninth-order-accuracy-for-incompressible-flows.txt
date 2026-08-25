@@ -1,0 +1,2567 @@
+Title: Stability analysis of consistent splitting implicit-explicit multistep methods up to ninth-order accuracy for incompressible flows
+
+URL Source: https://arxiv.org/pdf/2608.22481v1
+
+Published Time: Tue, 25 Aug 2026 01:34:03 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# Stability analysis of consistent splitting implicit-explicit multistep methods up to ninth-order accuracy for incompressible flows 
+
+Yuanyuan Kang ∗ Hong-lin Liao † Guidong Liu ‡
+
+August 25, 2026 
+
+Abstract 
+
+This work presents a concise, unified stability theory of high-order decoupled implicit-explicit linear multistep (IELM) methods based on the well-known consistent splitting technique for the incompressible Navier-Stokes equation (INSE). With the help of the recent semi-generating function approach and the global discrete energy analysis, one can establish the unconditional stability of a consistent splitting IELM method with respect to the ℓ∞(H1) ∩ ℓ2(H2) norm if the associated implicit-explicit controllability intensity is larger than √2/2, a constant determined by the Stokes pressure estimate. It is shown that the β-parameterized GBDF-k (2 ≤ k ≤ 5) schemes and γ-parameterized SIELM-k (2 ≤ k ≤ 9) schemes can fulfill this requirement of implicit-explicit controllability intensity by choosing proper parameters so that they can theoretically maintain the unconditional stability of the associated consistent splitting IELM methods. Numerical experiments are also included to support our theory. 
+
+Keywords: incompressible Navier-Stokes, implicit-explicit multistep methods, semi-generating function approach, implicit-explicit controllability intensity, unconditional stability 
+
+AMS subject classifications : 65M12, 65M15, 76D05 
+
+# 1 Introduction 
+
+Let Ω be a bounded domain in Rd (d = 2 , 3) with smooth boundary ∂Ω and a finite time T . We consider the incompressible Navier-Stokes equations (INSE) in primitive variables, 
+
+∂tu − ν∆u + u · ∇ u + ∇p = f for x ∈ Ω, 0 < t ≤ T , (1.1) 
+
+∇ · u = 0 for x ∈ Ω, (1.2) subjected to u = u0 at t = 0 and the no-slip boundary condition u = 0 on ∂Ω. Here u is the velocity of fluid and p is its pressure, ν := 1 /Re is the coefficient of the kinematic viscosity with the Reynolds number Re ≥ 1, and f is a given body force. We introduce the inner product ⟨u, v⟩Ω := ∫ 
+
+> Ω
+
+u · v dx for the functions u, v in Ω, and the associated L2 norm ∥u∥Ω := √⟨u, u⟩Ω. The subscript on the inner product and norm will be 
+
+> ∗
+
+School of Mathematics, Nanjing University of Aeronautics and Astronautics, Nanjing 211106, China. Email: kangyy0101@163.com. 
+
+> †
+
+ORCID 0000-0003-0777-6832. School of Mathematics, Nanjing University of Aeronautics and Astronautics, Nan-jing 211106, China; Key Laboratory of Mathematical Modeling and High Performance Computing of Air Vehicles (NUAA), MIIT, Nanjing 211106, China. Email: liaohl@nuaa.edu.cn. This author’s work is supported in part by National Natural Science Foundation of China under grant 12471383, National Natural Science Foundation of Jiangsu Province under grant BK20252027, and Ministry of Education Key Laboratory of NSLSCS under grant 202501. 
+
+> ‡
+
+School of Mathematics, Nanjing Audit University, Nanjing 211815, China. Email: liugd@nau.edu.cn 
+
+1arXiv:2608.22481v1 [math.NA] 23 Aug 2026 dropped when the domain of integration is understood in context. As an efficient decoupled approach that does not suffer from the splitting error and can achieve full-order accuracy in strong norms, the so-called gauge method [8,21] or well-known consistent splitting technique [9,14,19,20,22] computes the pressure p with a weak form Poisson equation by testing the momentum equation (1.1) against gradients. That is, by taking the L2 inner product of (1.1) with ∇ϕ and using the incompressible condition (1.2), we find that 
+
+⟨∇ p, ∇ϕ⟩ = ⟨f + ν∆u − u · ∇ u, ∇ϕ⟩ for ∀ϕ ∈ H1(Ω) . (1.3) This weak form Poisson equation can split the computation of the velocity u and the pressure p of INSE model (1.1)-(1.2) into two consecutive steps. Once the velocity u is known, one can compute the current pressure p via the Poisson equation (1.3) and update the velocity from the momentum equation (1.1) with the no-slip boundary condition by using the previous values of the pressure. In this way, one can construct fully decoupled time approximations of INSE model (1.1)-(1.2) by the following unconstrained INSE system 
+
+⟨∇ p, ∇ϕ⟩ = ⟨ν∆u − ν∇∇ · u − g, ∇ϕ⟩ for ∀ϕ ∈ H1(Ω) , (1.4) 
+
+∂tu = ν∆u − ∇ p − g for x ∈ Ω with u = 0 on ∂Ω, (1.5) subjected to the initial data u = u0 at t = 0 , where the notation g := u · ∇ u − f . Here the grad-div term ν∇∇ · u in the pressure Poisson equation (1.4) is added to improve the stability of numerical approximations [14, 19, 20]. As proved in [19, Theorem 5.1], the divergence w := ∇ · u in the unconstrained INSE system (1.4)-(1.5) is a classical solution of the heat equation ∂tw = ν∆w with no-flux boundary conditions, n · ∇ w = 0 on ∂Ω. This property is practically useful in developing stable numerical algorithms since any residues of the numerical divergence would be over controlled especially near the no-slip boundary. Alternatively, due to the identity ∆u = ∇∇ · u − ∇ × ∇ × u,the modification in (1.4) can be also viewed as the replacement of ∆u by −∇ × ∇ × u to improve the accuracy of fractional-step splitting procedures [9, 22]. Consider the time mesh 0 = t0 < t 1 < · · · < t N = T with the time-step size τ = tj − tj−1 for 
+
+j ≥ 1, and denote the difference quotient ∂τ vj := ( vj − vj−1)/τ for any mesh function vj . Let uk
+
+and pk be the numerical approximation of Uk := u(x, t k) and P k := p(x, t k), respectively, at the discrete time level tk for 0 ≤ k ≤ N . The classical first-order consistent splitting scheme [19, 20] 
+
+⟨∇ pn, ∇ϕ⟩ = ⟨ν∆un − ν∇∇ · un − gn, ∇ϕ⟩ for ∀ϕ ∈ H1(Ω) and n ≥ 0, (1.6) 
+
+∂τ un = ν∆un − ∇ pn−1 − gn−1 for x ∈ Ω and n ≥ 1, (1.7) subjected to the boundary condition un = 0 on ∂Ω. The stability result of the semi-discrete first-order consistent splitting scheme for the time dependent Stokes equations with no-slip boundary conditions (resp., with periodic-nonperiodic boundary conditions in a periodic channel) was estab-lished in [9], and the local-in-time stability and error estimates for INSE were proven in a series of work by Liu, Liu and Pego [19, 20]. By using the second order backward differentiation for-mula D2vn := 32 ∂τ vn − 12 ∂τ vn−1 and the second-order explicit extrapolation ˆvn := 2 vn−1 − vn−2, a second-order consistent splitting scheme [9, 14] was formulated as follows, 
+
+⟨∇ pn, ∇ϕ⟩ = ⟨ν∆un − ν∇∇ · un − gn, ∇ϕ⟩ for ∀ϕ ∈ H1(Ω) and n ≥ 0,
+
+D2un = ν∆un − ∇ ˆpn − ˆgn for x ∈ Ω with un = 0 on ∂Ω and n ≥ 2.However, whether the second-order consistent splitting scheme is stable remains open since its inception. Actually, as pointed out by [10, 12], it has been a long standing open question on how to 2construct unconditionally stable second- or higher-order decoupled scheme with a rigorous stability and error analysis. The situation was essentially changed after the series of works [10–12] by Huang and Shen, in which a class of k-th ( 2 ≤ k ≤ 5) order generalized implicit-explicit backward differentiation formulas (GBDF-k) with a free parameter β (β ≥ 1) was designed and applied to develop some high-order unconditionally stable schemes. They proved in [11, Theorem 2] that the GBDF2 and GBDF3 methods for β > 1, and the GBDF4 method for β ≥ 2 are stable for linear parabolic problems; while [11, Theorem 3] establishes the corresponding convergence for a class of nonlinear parabolic problems by assuming that the nonlinear term is locally Lipschitz continuous. By choosing three fixed parameters βk = 3 , 6, 9 corresponding to the order indexes k = 2 , 3, 4, respectively, Huang and Shen [12] established the unconditional stability and convergence of GBDF-k consistent splitting schemes in the ℓ∞(H1) ∩ ℓ2(H2) norm for the INSE. Note that, the theoretical analysis in [11, 12] always takes advantage of the Dahlquist’s G-stability theory, a new convolution-type multiplier and certain decomposition of implicit part, cf. [11, (3.5)] and [12, (3.16)]. The significant developments in [10–12] raise some new questions: why can the GBDF-k con-sistent splitting methods achieve the unconditional stability for the INSE, or why choose the free parameters βk = 3 , 6, 9 for the order indexes k = 2 , 3, 4, respectively? What kind of implicit-explicit linear multistep (IELM) methods can also make the associated consistent splitting algorithms un-conditionally stable for the INSE? This article answers these questions by presenting a concise, unified theory on the unconditional stability and convergence of general IELM methods for the unconstrained INSE system (1.4)-(1.5): • With the help of the Stokes pressure estimate from [19, Theorem 1.2], we apply the recent semi-generating function approach [16] and the global discrete energy analysis to establish the unconditional stability of consistent splitting IELM methods with respect to the ℓ∞(H1) ∩
+
+ℓ2(H2) norm if the associated implicit-explicit controllability intensity I(k) IE > √2/2.• By choosing proper large parameters, the recently proposed β-parameterized GBDF-k (for 
+
+2 ≤ k ≤ 5) schemes in [11, 12] and γ-parameterized SIELM-k (for 2 ≤ k ≤ 9) schemes in [16] can fulfill I(k) IE > √2/2 so that they can theoretically achieve the unconditional stability of the associated consistent splitting IELM methods. They present a positive answer to the first open issue proposed by Huang and Shen [12]. • Extensive experiments are presented to examine the stability and convergence of GBDF-k and SIELM-k methods for different parameters. They suggest that our theoretical requirement 
+
+I(k) IE > √2/2 is sufficient but always not sharp. Note that, our theory would be theoretically concise since the stability and convergence analysis do not involve any Nevanlinna-Odeh type multipliers for high-order implicit-explicit BDF methods [1–4] or any delicate decompositions of implicit part for the GBDF-k methods [11, 12]. We consider the following k-step consistent splitting IELM method to integrate the INSE from 
+
+tn−1 (n ≥ 1) to the next grid point tn:
+
+⟨∇ pn, ∇ϕ⟩ = ⟨ν∆un − ν∇∇ · un − gn, ∇ϕ⟩ for ∀ϕ ∈ H1(Ω) , n ≥ 0, (1.8) 
+
+> k−1
+
+∑
+
+> j=0
+
+a(k)  
+
+> j
+
+∂τ un−j = ν
+
+> k−1
+
+∑
+
+> j=0
+
+b(k)  
+
+> j
+
+∆un−j −
+
+> k−1
+
+∑
+
+> j=0
+
+c(k)  
+
+> j
+
+(∇pn−j−1 + gn−j−1) (1.9) for x ∈ Ω with un = 0 on ∂Ω and n ≥ k, where a(k)  
+
+> j
+
+, b(k)  
+
+> j
+
+and c(k)  
+
+> j
+
+are the coefficients with 
+
+a(k) 0 , b (k) 0 , c (k) 0 > 0. One can use a triad (⃗a (k) ,⃗ b (k) ,⃗ c (k) ) to represent the IELM method with vectors 3⃗a (k) = (a(k) 0 , a (k) 1 , · · · , a (k) k−1
+
+),⃗ b(k) = (b(k) 0 , b (k) 1 , · · · , b (k) k−1
+
+) and ⃗c (k) = (c(k) 0 , c (k) 1 , · · · , c (k) k−1
+
+). Here we assume that the starting solutions uj for 1 ≤ j ≤ k − 1 are available and accurate enough to meet with the global time accuracy of the IELM method (1.9). The IELM scheme can be characterized by the following three polynomials 
+
+ϱa(ζ) := 
+
+> k−1
+
+∑
+
+> j=0
+
+a(k)  
+
+> j
+
+ζk−1−j , ϱb(ζ) := 
+
+> k
+
+∑
+
+> j=0
+
+b(k)  
+
+> j
+
+ζk−j , ϱc(ζ) := 
+
+> k−1
+
+∑
+
+> j=0
+
+c(k)  
+
+> j
+
+ζk−1−j .
+
+Following [5, 6], we always let (ϱa, ϱ b) be a strongly A(0) -stable implicit scheme, that is, ϱa is a Schur polynomial (all its roots lie strictly inside the unit disk). We reformulate the IELM method (1.9) into a convolution form, 
+
+> n
+
+∑
+
+> j=k
+
+a(k)  
+
+> n−j
+
+∂τ uj = ν
+
+> n
+
+∑
+
+> j=k
+
+b(k)  
+
+> n−j
+
+∆uj −
+
+> n
+
+∑
+
+> j=k
+
+c(k)  
+
+> n−j
+
+(∇pj−1 + gj−1) − u(k ,n )sta (1.10) for n ≥ k with the starting term u(k ,n )sta defined by, cf. [13, 15, 17], 
+
+u(k ,n )sta := 
+
+> k−1
+
+∑
+
+> j=1
+
+a(k)  
+
+> n−j
+
+∂τ uj − ν
+
+> k−1
+
+∑
+
+> j=1
+
+b(k)  
+
+> n−j
+
+∆uj +
+
+> k−1
+
+∑
+
+> j=1
+
+c(k)  
+
+> n−j
+
+(∇pj−1 + gj−1), (1.11) where the values of a(k)  
+
+> j
+
+, b(k)  
+
+> j
+
+and c(k)  
+
+> j
+
+are extended to any indexes j but assume that the coefficients 
+
+a(k)  
+
+> j
+
+, b(k)  
+
+> j
+
+and c(k)  
+
+> j
+
+vanish when j ≥ k so that u(k ,n )sta = 0 for n ≥ 2k − 1.Our framework will use the global discrete energy analysis [15, 17, 18] with the so-called discrete orthogonal convolution (DOC) kernels. For the finite sequence ⃗a (k) , we define the DOC kernels ⃗a (−1,k) = {a(−1,k) 0 , a (−1,k) 1 , · · · , a (−1,k) k−1 , · · · } as follows 
+
+a(−1,k) 0 := 1
+
+a(k) 0
+
+and a(−1,k)  
+
+> j
+
+:= − 1
+
+a(k) 0
+
+> j
+
+∑
+
+> i=1
+
+a(−1,k)  
+
+> j−i
+
+a(k)  
+
+> i
+
+for j ≥ 1. (1.12) For n ≥ 1, one has the discrete orthogonal convolution identity [17] 
+
+> n
+
+∑
+
+> ℓ=j
+
+a(−1,k)  
+
+> n−ℓ
+
+a(k)  
+
+> ℓ−j
+
+≡ δnj =
+
+> n
+
+∑
+
+> ℓ=j
+
+a(k) 
+
+> n−ℓ
+
+a(−1,k)  
+
+> ℓ−j
+
+for any 1 ≤ j ≤ n, (1.13) where δnj is the Kronecker delta symbol. Since a(k)  
+
+> ℓ
+
+= 0 for ℓ ≥ k, the DOC kernels a(−1,k)  
+
+> j
+
+solve the linear difference equation a(−1,k)  
+
+> j
+
+a(k) 0 + ∑k−1 
+
+> ℓ=1
+
+a(−1,k)  
+
+> j−ℓ
+
+a(k)  
+
+> ℓ
+
+= 0 for j ≥ k so that it has the solution 
+
+a(−1,k)  
+
+> j
+
+= ∑k−1  
+
+> ℓ=1 K∗
+> ℓ
+
+λjℓ , where λℓ (1 ≤ ℓ ≤ k − 1) are zero points of the Schur polynomial ϱa(ζ) and  
+
+> K∗
+> ℓ
+
+are constants determined by the initial values a(−1,k)  
+
+> ℓ
+
+for 0 ≤ ℓ ≤ k − 1. Then there exist positive constants Ka and ρk < 1 such that 
+
+∣∣a(−1,k) 
+
+> j
+
+∣∣ ≤ Ka ρj 
+
+> k
+
+for j ≥ 1, (1.14) that is, the DOC kernels a(−1,k)  
+
+> j
+
+decay exponentially. By exchanging the summation order, one gets 
+
+> n
+
+∑
+
+> j=k
+
+a(−1,k) 
+
+> n−jj
+
+∑
+
+> ℓ=k
+
+a(k) 
+
+> j−ℓ
+
+∂τ uℓ =
+
+> n
+
+∑
+
+> ℓ=k
+
+∂τ uℓn∑
+
+> j=ℓ
+
+a(−1,k)  
+
+> n−j
+
+a(k)  
+
+> j−ℓ
+
+= ∂τ un for n ≥ k.4Multiplying the equation (1.10) with the DOC kernels a(−1,k)  
+
+> m−n
+
+, summing over n from n = k to m
+
+and replacing m by n, we get 
+
+> n
+
+∑
+
+> j=k
+
+a(−1,k) 
+
+> n−jj
+
+∑
+
+> ℓ=k
+
+a(k) 
+
+> j−ℓ
+
+∂τ uℓ = ν
+
+> n
+
+∑
+
+> j=k
+
+a(−1,k) 
+
+> n−jj
+
+∑
+
+> ℓ=k
+
+b(k) 
+
+> j−ℓ
+
+∆uℓ (1.15) 
+
+−
+
+> n
+
+∑
+
+> j=k
+
+a(−1,k) 
+
+> n−jj
+
+∑
+
+> ℓ=k
+
+c(k) 
+
+> j−ℓ
+
+(∇pℓ−1 + gℓ−1) −
+
+> n
+
+∑
+
+> j=k
+
+a(−1,k)  
+
+> n−j
+
+u(k ,j )sta 
+
+for x ∈ Ω and n ≥ k. By exchanging the summation order, one can apply discrete orthogonal convolution identity (1.13) to find 
+
+∂τ un = ν
+
+> n
+
+∑
+
+> ℓ=k
+
+ˆb(k) 
+
+> n−ℓ
+
+∆uℓ −
+
+> n
+
+∑
+
+> ℓ=k
+
+ˆc(k) 
+
+> n−ℓ
+
+(∇pℓ−1 + gℓ−1) −
+
+> n
+
+∑
+
+> ℓ=k
+
+a(−1,k)  
+
+> n−ℓ
+
+u(k ,ℓ )sta (1.16) for x ∈ Ω and n ≥ k, where the composited kernels ˆb(k)  
+
+> n−ℓ
+
+and ˆc(k)  
+
+> n−ℓ
+
+are defined by 
+
+ˆb(k)  
+
+> j
+
+:= 
+
+> j
+
+∑
+
+> i=0
+
+a(−1,k)  
+
+> j−i
+
+b(k)  
+
+> i
+
+and ˆc(k)  
+
+> j
+
+:= 
+
+> j
+
+∑
+
+> i=0
+
+a(−1,k)  
+
+> j−i
+
+c(k)  
+
+> i
+
+for j ≥ 0. (1.17) For the coefficients a(k)  
+
+> n−j
+
+and the associated DOC kernels a(−1,k)  
+
+> n−j
+
+defined by (1.12), we introduce the following n × n lower triangular Toeplitz matrices 
+
+AL, k := 
+
+
+
+a(k) 0
+
+... . . .
+
+a(k) k−1 · · · a(k) 0
+
+. . . · · · . . .
+
+a(k) k−1 · · · a(k) 0
+
+
+
+, A(−1)  
+
+> L, k
+
+:= 
+
+
+
+a(−1,k) 0
+
+a(−1,k) 1 a(−1,k) 0
+
+a(−1,k) 2 a(−1,k) 1 a(−1,k) 0
+
+... . . . . . .
+
+a(−1,k)  
+
+> n−1
+
+· · · a(−1,k) 1 a(−1,k) 0
+
+
+
+.
+
+The discrete orthogonal convolution identity (1.13) says that A(−1)  
+
+> L, k
+
+= A−1
+
+> L, k
+
+. In a similar way, one can write out the lower triangular Toeplitz matrices BL, k and CL, k from the discrete coefficients 
+
+b(k)  
+
+> n−j
+
+and c(k)  
+
+> n−j
+
+; while B(−1)  
+
+> L, k
+
+= B−1 
+
+> L, k
+
+and C(−1)  
+
+> L, k
+
+= C−1 
+
+> L, k
+
+are the lower triangular Toeplitz matrices for the corresponding DOC kernels b(−1,k)  
+
+> n−j
+
+and c(−1,k)  
+
+> n−j
+
+defined in similar to (1.12) from b(k)  
+
+> n−j
+
+and c(k)  
+
+> n−j
+
+,respectively. Moreover, for the composited kernels ˆb(k)  
+
+> n−ℓ
+
+and ˆc(k)  
+
+> n−ℓ
+
+defined in (1.17), it is easy to know that the corresponding lower triangular Toeplitz matrices are ̂
+
+BL, k := A(−1)  
+
+> L, k
+
+BL, k = A−1
+
+> L, k
+
+BL, k,̂ CL, k := A(−1)  
+
+> L, k
+
+CL, k = A−1
+
+> L, k
+
+CL, k. (1.18) In the energy analysis of the convolution form (1.16), the treatment of implicit part requires to determine the minimum eigenvalue λ(k) I of the Toeplitz matrix S(̂ BL, k), where S(D) := ( D + DT )/2
+
+for any matrix D, while certain spectral norm bounds σ(k) E and σ(k) F of the lower triangular Toeplitz matrices ̂ CL, k and A−1 
+
+> L, k
+
+should be evaluated in handling the explicit and starting terms. These issues are addressed in Section 2 by the semi-generating function method. With the help of the Leray-Helmholtz projection operator, the stability analysis of consistent splitting multistep methods (1.8)-(1.9) will be performed in Section 3 by a complete mathematical 5induction to the ℓ∞(H1)∩ℓ2(H2) norm boundedness of the velocity error. It is shown that the IELM methods (1.8)-(1.9) are unconditionally stable if the controllability intensity I(k) IE := λ(k) I /σ (k) E > 
+
+> √22
+
+.Section 4 witnesses that the stability condition can be fulfilled by two classes of IELM methods, including GBDF schemes up to fifth order accuracy and SIELM schemes up to ninth order accuracy. Numerical experiments are included in Section 5 to support our theory. 
+
+# 2 Semi-generating function method and technical lemmas 
+
+At first, we recall the semi-generating function method to handle the three groups of discrete coefficients via three complex polynomials on the unit circle. 
+
+Lemma 2.1. [16, Lemma 2.1] For a real sequence {a0, a 1, · · · , a n, · · · } , we define the semi-generating function a(θ) := ∑∞ 
+
+> k=0
+
+akeıkθ ∈ L2([0 , 2π)) with the complex unit ı = √−1. For any index n ≥ 1 (while n → ∞ as the time-step size τ → 0), consider the following real quadratic form 
+
+Qn := 
+
+> n
+
+∑
+
+> k=1
+
+wkk∑
+
+> j=1
+
+ak−j wj for any sequence {w1, w 2, · · · , w n},corresponding to the real symmetric Toeplitz matrix S(PL,n ) = ( PL,n + P TL,n )/2 with the following associated lower triangular Toeplitz matrix 
+
+PL,n := 
+
+
+
+a0
+
+a1 a0
+
+... . . . . . .
+
+an−1 · · · a1 a0
+
+
+
+> n×n
+
+. (2.1) 
+
+(i) Then Qn is positive definite if and only if ℜ [a(θ)] > 0 for θ ∈ [0 , 2π);(ii) and the eigenvalues λj (Qn) of Qn can be bounded by 
+
+min  
+
+> θ∈[0 ,2π)
+
+ℜ[a(θ)] ≤ λj (Qn) ≤ max  
+
+> θ∈[0 ,2π)
+
+ℜ[a(θ)] for any n ≥ j + 1 ≥ 1.
+
+Lemma 2.2. [16, Lemma 2.2] Let the functions a(θ) := ∑∞ 
+
+> j=0
+
+aj eıjθ ∈ L2([0 , 2π)) and b(θ) := 
+
+∑∞ 
+
+> j=0
+
+bj eıjθ ∈ L2([0 , 2π)) be the semi-generating functions for real sequences {a0, a 1, · · · , a k, · · · } 
+
+and {b0, b 1, · · · , b k, · · · } , respectively. (i) For the composited sequence {ˆb0, ˆb1, · · · , ˆbk, · · · } defined by ˆbj := ∑jk=0 aj−kbk, the semi-generating function ˆb(θ) = ∑∞ 
+
+> j=0
+
+ˆbj eıjθ satisfies ˆb(θ) = a(θ)b(θ).(ii) Assume that the real sequence {ξ0, ξ 1, · · · , ξ k, · · · } is the DOC kernels of {a0, a 1, · · · , a k, · · · } ,defined by ξ0 := 1 
+
+> a0
+
+and ξj := − 1
+
+> a0
+
+∑jk=1 ξj−kak for j ≥ 1. Then the associated semi-generating function ξ(θ) = ∑∞ 
+
+> j=0
+
+ξj eıjθ satisfies ξ(θ) = 1 /a (θ).
+
+Lemma 2.3. [16, Lemma 2.3] For the lower triangular Toeplitz matrix PL,n in (2.1) and the associated semi-generating function a(θ) = ∑∞ 
+
+> k=0
+
+akeıkθ ∈ L2([0 , 2π)) , the spectral norm of PL,n is not larger than max θ∈[0 ,2π) |a(θ)| for any n ≥ 1.
+
+6For the discrete coefficients a(k)  
+
+> j
+
+, b(k)  
+
+> j
+
+and c(k)  
+
+> j
+
+of the k-step multistep method (1.9), Lemma 2.1 defines the associated semi-generating functions 
+
+a(k) (θ) := 
+
+> k−1
+
+∑
+
+> j=0
+
+a(k)  
+
+> j
+
+eıjθ , b(k) (θ) := 
+
+> k−1
+
+∑
+
+> j=0
+
+b(k)  
+
+> j
+
+eıjθ and c(k) (θ) := 
+
+> k−1
+
+∑
+
+> j=0
+
+c(k)  
+
+> j
+
+eıjθ . (2.2) Lemma 2.2 (ii) gives the semi-generating function for the DOC kernels a(−1,k)  
+
+> n−j
+
+,
+
+a(−1,k) (θ) := 
+
+> ∞
+
+∑
+
+> j=0
+
+a(−1,k)  
+
+> j
+
+eıjθ = 1
+
+a(k) (θ) . (2.3) For the composited discrete kernels ˆb(k)  
+
+> n−ℓ
+
+and ˆc(k)  
+
+> n−ℓ
+
+defined in (1.17), Lemma 2.2 (i) gives the asso-ciated semi-generating functions 
+
+ˆb(k) (θ) := 
+
+> ∞
+
+∑
+
+> j=0
+
+ˆb(k)  
+
+> j
+
+eıjθ = a(−1,k) (θ)b(k) (θ) = b(k) (θ)
+
+a(k) (θ) , ˆc(k) (θ) := c(k) (θ)
+
+a(k) (θ) . (2.4) The following result builds some close relationships between the semi-generating functions of lower triangular Toeplitz matrices and our discrete energy techniques for IELM methods. 
+
+Lemma 2.4. [16, Lemma 2.4] Assume that the implicit part of the IELM method (1.9) is strongly 
+
+A(0) -stable. For the semi-generating functions a(k) (θ), b(k) (θ) and c(k) (θ) defined in (2.2) , assume that there exist finite constants σ(k) F > 0, σ(k) E > 0 and λ(k) I > 0 such that 
+
+σ(k) F = max 
+
+> θ∈[0 ,2π)
+
+∣∣∣∣
+
+1
+
+a(k) (θ)
+
+∣∣∣∣ , σ(k) E = max 
+
+> θ∈[0 ,2π)
+
+∣∣∣∣∣
+
+c(k) (θ)
+
+a(k) (θ)
+
+∣∣∣∣∣ , λ(k) I = min  
+
+> θ∈[0 ,2π)
+
+ℜ
+
+[
+
+b(k) (θ)
+
+a(k) (θ)
+
+]
+
+. (2.5) 
+
+Then, for n ≥ 1, the spectral norms of the lower triangular Toeplitz matrices A−1 
+
+> L, k
+
+and A−1
+
+> L, k
+
+CL, k are bounded by the positive constants σ(k) F and σ(k) E , respectively, and all eigenvalues of the symmetric matrix S(A−1
+
+> L, k
+
+BL, k) are not less than λ(k) I . For any sequences {vi, u i : i ≥ 1}, it holds that 
+
+(i)
+
+> n
+
+∑
+
+> i=1
+> i
+
+∑
+
+> j=1
+
+ˆb(k)  
+
+> i−j
+
+vj vi ≥ λ(k) I
+
+> n
+
+∑
+
+> i=1
+
+∣∣vi∣∣2 for n ≥ 1,
+
+(ii )
+
+> n
+
+∑
+
+> i=1
+> i
+
+∑
+
+> j=1
+
+a(−1,k)  
+
+> i−j
+
+vj ui ≤ σ(k) F
+
+√√√√ n∑
+
+> i=1
+
+∣∣vi∣∣2
+
+√√√√ n∑
+
+> i=1
+
+∣∣ui∣∣2 for n ≥ 1,
+
+(iii )
+
+> n
+
+∑
+
+> i=1
+> i
+
+∑
+
+> j=1
+
+ˆc(k)  
+
+> i−j
+
+vj ui ≤ σ(k) E
+
+√√√√ n∑
+
+> i=1
+
+∣∣vi∣∣2
+
+√√√√ n∑
+
+> i=1
+
+∣∣ui∣∣2 for n ≥ 1.
+
+As shown later, the boundedness of σ(k) F , σ(k) E and λ(k) I defined in (2.5) will be essential in the discrete energy analysis for the stability of IELM methods (1.9). From the perspective of the transformed IELM scheme (1.16) and the associated discrete energy analysis with respect to the 
+
+ℓ∞(H1) ∩ ℓ2(H2) norm, cf. Section 3, the spectral norm bound σ(k) F in (2.5) represents the ability of the DOC kernels a(−1,k)  
+
+> i−j
+
+to control the numerical growth of the starting term usta or truncation 7errors. The smaller the value of σ(k) F , the less the DOC kernels amplify the perturbation error. The spectral norm bound σ(k) E in (2.5) represents the ability of the composited kernels ˆc(k)  
+
+> i−j
+
+to restrain the possible instability due to the explicit approximation of g and ∇p. The smaller the value of 
+
+σ(k) E , the better the composited discrete kernels ˆc(k)  
+
+> i−j
+
+control the numerical instability. Meanwhile, the minimum eigenvalue λ(k) I in (2.5) represents the ability of the composited discrete kernels ˆb(k) 
+
+> i−j
+
+in the implicit part to maintain the dissipation property of ν∆u. The larger the value of λ(k) I , the better the composited discrete kernels ˆb(k)  
+
+> i−j
+
+inherit the dissipativity of ν∆u.In this sense, we introduce the implicit-explicit controllability intensity I(k) IE in [16], defined by the ratio of the minimum eigenvalue (dissipation preserving factor) λ(k) I from the implicit part over the spectral norm bound (nonlinear amplification factor) σ(k) E from the explicit part, 
+
+I(k) IE := λ(k) I
+
+σ(k) E
+
+=min  
+
+> θ∈[0 ,2π)
+
+ℜ
+
+[ b(k) (θ)
+
+> a(k) (θ)
+
+]
+
+max 
+
+> θ∈[0 ,2π)
+
+∣∣∣ c(k) (θ)
+
+> a(k) (θ)
+
+∣∣∣
+
+, (2.6) where the deduced formula follows from the definitions in (2.5). It would represent the degree of controllability of the implicit part over the explicit part of a given IELM method. 
+
+Lemma 2.5. [16, Lemma 2.6 and Corollary 3.4] Assume that the k-th step IELM method (1.9) 
+
+with the discrete coefficients a(k)  
+
+> j
+
+, b(k)  
+
+> j
+
+and c(k)  
+
+> j
+
+are consistent. It holds that σ(k) F ≥ 1, σ(k) E ≥ 1 and 
+
+λ(k) I ≤ 1 such that I(k) IE ≤ 1. While, the implicit-explicit Euler scheme achieves the optimal values, 
+
+σ(1) F = 1 , σ(1) E = 1 , λ(1) I = 1 and I(1) IE = 1 .
+
+To handle the nonlinear convection term u · ∇ u, we need the following lemma, see [19, (4.9)-(4.14)], which can be derived from the Ladyzhenskaya’s inequalities, the embedding from H1(Ω) 
+
+into L4(Ω) and L6(Ω) , and the elliptic regularity estimate. 
+
+Lemma 2.6. For u, v ∈ H2(Ω , Rd) ∩ H10 (Ω , Rd), there exists a constant Kl > 0 such that 
+
+∥∥u · ∇ v∥∥2 ≤ Kl 
+
+∥∥u∥∥∥∥∇u∥∥∥∥∇v∥∥∥∥∆v∥∥ for d = 2 ,
+
+∥∥u · ∇ v∥∥2 ≤ Kl 
+
+∥∥∇u∥∥2∥∥∇v∥∥∥∥∆v∥∥ for d = 2 , 3.
+
+To bound the pressure gradient, it is to introduce the Stokes pressure ps = ps(u) for any u ∈
+
+H2(Ω , Rd), defined from ∇ps(u) := (∆ P −P ∆) u. Here P is the Leray-Helmholtz projection operator onto divergence-free fields with zero normal component, providing the Helmholtz decomposition 
+
+u = Pu + ∇ϕ, where 
+
+⟨P u, ∇φ⟩ = ⟨u − ∇ ϕ, ∇φ⟩ = 0 ∀φ ∈ H1(Ω) .As presented in [19, (2.1)-(2.2)], ps(u) is determined as the mean-zero solution of 
+
+⟨∇ ps(u), ∇φ⟩ = ⟨∆u − ∇∇ · u, ∇φ⟩ ∀φ ∈ H1(Ω) . (2.7) Also, we have the following result. 
+
+Lemma 2.7. [19, Theorem 1.2] Let Ω ⊂ Rd (d ≥ 2) be a connected bounded domain with C3
+
+boundary ∂Ω. Then for any constant ε > 0, there exists a constant Kε > 0 such that for all vector fields u ∈ H2(Ω , Rd) ∩ H10 (Ω , Rd),
+
+∥(∆ P − P ∆) u∥2 ≤ ( 12 + ε) ∥∆u∥2 + Kε ∥∇ u∥2 .
+
+8The constant 12 + ε before the norm ∥∆u∥ would be essential to maintain the unconditional stability of any numerical methods with certain explicit approximation of pressure gradient ∇p
+
+because the involved norm ∥∆u∥ should be properly controlled by using the dissipation term ν∆u.
+
+# 3 Stability of general IELM methods 
+
+Theorem 3.1. Assume that there exists a finite time T∗ > 0 such that the solution pair (u, p ) of the INSE model (1.1) -(1.2) on the spatial domain Ω is regular and fulfills u ∈ C([0 , T ∗]; H10 (Ω) ∩ H2(Ω)) ,
+
+∂tu ∈ L2([0 , T ∗]; H2(Ω)) , ∂tt u ∈ L2([0 , T ∗]; L2(Ω)) and ∂tp ∈ L2([0 , T ∗]; H1(Ω)) . Assume further that the IELM method (1.9) satisfies the assumptions of Lemma 2.4. If the implicit-explicit controllability intensity I(k) IE > 
+
+> √22
+
+, and the time-step size τ is sufficiently small, the consistent splitting multistep methods (1.8) -(1.9) for the INSE model (1.1) -(1.2) are unconditionally stable, provided the starting solutions (uj , p j ) for 1 ≤ j ≤ k − 1 are sufficiently accurate. Proof. Let the exact solutions (Un, P n) solve the time-discrete system (1.8)-(1.9) with the trunca-tion error dn for 1 ≤ n ≤ N . According to the regularity assumption of solution, there exists a constant Ku > 0 such that 
+
+∥∥∇Un∥∥2 + ∥∥∆Un∥∥2 +
+
+> n
+
+∑
+
+> k=1
+
+τ ∥∥∆Uk∥∥2 +
+
+> n
+
+∑
+
+> k=1
+
+τ ∥∥∇P k∥∥2 ≤ K2 
+
+> u
+
+for 1 ≤ n ≤ N .Let the solution errors ˜un := Un − un and ˜pn := P n − pn. Also, define the nonlinear error ˜gn by 
+
+˜gn := Un · ∇ Un − un · ∇ un = ˜ un · ∇ un + Un · ∇ ˜un. (3.1) Then it is easy to derive the error equations with the no-slip boundary condition ˜un = 0 on ∂Ω,
+
+⟨∇ ˜pn, ∇ϕ⟩ = ⟨ν∆˜ un − ν∇∇ · ˜un − ˜gn, ∇ϕ⟩ for ∀ϕ ∈ H1(Ω) and n ≥ 0, (3.2) 
+
+> n
+
+∑
+
+> j=k
+
+a(k)  
+
+> n−j
+
+∂τ ˜uj = ν
+
+> n
+
+∑
+
+> j=k
+
+b(k)  
+
+> n−j
+
+∆˜ uj −
+
+> n
+
+∑
+
+> j=k
+
+c(k)  
+
+> n−j
+
+(∇˜pj−1 + ˜ gj−1) − ˜u(k ,n )sta + dn (3.3) for n ≥ k with the starting error term ˜u(k ,n )sta defined by 
+
+˜u(k ,n )sta := 
+
+> k−1
+
+∑
+
+> j=1
+
+a(k)  
+
+> n−j
+
+∂τ ˜uj − ν
+
+> k−1
+
+∑
+
+> j=1
+
+b(k)  
+
+> n−j
+
+∆˜ uj +
+
+> k−1
+
+∑
+
+> j=1
+
+c(k)  
+
+> n−j
+
+(∇˜pj−1 + ˜ gj−1), (3.4) which vanishes for n ≥ 2k − 1. Following the derivation of (1.16), it is not difficult to derive the equivalent convolution form of the error equation (3.3), 
+
+∂τ ˜ui = ν
+
+> i
+
+∑
+
+> ℓ=k
+
+ˆb(k) 
+
+> i−ℓ
+
+∆˜ uℓ −
+
+> i
+
+∑
+
+> ℓ=k
+
+ˆc(k) 
+
+> i−ℓ
+
+(∇˜pℓ−1 + ˜ gℓ−1) + 
+
+> i
+
+∑
+
+> ℓ=k
+
+a(−1,k)  
+
+> i−ℓ
+
+Rℓ for i ≥ k, (3.5) where Rℓ = dℓ − ˜u(k ,ℓ )sta for ℓ ≥ k. The time truncation error dn = O(τ ) according to the solution regularity. Assume further that the starting solutions (uj , p j ) for 1 ≤ j ≤ k − 1 are accurate enough and there exists a constant ˜Ku > 0 such that 
+
+∥∥∇˜uk−1∥∥2 + τ ∥∥∆˜ uk−1∥∥2 + τ ∥∥∇˜pk−1∥∥2 +
+
+> n
+
+∑
+
+> j=k
+
+τ ∥∥Rj ∥∥2 ≤ ˜K2
+
+> u
+
+τ 2. (3.6) 9We consider the mathematical induction for the error bound in the ℓ∞(H1) ∩ ℓ2(H2) norm 
+
+∥∥∇˜uℓ∥∥2 +
+
+> ℓ
+
+∑
+
+> j=k
+
+τ ∥∥∆˜ uj ∥∥2 ≤ 1 for k − 1 ≤ ℓ ≤ N . (3.7) It holds for ℓ = k − 1 if the time-step size τ ≤ 1/ ˜Ku. It needs to verify the case ℓ = m (m ≥ k) from the induction hypothesis 
+
+∥∥∇˜uℓ∥∥2 +
+
+> ℓ
+
+∑
+
+> j=k
+
+τ ∥∥∆˜ uj ∥∥2 ≤ 1 for k − 1 ≤ ℓ ≤ m − 1. (3.8) The hypothesis and the regularity setting imply that 
+
+∥∥∇uℓ∥∥2 +
+
+> ℓ
+
+∑
+
+> j=k
+
+τ ∥∥∆uj ∥∥2 ≤ (1 + Ku)2 for k − 1 ≤ ℓ ≤ m − 1. (3.9) To derive the error estimate at tm, we present some estimates on the pressure gradient and the nonlinear term. According to the equivalent equation (2.7) for the Stokes pressure ps, the pressure error equation (3.2) has the following form 
+
+〈∇˜pℓ, ∇ϕ〉 = 〈ν∇ps(˜ uℓ) − ˜gℓ, ∇ϕ〉 for 0 ≤ ℓ ≤ N , ∀ϕ ∈ H1(Ω) .Taking ϕ := ˜ pℓ arrives at 
+
+∥∥∇˜pℓ∥∥ ≤ ν∥∥∇ps(˜ uℓ)∥∥ + ∥∥˜gℓ∥∥ for 0 ≤ ℓ ≤ N , (3.10) and thus 
+
+∥∥∇˜pℓ + ˜ gℓ∥∥ ≤ ν∥∥∇ps(˜ uℓ)∥∥ + 2 ∥∥˜gℓ∥∥ for 0 ≤ ℓ ≤ N . (3.11) By using Lemma 2.6, we can bound the convection error term by 
+
+∥∥˜gj ∥∥2 ≤ 2∥∥˜uj · ∇ uj ∥∥2 + 2 ∥∥Uj · ∇ ˜uj ∥∥2
+
+≤ 2Kl 
+
+∥∥∇˜uj ∥∥2∥∥∇uj ∥∥∥∥∆Uj − ∆˜ uj ∥∥ + 2 Kl 
+
+∥∥∇Uj ∥∥2∥∥∇˜uj ∥∥∥∥∆˜ uj ∥∥
+
+≤ 2Kl 
+
+∥∥∇˜uj ∥∥2∥∥∇uj ∥∥∥∥∆Uj ∥∥ + 2 Kl 
+
+∥∥∇˜uj ∥∥2∥∥∇uj ∥∥∥∥∆˜ uj ∥∥ + 2 KlK 2
+
+> u
+
+∥∥∇˜uj ∥∥∥∥∆˜ uj ∥∥
+
+≤ 2Kl (1 + Ku)Ku
+
+∥∥∇˜uj ∥∥2 + 2 Kl (1 + Ku)2∥∥∇˜uj ∥∥∥∥∆˜ uj ∥∥
+
+≤ K1ϵ−12
+
+∥∥∇˜uj ∥∥2 + ϵ2
+
+∥∥∆˜ uj ∥∥2 for k − 1 ≤ j ≤ m − 1, (3.12) where K1 := 2 Kl (1 + Ku)Kuϵ2 + K2 
+
+> l
+
+(1 + Ku)4 with a small constant ϵ2 > 0 to be determined. By testing the error equation (3.5) with −2τ ∆˜ ui, and summing over i from i = k to m, we have 
+
+∥∥∇˜um∥∥2 − ∥∥∇˜uk−1∥∥2 +
+
+> m
+
+∑
+
+> i=k
+
+∥∥∇(˜ ui − ˜ui−1)∥∥2 + 2 ντ 
+
+> m
+
+∑
+
+> i=k
+> i
+
+∑
+
+> j=k
+
+ˆb(k) 
+
+> i−j
+
+〈∆˜ uj , ∆˜ ui〉
+
+= 2 τ
+
+> m
+
+∑
+
+> i=k
+> i
+
+∑
+
+> j=k
+
+ˆc(k) 
+
+> i−j
+
+〈∇˜pj−1 + ˜ gj−1, ∆˜ ui〉 − 2τ
+
+> m
+
+∑
+
+> i=k
+> i
+
+∑
+
+> j=k
+
+a(−1,k) 
+
+> i−j
+
+〈Rj , ∆˜ ui〉. (3.13) 10 Lemma 2.4 (i) gives 
+
+2ντ 
+
+> m
+
+∑
+
+> i=k
+> i
+
+∑
+
+> j=k
+
+ˆb(k) 
+
+> i−j
+
+〈∆˜ uj , ∆˜ ui〉 ≥ 2λ(k) I ν
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2.
+
+Applying Lemma 2.4 (iii) and the pressure gradient estimate (3.11), the first term at the right hand side (RHS) of (3.13) can be bounded by RHS 1 ≤ 2σ(k) E
+
+√√√√ m∑
+
+> i=k
+
+τ ∥∥∇˜pi−1 + ˜ gi−1∥∥2
+
+√√√√ m∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2
+
+≤ 4σ(k) E
+
+√√√√ m∑
+
+> i=k
+
+τ ∥∥˜gi−1∥∥2
+
+√√√√ m∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2
+
++ 2 σ(k) E ν
+
+√√√√ m∑
+
+> i=k
+
+τ ∥∇ ps(˜ ui−1)∥2
+
+√√√√ m∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2,
+
+where the triangular inequality was used in the last step. Thus, by using the Young inequality and the convection error bound (3.12), the right hand side (RHS) of (3.13) can be bounded by RHS ≤ 2ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2 + 2( σ(k) E )2
+
+ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥˜gi−1∥∥2
+
++ (σ(k) E )2νλ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∇ps(˜ ui−1)∥∥2 + λ(k) I ν
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2
+
++ (σ(k) F )2
+
+ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=1
+
+τ ∥∥Ri∥∥2 + ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2
+
+≤ (ν + 3 ϵ3)λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2 + 2( σ(k) E )2ϵ2
+
+ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui−1∥∥2
+
++ 2K1(σ(k) E )2
+
+ϵ2ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∇˜ui−1∥∥2 + (σ(k) E )2νλ(k) I
+
+( 12 + ε)
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui−1∥∥2
+
++ Kε ν(σ(k) E )2
+
+λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∇˜ui−1∥∥2 + (σ(k) F )2
+
+ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥Ri∥∥2,
+
+where we use the Stokes pressure estimate from Lemma 2.7 (by taking 0 < ε < 18 )
+
+∥∥∇ps(˜ uℓ)∥∥2 ≤ ( 12 + ε)∥∥∆˜ uℓ∥∥2 + Kε 
+
+∥∥∇˜uℓ∥∥2 for 0 ≤ ℓ ≤ N . 
+
+Then it follows from (3.13) that 
+
+∥∥∇˜um∥∥2− ∥∥∇˜uk−1∥∥2 + ( ν − 3ϵ3)λ(k) I τ ∥∥∆˜ um∥∥2 − (ν − 3ϵ3)λ(k) I τ ∥∥∆˜ uk−1∥∥2
+
++
+
+[
+
+(ν − 3ϵ3) − (( 12 + ε)ν + 2 ϵ2ϵ−13
+
+) (σ(k) E )2
+
+(λ(k) I )2
+
+]
+
+λ(k) I
+
+> m−1
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2
+
+≤ ( 2K1
+
+ϵ2
+
++ Kε ϵ3ν) (σ(k) E )2
+
+ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∇˜ui−1∥∥2 + (σ(k) F )2
+
+ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥Ri∥∥2.
+
+11 Under the priori setting I(k) IE > 
+
+> √22
+
+, one can choose a small ε := (λ(k) I )2  
+
+> 4( σ(k) E)2
+
+− 18 ∈ (0 , 18 ) and ϵ2 := ϵ3εν/ 2
+
+such that 
+
+(ν − 3ϵ3) − (( 12 + ε)ν + 2 ϵ2ϵ−13
+
+) (σ(k) E )2
+
+(λ(k) I )2 = ν − 3ϵ3 − 
+
+> 12
+
++ 2 ε 
+
+> 12
+
++ 4 ε ν = 2εν  
+
+> 12
+
++ 4 ε − 3ϵ3.
+
+By taking ϵ3 := εν  
+
+> 1+8 ε
+
+, one has 
+
+(ν − 3ϵ3) − (( 12 + ε)ν + 2 ϵ2ϵ−13
+
+) (σ(k) E )2
+
+(λ(k) I )2 = ϵ3 and ν − 3ϵ3 = 
+
+> 12
+
++ 52 ε 
+
+> 12
+
++ 4 ε ν > ϵ 3.
+
+Thus, with the constant K2 := 4K1 
+
+> ϵ3εν
+
++ Kε ϵ3ν, we have 
+
+∥∥∇˜um∥∥2 + ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2 ≤ ∥∥∇˜uk−1∥∥2 + λ(k) I ντ ∥∥∆˜ uk−1∥∥2
+
++ K2(σ(k) E )2
+
+ϵ3λ(k) I
+
+> m−1
+
+∑
+
+> i=k −1
+
+τ ∥∥∇˜ui∥∥2 + (σ(k) F )2
+
+ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥Ri∥∥2.
+
+The standard discrete Grönwall inequality yields 
+
+∥∥∇˜um∥∥2 + ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2 ≤ (σ(k) F )2
+
+ϵ3λ(k) I
+
+exp 
+
+( K2(σ(k) E )2
+
+ϵ3λ(k) I
+
+tm−k+1 
+
+)
+
+∗
+
+(∥∥∇˜uk−1∥∥2 + λ(k) I ντ ∥∥∆˜ uk−1∥∥2 +
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥Ri∥∥2)
+
+,
+
+and then, by using the prior setting (3.6), 
+
+∥∥∇˜um∥∥2 + ϵ3λ(k) I
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2 ≤ (σ(k) F )2
+
+ϵ3λ(k) I
+
+˜K2 
+
+> u
+
+exp 
+
+( (σ(k) E )2
+
+ϵ3λ(k) I
+
+> K2
+
+T∗
+
+)
+
+τ 2. (3.14) It implies that, since ϵ3λ(k) I < 1 according to Lemma 2.5, 
+
+∥∥∇˜um∥∥2 +
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2 ≤ K23τ 2,
+
+where the constant K3 := σ(k) F
+
+> ϵ3λ(k) I
+
+˜Ku exp 
+
+( (σ(k) E )2
+
+> 2ϵ3λ(k) I
+> K2
+
+T∗
+
+)
+
+. By choosing the small time-step size τ ≤ 1/K3,we recover the desired ℓ∞(H1) ∩ ℓ2(H2) norm error bound (3.7) holds for ℓ = m and complete the mathematical induction. As a byproduct, the error bound (3.14) holds for any k ≤ m ≤ N . By using the regularity assumption of solution, it is easy to obtain the following stability estimate 
+
+∥∥∇um∥∥2 +
+
+> m
+
+∑
+
+> j=k
+
+τ ∥∥∆uj ∥∥2 ≤ (1 + Ku)2 for k ≤ m ≤ N . (3.15) 12 By using the pressure gradient estimate (3.10), Lemma 2.7 and the convection error bound (3.12), which is also valid for ℓ = m according to (3.15), one applies the error estimate (3.14) to obtain 
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∇˜pi∥∥2 ≤ 2ν
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∇ps(˜ ui)∥∥2 + 2 
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥˜gi∥∥2
+
+≤ (ν + 2 εν + ϵ3εν )
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∆˜ ui∥∥2 + 2( νKε + 2K1 
+
+> ϵ3εν
+
+)
+
+> m
+
+∑
+
+> i=k
+
+τ ∥∥∇˜ui∥∥2
+
+≤
+
+[
+
+(ν + 2 εν + ϵ3εν ) + 2( νKε + 2K1 
+
+> ϵ3εν
+
+)T∗
+
+]
+
+> K23
+
+τ 2 for 1 ≤ m ≤ N .Thus, ∑mi=k τ ∥∥∇˜pi∥∥2 and ∑mi=k τ ∥∥∇pi∥∥2 in the ℓ2(H1) norm are also bounded for k ≤ m ≤ N if the time-step size τ ≤ 1/K3. It completes the proof. By imposing further regularity in time, one has the following convergence result. 
+
+Theorem 3.2. Assume that there exists a finite time T∗ > 0 such that the solution pair (u, p )
+
+of the INSE model (1.1) -(1.2) fulfills u ∈ C([0 , T ∗]; H10 (Ω) ∩ H2(Ω)) , ∂(k+1)  
+
+> t
+
+u ∈ L2([0 , T ∗]; L2(Ω)) 
+
+and ∂(k)  
+
+> t
+
+p ∈ L2([0 , T ∗]; H1(Ω)) for some integer k ≥ 1. Assume further that the k-step IELM method (1.9) is consistent with an order of O(τ k) and satisfies the assumptions of Lemma 2.4. If the controllability intensity I(k) IE > 
+
+> √22
+
+and the step size τ is sufficiently small, the solution pairs (un, p n) of the consistent splitting IELM methods (1.8) -(1.9) for the INSE model (1.1) -(1.2) 
+
+are unconditionally stable and convergent with an order of O(τ k), provided the starting solutions 
+
+(uj , p j ) for 1 ≤ j ≤ k − 1 are sufficiently accurate. 
+
+# 4 Two classes of IELM methods 
+
+Among the four parameterized classes of IELM methods in [16, Section 4], the GBDF-k (2 ≤ k ≤ 5)and SIELM-k (2 ≤ k ≤ 9) schemes can theoretically maintain the unconditional stability of the consistent splitting IELM methods (1.8)-(1.9) because the associated controllability intensities I(k) IE 
+
+fulfill the stability requirement of Theorem 3.1. 
+
+4.1 β-parameterized GBDF-k methods 
+
+The β-parameterized GBDF methods [11] are constructed by approximating each term of the dif-ferential equations at the off-set grid point t∗ := tn−1+ β (β ≥ 1) ,
+
+> k−1
+
+∑
+
+> j=0
+
+a(k) G,j ∂τ un−j ≈ u′(t∗),
+
+> k−1
+
+∑
+
+> j=0
+
+b(k) G,j un−j ≈ u(t∗),
+
+> k−1
+
+∑
+
+> j=0
+
+c(k) G,j un−j−1 ≈ u(t∗).
+
+That is, the discrete coefficients a(k) G,j , b(k) G,j and c(k) G,j for 0 ≤ j ≤ k−1 can be determined independently by three linear algebraic systems of Vandermonde-type. We recall the GBDF-k (2 ≤ k ≤ 5) methods with the coefficient vectors as follows: (GBDF2) : ⃗a (2) G = ( 12 + β, 12 − β),⃗ b(2) G = ( β, 1 − β),⃗c (2) G = ( β + 1 , −β);(GBDF3) : ⃗a (3) G = ( 3β2+6 β+2 6 , −6β2−6β+5 6 , 3β2−16
+
+),⃗ b (3) G = ( β2+β 
+
+> 2
+
+, 1 − β2, β2−β
+
+> 2
+
+),⃗c (3) G = ( β2+3 β+2 2 , −2β − β2, β2+β 
+
+> 2
+
+);13 (GBDF4) : ⃗a (4) G = ( 2β3+9 β2+11 β+3 12 , −6β3−21 β2−9β+13 12 , 6β3+15 β2−3β−512 , −2β3−3β2+β+1 12 
+
+),⃗ b(4) G = ( β3+3 β2+2 β
+
+6 , −β3−2β2+β+2 2 , β3+β2−2β
+
+2 , β−β3
+
+6
+
+),⃗ c (4) G = ( β3+6 β2+11 β+6 6 , −β3−5β2−6β
+
+2 , β3+4 β2+3 β
+
+2 , −β3−3β2−2β
+
+6
+
+);(GBDF5) : ⃗a (5) G = ( 5β4+40 β3+105 β2+100 β+24 120 , −10 β4−70 β3−135 β2−25 β+77 60 ,
+
+15 β4+90 β3+120 β2−45 β−43 60 , −10 β4−50 β3−45 β2+25 β+17 60 , 5β4+20 β3+15 β2−10 β−6120 
+
+),⃗ b(5) G = ( β(β3+6 β2+11 β+6) 24 , −β4−5β3−5β2+5 β+6 6 , β(β3+4 β2+β−6) 4 , β(−β3−3β2+β+3) 6 , β(β3+2 β2−β−2) 24 
+
+),⃗ c (5) G = ( β4+10 β3+35 β2+50 β+24 24 , − β(β3+9 β2+26 β+24) 6 ,
+
+β(β3+8 β2+19 β+12) 4 , − β(β3+7 β2+14 β+8) 6 , β(β3+6 β2+11 β+6) 24 
+
+).
+
+It is easy to get the associated three characteristic polynomials 
+
+ϱ(k) 
+
+a, G(ζ) := 
+
+k−1∑
+
+j=0 
+
+a(k) G,j ζk−1−j =
+
+k∑
+
+j=1 
+
+f (j)G (1) 
+
+j! (ζ − 1) j−1 with fG(z) = zk−1+ β ln z, ϱ(k) 
+
+b, G(ζ) := 
+
+k−1∑
+
+j=0 
+
+(k−2+ βj
+
+)(ζ − 1) j , ϱ(k) 
+
+c, G(ζ) := 
+
+k−1∑
+
+j=0 
+
+(k−1+ βj
+
+)(ζ − 1) j ,
+
+where (mj
+
+) := m(m−1) ··· (m−j+1) 
+
+j! denotes the usual binomial coefficient. It is not difficulty to check that ϱ(k) 
+
+a, G(ζ) is a Schur polynomial for k = 2 , 3, 4 and 5 if β > 0, β > 
+
+√21 −36 , β > √2 − 1 and 
+
+β > 0.50969 , respectively. They ensure that the implicit parts of the GBDF-k (2 ≤ k ≤ 5) methods are strongly A(0) stable if β ≥ 1, while the implicit part of the GBDF-6 method is not strongly 
+
+A(0) stable for β ≥ 2, see [16, Section 4]. Table 1: Stability property of GBDF-k methods for β ≥ 1k σ(k ,β )F,G σ(k ,β )E,G λ(k ,β )I,G I(k ,β )IE ,G
+
+2 1 2β+1 2β
+
+2β−12β
+
+2β−12β+1 
+
+3 1 6β2+12 β+3 6β2+6 β−26β2−46β2+6 β−26β2−46β2+12 β+3 
+
+4 11 β−110 β
+
+4β3+19 β2+20 β+3 4( β3+3 β2+β−1) 4β3+5 β2−4β−34( β3+3 β2+β−1) 4β3+5 β2−4β−34β3+19 β2+20 β+3 
+
+5∗ 20 β−110 β
+
+5(2 β4+30 β3+32 β2+38 β+5) 10 β4+60 β3+90 β2−32 5(2 β4+β3+4 β2−4β−2) 10 β4+60 β3+90 β2−32 2β4+β3+4 β2−4β−22β4+30 β3+32 β2+38 β+5 
+
+5⋆ 20 β−110 β
+
+5(2 β4+21 β3+29 β2+38 β+5) 10 β4+60 β3+90 β2−32 5(2 β4+3 β3+25 β2−9β−3) 10 β4+60 β3+90 β2−32 2β4+3 β3+25 β2−9β−32β4+21 β3+29 β2+38 β+5 
+
+The two cases k = 5 ∗ and 5⋆ require 1 ≤ β < 18 and β ≥ 18 , respectively. 
+
+Table 1 collects the upper bounds of σ(k ,β )F,G and σ(k ,β )E,G , the lower bounds of λ(k ,β )I,G and I(k ,β )IE ,G for the GBDF-k methods with the parameter β ≥ 1, see [16, Table 2]. Simple computations show that 
+
+I(2 ,β )IE ,G >
+
+√22 if β > 32 + √2 ≈ 2.914 , I(3 ,β )IE ,G >
+
+√22 if β > 5.46572 ,
+
+I(4 ,β )IE ,G >
+
+√22 if β > 8.97865 , I(5 ,β )IE ,G >
+
+√22 if β > 19 .9988 .14 They say that, by choosing the parameters βk = 3 , 11 /2, 9, 20 corresponding to k = 2 , 3, 4, 5, re-spectively, the GBDF-k schemes theoretically maintain the unconditional stability of the consistent splitting IELM methods (1.8)-(1.9). In this sense, Theorems 3.1 and 3.2 essentially improve the results of [12, Theorem 4.1], where three concrete cases with fixed parameters βk = 3 , 6, 9 corre-sponding to k = 2 , 3, 4, respectively, were verified theoretically. 
+
+4.2 γ-parameterized SIELM-k methods 
+
+The SIELM-k (2 ≤ k ≤ 9) methods [16] with the discrete coefficients a(k) S,j , b(k) S,j and c(k) S,j are deter-mined by the following three characteristic polynomials 
+
+ϱ(k) 
+
+> a, S
+
+(ζ) := 
+
+> k
+
+∑
+
+> j=1
+
+f (j)S (1) 
+
+j! (ζ − 1) j−1 with fS(z) = ( γz − γ + 1) k−1z ln z, ϱ(k)  
+
+> b, S
+
+(ζ) := ζ(γζ − γ + 1) k−1 and ϱ(k)  
+
+> c, S
+
+(ζ) := ζ(γζ − γ + 1) k−1 − γk−1(ζ − 1) k, respectively. By the Routh-Hurwitz criterion, one can check that ϱ(k) 
+
+> a, S
+
+(ζ) is a Schur polynomial if γ > 0, γ > 1√6 , γ > 0,
+
+γ > 0.647518 , γ > 0.830364 , γ > 1.02816 , γ > 1.23687 and γ > 1.45371 corresponding to the order index k = 2 , 3, · · · , 8 and 9, respectively, which ensure that the implicit parts of the SIELM-k
+
+methods for 2 ≤ k ≤ 9 are strongly A(0) -stable. Here we recall the SIELM-k methods for 2 ≤ k ≤ 6 with the first coefficient vector: (SIELM2) : ⃗a (2) S = ( 12 + γ, 12 − γ);(SIELM3) : ⃗a (3) S = (γ2 + γ − 16 , 56 − 2γ2, γ 2 − γ + 13
+
+);
+
+(SIELM4) : ⃗a (4) S = (γ3 + 3γ2 
+
+> 2
+
+− γ 
+
+> 2
+
++ 112 , −3γ3 − 3γ2 
+
+> 2
+
++ 3 γ − 512 , 3γ3 − 3γ2 
+
+> 2
+
+− 3γ 
+
+> 2
+
++ 13 12 , −γ3 + 3γ2 
+
+> 2
+
+− γ + 14
+
+);
+
+(SIELM5) : ⃗a (5) S = (γ4 + 2 γ3 − γ2 + γ 
+
+> 3
+
+− 120 , −4γ4 − 4γ3 + 7 γ2 − 2γ + 17 60 ,
+
+6γ4 − 9γ2 + 6 γ − 43 60 , −4γ4 + 4 γ3 + γ2 − 10 γ 
+
+> 3
+
++ 77 60 , γ 4 − 2γ3 + 2 γ2 − γ + 15
+
+);
+
+(SIELM6) : ⃗a (6) S = (γ5 + 5γ4 
+
+> 2
+
+− 5γ3 
+
+> 3
+
++ 5γ2 
+
+> 6
+
+− γ 
+
+> 4
+
++ 130 , −5γ5 − 15 γ4 
+
+> 2
+
++ 40 γ3 
+
+> 3
+
+− 35 γ2 
+
+> 6
+
++ 5γ 
+
+> 3
+
+− 13 60 ,
+
+10 γ5 + 5 γ4 − 80 γ3 
+
+> 3
+
++ 20 γ2 − 5γ + 37 60 , −10 γ5 + 5 γ4 + 50 γ3 
+
+> 3
+
+− 70 γ2 
+
+> 3
+
++ 10 γ − 21 20 ,
+
+5γ5 − 15 γ4 
+
+> 2
+
++ 5γ3 
+
+> 3
+
++ 35 γ2 
+
+> 6
+
+− 65 γ 
+
+> 12
+
++ 29 20 , −γ5 + 5γ4 
+
+> 2
+
+− 10 γ3 
+
+> 3
+
++ 5γ2 
+
+> 2
+
+− γ + 16
+
+).
+
+For the semi-generating functions a(k) S (θ), b(k) S (θ) and c(k) S (θ), defined via (2.2), of the SIELM-k
+
+methods, we have the following results, see [16, Propositions SM3.1-SM3.17], 
+
+σ(k) F,S = 1
+
+∣∣a(k) S (0) ∣∣ = 1 , σ(k) E,S =
+
+∣∣c(k) S (π)∣∣∣∣a(k) S (π)∣∣ , λ(k) I,S = ℜ
+
+[
+
+b(k) S (π)
+
+a(k) S (π)
+
+]
+
+(4.1) 15 Table 2: Stability property of SIELM-k methods 
+
+k Range of γ I(k ,γ )IE ,S
+
+2 [1 , +∞) 2γ−12γ+1 
+
+3 [1 , +∞) (2 γ−1) 2
+
+> 4γ2+4 γ−1
+
+4 [6 /5, +∞) (2 γ−1) 3
+
+> 8γ3+12 γ2−6γ+1
+
+5 [7 /5, +∞) (2 γ−1) 4
+
+> 16 γ4+32 γ3−24 γ2+8 γ−1
+
+6 [10 /5, 80] (2 γ−1) 5
+
+> 32 γ5+80 γ4−80 γ3+40 γ2−10 γ+1
+
+7 [11 /5, 60] (2 γ−1) 6
+
+> 64 γ6+192 γ5−240 γ4+160 γ3−60 γ2+12 γ−1
+
+8 [13 /5, 40] (2 γ−1) 7
+
+> 128 γ7+448 γ6−672 γ5+560 γ4−280 γ3+84 γ2−14 γ+1
+
+9 [15 /5, 25] (2 γ−1) 8
+
+> 256 γ8+1024 γ7−1792 γ6+1792 γ5−1120 γ4+448 γ3−112 γ2+16 γ−1
+
+if the free parameter γ satisfies γk ≤ γ ≤ γ∗ 
+
+> k
+
+, cf. Table 2. Table 2 collects the value of I(k ,γ )IE ,S with the ranges of γ for the SIELM-k methods, see [16, Table 3]. It is easy to check that the implicit-explicit controllability intensities for 2 ≤ k ≤ 9, respectively, 
+
+I(2 ,γ )IE ,S >
+
+√22 if γ > 2.914 , I(3 ,γ )IE ,S >
+
+√22 if γ > 5.56667 ,
+
+I(4 ,γ )IE ,S >
+
+√22 if γ > 8.22174 , I(5 ,γ )IE ,S >
+
+√22 if γ > 10 .8775 ,
+
+I(6 ,γ )IE ,S >
+
+√22 if 13 .5334 < γ ≤ 80 , I(7 ,γ )IE ,S >
+
+√22 if 16 .18966 < γ ≤ 60 ,
+
+I(8 ,γ )IE ,S >
+
+√22 if 18 .84576 < γ ≤ 40 , I(9 ,γ )IE ,S >
+
+√22 if 21 .5026 < γ ≤ 25 .They say that, by choosing the parameters γk = 3 .0, 5.6, 8.3, 10 .9, 13 .6, 16 .2, 18 .9 and 21 .6 corre-sponding to k = 2 , 3, · · · , 8 and 9, respectively, the SIELM-k schemes theoretically maintain the unconditional stability of the consistent splitting IELM methods (1.8)-(1.9). 
+
+# 5 Numerical experiments 
+
+This section presents some numerical tests of the GBDF-k and SIELM-k methods for the uncon-strained INSE system (1.4)-(1.5). For the convenience of comparisons, our numerical setting follows closely the benchmark tests in [12], where three specific cases β = 3 , 6 and 9 of the following GBDF-k
+
+schemes were verified for k = 2 , 3 and 4, respectively, 
+
+⟨∇ pn, ∇ϕ⟩ = ⟨ν∆un − ν∇∇ · un − gn, ∇ϕ⟩ for ∀ϕ ∈ H1(Ω) , n ≥ 0,
+
+> k−1
+
+∑
+
+> j=0
+
+a(k) G,j ∂τ un−j = ν
+
+> k−1
+
+∑
+
+> j=0
+
+b(k) G,j ∆un−j −
+
+> k−1
+
+∑
+
+> j=0
+
+c(k) G,j ∇pn−j−1 − g
+
+( k−1∑
+
+> j=0
+
+c(k) G,j un−j−1)
+
+for x ∈ Ω with un = 0 on ∂Ω and n ≥ k. Note that, the GBDF approximation in [12] of the momen-tum equation is slightly different from (1.9) on the explicit approximation of nonlinear convective term. 16 (a) GBDF3 (b) GBDF4 
+
+Figure 1: Energy curves for the Stokes problem by GBDF3 and GBDF4 schemes.  
+
+> (a) SIELM3 (b) SIELM4
+
+Figure 2: Energy curves for the Stokes problem by SIELM3 and SIELM4 schemes. To demonstrate the practical effects of high-order IELM methods, we adopt a Legendre-Galerkin spectral method in space and choose sufficiently many spatial modes so that the spatial discretization error is negligible compared with the temporal error. Our proof requires that the domain Ω has a 
+
+C3 boundary, see [19, Theorem 1.2] or Lemma 2.7, in order to apply the Stokes pressure estimate, but the present numerical tests use the square domain Ω = ( −1, 1) 2 with a rough C0 boundary to empirically probe whether the theory can be extended to polygonal domains (though it remains open to us). 
+
+Example 1. [12, Example 1] We first consider the Stokes problem, namely the unconstrained INSE system (1.4) -(1.5) with g = 0. The viscosity is set to ν = 0 .005 , and the initial velocity 
+
+u0 = ( sin 2 πy sin 2 πx, − sin 2 πx sin 2 πy ). The Legendre-Galerkin method is used in space with the mode number Nx = Ny = 128 .
+
+Fig. 1 shows the energy curves, normalized by E(0) , generated by the GBDF3 and GBDF4 schemes with a properly large step τ = 0 .01 for different parameters β, in which the reference energy is obtained by using a small step τ = 0 .0005 . As confirmed in [12], the choices β = 6 and 
+
+β = 9 arrive at stable solutions for the GBDF3 and GBDF4 schemes, respectively; while the smaller parameters β = 1 and 2 always generate unstable solutions. These cases also support our theory 17 0 1 2 3 4 5        
+
+> t
+> 00.2 0.4 0.6 0.8 1
+> Normalized energy E(t)/E(0)
+> reference SIEMS-3, =6, =0.0005 SIEMS-3, =3, =0.0005 SIEMS-4, =9, =0.0005 SIEMS-4, =6, =0.0005
+
+(a) Normalized energy evolution (b) T=0.01 
+
+(c) T=3 (d) T=5 
+
+Figure 3: Normalized energy evolution for the Navier-Stokes equations and snapshots of the vorticity contours at T = 0 .01 , T = 3 and T = 5 .since they satisfy our theoretical requirements β > 5.46572 and β > 8.97865 for the two schemes. To check the sharpness of our stability indicator I(k) IE ,G > √2/2, some smaller parameters β are also examined in our tests. We observe from Fig. 1 that the proposed indicator would be somewhat sharp for the GBDF4 scheme since the parameters β = 6 and 8 always generate unstable solutions, while the stability condition for the GBDF3 scheme is far away from sharp, at least for this specific example, since the choices β = 4 and 5 arrive at stable solutions. Fig. 2 presents the numerical results for the SIELM3 and SIELM4 schemes with the corre-sponding theoretical requirements γ > 5.56667 and γ > 8.22174 for the unconditional stability, respectively. It is observed that the SIELM3 scheme is stable for γ ≥ 2 and the SIELM4 scheme is stable for γ ≥ 6. It seems that the proposed stability indicator I(k) IE ,S > √2/2 is sufficient but always not sharp. We next test the SIELM3 and SIELM4 schemes for the unconstrained INSE system (1.4)-(1.5) with ν = 0 .005 and the zero-valued external force f = 0. The reference solution is computed using the SIELM4 scheme ( γ = 9 ) on a refined space mesh with Nx = Ny = 192 . Fig. 3 displays the energy evolution for the SIELM3 and SIELM4 schemes with τ = 0 .0005 . As predicted in Theorem 3.1, the solutions generated by the two certified SIELM schemes are stable and agree well with the reference solution. Also, the SIELM3 scheme with γ = 3 and the SIELM4 scheme with γ = 6 remain stable in our tests, although these parameter values are smaller than the theoretically certified value. 18 (a) GBDF-2 (b) GBDF-3  
+
+> (c) GBDF-4 (d) GBDF-5
+
+Figure 4: Convergence test for the GBDF-k consistent splitting schemes. The qualitative behaviors of numerical solutions, see the vorticity contours at T = 0 .01 , T = 3 
+
+and T = 5 , are depicted in Fig. 3. As seen, the vortex structures produced by the SIELM schemes agree well with the reference solution, confirming that the stable energy behavior is accompanied by physically meaningful flow patterns. 
+
+Example 2. [12, Example 2] Consider the INSE model (1.1) -(1.2) on the domain Ω = ( −1, 1) 2
+
+with no-slip boundary condition, which admits the exact solution 
+
+u = (sin 2 πy sin 2 πx sin πt, − sin 2 πx sin 2 πy sin πt ) ,
+
+and p = cos πx sin πy sin πt . We set the viscosity coefficient ν = 1 and use the Legendre-Galerkin method with N x = N y = 64 modes in space so that the spatial discretization error is negligible compared with the time discretization error. 
+
+We now verify the temporal convergence rates of the GBDF-k (2 ≤ k ≤ 5) and SIELM-k
+
+(4 ≤ k ≤ 9) schemes. Always, we choose two different parameters β (or γ) for each method, including a theoretically certified value from the stability condition I(k)IE ,S > √2/2 and a smaller one for examining the practical effect of the parameters on the time accuracy. More precisely, for the GBDF-k schemes, we test GBDF2 with β = 1 , 3, GBDF3 with β = 4 , 5.5, GBDF4 with β = 8 .5, 9,and GBDF5 with β = 18 , 20 . For the SIELM-k schemes, we test SIELM4 with γ = 6 , 8.3, SIELM5 with γ = 7 , 10 .9, SIELM6 with γ = 9 , 13 .6, SIELM7 with γ = 11 , 16 .2, SIELM8 with γ = 14 , 18 .9
+
+19 (a) SIELM-4 (b) SIELM-5 (c) SIELM-6   
+
+> (d) SIELM-7 (e) SIELM-8 (f) SIELM-9
+
+Figure 5: Convergence test for the SIELM-k consistent splitting schemes. and SIELM9 with γ = 16 , 21 .6. In each pair, the larger parameter is certified by our stability condition, while the smaller one is always not covered by the current theory. Fig. 4 shows the log-log plots of the L2 norm errors of the velocity and pressure, and the L2 norm 
+
+∥∇ · uN ∥ of discrete divergence at the final time T = 1 for the GBDF-k schemes with 2 ≤ k ≤ 5
+
+against the varied time steps τ = 10 −2/2m (0 ≤ m ≤ 3) . For all tested values of β, the GBDF-k
+
+schemes generate approximately the k-th order convergence in time, as predicted by Theorem 3.2. It seems that the GBDF-k schemes with the smaller parameter can retain the desired temporal accuracy if they practically maintain the numerical stability. Fig. 5 presents the corresponding results for the SIELM-k schemes with 4 ≤ k ≤ 9. Again, for all tested values of γ, the observed slopes match the designed temporal accuracy O(τ k) for the SIELM-k schemes. As seen, the smaller choices of γ also retain the expected convergence rates in these tests provided that the computation remains stable. We observe that, for the same index k, a smaller value of β or γ usually leads to smaller L2 errors for both the velocity and the pressure. They are consistent with the fact that a larger parameter improves the stability but always introduces a larger value of truncation error, cf. [16, Sections SM2 and SM3]. Therefore, a moderately smaller β or γ would be practically desirable in numerical simulations; however, up to now, we are not able to improve the stability condition I(k)IE > √2/2.We further examine the long-time behavior of the SIELM-k schemes by monitoring the vorticity profile. For the exact solution in the above example, the corresponding vorticity is 
+
+ω = ∂xu2 − ∂yu1 = −2π [cos(2 πx ) sin 2(πy ) + cos(2 πy ) sin 2(πx )] sin( πt ).
+
+Therefore, ω(·, t ) = 0 and ∇ω(·, t ) = 0 whenever t ∈ N. This provides a useful benchmark for the long-time simulation. On the one hand, the long-time boundedness of the discrete vorticity norms reflects the stability of the numerical scheme. On the other hand, since the exact vorticity vanishes 20 10 -2 10 -1 10 0 10 1 10 2
+
+> 10 -4
+> 10 -3
+> 10 -2
+> 10 -1
+> 10 0
+> 10 1
+> 10 2
+
+(a) SIELM-4 (γ = 8 .3) 10 -2 10 -1 10 0 10 1 10 2 
+
+> 10 -4
+> 10 -3
+> 10 -2
+> 10 -1
+> 10 0
+> 10 1
+> 10 2
+
+(b) SIELM-5 (γ = 10 .9) 10 -2 10 -1 10 0 10 1 10 2 
+
+> 10 -4
+> 10 -3
+> 10 -2
+> 10 -1
+> 10 0
+> 10 1
+> 10 2
+
+(c) SIELM-6 (γ = 13 .6) 10 -2 10 -1 10 0 10 1 10 2
+
+> 10 -4
+> 10 -3
+> 10 -2
+> 10 -1
+> 10 0
+> 10 1
+> 10 2
+
+(d) SIELM-7 (γ = 16 .2) 10 -2 10 -1 10 0 10 1 10 2 
+
+> 10 -4
+> 10 -3
+> 10 -2
+> 10 -1
+> 10 0
+> 10 1
+> 10 2
+
+(e) SIELM-8 (γ = 18 .9) (f) SIELM-9 (γ = 21 .6) 
+
+Figure 6: The vorticity in the discrete L2 and H1 norms for the SIELM-k schemes. at every integer time, the numerical vorticity should also exhibit pronounced decay near these time levels if the scheme accurately captures the temporal oscillation of the solution. We take the time step size τ = 0 .01 and compute the numerical solution up to T = 50 . At each time level, we compute the discrete L2 norm and H1 semi-norm of the vorticity for the numerical solution unN . Fig. 6 shows the time histories of these two quantities for the SIELM-k schemes with 4 ≤ k ≤ 9. The curves remain uniformly bounded over the long time interval [0 , 50] , which indicates the long-time stability of the SIELM schemes. 
+
+# References 
+
+[1] G. Akrivis , Implicit-explicit multistep methods for nonlinear parabolic equations, Math. Comput. , 82 (2013), pp. 45-68. [2] G. Akrivis , Stability of implicit-explicit backward difference formulas for nonlinear parabolic equations, SIAM J. Numer. Anal. , 53 (2015), pp. 464-484. [3] G. Akrivis, M.H. Chen, F. Yu and Z. Zhou , The energy technique for the six-step BDF method, SIAM J. Numer. Anal. , 59(5) (2021), pp. 2449-2472. [4] G. Akrivis, M.H. Chen and F. Yu , The weighted and shifted seven-step BDF method for parabolic equations, IMA J. Numer. Anal. , 45 (2025), pp. 3207-3234. [5] G. Akrivis, M. Crouzeix and Ch. Makridakis , Implicit-explicit multistep finite element methods for nonlinear parabolic problems, Math. Comput. , 67 (1998), pp. 457-477. 21 [6] G. Akrivis, M. Crouzeix and Ch. Makridakis , Implicit-explicit multistep methods for quasilinear parabolic equations, Numer. Math. , 82 (1999), pp. 521-541. [7] G. Dahlquist , G-stability is equivalent to A-stability, BIT , 18 (1978), pp. 384-401. [8] W. E and J. G. Liu , Gauge method for viscous incompressible flows, Commun. Math. Sci. ,1 (2003), pp. 317-332. [9] J. L. Guermond and J. Shen , A new class of truly consistent splitting schemes for incom-pressible flows, J. Comput. Phys. , 192 (1) (2003), pp. 262-276. [10] F. Huang and J. Shen , Stability and error analysis of a second-order consistent splitting scheme for the Navier-Stokes equations, SIAM J. Numer. Anal. , 61(5) (2023), pp. 2408-2433. [11] F. Huang and J. Shen , On a new class of multistep and IMEX schemes for parabolic type equations, SIAM J. Numer. Anal. , 62(4) (2024), pp. 1609-1637. [12] F. Huang and J. Shen , Stability and error analysis of a new class of higher-order consistent splitting schemes for the Navier-Stokes equations, Math. Comput. , 2025, doi: 10.1090/mcom/4132. [13] B. Ji and H.-L. Liao , A unified L2 norm error analysis of SAV-BDF schemes for the incompressible Navier-Stokes equation, J. Sci. Comput. , 2024, 100:5. [14] H. Johnston and J. G. Liu , Accurate, stable and efficient Navier-Stokes solvers based on explicit treatment of the pressure term, J. Comput. Phys. , 199 (2004), pp. 221-259. [15] H.-L. Liao, and Y. Kang , L2 norm error estimates of BDF methods up to fifth-order for the phase field crystal model, IMA J. Numer. Anal. , 44 (2024), pp. 2138-2164. [16] H.-L. Liao, C. Quan, T. Tang and T. Zhou , A semi-generating function approach to the stability of implicit-explicit multistep methods for nonlinear parabolic equations, arXiv: 2605.05619v2 , 2026, revised in SIAM J. Numer. Anal. 
+
+[17] H.-L. Liao, T. Tang and T. Zhou , A new discrete energy technique for multi-step backward difference formulas, CSIAM Trans. Appl. Math. , 3(2) (2022), pp. 318-334. [18] H.-L. Liao and Z. Zhang , Analysis of adaptive BDF2 scheme for diffusion equations, Math. Comput. , 90 (2021), pp. 1207-1226. [19] J. G. Liu, J.-G. Liu and R.L. Pego , Stability and convergence of efficient Navier-Stokes solvers via a commutator estimate, Commun. Pure Appl. Math. , 60(10) (2007), pp. 1443-1487. [20] J. G. Liu, J.-G. Liu and R.L. Pego , Stable and accurate pressure approximation for un-steady incompressible viscous flow, J. Comput. Phys. , 229(9) (2010), pp. 3428-3453. [21] R. Nochetto and J.-H. Pyo , Error estimates for semi-discrete gauge methods for the Navier-Stokes equations, Math. Comput. , 74 (2005), pp. 521-542. [22] J. Shen and X. Yang , Error estimates for finite element approximations of consistent splitting schemes for incompressible flows, Discrete Contin. Dyn. Syst. B. , 8(3) (2007), pp. 663-675. 22

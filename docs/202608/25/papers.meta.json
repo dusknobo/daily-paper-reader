@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-25",
+  "date": "2026-08-25",
+  "generated_at": "2026-08-25T20:57:26",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/25/2608.23110v1-weakly-compressible-subcycling-for-accelerating-simulations-of-surface-tension-dominated-incompressible-two-phase-flows",
+      "section": "quick",
+      "title_en": "Weakly Compressible Subcycling for Accelerating Simulations of Surface-Tension-Dominated Incompressible Two-Phase Flows",
+      "authors": "Shu Yamashita, Shintaro Matsushita, Tetsuya Suekane",
+      "date": "2026-08-24",
+      "pdf": "https://arxiv.org/pdf/2608.23110v1",
+      "score": "7.0",
+      "evidence": "提出加速含表面张力的两相流模拟方法",
+      "tldr": "表面张力主导的不可压缩两相流模拟受毛细时间步约束计算昂贵。针对现有隐式方法存在人工耗散或实现复杂的问题，提出弱可压缩子循环方法，以轻量级弱可压缩子步辅助不可压缩主求解器。该方法放宽毛细时间步约束，加速超过8.6倍，且在无人工耗散和简单实现下，于Rayleigh-Plateau不稳定性和多孔介质两相流中验证有效。这一工作为弱可压缩求解器作为不可压缩求解器助手的新范式铺路。",
+      "tags": "query:falling-film",
+      "abstract_en": "Simulations of surface-tension-dominated incompressible two-phase flows are computationally expensive due to the severe capillary time-step constraint. Although many studies have proposed time-implicit discretizations of surface tension to allow larger time-step sizes and accelerate simulations, these methods suffer from either artificial dissipation or complex implementation. Here, we propose a simple and novel approach: an incompressible solver with weakly compressible subcycling. The proposed approach relaxes the capillary time-step constraint, thereby accelerating simulations by more than $8.6\\times$ without relying on artificially dissipative stabilization or requiring complex implementation. The key idea is to introduce lightweight substeps using a weakly compressible solver to assist the main incompressible solver. These substeps enable the main incompressible solver to use accurately computed fluxes and surface tension force, even with large time-step sizes. Numerical tests demonstrate the effectiveness of the proposed approach for practical problems, including the Rayleigh--Plateau instability and two-phase flows in porous media. This study paves the way for a new paradigm in which a weakly compressible solver serves as an assistant to an incompressible solver.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/25/2608.22269v1-a-well-balanced-weakly-compressible-sph-formulation-for-free-surface-flows-and-its-gpu-implementation",
+      "section": "quick",
+      "title_en": "A well-balanced weakly compressible SPH formulation for free-surface flows and its GPU implementation",
+      "authors": "Jiawang Zhang, Fengxiang Zhao, Jianping Gan, Kun Xu",
+      "date": "2026-08-23",
+      "pdf": "https://arxiv.org/pdf/2608.22269v1",
+      "score": "6.0",
+      "evidence": "自由表面流SPH模拟方法，可用于降膜多相流CFD",
+      "tldr": "针对弱可压缩光滑粒子流体动力学（WCSPH）自由表面流中压力梯度与重力无法精确平衡的问题，提出一种良平衡（well-balanced）离散格式。该方法通过引入辅助势变量将非线性压力项化为线性标量梯度，并结合黎曼型梯度近似与核修正实现一阶一致性。静水测试显示虚假速度误差从10^-3降至10^-13量级，达到机器精度。该格式已扩展至三维并实现GPU加速，可模拟1753万粒子，显著提升长期模拟可靠性。",
+      "tags": "query:falling-film",
+      "abstract_en": "This study proposes a well-balanced formulation of weakly compressible smoothed particle hydrodynamics (WCSPH) for free-surface flows, which preserves hydrostatic equilibrium exactly at the discrete level--a property essential for reliable long-term simulations. Although well-balanced schemes are well established for mesh-based methods, the property remains largely unaddressed in WCSPH, where the particle approximation of the pressure gradient fails to balance the gravitational force exactly. The imbalance stems from two difficulties: the nonlinearity of the pressure-gradient-over-density term, and the approximation error of gradients evaluated by particle summation. The first is resolved by introducing an auxiliary potential variable that recasts the nonlinear term as the gradient of a single scalar, which reduces to a linear function of position under hydrostatic conditions. The second is resolved by a Riemann-based gradient approximation with kernel correction, which is first-order consistent and recovers linear fields exactly. These two ingredients ensure that the discrete potential gradient balances gravitational force exactly. Widely used techniques, including $δ-$SPH, particle shifting and tensile instability control, are readily incorporated. The formulation is further extended to three dimensions and implemented on GPU with architecture-tailored optimizations. Hydrostatic tests with rectangular, triangular and Gaussian bottom topographies show that the proposed formulation attains the well-balanced property to machine precision, reducing the spurious velocity error of conventional SPH from $10^{-3}$ to the order of $10^{-13}$. More complex benchmarks confirm its robustness, accuracy and low pressure oscillation, with simulations of up to 17.53 million particles performed on a single consumer-grade GPU.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/25/2608.22481v1-stability-analysis-of-consistent-splitting-implicit-explicit-multistep-methods-up-to-ninth-order-accuracy-for-incompressible-flows",
+      "section": "quick",
+      "title_en": "Stability analysis of consistent splitting implicit-explicit multistep methods up to ninth-order accuracy for incompressible flows",
+      "authors": "Yuanyuan Kang, Hong-lin Liao, Guidong Liu",
+      "date": "2026-08-23",
+      "pdf": "https://arxiv.org/pdf/2608.22481v1",
+      "score": "6.0",
+      "evidence": "不可压缩Navier-Stokes的高阶稳定时间推进方法，与多相流CFD相关",
+      "tldr": "针对不可压缩 Navier-Stokes 方程的高阶解耦隐式-显式线性多步方法缺乏统一稳定性理论。本文提出基于 consistent splitting 技术、半生成函数和全局离散能量分析的稳定性框架，证明当隐式-显式可控性强度大于 sqrt(2)/2 时，相关方法在 l∞(H1)∩l2(H2) 范数无条件稳定。并且 β 参数化 GBDF-k（2≤k≤5）和 γ 参数化 SIELM-k（2≤k≤9）可通过选择合适参数满足该条件，为高精度流动求解提供稳定性保证。",
+      "tags": "query:falling-film",
+      "abstract_en": "This work presents a concise, unified stability theory of high-order decoupled \\lan{implicit-explicit linear multistep (IELM)} methods based on the well-known consistent splitting technique for the incompressible Navier-Stokes equation. With the help of the recent semi-generating function approach and the global discrete energy analysis, one can establish the unconditional stability of a consistent splitting IELM method with respect to the $\\ell^{\\infty}(H^1)\\cap \\ell^{2}(H^2)$ norm if the associated implicit-explicit controllability intensity is larger than $\\sqrt{2}/2$, a constant determined by the Stokes pressure estimate. It is shown that the $β$-parameterized GBDF-$\\rmk$ ($2\\le \\rmk\\le5$) schemes and $γ$-parameterized SIELM-$\\rmk$ ($2\\le \\rmk\\le9$) schemes can fulfill this requirement of implicit-explicit controllability intensity by choosing proper parameters so that they can theoretically maintain the unconditional stability of the associated consistent splitting IELM methods. Numerical experiments are also included to support our theory.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
