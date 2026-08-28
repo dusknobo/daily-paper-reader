@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-28",
+  "date": "2026-08-28",
+  "generated_at": "2026-08-28T04:13:59",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/28/2608.26046v1-a-family-of-second-order-linear-unconditionally-stable-methods-for-the-cahn-hilliard-navier-stokes-equations",
+      "section": "quick",
+      "title_en": "A family of second order, linear, unconditionally stable methods for the Cahn-Hilliard-Navier-Stokes equations",
+      "authors": "Daozhi Han, Nan Jiang, Jonah H. Nissan, Sayantan Sarkar",
+      "date": "2026-08-26",
+      "pdf": "https://arxiv.org/pdf/2608.26046v1",
+      "score": "6.0",
+      "evidence": "用于Cahn-Hilliard-Navier-Stokes两相流模拟的无条件稳定IMEX方法",
+      "tldr": "针对匹配密度两相流的CHNS方程，现有二阶方法难以同时实现线性、无条件稳定和高精度。本文提出一族二阶线性无条件稳定的IMEX方法，结合非线性项外推、辅助变量及参数ε控制的时间曲率正则化。离散能量估计证明当θ∈(1/2,1]且ε≥0时方法无条件长期稳定，每步仅需线性求解。数值实验验证了二阶收敛性和守恒性质，并成功模拟旋节分解、液滴弛豫及Rayleigh-Taylor不稳定性等界面流问题。",
+      "tags": "query:falling-film",
+      "abstract_en": "We present a family of second-order, linear, unconditionally stable implicit-explicit (IMEX) methods for the Cahn-Hilliard-Navier-Stokes (CHNS) equations modeling matched-density two-phase flows. The proposed semi-discrete scheme combines extrapolation of the nonlinear terms with an auxiliary-variable formulation of the nonlinear free-energy term and a temporal-curvature regularization controlled by a parameter $ε$. We establish a discrete energy estimate showing unconditional long-time stability of the method for $θ\\in(1/2,1]$ and $ε\\geq0$. The resulting scheme requires only linear solves at each time step. Numerical experiments demonstrate approximately second-order temporal convergence and examine mass conservation, energy dissipation, numerical robustness, and several representative interfacial-flow problems, including spinodal decomposition, droplet shape relaxation, two-phase lid-driven cavity flow, and Rayleigh-Taylor instability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

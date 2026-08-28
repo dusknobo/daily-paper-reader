@@ -1,0 +1,56 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-28T04:10:01.222682+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.26046v1",
+      "source": "arxiv",
+      "title": "A family of second order, linear, unconditionally stable methods for the Cahn-Hilliard-Navier-Stokes equations",
+      "abstract": "We present a family of second-order, linear, unconditionally stable implicit-explicit (IMEX) methods for the Cahn-Hilliard-Navier-Stokes (CHNS) equations modeling matched-density two-phase flows. The proposed semi-discrete scheme combines extrapolation of the nonlinear terms with an auxiliary-variable formulation of the nonlinear free-energy term and a temporal-curvature regularization controlled by a parameter $ε$. We establish a discrete energy estimate showing unconditional long-time stability of the method for $θ\\in(1/2,1]$ and $ε\\geq0$. The resulting scheme requires only linear solves at each time step. Numerical experiments demonstrate approximately second-order temporal convergence and examine mass conservation, energy dissipation, numerical robustness, and several representative interfacial-flow problems, including spinodal decomposition, droplet shape relaxation, two-phase lid-driven cavity flow, and Rayleigh-Taylor instability.",
+      "authors": [
+        "Daozhi Han",
+        "Nan Jiang",
+        "Jonah H. Nissan",
+        "Sayantan Sarkar"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "math-ph"
+      ],
+      "published": "2026-08-26T17:22:48+00:00",
+      "link": "https://arxiv.org/pdf/2608.26046v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Unconditionally stable IMEX methods for Cahn-Hilliard-Navier-Stokes two-phase flow simulation",
+      "llm_evidence_cn": "用于Cahn-Hilliard-Navier-Stokes两相流模拟的无条件稳定IMEX方法",
+      "llm_evidence": "用于Cahn-Hilliard-Navier-Stokes两相流模拟的无条件稳定IMEX方法",
+      "canonical_evidence": "用于Cahn-Hilliard-Navier-Stokes两相流模拟的无条件稳定IMEX方法",
+      "llm_tldr_en": "Presents second-order linear unconditionally stable IMEX schemes for matched-density two-phase flows modeled by Cahn-Hilliard-Navier-Stokes equations, using extrapolation and scalar auxiliary variables; achieves unconditional stability with only linear solves, verified by numerical convergence tests.",
+      "llm_tldr_cn": "针对等密度两相流模拟中无条件稳定与高效求解难以兼顾的问题，本文提出一类二阶线性无条件稳定的隐式-显式(IMEX)方法，用于Cahn-Hilliard-Navier-Stokes方程。该方法通过外推非线性项、引入标量辅助变量和曲率正则化，在保持能量稳定性的同时仅需在每个时间步求解线性系统。数值实验验证了二阶时间收敛精度和质量守恒性质，为两相流问题提供了可靠且计算高效的数值格式。",
+      "llm_tldr": "针对等密度两相流模拟中无条件稳定与高效求解难以兼顾的问题，本文提出一类二阶线性无条件稳定的隐式-显式(IMEX)方法，用于Cahn-Hilliard-Navier-Stokes方程。该方法通过外推非线性项、引入标量辅助变量和曲率正则化，在保持能量稳定性的同时仅需在每个时间步求解线性系统。数值实验验证了二阶时间收敛精度和质量守恒性质，为两相流问题提供了可靠且计算高效的数值格式。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
