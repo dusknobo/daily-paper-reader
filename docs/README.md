@@ -47,11 +47,11 @@
     <strong class="dpr-home-dashboard-count">共 1 篇</strong>
   </div>
   <dl class="dpr-home-dashboard-stats">
-    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>1 次</dd></div>
+    <div class="dpr-home-dashboard-stat"><dt>累计更新</dt><dd>2 次</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>精读</dt><dd>0</dd></div>
     <div class="dpr-home-dashboard-stat"><dt>速读</dt><dd>1</dd></div>
   </dl>
-  <p class="dpr-home-dashboard-body">最近更新：2026-08-29 03:07:24 UTC<br>状态：成功</p>
+  <p class="dpr-home-dashboard-body">最近更新：2026-08-29 22:35:41 UTC<br>状态：成功</p>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-brief-card">
   <div class="dpr-home-dashboard-header">
@@ -62,9 +62,9 @@
     <strong class="dpr-home-dashboard-count">AI</strong>
   </div>
   <div class="dpr-home-dashboard-body">
-<p>今日速读了一篇关于体-表面 Navier-Stokes-Cahn-Hilliard 模型的研究，重点讨论弱解存在性与渐近极限。</p>
-<p>最值得关注的是它把体相与表面相分离动力学耦合起来，为复杂流体界面问题提供严格数学基础。</p>
-<p>建议后续可关注该模型在数值计算或简化极限下的实际表现，以更直观地理解其应用价值。</p>
+<p>今日速读一篇复杂流体数学论文：体-表面 Navier-Stokes-Cahn-Hilliard 系统的弱解存在性与渐近极限。</p>
+<p>最值得关注的是体相与表面流场、相场耦合下的弱解框架，以及系统在不同极限下的行为。</p>
+<p>建议普通读者从引言中的物理背景和主要定理入手，再决定是否深入证明细节。</p>
   </div>
 </section>
 <section class="dpr-home-dashboard-card dpr-home-deep-card">
