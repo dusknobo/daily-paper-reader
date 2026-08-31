@@ -1,0 +1,24 @@
+{
+  "label": "2026-08-31",
+  "date": "2026-08-31",
+  "generated_at": "2026-08-31T23:41:35",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202608/31/2608.26908v1-a-novel-grand-potential-phase-field-lattice-boltzmann-model-for-multi-phase-solidification-with-convection",
+      "section": "quick",
+      "title_en": "A novel Grand-Potential Phase-Field Lattice-Boltzmann model for multi-phase solidification with convection",
+      "authors": "Chirantandip Mahanta, Sanjeev Kumar, Gandham Phanikumar, Abhik N. Choudhury",
+      "date": "2026-08-27",
+      "pdf": "https://arxiv.org/pdf/2608.26908v1",
+      "score": "6.0",
+      "evidence": "多相凝固对流的Grand-Potential相场格子玻尔兹曼耦合模型",
+      "tldr": "合金凝固中熔体对流显著影响微观结构演化，但准确捕捉其与移动固液界面的相互作用仍是突出计算挑战，尤其多相多组分系统。本文提出将Grand-Potential相场模型与格子Boltzmann方法耦合，在热力学一致框架内强制界面无滑移条件。模拟枝晶与共晶凝固表明，对流改变溶质偏析、促使生长前沿失稳并诱发振荡生长模式。该框架为研究对流驱动的凝固组织演变提供了高效方法，并揭示了流动诱导形态失稳的新机理。",
+      "tags": "query:falling-film",
+      "abstract_en": "Melt convection plays a critical role in microstructure evolution during alloy solidification, yet accurately capturing its interaction with moving solid-liquid interfaces remains a significant computational challenge, particularly in multi-phase, multi-component systems. In this work, we develop a computational framework that couples a Grand-Potential phase-field model with the Lattice Boltzmann method (LBM) to simulate convection-driven solidification within a unified and thermodynamically consistent formulation. The proposed approach rigorously enforces no-slip conditions at evolving solid-liquid interfaces, while fluid transport is solved using the standard single-relaxation-time Bhatnagar-Gross-Krook collision operator. The framework provides an efficient and robust methodology for resolving the coupled evolution of interfaces, solute transport, and fluid flow.   The versatility of the proposed framework is demonstrated through simulations of dendritic and eutectic solidification under natural convection. The results show that convection significantly modifies solute segregation, destabilizes growth fronts, and induces oscillatory growth modes in both systems. These examples illustrate the capability of the proposed method to capture complex flow-induced morphological instabilities and provide new insights into the mechanisms governing convection-driven microstructure evolution in alloy solidification.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
