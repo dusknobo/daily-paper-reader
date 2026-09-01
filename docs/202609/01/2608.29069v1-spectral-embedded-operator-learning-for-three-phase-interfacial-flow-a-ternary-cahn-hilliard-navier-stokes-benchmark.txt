@@ -1,0 +1,1599 @@
+Title: Spectral-Embedded Operator Learning for Three-Phase Interfacial Flow: A Ternary Cahn-Hilliard-Navier-Stokes Benchmark
+
+URL Source: https://arxiv.org/pdf/2608.29069v1
+
+Published Time: Tue, 01 Sep 2026 00:36:03 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# SPECTRAL -E MBEDDED OPERATOR LEARNING FOR 
+
+# THREE -P HASE INTERFACIAL FLOW : A T ERNARY 
+
+# CAHN -H ILLIARD -N AVIER -S TOKES BENCHMARK 
+
+A P REPRINT 
+
+Muhammad Abid 
+
+Department of Mechanical and Aerospace Engineering, University of Tennessee, Knoxville Knoxville, TN 37996, USA. 
+
+mabid@vols.utk.edu 
+
+Arth Sojitra 
+
+Department of Mechanical and Aerospace Engineering University of Tennessee, Knoxville Knoxville, TN 37996, USA 
+
+asojitra@vols.utk.edu 
+
+Omer San 
+
+Department of Mechanical and Aerospace Engineering, University of Tennessee, Knoxville Knoxville, TN 37996, USA. 
+
+osan@utk.edu 
+
+# ABSTRACT 
+
+Operator-learning surrogates have been benchmarked largely on single-field, single-interface prob-lems, leaving unclear whether architectural choices validated in those settings transfer to constrained, multiphase flows. We introduce a three-phase interfacial-flow benchmark to examine whether the trunk coordinate representation matters for a multi-channel, interface-dominated target. The configu-ration consists of an air bubble rising through water, piercing a water-oil interface, and entraining a water plume into the oil within a bounded, wall-confined domain. Reference data are generated using a structure-preserving ternary Cahn-Hilliard-Navier-Stokes solver that algebraically preserves the simplex constraint. From 1,024 Sobol-sampled simulations spanning a nine-dimensional parameter space, we learn the mapping from physical parameters to five-channel space-time fields. We compare three parameter-matched DeepONet variants differing only in trunk representation: raw coordinates (DeepONet), random Fourier features (FEDONet), and a fixed tensor-product Chebyshev dictionary (SEDONet). SEDONet reduces the test relative L2 error by 16 .8% compared with FEDONet and by 
+
+24 .0% compared with DeepONet, while improving all five output channels. Spatial and temporal error analyses localize the principal gains near the diffuse interfaces and after bubble breakthrough. The results indicate that the Chebyshev representation is particularly effective for the strongly non-periodic wall-normal and temporal structure of this three-phase flow. 
+
+Keywords: Scientific Machine Learning (SciML); Neural Operators; Three-phase Flow; Spectral Methods; Ternary Cahn-Hilliard-Navier-Stokes 
+
+# 1 Introduction 
+
+Flows in which three immiscible fluids share a domain are common in industrial practice: enhanced oil recovery moves water, oil and gas through the same pore network, froth flotation separates minerals at gas-water-solid contacts, and geological CO 2 sequestration and nuclear severe-accident analysis involve at least three phases in simultaneous contact. Relative to two-phase flow the ternary problem is a qualitative change in difficulty, for three reasons. There are three pairwise interfaces instead of one, each with its own tension σij , and they meet along triple junctions whose geometry is fixed by a Neumann-triangle balance, so contact angles are determined by the three tensions jointly rather than independently [1]. When the tensions violate the partial-spreading inequalities, one phase films spontaneously between the other two with no external forcing, so the parameter space contains regime boundaries that a naive sampling strategy arXiv:2608.29069v1 [physics.flu-dyn] 29 Aug 2026 A PREPRINT 
+
+will cross without warning [2]. And the phase variables are algebraically constrained, summing to unity pointwise, a condition any faithful discretization, and we will argue any faithful surrogate, should respect rather than merely approximate [3]. The canonical model problem for this regime, and the one we adopt, is a gas bubble rising through a lower liquid and crossing a horizontal liquid-liquid interface. Even in isolation this configuration exhibits a rich sequence of regimes: the bubble deforms into a spherical cap, decelerates as it approaches the interface, drapes a film of the lower liquid over its crown, breaks through, and drags a column of the lower liquid into the upper one, which subsequently thins, necks and pinches. These crossing regimes have been mapped experimentally and numerically as a function of Bond and Archimedes numbers, showing that the entrained column and its breakup are governed by an inertia-capillarity competition sensitive to all three tensions and both density contrasts [4]. The problem therefore packages, in one compact two-dimensional domain, essentially every feature that makes multiphase simulation hard: thin films, high curvature, a moving triple junction and a genuine topological transition. Two families of numerical methods can resolve such a flow, and the choice between them is dictated by the topological transition. Sharp-interface approaches, volume of fluid [5], level sets [6], front tracking [7], represent the interface explicitly and reconstruct it at each step, achieving excellent geometric fidelity in two-phase settings but requiring dedicated junction models [8] and ad hoc surgery precisely when the topology changes. Diffuse-interface, or phase-field, methods take the opposite route: the interface becomes a thin transition layer of width ε over which an order parameter varies smoothly, and topological change is handled automatically because nothing needs to be reconstructed. The formulation descends from the free energy of a nonuniform system [9], its coupling to fluid mechanics has been reviewed [10], its thermodynamic consistency at variable density was settled in [11, 12], and the schemes used at large density ratios follow [13, 14]. For three or more components, a free energy algebraically consistent with the three pairwise tensions keeps the phase variables on the Gibbs simplex [2]; it is this construction we adopt, and its algebraic structure is what allows our reference solver to make the simplex constraint exact rather than approximate. The price of that fidelity is severe, and structural rather than incidental. In a diffuse-interface formulation the transition layer must be resolved by several mesh cells, so the interface thickness is tied to the grid and the grid cannot be coarsened; and the explicit treatment of the interfacial forces imposes a time-step restriction that tightens faster than the mesh is refined, a capillary-wave limit ∆t ∼ pρh 3/σ in the capillary-dominated regime [15], and a viscous limit 
+
+∆t ∼ h2/ν where the viscosity contrast is large. Careful treatment of the variable-density pressure coupling [16] makes each step cheap, but it cannot reduce their number: a single two-dimensional run costs tens of thousands of steps. A parametric study, sweeping tensions, density ratios, bubble size, layer thickness, multiplies that by the size of the design, and it is precisely such studies that engineering practice demands. This is the cost structure that surrogate modelling exists to break. Machine-learning surrogates for fluid mechanics have matured rapidly toward that goal; the landscape has been surveyed broadly [17, 18], and its intersection with interface capturing specifically [19]. Early work targeted particular tasks: hybrid solvers in which a learned component corrects a coarse-grid discretization [20], and physics-informed neural networks that embed the PDE residual in the training objective [21, 22]. A limitation these share is that they learn a function, one solution field, on one discretization, for one set of conditions, so a parametric sweep requires retraining, which reintroduces the cost the surrogate was meant to remove. Operator learning removes that limitation by targeting the solution map itself, as a mapping between infinite-dimensional function spaces. Its theoretical foundation is the operator universal approximation theorem [23], realized in practice by the Deep Operator Network [24] through a branch–trunk factorization in which one network encodes the input and another the query coordinate; the neural-operator framework [25] gives an alternative construction based on learned integral kernels, of which the Fourier Neural Operator [26] is the best-known instance. The approach has already been deployed at scale on multiphase problems in porous media [27, 28] and at a planetary scale in weather forecasting [29, 30], and the field is consolidating around shared benchmarks [31] and multi-physics pretrained models [32]. What is conspicuously absent from those benchmark suites is a problem with three phases, a moving triple junction, and an algebraic constraint on the state, which is to say, the problem this paper contributes. Within the branch-trunk architecture, the component that encodes the query coordinate, the trunk is almost always a shallow multilayer perceptron acting on raw (x, y, t ), and that choice inherits a well-documented pathology. Neural networks exhibit spectral bias, fitting low-frequency content first and fastest and high-frequency content last or not at all [33]; the effect has been characterized in the Fourier domain as a frequency principle [34] and connected to the eigenspectrum of the neural tangent kernel [35]. For interfacial flow the bias is maximally badly placed. The bulk of a phase-field solution is nearly constant and carries almost no information, while everything physically interesting lives in transition layers whose width is the smallest length scale in the problem, exactly the content the network learns last. The standard remedy is to replace the raw coordinate with a fixed high-dimensional dictionary. Random Fourier features [36], whose kernel interpretation goes back to the random-features construction for large-scale kernel 2A PREPRINT 
+
+machines [37] and whose effect on the tangent-kernel spectrum has since been analyzed [38], were transplanted into the DeepONet trunk as FEDONet [39]. A sinusoidal dictionary, however, encodes a periodic prior, whereas classical numerical analysis settled long ago that the natural basis on a bounded, non-periodic interval is polynomial [40, 41], the motivation for the Chebyshev-embedded trunk of SEDONet [42]. Two structural facts about the present target shape what a surrogate for it can and should do, and both are easy to overlook. The first is that the state is confined to an affine subspace. A learned model can satisfy such a constraint approximately, by penalizing violations in the loss, or exactly, by building it into the output map; for climate emulation the second route has been shown to be both cheaper and more reliable when the constraint is linear, since it costs no capacity and cannot be traded away against the data term [43]. The second is that a branch-trunk prediction is a linear combination of a fixed number of learned basis functions, so its accuracy is bounded below by how well a subspace of that dimension approximates the solution manifold, the Kolmogorov width, whose behaviour for parametric PDEs has been surveyed [44] and which is known to decay slowly for advection-dominated problems with moving features [45]. Together these say that the algebraic constraint should be imposed and not learned, and that no coordinate dictionary should be expected to buy orders of magnitude on a transport-dominated target. Both predictions are borne out below. This paper addresses two gaps. The first is that the evidence for spectral trunks, while encouraging, is narrow: existing evaluations use single-field targets on domains that are one spatial dimension plus time or two spatial dimensions with no time, carrying no algebraic constraint on the state, no competition between fields of different character and no genuinely interface-dominated physics. Whether a trunk embedding still matters when the target is a five-channel space-time field on a constrained manifold, dominated by three mutually interacting interfaces and a topological transition, is an open question. The second gap is subtler: because operator surrogates are almost always evaluated by pointwise error norms alone, it is rarely possible to tell where an architectural change helps. A reduction in relative L2 error of any size is compatible with a uniform improvement everywhere, with a large improvement in a small region, or with an improvement in the bulk purchased at the cost of the interfaces, entirely different outcomes for interfacial physics, of which only the second is worth having. A scalar norm also cannot discriminate between competing explanations of an improvement, so a result reported that way leaves the reader unable to judge whether it will transfer to any other problem. Our contributions are as follows. 1. A ternary CHNS operator-learning benchmark: An air bubble rising through water, breaking through a water-oil interface and entraining a plume. The target is a five-channel space-time field (cw, c o, c a, u, v ) over a nine-dimensional parameter space, produced by a 1,024 -member Sobol [46] ensemble. To our knowledge this is the first operator-learning benchmark with three phases and a simplex-constrained state. 2. A structure-preserving reference solver: Choosing the mobility as Mi = M0/Σi makes P 
+
+> i
+
+Miμi ≡ 0, so P 
+
+> i
+
+ci = 1 is an identity of the semi-discrete system rather than something the solver is nudged toward (Theorem 3.1). Any simplex violation exhibited by a surrogate is therefore provably its own. Exact DCT-II diagonalization of the Laplacian, the Dodd-Ferrante split [16] and batched execution in JAX [47] give 1,024 runs in 37 minutes. 3. Graded truncation of the Chebyshev dictionary: Extending the trunk embedding of [42] from (x, t ) to (x, y, t )
+
+exposes a defect in its lexicographic crop, which in three coordinates retains full degree in the last index and almost none in the first. Total-degree ordering yields a degree-balanced dictionary at identical feature budget. 4. A parameter-exact controlled comparison: The three models share branch and trunk depths, widths, optimizer, schedule and data, differing only in the trunk embedding. FEDONet and SEDONet have identical parameter counts, so the gap between them cannot be attributed to capacity. 5. Localization of the gain: We decompose the error spatially, temporally, by channel and across the parameter space. Essentially the entire SEDONet advantage sits at the diffuse interfaces and emerges only after breakthrough. The decomposition also falsifies the obvious mechanism, the error is smallest at the walls, and isolates an alternative, the representation of monotone, non-periodic trends in the wall-normal and temporal coordinates (Section 5.1). The remainder of the paper is organized as follows. Section 2 works through the literature in more detail, Section 3 states the ternary CHNS model and establishes its structural properties, and Section 4 formulates the operator-learning problem, the three trunk embeddings and the simplex closure. Section 5 reports convergence, accuracy and the spatial, temporal and per-channel error decompositions. Section 6 summarizes and states limitations, and Section 7 sets out what we would do next. 3A PREPRINT 
+
+# 2 Related Work 
+
+2.1 Interface capturing and three-phase flow 
+
+The distinction drawn in Section 1 between sharp- and diffuse-interface methods deserves elaboration, because it is what determines whether a three-phase configuration is tractable at all. Sharp-interface approaches represent the interface explicitly or implicitly and reconstruct it at each step: volume of fluid [5], level sets [6] and front tracking [7] are the standard representatives, and all three achieve excellent mass or geometric fidelity in two-phase settings. Extending them to three phases is where the difficulty concentrates. Triple junctions require either explicit junction models or coupled level-set systems with projection to prevent vacuum and overlap [8], and topological change, the very event of interest here, requires ad hoc surgery, so the method must be told in advance about the events it is being used to discover. Diffuse-interface methods trade that difficulty for a resolution requirement. Because the order parameter varies smoothly over a layer of width ε, merging and pinching are automatic consequences of the dynamics rather than special cases in the code; the cost is that ε must be resolved. Within this family the multi-component case has been developed along two lines. A free energy algebraically consistent with the three pairwise tensions keeps the phase variables on the Gibbs simplex [2], and the coupled Cahn-Hilliard/Navier-Stokes system built on it is developed in [48]; related multi-component formulations are given in [3, 49]. The feature of the Boyer-Lapuerta construction that matters most here is not its free energy but its Lagrange-multiplier term, whose particular prefactor makes a specific choice of mobility turn the simplex condition into an identity; we exploit exactly that in Section 3.3. The numerical ingredients are individually standard, but their combination is what makes a large ensemble affordable. Energy-stable time integration for Cahn-Hilliard systems rests on convex splitting [50] and, more recently, on the scalar auxiliary variable framework [51]. The velocity-pressure coupling follows the projection method [52], with the variable-density modification [16] that preserves a constant-coefficient Poisson operator, the property that makes a transform-based solve viable at every step and hence that removes iteration and run-to-run cost variability from the ensemble. The capillary force is most conveniently written in continuum-surface form [15], whose ternary generalization requires no estimate of interface normals or of triple-junction geometry and therefore degrades gracefully exactly where a curvature-based force would fail. 
+
+2.2 Operator learning for parametric PDEs 
+
+The branch-trunk factorization [24] and the integral-kernel framework [25] define the two dominant families, and the choice between them is not settled. Approximation-theoretic guarantees for the first are available [53], and a controlled comparison of the two on matched data has been reported [54], a study whose methodology, holding everything fixed except the component under test, is the one we adopt here at the level of a single layer rather than a whole architecture. The subsequent literature has enriched the landscape along several axes: alternative bases such as wavelets [55]; attention and transformer mechanisms [56]; convolutional operators with continuous-discrete equivalence [57]; geometry-aware and resolution-independent formulations [58, 59]; multifidelity closure constructions [60]; and physics-informed variants that embed residuals or variational principles directly [61, 62]. Of particular relevance here is a small body of work on interface-dominated problems, in which architectures are modified to accommodate discontinuities across an interface [63, 64], and on the mitigation of spectral bias in multiscale operator learning [65]. These differ from ours in strategy rather than in aim: they change the architecture to accommodate the interface, whereas we change only the coordinate representation. The two are complementary, and our results establish how much of the gap a coordinate dictionary alone can close. Operator surrogates are past the proof-of-concept stage on problems with genuine industrial stakes: reservoir-scale 
+
+CO 2 plume migration with U-FNO [27] and its nested successor [28], and operational-quality weather forecasting with FourCastNet [29] and GraphCast [30]. It is worth noting what they have in common: all four are single-phase or effectively two-phase, all are posed on periodic or quasi-periodic domains, and none carries a pointwise algebraic constraint on the state. The same is true of the shared benchmark suites [31, 32], which is why the family of problems studied here is not represented in them. 
+
+2.3 Coordinate representations and spectral trunks 
+
+The limitation motivating a coordinate embedding is well characterized. Neural networks fit low frequencies first and fastest [33]; the phenomenon has been described in the Fourier domain as a frequency principle [34] and connected to the eigenspectrum of the neural tangent kernel [35], which supplies the mechanism: convergence along an eigendirection is governed by its eigenvalue, so directions with small eigenvalues are learned last regardless of how important they are 4A PREPRINT 
+
+to the target. Random Fourier features [36], whose kernel interpretation goes back to the random-features construction for large-scale kernel machines [37], reshape that spectrum, and the reshaping has been analyzed directly [38]. Within operator learning, FEDONet [39] transplants the construction into the DeepONet trunk and reports gains across a range of PDE families, with the largest improvements on oscillatory, broadband problems such as Kuramoto-Sivashinsky, a pattern that is itself informative, since those are the problems whose structure best matches a sinusoidal prior. That prior is the limitation. A dictionary built from functions periodic on the embedding scale is well matched to tori and to broadband oscillatory content, and poorly matched to bounded domains with Dirichlet or Neumann boundaries, which describes most of computational mechanics, and describes the wall-confined, strictly non-periodic domain of the present problem exactly. Classical numerical analysis settled the alternative long ago: on a bounded interval the natural orthogonal basis is polynomial [40]. Chebyshev expansions converge geometrically for analytic functions [41], their nodes cluster near the endpoints where a bounded-domain solution varies most sharply [66], and the resulting differentiation operators are well conditioned [67]. A growing literature carries that structure into neural architectures: Chebyshev feature networks for function approx-imation [68], Chebyshev spectral neural networks for PDEs [69], spectral neural operators combining Fourier and Chebyshev representations [70], and an orthogonal polynomial neural operator [71], which targets nonperiodic boundary conditions directly. Most of these parametrize the solution in spectral space or map between coefficient vectors, so the spectral representation becomes part of the model’s output as well as its input; that buys accuracy but forfeits the ability to attribute a change in performance to the coordinate representation alone. SEDONet [42] takes a minimal route: it replaces only the trunk’s coordinate input with a fixed tensor-product Chebyshev dictionary, leaving the branch, the factorization and the parameter count untouched, and reports consistent improvements over baseline DeepONet on a suite of canonical benchmarks, with the largest gains on bounded, non-periodic problems. That minimality is what makes the controlled comparison of this paper possible. 
+
+2.4 Structural constraints, representational limits, and the remaining gap 
+
+The two structural facts noted above, an affine constraint on the state and the bounded rank of a branch-trunk prediction, each carry a consequence specific to this benchmark. On the first, what makes the present setting unusual is not that the constraint can be imposed exactly [43], but the other side of the comparison: the reference data satisfies it to round-off by construction, so a surrogate’s violation is unambiguously its own and can be reported as a diagnostic rather than absorbed into the data’s own error budget. Benchmarks whose reference data merely approximates a constraint cannot make that separation, and a surrogate evaluated on them can appear constraint-consistent for the wrong reason. On the second, the slow decay of the Kolmogorov width for advection-dominated problems [44] has a well-documented cause: a translating sharp feature is not well approximated by any fixed linear combination of fixed spatial modes. The limitation is recorded in the reduced-basis literature [45, 72] and has motivated nonlinear alternatives such as manifold-based reduction with deep convolutional autoencoders [73]. The bound applies to every architecture we compare, and it is the most likely reason all three saturate at a similar accuracy floor. It also locates the contribution of a coordinate dictionary correctly: a dictionary changes how quickly and stably a good basis is found, not which bases are reachable. Taken together, the picture is as follows. Three-phase phase-field simulation is mature but expensive, and its structural properties, an algebraic constraint on the state, a moving triple junction, and a genuine topological transition are exactly the properties that operator-learning benchmarks currently omit. Coordinate embeddings for the trunk are a promising and minimally invasive intervention, but the evidence for them comes from single-field targets on unconstrained domains, and it is reported as scalar error norms that cannot say where an architectural change helps or which of several plausible mechanisms produced it. Nothing in the existing literature answers whether a trunk dictionary still matters on a multi-channel, constrained, interface-dominated target. The benchmark and the controlled comparison that follow are designed to answer both questions, and the error decompositions of Section 5 are designed to answer the second one in a form that transfers to problems other than this one. 
+
+# 3 Governing Model: Ternary Cahn–Hilliard–Navier–Stokes 
+
+This section states the model that generates the reference data and establishes the one structural property on which the evaluation protocol depends. Figure 1 shows what the model produces. Section 3.1 gives the Boyer-Lapuerta ternary Cahn-Hilliard system and the algebraic structure that keeps the phase variables on the Gibbs simplex; Section 3.2 couples it to variable-density Navier–Stokes and fixes the boundary conditions; Section 3.3 shows that the simplex constraint is an identity of the model rather than an approximation, which is what makes any simplex violation by a 5A PREPRINT 
+
+surrogate attributable to the surrogate; and Section 3.4 reduces the physics to the nine dimensionless parameters that the ensemble varies. 
+
+Figure 1: The target physics: RGB composite of the three volume fractions (red = water, green = oil, blue = air) at 
+
+t = 0 , 0.75 , 1.50 , 2.38 , 3.12 , 4.00 . The bubble rises, deforms into a spherical cap, pierces the water-oil interface, and entrains a water plume that thins and pinches as the bubble detaches. 
+
+3.1 Phase transport 
+
+Let Ω = (0 , L x) × (0 , L y ) ⊂ R2 be a bounded, wall-confined domain and let c = ( c1, c 2, c 3) denote the volume fractions of water, oil, and air, for which we write (cw, c o, c a) ≡ (c1, c 2, c 3) interchangeably. The three fields are not independent: at every point of space and time they are constrained to the Gibbs simplex, 
+
+P3 
+
+> i=1
+
+ci(x, t ) = 1 , ci ≥ 0. (1) This algebraic constraint has no counterpart in the two-phase problem, where a single order parameter carries all the information, and it is the first of the two features that make the ternary system a qualitatively different learning target. Section 3.3 concerns how Eq. (1) is maintained by the model; how a surrogate should be made to respect it is taken up later. The second such feature is that the three pairwise surface tensions σij act jointly rather than separately. They enter the model through the spreading coefficients [2] 
+
+Σi = σij + σik − σjk , 3ΣT
+
+= 1Σ1
+
++ 1Σ2
+
++ 1Σ3
+
+, (2) with {i, j, k } a permutation of {1, 2, 3} and ΣT the harmonic mean that will reappear below as a Lagrange multiplier. Their signs decide the wetting regime. If Σi > 0 for all i, the configuration is partial-spreading: the three phases meet at a triple junction whose contact angles are fixed jointly by the three tensions through a Neumann-triangle balance [1]. If 
+
+Σi < 0 for some i, the configuration is total-spreading: phase i films spontaneously between the other two and the triple junction ceases to exist. The second regime is physically real but is not a well-posed target for a single-valued solution operator, since arbitrarily close parameter values then produce topologically distinct arrangements; the sampling box of Section 3.4 is accordingly parametrized so that Σi > 0 holds identically over it. Those coefficients set the depth of the wells in the bulk free energy density, which is the triple-well 
+
+F0(c) = 
+
+> 3
+
+X
+
+> i=1
+
+Σi
+
+2 c2 
+
+> i
+
+(1 − ci)2 + Λ c21c22c23, (3) whose three minima at the pure-phase vertices of the simplex are what make the diffuse interfaces stable. The optional term with Λ ≥ 0 penalizes spurious formation of a third phase at what should be a two-phase interface, but throughout the present ensemble Λ = 0 : over the admissible spreading coefficients the pure triple-well is already free of spurious third-phase layers, and the derivative 2Λ Q 
+
+> j
+
+c2 
+
+> j
+
+/c i is singular wherever a phase vanishes, which is almost everywhere in this problem. Given the free energy, the phase fields are advected by the flow and relax by Cahn–Hilliard dynamics, 
+
+∂tci + ∇· (u ci) = ∇·  Mi∇μi
+
+, i = 1 , 2, 3, (4) 6A PREPRINT 
+
+with generalized chemical potentials 
+
+μi = 12 
+
+ε∂F 0
+
+∂c i
+
+− 4 Σ T
+
+ε
+
+> 3
+
+X
+
+> j=1
+
+1Σj
+
+∂F 0
+
+∂c j
+
+| {z }
+
+=: Ni(c)
+
+− 34 ε Σi ∇2ci, (5) in which ε is the interface thickness parameter and Mi the mobility of species i. We name the algebraic, gradient-free part Ni explicitly because it carries the cancellation of Theorem 3.1. The remaining term is the surface term, whose coefficient 34 εΣi sets both the equilibrium profile width and the tension of interface i. The second term of Eq. (5) deserves particular attention, because it is independent of i. It is therefore not a species-specific contribution to the thermodynamics but a Lagrange multiplier enforcing Eq. (1), and its prefactor 4Σ T /ε is not a matter of convention. Together with the mobility choice Mi = M0/Σi made in Section 3.3, that prefactor is exactly what causes the weighted sum P 
+
+> i
+
+MiNi to vanish identically. This is the single most important structural feature of the model for our purposes, and everything the benchmark claims about constraint preservation rests on it. 
+
+3.2 Momentum and incompressibility 
+
+The phase fields of Eq. (4) are transported by a velocity field that they in turn determine, since the three fluids are treated as a single incompressible mixture whose density and viscosity are composition-dependent, 
+
+ρ(c) = 
+
+> 3
+
+X
+
+> i=1
+
+ρici, η(c) = 
+
+> 3
+
+X
+
+> i=1
+
+ηici, (6) so that both vary smoothly across each diffuse interface between their bulk values. In the present ensemble the density ratio across the water-air interface reaches 100 and the viscosity ratio across the water-oil interface reaches 3, so the variable-coefficient structure that Eq. (6) introduces into the momentum equation is not a formality. With those properties fixed, the mixture obeys 
+
+ρ(c) ∂tu + u·∇ u = −∇ p + ∇· 
+
+h
+
+η(c) ∇u + ∇u⊤i
+
+−
+
+> 3
+
+X
+
+> i=1
+
+ci∇μi − ρ(c) g ey , (7) 
+
+∇· u = 0 , (8) in which the buoyancy that drives the entire problem enters through the last term of Eq. (7), as the imbalance between the local mixture density and its surroundings. There is no separate forcing and no imposed inflow; the bubble rises because Eq. (6) makes it lighter than the water around it. The capillary force appears as the potential term − P 
+
+> i
+
+ci∇μi, the ternary generalization of the continuum-surface-force representation [15], and this form is what makes a three-phase computation tractable at all. A curvature-based force would require an estimate of the interface normal and curvature for each of the three interfaces and, at the triple junction, an explicit model of the junction geometry, precisely the machinery that sharp-interface methods must supply and that fails when the topology changes. The potential form requires none of it. It is assembled from quantities the Cahn-Hilliard system already computes, and it produces the correct Neumann-triangle balance at the junction automatically, as a consequence of Eq. (2) rather than as an imposed condition. It remains to close the system at the walls. The domain is a closed box: the phase fields and chemical potentials satisfy homogeneous Neumann conditions, corresponding to neutral wetting; the velocity satisfies no-slip and no-penetration; and the pressure satisfies homogeneous Neumann, 
+
+∂nci = ∂nμi = 0 , u = 0, ∂np = 0 on ∂Ω. (9) This choice matters in two ways. Every condition on a scalar in Eq. (9) is homogeneous Neumann, which permits an exact cosine diagonalization of the discrete Laplacian and hence a transform-based solve at every step; and the domain is strictly non-periodic in both x and y, a property that Section 4.3 returns to when the three trunk embeddings are compared. 
+
+3.3 Structural consistency of the simplex constraint 
+
+The mobilities have so far been left free. Fixing them in inverse proportion to the spreading coefficients turns Eq. (1) from a constraint that must be enforced into an identity that holds automatically. 7A PREPRINT 
+
+Proposition 3.1 (Simplex preservation) Let the mobilities be chosen as Mi = M0/Σi with M0 > 0 constant. Then the algebraic part of the chemical potential satisfies 
+
+> 3
+
+X
+
+> i=1
+
+Mi Ni(c) ≡ 0 for every c ∈ R3, (10) 
+
+and, if in addition u is divergence free and P 
+
+> i
+
+ci = 1 , then P 
+
+> i
+
+Miμi ≡ 0 and ∂t(P 
+
+> i
+
+ci) = 0 ; the constraint Eq. (1) is propagated exactly by Eq. (4) .
+
+The proof is given in Section A. Two aspects of it are worth isolating. First, Eq. (10) is unconditional: it holds pointwise for arbitrary c, whether or not the simplex constraint is currently satisfied, because it follows from the identity P 
+
+> i
+
+Σ−1 
+
+> i
+
+= 3 /ΣT alone. Second, the surface term of Eq. (5) contributes − 34 εM 0∇2ci once MiΣi = M0, so its coefficient is species-independent. The cancellation therefore depends neither on the solution being smooth nor on the constraint holding beforehand, which is what allows a discretization to inherit it (Theorem E.1). The practical content is that P 
+
+> i
+
+ci = 1 is a structural identity of the model and of its discretization, not a condition the solver is nudged toward by penalty or projection. In the reference ensemble the measured drift is max x,t 
+
+P 
+
+> i
+
+ci − 1 =2.1 × 10 −4, at the floor of single-precision accumulation. Because the training data satisfies the constraint to round-off, any simplex violation exhibited by a surrogate trained on that data is provably its own and is therefore an unambiguous diagnostic of the learned model. Benchmarks whose reference data merely approximates a constraint cannot make this separation. 
+
+3.4 Nondimensionalization and parameters 
+
+Equations (4), (7) and (9) specify the model; what remains is to reduce it to the finite set of numbers the ensemble varies. All quantities are reported in computational units in which the channel width, the water density and gravity are the references, Lx = 1 , ρw = 1 and g = 0 .98 , so that Ω = (0 , 1) × (0 , 2.5) and the horizon is t ∈ [0 , 4] , with the bubble diameter fixed at d = 0 .25 Lx and the undisturbed water–oil interface at yint = 0 .9 Lx. The velocity scale is built on the bubble rather than the channel, since it is the bubble that sets every time scale in the problem, 
+
+U = pg d = 0 .4950 , (11) so that t = 4 amounts to ≈ 7.9 convective times d/U , long enough for rise, breakthrough, entrainment and detachment, and short enough that no member reaches the lid. Sampling the three tensions independently would waste much of the box on inadmissible triples and would distort the design near the total-wetting boundary, so we instead set the water-air tension by an Eötvös number built on d and the other two by dimensionless ratios, 
+
+Eo = ρw g d 2
+
+σaw 
+
+, σow = row σaw , σao =  1 + s − row 
+
+ σaw , (12) which on substitution into Eq. (2) gives the spreading coefficients in closed form, 
+
+Σw
+
+σaw 
+
+= 2 row − s, Σo
+
+σaw 
+
+= s, Σa
+
+σaw 
+
+= 2 + s − 2row . (13) This exposes the meaning of the third parameter, since s is the normalized oil spreading coefficient, with s → 0+
+
+the total-wetting limit and larger s pushing the triple junction toward a symmetric Neumann triangle. Over the sampling box the three ratios lie in [0 .10 , 1.38] , [0 .02 , 0.50] and [0 .62 , 1.90] , all strictly positive, so every design point is admissible and no rejection is required, and with g and d fixed the range Eo ∈ [5 , 40] corresponds to 
+
+σaw ∈ [1 .53 × 10 −3, 1.23 × 10 −2].Viscosities are set on the same scales by a Reynolds number, with the oil viscosity a free ratio and the air viscosity fixed by a constant kinematic ratio, 
+
+Re = ρwU d ηw
+
+, ηo = ( ηo/η w) ηw, νa
+
+νw
+
+= 2 ( fixed ), (14) where tying ηa to the air density reflects a physical link and avoids tightening the explicit viscous time-step limit without adding physics; the range Re ∈ [20 , 70] corresponds to ηw ∈ [1 .77 × 10 −3, 6.19 × 10 −3]. One group is deliberately held fixed: the Cahn number Cn = ε/L x = 3 .125 × 10 −2 gives ε/d = 0 .125 , so the diffuse layer is one eighth of a bubble diameter, thin enough to resolve the physics and thick enough to be resolved by the grid, and varying it would make the ensemble a study of discretization error as much as of physics. The nine quantities actually varied are Eo , Re ,
+
+s, row , the oil-to-water and air-to-water density ratios, the oil-to-water viscosity ratio, and the two coordinates of the initial bubble centre. 8A PREPRINT 
+
+# 4 Operator-Learning Formulation 
+
+This section sets up the learning problem and then isolates the one degree of freedom that the paper actually varies. Section 4.1 defines the target operator and records the two structural properties, a constrained codomain and a shared underlying geometry, that distinguish it from the single-field benchmarks on which trunk embeddings have previously been tested. Section 4.2 gives the branch-trunk factorization for a five-channel output, states what a rank-p factorization can and cannot represent, and imposes the simplex constraint structurally. Section 4.3 defines the three trunk embeddings, which constitute the entire difference between DeepONet, FEDONet and SEDONet, and Section 4.4 explains in terms of feature conditioning why that difference should be expected to matter at all. The remaining subsections give the architectures and their parameter accounting, the training protocol, and one training algorithm per method. 
+
+4.1 The parametric solution operator 
+
+Let π ∈ P ⊂ R9 be the vector of physical parameters of Section 3.4, so that P is the compact nine-dimensional box defined by their sampling ranges, and let ζ = ( x, y, t ) ∈ Ω × [0 , T ] with Ω = (0 , L x) × (0 , L y ), Lx = 1 , Ly = 2 .5
+
+and T = 4 . The map we learn is the parametric solution operator 
+
+G : π 7 −→ s(· ; π) =  cw, c o, c a, u, v (ζ; π), G : P → S , S ⊂ C Ω × [0 , T ]; R5, (15) whose codomain is a space of functions rather than a finite-dimensional vector space: G sends each of the nine numbers to an entire space–time field, and it is this that makes the problem operator learning rather than regression. What the surrogate must learn is not a solution but the map that produces solutions. For Eq. (15) to be a legitimate learning target, G must be single-valued and continuous on P. Single-valuedness is not automatic in multiphase flow, since a topological bifurcation, a member in which the bubble fails to cross, or in which the plume pinches instead of persisting, would make arbitrarily close parameters produce qualitatively different fields, and no continuous operator could interpolate between them. Diagnostics computed over the ensemble rule this out: every member follows the same qualitative sequence, and the scalar responses vary smoothly and monotonically with the dominant parameter. Within the sampled box G is therefore a continuous map from a compact set into 
+
+C(Ω × [0 , T ]; R5), and the operator universal approximation theorem [23], in its branch-trunk form [24], guarantees that for any ϵ > 0 there exist networks and a latent width p achieving sup π∈P ∥G (π) − bG(π)∥∞ < ϵ . The theorem is an existence statement and says nothing about p, about the number of samples, or about whether gradient descent will find the approximation; the entire empirical content of this paper concerns the last of these. Two further properties of S are worth recording before any architecture is chosen, because both have architectural consequences. The first is that the image of G does not fill R5 pointwise: by Eq. (1) the first three components lie on the two-dimensional affine slice Π = {c ∈ R3 : cw + co + ca = 1 }, so the effective pointwise output dimension is four rather than five, and any surrogate whose codomain is all of R5 is by construction able to leave the physically admissible set. The second is that the five components are not independent observables of independent physics but five functionals of one moving geometry: the same interface that separates cw from co carries the capillary jump that structures v, and the same bubble rim that gives ca its high-wavenumber content drives the recirculation that appears in 
+
+u. Section 4.2 takes up both. One specialization of the general setting [24,25] is worth noting, because it sharpens the test. There the branch consumes sensor samples [u0(x1), . . . , u 0(xm)] of an input function u0, and the total error decomposes into the finite-sensor discretization of u0, the representation error of the branch–trunk product, and the optimization error. Here the input function space is the nine-dimensional parametric family, so the branch consumes π directly with m = 9 and the first term is closed exactly: the nine numbers determine the simulation bit for bit. Whatever error is measured in Section 5 is therefore representation error plus optimization error, and a controlled change in the trunk acts on it directly rather than competing with a sensor-resolution term. Nothing else in the factorization depends on the distinction, the branch reads a finite-dimensional encoding exactly as it would read a sensor vector, and the trunk, where all three architectures differ, is untouched by it. 
+
+4.2 Branch-Trunk factorization and the simplex closure 
+
+We use a shared trunk basis with per-channel branch coefficients. The branch network Bθ maps π to 5p latent coefficients, reshaped as b(c) 
+
+> k
+
+(π) for channel c ∈ { 1, . . . , 5} and mode k ∈ { 1, . . . , p }, while the trunk network Tθ
+
+maps the embedded coordinate ϕ(ζ) to p latent basis channels tk, so that the prediction is 
+
+bsc(ζ; π) = 
+
+> p
+
+X
+
+> k=1
+
+b(c) 
+
+> k
+
+(π) tk
+
+ ϕ(ζ) + b(c)0 , tk = Tθ ◦ ϕ
+
+> k
+
+, b(c) 
+
+> k
+
+= Bθ (π)
+
+> (c,k )
+
+, (16) 9A PREPRINT 
+
+with b(c)0 a per-channel bias [24]. The two networks never interact except through the sum in Eq. (16): the branch never sees a coordinate and the trunk never sees a parameter. This separation is what makes the architecture an operator approximator rather than a function approximator on P × Ω × [0 , T ], and it is also what makes the trunk a clean experimental target, since any change to ϕ alters the coordinate representation without touching the parameter encoding. Written for a batch of query points the structure becomes explicit. Let Z = {ζq }Qq=1 be the query grid, let 
+
+T (Z) ∈ RQ×p have entries Tqk = tk(ϕ(ζq )) , and let B(π) ∈ R5×p collect the branch coefficients; then 
+
+bS(π) = T (Z) B(π)⊤ + 1Q b⊤ 
+
+> 0
+
+∈ RQ×5, (17) a separated representation of rank at most p in which the Q × p factor is shared across every parameter value and every channel and the 5 × p factor carries all parameter dependence. This is the structure of a reduced-basis or proper-orthogonal-decomposition expansion, with the single difference that the basis T (Z) is learned by gradient descent rather than computed from a snapshot matrix. That observation carries a genuine limitation, and it is worth stating explicitly because it bounds what any DeepONet variant can achieve here. Since Eq. (17) is linear in the trunk basis, the best achievable error is bounded below by the error of the best p-dimensional linear subspace of the solution manifold, the Kolmogorov p-width. Writing S ∈ RQ×5N
+
+for the snapshot matrix of the training ensemble with singular values ς1 ≥ ς2 ≥ · · · , the best rank-p approximation in the Frobenius norm satisfies 
+
+min 
+
+> rank( bS)≤p
+
+S − bS 2 
+
+> F
+
+= X
+
+> j>p
+
+ς2 
+
+> j
+
+, (18) so no choice of ϕ, and no amount of training, can push the error of a rank-p model below that tail. For advection-dominated problems with moving interfaces the singular values decay slowly, because a translating sharp feature is not well approximated by any fixed linear combination of fixed spatial modes, and this is the standard obstruction to linear reduced-order modeling of transport. It is the most likely explanation for the accuracy floor all three models reach in Section 5, and it locates the trunk embedding correctly: ϕ does not change what T is capable of representing, only how quickly and stably gradient descent finds a good T . Breaking that barrier would require a nonlinear parametrization of the basis, which we note as future work in Section 6 rather than pursue here. Within that bound, a single trunk is shared by all five channels deliberately. One trunk per channel would multiply the trunk parameters by five and would force each channel to rediscover the same interface geometry from its own supervision alone. Under Eq. (17) the five channels instead share one set of spatiotemporal basis functions and differ only in the coefficients with which they combine them, which is the correct encoding of the second property recorded above. The price is that a basis good for one channel must be good for all, so a dictionary that helped the phase fields at the expense of the velocities would show up immediately; the per-channel breakdown of Table 3 is the test of exactly this. The first property is handled at the output rather than in the basis. Because Eq. (1) holds exactly in the data (Theorem 3.1), it would be perverse to let the surrogate violate it, and since the constraint is affine it can be imposed structurally at no cost. We predict two concentration channels and close the third, 
+
+bca = 1 − bcw − bco, (19) a section of the constraint map that parametrizes Π by two free coordinates; the alternative, predicting all three and projecting orthogonally onto Π, distributes the residual equally and is the minimum-norm correction. Either way the constraint holds to floating-point rounding, so the simplex violation we report is a machine-epsilon quantity rather than a modelling error. One implementation point is worth stating because getting it wrong fails silently: since each channel is standardized to zero mean and unit variance for training, Eq. (19) is not the identity bc std  
+
+> a
+
+= 1 − bc std  
+
+> w
+
+− bc std 
+
+> o
+
+in standardized variables. Writing ci = μi + sicstd  
+
+> i
+
+with per-channel mean μi and scale si, the closure becomes 
+
+bc std  
+
+> a
+
+= 1 − μw − μo − μa
+
+sa
+
+− sw
+
+sa
+
+bc std  
+
+> w
+
+− so
+
+sa
+
+bc std  
+
+> o
+
+, (20) an affine map with channel-specific coefficients; the unweighted form leaves an O(1) residual while looking entirely correct in code. The closure also reshapes the supervision, and it is worth working out how. The loss is still evaluated on all three concentration channels, so no phase is privileged, but the three errors are no longer independent. Let ew = bcw − cw and 
+
+eo = bco − co; under Eq. (19), and using P 
+
+> i
+
+ci = 1 in the data, the third error is determined, ea = −(ew + eo), and the three-channel squared error collapses to a quadratic form in two variables, 
+
+e2 
+
+> w
+
++ e2 
+
+> o
+
++ e2 
+
+> a
+
+= 2 e⊤A e, e = ( ew, e o)⊤, A =
+
+1 1212 1
+
+
+
+, (21) 10 A PREPRINT 
+
+with eigenvalues 32 along (1 , 1) /√2 and 12 along (1 , −1) /√2. The closure therefore penalizes co-directional errors in water and oil, which are exactly errors in the total liquid fraction, that is, in the placement of the air interface, three times more heavily than exchange errors, in which water is mistaken for oil at fixed total liquid. For the present problem this is a favorable reweighting, since the bubble boundary is the hardest and most consequential feature in the field, and the closure upweights it without a hand-tuned channel weight; the induced metric has condition number 3, small enough that no optimization penalty accompanies it. The asymmetry is a property of the section rather than of the constraint: under the orthogonal projection, the penalty would be isotropic on Π.
+
+4.3 Trunk embeddings: the only difference between the three models 
+
+All three architectures use Eq. (16) verbatim, with identical branch network, identical trunk depth and width, identical latent width p, identical loss, optimizer, schedule and data. They differ only in the fixed, non-trainable map ϕ that preprocesses the query coordinate before it reaches the first trunk layer. This is the experimental control on which the entire paper rests, so we state each ϕ explicitly and in full. Every embedding acts on affinely rescaled coordinates rather than on physical ones, so that the three axes, whose physical extents Lx = 1 , Ly = 2 .5 and T = 4 differ by a factor of four, are treated comparably: 
+
+ξx = 2xLx
+
+− 1, ξy = 2yLy
+
+− 1, ξt = 2tT − 1, ξ = ( ξx, ξ y , ξ t) ∈ [−1, 1] 3. (22) For the Chebyshev dictionary this is a requirement rather than a convention, since {Tn} is orthogonal on [−1, 1] and nowhere else. For the Fourier features it is a fairness condition: applying a single isotropic bandwidth to unscaled 
+
+(x, y, t ) would give the temporal axis four times the effective frequency content of the horizontal one, so the two embeddings would no longer be compared on equal footing. 
+
+4.3.1 DeepONet: Raw coordinates 
+
+The baseline applies no embedding at all, 
+
+ϕraw (ζ) = ξ ∈ R3, dtrunk = 3 , (23) so that every basis function in T (Z), every interface profile, every oscillation, every sharp gradient, must be synthesized from compositions of affine maps and pointwise nonlinearities acting on three numbers. This is exactly the configuration to which the spectral-bias analysis of [33–35] applies: the neural tangent kernel of a shallow MLP on raw coordinates has an eigenspectrum dominated by low-frequency eigenfunctions, so high-wavenumber content is learned last, if at all. For a phase-field target this is the worst possible allocation of prior mass, since the bulk of the solution is nearly constant and carries almost no information while everything of interest lives in the thin diffuse layers. 
+
+4.3.2 FEDONet: Random Fourier features 
+
+The first remedy lifts the coordinate into a sinusoidal dictionary with random frequencies [36, 39], 
+
+ϕF(ζ) = 
+
+h
+
+sin  2πB ξ, cos  2πB ξi
+
+∈ R2M , B ∈ RM ×3, Bij ∼ N  0, σ 2
+
+> B
+
+, (24) with M = 128 , hence dtrunk = 2 M = 256 . The matrix B acts on the normalized coordinates of Eq. (22), is drawn once at a fixed bandwidth and frozen thereafter: it is not trained and does not appear in θ, so the embedding contributes no parameters and the comparison with SEDONet remains exact. The mechanism is best seen through the kernel that Eq. (24) induces. By Bochner’s theorem and the random-features construction [37], the inner product of two embedded coordinates is a Monte Carlo estimate of the Fourier transform of the sampling density, 
+
+1
+
+M ϕF(ζ)⊤ϕF(ζ′) = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+cos  2π b⊤ 
+
+> j
+
+(ξ − ξ′) −−−−→  
+
+> M→∞
+
+exp 
+
+
+
+− 2π2σ2 
+
+> B
+
+ξ − ξ′ 2
+
+, (25) a Gaussian kernel of length scale (2 πσ B )−1. Three properties follow that matter here. The kernel is stationary, depending on ξ − ξ′ alone, so the prior is blind to the boundary of the box and is identical at the walls and in the interior. It is isotropic at fixed σB , so one scalar sets the resolvable scale in all three coordinates, a strong assumption for a field whose structure in t is a monotone drift and whose structure in x is a thin neck. And it is built from functions periodic on the embedding scale, so a non-periodic component of the target, such as a linear ramp in ξt, must be represented by a slowly converging sinusoidal series with Gibbs oscillations at the endpoints. 11 A PREPRINT 
+
+4.3.3 SEDONet: Chebyshev dictionary 
+
+The second remedy replaces that sinusoidal prior with a polynomial one. Let {Tn}n≥0 be the Chebyshev polynomials of the first kind, generated by the three-term recurrence 
+
+T0(ξ) = 1 , T1(ξ) = ξ, Tn+1 (ξ) = 2 ξ T n(ξ) − Tn−1(ξ), (26) orthogonal on [−1, 1] under the weight w(ξ) = (1 − ξ2)−1/2 and satisfying Tn(cos ϑ) = cos( nϑ ). That last identity is worth keeping in view: a Chebyshev expansion is a cosine series in a stretched variable, so the dictionary is not an alternative to a Fourier basis so much as a Fourier basis on a coordinate that clusters near the endpoints and imposes no periodicity. The three-dimensional tensor-product dictionary indexed by the multi-index α = ( k, l, m ) is 
+
+Φα(ζ) = Tk(ξx) Tl(ξy ) Tm(ξt), 0 ≤ k, l, m < K, (27) and the embedding is a truncation of these K3 modes to an index set A of cardinality dtrunk ,
+
+ϕC(ζ) =  Φα(ζ)  
+
+> α∈A
+
+∈ Rdtrunk . (28) Like B in Eq. (24), A is fixed before training and carries no parameters; unlike B, it involves no random draw, so ϕC is bit-identical across seeds and requires no bandwidth selection. The choice of A deserves attention, because the obvious choice fails in three coordinates. In one spatial dimension plus time [42] uses a lexicographic crop, which is harmless when almost every mode is retained. In three coordinates it is not: cropping the lexicographically ordered K3 modes to the first dtrunk ≪ K3 entries retains 
+
+Alex =
+
+n
+
+(k, l, m ) : k < dtrunk /K 2o
+
+=⇒ k ∈ { 0, 1, 2} for K = 10 , d trunk = 256 , (29) that is, full degree in the last index and degree at most two in the first. Such a dictionary is nearly blind to x-structure above quadratic order, which is fatal on a problem whose hardest feature, the plume neck, is a thin structure in x. We therefore order modes by total degree, 
+
+Agraded : Φα retained iff rank ⪯(α) < d trunk , α ⪯ α′ ⇐⇒ | α| < |α′|, |α| = k + l + m, (30) with ties broken lexicographically and the bound max( k, l, m ) < K applied first. Since the number of multi-indices of total degree at most D in three variables is 
+
+#α ∈ Z3 
+
+> ≥0
+
+: |α| ≤ D =
+
+D + 3 3
+
+
+
+, #α : |α| = D =
+
+D + 2 2
+
+
+
+, (31) the budget dtrunk = 256 with K = 10 retains every mode of total degree at most 9, all  12 3
+
+ = 220 of them, plus 36 
+
+modes of degree exactly 10 . The resulting dictionary is degree-balanced across x, y and t by construction, and Eq. (31) makes the feature budget easy to choose in advance. 
+
+4.4 Why the embedding changes the optimization 
+
+Each ϕ encodes a prior about what solution fields look like, and the three priors are genuinely different rather than three parametrizations of one thing. The cleanest way to see why they should affect training, rather than only expressivity, is to examine the second-order statistics of the features the first trunk layer receives. Define the empirical feature Gram matrix over the query set, 
+
+G = 1
+
+Q
+
+> Q
+
+X
+
+> q=1
+
+ϕ(ζq ) ϕ(ζq )⊤ ∈ Rdtrunk ×dtrunk . (32) For the idealized linear model bs = w⊤ϕ(ζ) trained by gradient descent with step η on a squared loss, the error component along the ith eigenvector of G contracts by a factor (1 − ηλ i) per step, so directions with small λi are learned last and the steps needed to resolve a direction scale as λ−1 
+
+> i
+
+. The conditioning of G is the learning-rate spectrum, and spectral bias is the statement that for a raw-coordinate MLP the relevant λi are tiny. The trunk is a nonlinear network rather than a linear model, so this is a heuristic rather than a theorem, but it is the same heuristic that underlies the neural tangent kernel analyses of [35, 38] and it predicts the observed ordering correctly. Under this lens the three embeddings separate sharply. The raw trunk offers almost nothing for G to condition, so every useful feature direction must be manufactured by the network itself, precisely the regime in which the NTK eigenspectrum decays fastest. The random Fourier embedding whitens G in expectation, since distinct frequency rows are uncorrelated and E[sin 2] = E[cos 2] = 12 give E[G] = 12 I, but only in expectation and only at a well-chosen bandwidth: as σB → 0 the features collapse toward rank one and κ(G) diverges, while at large σB they decorrelate 12 A PREPRINT 
+
+faster than the target varies and the model must fit high-frequency noise. Bandwidth tuning in FEDONet is, in this language, conditioning repair. The Chebyshev dictionary needs no such repair, and the reason is exact rather than statistical. Under the weight 
+
+w(ξ) = (1 − ξ2)−1/2 that makes {Tn} orthogonal, G is diagonal with a condition number independent of dtrunk , of K
+
+and of any random draw. The query set is sampled uniformly rather than under that weight, so the realized conditioning is weaker than the orthogonal figure, and this is a property of the sampling measure that grid refinement does not remove (Section B). What carries the comparison is therefore not the magnitude of κ(G) but its character. The polynomial dictionary is not uniformly better conditioned, at a well-chosen bandwidth the Fourier features are in fact better, and at a poor one they are singular to single precision, the realized κ(G) spanning many orders of magnitude across plausible 
+
+σB (Section C). It is instead unconditionally conditioned: a fixed number, known before training, identical across seeds, with no hyperparameter to select. The whitening that [39] obtains in expectation and at a tuned bandwidth, the polynomial dictionary obtains deterministically. Alongside conditioning, the three embeddings differ in what they represent cheaply. A Chebyshev dictionary represents a linear trend exactly in two modes; a random Fourier dictionary must build the same trend from periodic functions and pays the Gibbs penalty at the interval endpoints; a raw trunk must build it, like everything else, from nonlinearities. On a problem whose leading behaviour in ξy and ξt is a monotone drift, the bubble rising, the plume tip advancing, the entrained volume growing, this difference is not incidental, and the per-channel evidence of Section 5 identifies it as the operative mechanism. Table 1 summarizes the comparison. Table 1: The three trunk embeddings side by side. Everything not listed (branch, trunk depth and width, latent width p,loss, optimizer, schedule and data split) is identical across the three models.               
+
+> DeepONet FEDONet SEDONet
+> Embedding ϕξ[sin ,cos](2 πB ξ){TkTlTm}A
+> Implied prior none (spectral bias) periodic, translation invariant non-periodic, boundary emphasized Represents a linear trend via nonlinearities slowly converging series exactly, in two modes
+
+4.5 Architectures and parameter accounting 
+
+Figure 2 presents the three architectures in one layout, drawn so that the single point of difference, the block on the trunk input path, is the only thing that changes between them. The branch is 9 → 512 → 512 → 5p and the trunk 
+
+dtrunk → 512 → 512 → p with p = 64 latent basis channels and GELU activations [74], identical across the three models except for dtrunk .13 A PREPRINT 
+
+Figure 2: The three architectures differ only in the trunk coordinate embedding. (a) The branch-trunk factorization of Eq. (16): the branch encodes the input, the trunk encodes the query coordinate after a fixed embedding ϕ, and the two are combined by an inner product. (b)-(d) The three fillings of the ϕ slot, raw rescaled coordinates, random Fourier features, and a deterministic Chebyshev dictionary, which constitute the entire experimental manipulation. The first trunk layer has the same width in both (c) and (d), so FEDONet and SEDONet are parameter-identical, and no block carries trainable parameters. Since the embeddings carry no trainable parameters, the three models differ only in the input width of that first trunk layer, giving 0.73 M parameters for the raw baseline and 0.86 M for the two embedded models (Table 2). The gap is precisely one weight matrix, about 17 .8% of the baseline. That residual advantage is unavoidable if the embedding width is to be nontrivial and should be acknowledged rather than explained away, but it cannot account for the result: FEDONet and SEDONet have identical parameter counts, depths, widths, optimizers and data, so whatever separates them is the content of ϕ and nothing else. The DeepONet comparison is the weaker of the two and we report it as such. Table 2: Model configurations. The three architectures share branch and trunk depths and widths and differ only in the trunk coordinate embedding; the parameter gap is exactly the first trunk layer. Model Trunk embedding ϕ dtrunk Parameters DeepONet raw ξ = ( ξx, ξ y , ξ t) 3 0.73 MFEDONet [sin(2 πB ξ), cos(2 πB ξ)] , M = 128 256 0.86 MSEDONet Tk(ξx)Tl(ξy )Tm(ξt), graded, K = 10 256 0.86 MNeither embedding changes the asymptotic cost of training. The embedding adds a wider first trunk layer, a few percent of the per-step cost, and for SEDONet the dictionary itself is evaluated once for the whole training run or regenerated on the fly from the recurrence Eq. (26) at negligible cost. 
+
+4.6 Training and evaluation protocol 
+
+The ensemble is split at the level of the design member into training, validation and test sets of 905 , 16 and 103 runs, so no test parameter vector is seen during training. Each of the five channels is standardized to zero mean and unit variance using training-split statistics, and the closure is applied in physical units per Eq. (20). The objective is the 14 A PREPRINT 
+
+channel-averaged mean-squared error over a mini-batch B of ensemble members and the query set, 
+
+L(θ) = 1
+
+|B| Q
+
+X
+
+> i∈B
+> Q
+
+X
+
+> q=1
+
+15
+
+> 5
+
+X
+
+> c=1
+
+bsc
+
+ ζq ; π(i) − s(i) 
+
+> c
+
+(ζq )
+
+2
+
+, (33) evaluated on standardized channels, with the third concentration term acting through the metric Eq. (21). Optimization uses Adam [75] with cosine decay of the learning rate to zero. All three models are trained under an identical schedule, validation relative L2 is recorded periodically on the held-out runs, and every reported test number comes from the final weights rather than a selected checkpoint, so no comparison depends on where one might have stopped. The primary metric is the relative L2 error over the full space-time grid, computed per run and per channel and then averaged over the test runs, 
+
+E(c) 
+
+> L2
+
+= bsc − sc 2
+
+sc 2
+
+, EL2 = 15
+
+> 5
+
+X
+
+> c=1
+
+E(c) 
+
+> L2
+
+, (34) with norms taken in physical rather than standardized units so that the numbers are comparable across channels of different magnitude. This metric is scale-sensitive by construction: a channel whose norm is small, such as ca, is judged more harshly for the same absolute error, and the denominator vanishes identically for the velocity channels at t = 0 ,where the initial condition is at rest, a point we return to in Section 5.3. Alongside it we report the simplex violation 
+
+E∆ = max 
+
+> x,t
+
+X
+
+> i
+
+bci − 1 , (35) the wall-normal error profile, averaged over x, over the snapshot set T and over the test runs, 
+
+e(y) = 1
+
+|T | Nx
+
+X
+
+> t∈T
+
+X
+
+> j
+
+bc(xj , y, t ) − c(xj , y, t ) , (36) the domain-averaged phase error at each output time, which is Eq. (36) with the roles of y and t exchanged, and the deviations of the derived physical diagnostics recomputed from the predicted fields. 
+
+4.7 Algorithms 
+
+Algorithms 1 to 3 give one training procedure per method. They are written in parallel deliberately: every line is shared except the embedding block at the top, which is the whole experimental manipulation. What differs is when the coordinate representation is fixed. DeepONet has none to fix. FEDONet fixes a random draw at initialization, so its representation is frozen for the run but differs between runs and depends on a chosen bandwidth. SEDONet fixes a deterministic dictionary constructed before training begins, bit-identical across runs and specified by two integers. 
+
+Algorithm 1 DeepONet — Raw-coordinate trunk 
+
+Require: Training ensemble D = {(π(i), s(i))}Ntr 
+
+> i=1
+
+; query set Z = {ζq }Qq=1 ; latent width p; learning-rate schedule 
+
+{ηe}; epochs E
+
+Ensure: Trained θ = ( θbranch , θ trunk ) 
+
+> 1:
+
+Φ ← ξ(Z) ∈ RQ×dtrunk ▷ embedding: affine rescaling only, Eqs. (22) and (23)  
+
+> 2:
+
+Standardize channels using training-split statistics; initialize θ 
+
+> 3:
+
+for e = 1 , . . . , E do  
+
+> 4:
+
+for each mini-batch M ⊂ D do  
+
+> 5:
+
+B(π(i)) ← B θ (π(i)) ∈ R5×p for i ∈ M ▷ branch  
+
+> 6:
+
+T ← T θ (Φ) ∈ RQ×p ▷ trunk; first layer dtrunk → 512  
+
+> 7:
+
+bS(i)
+
+← T B (π(i))⊤ + 1b⊤ 
+
+> 0
+
+; apply the closure Eq. (20)  
+
+> 8:
+
+Evaluate L(θ) by Eq. (33); take one Adam step with rate ηe 
+
+> 9:
+
+end for  
+
+> 10:
+
+if e mod 5 = 0 then  
+
+> 11:
+
+Evaluate validation EL2 on the held-out runs  
+
+> 12:
+
+end if  
+
+> 13:
+
+end for 
+
+The embedding block of Algorithm 3 is executed once for the whole training run and is identical across seeds, so the trunk sees a spectral input distribution whose conditioning is fixed before training begins rather than realized from a draw (Section B.2). This is the one property Algorithm 2 cannot share, since its first line depends on a random draw whose bandwidth must additionally be selected. 15 A PREPRINT 
+
+Algorithm 2 FEDONet — Random Fourier feature trunk 
+
+Require: As Algorithm 1, plus feature count M , bandwidth σB , embedding seed 
+
+Ensure: Trained θ; frozen B 
+
+> 1:
+
+Draw B ∈ RM ×3 with Bij ∼ N (0 , σ 2 
+
+> B
+
+) and freeze it ▷ drawn once; B / ∈ θ 
+
+> 2:
+
+Φ ←  sin(2 π ξ(Z)B⊤), cos(2 π ξ(Z)B⊤) ∈ RQ×dtrunk ▷ embedding, Eq. (24)  
+
+> 3:
+
+Standardize channels using training-split statistics; initialize θ 
+
+> 4:
+
+for e = 1 , . . . , E do  
+
+> 5:
+
+for each mini-batch M ⊂ D do  
+
+> 6:
+
+B(π(i)) ← B θ (π(i)) for i ∈ M ▷ branch  
+
+> 7:
+
+T ← T θ (Φ) ▷ trunk; first layer dtrunk → 512  
+
+> 8:
+
+bS(i)
+
+← T B (π(i))⊤ + 1b⊤ 
+
+> 0
+
+; apply the closure Eq. (20)  
+
+> 9:
+
+Evaluate L(θ) by Eq. (33); take one Adam step with rate ηe 
+
+> 10:
+
+end for  
+
+> 11:
+
+if e mod 5 = 0 then  
+
+> 12:
+
+Evaluate validation EL2 on the held-out runs  
+
+> 13:
+
+end if  
+
+> 14:
+
+end for Algorithm 3 SEDONet — Chebyshev spectral trunk 
+
+Require: As Algorithm 1, plus per-axis degree bound K and feature budget dtrunk 
+
+Ensure: Trained θ 
+
+> 1:
+
+A ← the first dtrunk multi-indices (k, l, m ) with max( k, l, m ) < K in order of increasing total degree k + l + m,ties broken lexicographically ▷ Eq. (30)  
+
+> 2:
+
+Φ[ q, j ] ← Tkj (ξqx) Tlj (ξqy ) Tmj (ξqt ) for q = 1 , . . . , Q and (kj , l j , m j ) ∈ A , each factor from the recurrence Eq. (26) ▷ embedding; no parameters, no random draw  
+
+> 3:
+
+Standardize channels using training-split statistics; initialize θ 
+
+> 4:
+
+for e = 1 , . . . , E do  
+
+> 5:
+
+for each mini-batch M ⊂ D do  
+
+> 6:
+
+B(π(i)) ← B θ (π(i)) for i ∈ M ▷ branch  
+
+> 7:
+
+T ← T θ (Φ) ▷ trunk; first layer dtrunk → 512  
+
+> 8:
+
+bS(i)
+
+← T B (π(i))⊤ + 1b⊤ 
+
+> 0
+
+; apply the closure Eq. (20)  
+
+> 9:
+
+Evaluate L(θ) by Eq. (33); take one Adam step with rate ηe 
+
+> 10:
+
+end for  
+
+> 11:
+
+if e mod 5 = 0 then  
+
+> 12:
+
+Evaluate validation EL2 on the held-out runs  
+
+> 13:
+
+end if  
+
+> 14:
+
+end for 
+
+# 5 Results 
+
+The evidence is reported in increasing order of specificity: what accuracy the three models reach and how it is distributed over channels and over the parameter space (Section 5.1); where in space and time the differences between them live (Section 5.2); one hard member examined snapshot by snapshot (Section 5.3); and whether the pointwise gains translate into derived physical quantities and constraint consistency (Section 5.4). The interpretation is developed alongside the evidence, because each piece of it discriminates between different candidate explanations. 
+
+5.1 Test accuracy, by channel and across the design 
+
+SEDONet reduces the mean relative L2 error by 24 .0% relative to the raw-trunk baseline and by 16 .8% relative to FEDONet, uniformly across channels. That uniformity is not automatic on a multi-field target: a prior that helped the phase fields at the expense of the velocities would be a more equivocal outcome, and the shared trunk of Section 4.2 is exactly the arrangement that would expose such a trade-off. The per-channel reductions of Table 4 are the most informative result in the paper, and they are invisible in the channel-averaged number. The Fourier embedding delivers its gain almost entirely on ca and the velocities, the channels with small-scale, oscillatory, or recirculating structure, which is exactly where a stationary broadband kernel should 16 A PREPRINT 
+
+help and close to none of it on the two large-region concentration fields. The Chebyshev embedding improves those same oscillatory channels by more, and additionally improves cw and co by about a fifth; those two are precisely the fields dominated by a large connected region bounded by a single slowly translating level set, that is, by a monotone and strongly non-periodic trend in y and in t.That split separates the two candidate mechanisms cleanly, and it is the central interpretive claim of the paper. Broadband resolution, supplying high-wavenumber modes at initialization instead of requiring the network to synthesize them, is common to both embeddings and accounts for the improvement both deliver on ca and on the velocities. Trend representation is specific to the polynomial dictionary: a linear ramp is two Chebyshev modes, whereas a dictionary built from functions periodic on the embedding scale represents the same ramp as a slowly converging sinusoidal series, spending on the trend part of a budget the polynomial basis leaves free for the interface structure. Table 3: Test relative L2 error over 103 held-out simulations, and the maximum simplex violation E∆ of Eq. (35). Lowest per column in bold. Model mean cw co ca u v E∆
+
+DeepONet 0.0821 0.0319 0.0170 0.1331 0.1406 0.0879 1.79 × 10 −7
+
+FEDONet 0.0750 0.0315 0.0170 0.1236 0.1231 0.0797 1.79 × 10 −7
+
+SEDONet 0.0624 0.0251 0.0136 0.1053 0.1037 0.0644 1.79 × 10 −7
+
+SEDONet vs. DeepONet: −24 .0% SEDONet vs. FEDONet: −16 .8% channels improved: 5/5
+
+Table 4: Per-channel error reduction (%) implied by Table 3. The two embeddings differ in where their gains fall as well as in magnitude: the Fourier trunk concentrates its improvement on the oscillatory channels, while the Chebyshev trunk improves every channel by a comparable fifth to a quarter. Comparison mean cw co ca u v
+
+FEDONet vs. DeepONet 8.6 1.3 0.0 7.1 12 .4 9.3
+
+SEDONet vs. DeepONet 24 .0 21 .3 20 .0 20 .9 26 .2 26 .7
+
+SEDONet vs. FEDONet 16 .8 20 .3 20 .0 14 .8 15 .8 19 .2
+
+Figure 3: Test relative L2 over the 103 held-out simulations. (a) Channel-averaged error. (b) Per-channel breakdown. The ordering SEDONet < FEDONet < DeepONet holds for the mean and for every one of the five channels, but the margins are strongly channel dependent: FEDONet is close to the baseline on cw and co, whereas SEDONet improves those two channels by about a fifth. The absolute level of the error is also interpretable. The oil field co is easiest, one large connected region with a single smooth boundary, while ca and the horizontal velocity u carry the budget: ca is a small, strongly deforming, topologically active object whose support is a few percent of the domain, and u is driven by the lateral squeezing of the plume and the recirculation behind the cap. Notably the velocity channels are where SEDONet gains most, at 26 –27% ,which is not what one would predict if the mechanism were purely sharp-interface resolution in the phase fields. 17 A PREPRINT 
+
+Two cautions attach to these numbers. The relative L2 metric is unforgiving for ca, because the small norm of a field occupying a few percent of the domain puts a small denominator under any error concentrated on the bubble rim; that column is a stringent interface-localization score rather than evidence that the bubble is misplaced, which Figure 6 shows it is not. And the common accuracy floor in the range 6–8% is most likely not a shortcoming of any of the three: a rank-p separated representation is bounded below by the Kolmogorov p-width of the solution manifold (Section 4.2), and that width decays slowly for advection-dominated problems with moving interfaces. 
+
+Figure 4: Test relative L2 of each held-out member (points) against the three most influential design parameters, with binned means (lines), log scale. The SEDONet curve lies below the other two across the entire range of all three parameters and the vertical separation is roughly constant in the log, so the improvement is multiplicative and essentially uniform in π rather than concentrated in a subregion of the design. Figure 4 answers a question the aggregate numbers cannot: is the 24% gain broad, or an average over a strong improvement on part of the design and none elsewhere? It is the former. Across the Eötvös number, the Reynolds number and the density ratio the three binned-mean curves are close to parallel on a logarithmic axis with SEDONet uniformly lowest, so the parameter dependence is a property of the problem rather than of any one architecture. That shared dependence is itself informative: error rises sharply as Eo → 5, where strong water-air tension produces a taller, thinner plume and a more sharply curved bubble crown and therefore more high-wavenumber content in every channel, and the ordering mirrors the sensitivity ranking of the reference data itself. The scatter within each bin spans nearly an order of magnitude, which is why the single-member comparison of Section 5.3 must be read as an illustration rather than as evidence. 
+
+5.2 Where the error lives, and when 
+
+A scalar error can conceal entirely different outcomes, and for interfacial physics only one of them is worth having: a 
+
+24% reduction is compatible with a uniform improvement everywhere, with a large improvement in a small region, or with an improvement in the bulk purchased at the cost of the interfaces. Figure 5 resolves which. In space, the wall-normal profile is a two-peak structure that tracks the moving geometry, with peaks at the bubble rim and at the interface that are narrow and nearly coincident across the three models until t = 2 , after which the upper peak detaches and migrates with the bubble while a second, broader peak persists at the deformed interface and the plume flanks. It is at these peaks, and only at these peaks, that the models separate: the baseline reaches 0.33 at t = 4 against SEDONet’s 0.17 , while in the bulk of both liquid layers all three curves lie together near zero. The improvement is therefore not a uniform rescaling of a smooth error field but a targeted improvement in interface resolution. The same panels falsify the explanation one would reach for first. The error is small at the walls, at every time and for every model. This matters because the classical justification for a Chebyshev basis is boundary-layer resolution, and because the polynomial dictionary does carry its largest prior amplitude at the domain boundary, the mechanism is available to the model. It is demonstrably not what produces the gain, because there is no wall error to remove: the viscous layers that form at the no-slip walls are three to five times wider than the diffuse interface, carry no high-wavenumber content, and the bubble never approaches them. Boundary emphasis is a real property of the polynomial dictionary and is simply not what this problem rewards. In time, the lower panels show the domain-averaged phase error against t. For t ≲ 1.5, while the bubble is simply rising through the water, the three curves are close and the raw-coordinate baseline is in fact marginally the best of the three: the target in that window is a single, smoothly translating, nearly axisymmetric object that a raw trunk represents 18 A PREPRINT 
+
+adequately, and the embedded models pay a small price for carrying a dictionary they do not yet need. The curves cross at breakthrough, and from there the ordering inverts and the gap widens monotonically to the end of the horizon. 
+
+Figure 5: Top: wall-normal error profile e(y) from Eq. (36) at t = 0 , 1, 2, 3, 4; the dashed line marks the undisturbed water–oil interface yint = 0 .9. Bottom: domain-averaged phase error against time, with the vertical dashed line marking the snapshot shown above it. Error is concentrated at the interfaces, near zero in both bulk layers and at both walls, and the three models separate only after breakthrough. The timing of that crossing is a direct test of the mechanism rather than an incidental observation. Before breakthrough the target is smooth and effectively low-rank, cheap to represent in any reasonable basis, and the trunk is not the binding constraint on accuracy. After breakthrough it acquires a triple junction, a thin high-curvature spike and a topological transition as the bubble detaches, and simultaneously the monotone drift in the wall-normal and temporal coordinates becomes pronounced. These are precisely the conditions under which both advantages identified in Section 5.1 should come into play, and this is precisely when the curves separate. The trunk embedding does not make the surrogate uniformly better; it makes it better at the topologically active phase of the flow, which is the phase where all three surrogates are least accurate and the phase anyone runs this simulation to see. 
+
+5.3 A hard test member, resolved in time 
+
+Test member 269 ranks in the hardest decile of the test set, for reasons the previous subsections make legible. Two of its nine parameters sit at the edge of the design box: the Eötvös number is at the extreme low end of its range, the corner where Figure 4 shows all three models degrading; and the normalized oil spreading coefficient is near its lower bound, so the configuration lies close to the total-wetting boundary at which oil would film between water and air, leaving the triple junction nearly degenerate. The t = 0 row of Table 5 needs comment before the rest can be read, because one of its two anomalies is an artifact and the other is not. The per-snapshot relative L2 of the velocity channels at t = 0 returns enormous values in all three models, but these are not failures: the initial condition sets the velocity identically to zero, so the denominator of Eq. (34) vanishes and the figures carry no information about accuracy. We therefore exclude t = 0 from all per-snapshot velocity metrics; the space-time aggregate of Table 6 is unaffected, since there the denominator is dominated by the finite velocities at later times. We flag this because it is a trap in any operator-learning benchmark initialized from rest. 19 A PREPRINT 
+
+Figure 6: Test member 269 : RGB composite of (cw, c o, c a) (red = water, green = oil, blue = air) at t = 0 , 1, 2, 3, 4.Rows: reference, DeepONet, FEDONet, SEDONet. All three surrogates reproduce the full sequence, rise, cap deformation, breakthrough, plume entrainment, detachment, and the correct topology at every time, including the reconnected oil layer and the sharp water spike beneath the detached bubble at t = 4 .20 A PREPRINT 
+
+Figure 7: Absolute phase error for the same member on a shared colour scale. The error is a thin shell hugging the bubble rim, the water-oil interface and the plume flanks, and is black over the bulk of both liquid layers. The baseline’s rim is a thick bright ring; SEDONet’s is a thinner, dimmer arc. The one persistent bright feature common to all three is the horizontal band immediately beneath the bubble crown at t ≥ 2, where the drainage film between the bubble and the oil is thinnest. The concentration errors at t = 0 are a different matter, and more interesting. They are not small. Yet the initial phase field is an analytic function of the parameters, so a surrogate handed π knows the initial state exactly and is nonetheless placing the bubble rim a fraction of a cell off. This is pure representation error in the trunk, present before any dynamics have been learned, and it is the cleanest available lower bound on what the architecture costs. It also suggests a structural remedy in the spirit of the simplex closure: predicting a correction to the analytically known initial field rather than the field itself. With that understood, Table 5 corroborates Figure 5 on a single member. At t = 1 , before breakthrough, the three models are indistinguishable, a spread under 1.5% in the mean. At t = 2 , as the bubble begins to pierce the interface, 21 A PREPRINT 
+
+Table 5: Relative L2 error on test member 269 , resolved by snapshot. The t = 0 velocity entries are undefined, for the reason given in the text, and are marked †. Lowest per row in bold. 
+
+t Model mean cw co ca u v
+
+0
+
+DeepONet † 0.0337 0.0073 0.1439 † †
+
+FEDONet † 0.0320 0.0093 0.1275 † †
+
+SEDONet † 0.0236 0.0045 0.1056 † †
+
+1
+
+DeepONet 0.0612 0.0244 0.0067 0.1004 0.1067 0.0679 FEDONet 0.0618 0.0231 0.0089 0.0865 0.1148 0.0755 SEDONet 0.0609 0.0249 0.0046 0.1069 0.1075 0.0605 
+
+2
+
+DeepONet 0.1563 0.0718 0.0265 0.2874 0.2681 0.1276 FEDONet 0.1221 0.0534 0.0206 0.2121 0.2121 0.1121 SEDONet 0.0985 0.0408 0.0167 0.1597 0.1865 0.0890 
+
+3
+
+DeepONet 0.2160 0.0752 0.0515 0.3803 0.3675 0.2056 FEDONet 0.1399 0.0479 0.0366 0.1730 0.2771 0.1650 SEDONet 0.1446 0.0494 0.0335 0.2147 0.2689 0.1564 
+
+4
+
+DeepONet 0.1685 0.0601 0.0641 0.2927 0.2174 0.2081 FEDONet 0.1333 0.0507 0.0452 0.1831 0.2406 0.1472 SEDONet 0.1192 0.0398 0.0412 0.1986 0.1800 0.1364 
+
+Table 6: Relative L2 error on member 269 aggregated over the full space–time grid, that is, with a single global denominator rather than a per-snapshot one. Errors are roughly 50% above the test mean of Table 3 and the overall ordering is restored. Model mean cw co ca u v
+
+DeepONet 0.1421 0.0546 0.0359 0.2527 0.2233 0.1440 FEDONet 0.1083 0.0427 0.0259 0.1645 0.1892 0.1192 SEDONet 0.0954 0.0350 0.0230 0.1555 0.1624 0.1011 
+
+SEDONet is lowest on every channel, by 37 .0% relative to the baseline and 19 .3% relative to FEDONet; at t = 4 , with the bubble detached and the spike thin, the margins are 29 .3% and 10 .6% .At t = 3 the ordering reverses on one channel, and the reversal is informative rather than anomalous. FEDONet’s mean is a few percent below SEDONet’s, and the margin comes almost entirely from ca, while SEDONet retains co, u and v.At that instant the bubble is a compact, recently detached blob whose boundary is a closed curve of high and nearly uniform curvature, in the angular coordinate a genuinely periodic feature, which is what a Fourier dictionary represents most efficiently, whereas the water spike beneath it is a monotone, strongly non-periodic protrusion. A single member at a single instant should not carry an architectural claim in either direction, but it does show that the channel-wise ordering of Table 3 is an aggregate statement rather than a pointwise one, and it shows the two dictionaries behaving as their priors predict. The qualitative picture is in the end the more important result. All three models reproduce the correct topology at every snapshot (Figure 6): bubble detached, spike sharp, oil layer reconnected. Figure 7 shows that the absolute error is a thin shell hugging the bubble rim and the plume flanks and is essentially black everywhere else, interface localization error, the models placing the interface a fraction of a cell off, rather than a field-level failure in which the bulk arrangement is wrong. What distinguishes the models is the thickness and brightness of that shell. The improvement sits exactly where the physics is. 
+
+5.4 Physical diagnostics and constraint preservation 
+
+A pointwise norm is not what a surrogate is ultimately used for; integral and geometric quantities are, and a constraint-consistent output is, so we close by evaluating both. The bubble kinematics follow the same pattern as the field error, and more sharply. All three models track the centroid height closely until t ≈ 1, after which the deviations grow monotonically; by the end of the horizon SEDONet’s deviation is 42% below the baseline’s and 33% below FEDONet’s, both larger than the corresponding field-error gaps, and the interquartile bands are well separated over the second half of 22 A PREPRINT 
+
+the horizon. The improvement in interface localization therefore translates into a better-than-proportional improvement in the geometric quantity that localization determines. The entrained volume is more equivocal and we report it as such. SEDONet’s deviation is the largest of the three until the plume has fully formed, and only then becomes the smallest. Part of the early-time deviation is a small-number artifact, since before breakthrough the entrained volume is a near-zero integral over the diffuse tail of the interface profile and any smoothing bias registers as a bias in the integral. But the effect is real, and a surrogate used to predict entrainment specifically would need it addressed, most naturally by supervising the diagnostic directly or by closing the initial condition structurally. 
+
+Figure 8: Absolute deviation of two derived diagnostics computed from the predicted fields and compared with the reference: bubble centroid height ybubble (left) and entrained plume volume Vplume (right). Lines are means over the 
+
+103 test members, bands the interquartile spread. Constraint preservation is the one place where the surrogate is exactly right rather than approximately so. With the closure of Eq. (20) the measured simplex, the violation sits at the single-precision rounding floor for all three models, orders of magnitude below the drift present in the reference data itself, and the value is identical across the three independently trained networks. That identity is itself the diagnostic: a learned approximation to the constraint would vary with architecture and with seed, whereas a value reproduced by three different models is the rounding error of the closure arithmetic and nothing else. It is worth being clear about what this does not say. The surrogate satisfies the algebraic constraint exactly while satisfying none of the differential ones, since neither incompressibility nor mass conservation is enforced anywhere; structural constraints are essentially free when they are affine, which is not the same as the surrogate being physically consistent in general. 
+
+# 6 Summary and Conclusions 
+
+We have introduced a ternary Cahn-Hilliard-Navier-Stokes benchmark for operator learning, an air bubble rising through water, piercing a water-oil interface and entraining a plume into the oil, and used it to compare three parameter-matched DeepONet variants that differ only in the trunk coordinate embedding. The benchmark contributes three things its predecessors lack: a five-channel space-time target rather than a single scalar field, an algebraic constraint on the state that a faithful surrogate should respect exactly, and a reference solver in which that constraint is a structural identity of the discretization rather than an approximation, so that any violation exhibited by a surrogate is provably its own. On this benchmark the Chebyshev-embedded trunk reduces test relative L2 error by 24 .0% relative to the raw-coordinate baseline and by 16 .8% relative to the Fourier-embedded variant, improves every output channel and the bubble-centroid diagnostic, and preserves the simplex constraint to the single-precision rounding floor through an affine closure. The comparison that carries the claim is parameter-exact: the two embedded models have identical parameter counts, depths, widths, optimizers and data, so the difference between them is attributable to the coordinate dictionary and to nothing else. The interpretive claim we would defend is narrower than the headline number, and the evidence for it is the localization of the gain rather than its size. The advantage of the polynomial dictionary here is not boundary-layer resolution: the error is smallest at the walls, at every time and for every model, so although the Chebyshev prior does place its greatest amplitude near the domain boundary, there is nothing there for it to resolve. What the dictionary supplies instead is twofold. It represents the strongly non-periodic, monotone trends of the solution in the wall-normal and temporal 23 A PREPRINT 
+
+Table 7: Summary. All three models share branch and trunk depths, widths, optimizer, schedule and data, and differ only in the trunk embedding ϕ. The FEDONet–SEDONet comparison is parameter-exact. Model Test rel. L2 Reduction Parameters DeepONet (raw trunk) 0.0821 — 0.73 M FEDONet (Fourier) 0.0750 8.6% 0.86 M SEDONet (Chebyshev) 0.0624 24 .0% 0.86 M coordinates in a handful of low-order modes, where a periodic dictionary needs a slowly converging series; and it conditions the trunk input deterministically, where the Fourier alternative achieves the same effect only in expectation and at a bandwidth that must be chosen. Both advantages are contingent on the problem: on a genuinely periodic domain, or one without a dominant drift, we would not expect the ordering to hold. Several limitations bear on how the numbers should be read. Each model was trained once, so the reported gaps are point estimates without run-to-run error bars, and repeated runs at matched budgets are the first thing this study needs. The learning target is a diffuse-interface solution at a finite Cahn number, so conclusions transfer to sharp-interface physics only insofar as the diffuse solution approximates it. The design space contains a single topological class by construction, so the surrogates have not been tested near a bifurcation boundary, and all test members are drawn from that same design, leaving extrapolation untested. The surrogate is also purely data driven apart from the algebraic closure, and the configuration is two-dimensional, whereas triple junctions in three dimensions are lines rather than points. 
+
+# 7 Future Work 
+
+The most pressing extensions are evaluative rather than architectural. The effect sizes reported here rest on one training run per model, so converting them into defensible claims requires repetition at matched compute budgets across several seeds and several choices of the Fourier bandwidth, so that a tuned stochastic embedding and a deterministic one are compared on equal terms. The design space should then be widened until it crosses a regime boundary, and sampled outside the training box, since engineering use of a parametric surrogate almost always involves some extrapolation. The same comparison belongs in three dimensions, where triple junctions are lines rather than points and the anisotropy of a truncated tensor-product dictionary becomes a more delicate question, and on other multiphase systems, so that the conditions under which a polynomial dictionary helps can be separated from the particulars of one benchmark. Because the coordinate representation is modular, the same question can be asked of the lifting layers of other neural-operator families. The architectural directions follow from where the error still sits. All three models spend their budget at the diffuse interfaces, which are precisely the features a fixed global basis represents least efficiently; a dictionary combining global trend modes with localized modes tied to the instantaneous interface position would attack that budget directly, and more generally a basis that adapts to the moving geometry is the natural route past the limits of any fixed linear expansion. A second direction is to extend the structural approach that worked for the algebraic constraint to the differential ones: incompressibility and mass conservation are not affine, but they can be built into the output representation or enforced by projection rather than left for the data to teach, and the same logic applies to an initial condition known in closed form. The benchmark itself is meant to be reusable, and a surrogate that respects the differential structure as well as the algebraic one would be the natural next entry. 
+
+# Declaration of Competing Interest 
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+# Acknowledgements 
+
+This work was supported by the grant in part by the AFOSR Grant FA9550-24-1-0327. 24 A PREPRINT 
+
+# Data Availability 
+
+The data supporting the findings of this study are available from the corresponding author upon reasonable request. 
+
+# References 
+
+[1] P. G. de Gennes. Wetting: Statics and dynamics. Reviews of Modern Physics , 57(3):827–863, 1985. [2] Franck Boyer and Céline Lapuerta. Study of a three component Cahn–Hilliard flow model. ESAIM: Mathematical Modelling and Numerical Analysis , 40(4):653–687, 2006. [3] Junseok Kim. Phase-field models for multi-component fluid flows. Communications in Computational Physics ,12(3):613–661, 2012. [4] Roberto Bonhomme, Jacques Magnaudet, Fabien Duval, and Bruno Piar. Inertial dynamics of air bubbles crossing a horizontal fluid–fluid interface. Journal of Fluid Mechanics , 707:405–443, 2012. [5] C. W. Hirt and B. D. Nichols. Volume of fluid (VOF) method for the dynamics of free boundaries. Journal of Computational Physics , 39(1):201–225, 1981. [6] Mark Sussman, Peter Smereka, and Stanley Osher. A level set approach for computing solutions to incompressible two-phase flow. Journal of Computational Physics , 114(1):146–159, 1994. [7] G. Tryggvason, B. Bunner, A. Esmaeeli, D. Juric, N. Al-Rawahi, W. Tauber, J. Han, S. Nas, and Y.-J. Jan. A front-tracking method for the computations of multiphase flow. Journal of Computational Physics , 169(2):708–759, 2001. [8] K. A. Smith, F. J. Solis, and D. L. Chopp. A projection method for motion of triple junctions by levels sets. 
+
+Interfaces and Free Boundaries , 4(3):263–276, 2002. [9] John W Cahn and John E Hilliard. Free energy of a nonuniform system. i. interfacial free energy. The Journal of Chemical Physics , 28(2):258–267, 1958. [10] D. M. Anderson, G. B. McFadden, and A. A. Wheeler. Diffuse-interface methods in fluid mechanics. Annual Review of Fluid Mechanics , 30:139–165, 1998. [11] John Lowengrub and Lev Truskinovsky. Quasi-incompressible Cahn–Hilliard fluids and topological transitions. 
+
+Proceedings of the Royal Society of London A , 454(1978):2617–2654, 1998. [12] Helmut Abels, Harald Garcke, and Günther Grün. Thermodynamically consistent, frame indifferent diffuse interface models for incompressible two-phase flows with different densities. Mathematical Models and Methods in Applied Sciences , 22(3):1150013, 2012. [13] David Jacqmin. Calculation of two-phase Navier–Stokes flows using phase-field modeling. Journal of Computa-tional Physics , 155(1):96–127, 1999. [14] Hang Ding, Peter D. M. Spelt, and Chang Shu. Diffuse interface model for incompressible two-phase flows with large density ratios. Journal of Computational Physics , 226(2):2078–2095, 2007. [15] J. U. Brackbill, D. B. Kothe, and C. Zemach. A continuum method for modeling surface tension. Journal of Computational Physics , 100(2):335–354, 1992. [16] Michael S. Dodd and Antonino Ferrante. A fast pressure-correction method for incompressible two-fluid flows. 
+
+Journal of Computational Physics , 273:416–434, 2014. [17] Steven L. Brunton, Bernd R. Noack, and Petros Koumoutsakos. Machine learning for fluid mechanics. Annual Review of Fluid Mechanics , 52:477–508, 2020. [18] Ricardo Vinuesa and Steven L. Brunton. Enhancing computational fluid dynamics with machine learning. Nature Computational Science , 2:358–366, 2022. [19] Frederic Gibou, David Hyde, and Ron Fedkiw. Sharp interface approaches and deep learning techniques for multiphase flows. Journal of Computational Physics , 380:442–463, 2019. [20] Dmitrii Kochkov, Jamie A. Smith, Ayya Alieva, Qing Wang, Michael P. Brenner, and Stephan Hoyer. Ma-chine learning-accelerated computational fluid dynamics. Proceedings of the National Academy of Sciences ,118(21):e2101784118, 2021. [21] M. Raissi, P. Perdikaris, and G. E. Karniadakis. Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations. Journal of Computational Physics , 378:686–707, 2019. 25 A PREPRINT 
+
+[22] George Em Karniadakis, Ioannis G. Kevrekidis, Lu Lu, Paris Perdikaris, Sifan Wang, and Liu Yang. Physics-informed machine learning. Nature Reviews Physics , 3:422–440, 2021. [23] Tianping Chen and Hong Chen. Universal approximation to nonlinear operators by neural networks with arbitrary activation functions and its application to dynamical systems. IEEE Transactions on Neural Networks ,6(4):911–917, 1995. [24] Lu Lu, Pengzhan Jin, Guofei Pang, Zhongqiang Zhang, and George Em Karniadakis. Learning nonlinear operators via DeepONet based on the universal approximation theorem of operators. Nature Machine Intelligence ,3(3):218–229, 2021. [25] Nikola Kovachki, Zongyi Li, Burigede Liu, Kamyar Azizzadenesheli, Kaushik Bhattacharya, Andrew Stuart, and Anima Anandkumar. Neural operator: Learning maps between function spaces with applications to PDEs. 
+
+Journal of Machine Learning Research , 24(89):1–97, 2023. [26] Zongyi Li, Nikola Kovachki, Kamyar Azizzadenesheli, Burigede Liu, Kaushik Bhattacharya, Andrew Stuart, and Anima Anandkumar. Fourier neural operator for parametric partial differential equations, 2021. [27] Gege Wen, Zongyi Li, Kamyar Azizzadenesheli, Anima Anandkumar, and Sally M. Benson. U-FNO—an enhanced Fourier neural operator-based deep-learning model for multiphase flow. Advances in Water Resources ,163:104180, 2022. [28] Gege Wen, Zongyi Li, Qirui Long, Kamyar Azizzadenesheli, Anima Anandkumar, and Sally M. Benson. Real-time high-resolution CO 2 geological storage prediction using nested Fourier neural operators. Energy & Environmental Science , 16:1732–1741, 2023. [29] Jaideep Pathak, Shashank Subramanian, Peter Harrington, Sanjeev Raja, Ashesh Chattopadhyay, Morteza Mardani, Thorsten Kurth, David Hall, Zongyi Li, Kamyar Azizzadenesheli, Pedram Hassanzadeh, Karthik Kashinath, and Animashree Anandkumar. FourCastNet: A global data-driven high-resolution weather model using adaptive Fourier neural operators, 2022. [30] Remi Lam, Alvaro Sanchez-Gonzalez, Matthew Willson, et al. Learning skillful medium-range global weather forecasting. Science , 382(6677):1416–1421, 2023. [31] Makoto Takamoto, Timothy Praditia, Raphael Leiteritz, Dan MacKinlay, Francesco Alesiani, Dirk Pflüger, and Mathias Niepert. PDEBench: An extensive benchmark for scientific machine learning. In Advances in Neural Information Processing Systems (NeurIPS) Datasets and Benchmarks Track , 2022. [32] Maximilian Herde, Bogdan Raoni´ c, Tobias Rohner, Roger Käppeli, Roberto Molinaro, Emmanuel de Bézenac, and Siddhartha Mishra. Poseidon: Efficient foundation models for PDEs. In Advances in Neural Information Processing Systems (NeurIPS) , volume 37, 2024. [33] Nasim Rahaman, Aristide Baratin, Devansh Arpit, Felix Draxler, Min Lin, Fred A. Hamprecht, Yoshua Bengio, and Aaron Courville. On the spectral bias of neural networks, 2019. [34] Zhi-Qin John Xu, Yaoyu Zhang, Tao Luo, Yanyang Xiao, and Zheng Ma. Frequency principle: Fourier analysis sheds light on deep neural networks. Communications in Computational Physics , 28(5):1746–1767, 2020. [35] Arthur Jacot, Franck Gabriel, and Clément Hongler. Neural tangent kernel: Convergence and generalization in neural networks. In Advances in Neural Information Processing Systems (NeurIPS) , 2018. [36] Matthew Tancik, Pratul P. Srinivasan, Ben Mildenhall, Sara Fridovich-Keil, Nithin Raghavan, Utkarsh Singhal, Ravi Ramamoorthi, Jonathan T. Barron, and Ren Ng. Fourier features let networks learn high frequency functions in low dimensional domains, 2020. [37] Ali Rahimi and Benjamin Recht. Random features for large-scale kernel machines. In Advances in Neural Information Processing Systems (NeurIPS) , volume 20, 2007. [38] Sifan Wang, Hanwen Wang, and Paris Perdikaris. On the eigenvector bias of Fourier feature networks: From regression to solving multi-scale PDEs with physics-informed neural networks. Computer Methods in Applied Mechanics and Engineering , 384:113938, 2021. [39] Arth Sojitra, Mrigank Dhingra, and Omer San. Fedonet: Fourier-embedded deeponet for spectrally accurate operator learning. Journal of Computational Physics , page 114931, 2026. [40] John P. Boyd. Chebyshev and Fourier Spectral Methods . Dover Publications, Mineola, NY, 2nd edition, 2001. [41] Lloyd N. Trefethen. Approximation Theory and Approximation Practice . SIAM, Philadelphia, PA, 2013. [42] Muhammad Abid and Omer San. Spectral embedding via Chebyshev bases for robust DeepONet approximation, 2026. 26 A PREPRINT 
+
+[43] Tom Beucler, Michael Pritchard, Stephan Rasp, Jordan Ott, Pierre Baldi, and Pierre Gentine. Enforcing analytic constraints in neural networks emulating physical systems. Physical Review Letters , 126(9):098302, 2021. [44] Albert Cohen and Ronald DeVore. Approximation of high-dimensional parametric PDEs. Acta Numerica ,24:1–159, 2015. [45] Benjamin Peherstorfer. Breaking the Kolmogorov barrier with nonlinear model reduction. Notices of the American Mathematical Society , 69(5):725–733, 2022. [46] I. M. Sobol’. On the distribution of points in a cube and the approximate evaluation of integrals. USSR Computational Mathematics and Mathematical Physics , 7(4):86–112, 1967. [47] James Bradbury, Roy Frostig, Peter Hawkins, Matthew James Johnson, Chris Leary, Dougal Maclaurin, George Necula, Adam Paszke, Jake VanderPlas, Skye Wanderman-Milne, and Qiao Zhang. JAX: Composable transforma-tions of Python +NumPy programs. https://github.com/jax-ml/jax , 2018. [48] Franck Boyer, Céline Lapuerta, Sebastian Minjeaud, Bruno Piar, and Michel Quintard. Cahn–Hilliard/Navier– Stokes model for the simulation of three-phase flows. Transport in Porous Media , 82(3):463–483, 2010. [49] Junseok Kim and John Lowengrub. Phase field modeling and simulation of three-phase flows. Interfaces and Free Boundaries , 7(4):435–466, 2005. [50] David J. Eyre. Unconditionally gradient stable time marching the Cahn–Hilliard equation. In Computational and Mathematical Models of Microstructural Evolution , volume 529 of Materials Research Society Symposium Proceedings , pages 39–46. Materials Research Society, Warrendale, PA, 1998. [51] Jie Shen, Jie Xu, and Jiang Yang. The scalar auxiliary variable (SAV) approach for gradient flows. Journal of Computational Physics , 353:407–416, 2018. [52] Alexandre Joel Chorin. Numerical solution of the Navier–Stokes equations. Mathematics of Computation ,22(104):745–762, 1968. [53] Samuel Lanthaler, Siddhartha Mishra, and George Em Karniadakis. Error estimates for DeepONets: A deep learning framework in infinite dimensions. Transactions of Mathematics and Its Applications , 6(1):tnac001, 2022. [54] Lu Lu, Xuhui Meng, Shengze Cai, Zhiping Mao, Somdatta Goswami, Zhongqiang Zhang, and George Em Karniadakis. A comprehensive and fair comparison of two neural operators (with practical extensions) based on FAIR data. Computer Methods in Applied Mechanics and Engineering , 393:114778, 2022. [55] Tapas Tripura and Souvik Chakraborty. Wavelet neural operator for solving parametric partial differential equations in computational mechanics problems. Computer Methods in Applied Mechanics and Engineering , 404:115783, 2023. [56] Zhongkai Hao, Zhengyi Wang, Hang Su, Chengyang Ying, Yinpeng Dong, Songming Liu, Ze Cheng, Jian Song, and Jun Zhu. GNOT: A general neural operator transformer for operator learning. In International Conference on Machine Learning (ICML) , pages 12556–12569, 2023. [57] Bogdan Raonic, Roberto Molinaro, Tim Rohner, Siddhartha Mishra, and Emmanuel de Bézenac. Convolutional neural operators for robust and accurate learning of PDEs. In Advances in Neural Information Processing Systems (NeurIPS) , 2023. [58] Zongyi Li, Daniel Zhengyu Huang, Burigede Liu, and Anima Anandkumar. Fourier neural operator with learned deformations for PDEs on general geometries. Journal of Machine Learning Research , 24(388):1–26, 2023. [59] Bahador Bahmani, Somdatta Goswami, Ioannis G. Kevrekidis, and Michael D. Shields. A resolution independent neural operator. Computer Methods in Applied Mechanics and Engineering , 444:118113, 2025. [60] Amanda A. Howard, Mauro Perego, George Em Karniadakis, and Panos Stinis. Multifidelity deep operator networks for data-driven and physics-informed problems. Journal of Computational Physics , 493:112462, 2023. [61] Sifan Wang, Hanwen Wang, and Paris Perdikaris. Learning the solution operator of parametric partial differential equations with physics-informed DeepONets. Science Advances , 7(40):eabi8605, 2021. [62] Somdatta Goswami, Minglang Yin, Yue Yu, and George Em Karniadakis. A physics-informed variational DeepONet for predicting crack path in quasi-brittle materials. Computer Methods in Applied Mechanics and Engineering , 391:114587, 2022. [63] Sidi Wu, Aiqing Zhu, Yifa Tang, and Benzhuo Lu. Solving parametric elliptic interface problems via interfaced operator network. Journal of Computational Physics , 514:113217, 2024. [64] Xiaoxue Bi, Xin Chen, Chuang Zhao, Qiang Li, and Jian Zhang. XI-DeepONet: An operator learning method for elliptic interface problems. Journal of Computational Physics , 538:114164, 2025. 27 A PREPRINT 
+
+[65] Xinliang Liu, Bo Xu, Shuhao Cao, and Lei Zhang. Mitigating spectral bias for the multiscale operator learning. 
+
+Journal of Computational Physics , 506:112944, 2024. [66] David Gottlieb and Steven A. Orszag. Numerical Analysis of Spectral Methods: Theory and Applications . Society for Industrial and Applied Mathematics, Philadelphia, PA, 1977. [67] Claudio Canuto, M. Youssuff Hussaini, Alfio Quarteroni, and Thomas A. Zang. Spectral Methods: Fundamentals in Single Domains . Springer, Berlin, Heidelberg, 2006. [68] Zhongshu Xu, Yuan Chen, and Dongbin Xiu. Chebyshev feature neural network for accurate function approxima-tion, 2024. [69] Pengfei Yin, Shuai Ling, and Wenjun Ying. Chebyshev spectral neural networks for solving partial differential equations, 2024. [70] V. S. Fanaskov and I. V. Oseledets. Spectral neural operators. Doklady Mathematics , 108:S226–S232, 2023. [71] Ziyuan Liu, Haifeng Wang, Hong Zhang, Kaijun Bao, Xu Qian, and Songhe Song. Render unto numerics: Orthogonal polynomial neural operator for PDEs with nonperiodic boundary conditions. SIAM Journal on Scientific Computing , 46(4):C323–C348, 2024. [72] Mario Ohlberger and Stephan Rave. Reduced basis methods: Success, limitations and future challenges. In 
+
+Proceedings of the Conference Algoritmy , pages 1–12, 2016. [73] Kookjin Lee and Kevin T. Carlberg. Model reduction of dynamical systems on nonlinear manifolds using deep convolutional autoencoders. Journal of Computational Physics , 404:108973, 2020. [74] Dan Hendrycks and Kevin Gimpel. Gaussian error linear units (GELUs), 2016. [75] Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization. In International Conference on Learning Representations (ICLR) , 2015. 
+
+# A Proof of Proposition 3.1 
+
+With Mi = M0/Σi, sum Eq. (5) against Mi:
+
+> 3
+
+X
+
+> i=1
+
+Miμi = M0
+
+ 12 
+
+ε
+
+X
+
+> i
+
+1Σi
+
+∂F 0
+
+∂c i
+
+− 4Σ T
+
+ε
+
+X
+
+> i
+
+1Σi
+
+! X
+
+> j
+
+1Σj
+
+∂F 0
+
+∂c j
+
+− 34 ε X
+
+> i
+
+∇2ci
+
+ . (37) By Eq. (2), P 
+
+> i
+
+Σ−1 
+
+> i
+
+= 3 /ΣT , so the second bracketed term equals 12 
+
+> ε
+
+P 
+
+> j
+
+Σ−1 
+
+> j
+
+∂cj F0 and cancels the first exactly; the third vanishes whenever Eq. (1) holds. Hence P 
+
+> i
+
+Miμi ≡ 0. Summing Eq. (4) over i and using ∇· u = 0 ,
+
+∂t
+
+ X 
+
+> i
+
+ci
+
+
+
++ u·∇ 
+
+ X 
+
+> i
+
+ci
+
+
+
+= ∇2 X 
+
+> i
+
+Miμi
+
+
+
+= 0 , (38) so P 
+
+> i
+
+ci ≡ 1 is propagated exactly. The cancellation carries to the discrete level provided the same discrete Laplacian is used in Eq. (5) and Eq. (4), which holds for the scheme of Section D; the discrete statement is Theorem E.1. ■
+
+# B Spectral properties of the Chebyshev dictionary 
+
+This appendix sources the conditioning claim of Section 4.4 and reports the deviation from it on the grid actually used. 
+
+B.1 Exact orthogonality 
+
+The Chebyshev polynomials satisfy 
+
+Z 1
+
+> −1
+
+Tm(ξ)Tn(ξ)
+
+p1 − ξ2 dξ =
+
+
+
+0, m̸ = n, π, m = n = 0 ,π/ 2, m = n ≥ 1,
+
+(39) and tensorization preserves this: with w3(ξ) = Q
+
+> d
+
+(1 − ξ2 
+
+> d
+
+)−1/2,
+
+Z
+
+> [−1,1] 3
+
+Φklm Φk′l′m′ w3 dξ = γkγlγm δkk ′ δll ′ δmm ′ , γ0 = π, γ n≥1 = π/ 2. (40) 28 A PREPRINT 
+
+The discrete counterpart is what the embedding actually sees. On an m-point Gauss–Chebyshev set ξq = cos  (q + 
+
+> 12
+
+)π/m  the relation 
+
+1
+
+m
+
+> m
+
+X
+
+> q=1
+
+Tj (ξq )Tn(ξq ) = γn δjn , γ0 = 1 , γn≥1 = 12 , (41) holds exactly for j, n < m , so on the tensor product of such sets the empirical Gram matrix 
+
+G = 1
+
+Q
+
+> Q
+
+X
+
+> q=1
+
+ϕ(ζq ) ϕ(ζq )⊤ (42) is diagonal with entries γkγlγm ∈ { 1, 12 , 14 , 18 }. The extreme values are attained by Φ000 and by any mode with all three indices nonzero, both of which the graded set A contains, so 
+
+κ(G) = 11/8 = 8 (43) independently of dtrunk , of K, and of any random draw, and rescaling each mode by γ−1/2 
+
+> α
+
+gives κ(G) = 1 exactly. We confirm Eq. (43) numerically: with K = 10 the off-diagonal entries of the one-dimensional Gram matrix are at most 1.8 × 10 −16 and κ = 2 per axis, hence 23 = 8 in three dimensions. 
+
+B.2 Conditioning on the uniform query grid 
+
+The query set is sampled uniformly rather than under the weight w(ξ), so Eq. (41) does not apply. Evaluated directly with K = 10 , the per-axis condition numbers are 15 .1, 13 .7 and 5.2, and the graded 256 -mode dictionary gives 
+
+κ(G) ≈ 2.7 × 10 2, κ(G) ≈ 74 after diagonal rescaling , (44) against 8 and 1 under the orthogonality weight. This is a property of the sampling measure, not of the resolution: refining the grid drives the per-axis figure to 13 .51 rather than to 2, since R 1 
+
+> −1
+
+TmTn dξ ̸ = 0 in general (for instance 
+
+R T0T2 dξ = − 23 ). Two consequences. First, Eq. (43) is the orthogonal-weight value rather than the value in force during training, the realized whitening being weaker by about a factor of thirty. What the argument of Section 4.4 needs is untouched: a Gram matrix that is fixed, deterministic, seed-identical and bandwidth-free, which Eq. (44) still is, where Section C shows the Fourier alternative varies over twenty orders of magnitude with a parameter that must be chosen in advance. Second, normalized Legendre polynomials ˜Pn = √2n + 1 Pn are orthogonal under the uniform measure and give 
+
+κ(G) = 1 .15 per axis, 1.53 in three dimensions. Nothing in our mechanism selects Chebyshev over Legendre within the polynomial family, and the comparison is untested here. 
+
+# C Spectral properties of the random Fourier dictionary 
+
+The claims made for the Fourier embedding are comparative, so they need the same treatment as Section B. 
+
+C.1 Induced kernel 
+
+With Bij ∼ N (0 , σ 2 
+
+> B
+
+), the identity sin a sin b + cos a cos b = cos( a − b) gives 
+
+1
+
+M ϕF(ζ)⊤ϕF(ζ′) = 1
+
+M
+
+> M
+
+X
+
+> j=1
+
+cos 
+
+
+
+2πb⊤ 
+
+> j
+
+(ξ − ξ′)
+
+
+
+−−−−→  
+
+> M→∞
+
+exp 
+
+
+
+− 2π2σ2 
+
+> B
+
+ξ − ξ′ 2
+
+, (45) a Gaussian kernel of length scale (2 πσ B )−1 [37]. Three properties contrast with the polynomial dictionary. It is stationary, so the prior is identical at the walls and in the interior, where the polynomial prior is maximal at the corners of [−1, 1] 3; on this problem that difference is inert, since the error is smallest at the walls for every model (Section 5.2). It is isotropic, so one scalar sets the resolvable scale on all three axes, a strong assumption for a field whose structure in 
+
+t is a drift and in x a thin neck, and the reason Eq. (22) is a fairness condition rather than a convention. And it is built from functions periodic on the embedding scale, which is the mechanism quantified in Section C.3. 29 A PREPRINT 
+
+Table 8: Conditioning of the Fourier feature Gram matrix on the query grid ( M = 128 ). The graded Chebyshev dictionary on the same grid gives κ(G) ≈ 2.7 × 10 2 with no parameter to select. 
+
+σB 0.05 0.25 0.5 1.0 2.0 4.0 8.0
+
+κ(G) 2 × 10 20 5 × 10 15 5 × 10 8 3.1 × 10 2 3.4 1.5 2.3
+
+C.2 Conditioning and its bandwidth dependence 
+
+Distinct frequency rows are uncorrelated and E[sin 2] = E[cos 2] = 12 , so E[G] = 12 I: the dictionary is whitened in expectation . What the optimizer sees is the realized G, which depends sharply on σB (Table 8). As σB → 0 the features collapse toward rank one and G becomes singular to single precision; near σB = 4 the dictionary is better conditioned than the polynomial one by two orders of magnitude. Both facts together are the point: the polynomial dictionary is not uniformly better conditioned, it is unconditionally conditioned, its κ being a fixed number known before training where the Fourier value sweeps twenty orders of magnitude across a parameter chosen without knowing the answer. Seed dependence compounds this: at σB = 1 , six draws of B give κ between 3.1 × 10 2
+
+and 4.0 × 10 3. The polynomial dictionary is bit-identical across seeds, so the two embeddings should not be expected to have comparable seed variance. 
+
+C.3 The cost of a monotone trend 
+
+Section 5.1 attributes the divergence between the embeddings on the large-region concentration fields to trend repre-sentation. Fitting f (ξ) = ξ in least squares on the wall-normal grid, the first two Chebyshev modes give a relative residual of 6 × 10 −17 — exact, since T1 = ξ. Two Fourier features at the same budget give 6.9 × 10 −3 at σB = 0 .5,
+
+2.8 × 10 −2 at 1, 1.2 × 10 −1 at 2 and 6.3 × 10 −1 at 4; reaching 10 −3 takes 8 features at σB = 1 and 16 at σB = 2 . The temporal grid gives the same figures to two digits. The residual grows with bandwidth while the conditioning of Table 8 improves with it, so within the Fourier family no single σB serves both and the trade-off is structural rather than a matter of tuning. The magnitudes are a few percent of the trend, which is the right scale to explain the per-channel gap of Table 4; it would not explain an order of magnitude, and we do not claim one. 
+
+# D The DCT-II Poisson and Helmholtz solves 
+
+On a uniform cell-centred grid Nx ×Ny with spacing h and homogeneous Neumann conditions, the five-point Laplacian is diagonalized by the type-II DCT: with b· the two-dimensional DCT-II, 
+
+\(∇2
+
+> h
+
+f )mn = λmn bfmn , λmn = 2
+
+h2
+
+
+
+cos 
+
+ πm Nx
+
+
+
++ cos 
+
+ πn Ny
+
+
+
+− 2
+
+
+
+. (46) Both the pressure Poisson solve and the linear implicit part of the Cahn–Hilliard update reduce to elementwise division by a known function of λmn , with the λ00 = 0 mode handled by fixing the mean, at O(NxNy log NxNy ) per solve and with no iteration. The implicit Cahn–Hilliard operator is a polynomial in ∇2 
+
+> h
+
+(Eq. (47)), so the same transform pair serves both and each species costs two DCTs per step. 
+
+# E The benchmark dataset 
+
+This appendix specifies the reference solver and the ensemble. With Tables 9 and 10 it reproduces the benchmark completely. 
+
+E.1 Solver 
+
+The discretization is staggered (MAC) finite differences on a uniform grid, second-order centred in space, first order in time, explicit for momentum and for the Cahn–Hilliard nonlinearity and implicit for its linear part. Three choices make an ensemble of this size affordable while preserving the structure of Section 3.3. The first exploits the boundary conditions. Under Eq. (9) every scalar satisfies a homogeneous Neumann condition, so the discrete Laplacian is diagonalized exactly by the DCT-II (Section D) and both the pressure Poisson equation and the 30 A PREPRINT 
+
+linear Cahn–Hilliard update become one-shot solves, with no iteration, no tolerance and no run-to-run variability in cost. The second scales the mobility and stabilization so that all three species share one implicit operator. With Mi = M0/Σi
+
+and Si = S0Σi, both MiΣi = M0 and MiSi = M0S0 are species-independent, so 
+
+
+
+I − ∆t M 0S0∇2 
+
+> h
+
++ 34 ∆t M 0 ε ∇4
+
+> h
+
+
+
+c n+1  
+
+> i
+
+=
+
+
+
+I − ∆t M 0S0∇2
+
+> h
+
+
+
+c ni + ∆ t
+
+h
+
+− ∇ h · u nc ni
+
+ + Mi∇2
+
+> h
+
+N ni
+
+i
+
+(47) has the same left-hand operator for every phase. This is what carries Theorem 3.1 to the discrete level. 
+
+Proposition E.1 (Discrete simplex preservation) Let Mi = M0/Σi and Si = S0Σi, let the face-interpolated phase fields in the advective flux be linear in c, and let ∇h ·u n = 0 . If P 
+
+> i
+
+c ni = 1 pointwise, then P 
+
+> i
+
+c n+1  
+
+> i
+
+= 1 pointwise. Proof. Sum Eq. (47) over i. The left operator and the first right operator are species-independent, so they act on P 
+
+> i
+
+c n+1  
+
+> i
+
+and P 
+
+> i
+
+c ni . The explicit potential contributes ∇2
+
+> h
+
+(P 
+
+> i
+
+MiN ni ) = 0 by Eq. (10), pointwise and unconditionally. Linear interpolation commutes with the sum, so the advective fluxes sum to u n and their divergence vanishes. Hence 
+
+L(P 
+
+> i
+
+c n+1  
+
+> i
+
+) = L(P 
+
+> i
+
+c ni ) with L invertible, and Eq. (48) gives P 
+
+> i
+
+c 0 
+
+> i
+
+= 1 . □
+
+The third concerns the pressure. Variable density would destroy the constant-coefficient Poisson structure, so we use the split of [16] with ρ0 = min i ρi and a lagged pressure ˆp, iterated three times per step. One detail interacts with Theorem E.1: the velocity correction must reuse the same ˆp that entered the Poisson right-hand side, since substituting the converged pressure into both terms leaves ∇h ·u n+1 = O(10 −5) and destroys the exact simplex property. None of the three introduces data-dependent control flow, so the whole step is fused into one jitted JAX [47] kernel and vmap ped over members: one compilation serves all 1,024 runs, completed in 37 minutes. The scheme being explicit in advection, viscosity and capillarity, the binding stability limit over the whole design box is viscous, 
+
+∆t ≤ 0.2h2/ν max = 4 .60 × 10 −4 at Re = 20 , against 1.72 × 10 −3 for the capillary limit, so ∆t = 2 .5 × 10 −4 retains a 1.8× margin. Table 9: Discretization, fixed physical quantities and cost. With Table 10 this specifies the benchmark completely. Domain Ω (0 , 1) × (0 , 2.5) 
+
+Simulation grid 128 × 320 (h = 1 /128 )Output grid (2 × block mean) 64 × 160 
+
+Bubble diameter d 0.25 
+
+Interface height yint 0.9
+
+Gravity g, water density ρw 0.98 , 1
+
+Velocity scale U = √gd 0.4950 
+
+Interface thickness ε = 4 h = 3 .125 × 10 −2 (Cn = ε/L x)Mobility Mi = M0/Σi, M0 = 10 −3 U εL x = 1 .55 × 10 −5
+
+CH stabilization Si = S0Σi, S0 = 24 /ε = 768 
+
+Triple-well penalty Λ = 0 
+
+Kinematic viscosity ratio νa/ν w = 2 
+
+Pressure sub-iterations 3
+
+Time step ∆t 2.5 × 10 −4 (viscosity limited) Steps to t = 4 16 ,000 
+
+Snapshots 33 , spacing ∆tout = 0 .125 
+
+Ensemble wall clock 37 min for 1,024 runs 
+
+E.2 Initial condition and ensemble design 
+
+Each member starts at rest with a circular air bubble of radius d/ 2 centred at (xb, y b) beneath a flat interface at yint .With δ(x) = ∥x − (xb, y b)∥ − d/ 2,
+
+c0 
+
+> a
+
+= 12
+
+h
+
+1 − tanh  2δ/ε i
+
+, c0 
+
+> w
+
+=  1 − c0
+
+> a
+
+ · 12
+
+h
+
+1 − tanh  2( y − yint )/ε i
+
+, c0 
+
+> o
+
+= 1 − c0 
+
+> w
+
+− c0
+
+> a
+
+, (48) the third field by affine closure exactly as in the surrogate (Eq. (19)), so Theorem E.1 applies from the first step. Because Eq. (48) is a closed-form function of π, the surrogate’s nonzero error at t = 0 (Section 5.3) is pure trunk representation error. 31 A PREPRINT 
+
+The design is a scrambled Sobol sequence [46] of N = 1 ,024 = 2 10 points over the nine parameters of Table 10, drawn in a single base-two call so the balance properties are preserved. Because Eq. (12) guarantees Σi > 0 over the whole box, no draw is rejected and the realized design is exactly the low-discrepancy sequence. The domain height was set by a pre-flight run of the corner most likely to reach the lid, which puts the plume tip at y = 1 .23 at t = 4 against 
+
+Ly = 2 .5.Table 10: The nine Sobol design variables and their sampling ranges. Parameters 1–3 control capillarity and wetting, 4–7 the material contrasts, 8–9 the initial bubble placement. # Symbol Meaning Range Sets 1 Eo Eötvös number ρwgd 2/σ aw [5 , 40] σaw 
+
+2 Re Reynolds number ρwU d/η w [20 , 70] ηw
+
+3 s normalized oil spreading coeff. Σo/σ aw [0 .02 , 0.50] σao 
+
+4 row tension ratio σow /σ aw [0 .30 , 0.70] σow 
+
+5 ρo/ρ w oil-to-water density ratio [0 .70 , 0.95] ρo
+
+6 ρa/ρ w air-to-water density ratio [0 .01 , 0.10] ρa, η a
+
+7 ηo/η w oil-to-water viscosity ratio [0 .5, 3.0] ηo
+
+8 yb initial bubble centre height [0 .35 , 0.50] IC 9 xb initial bubble centre lateral position [0 .45 , 0.55] IC 
+
+E.3 Diagnostics, well-posedness and known imperfections 
+
+Four scalar diagnostics are stored at every snapshot, 
+
+ybubble =
+
+R 
+
+> Ω
+
+ca y d x
+
+R 
+
+> Ω
+
+ca dx , Asharp = {x : ca(x) > 12 } , (49) 
+
+Vplume =
+
+Z
+
+> y>y int
+
+cw dx, ytop = max y > y int : max x cw(x, y ) > 0.3 , (50) serving two purposes: they verify that the ensemble is well posed as an operator-learning target, and they provide the accuracy measures of Section 5.4. 
+
+Figure 9: Ensemble diagnostics across all members, from Eqs. (49) and (50). The response surfaces are smooth and non-bifurcating: every member follows the same qualitative sequence — rise, deform, breakthrough, entrain, detach. Figure 9 shows what Eq. (15) requires: a sweep across Eo ∈ [5 , 40] gives a monotone response, with every case crossing the interface and entraining a plume, so the design contains a single topological class and G is single-valued. It is also a limitation, since the surrogates are never tested near a regime boundary. Influence is deliberately non-uniform — a one-at-a-time study ranks Eo (15 .8% ), Re (12 .8% ), ρo (12 .3% ), ηo (9.1% ), ρa (6.3% ), row (3.0% ) and s (1.4% ) — since a surrogate’s ability to ignore a nuisance direction is worth testing. The placement parameters register 18% and 
+
+9.5% , but these are artifacts of a pointwise metric under translation and are not physical sensitivities. Each run is stored at 33 snapshots over t ∈ [0 , 4] , coarsened by a 2 × 2 block mean to 64 × 160 , five channels in single precision, with velocities interpolated from MAC faces to cell centres first. Block averaging is linear, so the simplex constraint survives it exactly; discrete incompressibility does not, and the stored velocities are divergence free only to interpolation accuracy — a caveat for anyone imposing ∇· bu = 0 on the coarse grid. 32 A PREPRINT 
+
+Two imperfections bear on Section 5. The simplex drift is small but nonzero, at most 2.1 × 10 −4 over the ensemble, consistent with single-precision accumulation over 16 ,000 steps; it is a floating-point residual, and it sets the bar against which the surrogate’s own violation is reported. And the bubble slowly dissolves: measured by Asharp , the ensemble loses 15% of its initial bubble area on average by t = 4 . This is the Ostwald-ripening-like dissolution of small features under Cahn–Hilliard dynamics at finite ε and mobility, a property of the diffuse-interface model that constitutes the learning target rather than a defect of the solver, and the price of ε = 4 h, which is what allows 1,024 members in 37 
+
+minutes. 33

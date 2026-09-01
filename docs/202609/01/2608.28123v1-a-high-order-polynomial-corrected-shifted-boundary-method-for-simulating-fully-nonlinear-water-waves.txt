@@ -1,0 +1,1001 @@
+Title: A high-order polynomial-corrected shifted boundary method for simulating fully nonlinear water waves
+
+URL Source: https://arxiv.org/pdf/2608.28123v1
+
+Published Time: Mon, 31 Aug 2026 00:46:10 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+# A HIGH -ORDER POLYNOMIAL -CORRECTED SHIFTED BOUNDARY METHOD FOR SIMULATING FULLY NONLINEAR WATER WAVES 
+
+AN AR XIV PREPRINT 
+
+Jens Visbech 
+
+Department of Applied Mathematics and Computer Science Technical University of Denmark 2800, Kgs. Lyngby 
+
+jvis@dtu.dk 
+
+Allan P. Engsig-Karup 
+
+Department of Applied Mathematics and Computer Science Technical University of Denmark 2800, Kgs. Lyngby 
+
+apek@dtu.dk 
+
+Harry B. Bingham 
+
+Department of Civil & Mechanical Engineering Technical University of Denmark 2800, Kgs. Lyngby 
+
+hbbi@dtu.dk 
+
+Mario Ricchiuto 
+
+INRIA, Univ. Bordeaux, CNRS, Bordeaux INP, IMB, UMR 5251, 200 Avenue de la Vieille Tour, 33405 Talence cedex, France 
+
+mario.ricchiuto@inria.fr 
+
+August 31, 2026 
+
+# ABSTRACT 
+
+We present a novel unfitted computational framework for simulating fully nonlinear potential flow-based water waves. Focusing on wave propagation, we describe the core methodology, which involves a high-order polynomial-corrected shifted-boundary approximation on unfitted spectral elements. This approach allows for the simulation of a curved, highly time-dependent (moving and deforming) free surface affected by bathymetric changes. All that on a simple Cartesian background mesh without re-meshing or further approximations of non-affine geometric features. In addition, we highlight the importance of proper gradient recovery using a polynomial-preserving technique to accurately capture the vertical free-surface velocity. Ultimately, the goal is to develop a high-order convergent numerical scheme capable of simulating highly nonlinear waves over long periods. This is achieved through an arbitrary-order finite-difference approximation of the free surface combined with added hyperviscosity for numerical stability. We present verification and validation test cases for wave propagation in both periodic and finite domains. Emphasis is placed on convergence studies, the justification for using high-order approximations, the importance of optimal gradient recovery, long-time simulation of highly nonlinear waves, and nonlinear wave interactions with both affine and curved bathymetry changes, as well as with vertical walls, for highly nonlinear stream function waves and high-amplitude solitons. The novel computational model offers a comprehensive, all-in-one framework for simulating ocean waves and their interactions with offshore structures. It provides significant geometric flexibility, enabling boundaries such as the free surface to move and deform over time without the need to re-mesh a boundary-fitted mesh. 
+
+Keywords High order method · Shifted boundary method · Polynomial correction · Unfitted method · Fully nonlinear potential flow · Water waves · Polynomial-preserving gradient recovery · Spectral element method arXiv:2608.28123v1 [physics.flu-dyn] 28 Aug 2026 An arXiv Preprint VISBECH ET AL . (2026) 
+
+# 1 Introduction 
+
+As a supplementary method to physical testing in the laboratory or on a full scale in the ocean, numerical models have been used for decades to study wave propagation and wave-structure interaction [20, 34, 70]. Here, circumventing potential scaling issues and the time-consuming process of constructing, modifying, and running costly test campaigns by performing calculations entirely computationally. Consequently, numerical models have become essential tools for the development, design, and analysis of ocean engineering projects, enabling efficient simulations of floating offshore wind turbines, wave energy converters, coastal regions, and much more. However, reliance on simulations imposes significant demands on the numerical model in terms of i) physical representation and ii) numerical accuracy, efficiency, scalability, stability , and geometrical flexibility .Regarding the first requirement, we focus on which governing equations to use, as this sets an upper bound on how close we can be to the real physical truth. Here, the Navier-Stokes (NS) equations are widely recognized as the most precise description of fluid flow, but they also represent the most complex mathematical challenge and demanding computational problem to solve. In many cases, viscous effects are negligible, and a potential flow assumption can be invoked to greatly simplify the mathematical description. Additionally, assumptions and simplifications made to the governing equations and their domain set limits on expectations, such as the exclusion of moving structures or overturning waves. An example of this is the σ-transformation used in pure wave propagation problems, e.g., see [27, 48], where the fluid domain is mapped onto a simple, time-invariant domain. For the second requirement, we are concerned with selecting a numerical method to approximate the mathematical model (the physical representation). We want the numerical method to exhibit convergent error behavior as we refine the approximation resolution, e.g., by refining the mesh in mesh-based methods, increasing the order of the basis functions, or both. This is especially important if low dispersion errors (phase lag) are desired after long-time wave propagation, in which high-order numerical schemes are essential [46]. Furthermore, we want the computational cost of the numerical method to scale efficiently with increasing problem size, ideally linearly, such that doubling the number of degrees of freedom doubles the computational work. Equally important, the method should lend itself to efficient parallel computation on modern many-core architectures, for example, through scalable iterative solvers, thereby enabling large-scale simulations over long time periods [29]. The numerical method should also remain stable during temporal integration, ensuring that the solution remains bounded within the physical representation. Finally, applications to real-world problems require substantial geometric flexibility in how the numerical method represents the computational domain and its boundaries. These may be curved and geometrically complex, contain features and curvature spanning multiple length scales, and, in some physical problems, evolve significantly in time through motion, deformation, or even changes in topology. 
+
+1.1 Unfitted methods for an efficient, accurate, and flexible geometrical approximation 
+
+The modeling of free-surface flows is commonly approached using single-phase or two-phase formulations. In two-phase formulations, both fluids separated by the free surface, such as water and air, are explicitly represented. A widely used approach for capturing the interface in such formulations is the volume-of-fluid (VOF) method, which represents the interface using a volume-fraction field without requiring the computational mesh to conform to the free surface [41]. However, an accurate representation of the interface generally requires coupling the VOF formulation with a sharp-interface technique, either through post-processing or directly within the numerical formulation; see, e.g., [19, 63] and references therein. In this work, we focus on formulations that explicitly track the free surface in a single-phase formulation. To this end, we use the computational setting of embedded/unfitted boundary methods. Classical boundary-fitted methods use meshes that are conformal with all boundaries and interfaces. In contrast, in unfitted methods, the computational domain may be non-conforming with both physical interfaces and domain boundaries. In both approaches, we require a discrete geometrical representation of the domain, i.e., a mesh. For boundary-fitted methods, we have an exact representation (for affine domains using affine elements and for curved domains using curvilinear elements); however, this comes at the cost of re-meshing or mesh updating if the domain is time-dependent. This can be very time-consuming, and as the domain’s complexity increases, mesh generation becomes dependent on a sophisticated mesh generator and an experienced engineer to operate it. On the other hand, for unfitted methods, generally speaking, the approach is to decouple the mesh generation and the domain in two steps: i) generate a very simple Cartesian mesh and ii) immerse/embed the domain onto this mesh. Then, the last step is to incorporate the appropriate geometric representation and the boundary conditions for the chosen mathematical problem. It is here that the various unfitted methods primarily differ. Building on Peskin’s 1970s work [61], the immersed boundary method (IBM) was introduced. The literature on immersed/embedded/unfitted methods is vast, and one can hardly mention all the methods. To name a few, we mention 2An arXiv Preprint VISBECH ET AL . (2026) 
+
+the ghost fluid method (GFM) [35], the cut finite element method (CutFEM) [13], the aggregated unfitted finite element method (AgFEM) [8], and very recently, the unfitted ϕ finite element method ( ϕ-FEM) [24]. Although all of the methods mentioned above avoid the need for boundary-fitted meshes, they differ in how they represent the true geometry and enforce boundary conditions. Earlier approaches, such as IBM and GFM, typically modify the governing equations or add forcing terms to handle immersed boundaries. More recent embedded finite element methods, including CutFEM and AgFEM, aim to perform computations on unfitted meshes while maintaining the accuracy, stability, and flexibility of standard finite element discretizations, even in the presence of cut elements or implicitly defined domains. The 
+
+small-cut-cell stability problem is well known, has led to many stabilization techniques (see [10, 12] and references therein), and has inspired some of the formulations mentioned above. Among the methods that allow one to sidestep this issue, we have the ϕ-FEM and the shifted boundary method (SBM), introduced by Main and Scovazzi [51, 52], with the latter methodological framework used as the basis in this work. In the SBM, instead of cutting the boundary intersecting elements, they are kept whole. The SBM then solves the problem on this artificial/approximate surrogate domain rather than on the actual true domain. This is done by modifying the boundary condition itself so that the modified condition on the surrogate domain is consistent with a high-order approximation of the true condition on the true boundary. More specifically, this is done using a unique mapping between points on the two boundaries and Taylor series expansions, ultimately consistently satisfying the boundary conditions while preserving optimal convergence. The SBM has matured in recent years, and its literature is vast. We refer to some of its main works [51, 52, 59, 68], with a high-order version in [5] and the weighted SBM (WSBM) in [17]. 
+
+1.2 Simulating waves using unfitted discretizations 
+
+For this work, we use the fully nonlinear potential flow (FNPF) approximation to simulate water waves [21]. With this, at each discrete time step/stage, we solve a Laplace problem in the fluid domain, coupled with two nonlinear free-surface boundary conditions that evolve in time. The FNPF formulation arises from the NS equations [29] and is subject to various assumptions about the fluid (incompressible, inviscid, and irrotational), and is regarded as a reasonable physical representation for modeling ocean waves and their interactions with offshore structures. Arguably, when a wave problem is applicable to FNPF and is solved efficiently, it can be multiple orders of magnitude faster than conventional VOF-based CFD simulations [62] at the same level of accuracy. When simulated, the geometrical features of the domain are altered at each discrete time step/stage due to moving, deforming, curved, and complex boundaries (free surface, bathymetry, structures, etc.), ultimately requiring re-meshing/updating at all times. Moreover, linear potential flow (LPF) is applicable if further simplifications can be made to the problem, such as a small wave height relative to the wavelength and small body motion relative to the body length [57]. Additionally, LPF offers additional orders-of-magnitude improvements in performance compared to the FNPF problem. The LPF is a simplified model formulation derived by assuming a small-amplitude wave, which eliminates the need for time-dependent mesh updates and the nonlinear terms in the FNPF formulation. Yet, it still poses challenges in representing the potentially curved and complex geometry of floating or submerged structures, necessitating unfitted discretizations. Focusing on the LPF and FNPF formulations, we review some of the advances that have been made for wave modeling on unfitted discretizations, including both pure wave propagation and wave-structure interactions: Building on [11, 27], where the finite difference method (FDM) is used to solve the FNPF wave problem, we have the work presented in [39, 45]. Here, an IBM approach was used to model wave propagation (through a σ-transform) and wave-structure interactions, e.g., using a wedge-shaped wave-maker to generate nonlinear waves [40]. Later extensions to these works are reported in [79, 80] for a finite Eulerian/Lagrangian non-transformed domain. Additionally, [44] recently presented a similar approach for modeling FNPF wave propagation using the FDM and the IBM. In [69], the IBM approach has also been combined with the harmonic polynomial cell (HPC) method, originally proposed in [67], to solve FNPF problems for wave–structure interaction. A partially unfitted approach is to use an overlapping grid (OG), in which the domain and boundaries have individual boundary-fitted meshes that overlap and are unfitted to each other [14]. This concept has also been combined with the FDM in [1, 2] to compute LPF radiation and diffraction problems, and in [3] to present preliminary results on FNPF computations with and without structures. Moreover, solving hydro-elastic problems in [82]. Combining both IBM and OG methodologies with the HPC method is the work in [37], which simulates nonlinear wave-making and surface-piercing wave-structure interactions. Considering fluid-structure interactions and free-surface flows (not solely in connection with FNPF or LPF) in the context of SBM: The shallow water equations are solved in [68] and the incompressible NS equations subject to a free surface are solved in [17, 77] using the WSBM approach. The high-order SBM was used in [6] to model interfaces for Lagrangian shock hydrodynamics. Moreover, the incompressible NS equations are modeled using an adaptive Octree-based technique with the SBM in [81]. Very recently, the LPF problem of estimating hydrodynamic coefficients 3An arXiv Preprint VISBECH ET AL . (2026) 
+
+(added mass and damping) in the frequency domain was solved in [55] using lower-order SBM, CutFEM, and AgFEM. As a follow-up, extensions to the WSBM are given in [54]. Even though FNPF wave propagation and wave-structure interaction pose highly time-dependent problems (with multiple curved, complex boundaries that move and deform over time), making them well-suited to unfitted domain discretizations, the literature review above indicates that this is a relatively underexplored research topic. 
+
+1.3 Paper contribution 
+
+Motivated by this realization, we introduce a new unfitted approach based on the SBM for modeling FNPF-based water waves. The new model presents itself as a high-order unfitted model employing a high-order spectral element-based polynomial-corrected shifted boundary approximation combined with optimal polynomial-preserving gradient recovery. The primary numerical discretization of the fluid domain is handled weakly using unfitted spectral elements to obtain a solution for the Laplace problem. Motivated by stability, the nonlinear free-surface conditions are handled strongly via a collocation scheme using arbitrary-order finite-difference approximations and added numerical hyperviscosity. We outline the entire methodology step by step, emphasizing the polynomial-corrected shifted boundary approximation, as the application of this unfitted approach is novel in the field of computational models for FNPF wave simulation. Several verification and validation tests are conducted in both periodic and finite wave tanks. These include: i) convergence studies, ii) speed-up measurements to justify using high-order methods instead of traditional low-order ones and underlining the importance of proper gradient recovery of the vertical free surface velocity, iii) long-term wave propagation simulations of highly nonlinear waves with and without wave generation and absorption zones, iv) the generation of high-order harmonics over a submerged bar, and v) nonlinear soliton interactions with a vertical wall and a half-circular bathymetry. This supports the validity of the proposed unfitted high-order wave model based on the methodology in [74]. Very preliminary results have been reported in [72, 73]; however, this work extends the initial results by improving gradient recovery, numerical stability, and accuracy, and by introducing new nonlinear test cases. This work can be seen as a stepping stone towards the inclusion of fully or partially submerged structures, ultimately providing a complete unfitted framework for simulating all wave propagation and wave-structure interaction problems using FNPF. 
+
+1.4 Outline 
+
+Following this section’s introduction, we present the continuous mathematical model in Section 2, defining the domain and the governing equations. Hereafter, we outline the numerical discretization of the fluid domain in Section 3 and the free surface in Section 4, covering topics such as the construction of the unfitted domain, the polynomial corrected shifted boundary approximation of the Laplacian, the discretization of the free surface, polynomial preserving gradient recovery, and time integration and stabilization. The paper’s main numerical results are discussed in sections 5 and 6, with additional material reported in the appendix. Finally, Section 7 summarizes the main results of the work and discusses perspectives and future directions. 
+
+# 2 Mathematical model 
+
+We consider a time-dependent, potentially curved, two-dimensional (2D) fluid domain denoted by Ω ∈ R2. The domain is spanned by the horizontal x-axis and the vertical z-axis, and is completely surrounded by its boundary ∂Ω = Γ ∈ R2.For this work, we partition Γ into: i) the time-dependent (moving and deforming) free surface, Γη , at z = η, where 
+
+η = η(x, t ) : Γ η × T 7 → R is the free surface elevation defined from z = 0 . Moreover, T : t ≥ 0 is the time domain. ii) the bathymetry, Γb, at z = −h, where h = h(x) : Γ b 7 → R is the height of the water column measured from z = 0 . iii) walls, Γw, defined vertically at the ends of Ω. iv) periodic boundaries, Γp, also defined vertically at the ends of Ω. With all of this, we have that Γ = Γ η ∪ Γb ∪ Γw ∪ Γp which completely encloses Ω. See Figure 1 for a conceptualization of the fluid domain and its boundaries. Structures (partially or fully submerged) can be included in this setting, yet this is not the focus of the present work. 
+
+2.1 Governing equations 
+
+We adopt a potential-flow approximation in two space dimensions, assuming the fluid is incompressible, inviscid, and irrotational. The fluid velocities, u = ( u, w ) = ( u(x, z, t ), w (x, z, t )) : Ω × T 7 → R2, can then be expressed as the gradient of a velocity potential, u = ∇ϕ, where ϕ = ϕ(x, z, t ) : Ω × T 7 → R with ∇ = ( ∂x, ∂ z ) being the gradient 4An arXiv Preprint VISBECH ET AL . (2026) !2
+
+!w !w
+
+!b
+
++
+
+z = !hz = 2
+
+x
+
+Figure 1: Illustration of the fluid domain, Ω, and its boundaries segments Γi with i ∈ { η, w, b}.operator on Ω. The mathematical problem is to find ϕ ∈ C2(Ω) by solving the Laplace problem as 
+
+∇2ϕ = 0 , in Ω, (1a) 
+
+ϕ = ϕη , on Γη , (1b) 
+
+∇ϕ · n = 0 , on {Γb, Γw}, (1c) 
+
+ϕ|x=xmin = ϕ|x=xmax , on Γp, (1d) where the subscript notation of " η" indicates variables defined in Ω, but also on Γη , e.g., the free surface velocity potential, ϕη = ϕη (x, t ) : Γ η × T 7 → R. Moreover, n = ( nx, n z ) = ( nx(x, z, t ), n z (x, z, t )) : Γ 7 → R2 is the outwards-facing normal vector to the boundary and any partition hereof. From the solution to the Laplace problem, we can compute the vertical free surface velocity, wη = wη (x, t ) : Γ η × T 7 → R, as wη = ∂z ϕ|z=η . This connects to the two coupled time-governing nonlinear free surface conditions, the kinematic and dynamic, on Zakharov form as 
+
+∂tη = wη − ∂xη∂ xϕη + wη ∂xη∂ xη, on Γη × T , (2a) 
+
+∂tϕη = −gη − 12 ∂xϕη ∂xϕη + 12 w2 
+
+> η
+
+(1 + ∂xη∂ xη), on Γη × T , (2b) where g = 9 .81 [m /s2] is the gravitational acceleration and ∂t denotes the time-derivative. A linearized version of (2) can be obtained by dropping all terms but the first on the right-hand side of both equations and applying them on z = 0 .
+
+2.1.1 Pressure and forces 
+
+Using Bernoulli’s equation, we can compute the local pressure, including both hydrostatic and dynamic contributions, at any point in the fluid domain. Integrating this over any wetted boundary, or partition hereof, denoted by S, gives the instantaneous force, F = ( Fx, F z ) = ( Fx(t), F z (t)) : T 7 → R2, as 
+
+F = −ρ
+
+Z
+
+> S
+
+
+
+gz + ∂tϕ + 12 ∇ϕ · ∇ ϕ
+
+
+
+n dS, in T , (3) where ρ = 1 , 025 [kg /m3] is the density of water and n is the normal vector to S.
+
+2.2 Wave initialization, generation, and absorption 
+
+In this work, we will consider two main configurations: a periodic wave tank with constant depth; a finite wave tank with the bathymetry changes. For the first case, we initialize our wave simulation with η and ϕη based on the stream function solution [36] to the FNPF model. For this, we specify the dimensionless dispersion parameter, kh , from which the depth, h, is computed, as the domain/wave length is fixed to L = 1 [m] such that the wave number k = 2 π/L is known. Moreover, we also specify the relative wave steepness, ε/ε max , between 0% and 100% to set the nonlinearity of the given wave. Here, ε = H/L is the actual wave steepness based on the wave height, H, and εmax is the maximum possible steepness before breaking. Lastly, the wave period is denoted by T and must satisfy the dispersion relation of the waves such that c = L/T .For the finite wave tank, solutions for η and ϕη are initialized to zero. We also consider solitary waves, which we initialize with the spectrally accurate method presented in [25]. This method provides solution values for η and ϕη
+
+on a grid different from what is used in this work; see Sections 3.5 and 4.1. We work around this by computing the soliton solution on a very fine grid and then spline-interpolating to our desired grid spacing, thereby preserving the 5An arXiv Preprint VISBECH ET AL . (2026) 
+
+method’s accuracy [25]. Wave generation and absorption are managed through relaxation zones [47]. We denote the generation and absorption zones as {Γg , Γa} ∈ Γη , and post-process the free surface variables at each timestep as 
+
+f = (1 − Cr )f + Cr ftrue , with f ∈ { η, ϕ η } and Cr = Cr (x, y ) : Γ η 7 → R is the relaxation shape function. For Cr , we employ a high-order step function as Cr = 6 ζ5 − 15 ζ4 + 16 ζ3, with 
+
+ζ = |(x − x0) − Lg |
+
+Lg
+
+, for x0 ≤ x ≤ x0+Lg , and ζ = |(x − xend ) + La|
+
+La
+
+, for xend −La ≤ x ≤ xend , (4) where x0 and xend are the beginning and end of the domain, respectively, and Lg and La are the length of the generation and absorption zone, respectively. In Γg , ftrue is the actual stream function wave solution, [36], whereas ftrue = 0 
+
+outside. The wave generation is gradually (linearly) ramped up over five wave periods to minimize the potential impulsive behavior of the system. 
+
+# 3 Numerical discretization: The fluid domain 
+
+In the following section, we outline the numerical discretization of the fluid domain and the Laplacian in the context of a high-order polynomial corrected shifted boundary approximation on an unfitted computational domain. 
+
+3.1 Construction of the unfitted domain 
+
+We start out by denoting a conformal computational domain by Ωh and an unfitted computational domain by eΩh. It is possible that Ω = Ω h, at least when Ω has piecewise polynomial boundaries. Conversely, we always have Ω̸ = eΩh.From now on, we refer to Ω as the true domain, and to eΩh as the unfitted surrogate domain. To construct eΩh we follow the three steps hereafter: i) Define a regular, uniform background tesselation of non-overlapping finite elements denoted by Th, with clos (Ω) ⊆ T h. For this work, we solely consider quadrilateral elements. ii) Embed Ω onto Th, and use some kind of identification, e.g. level sets, to locate elements outside Ω as 
+
+T out  
+
+> h
+
+, inside Ω as T in  
+
+> h
+
+, or elements intersecting with the true boundary, Γ, as T on  
+
+> h
+
+. With this, we have that 
+
+Th = T out  
+
+> h
+
+∪ T in  
+
+> h
+
+∪ T on  
+
+> h
+
+.iii) The unfitted computational surrogate domain is now chosen to consist of interior elements only, i.e., eΩh = T in  
+
+> h
+
+;however, including T on  
+
+> h
+
+is also a possibility. To support the understanding of the steps given above, consult Figure 2. Here, the partitioning of Th into T out  
+
+> h
+
+, T in  
+
+> h
+
+, and 
+
+T on  
+
+> h
+
+is seen for a nonlinear free surface elevation profile, alongside, the final computational domain obtained using only 
+
+eΩh = T in  
+
+> h
+
+with the true and surrogate boundaries, Γ and eΓh, respectively. Having introduced the unfitted computational domain, we have the following geometrical representation 
+
+eΩh =
+
+> Nelm
+
+[
+
+> n=1
+
+T nh , (5) with T nh being the n’th element from the initial background tesselation Th. Moreover, we denote by x = ( x, z ) a point on the true boundary Γ, and ex = ( ex, ez) a point on the surrogate boundary, eΓh. On Γ, we have the aforementioned outward-pointing normal, n, and its associated tangent, t = ( tx, t z ) = ( tx(x, z, t ), t z (x, z, t )) : Γ 7 → R2. Similarly on 
+
+eΓh, the outward-pointing surrogate normal is defined as en = ( enx, enz ) = ( enx(ex, ez), enz (ex, ez)) : eΓh 7 → R2.
+
+3.2 The shifted boundary method 
+
+As mentioned in Section 1, the shifted boundary methodology was first introduced by Main and Scovazzi in [51, 52] to solve boundary value problems with unfitted finite elements. The key idea is to solve the mathematical problem in question in the unfitted surrogate domain, eΩh, instead of the true domain, Ω. This is done by modifying the governing equations (typically through a weak Nitsche-type penalty approach), and shifting the data of the boundary conditions accordingly between Γ and eΓh. The shift is performed with two main ingredients: i) a unique mapping between true and surrogate boundary points and ii) Taylor series expansions of an appropriate order matching the intended approximation order, e.g., second order for the classical FEM. This has been shown (also for higher-order approximations) to preserve the expected optimal convergence order when applied consistently [5]. 6An arXiv Preprint VISBECH ET AL . (2026) T in h  
+
+> Tout h
+> Ton h
+> e+h
+> e!h
+> !
+
+Figure 2: Illustration of the final unfitted computational domain (bottom plot) and the construction hereof (top plot). Depicted free surface profile of a highly nonlinear stream function wave ( kh = 1 , ε/ε max = 90% ). As mentioned, a crucial ingredient in the shifted boundary approach is the mapping between the surrogate and true boundaries, eΓh and Γ, defined as 
+
+M(ex) : eΓh 7 → Γ, ex 7 → x. (6) A lot of freedom is related to x = M(ex). For this work, we use a purely vertical mapping for the free surface boundary, whereas for other boundaries (walls and bathymetry), we map along the true normal direction. 
+
+3.3 Laplace problem in variational form 
+
+For the sake of completeness, we consider a conformal boundary-fitted representation of Ω and Γ, given by Ωh and 
+
+Γh. In this setting, we want a variational formulation of the Laplace problem in (1) in terms of an Aubin-type penalty method [7]. Here, we recast the strong formulation and weakly seek to find ϕh ∈ V Ph given 
+
+a⟨ϕh, v h⟩ = b⟨vh⟩, ∀vh ∈ V Ph , (7) where a⟨ϕh, v h⟩ and b⟨vh⟩ denote the bilinear and linear forms, respectively, and vh is a test function from the following finite element space of piecewise continuous polynomials of degree p
+
+Vph = {vh ∈ C0(Ω); ∀n ∈ { 1, . . . , N elm }, v h|T nh ∈ Pp(T nh )}. (8) Furthermore, the bilinear and linear forms are given by 
+
+a⟨ϕh, v h⟩ = ( ∇ϕh, ∇vh)Ωh + τ (ϕh, v h)Γηh − (∇ϕh · n, v h)Γηh , (9a) 
+
+b⟨vh⟩ = τ (ϕη , v h)Γηh + ( qi, v h)Γi 
+
+> h
+
+, (9b) where (a, b )S = R 
+
+> S
+
+a · b dS is the classical L2 inner product over some set S. Moreover, we have adopted implicit summation over i ∈ { b, w}, with qi being the Neumann flux on the corresponding boundary. For this work, qi = 0 , but it is kept for the purpose of clarity. Note that periodic boundaries are imposed strongly by imposing continuity between the two domain ends. Lastly, τ is the penalty parameter that governs the stabilization term in the formulation. Now, we make the change from a conformal to an unfitted mesh, i.e., Ωh → eΩh, and naively state the bilinear and linear form as 
+
+a⟨ϕh, v h⟩ = ( ∇ϕh, ∇vh)eΩh + τ (ϕh, v h)eΓηh
+
+− (∇ϕh · en, v h)eΓηh
+
+, (10a) 
+
+b⟨vh⟩ = τ ( eϕη , v h)eΓηh
+
++ ( eqi, v h)eΓi
+
+> h
+
+, (10b) 7An arXiv Preprint VISBECH ET AL . (2026) 
+
+where the unknown Dirichlet and Neumann conditions are defined as 
+
+eϕη = ϕh(ex), on eΓηh, (11a) 
+
+eqi = ∇ϕh(ex) · en, on eΓi
+
+> h
+
+. (11b) The next task is to determine the value of the boundary data, eϕη and eqi, on eΓh using ϕη and qi from Γ. By simply equating those, the methodology is limited to first order; hence, a more elaborate exercise must be carried out. 
+
+3.4 Polynomial corrected shifted boundary approximation 
+
+In the context of the original SBM, a second-order accurate truncated Taylor series is used to match the boundary data between the true and surrogate boundary, [51, 52]. Using only the mapping, M(ex), the SBM is able to enforce the correct boundary data, while preserving the right accuracy (second order) of the underlying finite element discretization. This approach has also been extended to high-order finite element spaces; see, e.g., [5], where high-order Taylor series are truncated at the proper order. However, this poses an impractical feature, namely, the increased number of terms included in the series, as the order and especially the spatial dimension increase. Motivated by this, a simplified formulation was given in [15], exploiting a polynomial correction that is equivalent to a high-order Taylor series. This methodology was extended to the Poisson problem using very high-order basis functions in [74] and very recently generalized in [16]. In the following, we use this methodology. Consult [16, 74] for the derivation of the polynomial correction for Dirichlet and Neumann boundary conditions. Ultimately yielding 
+
+eϕη = ϕη + ϕh − ϕh(x), on eΓηh, (12a) 
+
+eqi = enn(qi − ∇ ϕh(x) · n + ∇ϕh · n) + ent∇ϕh · t, on eΓih, (12b) where the following decomposition of the surrogate normals has been used to reach the end result 
+
+en = ( en · n)n + ( en · t)t = ennn + entt, (13) and, most importantly, it can be observed that known boundary data, ϕη and qi, from Γ are imposed by evaluating solutions from the unfitted domain at the true boundary, ϕh(x). The final variation statement reads 
+
+a⟨ϕh, v h⟩ = ( ∇ϕh, ∇vh)eΩh + τ (ϕh(M(ex)) , v h)eΓηh
+
+− (∇ϕh · en, v h)eΓηh
+
++ enn(∇(ϕh(M(ex)) − ϕh) · n, v h)eΓih
+
+− ent(∇ϕh · t, v h)eΓih
+
+, (14a) 
+
+b⟨vh⟩ = τ (ϕη , v h)eΓηh
+
++ enn(qi, v h)eΓih
+
+(14b) In the following we will simply use the notation x instead of M(ex), since on eΓh we have by definition x = M(ex).
+
+3.5 The spectral element method 
+
+To represent any variable on the computational fluid domain, we employ a high-order spectral element method (SEM). The polynomial-based approach dates back to Patera’s work in the 1980s [60]. Since then, the method has established strong theoretical support [42] and has been used to model a wide range of problems [78]. In the SEM, the global discrete solution, e.g., ϕh, can be expressed as Nelm local solutions, ϕnh , on each element as 
+
+ϕh =
+
+> Nelm
+
+M
+
+> n=1
+
+ϕnh , where ϕnh ≈
+
+> Nep
+
+X
+
+> m=1
+
+bϕnh,m Lm =
+
+> Nep
+
+X
+
+> i=1
+
+ϕnh,i li. (15) Here, each local solution is equivalently expressed using modal or nodal basis functions of up to degree p from (8). As we work on a Cartesian quadrilateral mesh, both bases are constructed as tensor products of 1D function spaces. Therefore, we have Nep = (1 + p)2 quadrature points on each element distributed as Gauss-Lobatto-Legendre (GLL). The modal side is made up of its coefficients, bϕnh,m , and Legendre polynomials, Lm. The nodal counterpart consists of the local solution values, ϕnh,i , and Lagrange polynomials, li. Following [38], a nodal spectral element Galerkin discretization of the Laplace problem (14) is obtained. This is done by defining elemental contributions and operations in terms of generalized Vandermonde matrices linking the nodal and modal expansions in (15). By inserting our polynomial representation from (15) into the final weak statement in (14) and adopting a Galerkin formulation by choosing our test functions vh, to equal our basis function, we construct a large linear system of equations, Aϕh = b. Here, A ∈ RN Ω  
+
+> dof ×NΩ
+> dof
+
+is a sparse system matrix containing element and boundary contributions from the bilinear part of (14), b ∈ RN Ω 
+
+> dof
+
+is a system vector containing boundary contributions from the linear part of (14), and ϕh ∈ RN Ω 
+
+> dof
+
+is the solution vector with N Ω 
+
+> dof
+
+= DoF (eΩh). For this work, we solve the linear system directly in MATLAB (version R2025b) using a standard Gaussian elimination procedure. 8An arXiv Preprint VISBECH ET AL . (2026) 
+
+3.5.1 Spectral elements for fully nonlinear potential flow wave modeling 
+
+Using high-order SEM to model wave propagation and wave-structure interactions within the FNPF framework has been under active development for the past decades [26, 28, 32, 33, 64, 71, 75], denoted FNPF-SEM in the following. As noted in [46], the key to computational efficiency for large-scale wave propagation, especially over long time durations, is high-order in accuracy. Modeling waves with an element-wise spectral expansion yields an accurate numerical solution with both h and p convergence strategies, and can be solved very efficiently; see, e.g., the p-multigrid approach in [31]. Moreover, scalability can be achieved on multi-CPU systems as well [33, 75]. Stabilization of the nonlinear free surface equations in (2), e.g., see Section 4.3.1 in the following, is typically dealt with using a combination of over-integration and mild modal filtering [28], and potentially re-meshing [32]. Note that all present FNPF-SEM models have exact geometrical representation through either a σ-transformation or re-meshing of curvilinear elements. With this, stabilization is solely associated with i) the nonlinear terms from (2) and ii) dealing with the intrinsic mesh-induced instability from asymmetric elements addressed in [64]. The solution for the latter is to use vertically aligned nodes near the free surface [28]. Nevertheless, almost all the proposed requirements from Section 1 are fulfilled for a reliable numerical model for FNPF wave modeling. The last untouched requirement is geometric flexibility, which, of course, is present in the FNPF-SEM methodology through boundary-fitted element tessellations. Yet if we want to include partially or fully submerged structures, which is impossible for [28] due to the σ-transform, it comes at a cost of re-meshing by adopting the non-transformed approach in [32]. Here, the domain is re-meshed to account for the time-dependent curved free surface by vertically stretching a top layer of curvilinear quadrilaterals. This stretching effectively ruins h-convergence for highly nonlinear waves, as the vertical maximum element size is bounded by the difference between the minimum and maximum free-surface elevation. Arguably, for engineering purposes, errors at machine precision are a bit excessive, but from a theoretical standpoint, this feature is important to achieve. Motivated by this, we continue outlining our unfitted methodology. In Section 5.2, we justify using high-order approximations compared to lower-order ones, especially for long-time wave propagation. 
+
+3.6 Fixed versus embedded discretizations 
+
+Modeling the FNPF wave problem with unfitted methodologies generally requires multiple objectives to be met. First and foremost, we need to capture the correct geometry of the problem (curved, complex, moving, deforming, etc.). When this is secured, we can focus on accuracy in both practical terms (e.g., engineering precision) and more theoretical terms. For the latter, and focusing solely on the free surface boundary, we need the embedded discretization as shown in Figure 2 to achieve a true fully h-convergent scheme. On the more practical side, the discretization strategy for the boundary-fitted FNPF-SEM models for pure wave propagation and interactions with bottom-mounted structures [26, 28, 32, 33, 75] often uses polynomials of order p ∈ { 3, . . . , 8} on relatively coarse meshes in the vertical direction. Arguably, acting like a hybrid between a linear multi-domain approximation (classical FEM) and a pure spectral single-domain approximation (classical spectral method). Typically, applying 1 ≤ Nz ≤ 4 elements in the vertical direction. Examples of this are given in the following: In [28], high-order harmonic generation over a submerged bar was performed using one single element, Nz = 1 , in the depth of order p = 6 , with good visual comparison to experimental data [9]. In [32], a nonlinear soliton wall collision and reflection was modeled with excellent agreement compared to data from [18] using Nz = 1 and p = 7 . In [26], a nonlinear wave interaction with a FPSO-type structure using Nz = 2 and various orders p ∈ { 3, 4, 5}. Ultimately, performing a comparable accuracy level as expensive CFD codes [62]. In [33], a nonlinear shoaling test was performed using Nz = 1 and p = 5 , showing good agreement with the experimental data. In [75], modeling nonlinear wave-structure interactions with a vertical cylinder using Nz = 4 
+
+and p = 5 , as well as wave interactions with a V-shaped breakwater. All showed very acceptable results when compared to other analytical/numerical/experimental data. The pattern is clear: The practical requirement for modeling FNPF wave propagation with high-degree spectral elements is limited to about 1 to 4 elements in the vertical direction using a moderate to high polynomial order of the basis functions. The reason is related to the accuracy of sufficiently resolving the vertical dispersion relation, only requiring a few elements [27, 29]. For the embedded discretization, depicted in Figure 2, to be useful, practically speaking, the vertical length scale of the free surface, lη = max( η) − min( η), should at least be greater than the vertical length of the elements, hz , near the free surface. In Figure 3, three waves of kh ∈ { 1, π, 2π} and a range of nonlinearity, 
+
+ε/ε max ∈ { 10% , 50% , 90% }, are showcased with their associated depths, h. Clearly, deeper water (larger kh ) yields a greater water column below the free surface, and higher nonlinearity increases the free-surface length scale, lη . Now, checking how many elements can fit between z = −h and z = min( η) for the three wave cases, before exceeding the limit of hz ≤ 1.5lη , as an estimate of when embedded refinements start to be possible. The minimum number of elements in the vertical direction is reported in Table 1, ultimately highlighting that for mild to moderate nonlinearity, the free surface embedding is not possible before a very fine mesh. For high nonlinearities, particularly in the shallow-water regime, fewer elements are needed before the limit is exceeded. The case using the fewest is for kh = 1 , with 9An arXiv Preprint VISBECH ET AL . (2026) L [m]    
+
+> 00.5 1
+> z [m]
+> -1 -0.8 -0.6 -0.4 -0.2 00.2
+
+kh = 1    
+
+> "=" max = 10%
+> "=" max = 50%
+> "=" max = 90%
+> h
+
+L [m]    
+
+> 00.5 1-1 -0.8 -0.6 -0.4 -0.2 00.2
+
+kh = :
+
+L [m]    
+
+> 00.5 1-1 -0.8 -0.6 -0.4 -0.2 00.2
+
+kh = 2 :
+
+Figure 3: The relative depths, h, of three waves, kh ∈ { 1, π, 2π}, with ε/ε max ∈ { 10% , 50% , 90% }.
+
+ε/ε max = 90% , fitting 3 elements, which is still within the vertical refinement level of the FNPF-SEM models reported in the literature. Table 1: Minimum number of elements in the vertical between z = −h and z = min( η) not exceeding hz ≤ 1.5ls.
+
+kh ε/ε max 1 π 2π
+
+10% 24 53 106 
+
+50% 5 10 21 
+
+90% 3 6 12 Motivated by this, we introduce a fixed unfitted discretization of eΓηh when the free surface surrogate boundary: i) is time-invariant, ii) forms a straight horizontal line, and iii) lies below min( η) at all times. Using the fixed discretization, we can still represent the moving, deforming, curved geometry of the free surface with reasonable accuracy in practical wave propagation problems, especially with higher polynomial orders. 
+
+# 4 Numerical discretization: The free surface 
+
+Next, we describe the numerical discretization of the free surface. To do this, we use a standard method-of-lines approach, in which the spatial discretization (employing a strong finite difference approximation) and the temporal discretization (using a standard explicit 4th-order, 4-stage Runge-Kutta scheme) are explained below, including considerations on gradient recovery and stabilization. 
+
+4.1 Arbitrary-order finite difference method 
+
+For the discretization of the nonlinear free surface equations in (2), we use classical finite difference operators as 
+
+Dx = ∂x. See the remark in Section 4.3.1 on the choice of the discretization basis of the free surface. This approach has been employed to simulate FNPF wave problems [11, 27, 48], where the free-surface conditions are approximated directly in strong form. We adopt the same nodal distribution as for spectral element discretizations, i.e., GLL points. Here, we assemble sparse finite difference operators of arbitrary order (at least matching p) on a non-uniform grid using Fornberg’s recursive weighting algorithm. Typically, we use central stencils of size r = α + β + 1 , where α and β
+
+denote the number of points used to the left and right of the central point, respectively. For central stencils, α = β, and for finite domains, we employ off-centered stencils near the boundaries, thus α̸ = β. In semi-discrete form, we have 
+
+∂tη = wη − DxηDxϕη + wη DxηDxη, (16a) 
+
+∂tϕη = −gη − 12 Dxϕη Dxϕη + 12 w2 
+
+> η
+
+(1 + DxηDxη), (16b) where Dx ∈ RN Γη   
+
+> dof ×NΓη
+> dof
+
+, {η, ϕη , wη } ∈ RN Γη 
+
+> dof
+
+, and N Γη 
+
+> dof
+
+= DoF (eΓηh).10 An arXiv Preprint VISBECH ET AL . (2026) 
+
+4.2 Polynomial preserving gradient recovery 
+
+In the FNPF formulation, the vertical free surface velocity, wη , serves as the dispersive link between the Laplace problem in (1) and the two free surface conditions in (2). Here, wη is a crucial component for achieving an overall accurate numerical scheme and is therefore vital for the model’s numerical stability. How we compute wη via gradient recovery is therefore of great importance. Gradient recovery, in the context of both low- and high-order finite elements, is a broad research area, with two main challenges being i) avoiding loss of accuracy when differentiating the primary variable (in this case, ϕ) and ii) preventing discontinuities at element interfaces. Our focus in this work is on the polynomial-preserving recovery (PPR) introduced in [56]. Recall how wη is related to ϕ, namely, wη = w|z=η = ∂z ϕ|z=η . As a baseline, let us introduce local recovery: An efficient way to compute wη is to loop over the top layer of elements in the mesh and compute a local approximation of 
+
+wnh = Dnz ϕnh , where Dnz is a local differential operator for the n’th element acting on the elements associated solution values ϕnh . Then, evaluate wnη,h = Pnwnh , where Pn is some local projection operator, e.g., for boundary-fitted domains, extracting the corresponding free surface values from the top of the element (i.e., a simple index operation), and for the unfitted domains considered in this work, extrapolating onto the true boundary. Although this approach is very efficient, it introduces the aforementioned two problems, i.e., loss of accuracy and discontinuities on element interfaces. Now, let’s introduce our PPR-inspired approach by assuming order p of the finite element polynomial space in (8). Then, considering each i free surface grid point, one by one, given as (xi, z i). For each point, we define a one-dimensional vertical least-squares polynomial of order q = p + 1 , denoted by f (s) and expressed as 
+
+f (s) = 
+
+> q
+
+X
+
+> j=0
+
+cj ψj (s), with s = z − zi, (17) and where cj is the j’th coefficient and ψj (s) is the j’th basis function taken from a monomial basis, such that 
+
+ψj (s) = sj , i.e., ψ0(s) = 1 , ψ1(s) = s, ψ2(s) = s2, etc. For the q’th order polynomial to be uniquely defined, we require q + 1 sampling points, s = [ s1, . . . , s q+1 ]T , taking as the q + 1 closest points to zi in the vertical direction including zi. Also, we need sampling values, ϕ, of our velocity potential, ϕh, at these points. We construct f (s) such that the squared residual evaluated in s with respect to ϕ, is minimized, i.e., J (c) = |Ac −ϕ|2, where c = [ c0, . . . , c q ]T
+
+and the Vandermonde matrix as Ajk = ψj (sk) for j ∈ { 0, . . . , q } and k ∈ { 1, . . . , q + 1 }. Expanding J (c), taking the gradient with respect to c, and setting it to zero, gives the following normal equations, which can be solved for cAT Ac = AT ϕ, ←→ c = ( AT A)−1AT ϕ. (18) Now, writing out (17) as 
+
+f (s) = c0 + c1s + c2s2 + c3s3 + · · · , (19) and analytically differentiating with respect to s gives 
+
+g(s) = ∂f (s)
+
+∂s = c1 + 2 c2s + 3 c3s2 + · · · , (20) and finally, evaluating g(s) at z = zi, which means s = 0 , results in g(0) = c1. Using this, the gradient at the i’th free surface point (xi, z i) is simply taken as the second element of the coefficient vector, c, obtained from solving the small least-squares problem in (18). As we differentiate a q = p + 1 polynomial, we expect the error to behave as O(hq=p+1 ),matching the rate of the primary variable, ϕh. It can be observed that, compared to local recovery, the projection operations required on unfitted domains are naturally incorporated into the gradient recovery process. Additionally, the method can be considered meshless, as it operates only on a vertical cluster of points and is not limited to any specific numerical discretization method, such as FEM, SEM, FDM, HPC, etc. Therefore, it is a general approach that could enhance other FNPF models, which may experience suboptimal convergence due to gradient recovery. Finally, this method extends to 3D, as shown here, with no additional complexity beyond the need for more free-surface grid points. In the FNPF-SEM context [28, 32, 75], a global L2 projection is typically used, which evidently loses one order of accuracy for the entire scheme, as with the local recovery. Improving this could be highly beneficial, as will be shown in Section 5.2, where we underline the importance of using gradient recovery with optimal convergence properties. 
+
+4.3 Temporal integration 
+
+We perform temporal integration of the free surface conditions using a standard explicit 4th-order, 4-stage Runge-Kutta (ERK4) scheme with a constant time step size, ∆t = T / 200 , unless otherwise specified in the simulations. To accompany the ERK4 scheme, we estimate the time derivative of ϕ apparent in the force equation in (3), with a 4th-order-accurate finite difference approximation. 11 An arXiv Preprint VISBECH ET AL . (2026) 
+
+4.3.1 Numerical stabilization 
+
+When numerically integrating the FNPF free surface equations in (2), some form of numerical stabilization is often needed to prevent the simulation from becoming unstable, especially for highly nonlinear waves that are prone to aliasing-driven numerical instabilities over long integration times for such waves. The type of stabilization is related to the type of numerical approximation error introduced by the chosen discretization scheme. For explanation, generally, stability issues for FNPF wave problems can be divided into two categories related to the: i) numerical approximation and ii) geometrical representation. For the former, one can have a highly accurate numerical scheme. Yet, the simulation can still become unstable because aliasing errors accumulate in high-frequency components of the wave, eventually leading to undesirable behavior, e.g., saw-tooth-shaped instabilities [49]. For the latter, which is closely related to unfitted approaches, the instability is driven by errors arising from an inaccurate geometric representation. Adding too much stabilization will dampen the numerical solution; conversely, adding too little will cause the solution to become unstable and explode. Some examples of different stabilization approaches used within the field of FNPF wave simulation are given in the following: The aforementioned FNPF-SEM models, e.g., see [28, 32, 33, 75], often apply a combination of i) over-integration of the nonlinear terms, ii) a mild spectral filter removing between 1-5 % of the top modes in the interior of the free surface elements, and iii) some re-meshing to ensure the correct geometrical representation. Wave models based on FDM, e.g., see [11, 27, 79] often use a very high-order Savitzky–Golay low-pass filter [65]. The original HPC work in [67] applied a 5-point low-pass filter at every 5-30 time steps, following the recommendations of [49]. Later HPC frameworks also used the Savitzky–Golay filter [69]. The high-order spectral (HOS) model by [22] also used the 5-point low-pass filter in their original work. As we applied a finite-difference approximation to the free surface, we initially considered the Savitzky–Golay filter. However, this filter is restricted to equidistant grids and only works with central stencils. Thus, making it impossible to use for a finite wave tank with non-periodic boundaries, increased resolution near structures, and, as in our case, non-uniform mesh spacing from our GLL point distribution. Motivated by this and the work in [58, 66], we consider adding hyperviscosity nodally to (2) following [80]. The general idea is to add dissipative terms to the free surface equations to target the high-frequency waves where the instability arises. Applications of modal hyperviscosity can, e.g., be seen in [23]. Our modified free surface equations read 
+
+∂tη = L(wη ) + N (η, ϕ η , w η ) + Hmγ (η), and ∂tϕη = L(η) + N (η, ϕ η , w η ) + Hmγ (ϕη ), (21) where L() and N () are the classical linear and nonlinear terms and H() is the added hyperviscosity given as 
+
+Hmγ (f ) = ( −1) m+1 γ
+
+r gπ 
+
+∆x
+
+ ∆xπ
+
+2m
+
+Dmxx f. (22) Here ∆x is a measure of the grid spacing, γ is a non-dimensional scale coefficient, m is the hyperviscosity order, and 
+
+Dxx is the free surface Laplacian built using finite difference as described in Section 4.1. Consult [80] for various considerations and discussion on choosing the parameters, m and γ. In Section 5.3, we test different parameter configurations for long-time simulation of very nonlinear waves. 
+
+Remark : As mentioned at the beginning of this section, stability issues for FNPF wave problems are related to the approximation and geometrical representation of the problem. For boundary-fitted methodologies, a domain transformation (e.g., the σ-transform), re-meshing, etc., can ensure exact alignment between the true and computational domains. Evidently, this is not the case for unfitted methodologies. Even if the numerical and geometric results are convergent, small-scale errors may still arise as extrapolation errors or jumps across discontinuities from the staircase-like free surface approximation, e.g., see Figure 2. With this, the stabilization techniques used must be capable of containing such errors and ultimately stably propagating the free-surface wave profile. Based on experience (not shown), the authors have found that the strong FDM approximation of the free-surface equations is less sensitive to the geometric error introduced by the unfitted discretization than a weak SEM approximation. This ultimately yields a hybrid discretization, yet the overall scheme is, most importantly, of arbitrary order in accuracy regardless of the discretization. In 2D, this is trivial; however, in 3D, where the free surface may have complex geometric features in the xy -plane, special care is required to capture these features in an FDM setting. With this, we avoid introducing an additional weak statement of the free surface equations, and thereby performing a mass matrix inversion to compute the right-hand side of (2). The authors stress that this observation, comparing FDM [11, 27] and SEM approximations [28] for wave propagation, is no general claim and not necessarily applicable to classical boundary-fitted models. It is solely an observation for the formulation in question for this work. 
+
+# 5 Results: Verification in a periodic wave flume 
+
+For the first results section, we consider wave problems defined in a periodic wave flume. Here, we focus on verifying the model’s convergence behavior and its ability (in terms of accuracy and stability) to simulate highly nonlinear waves 12 An arXiv Preprint VISBECH ET AL . (2026) 
+
+over long time periods. For this, we give recommendations on how to set and choose the parameters for the added stabilization of hyperviscosity. Moreover, we attempt to justify the use of higher-order approximations over lower-order ones and underline the importance of proper gradient recovery at a given error level after long-time wave propagation. The periodic domain contains one wave of fixed length L = 1 [m] , irrespectively of wave number, kh , and level of nonlinearity, ε/ε max . Hence, the depth h will vary with kh .
+
+5.1 Convergence under mesh-refinement 
+
+As argued in Section 3.6, the embedded discretization of the free surface is mostly relevant for highly nonlinear waves. Therefore, we perform a classical convergence study under mesh-refinement for fixed polynomial orders, 
+
+p ∈ { 1, . . . , 5}, on three different waves, kh ∈ { 1, π, 2π}. All of nonlinearity, ε/ε max = 90% . The background mesh is defined using 8 ≤ Nx ≤ 50 elements in the horizontal direction, and Nz depends on kh , such that the elements are uniform/square in size ( hx/h z ≈ 1). The resolution is increased successively, one element at a time, in the x-direction. As argued in, e.g., [4], the classical method of doubling the resolution, i.e., Nx ∈ { 1, 2, 4, . . . }, when conducting convergence studies could create a biased mesh configuration (either in or unfavorable regarding the convergence of any numerical metric). The error is measured in the vertical free surface velocity as ∥wη − wη,h ∥∞, with the former denoting the true solution and the latter the numerical solution. 0.02 0.04 0.06 0.08 0.1                                         
+
+> hmax
+> 10 !8
+> 10 !6
+> 10 !4
+> 10 !2
+> 10 0
+> kw2 ! w2;h  k1
+> kh = 1
+> p= 1 ;O(h2)
+> p= 2 ;O(h2:7)
+> p= 3 ;O(h3:7)
+> p= 4 ;O(h4:5)
+> p= 5 ;O(h5:3)
+> 0.02 0.04 0.06 0.08 0.1
+> hmax
+> kh =:
+> p= 1 ;O(h2)
+> p= 2 ;O(h2:9)
+> p= 3 ;O(h3:8)
+> p= 4 ;O(h4:6)
+> p= 5 ;O(h5:6)
+> 0.02 0.04 0.06 0.08 0.1
+> hmax
+> kh = 2 :
+> p= 1 ;O(h2)
+> p= 2 ;O(h2:9)
+> p= 3 ;O(h3:7)
+> p= 4 ;O(h4:6)
+> p= 5 ;O(h5:6)
+
+Figure 4: Convergence study under mesh-refinement for embedded discretizations kh ∈ { 1, π, 2π} with polynomial orders of p ∈ { 1, . . . , 5}. The specified rate of convergence, O(hm), is a linear fit to all data points. The results can be seen in Figure 4, where the error of each mesh is depicted with a linear fit of the convergence rate as 
+
+O(hm) (solid lines). We observe a highly mesh-dependent error level (transparent lines) that oscillates from one mesh to the next; however, it remains convergent. This behavior is well known in high-order unfitted methods. Slightly moving the true geometry on the same background mesh will, without a doubt, change the solution. This phenomenon can be seen, as mentioned, not only when shifting the boundary but also during successive mesh refinement [4, 16]. In general, we observe how all orders converge with at least O(hp), most even closer to O(hp+1 ) (mostly true for p ∈ { 1, 2, 3}). Also, the deep water waves, kh ≥ π, have slightly better rates than the more shallow wave, kh = 1 . The magnitude of errors is similar to results in the literature [28, 32, 75], yet, as expected, slightly larger than boundary-fitted models. We emphasize the improved convergence rate of O(hp+1 ) for almost all orders of p compared to other FNPF-SEM models. At finer resolutions, the error is more oscillatory than on coarse meshes (still convergent, though). This indicates that the error on the coarser meshes is primarily dominated by the numerical approximation of ϕ and wη , rather than by the geometric representation of η. From this, we conclude that embedded discretizations are useful for highly nonlinear waves; however, if the accuracy in practical terms is expected, fixed discretizations can be employed as well. 
+
+5.2 Justification for using high-order approximations and importance of optimal gradient recovery 
+
+In the following, we will attempt to justify the use of higher-order polynomials over lower-order ones and emphasize the importance of gradient recovery for optimal convergence properties. Considering the simplest possible case of a small-amplitude wave, i.e., H/L ≪ 1, with kh = 2 π (thus h = L = 1 [m]) and analytical solutions from e.g., [57]. For this test, we introduce the relative error (in percent) in the free surface elevation, containing both numerical diffusion 13 An arXiv Preprint VISBECH ET AL . (2026) 
+
+and dispersion effects, as 
+
+erel (t) = ∥ηh(t) − η(t)∥∞
+
+∥η(t)∥∞
+
+· 100% .
+
+Next, we define the limit of "acceptable engineering accuracy" after 100 wave periods as 10% , i.e., erel (100 T ) ≤ 10% .We want to locate the coarsest possible uniform mesh ( Nx = Nz = N ) for each polynomial order p ∈ { 1, . . . , 6},which satisfies this limit. Given this mesh, we can study the CPU times for the entire computation using two gradient recovery methods for ws: PPR and local recovery, as discussed in Section 4.2. For this test, we use ∆t = T / 100 .10 0 10 2 10 4 10 6                                                    
+
+> N
+> 10 !2
+> 10 !1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> erel (100 T ) : 100  erel (1 T ) [%] PPR
+> p= 1 ;O!N!1:9"
+> p= 2 ;O!N!2:9"
+> p= 3 ;O!N!3:7"
+> p= 4 ;O!N!4:5"
+> p= 5 ;O!N!4:9"
+> p= 6 ;O!N!6"
+> 10% limit
+> 10 010 210 410 6
+> N
+> 10 !2
+> 10 !1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4Local recovery
+> O!N!0:9"
+> O!N!1:9"
+> O!N!2:8"
+> O!N!3:5"
+> O!N!4:1"
+> O!N!5:1"
+
+Figure 5: Estimation of the coarsest mesh configuration, N , to reach erel (100 T ) ≤ 10% for p ∈ { 1, . . . , 6} and gradient recovery techniques: PPR (left) and local recovery (right). The coarsest possible resolution, given by N , was determined by running tests at various resolutions for only one wave period. Then, estimating and confirming the convergence rate, roughly O(hp+1 ) for PPR and O(hp) for local recovery, and predicting N based on the acceptance limit by assuming that erel (100 T ) ≈ 100 erel (1 T ). This procedure is shown in Figure 5 for PPR (left) and local recovery (right). Each N is selected as the first integer above the non-integer, which arguably is a bit conservative. The coarsest mesh configurations, N , are listed in Table 2. From the figure, we generally see the expected difference in convergence order of one between PPR and local recovery. For p ≥ 4, both methods are slightly below expectations, which may be attributed to the 4th-order-accurate ERK4 scheme and the fixed time step size. Despite this, the pattern is very clear when comparing the two recovery techniques. Now, running for each of those mesh configurations in Table 2, and measuring the CPU time for solely the time-integration part, those not including mesh-generation, building time-independent operators, post-processing, etc. As for computational hardware, we use an Intel Xeon E5-2660 v3 CPU at 2.60 GHz. Each computation is performed on a full node with 20 cores; however, it is run as a single-core computation with appropriate spin-up. From the table, it is clear that all runs were successful except for p = 1 with local recovery, as this mesh has 220 million elements and is thus too demanding for a single-core computation. Next, we observe that all successful runs remain below the 10% limit as intended, where the one-wave-period estimate looks to have been more precise for finer meshes compared to coarser ones. Emphasizing how huge the difference is across the test: a 2 by 2 mesh with p = 6 and PPR has a 3.03% error after 100 wave periods and roughly 83 seconds of computations, whereas a 102 by 102 mesh with p = 2 and local recovery has a 9.70% error after around 13 , 319 seconds of computation. That equals a 1, 593 speed-up between the two tests. At last, we consider relative speed-ups of the results in Table 2 between i) PPR compared to PPR with p = 1 and ii) PPR compared to local recovery with equal p. The results are shown in Figure 6. Starting with i), we observe a speed-up of up to ≈ 36 with p = 6 compared to p = 1 . For ii) the speedup benefit looks to be mostly restricted to p ≤ 3, which can be explained by the increased size of the least-squares problem in (18) that increases with p in both the number of basis functions and sampling points required. Finally, we stress that this small numerical study is not a general proof, yet still a reasonable indication and argument for i) why it is preferable to use higher-order approximations over lower ones, and ii) the importance of using optimal gradient recovery techniques. The presented speed-up times are comparable to those reported in [28]. 14 An arXiv Preprint VISBECH ET AL . (2026) 
+
+Table 2: Mesh input, p, N , NΩh , and DoF ( Ωh), as a result of Figure 5 and output, erel (100 T ) and CPU time, for each run. "—" indicates an infeasible solution. Gradient recovery p N NΩh DoF ( Ωh) erel (100 T ) [%] CPU time [ s]PPR 1 182 33,124 33,306 9.05 3,017.07 2 28 784 3,192 8.61 673.54 3 9 81 756 9.11 205.55 4 5 25 420 4.70 135.63 5 3 9 240 3.70 102.38 6 2 4 156 3.03 83.64 Local 1 14,858 220,760,164 220,775,022 — —2 102 10,404 41,820 9.70 13,319.30 3 18 324 2,970 9.62 647.47 4 7 49 812 8.26 189.25 5 4 16 420 5.03 124.73 6 3 9 342 1.60 113.87 p       
+
+> 123456
+> Speed up [-]
+> 0510 15 20 25 30 35 40
+> PPR compared to PPR with p= 1 PPR compared to local recovery
+
+Figure 6: Speed up calculations of the results from Table 2. 
+
+5.3 Long time simulation with and without stabilization 
+
+In the next part, we focus on long-time simulations of highly nonlinear waves on a fixed discretization. Recall from Section 4.3.1, we have two free parameters for our hyperviscosity stabilization, namely, the order m and the scaling 
+
+γ. In the following, we test a wide range of settings, i.e., m = {1, . . . , 5} and γ = {0, 0.1, 1, 10 }, which are selected based on our personal experience with hyperviscosity stabilization, e.g., see [80]. Note that γ = 0 corresponds to running without any stabilization. We run the stabilization parameters for highly nonlinear ε/ε max = 90% waves of 
+
+kh = {1, π, 2π} for 50 T on meshes with Nx = {4, 8, 16 } horizontal elements and Nz = {1, 2, 4} vertical elements of order p = {4, 5, 6}. This gives a total of 1, 620 combinations. Each run is categorized either as: i) unstable, if the numerical solution explodes, ii) too damped, if the numerical solution, in terms of η, becomes less than 50% of the initial condition, and finally, iii) stable, otherwise. For all of the stable solutions, we compute a measure of relative diffusive and dispersive error (in percent) as 
+
+edif (t) = 
+
+|max  
+
+> x
+
+ηh(x, t ) − max  
+
+> x
+
+η(x, t )|
+
+max  
+
+> x
+
+η(x, t ) · 100% , and edis (t) = |xmax  
+
+> h
+
+(t) − xmax (t)|
+
+L · 100% ,
+
+where xmax  
+
+> h
+
+(t) is the location of max  
+
+> x
+
+ηh(x, t ) and similar for xmax (t). Note that ηh is interpolated using Lagrangian interpolation to a very fine mesh of ∆x = 10 −4L, whereon the two error measures are computed. In Table 3 in Appendix A, the best 50 runs, based on minimization emix = edif (50 T ) + edis (50 T ), are listed. Please note that from the 1,620 runs, 908 exploded, 225 were too damped, and 487 finished. Expecting all of the runs with γ = 0 to explode, the success rate (in percent) is about 40% , yet some waves will also be heavily dampened. From the table data, it is evident that different stabilization settings can be used, each working for various resolutions (p, N x, N z ) and waves. For example, out of the 50 best runs, the combination (m, γ ) = (3 , 1) occurs 13 times, (m, γ ) = (5 , 10) occurs 15 An arXiv Preprint VISBECH ET AL . (2026) 
+
+10 times, and (m, γ ) = (4 , 10) occurs 9 times. Moreover, it can be observed (as expected) that the runs with the best resolution give the best results, underlining the importance of having a well-resolved wave. Also, the kh = 1 results appear to score best, because the water column below the free surface is better resolved at lower kh than at higher kh .In the following, we use the parameters m = 3 and γ = 1 based on this test; however, other combinations are also valid. Now, applying these stabilization parameters, (m, γ ) = (3 , 1) , to various waves, kh = {1, π, 2π}, of different nonlinearities, ε/ε max = {10 , 20 , . . . , 90 }, all simulated on a (Nx, N z ) = (8 , 2) mesh with p = 6 for a total time of 
+
+50 T . This resolution is chosen to enable a qualitative comparison with the analysis in [32], which uses a boundary-fitted SEM approach to solve the FNPF wave problem in a mixed-Eulerian-Lagrangian frame; however, they used only 
+
+Nz = 1 . To make full use of our PPR technique to recover wη , we need one additional element in the depth reaching 
+
+Nz = 2 in total. For completeness and as a reference, we also add a simulation without any stabilization, i.e., γ = 0 .First, we consider the time of explosion, tex , if present, with and without stabilization as a function of nonlinearity. These results are reported in Figure 7. From the figure, the simulations without stabilization explode in all three wave cases, whereas larger kh yields a more stable solution for longer times than lower kh . Adding the stabilization of (m, γ ) = (3 , 1) , makes the numerical solution stable until at least 50 T , expect for kh = 1 and ε/ε max = 90% ,which exploded after approximately 49 .5T , thus indicating that more resolution is needed combined with stabilization parameters targeting even higher modes, e.g., (m, γ ) = (4 , 10) or (m, γ ) = (5 , 10) ."=" max [%]                   
+
+> 20 40 60 80
+> tex  =T  [-]
+> 020 40 60 kh = 1
+> "=" max [%]
+> 20 40 60 80 020 40 60 kh =:
+> "=" max [%]
+> 20 40 60 80 020 40 60 kh = 2 :
+> Without stabilization With stabilization
+
+Figure 7: Time of explosion, tex , for three waves of kh = {1, π, 2π} at increasing nonlinearity, ε/ε max , with and without hyperviscosity stabilization using (m, γ ) = (3 , 1) .Next, in Figure 8, the time-dependent diffusive, dispersive, and total errors are shown as a function of nonlinearity for the three different waves. We define the total error as ∥η − ηh∥∞. As expected, all errors are larger with greater nonlinearity. In general, the diffusive errors are much lower (by 1-3 orders of magnitude) than the dispersive errors and appear to be nearly constant over time, underlining the low diffusiveness of high-order approximation methods. The white space in the dispersive errors is due to the fine mesh resolution used in the Lagrangian interpolation, with 
+
+∆x = 10 −4L. In general, qualitative agreement with [32] is evident. 16 An arXiv Preprint VISBECH ET AL . (2026) kh = 1 ; log 10 (edif )                                                   
+
+> t=T  [-]
+> 010 20 30 40 50 kh =:;log 10 (edif )kh = 2 :;log 10 (edif )
+> -4 -3 -2 -1 01
+> kh = 1 ;log 10 (edis )
+> t=T  [-]
+> 010 20 30 40 50 kh =:;log 10 (edis )kh = 2 :;log 10 (edis )
+> -4 -3 -2 -1 01
+> kh = 1 ;log 10 (k2!2hk1)
+> "=" max [%]
+> 20 40 60 80
+> t=T  [-]
+> 010 20 30 40 50 kh =:;log 10 (k2!2hk1)
+> "=" max [%]
+> 20 40 60 80
+> kh = 2 :;log 10 (k2!2hk1)
+> "=" max [%]
+> 20 40 60 80 -5 -4.5 -4 -3.5 -3 -2.5 -2
+
+Figure 8: Time-dependent diffusive errors (top row), dispersive errors (middle row), and total error (bottom row) for different waves kh = {1, π, 2π} (columns) using a stabilization parameters of (m, γ ) = (3 , 1) on a mesh with 
+
+(Nx, N z , p ) = (8 , 2, 6) .
+
+# 6 Results: Numerical experiments in a finite wave flume 
+
+For the next results, we consider wave problems in a finite-length wave flume that may be subject to bathymetric changes. This covers verification of wave generation and absorption zones, high-order harmonic generation over a submerged bar, and soliton interactions with a vertical wall and a semi-circular obstacle in the seabed. For all simulations, which vary in nonlinearity (from mild to highly nonlinear), we use the unfitted fixed-discretization approach; see Section 3.6. 
+
+6.1 Wave generation and absorption on constant depth 
+
+First, we want to verify that our generation and absorption zones outlined in Section 2.2 work as intended, especially for wave propagation over a very extensive time period. The computational domain is given by a generation zone (0 ≤ x ≤ 2L), followed by the target zone ( 2L ≤ x ≤ 12 L), and an absorption zone at the end ( 12 L ≤ x ≤ 16 L), thus, the total length is 16 L. We consider a resolution of Nx = 10 per wavelength and Nz = 4 in the vertical direction, 17 An arXiv Preprint VISBECH ET AL . (2026) 
+
+with basis functions of order p = 6 . As for the wave input, we consider a wave with kh = 1 and ε/ε max = 70% in nonlinearity. We employed (m, γ ) = (3 , 1) stabilization parameters. The simulation is performed for 200 wave periods. Temporal, spatial, and frequency results are shown in Figure 9. t=T [-]                                   
+
+> 195 195.5 196 196.5 197 197.5 198 198.5 199 199.5 200
+> 2=a 0 [-]
+> -1 -0.5 00.5 11.5
+> Presented model Fenton (1988)
+> x=L [-]
+> 0246810 12 14 16
+> 2=a 0 [-]
+> -1 -0.5 00.5 11.5
+> t= 100 Tt= 200 T
+> x=L [-]
+> 0246810 12 14 16
+> an =a 0 [-]
+> 00.2 0.4 0.6 0.8 1
+> n= 1
+> n= 2
+> n= 3
+> n= 4 Fenton (1988)
+
+Figure 9: Simulation of a kh = 1 and ε/ε max = 70% wave in a constant-depth wave tank with generation and absorption zones. Top: The last five wave periods evaluated at x = 7 L compared to [36]. Middle: Wave profile at 100 and 200 wave periods across the domain. Bottom: Harmonic analysis along the x-directions. For normalization, 
+
+a0 = H/ 2 = 0 .0351 [m] .From the top plot, we see the wave free surface profile evaluated at the middle of the target domain, x = 7 L, for the last five wave periods of the simulation. Alongside this, we show the stream function solution from [36]. In general, there is reasonable visual agreement; however, a slight phase lag is evident. In the middle plot, we display the wave profiles along the domain at 100 and 200 wave periods, respectively. Overall, minimal to no differences are observed, indicating that all waves are being absorbed properly. Finally, a harmonic analysis is performed and shown in the bottom plot. This harmonic analysis is created by fitting (in a least-squares sense) a sum of trigonometric functions with the argument of 2πf nt, where fn = n/T for n ∈ { 1, . . . , 4}. Additionally, a0 is taken as a0 = H/ 2. As expected, the agreement between the computed and expected results is acceptable. 
+
+6.2 Harmonic generation over a submerged bar 
+
+In the next experiment, we examine the classic and widely used validation test case of harmonic wave generation over a submerged bar [9]. Here, waves are generated and then propagated toward the submerged bar, which transforms the wave by: i) steepening the wave due to nonlinear shoaling on the incline of the bar and ii) releasing bound harmonics as a decomposition of shorter "free" waves at the top of the bar. Ultimately, resulting in a completely transformed wave field behind the bar, overall testing the model’s ability to model the nonlinear dispersion of waves. 18 An arXiv Preprint VISBECH ET AL . (2026) 
+
+The domain layout of the wave flume is as follows in [m] : Generation zone ( 0 ≤ x ≤ 3), target zone with the submerged bar ( 3 ≤ x ≤ 25 ), and absorption zone ( 25 ≤ x ≤ 33 ). The depth at the top of the bar is h = 0 .1 [m] and h = 0 .4 [m] 
+
+away from the bar, with a 1:20 incline at the front and a 1:10 decline at the back. We used a nonlinear input wave with kh = 0 .675 , T = 2 .02 [s] , and ε/ε max ≈ 7% . For the computational inputs, we have employed a mesh with 
+
+(Nx, N z ) = (400 , 9) elements of order p = 4 to accurately capture the bathymetric change. A comment on this is left at the end of Section 6.4. The simulation runs for 30 period waves. For this test, no stabilization was needed. The time series of the free surface elevation, η, is given in Figure 13 in Appendix B at 10 different gauge locations governing the wave profiles before, on, and after the submerged bar. Clearly, the wave is steepened on the bar’s incline and higher-order harmonics are generated and released at the incline, which is even more evident when considering the spectral components throughout the entire domain in Figure 10 alongside a visualization of the submerged bar. The analysis confirms the aforementioned observations and visually aligns well with the experimental results from [9]. x [m]       
+
+> 0510 15 20 25 30
+> an=a 0 [-] or  z [m]
+> -0.5 00.5 11.5 2
+
+n = 1 
+
+n = 2 n = 3 n = 4 
+
+!g !a
+
+> Presented model Beji & Battjes (1994) Submerged bar
+
+Figure 10: Harmonic analysis for the submerged bar test along the x-direction. 
+
+6.3 High-amplitude solitary wave interactions with a vertical wall 
+
+Next, we consider the nonlinear test of high-amplitude solitary waves reflecting off a vertical wall. This problem is well-studied, verified, and validated in the literature, with, e.g., experiments in [53] and numerical results reported in, e.g., [18, 30, 43, 50] using different numerical approaches. We consider non-dimensionalized amplitudes as 
+
+0.075 ≤ a/h ≤ 0.6, with a being the initial soliton wave amplitude. For the test, we study four key metrics: i) maximum run-up height, η0, occurring at time t0, ii) attachment height, ηa, occurring before t0 defined when the maximum instantaneous wave crest is located at the wall, iii) detachment height, ηd, occurring after t0, defined when the crest leaves the wall, and iv) total (horizontal) force on the wall, F . In general, we note that ηd < η a < η 0. When the soliton reaches the wall, a thin column of water will shoot up, and after the soliton leaves the wall, it will have reduced wave height and a small dispersive trail behind, making it a challenging nonlinear computational test. As a/h 
+
+increases and nonlinearity becomes more prominent, the expected run-up will no longer follow the linear elasticity relationship of η0/h ≈ 2( a/h ).The domain and its computational layout are as follows: The domain is spanned by 0 ≤ x ≤ 40 [m] with a depth of 
+
+h = 1 [m] . Initially, the center of the soliton is located at x = 20 [m] , and at x = 40 [m] , the vertical wall is located; thus, the soliton propagates from left to right. For the simulation, we use a constant time step of ∆t = 0 .01 [s] and run until the wave has finished interacting with the wall. We have employed order p = 6 basis functions on a mesh with 
+
+(Nx, N z ) = (100 , 2) . For this test, no stabilization was used, as also noted in [30, 43]. The results are seen in Figure 11 with comparison to digitized values from the numerical results found in [18]. From the figure (left), we observe the maximum run-up height, η0, attachment height, ηa, detachment height, ηd, and maximum horizontal force, Fmax , all showing good agreement. Here, we note that the inelastic interaction becomes visually apparent for a/h > 0.2 [ -]. For the figure (right), we have the total horizontal force signals, also showing reasonable visual agreement with [18]. For this computation, the force is composed of three contributions: two from the vertical elements in the computational domain, and one from an artificial spectral element spanning the top of the fixed discretization and the free-surface elevation. Pressure values are projected via Lagrangian extrapolation onto the artificial element and integrated numerically as with the two other contributions. Upon closer inspection of the 19 An arXiv Preprint VISBECH ET AL . (2026) 
+
+results for the second most nonlinear case, a/h = 0 .6 [ -], a small "kink" in the force signal can be observed just after the point of maximum run-up. These small discrepancies might be explained by employing a fairly extreme projection, i.e., extrapolating a value approximately 1.7/0.5 = 3 .4 element lengths away. Regarding the most nonlinear case of 
+
+a/h = 0 .7 [ -], we were only able to predict the attachment height, initial part of the force profile, and the maximum force. For this case, the nonlinearity is so great that the topology of the free surface elevation profile changes, i.e., non-single values for η, thus the simulation breaks down. The force signal in Figure 11 (right) for a/h = 0 .7 [ -] is manually shifted as t0 was unknown for this simulation. The authors note that stabilization could slightly improve the results for a/h > 0.6; however, the instability here is primarily expected to arise from the non-uniqueness of η near the wall under extreme wave-wall interaction. a=h [-]                              
+
+> 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+> Amplitude or force [-]
+> 00.5 11.5 22.5
+> 20=h
+> 2a=h
+> 2d=h
+> 2( a=h )
+> Fmax =(;gh 2)Cooker et al. (1997)
+> (t!t0)==[-]
+> -4 -3 -2 -1 0123
+> F= (;gh 2) [-]
+> 11.5 22.5 a=h = 0 :1
+> a=h = 0 :2
+> a=h = 0 :3
+> a=h = 0 :4
+> a=h = 0 :5
+> a=h = 0 :6
+> a=h = 0 :7
+
+Figure 11: Solitary wave interactions with a vertical wall of different initial amplitudes, a/h . Left: maximum run-up height, η0, attachment height, ηa, detachment height, ηd, and maximum force, Fmax . Right: total horizontal force signals, F , for different a/h . All results compared with numerical solutions from [18]. 
+
+6.4 Solitary wave propagation over a semi-circular bathymetry bump 
+
+As a final numerical study, we consider an experiment in which a mildly nonlinear solitary wave is propagated over a semi-circular bump in the bathymetry. The domain spans 0 ≤ x ≤ 45 [m] with a constant depth (except on the bump) of 
+
+h = 1 [m] . The bump of radius R = 0 .3 [m] is located at (x, z ) = (30 , −1) [m] . The soliton is of height a/h = 0 .2 [ -]
+
+and initialized at x = 15 [m] .For the computation, a time step of ∆t = 0 .01 [s] is used, and the simulation is run until the soliton has finished interacting with the bump. As with the experiment in Section 6.3, no stabilization was needed. The domain is uniformly meshed using (Nx, N z ) = (450 , 11) elements with p = 3 . A zoom in at the unfitted mesh around the bump is shown in Figure 14 in Appendix C, with 14 surrogate boundary elements approximating the curved semi-circle. The results are shown in Figure 12 together with the digitized numerical FNPF results of [32, 76] in terms of the total horizontal dynamic force, Fx, thus dropping gz from (3). The force is computed by projecting the pressure onto the true boundary via Lagrangian interpolation and evaluating the integral numerically using artificial boundary-fitted curves. For the non-dimensionalization of the results, we have used the initial soliton wave speed, U = 3 .4276 [m /s] , from [25], and the solitary wave phase celerity, c = p1 + a/h = 1 .0954 [m /s] . As defined in [32], t0 is when the soliton is completely on top of the bump, experiencing zero horizontal force. In general, the computed results look to agree qualitatively well. As may be obvious, the meshing of this particular problem is quite excessive with 4,928 elements of order p = 3 .Comparing with the boundary-fitted model in [32], where 164 elements of order p = 6 were used. Similarly, this can be noted for the mesh used in Section B using 3,100 elements of order p = 4 , compared to 103 elements of order p = 6 in [28]. When applying a uniform, structured background mesh, the far-field resolution (often requiring only one or two elements in the depth) depends on the length scale of the geometrical features (the submerged bar and the semi-circular bump) in the domain. That is especially true for the vertical direction. In Section 7, we discuss potential solutions to this challenge to further improve the model’s efficiency. 20 An arXiv Preprint VISBECH ET AL . (2026) (t ! t0 ) ( c=h ) [-]      
+
+> -10 -5 0510 15
+> Fx =(;U 2 R) [-]
+> -1 -0.5 00.5 11.5
+> Presented model Wang et al. (2013) Engsig-Karup et al. (2019)
+
+Figure 12: Total horizontal dynamic force on the semi-circular bump due to a propagating solitary wave. 
+
+# 7 Conclusion 
+
+We have introduced a novel unfitted high-order computational framework for simulating highly nonlinear water waves that may be affected by bathymetric changes. The framework’s key feature is the unfitted method for discretizing and representing the fluid domain, based on a polynomial-corrected shifted-boundary approximation and spectral elements. Additionally, a polynomial-preserving recovery technique was employed to achieve optimal convergence when computing the free-surface vertical velocity, thereby further improving the accuracy of the numerical scheme. We described the continuous mathematical formulation, followed by the discretization of the fluid domain and the free surface. For the former, the unfitted polynomial-corrected shifted-boundary method on spectrally accurate elements was presented, while for the latter, emphasis was placed on the polynomial-preserving gradient-recovery technique and wave stabilization. Subsequently, a series of numerical verification and validation results was presented, ultimately demonstrating the capabilities and applicability of this new unfitted wave model for simulating highly nonlinear stream function waves and high-amplitude solitons over extended periods with high numerical accuracy. In this section, significant efficiency improvements were highlighted when using higher-order discretizations compared with lower-order ones, especially when combined with optimal gradient recovery. The proposed model (ongoing work) aims to be extended to include partially and/or fully submerged structures, whether fixed, forced, or eventually freely floating/oscillating. This emphasizes the need for geometric flexibility since multiple length scales will be present in the problem, as highlighted in Section 6.4. To address this, we must efficiently capture these scales with optimal resolution throughout the entire fluid domain. The proposed unfitted methodology could be combined with a non-conformal element discretization (i.e., two elements share the same element edge), i.e., a non-structured mesh approach to regular Cartesian grids, ultimately providing the geometric adaptivity necessary. 
+
+# Acknowledgments 
+
+The research was carried out at the Technical University of Denmark (DTU) in the Department of Applied Mathematics and Computer Science (Compute), with computational resources provided by the DTU Computing Center (DCC). Parts of the research were carried out during JV’s visit to the CARDAMOM team at the INRIA center at the University of Bordeaux. MR is a member of the CARDAMOM team at the INRIA center at the University of Bordeaux. 
+
+# Declarations 
+
+The authors declared that they had no potential conflicts of interest with respect to the research, authorship, and/or publication of this article. Generative AI was used solely to improve the grammar, spelling, and readability of this manuscript. The authors reviewed and edited all AI-assisted suggestions and take full responsibility for the final content. 21 An arXiv Preprint VISBECH ET AL . (2026) 
+
+# Funding 
+
+This work contributes to the activities of the PhD project of JV: “New Advanced Simulation Techniques for Wave Energy Converts”, fully funded by DTU Compute. 
+
+# CRediT author contribution statement 
+
+All: Conceptualization, Methodology, Writing - Original Draft, Writing - Review & Editing, Visualization Additional individual contributions: JV : Software, Validation, Formal analysis, Investigation. APEK , HBB , and MR : Supervision. 
+
+# References 
+
+[1] Amini-Afshar M and Bingham HB (2017) Solving the linearized forward-speed radiation problem using a high-order finite difference method on overlapping grids. Applied Ocean Research 69: 220–244. [2] Amini-Afshar M and Bingham HB (2018) Pseudo-impulsive solutions of the forward-speed diffraction problem using a high-order finite-difference method. Applied Ocean Research 80: 197–219. [3] Amini-Afshar M, Bingham HB, Henshaw WD and Read R (2019) A nonlinear potential-flow model for wave-structure interaction using high-order finite differences on overlapping grids. In: Proceedings: The 34th Interna-tional Workshop on Water Waves and Floating Bodies, Newcastle, Australia .[4] Antonelli N, Gorgi A, Zorrilla R and Rossi R (2026) Isogeometric multipatch coupling with arbitrary refinement and parametrization using the gap–shifted boundary method. Computer Methods in Applied Mechanics and Engineering 456: 118913. [5] Atallah NM, Canuto C and Scovazzi G (2022) The high-order shifted boundary method and its analysis. Computer Methods in Applied Mechanics and Engineering 394: 114885. [6] Atallah NM, Mittal K, Scovazzi G and Tomov VZ (2025) A high-order shifted interface method for Lagrangian shock hydrodynamics. Journal of Computational Physics 523: 113637. [7] Aubin JP (1970) Approximation des problèmes aux limites non homogènes pour des opérateurs non linéaires. 
+
+Journal of Mathematical Analysis and Applications 30(3): 510–521. [8] Badia S, Verdugo F and Martín AF (2018) The aggregated unfitted finite element method for elliptic problems. 
+
+Computer Methods in Applied Mechanics and Engineering 336: 533–553. [9] Beji S and Battjes J (1994) Numerical simulation of nonlinear wave propagation over a bar. Coastal Engineering 
+
+23(1): 1–16. [10] Berger M and Giuliani A (2024) A new provably stable weighted state redistribution algorithm. SIAM Journal on Scientific Computing 46(5): A2848–A2873. [11] Bingham HB and Zhang H (2007) On the accuracy of finite-difference solutions for nonlinear water waves. 
+
+Journal of Engineering Mathematics 58(1): 211–228. [12] Birke G, Engwer C, May S and Streitbürger F (2023) DoD stabilization of linear hyperbolic PDEs on general cut-cell meshes. Proceedings in Applied Mathematics and Mechanics 23(1): e202200198. [13] Burman E, Claus S, Hansbo P, Larson MG and Massing A (2015) CutFEM: discretizing geometry and partial differential equations. International Journal for Numerical Methods in Engineering 104(7): 472–501. [14] Chesshire G and Henshaw WD (1990) Composite overlapping meshes for the solution of partial differential equations. Journal of Computational Physics 90(1): 1–64. [15] Ciallella M, Gaburro E, Lorini M and Ricchiuto M (2023) Shifted boundary polynomial corrections for com-pressible flows: high order on curved domains using linear meshes. Applied Mathematics and Computation 441: 127698. [16] Ciallella M and Visbech J (2026) Generalized high-order minimization-based polynomial corrections on unfitted spectral elements for the poisson problem. arXiv:123.456 .[17] Colomés O, Main A, Nouveau L and Scovazzi G (2021) A weighted shifted boundary method for free surface flow problems. Journal of Computational Physics 424: 109837. [18] Cooker MJ, Weidman PD and Bale DS (1997) Reflection of a high-amplitude solitary wave at a vertical wall. 
+
+Journal of Fluid Mechanics 342: 141–158. 22 An arXiv Preprint VISBECH ET AL . (2026) 
+
+[19] Cutforth M, Barton PT and Nikiforakis N (2021) An efficient moment-of-fluid interface tracking method. Com-puters & Fluids 224: 104964. [20] Davidson J and Costello R (2020) Efficient nonlinear hydrodynamic models for wave energy converter design—a scoping study. Journal of Marine Science and Engineering 8(1): 35. [21] Dean RG and Dalrymple RA (1991) Water wave mechanics for engineers and scientists . World Scientific Publishing Company. [22] Dommermuth DG and Yue DK (1987) A high-order spectral method for the study of nonlinear gravity waves. 
+
+Journal of Fluid Mechanics 184: 267–288. [23] Ducrozet G, Charlou M and Bonnefoy F (2026) HOS-NWT: an open-source numerical wave tank based on the high-order spectral method. Computer Physics Communications : 110168. [24] Duprez M, Lleras V and Lozinski A (2023) A new ϕ-fem approach for problems with natural boundary conditions. 
+
+Numerical Methods for Partial Differential Equations 39(1): 281–303. [25] Dutykh D and Clamond D (2014) Efficient computation of steady solitary gravity waves. Wave Motion 51(1): 86–99. [26] Engsig-Karup A and Eskilsson C (2019) Spectral element FNPF simulation of focused wave groups impacting a fixed FPSO-type body. International Journal of Offshore and Polar Engineering 29(2): 141–148. [27] Engsig-Karup AP, Bingham HB and Lindberg O (2009) An efficient flexible-order model for 3D nonlinear water waves. Journal of Computational Physics 228(6): 2100–2118. [28] Engsig-Karup AP, Eskilsson C and Bigoni D (2016) A stabilised nodal spectral element method for fully nonlinear water waves. Journal of Computational Physics 318: 1–21. [29] Engsig-Karup AP, Glimberg LS, Nielsen AS and Lindberg O (2013) Fast hydrodynamics on heterogenous many-core hardware. In: Couturier R (ed.) Designing Scientific Applications on GPUs , Lecture notes in computational science and engineering. CRC Press / Taylor & Francis Group. [30] Engsig-Karup AP, Hesthaven JS, Bingham HB and Madsen PA (2006) Nodal DG-FEM solution of high-order Boussinesq-type equations. Journal of Engineering Mathematics 56(3): 351–370. [31] Engsig-Karup AP and Laskowski WL (2021) An efficient p-multigrid spectral element model for fully nonlinear water waves and fixed bodies. International Journal for Numerical Methods in Fluids 93(9): 2823–2841. [32] Engsig-Karup AP, Monteserin C and Eskilsson C (2019) A mixed Eulerian–Lagrangian spectral element method for nonlinear wave interaction with fixed structures. Water Waves 1(2): 315–342. [33] Eskilsson C, Abedi H and Engsig-Karup AP (2025) A co-simulation approach to modelling fully nonlinear water waves using the spectral/hp element method. Ocean Engineering 340: 122385. [34] Evans D and Newman J (1987) Report on the first international workshop on water waves and floating bodies. 
+
+Journal of Fluid Mechanics 174: 521–528. [35] Fedkiw RP, Aslam T, Merriman B and Osher S (1999) A non-oscillatory Eulerian approach to interfaces in multimaterial flows (the ghost fluid method). Journal of computational physics 152(2): 457–492. [36] Fenton J (1988) The numerical solution of steady water wave problems. Computers & Geosciences 14(3): 357–368. [37] Hanssen FCW and Greco M (2021) A potential flow method combining immersed boundaries and overlapping grids: Formulation, validation and verification. Ocean Engineering 227: 108841. [38] Hesthaven JS and Warburton T (2008) Nodal discontinuous Galerkin methods: algorithms, analysis, and applica-tions . Springer. [39] Hicks J (2020) Development of a high-order potential flow solver for nonlinear wave-structure interaction . PhD Thesis, Technical University of Denmark. [40] Hicks JB, Bingham HB, Read RW and Engsig-Karup AP (2021) Nonlinear wave generation using a heaving wedge. Applied Ocean Research 108: 102540. [41] Hirt CW and Nichols BD (1981) Volume of fluid (VOF) method for the dynamics of free boundaries. Journal of Computational Physics 39(1): 201–225. [42] Karniadakis G and Sherwin S (2005) Spectral/hp element methods for computational fluid dynamics . OUP Oxford. [43] Klahn M, Madsen PA and Fuhrman DR (2021) A new σ-transform based Fourier-Legendre-Galerkin model for nonlinear water waves. International Journal for Numerical Methods in Fluids 93(1): 220–248. 23 An arXiv Preprint VISBECH ET AL . (2026) 
+
+[44] Knoblauch F, Wang W and Bihs H (2026) Development of new free surface methods for a fixed-grid fully nonlinear potential flow solver using the immersed boundary method. International Journal for Numerical Methods in Fluids .[45] Kontos S (2016) Robust numerical methods for nonlinear wave-structure interaction in a moving frame of reference . PhD Thesis, Technical University of Denmark. [46] Kreiss HO and Oliger J (1972) Comparison of accurate methods for the integration of hyperbolic equations. Tellus 
+
+24(3): 199–215. [47] Larsen J and Dancy H (1983) Open boundaries in short wave simulations — a new approach. Coastal Engineering 
+
+7(3): 285–297. [48] Li B and Fleming CA (1997) A three dimensional multigrid model for fully nonlinear water waves. Coastal Engineering 30(3-4): 235–258. [49] Longuet-Higgins MS and Cokelet E (1976) The deformation of steep surface waves on water-I. A numerical method of computation. Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences 
+
+350(1660): 1–26. [50] Madsen PA, Bingham HB and Liu H (2002) A new Boussinesq method for fully nonlinear waves from shallow to deep water. Journal of Fluid Mechanics 462: 1–30. [51] Main A and Scovazzi G (2018) The shifted boundary method for embedded domain computations. Part I: Poisson and Stokes problems. Journal of Computational Physics 372: 972–995. [52] Main A and Scovazzi G (2018) The shifted boundary method for embedded domain computations. Part II: Linear advection–diffusion and incompressible Navier–Stokes equations. Journal of Computational Physics 372: 996–1026. [53] Maxworthy T (1976) Experiments on collisions between solitary waves. Journal of Fluid Mechanics 76(1): 177–186. [54] Modderman J (2026) Unfitted finite element methods for floating structure hydrodynamics . PhD Thesis, Delft University of Technology. [55] Modderman J and Colomés O (2025) Application of unfitted finite element methods for estimating added mass and added damping in floating structures. Advances in Computational Science and Engineering 4: 142–167. [56] Naga A (2005) The polynomial-preserving recovery for higher order finite element methods in 2D and 3D. 
+
+Discrete & Continuous Dynamical Systems-B .[57] Newman JN (2018) Marine hydrodynamics . MIT press. [58] Nielsen M (2020) Computational methods for wave-structure interaction: Numerical analysis of a RBF-based method . PhD Thesis, Aalborg University, Denmark. [59] Nouveau L, Ricchiuto M and Scovazzi G (2019) High-order gradients with the shifted boundary method: an embedded enriched mixed formulation for elliptic PDEs. Journal of Computational Physics 398: 108898. [60] Patera AT (1984) A spectral element method for fluid dynamics: Laminar flow in a channel expansion. Journal of Computational Physics 54(3): 468–488. [61] Peskin CS (1972) Flow patterns around heart valves: A numerical method. Journal of Computational Physics 
+
+10(2): 252–271. [62] Ransley E, Yan S, Brown SA, Mai T, Graham D, Ma Q, Musiedlak PH, Engsig-Karup AP, Eskilsson C, Li Q et al. (2019) A blind comparative study of focused wave interactions with a fixed FPSO-like structure (CCP-WSI Blind Test Series 1). International Journal of Offshore and Polar Engineering 29(02): 113–127. [63] Rim J, Yan J and Bazilevs Y (2026) A naturally sharpened level-set formulation for incompressible free-surface flows. Computer Methods in Applied Mechanics and Engineering 453: 118798. [64] Robertson I and Sherwin S (1999) Free-surface flow simulation using hp/spectral elements. Journal of Computa-tional Physics 155(1): 26–53. [65] Savitzky A and Golay MJ (1964) Smoothing and differentiation of data by simplified least squares procedures. 
+
+Analytical Chemistry 36(8): 1627–1639. [66] Shankar V and Fogelson AL (2018) Hyperviscosity-based stabilization for radial basis function-finite difference (RBF-FD) discretizations of advection–diffusion equations. Journal of Computational Physics 372: 616–639. [67] Shao YL and Faltinsen OM (2014) A harmonic polynomial cell (HPC) method for 3D Laplace equation with application in marine hydrodynamics. Journal of Computational Physics 274: 312–332. 24 An arXiv Preprint VISBECH ET AL . (2026) 
+
+[68] Song T, Main A, Scovazzi G and Ricchiuto M (2018) The shifted boundary method for hyperbolic systems: Embedded domain computations of linear waves and shallow water flows. Journal of Computational Physics 369: 45–79. [69] Tong C, Shao Y, Bingham HB and Hanssen FCW (2024) An adaptive harmonic polynomial cell method for three-dimensional fully nonlinear wave-structure interaction with immersed boundaries. Physics of Fluids 36(3). [70] Tsai WT and Yue DK (1996) Computation of nonlinear free-surface flows. Annual Review of Fluid Mechanics 
+
+28(1): 249–278. [71] Visbech J, Engsig-Karup AP and Bingham HB (2024) Solving the complete pseudo-impulsive radiation and diffraction problem using a spectral element method. Computer Methods in Applied Mechanics and Engineering 
+
+423: 116871. [72] Visbech J, Engsig-Karup AP, Bingham HB, Amini-Afshar M and Ricchiuto M (2024) A high-order shifted boundary method for water waves and floating bodies. In: Proceedings: The 39st International Workshop on Water Waves and Floating Bodies, Sct. Andrews, Scotland .[73] Visbech J, Engsig-Karup AP, Bingham HB and Ricchiuto M (2026) Recent progress on modeling nonlinear wave propagation and wave-structure interaction using a high-order shifted boundary method: Capabilities, challenges, and perspectives. In: Proceedings: The 41st International Workshop on Water Waves and Floating Bodies, Plitvice, Croatia .[74] Visbech J, Engsig-Karup AP and Ricchiuto M (2025) A spectral element solution of the Poisson equation with shifted boundary polynomial corrections: influence of the surrogate to true boundary mapping and an asymptotically preserving Robin formulation. Journal of Scientific Computing 102(1): 11. [75] Visbech J, Melander A and Engsig-Karup AP (2025) FNPF-SEM: A parallel spectral element model in Fire-drake for fully nonlinear water wave simulations. The International Journal of High Performance Computing Applications : 10943420261462394. [76] Wang L, Tang H and Wu Y (2013) Study on interaction between a solitary wave and a submerged semi-circular cylinder using acceleration potential. In: Proceedings: 23rd International Ocean and Polar Engineering Conference, Anchorage, Alaska, USA .[77] Xu D, Colomés O, Main A, Li K, Atallah NM, Abboud N and Scovazzi G (2025) A weighted shifted boundary method for the Navier-Stokes equations with immersed moving boundaries. Journal of Computational Physics :114571. [78] Xu H, Cantwell C, Monteserin C, Eskilsson C, Engsig-Karup AP and Sherwin S (2018) Spectral/hp element methods: Recent developments, applications, and perspectives. Journal of Hydrodynamics 30. [79] Xu Y, Bingham HB and Shao Y (2021) Finite difference solutions for nonlinear water waves using an immersed boundary method. International Journal for Numerical Methods in Fluids 93(4): 1143–1162. [80] Xu Y, Bingham HB and Shao Y (2023) A high-order finite difference method with immersed-boundary treatment for fully-nonlinear wave–structure interaction. Applied Ocean Research 134: 103535. [81] Yang CH, Scovazzi G, Krishnamurthy A and Ganapathysubramanian B (2025) Octree-based adaptive mesh refinement and the shifted boundary method for efficient fluid dynamics simulations. Advances in Computational Science and Engineering 4. [82] Zhou B, Amini-Afshar M, Bingham HB, Shao Y, Malenica Š and Andersen MH (2024) Solving for hydroelastic ship response using a high-order finite difference method on overlapping grids at zero speed. Marine Structures 
+
+95: 103602. 25 An arXiv Preprint VISBECH ET AL . (2026) 
+
+# A Comparing effect of stabilization parameters 
+
+Table 3: Testing various stabilization parameters for different waves and resolution with m = {1, . . . , 5}, γ =
+
+{0, 0.1, 1, 10 }, kh = {1, π, 2π}, Nx = {4, 8, 16 }, Nz = {1, 2, 4}, and p = {4, 5, 6} for ε/ε max = 90% nonlinearity after 50 T for analysis in Section 5.3. Showing the 50 best runs sorted after emix = edif + edis .
+
+kh Nx Nz p m γ edif edis emix 
+
+1 16 4 6 4 10 0.1802 0.0100 0.1902 1 16 4 6 3 1 0.1403 0.1100 0.2503 1 16 4 6 5 10 0.0809 0.2400 0.3209 1 16 4 5 5 10 0.3970 0.1200 0.5170 1 16 2 6 4 10 0.1367 0.4501 0.5868 1 16 2 6 3 1 0.1059 0.5201 0.6260 1 16 2 5 3 1 0.4374 0.2100 0.6474 1 16 2 6 4 1 0.0383 0.6901 0.7283 1 16 2 6 5 1 0.0292 0.7101 0.7393 1 16 2 6 5 10 0.0541 0.6901 0.7442 1 16 2 5 4 10 0.6209 0.2200 0.8410 1 16 2 5 5 10 0.2021 0.6801 0.8822 
+
+π 16 4 6 3 10 0.1407 0.7701 0.9108 
+
+π 16 4 6 3 1 0.0057 1.1001 1.1058 
+
+π 16 4 6 4 10 0.0100 1.1001 1.1101 
+
+π 16 4 6 4 1 0.0197 1.1301 1.1498 
+
+π 16 4 6 5 10 0.0213 1.1301 1.1514 1 16 4 5 3 1 0.6113 0.5801 1.1913 
+
+π 16 4 6 5 1 0.0682 1.2401 1.3083 1 16 2 5 4 1 0.3550 0.9901 1.3451 
+
+π 8 4 6 3 1 0.7986 0.5801 1.3787 
+
+π 16 4 5 3 10 0.5505 0.8801 1.4306 
+
+π 8 2 6 4 10 1.4482 0.2800 1.7282 
+
+π 16 4 6 2 1 0.1148 1.6802 1.7950 1 16 4 5 4 10 0.7869 1.0401 1.8270 
+
+2π 8 4 6 4 10 1.2064 0.7001 1.9065 
+
+π 16 4 5 4 10 0.0195 1.9602 1.9797 
+
+π 16 4 5 3 1 0.0229 1.9602 1.9831 
+
+π 8 4 6 4 1 0.5827 1.4701 2.0528 
+
+π 16 4 5 5 10 0.0262 2.0502 2.0764 1 16 2 4 3 1 1.6516 0.4601 2.1117 
+
+π 16 4 5 4 1 0.0338 2.0802 2.1140 1 16 2 6 3 10 0.9168 1.3001 2.2169 
+
+π 8 2 6 3 1 0.5710 1.7002 2.2712 1 16 4 6 3 10 0.8190 1.4601 2.2791 
+
+2π 8 4 6 3 1 0.3104 2.0402 2.3506 1 16 2 4 5 10 1.0841 1.2901 2.3742 
+
+π 16 4 5 2 1 0.1662 2.2902 2.4564 1 16 2 5 2 1 0.3757 2.2002 2.5759 
+
+π 8 2 6 4 1 0.0920 2.7003 2.7923 
+
+π 8 2 6 5 10 0.2590 2.8203 3.0793 
+
+π 8 2 5 3 1 1.3131 2.0102 3.3233 
+
+π 16 4 4 2 1 1.7907 1.5702 3.3609 
+
+2π 8 4 6 5 10 0.4335 2.9403 3.3738 
+
+2π 8 4 6 4 1 0.3912 2.9903 3.3815 
+
+π 16 2 6 3 10 0.3251 3.0703 3.3954 
+
+π 8 2 5 5 10 0.5048 2.9403 3.4451 
+
+π 16 4 4 4 10 0.4282 3.0903 3.5185 
+
+2π 8 4 5 3 1 0.8164 2.7603 3.5767 
+
+π 16 4 4 3 1 0.3869 3.2303 3.6172 26 An arXiv Preprint VISBECH ET AL . (2026) 
+
+# B Free surface wave elevations for the submerged bar test 30 32 34 36 38 40 
+
+> 2 [m]
+
+-0.02 -0.01 00.01 0.02 
+
+x = 2 [m] 
+
+> Beji & Battjes (1994) Presented model
+
+30 32 34 36 38 40 -0.02 -0.01 00.01 0.02 
+
+x = 4 [m] 
+
+30 32 34 36 38 40 
+
+> 2 [m]
+
+-0.02 -0.01 00.01 0.02 
+
+x = 10 :5 [m] 
+
+30 32 34 36 38 40 -0.02 -0.01 00.01 0.02 
+
+x = 12 :5 [m] 
+
+30 32 34 36 38 40 
+
+> 2 [m]
+
+-0.02 -0.01 00.01 0.02 
+
+x = 13 :5 [m] 
+
+30 32 34 36 38 40 -0.02 -0.01 00.01 0.02 
+
+x = 14 :5 [m] 
+
+30 32 34 36 38 40 
+
+> 2 [m]
+
+-0.02 -0.01 00.01 0.02 
+
+x = 15 :7 [m] 
+
+30 32 34 36 38 40 -0.02 -0.01 00.01 0.02 
+
+x = 17 :3 [m] 
+
+t [s] 
+
+30 32 34 36 38 40 
+
+> 2 [m]
+
+-0.02 -0.01 00.01 0.02 
+
+x = 19 [m] 
+
+t [s] 
+
+30 32 34 36 38 40 -0.02 -0.01 00.01 0.02 
+
+x = 21 [m] 
+
+Figure 13: Time series of the free surface wave elevation at 10 different wave gauge locations for the submerged bar test in Section 6.2. 27 An arXiv Preprint VISBECH ET AL . (2026) 
+
+# C Unfitted mesh for the semi-circular bathymetry bump x [m] 
+
+29.5 29.6 29.7 29.8 29.9 30 30.1 30.2 30.3 30.4 30.5 
+
+> z [m]
+
+-1 -0.9 -0.8 -0.7 -0.6 -0.5 
+
+> e+h
+> e!bh
+> !b
+
+Figure 14: Zoomed in around the unfitted mesh of the semi-circular bathymetry bump. 28

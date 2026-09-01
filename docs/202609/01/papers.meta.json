@@ -1,0 +1,39 @@
+{
+  "label": "2026-09-01",
+  "date": "2026-09-01",
+  "generated_at": "2026-09-01T22:33:41",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202609/01/2608.28123v1-a-high-order-polynomial-corrected-shifted-boundary-method-for-simulating-fully-nonlinear-water-waves",
+      "section": "quick",
+      "title_en": "A high-order polynomial-corrected shifted boundary method for simulating fully nonlinear water waves",
+      "authors": "Jens Visbech, Allan P. Engsig-Karup, Harry B. Bingham, Mario Ricchiuto",
+      "date": "2026-08-28",
+      "pdf": "https://arxiv.org/pdf/2608.28123v1",
+      "score": "7.0",
+      "evidence": "自由表面水波高阶平移边界法，多相流CFD",
+      "tldr": "针对完全非线性水波模拟中自由表面移动变形和地形变化带来的网格重构难题，本文提出一种高阶多项式校正移位边界方法，结合任意阶有限差分与超粘性稳定技术。该方法在非拟合谱元素上精确逼近弯曲时变边界，无需重新网格化，并通过保多项式梯度恢复准确捕捉垂直自由表面速度。数值实验验证了高阶收敛性、长时间稳定性以及非线性波与仿射/弯曲地形和垂直壁的相互作用。该工作为海浪与海上结构物相互作用提供了灵活高效的一体化计算框架。",
+      "tags": "query:falling-film",
+      "abstract_en": "We present a novel unfitted computational framework for simulating fully nonlinear potential flow-based water waves. Focusing on wave propagation, we describe the core methodology, which involves a high-order polynomial-corrected shifted-boundary approximation on unfitted spectral elements. This approach allows for the simulation of a curved, highly time-dependent (moving and deforming) free surface affected by bathymetric changes. All that on a simple Cartesian background mesh without re-meshing or further approximations of non-affine geometric features. In addition, we highlight the importance of proper gradient recovery using a polynomial-preserving technique to accurately capture the vertical free-surface velocity. Ultimately, the goal is to develop a high-order convergent numerical scheme capable of simulating highly nonlinear waves over long periods. This is achieved through an arbitrary-order finite-difference approximation of the free surface combined with added hyperviscosity for numerical stability. We present verification and validation test cases for wave propagation in both periodic and finite domains. Emphasis is placed on convergence studies, the justification for using high-order approximations, the importance of optimal gradient recovery, long-time simulation of highly nonlinear waves, and nonlinear wave interactions with both affine and curved bathymetry changes, as well as with vertical walls, for highly nonlinear stream function waves and high-amplitude solitons. The novel computational model offers a comprehensive, all-in-one framework for simulating ocean waves and their interactions with offshore structures. It provides significant geometric flexibility, enabling boundaries such as the free surface to move and deform over time without the need to re-mesh a boundary-fitted mesh.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/01/2608.29069v1-spectral-embedded-operator-learning-for-three-phase-interfacial-flow-a-ternary-cahn-hilliard-navier-stokes-benchmark",
+      "section": "quick",
+      "title_en": "Spectral-Embedded Operator Learning for Three-Phase Interfacial Flow: A Ternary Cahn-Hilliard-Navier-Stokes Benchmark",
+      "authors": "Muhammad Abid, Arth Sojitra, Omer San",
+      "date": "2026-08-29",
+      "pdf": "https://arxiv.org/pdf/2608.29069v1",
+      "score": "6.0",
+      "evidence": "三相界面流算子学习基准，多相流CFD",
+      "tldr": "现有算子学习代理多在单场单界面问题上验证，能否迁移到约束多相流尚不清楚。本文构建三相界面流基准，比较三种仅 trunk 表示不同的 DeepONet 变体：原始坐标、随机傅里叶特征和切比雪夫字典。切比雪夫字典（SEDONet）使测试相对 L2 误差比 FEDONet 降低16.8%，比 DeepONet 降低24.0%，五个输出通道全部改善。该结果表明切比雪夫表示对强非周期性壁面法向和时间结构特别有效，为多相流代理模型提供新基准。",
+      "tags": "query:falling-film",
+      "abstract_en": "Operator-learning surrogates have been benchmarked largely on single-field, single-interface problems, leaving unclear whether architectural choices validated in those settings transfer to constrained, multiphase flows. We introduce a three-phase interfacial-flow benchmark to examine whether the trunk coordinate representation matters for a multi-channel, interface-dominated target. The configuration consists of an air bubble rising through water, piercing a water-oil interface, and entraining a water plume into the oil within a bounded, wall-confined domain. Reference data are generated using a structure-preserving ternary Cahn-Hilliard-Navier-Stokes solver that algebraically preserves the simplex constraint. From 1,024 Sobol-sampled simulations spanning a nine-dimensional parameter space, we learn the mapping from physical parameters to five-channel space-time fields. We compare three parameter-matched DeepONet variants differing only in trunk representation: raw coordinates (DeepONet), random Fourier features (FEDONet), and a fixed tensor-product Chebyshev dictionary (SEDONet). SEDONet reduces the test relative L2 error by 16.8% compared with FEDONet and by 24.0% compared with DeepONet, while improving all five output channels. Spatial and temporal error analyses localize the principal gains near the diffuse interfaces and after bubble breakthrough. The results indicate that the Chebyshev representation is particularly effective for the strongly non-periodic wall-normal and temporal structure of this three-phase flow.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

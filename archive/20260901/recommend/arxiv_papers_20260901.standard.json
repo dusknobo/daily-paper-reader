@@ -1,0 +1,94 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-01T22:30:13.201407+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.28123v1",
+      "source": "arxiv",
+      "title": "A high-order polynomial-corrected shifted boundary method for simulating fully nonlinear water waves",
+      "abstract": "We present a novel unfitted computational framework for simulating fully nonlinear potential flow-based water waves. Focusing on wave propagation, we describe the core methodology, which involves a high-order polynomial-corrected shifted-boundary approximation on unfitted spectral elements. This approach allows for the simulation of a curved, highly time-dependent (moving and deforming) free surface affected by bathymetric changes. All that on a simple Cartesian background mesh without re-meshing or further approximations of non-affine geometric features. In addition, we highlight the importance of proper gradient recovery using a polynomial-preserving technique to accurately capture the vertical free-surface velocity. Ultimately, the goal is to develop a high-order convergent numerical scheme capable of simulating highly nonlinear waves over long periods. This is achieved through an arbitrary-order finite-difference approximation of the free surface combined with added hyperviscosity for numerical stability. We present verification and validation test cases for wave propagation in both periodic and finite domains. Emphasis is placed on convergence studies, the justification for using high-order approximations, the importance of optimal gradient recovery, long-time simulation of highly nonlinear waves, and nonlinear wave interactions with both affine and curved bathymetry changes, as well as with vertical walls, for highly nonlinear stream function waves and high-amplitude solitons. The novel computational model offers a comprehensive, all-in-one framework for simulating ocean waves and their interactions with offshore structures. It provides significant geometric flexibility, enabling boundaries such as the free surface to move and deform over time without the need to re-mesh a boundary-fitted mesh.",
+      "authors": [
+        "Jens Visbech",
+        "Allan P. Engsig-Karup",
+        "Harry B. Bingham",
+        "Mario Ricchiuto"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "math.NA"
+      ],
+      "published": "2026-08-28T09:35:17+00:00",
+      "link": "https://arxiv.org/pdf/2608.28123v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "high-order shifted boundary method for free-surface water waves, multiphase CFD",
+      "llm_evidence_cn": "自由表面水波高阶平移边界法，多相流CFD",
+      "llm_evidence": "自由表面水波高阶平移边界法，多相流CFD",
+      "canonical_evidence": "自由表面水波高阶平移边界法，多相流CFD",
+      "llm_tldr_en": "Proposes a high-order unfitted spectral element method with polynomial-corrected shifted boundaries for simulating fully nonlinear free-surface water waves, offering advanced multiphase flow CFD capabilities.",
+      "llm_tldr_cn": "该文针对全非线性水波模拟中曲率大、动边界复杂的问题，提出高阶多项式校正平移边界方法，在简单笛卡尔背景网格上用非拟合谱元逼近自由表面。该方法无需重网格，能处理随时间和地形变化的自由面，并强调梯度恢复保证垂直速度精度。该工作为多相流自由表面CFD提供了高精度工具，可借鉴于降膜界面模拟。",
+      "llm_tldr": "该文针对全非线性水波模拟中曲率大、动边界复杂的问题，提出高阶多项式校正平移边界方法，在简单笛卡尔背景网格上用非拟合谱元逼近自由表面。该方法无需重网格，能处理随时间和地形变化的自由面，并强调梯度恢复保证垂直速度精度。该工作为多相流自由表面CFD提供了高精度工具，可借鉴于降膜界面模拟。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.29069v1",
+      "source": "arxiv",
+      "title": "Spectral-Embedded Operator Learning for Three-Phase Interfacial Flow: A Ternary Cahn-Hilliard-Navier-Stokes Benchmark",
+      "abstract": "Operator-learning surrogates have been benchmarked largely on single-field, single-interface problems, leaving unclear whether architectural choices validated in those settings transfer to constrained, multiphase flows. We introduce a three-phase interfacial-flow benchmark to examine whether the trunk coordinate representation matters for a multi-channel, interface-dominated target. The configuration consists of an air bubble rising through water, piercing a water-oil interface, and entraining a water plume into the oil within a bounded, wall-confined domain. Reference data are generated using a structure-preserving ternary Cahn-Hilliard-Navier-Stokes solver that algebraically preserves the simplex constraint. From 1,024 Sobol-sampled simulations spanning a nine-dimensional parameter space, we learn the mapping from physical parameters to five-channel space-time fields. We compare three parameter-matched DeepONet variants differing only in trunk representation: raw coordinates (DeepONet), random Fourier features (FEDONet), and a fixed tensor-product Chebyshev dictionary (SEDONet). SEDONet reduces the test relative L2 error by 16.8% compared with FEDONet and by 24.0% compared with DeepONet, while improving all five output channels. Spatial and temporal error analyses localize the principal gains near the diffuse interfaces and after bubble breakthrough. The results indicate that the Chebyshev representation is particularly effective for the strongly non-periodic wall-normal and temporal structure of this three-phase flow.",
+      "authors": [
+        "Muhammad Abid",
+        "Arth Sojitra",
+        "Omer San"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "cs.LG"
+      ],
+      "published": "2026-08-29T05:45:42+00:00",
+      "link": "https://arxiv.org/pdf/2608.29069v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "three-phase interfacial flow operator learning benchmark, multiphase CFD",
+      "llm_evidence_cn": "三相界面流算子学习基准，多相流CFD",
+      "llm_evidence": "三相界面流算子学习基准，多相流CFD",
+      "canonical_evidence": "三相界面流算子学习基准，多相流CFD",
+      "llm_tldr_en": "Introduces a three-phase interfacial-flow benchmark to test spectral-embedded operator learning surrogates for multiphase Cahn-Hilliard-Navier-Stokes simulations, providing a relevant computational multiphase flow tool.",
+      "llm_tldr_cn": "该文针对算子学习在受限多相流中的适用性，提出三相界面流基准，包含气泡上升穿过水油界面等物理过程。参考数据由结构保持的三元Cahn-Hilliard-Navier-Stokes求解器生成，重点考察谱嵌入坐标表示对多通道界面主导目标的影响。该基准为多相流CFD代理模型开发提供了评估平台，虽非降膜专用，但方法可迁移。",
+      "llm_tldr": "该文针对算子学习在受限多相流中的适用性，提出三相界面流基准，包含气泡上升穿过水油界面等物理过程。参考数据由结构保持的三元Cahn-Hilliard-Navier-Stokes求解器生成，重点考察谱嵌入坐标表示对多通道界面主导目标的影响。该基准为多相流CFD代理模型开发提供了评估平台，虽非降膜专用，但方法可迁移。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
