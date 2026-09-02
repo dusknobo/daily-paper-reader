@@ -1,0 +1,69 @@
+{
+  "label": "2026-09-02",
+  "date": "2026-09-02",
+  "generated_at": "2026-09-02T22:55:54",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202609/02/2608.29240v1-from-localized-dryout-to-convective-elongated-vapor-structures-reynolds-number-effects-on-boiling-transition-in-a-rectangular-mini-channel",
+      "section": "deep",
+      "title_en": "From localized dryout to convective elongated vapor structures: Reynolds number effects on boiling transition in a rectangular mini-channel",
+      "authors": "Qi Wang, Xin Wang, Mingze Wang, Yifei Guan, Kang Luo, Jian Wu, Wei Wang, Alberto T. Perez",
+      "date": "2026-08-29",
+      "pdf": "https://arxiv.org/pdf/2608.29240v1",
+      "score": "8.0",
+      "evidence": "直接研究微通道内两相流动沸腾模拟，含共轭传热",
+      "tldr": "在矩形微通道饱和流动沸腾中，入口雷诺数如何影响沸腾模式转变与传热恶化仍缺乏深入理解。本研究采用三维共轭模拟，结合物理信息多站点成核模型与Halton序列空间分配，系统分析不同Re下的沸腾行为。结果表明，低Re下转变由上游局部干涸和下游液体饥饿主导，高Re下则通过蒸汽结构对流拉伸形成拉长蒸汽塞并演化为蒸汽膜，其中Re=2000整体热响应最优。研究建立了雷诺数与蒸汽组织、壁面干涸及全局传热性能之间的关联，为微通道沸腾优化提供了理论依据。",
+      "tags": "query:falling-film",
+      "abstract_en": "Three-dimensional conjugate simulations were conducted to investigate saturated flow boiling in a rectangular mini-channel, with particular emphasis on the role of inlet Reynolds number on boiling mode selection and transition. A C++ based open-source numerical framework was employed, incorporating a physically informed multi-site nucleation model by coupling a nucleation site density correlation with a Halton-sequence based spatial allocation strategy. Two distinct Re-dependent transition pathways were identified. At low Re, boiling transition is mainly associated with localized dryout development associated with upstream active boiling and progressive downstream liquid starvation. At high Re, the transition is characterized by convective stretching and reorganization of vapor structures, through which elongated vapor slugs evolve into localized vapor films and eventually approach full surface vapor coverage. The global heat transfer characteristics and peak heat transfer capacity are further interpreted in conjunction with boiling mode transition, clarifying the respective roles of wall dryout and volumetric vapor fraction in heat transfer deterioration. Among all cases, Re=2000 provides the most favorable overall thermal response. Overall, within the rectangular mini-channel configuration and operating range considered in this study, Re is closely associated with vapor organization, boiling transition, wall dryout, and global heat transfer performance.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/02/2608.25578v1-global-quasi-strong-solutions-to-the-voigt-regularization-of-a-diffuse-interface-model-for-incompressible-two-phase-flows-with-bulk-surface-interaction",
+      "section": "quick",
+      "title_en": "Global Quasi-strong Solutions to the Voigt Regularization of a Diffuse Interface Model for Incompressible Two-phase Flows with Bulk-surface Interaction",
+      "authors": "Patrik Knopf, Maoyin Lv, Hao Wu",
+      "date": "2026-08-26",
+      "pdf": "https://arxiv.org/pdf/2608.25578v1",
+      "score": "6.0",
+      "evidence": "不可压缩两相流扩散界面模型的Voigt正则化",
+      "tldr": "针对具有体-表面相互作用、密度不匹配的不可压缩两相流，其扩散界面模型包含Navier-Stokes-Voigt速度方程与带奇异势的对流Cahn-Hilliard相场方程，并受广义滑移和动态边界条件约束。通过Voigt正则化、精细近似方案与半Galerkin方法，克服了非线性与边界耦合困难。证明该模型存在全局准强解，且解满足能量等式。这为复杂两相流系统的适定性提供了严格理论支撑，并保留了热力学一致性。",
+      "tags": "query:falling-film",
+      "abstract_en": "We analyze a thermodynamically consistent diffuse interface model for incompressible two-phase viscous flows with unmatched densities in a smooth bounded domain $Ω\\subset\\mathbb{R}^d$ $(d=2,3)$. This model consists of the Navier-Stokes-Voigt equations for the velocity field and a convective Cahn-Hilliard equation with a singular potential for the phase-field variable. The resulting hydrodynamic system is subject to a generalized Navier slip boundary condition for the velocity field and Cahn-Hilliard-type dynamic boundary conditions for the phase-field variable and the chemical potential. With the aid of the Voigt regularization, we establish the existence of global quasi-strong solutions that satisfy an energy equality. This is achieved through a combination of delicate approximation schemes and a semi-Galerkin method.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/02/2609.00535v1-spectral-element-lattice-boltzmann-method-for-non-ideal-gases-with-partial-wetting-boundary-condition",
+      "section": "quick",
+      "title_en": "Spectral element lattice Boltzmann method for non-ideal gases with partial wetting boundary condition",
+      "authors": "Chunheng Zhao, Saumil Patel, Taehun Lee",
+      "date": "2026-09-01",
+      "pdf": "https://arxiv.org/pdf/2609.00535v1",
+      "score": "6.0",
+      "evidence": "弯曲几何上两相流部分润湿的格子玻尔兹曼方法",
+      "tldr": "在复杂弯曲表面上模拟非理想气体相分离与部分润湿极具挑战，传统格子玻尔兹曼方法在非结构化网格上产生较大寄生电流。本文提出谱元格子玻尔兹曼方法，结合相场模型和力分裂策略，通过通量反弹方案处理复杂边界并实现热力学一致的润湿条件。模拟表明寄生电流显著降低，润湿配置残余动能达10^{-24}，孤立液滴达10^{-30}。该方法为复杂几何润湿现象提供了高精度、高稳定性的模拟工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "We present a spectral element lattice Boltzmann method (LBM) for partial wetting on curved geometries. A non-ideal gas phase-field model is incorporated into the LBM framework to enable phase separation with a constant interface thickness and the potential form of surface tension force is used. We adopt the force-splitting approach, yielding significantly improved stability and accuracy. Complex boundaries are naturally handled using a flux bounce-back scheme, which resolves inconsistencies in normal vectors across adjacent elements. Additionally, a general wetting boundary condition is implemented to capture static contact line in a thermodynamically consistent manner. The method is validated through simulations of droplets on flat surfaces, 2/3-dimensional curved surfaces, and equilibrium droplets without boundaries. Results demonstrate that parasitic currents are significantly reduced on unstructured meshes with complex geometries, reaching residual kinetic energy levels on the order of $10^{-24}$ for wetting configurations and $10^{-30}$ for isolated droplets.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/02/2609.01444v1-macroscopic-simulations-of-thin-film-wettingdewetting-using-a-precursor-film-model",
+      "section": "quick",
+      "title_en": "Macroscopic simulations of thin film wetting/dewetting using a precursor film model",
+      "authors": "Xi-Hu Wu, Zhuo Long, Xue-Li Wang, Peng Gao",
+      "date": "2026-09-01",
+      "pdf": "https://arxiv.org/pdf/2609.01444v1",
+      "score": "6.0",
+      "evidence": "基于前驱膜模型的薄膜润湿/去润湿有限元模拟",
+      "tldr": "动态润湿过程的数值模拟因移动接触线跨越分子到宏观的多尺度特征而极具挑战，传统方法需在接触线附近加密网格，计算成本高昂。本文提出一种基于润滑方程和重构分离压的介观前驱膜模型，并采用有限元法求解二维或三维问题。该模型使用相对较厚的前驱膜即可复现物理薄前驱膜的中间区域界面行为，显著降低空间分辨率要求。模拟液滴铺展、回缩、滑动、合并及液脊断裂等过程，结果与精确解和渐近理论吻合，为高效宏观薄膜润湿/去润湿模拟提供了新途径。",
+      "tags": "query:falling-film",
+      "abstract_en": "Numerical simulation of dynamic wetting processes remains challenging due to the multiscale feature of the moving contact line. This paper presents a finite element method for two- or three-dimensional dynamic wetting problems within the framework of the lubrication equation and the precursor film model. By reconstructing the disjoining pressure formulation, a mesoscopic precursor film model is implemented to enable a relatively thick precursor film to reproduce the intermediate-region interfacial behavior of a physically thin precursor film. The proposed model reduces the requirement for excessive spatial resolution near the contact line, thereby significantly reducing the computational cost while preserving the macroscopic flow dynamics. This method does not incorporate any moving boundary and easily handles topological changes. Its capability and accuracy are validated through various simulations, including the spreading, retraction, sliding, and coalescence of drops, as well as the breakup of liquid ridges. Numerical results (with the mesoscopic precursor film model adopted) show good agreement with the available exact solutions and asymptotic theories.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

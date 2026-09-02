@@ -1,0 +1,12728 @@
+Title: Global Quasi-strong Solutions to the Voigt Regularization of a Diffuse Interface Model for Incompressible Two-phase Flows with Bulk-surface Interaction
+
+URL Source: https://arxiv.org/pdf/2608.25578v1
+
+Published Time: Thu, 27 Aug 2026 00:57:57 GMT
+
+Number of Pages: 69
+
+Markdown Content:
+# Global Quasi-strong Solutions to the Voigt Regularization of a Diffuse Interface Model for Incompressible Two-phase Flows with Bulk-surface Interaction 
+
+Patrik Knopf * † , Maoyin Lv ‡ , Hao Wu ‡ § 
+
+Abstract 
+
+We analyze a thermodynamically consistent diffuse interface model for incompressible two-phase viscous flows with unmatched densities in a smooth bounded domain Ω ⊂ Rd (d = 2 , 3) . This model consists of the Navier–Stokes–Voigt equations for the velocity field and a convective Cahn–Hilliard equation with a singular potential for the phase-field variable. The resulting hydrodynamic system is subject to a generalized Navier slip boundary condition for the velocity field and Cahn–Hilliard-type dynamic boundary conditions for the phase-field variable and the chemical potential. With the aid of the Voigt regularization, we establish the existence of global quasi-strong solutions that satisfy an energy equality. This is achieved through a combination of delicate approximation schemes and a semi-Galerkin method. 
+
+Keywords : Two-phase flow, Navier–Stokes–Voigt system, Cahn–Hilliard equation, generalized Navier bound-ary condition, dynamic boundary condition, global quasi-strong solution. 
+
+MSC 2020 : 35A01, 35K55, 35Q35, 76D05. 
+
+# Contents 
+
+1 Introduction 22 Preliminaries and Main Result 7
+
+2.1 Preliminaries . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 72.2 Main result . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13 
+
+3 An Approximate Problem in the Case (K, L ) ∈ (0 , +∞] × (0 , +∞) 16 
+
+3.1 Approximation of the initial data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16 3.2 The approximate problem . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21 3.3 Existence of approximate solutions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22 
+
+4 Existence of Quasi-strong Solutions in the Case (K, L ) ∈ (0 , +∞] × (0 , +∞) 32 
+
+4.1 Uniform estimates for the approximate solutions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 4.2 Passage to the limit and existence of quasi-strong solutions . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43 
+
+5 Existence of Quasi-strong Solutions to the Limit Models 47 
+
+5.1 The case (K, L ) ∈ (0 , +∞] × { 0} . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48 5.2 The case (K, L ) ∈ (0 , +∞] × { +∞} . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51 
+
+A Analysis of a Bulk-Surface Convective Viscous Cahn–Hilliard System 55 
+
+> *
+
+Faculty for Mathematics, University of Regensburg, D-93053 Regensburg, Germany. Email: patrik.knopf@ur.de 
+
+> †
+
+Institute for Analysis, Department of Mathematics, Karlsruhe Institute of Technology (KIT), D-76128 Karlsruhe, Germany. 
+
+> ‡
+
+School of Mathematical Sciences, Fudan University, Shanghai 200433, P.R. China. Email: mylv22@m.fudan.edu.cn , haowufd@fudan.edu.cn 
+
+> §
+
+Corresponding author. 
+
+1arXiv:2608.25578v1 [math.AP] 26 Aug 2026 1 Introduction 
+
+The mathematical description of multi-phase flows is a central topic in modern continuum fluid dynamics. Such flows arise in a wide range of natural and industrial processes, including biological systems, chemical engineering, and materials science, and involve the evolution of complex fluid interfaces. A widely used diffuse-interface model for incompressible binary mixtures of immiscible fluids with unmatched densities is the so-called AGG model, which was proposed by Abels, Garcke, and Grün in [6]: 
+
+∂t(ρ(φ)v) + div( v ⊗ (ρ(φ)v + J)) − div(2 ν(φ)Dv) + ∇p = −div( ∇φ ⊗ ∇ φ) in QT , (1.1a) 
+
+div v = 0 in QT , (1.1b) 
+
+∂tφ + v · ∇ φ = ∆ μ in QT , (1.1c) 
+
+μ = −∆φ + F ′(φ) in QT . (1.1d) Here, T ∈ (0 , +∞) is a given final time, Ω ⊂ Rd (d = 2 , 3) is a bounded domain with smooth boundary 
+
+Γ := ∂Ω, and we write QT := Ω × (0 , T ). The letter n denotes the outward unit normal vector on ∂Ω, and ∂n
+
+denotes the associated normal derivative on ∂Ω. The unknowns v : Ω ×(0 , T ) → Rd, φ : Ω ×(0 , T ) → [−1, 1] ,and p : Ω × (0 , T ) → R represent the volume-averaged velocity field, the order parameter (i.e., the difference 
+
+φ = φ2 − φ1 of the volume fractions φ1 and φ2 of the two fluids), and the pressure of the fluid mixture, respectively. The flux term J, the density ρ, and the viscosity ν are given by 
+
+J = − ρ1 − ρ2
+
+2 ∇μ, ρ(φ) = ρ1
+
+1 + φ
+
+2 + ρ2
+
+1 − φ
+
+2 , ν(φ) = ν1
+
+1 + φ
+
+2 + ν2
+
+1 − φ
+
+2 , (1.2) where the positive constants ρ1, ρ2 and ν1, ν2 represent the homogeneous densities and viscosities of the two fluids, respectively. Without loss of generality, we assume that ρ1 > ρ 2 > 0. As ρ is linear in φ, we write 
+
+ρ′ := ρ′(φ) = ρ1 − ρ2
+
+2
+
+for simplicity. Moreover, the symbol Dv = 12 (∇v + ( ∇v)⊤) denotes the symmetric gradient of v, where the superscript ⊤ denotes the transposition of the matrix. The nonlinear function F is the homogeneous free energy density, which is assumed to exhibit a double-well structure, and F ′ is its derivative. For the description of binary fluids, the physically most relevant choice is the Flory–Huggins potential given by 
+
+Flog (r) = Θ2 [(1 + r)ln (1 + r) + (1 − r)ln (1 − r)] − Θ0
+
+2 r2, for all r ∈ (−1, 1) .
+
+Here, the constant parameters Θ and Θ0 are assumed to fulfill the condition 0 < Θ < Θ0, which ensures that 
+
+Flog is double-well shaped. In the case of matched densities ρ1 = ρ2, the AGG model (1.1) reduces to the well-known “Model H”, which was originally proposed in [38] and later rigorously derived in [36]. Since then, it has been investigated in numerous works such as [1, 33] and the references therein. For the development of thermodynamically consistent diffuse interface models for multi-phase flows with unmatched densities, we refer to [6, 11, 49, 57, 58, 64]. They are based on different choices of the mean velocity of the mixture as well as further constitutive assumptions. Further discussions on the existing Navier–Stokes–Cahn–Hilliard models can be found in [63], where a unified framework was developed. In the literature, the AGG model has mostly been supplemented with the classical no-slip boundary condi-tion for v and homogeneous Neumann boundary conditions for φ and μ:
+
+v = 0 on ΣT , (1.3a) 
+
+∂nφ = 0 on ΣT , (1.3b) 2∂nμ = 0 on ΣT . (1.3c) The AGG model (1.1), subject to (1.3a)–(1.3c) and suitable initial conditions, has been extensively studied; we refer to [3–5, 10, 28–30] and the references therein. Regarding progress in its nonlocal variant and other generalizations, we refer to [7–9, 17, 18, 20, 39]. Although the AGG model (1.1) is a useful model for the study of two-phase flows with unmatched densities, it inherits certain limitations resulting from the no-slip boundary condition on the velocity field and the homogeneous Neumann boundary conditions imposed on the underlying convective Cahn–Hilliard subsystem: (L1) As discussed in [56], the no-slip boundary condition (1.3a) is often inadequate for the description of moving contact line phenomena. This is mainly because it neglects convective effects at the boundary and in its close vicinity. (L2) The boundary condition (1.3b) implies that the diffuse interface intersects the boundary Γ at a perfect angle of ninety degrees. However, in the context of two-phase flows, the contact angle is expected to deviate from ninety degrees and even evolve dynamically due to the motion of the mixture [56]. (L3) The boundary condition (1.3c) can be regarded as a no-flux boundary condition, as it implies that the normal mass flux J · n vanishes at the boundary. Therefore, the system (1.1) can only describe the situation in which the mass of both fluids in the bulk is conserved. However, any transfer of material between bulk and surface (which could, for instance, be caused by absorption or desorption processes or chemical reactions that take place at the boundary) cannot be described (see, e.g., [40]). To overcome the aforementioned limitations (L1) and (L2), a new class of boundary conditions based on Onsager’s principle of maximal energy dissipation was proposed in [56]: 
+
+v · n = 0 , ∂nμ = 0 , ψ = φ on ΣT , (1.4a) 
+
+2ν(ψ)[ Dv n ]τ + βvτ = G(ψ)∇τ ψ on ΣT , (1.4b) 
+
+∂tψ + vτ · ∇ τ ψ = −γG(ψ) on ΣT , (1.4c) 
+
+G(ψ) = −κ∆τ ψ + ε∂ nφ + G′(ψ) on ΣT . (1.4d) It involves a generalized Navier slip boundary condition on the tangential part of the velocity field (see (1.4b)) and a second-order (Allen–Cahn type) dynamic boundary condition on the phase field (see (1.4c)–(1.4d)). Here, the subscript τ denotes the tangential component of any vector field w, i.e., wτ = w − (w · n)n, ∇τ is the tan-gential gradient on Γ and ∆τ denotes the Laplace–Beltrami operator on Γ. The phenomenological parameters 
+
+β, κ and γ are positive, and the function G represents a surface double-well potential. The “Model H” endowed with the boundary conditions (1.4) was first studied in [21], where the authors proved the existence of global weak solutions for the cases where both F and G are polynomial-like potentials, or F is a singular potential and 
+
+G is a polynomial. Later, the existence of global weak solutions to (1.1) under (1.4) was established in [23]. To overcome the limitation (L3) of the AGG model (1.1), a new class of boundary conditions was derived in [31]. It consists of Cahn–Hilliard-type dynamic boundary conditions for the phase-field variable φ and the chemical potential μ, and a generalized Navier slip boundary condition for the velocity field v:
+
+v · n = 0 on ΣT , (1.5a) 
+
+h
+
+2ν(ψ)Dv n + β(ψ)v
+
+i 
+
+> τ
+
+=
+
+h
+
+− ψ∇τ L + 12 (J · n)v
+
+i 
+
+> τ
+
+on ΣT , (1.5b) 
+
+(
+
+L∂ nμ = L − μ, if L ∈ [0 , +∞),∂nμ = 0 , if L = + ∞, ψ = φ on ΣT , (1.5c) 3∂tψ + div Γ(ψvτ ) = ∆ τ L − ∂nμ on ΣT , (1.5d) 
+
+L = −∆τ ψ + ∂nφ + G′(ψ) on ΣT . (1.5e) Here the positive slip parameter β may also depend on the surface phase-field ψ. The derivation of system (1.1) subject to the boundary conditions (1.5) was carried out in [31] by means of local mass balance laws, local energy dissipation laws, and the Lagrange multiplier approach. This model allows for surface diffusion, a dynamic contact angle between the bulk diffuse interface and the solid boundary, and possible mass transfer between bulk and surface. Given the initial conditions 
+
+v|t=0 = v0, φ|t=0 = φ0 in Ω, ψ|t=0 = ψ0 = tr( φ0) on Γ, (1.6) the system (1.1) subject to (1.5)–(1.6) has been studied in [24, 31]. In [31], the authors considered the case 
+
+L = 0 with regular potentials and matched densities, i.e., ρ1 = ρ2. They showed the existence of global weak solutions in two and three dimensions, as well as the uniqueness of the weak solution in two dimensions. Later, in [24], the existence of global weak solutions in two and three dimensions was established for singular potentials and unmatched densities when L ∈ (0 , +∞] or matched densities when L = 0 . For prescribed velocity fields in the bulk and on the boundary, the associated convective bulk-surface Cahn–Hilliard subsystem was analyzed in [32, 43–45]. The non-convective version (i.e., v ≡ 0) has been the subject of extensive investigation in the literature. We refer to [15, 19, 26, 27, 35, 40, 48, 50–52, 60] for a selection of representative contributions. For a comprehensive overview of the Cahn–Hilliard equation with classical or dynamic boundary conditions, we refer to the book [53] and the recent review paper [66]. Finally, we mention a new diffuse interface model for incompressible, viscous fluid mixtures with bulk-surface interaction, consisting of a Navier– Stokes–Cahn–Hilliard model in the bulk that is coupled to a surface Navier–Stokes–Cahn–Hilliard model on the boundary, which has been proposed and analyzed in [46, 61, 62]. Regarding the regularity of solutions to (1.1) subject to (1.5)–(1.6), it seems difficult to go beyond the mere existence of global weak solutions in the case of unmatched densities. This is due to the low regularity of the trace of the velocity field on the boundary and the fact that div Γvτ̸ = 0 on ΣT , which make the nonlinear coupling term div Γ(ψvτ ) difficult to handle. Instead, we shall consider an alternative new class of boundary conditions, which was recently derived in [42] based on local mass balance laws, local energy dissipation laws, and the Lagrange multiplier approach: 
+
+v · n = 0 , div Γ vτ = 0 on ΣT , (1.7a) 
+
+(
+
+K∂ nφ = ψ − φ, if K ∈ [0 , +∞)
+
+∂nφ = 0 , if K = + ∞ on ΣT , (1.7b) 
+
+h
+
+2ν(ψ)Dv n + β(ψ)v
+
+i 
+
+> τ
+
++ ∇τ q =
+
+h
+
+− ψ∇τ L + 12 (J · n)v
+
+i 
+
+> τ
+
+on ΣT , (1.7c) 
+
+(
+
+L∂ nμ = L − μ, if L ∈ [0 , +∞)
+
+∂nμ = 0 , if L = + ∞ on ΣT , (1.7d) 
+
+∂tψ + vτ · ∇ τ ψ = ∆ τ L − ∂nμ on ΣT , (1.7e) 
+
+L = −∆τ ψ + ∂nφ + G′(ψ) on ΣT . (1.7f) In particular, compared to (1.5b), the boundary condition (1.7c) involves an additional surface pressure q, which acts as a Lagrange multiplier for the condition div Γ vτ = 0 on ΣT . To our knowledge, no theoretical results are available for the AGG model (1.1) subject to the initial conditions (1.6) and boundary conditions (1.7). However, a strategy similar to that employed in [24] can be used to establish the existence of a global weak solution. In the case of unmatched densities, it remains difficult to obtain results beyond the existence of weak solutions. Nevertheless, inspired by [22], we will show that the existence of more regular solutions can at least 4be established for a Voigt regularization of the system (1.1), subject to (1.6)–(1.7). From a physical point of view, the Voigt regularization (sometimes also referred to as the Kelvin–Voigt regularization) is mainly used to describe viscoelastic fluids or highly turbulent flows. For mathematical purposes, it has also been extensively employed as a regularization of various incompressible flow models for analytical or numerical purposes. The Voigt-regularized stress tensor is given by 
+
+T(v) = 2 ν(φ)Dv + 2 αD∂tv.
+
+The additional term 2αD∂tv with α > 0 can be interpreted as a time relaxation (see, e.g., [13, 47, 55] and references therein). In summary, for any α > 0, we consider the following Voigt-regularized variant of the Navier–Stokes– Cahn–Hilliard model (1.1) subject to (1.6)–(1.7): 
+
+∂t(ρ(φ)v) + div  v ⊗ (ρ(φ)v + J) − div  2ν(φ)Dv + 2 αD∂tv + ∇p = μ∇φ in QT , (1.8a) 
+
+div v = 0 in QT , (1.8b) 
+
+∂tφ + v · ∇ φ = ∆ μ in QT , (1.8c) 
+
+μ = −∆φ + F ′(φ) in QT , (1.8d) 
+
+ρ(φ) = ρ1 − ρ2
+
+2 φ + ρ1 + ρ2
+
+2 , J = −ρ′∇μ in QT , (1.8e) subject to the boundary conditions 
+
+v · n = 0 , div Γ vτ = 0 on ΣT , (1.9a) 
+
+(
+
+K∂ nφ = ψ − φ, if K ∈ [0 , +∞)
+
+∂nφ = 0 , if K = + ∞ on ΣT , (1.9b) 
+
+h 2ν(φ)Dv + 2 αD∂tvn
+
+i 
+
+> τ
+
++ β(ψ)vτ + ∇τ q =
+
+h
+
+− ψ∇τ L + 12 (J · n)v
+
+i 
+
+> τ
+
+on ΣT , (1.9c) 
+
+(
+
+L∂ nμ = L − μ, if L ∈ [0 , +∞)
+
+∂nμ = 0 , if L = + ∞ on ΣT , (1.9d) 
+
+∂tψ + vτ · ∇ τ ψ = ∆ τ L − ∂nμ on ΣT , (1.9e) 
+
+L = −∆τ ψ + ∂nφ + G′(ψ) on ΣT , (1.9f) and the initial conditions 
+
+v|t=0 = v0, φ|t=0 = φ0 in Ω, ψ|t=0 = ψ0 on Γ. (1.10) The total energy of the system (1.8)–(1.9) is given by 
+
+Etot (v, φ) := Ekin (v, φ) + Efree (φ)
+
+with 
+
+Ekin (v, φ) := 12
+
+Z
+
+> Ω
+
+ρ(φ)|v|2 dx + α
+
+Z
+
+> Ω
+
+|Dv|2 dx, Efree (φ) := 
+
+Z
+
+> Ω
+
+ 12 |∇ φ|2 + F (φ)
+
+
+
+dx
+
+| {z }
+
+> bulk free energy
+
++
+
+Z
+
+> Γ
+
+ 12 |∇ τ ψ|2 + G(ψ)
+
+
+
+dS
+
+| {z }
+
+> surface free energy
+
++ χ(K)2
+
+Z
+
+> Γ
+
+|ψ − φ|2 dS
+
+5where the third term in Efree denotes a penalization of the mismatch between ϕ and ψ on Γ, and 
+
+χ(r) = 
+
+
+
+1
+
+r , if r ∈ (0 , +∞),
+
+0, if r = 0 or + ∞.
+
+(1.11) Moreover, sufficiently regular solutions to problem (1.8)–(1.10) satisfy the mass conservation property 
+
+Z
+
+> Ω
+
+φ(t) d x +
+
+Z
+
+> Γ
+
+ψ(t) d S =
+
+Z
+
+> Ω
+
+φ0 dx +
+
+Z
+
+> Γ
+
+ψ0 dS, for all t ∈ [0 , T ] and L ∈ [0 , +∞),
+
+Z
+
+> Ω
+
+φ(t) d x =
+
+Z
+
+> Ω
+
+φ0 dx, 
+
+Z
+
+> Γ
+
+ψ(t) d S =
+
+Z
+
+> Γ
+
+ψ0 dS, for all t ∈ [0 , T ] and L = + ∞,
+
+and satisfy the energy identity 
+
+ddt Etot (v(t), φ(t)) + 
+
+Z
+
+> Ω
+
+2ν(φ(t)) |Dv(t)|2 dx +
+
+Z
+
+> Γ
+
+β(ψ(t)) |vτ (t)|2 dS
+
++
+
+Z
+
+> Ω
+
+|∇ μ(t)|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ L(t)|2 dS + χ(L)
+
+Z
+
+> Γ
+
+|μ(t) − L (t)|2 dS = 0 
+
+(1.12) for all t ∈ (0 , T ), where χ is defined as in (1.11). 
+
+Goals and main ideas. The goal of this work is to establish the global existence of a more regular (with respect to time) solution to the system (1.8)–(1.10) (see Theorem 2.1). This so-called quasi-strong solution satisfies the energy equality in both two and three dimensions. The proof is based on an appropriate semi-Galerkin approximation scheme. In the following, we outline some features of the problem and key ideas of the proof. (1) Voigt regularization. The parameter α > 0 plays a significant role in the analysis, as the Voigt term 
+
+div(2 αD∂tv) provides estimates for ∂tv in H1(Ω) . This enables us to improve the regularity of ∂tv and to show the existence of a quasi-strong solution. More precisely, to obtain the H1(Ω) -regularity of ∂tv,we need to take w = ∂tv as a test function for the velocity equation (cf. (2.13)). Then, there will emerge three integrals over the boundary Γ involving ∂tv, that is, 
+
+Z
+
+> Γ
+
+β(ψ)vτ · ∂tvτ dS +
+
+Z
+
+> Γ
+
+ψ∇τ L · ∂tvτ dS − 12
+
+Z
+
+> Γ
+
+(J · n)vτ · ∂tvτ dS. 
+
+Since α > 0, the term ∥∂tv∥L4(Γ) can be estimated using the Sobolev embedding theorem and eventually be controlled by Z
+
+> Ω
+
+ρ(φ)|∂tv|2 dx + 2 α
+
+Z
+
+> Ω
+
+|D∂tv|2 dx. 
+
+For more details, we refer to the terms K2, K4 and K11 in (4.36). (2) Construction of approximate solutions. We employ a suitable approximation procedure involving a vis-cous regularization to the bulk-surface convective Cahn–Hilliard subsystem (see Appendix A), together with an appropriate regularization of the initial data (see Proposition 3.1). Such approximations are cru-cial to rigorously justify higher-order Sobolev estimates for the corresponding approximate solutions. The most crucial step is to obtain the regularity 
+
+(∂tμ, ∂ tL) ∈ L2(0 , T ; H1),
+
+which allows us to rigorously compute a priori estimates. However, to derive this regularity prop-erty, we need some higher-order regularity of ∂nφ. When K ∈ (0 , +∞], this can be derived via the 6Robin/Neumann boundary condition K∂ nφ = ψ − φ on ΣT . Therefore, in Appendix A, we shall focus on the case 
+
+(K, L ) ∈ (0 , +∞] × (0 , +∞),
+
+and establish the existence of approximate solutions in this case (see Section 3). Then, by deriving suit-able estimates that are uniform with respect to the approximate parameters, we can deduce the existence of a global quasi-strong solution to problem (1.8)–(1.10) with (K, L ) ∈ (0 , +∞]×(0 , +∞) using a com-pactness argument (see Section 4). For the limit models corresponding to (K, L ) ∈ (0 , +∞] × { 0, +∞} ,the existence of a global quasi-strong solution can be obtained by studying the corresponding asymptotic limits as L → 0 and L → +∞ (see Section 5). (3) Motivation for an additional singular potential. For our analysis of the viscous approximation to the bulk-surface convective Cahn–Hilliard system in Appendix A, we introduce a further singular potential 
+
+Fσ (see (3.5)), which exhibits its singularities at ±(1 − σ). It enforces a so-called strict separation property, which means that the values of the phase-field variables φ and ψ cannot exceed the interval 
+
+(−1 + σ, 1 − σ). As the singularities of the potentials F and G lie at ±1, these potentials and their derivatives f = F ′ and g = G′ can be interpreted as regular functions on (−1 + σ, 1 − σ).In Appendix A, we prove the aforementioned strict separation property using a comparison argument. To this end, we rewrite the convective viscous Cahn–Hilliard system (A.1) as (A.24) and consider the ODE system (A.25). Taking the difference between (A.24) and (A.25) and testing the resultant with a suitable test function, we arrive at (A.27). By the monotonicity of fσ = F ′
+
+> σ
+
+, the terms in the second line of (A.27) are nonnegative. If we had not introduced the additional function fσ, we would have obtained the following ODE system instead of (A.25): 
+
+(
+
+γ∂ tU + f0(U ) = H, U (0) = 1 − δ0,
+
+(
+
+γ∂ tV + f0(V ) = −H, V (0) = −1 + δ0.
+
+Then, the second line of (A.27) would read as 
+
+Z
+
+> Ω
+
+(f0(φ) − f0(U )) w+ dx
+
+| {z }
+
+> ≥0
+
++
+
+Z
+
+> Γ
+
+(g0(ψ) − f0(U )) w+Γ dS
+
+| {z } 
+
+> No sign, unless g0=f0
+
+.
+
+Here, f0 and g0 denote the singular parts of the functions f = F ′ and g = G′, respectively (see as-sumption (A2) ). Thus, the introduction of the singular potential fσ allows us to avoid the additional assumption f0 = g0.
+
+Plan of this paper. In Section 2, we present some preliminaries for the analysis and state the main result of this paper. Sections 3 and 4 are devoted to the proof of Theorem 2.1 for the case (K, L ) ∈ (0 , +∞] × (0 , +∞).More precisely, the existence of approximate solutions is established in Section 3, while the existence of quasi-strong solutions to system (1.8)–(1.10) with (K, L ) ∈ (0 , +∞] × (0 , +∞) is shown in Section 4. In Section 5, we complete the proof of Theorem 2.1 by investigating the asymptotic limits as L → 0 and L → +∞ with 
+
+K ∈ (0 , +∞]. Finally, in Appendix A, we establish the well-posedness of the bulk-surface convective Cahn– Hilliard subsystem with viscous regularization. 
+
+# 2 Preliminaries and Main Result 
+
+2.1 Preliminaries 
+
+We write a ⊗ b = ( aibj )di,j =1 for any vectors a, b ∈ Rd and Asym = 12 (A + A⊤) for any matrix A ∈ Rd×d.Let X be a real Banach space. We denote its norm by ∥ · ∥ X , its dual space by X′ and the duality pairing by 7⟨· , ·⟩ X′,X . If X is a Hilbert space, its inner product will be denoted by (·, ·)X . The notation X , → Y means that X is continuously embedded in Y . We further denote by X the generic space of vectors or matrices, with each component belonging to X. The space Lq(0 , T ; X) with 1 ≤ q ≤ +∞ denotes the Bochner space consisting of all strongly measurable q-integrable functions with values in X, or, if q = + ∞, essentially bounded functions. Besides, the space C([0 , T ]; X) denotes the Banach space of all bounded and continuous functions u : [0 , T ] → X equipped with the supremum norm. For q ∈ [1 , +∞], W 1,q (0 , T ; X) denotes the space of functions f such that f ∈ Lq(0 , T ; X) with ∂tf ∈ Lq(0 , T ; X), where ∂t denotes the vector-valued distributional derivative of f with respect to t. For q = 2 , we set H1(0 , T ; X) = W 1,2(0 , T ; X).Let Ω ⊂ Rd (d ∈ { 2, 3}) be a bounded domain with smooth boundary Γ = ∂Ω. The Lebesgue spaces in Ω
+
+and on Γ are denoted by Lq(Ω) , Lq(Γ) (1 ≤ q ≤ +∞) with norms ∥ · ∥ Lq (Ω) and ∥ · ∥ Lq (Γ) , respectively. For 
+
+s ≥ 0 and q ∈ [1 , +∞), we denote by Hs,q (Ω) the Bessel-potential spaces and by W s,q (Ω) the Slobodeckij spaces. It holds Hs, 2(Ω) = W s, 2(Ω) for all s, but for q̸ = 2 the identity Hs,q (Ω) = W s,q (Ω) is only true if 
+
+s ∈ N. For clarity, we denote by N the set of natural numbers including zero. If s ∈ N, then Hs,q (Ω) and 
+
+W s,q (Ω) coincide with the usual Sobolev spaces. The corresponding function spaces over the boundary Γ are defined via local charts. Let Υi : Ui ⊂ Rd−1 → Γ be a finite family of parametrizations such that S 
+
+> i
+
+Υi(Ui)
+
+covers Γ, and let {ψi} be a partition of unity for Γ subordinate to this cover. Then for s ≥ 0, we have 
+
+Hs,q (Γ) = u ∈ Lq(Γ) : ( ψiu) ◦ Υi ∈ Hs,q (Rd−1) for all i ,
+
+with an equivalent norm given by ∥u∥Hs,q (Γ) = P 
+
+> i
+
+∥(ψiu) ◦ Υi∥Hs,q (Rd−1). The spaces W s,q (Γ) are defined similarly. The properties of the spaces over Ω described above can easily be transferred to the spaces over Γ.If q = 2 , Hs, 2(Ω) = W s, 2(Ω) for all s and these spaces are Hilbert spaces. Throughout this paper, we use the notation Hs(Ω) = Hs, 2(Ω) = W s, 2(Ω) and H0(Ω) is identified with L2(Ω) . The Lebesgue spaces, Sobolev spaces and Slobodeckij spaces on the boundary Γ can be defined analogously, provided that Γ is sufficiently regular. We write Hs(Γ) = Hs, 2(Γ) = W s, 2(Γ) and identify H0(Γ) with L2(Γ) . Hereafter, the following shortcuts will be applied: 
+
+H := L2(Ω) , HΓ := L2(Γ) , V := H1(Ω) , VΓ := H1(Γ) .
+
+For every y ∈ V ′, we denote by ⟨y⟩Ω = |Ω|−1⟨y, 1⟩V ′,V its generalized mean value over Ω. If in addition 
+
+y ∈ L1(Ω) , its spatial mean can be expressed as ⟨y⟩Ω = |Ω|−1 R 
+
+> Ω
+
+y dx. The spatial mean for any yΓ ∈ V ′ 
+
+> Γ
+
+on 
+
+Γ, denoted by ⟨yΓ⟩Γ, is defined analogously. Furthermore, we introduce the following subspaces of functions with zero mean: 
+
+V0 := y ∈ V : ⟨y⟩Ω = 0 , V ∗ 
+
+> 0
+
+:= y∗ ∈ V ′ : ⟨y∗⟩Ω = 0 ,VΓ,0 := yΓ ∈ VΓ : ⟨yΓ⟩Γ = 0 , V ∗ 
+
+> Γ,0
+
+:= y∗ 
+
+> Γ
+
+∈ V ′ 
+
+> Γ
+
+: ⟨y∗
+
+> Γ
+
+⟩Γ = 0 .
+
+We further recall the Poincaré–Wirtinger inequalities in Ω and on Γ (see, e.g., [16, Theorem 2.12] for the case on Γ): 
+
+∥u − ⟨ u⟩Ω∥H ≤ CΩ∥∇ u∥L2(Ω) for all u ∈ V ,
+
+∥uΓ − ⟨ uΓ⟩Γ∥HΓ ≤ CΓ∥∇ τ uΓ∥L2(Γ) for all uΓ ∈ VΓ.Here, CΩ (resp. CΓ) is a positive constant depending only on Ω (resp. Γ). Moreover, the following Poincaré-type inequality (see, e.g., [65, Chapter II, Section 1.4]) holds: 
+
+∥u∥H ≤ eCP(∥∇ u∥L2(Ω) + ∥u∥HΓ ) for all u ∈ V . (2.1) Here, the constant eCP > 0 depends only on Ω.8Let us now consider the Poisson–Neumann problem 
+
+(−∆u = y in Ω,∂nu = 0 on Γ. (2.2) By the Lax–Milgram theorem, for every y ∈ V ∗ 
+
+> 0
+
+, problem (2.2) admits a unique weak solution u ∈ V0. This means that u satisfies 
+
+Z
+
+> Ω
+
+∇u · ∇ ζ dx = ⟨y, ζ ⟩V ′,V for all ζ ∈ V . 
+
+Thus, we can define the solution operator NΩ : V ∗ 
+
+> 0
+
+→ V0 such that u = NΩy. Furthermore, we consider the surface Poisson equation 
+
+−∆τ uΓ = yΓ on Γ, (2.3) where ∆τ = div Γ∇τ is the Laplace–Beltrami operator on Γ. For every yΓ ∈ V ∗
+
+> Γ,0
+
+, problem (2.3) admits a unique weak solution uΓ ∈ VΓ,0 satisfying 
+
+Z
+
+> Γ
+
+∇τ uΓ · ∇ τ ζΓ dS = ⟨yΓ, ζ Γ⟩V ′ 
+
+> Γ,V Γ
+
+for all ζΓ ∈ VΓ.Hence, we can define the solution operator NΓ : V ∗ 
+
+> Γ,0
+
+→ VΓ,0 such that uΓ = NΓyΓ. By virtue of these definitions, we introduce the following equivalent norms: 
+
+∥y∥V ∗ 
+
+> 0
+
+:= 
+
+ Z
+
+> Ω
+
+|∇N Ωy|2 dx
+
+1/2
+
+for all y ∈ V ∗ 
+
+> 0
+
+,
+
+∥y∥V ′ := 
+
+
+
+∥y − ⟨ y⟩Ω∥2  
+
+> V∗
+> 0
+
++ |⟨ y⟩Ω|21/2
+
+for all y ∈ V ′,
+
+∥yΓ∥V ∗ 
+
+> Γ,0
+
+:= 
+
+ Z
+
+> Γ
+
+|∇ τ NΓyΓ|2 dS
+
+1/2
+
+for all yΓ ∈ V ∗
+
+> Γ,0
+
+,
+
+∥yΓ∥V ′ 
+
+> Γ
+
+:= 
+
+
+
+∥yΓ − ⟨ yΓ⟩Γ∥2  
+
+> V∗
+> Γ,0
+
++ |⟨ yΓ⟩Γ|21/2
+
+for all yΓ ∈ V ′
+
+> Γ
+
+.
+
+Next, for q ∈ [1 , +∞] and k ∈ N, we introduce the product spaces 
+
+Lq := Lq(Ω) × Lq(Γ) and Wk,q := W k,q (Ω) × W k,q (Γ) .
+
+In particular, we use the notation 
+
+Hk := Hk(Ω) × Hk(Γ) = Wk, 2.
+
+As before, we identify H0 with L2. For any k ∈ N, Hk is a Hilbert space endowed with the standard inner product 
+
+(( y, y Γ), (z, z Γ)) Hk := ( y, z )Hk (Ω) + ( yΓ, z Γ)Hk (Γ) for all (y, y Γ), (z, z Γ) ∈ H k,and the induced norm ∥ · ∥ Hk := ( ·, ·)1/2 
+
+> Hk
+
+. We further introduce the bilinear form 
+
+⟨(y, y Γ), (ζ, ζ Γ)⟩(H1)′,H1 := ( y, ζ )L2(Ω) + ( yΓ, ζ Γ)L2(Γ) for all (y, y Γ) ∈ L 2, (ζ, ζ Γ) ∈ H 1.By the Riesz representation theorem, this product can be extended to a duality pairing on (H1)′ × H 1.9For any k ∈ N+, we introduce the Hilbert space 
+
+Vk := (y, y Γ) ∈ H k : tr (y) = yΓ a.e. on Γ ,
+
+endowed with the inner product (·, ·)Vk := ( ·, ·)Hk and the associated norm ∥ · ∥ Vk := ∥ · ∥ Hk . Here, tr (y)
+
+stands for the trace of y ∈ Hk(Ω) on the boundary Γ, which makes sense for k ∈ N+. The duality pairing on 
+
+(V1)′ × V 1 can be defined analogously to the one on (H1)′ × H 1. Besides, for K ∈ [0 , +∞], we introduce the space 
+
+W2 
+
+> K
+
+:= 
+
+
+
+V2 if K = 0 ,
+
+{(y, y Γ) ∈ H 2 : K∂ ny = yΓ − y} if K ∈ (0 , +∞),
+
+{(y, y Γ) ∈ H 2 : ∂ny = 0 } if K = + ∞.
+
+(2.4) For any given m ∈ R, we set 
+
+L2(m) := (y, y Γ) ∈ L 2 : m(y, y Γ) = m ,
+
+where the generalized bulk-surface mean is defined by 
+
+m(y, y Γ) := |Ω|⟨ y⟩Ω + |Γ|⟨ yΓ⟩Γ
+
+|Ω| + |Γ| . (2.5) Furthermore, we define the projection operator 
+
+P : L2 → L 2(0) , P(y, y Γ) =  y − m(y, y Γ), y Γ − m(y, y Γ). (2.6) For any k ∈ N+, the closed linear subspaces 
+
+Hk 
+
+> (0)
+
+:= Hk ∩ L 2(0) , Vk 
+
+> (0)
+
+:= Vk ∩ L 2(0) ,
+
+both endowed with the inner product (·, ·)Hk and the induced norm ∥·∥ Hk , are Hilbert spaces. For L ∈ [0 , +∞)
+
+and k ∈ N+, we introduce the function spaces 
+
+HkL := 
+
+(
+
+Hk, if L ∈ (0 , +∞),
+
+Vk, if L = 0 , HkL, 0 := 
+
+( Hk
+
+> (0)
+
+, if L ∈ (0 , +∞),
+
+Vk
+
+> (0)
+
+, if L = 0 .
+
+We further consider the bilinear form 
+
+aL(( y, y Γ), (z, z Γ)) := 
+
+Z
+
+> Ω
+
+∇y · ∇ z dx +
+
+Z
+
+> Γ
+
+∇τ yΓ · ∇ τ zΓ dS + χ(L)
+
+Z
+
+> Γ
+
+(y − yΓ)( z − zΓ) d S, 
+
+for all (y, y Γ), (z, z Γ) ∈ H 1. For L ∈ [0 , +∞), we define the inner product on H1 
+
+> L, 0
+
+by (·, ·)H1 
+
+> L, 0
+
+= aL(·, ·),and for any (y, y Γ) ∈ H 1
+
+> L, 0
+
+, we define the norm 
+
+∥(y, y Γ)∥H1
+
+> L, 0
+
+:= (( y, y Γ), (y, y Γ)) 1/2
+
+> H1
+> L, 0
+
+= aL(( y, y Γ), (y, y Γ)) 1/2. (2.7) For (y, y Γ) ∈ V 1(0) ⊆ H 1
+
+> L, 0
+
+, ∥(y, y Γ)∥H1 
+
+> L, 0
+
+does not depend on L, since the third term in aL vanishes. In addition, the following Poincaré-type inequality has been proved in [41, Lemma A.1]: 
+
+Lemma 2.1. There exists a constant CP > 0 depending only on L ∈ [0 , +∞) and Ω such that 
+
+∥(y, y Γ)∥L2 ≤ CP∥(y, y Γ)∥H1 
+
+> L, 0
+
+for all (y, y Γ) ∈ H 1
+
+> L, 0
+
+.
+
+10 This shows that for every L ∈ [0 , +∞), H1 
+
+> L, 0
+
+is a Hilbert space with the inner product (·, ·)H1 
+
+> L, 0
+
+. The induced norm ∥ · ∥ H1 
+
+> L, 0
+
+introduced in (2.7) is equivalent to the standard one ∥ · ∥ H1 on H1
+
+> L, 0
+
+.For L ∈ [0 , +∞), let us now consider the following elliptic boundary value problem 
+
+
+
+−∆u = y in Ω,
+
+−∆τ uΓ + ∂nu = yΓ on Γ,L∂ nu = uΓ − u on Γ .
+
+(2.8) We define the space 
+
+H−1 
+
+> L, 0
+
+=
+
+( H−1(0) := {(y, y Γ) ∈ (H1)′ : m(y, y Γ) = 0 }, if L ∈ (0 , +∞),
+
+V−1(0) := {(y, y Γ) ∈ (V1)′ : m(y, y Γ) = 0 }, if L = 0 ,
+
+where m is given by (2.5) if L ∈ (0 , +∞) and for L = 0 , it is defined as 
+
+m(y, y Γ) := ⟨(y, y Γ), (1 , 1) ⟩(V1)′,V1
+
+|Ω| + |Γ| .
+
+In particular, we have the chain of inclusions 
+
+H1 
+
+> L, 0
+
+⊆ L 2(0) ⊆ H −1 
+
+> L, 0
+
+⊆ (H1
+
+> L
+
+)′.
+
+It has been shown in [41, Theorem 3.3] that for every (y, y Γ) ∈ H −1(0) , problem (2.8) admits a unique weak solution (u, u Γ) ∈ H 1 
+
+> L, 0
+
+satisfying the weak formulation 
+
+aL
+
+ (u, u Γ), (ζ, ζ Γ) = (y, y Γ), (ζ, ζ Γ) (H1
+
+> L)′,H1
+> L
+
+for all (ζ, ζ Γ) ∈ H 1
+
+> L
+
+,
+
+and the estimate 
+
+∥(u, u Γ)∥H1 ≤ C∥(y, y Γ)∥(H1 
+
+> L)′
+
+,
+
+for some constant C > 0 depending only on L and Ω. Furthermore, if the domain Ω is of class Ck+2 and 
+
+(y, y Γ) ∈ H kL, 0 for some k ∈ N, it was further shown in [41, Theorem 3.3] that then (u, u Γ) ∈ H k+2  
+
+> L
+
+and the following regularity estimate holds 
+
+∥(u, u Γ)∥Hk+2 ≤ C∥(y, y Γ)∥Hk . (2.9) The above facts enable us to define the solution operator 
+
+SL : H−1(0) → H 1
+
+> L, 0
+
+, (y, y Γ) 7 → SL(y, y Γ) =  SL
+
+> Ω
+
+(y, y Γ), SL 
+
+> Γ
+
+(y, y Γ) = ( u, u Γ).
+
+For the case L = 0 , similar results have been established in [14]. A direct calculation yields 
+
+ (u, u Γ), (z, z Γ) 
+
+> L2
+
+=  (u, u Γ), SL(z, z Γ)
+
+> H1
+> L, 0
+
+for all (u, u Γ) ∈ H 1(0) , (z, z Γ) ∈ L 2(0) .Thanks to [41, Corollary 3.5], the bilinear form 
+
+ (y, y Γ), (z, z Γ)
+
+> H−1
+> L, 0
+
+:=  SL(y, y Γ), SL(z, z Γ)
+
+> H1
+> L, 0
+
+for all (y, y Γ), (z, z Γ) ∈ H −1
+
+> L, 0
+
+11 defines an inner product on H−1
+
+> L, 0
+
+. The associated norm ∥(y, y Γ)∥H−1
+
+> L, 0
+
+:=  (y, y Γ), (y, y Γ)1/2
+
+> H−1
+> L, 0
+
+is equivalent to the standard dual norm ∥ · ∥ (H1 
+
+> L, 0)′
+
+= ∥ · ∥ (H1 
+
+> L)′
+
+on H−1
+
+> L, 0
+
+. Then it follows that 
+
+∥(y, y Γ)∥∗ := 
+
+
+
+∥(y, y Γ) − m(y, y Γ)1∥2
+
+> H−1
+> L, 0
+
++ |m(y, y Γ)|21/2
+
+for all (y, y Γ) ∈ (H1)′,is equivalent to the usual dual norm ∥ · ∥ (H1 
+
+> L)′
+
+on (H1)′.Concerning the velocity fields, we introduce the space L2div = L2div (Ω) × L2div (Γ) , where 
+
+L2div (Ω) := {v ∈ L2(Ω) : div v = 0 in Ω, v · n = 0 on Γ},
+
+L2div (Γ) := {w ∈ L2(Γ) : div Γ w = 0 , w · n = 0 on Γ}.
+
+Then, for s ≥ 0 and p ∈ [1 , +∞], we define Ws,p 
+
+> div
+
+(Ω) = Ws,p (Ω) ∩ L2div (Ω) . Analogously, we define 
+
+Ws,p 
+
+> div
+
+(Γ) = Ws,p (Γ) ∩ L2div (Γ) , and then set Ws,p = Ws,p (Ω) × Ws,p (Γ) , Ws,p  
+
+> div
+
+= Ws,p 
+
+> div
+
+(Ω) × Ws,p 
+
+> div
+
+(Γ) .Furthermore, for s > 1/p , we set 
+
+Ws,p  
+
+> 0
+
+:= (v, w) ∈ Ws,p : v · n = 0 , v|Γ = w on Γ , Ws,p  
+
+> 0,div
+
+:= Ws,p  
+
+> 0
+
+∩ Ws,p 
+
+> div
+
+.
+
+As before, we use the notation Hs
+
+> div
+
+(Ω) = Ws, 2div (Ω) , Hs = Ws, 2, Hs 
+
+> 0,div
+
+= Ws, 20,div .Next, we consider the Helmholtz projection 
+
+PΩdiv : L2(Ω) → L2div (Ω) , PΩdiv (v) = v − ∇ p, 
+
+where p ∈ V0 is the unique mean-free solution of the Poisson–Neumann problem 
+
+Z
+
+> Ω
+
+∇p · ∇ ζ dx =
+
+Z
+
+> Ω
+
+v · ∇ ζ dx for all ζ ∈ V. 
+
+In a similar fashion, we define the Helmholtz projection 
+
+PΓdiv : L2(Γ) → L2div (Γ) , PΓdiv (w) = w − ∇ τ q
+
+where q ∈ VΓ,0 is the unique mean-free solution of 
+
+Z
+
+> Γ
+
+∇τ q · ∇ τ ξ dS =
+
+Z
+
+> Γ
+
+w · ∇ τ ξ dS for all ξ ∈ VΓ.
+
+We also set Pdiv : L2 → L2div , Pdiv := ( PΩdiv , PΓdiv ). For more details, see [46]. Furthermore, for sufficiently regular vector fields v : Ω → Rd and w : Γ → Rd, we denote by 
+
+Dv = ∇v + ( ∇v)⊤
+
+2 , DΓw = ∇τ w + ( ∇τ w)⊤
+
+2
+
+the symmetric gradient of v and the symmetric surface gradient of w, respectively. Then we report the following Korn-type inequality, which can be found in [2, Appendix] (see also [37] for a variant version): 
+
+∥∇ v∥L2(Ω) ≤ eCK
+
+ ∥Dv∥L2(Ω) + ∥v∥L2(Γ) 
+
+ for all v ∈ H1div (Ω) , (2.10) where the constant eCK > 0 depends only on Ω. The following lemma is a corollary of (2.10) and will be frequently used in the subsequent analysis. 12 Lemma 2.2. The exists a positive constant eC0 depending only on Ω such that for all v ∈ H1div (Ω) , we have 
+
+∥v∥L2(Γ) ≤ eC0(∥Dv∥L2(Ω) + ∥v∥L2(Ω) ), (2.11) 
+
+∥v∥H1(Ω) ≤ (1 + eCK + eCK eC0) ∥Dv∥L2(Ω) + ∥v∥L2(Ω) 
+
+. (2.12) 
+
+Proof. Invoking a trace estimate presented in [25, Theorem II.4.1], we have 
+
+∥u∥HΓ ≤ Cin ∥u∥ 12 
+
+> H
+
+∥u∥ 12 
+
+> V
+
+for all u ∈ V, 
+
+for some constant Cin > 0 depending only on Ω. Using this estimate together with (2.10), we infer that 
+
+∥v∥2 
+
+> L2(Γ)
+
+≤ C2in ∥v∥L2(Ω) ∥v∥H1(Ω) 
+
+≤ C2in ∥v∥2 
+
+> L2(Ω)
+
++ C2in ∥v∥L2(Ω) ∥∇ v∥L2(Ω) 
+
+≤ C2in ∥v∥2 
+
+> L2(Ω)
+
++ C2in eCK∥v∥L2(Ω) (∥Dv∥L2(Ω) + ∥v∥L2(Γ) )
+
+≤ 12 ∥v∥2 
+
+> L2(Γ)
+
++ 12 C2in eCK∥Dv∥2 
+
+> L2(Ω)
+
++
+
+
+
+C2in + 12 C2in eCK + 12 C4in eC2K
+
+
+
+∥v∥2
+
+> L2(Ω)
+
+.
+
+As a consequence, it holds 
+
+∥v∥2 
+
+> L2(Γ)
+
+≤ C2in eCK∥Dv∥2 
+
+> L2(Ω)
+
++
+
+
+
+2C2in + C2in eCK + C4in eC2K
+
+
+
+∥v∥2
+
+> L2(Ω)
+
+≤ eC20
+
+ ∥Dv∥L2(Ω) + ∥v∥L2(Ω) 
+
+2,
+
+where eC20 := 2 C2in + 2 C2in eCK + C4in eC2K depends only on Ω. This verifies (2.11). Using Korn’s inequality (2.10) once more, we find that 
+
+∥v∥H1(Ω) ≤ ∥ v∥L2(Ω) + ∥∇ v∥L2(Ω) 
+
+≤ ∥ v∥L2(Ω) + eCK
+
+ ∥Dv∥L2(Ω) + ∥v∥L2(Γ) 
+
+
+
+≤ (1 + eCK + eCK eC0) ∥Dv∥L2(Ω) + ∥v∥L2(Ω) 
+
+,
+
+which implies (2.12) and completes the proof of Lemma 2.2. Finally, we report a variant of Gronwall’s lemma (see [59, Chapter IV, Lemma 4.1]), which will be useful in the subsequent analysis. 
+
+Lemma 2.3. Let T > 0, 0 ≤ α < 1, and a, b ∈ L1(0 , T ) with b ≥ 0 a.e. in (0 , T ). Moreover, suppose that 
+
+v : [0 , T ] → [0 , +∞) is absolutely continuous and satisfies 
+
+(1 − α) v′(t) ≤ a(t) v(t) + b(t) v(t)α for almost all t ∈ [0 , T ].Then it holds that 
+
+v1−α(t) ≤ v1−α(0) exp 
+
+Z t
+
+> 0
+
+a(τ ) d τ
+
+
+
++
+
+Z t
+
+> 0
+
+exp 
+
+Z ts
+
+a(τ ) d τ
+
+
+
+b(s) d s for all t ∈ [0 , T ].
+
+2.2 Main result 
+
+Let us introduce some assumptions that are used in the subsequent analysis. 
+
+(A1) The coefficients satisfy ν, β ∈ C0,1loc (R) and 
+
+0 < ν ∗ ≤ ν(r) ≤ ν∗, 0 < β ∗ ≤ β(r) ≤ β∗ for all r ∈ R.13 (A2) The bulk free energy density is given by 
+
+F = F0 + F1,
+
+where F0 ∈ C([ −1, 1]) ∩ C2(−1, 1) with F0(0) = 0 . For simplicity, we extend F0 by defining F0(r) = +∞ for all r ∈ R \ [−1, 1] . For the derivative f0 := F ′
+
+> 0
+
+, we assume that f0(0) = 0 , f ′
+
+> 0
+
+(r) ≥ κ > 0 for all r ∈ (−1, 1) , and 
+
+lim  
+
+> r→± 1
+
+f0 (r) = ±∞ , lim  
+
+> r→± 1
+
+f ′ 
+
+> 0
+
+(r) = + ∞.
+
+In particular, this entails that F0 is strongly convex on [−1, 1] . Moreover, F1 ∈ C2(R) and f1 := F ′ 
+
+> 1
+
+is Lipschitz continuous with Lipschitz constant CLip . Furthermore, for the surface singular potential G, we assume an analogous decomposition G = G0 + G1, where G0 and G1 have the same properties as F0
+
+and F1, respectively. We also write g0 := G′ 
+
+> 0
+
+and g1 := G′
+
+> 1
+
+.
+
+(A3) There exist constants ϱ > 0 and c0 > 0 such that 
+
+|f0(r)| ≤ ϱ|g0(r)| + c0 for all r ∈ (−1, 1) .We proceed by introducing the notion of a quasi-strong solution. 
+
+Definition 2.1. Let Ω ⊂ Rd with d ∈ { 2, 3} be a bounded domain with smooth boundary Γ = ∂Ω and let 
+
+T > 0 be a prescribed final time. Fix K ∈ (0 , +∞] and L ∈ [0 , +∞]. Assume that (A1) –(A3) hold and let 
+
+(v0, v0,τ ) ∈ H10,div and φ0 = ( φ0, ψ 0) ∈ W 2 
+
+> K
+
+be prescribed initial data with ∥φ0∥L∞ ≤ 1 and 
+
+(
+
+|m(φ0)| < 1, if L ∈ [0 , +∞),
+
+|⟨ φ0⟩Ω| < 1, |⟨ ψ0⟩Γ| < 1, if L = + ∞.
+
+If L = 0 , we further require ρ1 = ρ2 = const . > 0. A triplet (v, φ, μ) is called a quasi-strong solution to problem (1.8)–(1.10) if the following properties hold: (i) v : QT → Rd is a vector field and φ = ( φ, ψ ), μ = ( μ, L) are pairs of scalar functions φ, μ : QT → R
+
+and ψ, L : Σ T → R, which have the regularities 
+
+v ∈ L∞(0 , T ; H1div (Ω)) , ∂tv ∈ L2(0 , T ; H1div (Ω)) ,
+
+φ ∈ L∞(0 , T ; H2), ∂tφ ∈ L∞(0 , T ; ( H1
+
+> L, 0
+
+)′) ∩ L2(0 , T ; H1),φ ∈ L∞(QT ) with |φ(x, t )| < 1 a.e. in QT ,ψ ∈ L∞(Σ T ) with |ψ(x, t )| < 1 a.e. on ΣT ,
+
+μ ∈ L∞(0 , T ; H1
+
+> L
+
+) ∩ L2(0 , T ; H2),  f0(φ), g 0(ψ) ∈ L∞(0 , T ; L2).
+
+(ii) The weak formulation 
+
+Z
+
+> Ω
+
+ρ(φ)∂tv · w dx +
+
+Z
+
+> Ω
+
+2α D∂tv : Dw dx +
+
+Z
+
+> Ω
+
+2ν(φ)Dv : Dw dx +
+
+Z
+
+> Γ
+
+β(ψ)vτ · wτ dS
+
+=
+
+Z
+
+> Ω
+
+μ∇φ · w dx −
+
+Z
+
+> Γ
+
+ψ∇τ L · wτ dS −
+
+Z
+
+> Ω
+
+ρ(φ)( v · ∇ )v · w dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μ · ∇ )v · w dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μ · n)vτ · wτ dS, 
+
+(2.13) is satisfied for all (w, wτ ) ∈ H20,div and almost all t ∈ [0 , T ], and it further holds that 
+
+∂tφ + v · ∇ φ = ∆ μ a.e. in QT , (2.14a) 14 μ = −∆φ + f (φ) a.e. in QT , (2.14b) 
+
+(
+
+K∂ nφ = ψ − φ, if K ∈ (0 , +∞)
+
+∂nφ = 0 , if K = + ∞ a.e. on ΣT , (2.14c) 
+
+(
+
+L∂ nμ = L − μ, if L ∈ [0 , +∞)
+
+∂nμ = 0 , if L = + ∞ a.e. on ΣT , (2.14d) 
+
+∂tψ + vτ · ∇ τ ψ = ∆ τ L − ∂nμ a.e. on ΣT , (2.14e) 
+
+L = −∆τ ψ + ∂nφ + g(ψ) a.e. on ΣT . (2.14f) (iii) The functions v and φ satisfy the initial conditions 
+
+v|t=0 = v0 a.e. in Ω, (φ, ψ )|t=0 = ( φ0, ψ 0) in Ω × Γ. (2.15) 
+
+Remark 2.1. The regularity μ ∈ L2(0 , T ; H2) ensures that ∇μ · n ∈ L2(0 , T ; H 12 (Γ)) , and thus the last term on the right-hand side of (2.13) is well-defined. For L ∈ (0 , +∞), this term can be equivalently written as 
+
+− ρ′
+
+> 2L
+
+R
+
+> Γ
+
+(L − μ)vτ · wτ dS (cf. [24, 46]), while for L = 0 (with ρ1 = ρ2) or L = + ∞, this term simply vanish. Moreover, it follows from the regularities in Definition 2.1 that 
+
+v ∈ H1(0 , T ; H1div (Ω)) ,→ C([0 , T ]; H1div (Ω)) .
+
+As d ∈ { 2, 3}, the Aubin–Lions–Simon lemma, together with the Sobolev embedding theorem, gives 
+
+φ ∈ C([0 , T ]; H2−ϵ) ,→ C([0 , T ]; C(Ω) × C(Γ)) 
+
+for every ϵ ∈ (0 , 1/2) . Therefore, the initial conditions in (2.15) make sense. We are now in a position to state the main result of this work. 
+
+Theorem 2.1 (Existence of global quasi-strong solutions) . Let Ω ⊂ Rd with d ∈ { 2, 3} be a bounded domain with smooth boundary Γ = ∂Ω and let T > 0 be a prescribed final time. Fix K ∈ (0 , +∞] and L ∈ [0 , +∞].Assume that (A1) –(A3) hold and let (v0, v0,τ ) ∈ H10,div and φ0 = ( φ0, ψ 0) ∈ W 2 
+
+> K
+
+be prescribed initial data with ∥φ0∥L∞ ≤ 1 and 
+
+(
+
+|m(φ0)| < 1, if L ∈ [0 , +∞),
+
+|⟨ φ0⟩Ω| < 1, |⟨ ψ0⟩Γ| < 1, if L = + ∞. (2.16) 
+
+Moreover, assume that the following additional assumption holds: 
+
+(A4) (−∆φ0 + f0(φ0), −∆τ ψ0 + ∂nφ0 + g0(ψ0)) ∈ H 1.
+
+In the case L = 0 , we further require ρ1 = ρ2 = const . > 0 and assume the compatibility condition: 
+
+(C) −∆φ0 + f (φ0) = −∆τ ψ0 + ∂nφ0 + g(ψ0) a.e. on Γ.Then problem (1.8) –(1.10) admits a quasi-strong solution (v, φ, μ) on [0 , T ] in the sense of Definition 2.1. Furthermore, the energy identity 
+
+Etot (v(t), φ(t)) + 
+
+Z t
+
+> 0
+
+Z
+
+> Ω
+
+2ν(φ(s)) |Dv(s)|2 dx ds +
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+β(ψ(s)) |vτ (s)|2 dS ds
+
++
+
+Z t
+
+> 0
+
+Z
+
+> Ω
+
+|∇ μ(s)|2 dx ds +
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|∇ τ L(s)|2 dS ds + χ(L)
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|μ(s) − L (s)|2 dS ds
+
+= Etot (v0, φ0) (2.17) 
+
+holds for almost all t ∈ [0 , T ].
+
+15 Remark 2.2. For (K, L ) ∈ (0 , +∞] × (0 , +∞), the assertion of the theorem will be established in Sec-tion 4. The proof is based on an approximation scheme presented in Section 3. In the limiting cases (K, L ) ∈
+
+(0 , +∞] × { 0} and (K, L ) ∈ (0 , +∞] × { +∞} , the conclusion will be verified in Section 5. We note that the case (K, L ) ∈ { 0} × [0 , +∞] is not covered in the present work. One possible approach to establish the existence of global quasi-strong solutions for (K, L ) ∈ { 0} × [0 , +∞] is to pass to the limit as K → 0 with 
+
+L fixed. In this case, however, the initial datum have to satisfy φ0 ∈ W 20 = V2. At present, it is unclear how to approximate such an initial datum by a sequence satisfying the assumptions of Theorem A.1. Hence, the approximation scheme developed in Section 3 cannot be directly applied to construct approximate solutions for the case K = 0 .
+
+Remark 2.3. The matched-density assumption, i.e., ρ1 = ρ2 > 0, is required in our approach to the limit as L → 0. In the unmatched-density case, the lack of a uniform bound for ∥μL∥L2(0 ,T ;H2) with respect to 
+
+L ∈ (0 , 1] (see Remark 5.1) prevents us from passing to the limit in the boundary term ρ′ R
+
+> Γ
+
+(∇μL·n)vL 
+
+> τ
+
+·wτ dS.By contrast, under the matched-density assumption, the density is constant and hence ρ′ ≡ 0. Therefore, the above boundary term vanishes identically, thereby avoiding this difficulty. In contrast to the case L → 0,no matched-density assumption is required when passing to the limit as L → +∞. Indeed, the uniform 
+
+L∞(0 , T ; H1)-estimate for μL with respect to L ≥ L0 (cf. (5.17)), together with the trace theorem and the boundary condition, yields 
+
+∥∂nμL∥L∞(0 ,T ;HΓ) = 1
+
+L ∥L L − μL∥L∞(0 ,T ;HΓ) ≤ CL → 0, as L → +∞.
+
+This, together with the uniform L∞(0 , T ; H1div (Ω)) -estimate for vL (cf. (4.4)), allows us to pass to the limit in the boundary term. 
+
+Remark 2.4. The assumption (v0, v0,τ ) ∈ H10,div is a technical requirement that arises from our proof and is needed to derive uniform estimates of approximate solutions. More precisely, we introduce an approximate system whose solvability is established via a semi-Galerkin approximation scheme combined with a fixed-point argument inspired by [30]. In the semi-Galerkin scheme, the initial datum for the approximate velocity field 
+
+vm is chosen as vm(0) = PΩ
+
+> m
+
+(v0, v0,τ ); see Section 3.2 for the definition of the projection operator Pm.To derive estimates that are uniform with respect to the Galerkin parameter m ∈ N, we need to control the term α R 
+
+> Ω
+
+|DP Ω
+
+> m
+
+(v0, v0,τ )|2 dx appearing in (4.10). By the assumption (v0, v0,τ ) ∈ H10,div and the stability property (3.23) of Pm, we derive the estimate 
+
+α
+
+Z
+
+> Ω
+
+|DP Ω
+
+> m
+
+(v0, v0,τ )|2 dx
+
+≤ α
+
+Z
+
+> Ω
+
+|DP Ω
+
+> m
+
+(v0, v0,τ )|2 dx + α
+
+Z
+
+> Γ
+
+|Dτ PΓ
+
+> m
+
+(v0, v0,τ )|2 dS + α
+
+Z
+
+> Γ
+
+|PΓ
+
+> m
+
+(v0, v0,τ )|2 dS
+
+= α∥Pm(v0, v0,τ )∥2
+
+> H10,div
+
+≤ α∥(v0, v0,τ )∥2
+
+> H10,div
+
+,
+
+which is independent of m. This explains why the assumption (v0, v0,τ ) ∈ H10,div is required in our argument. 
+
+# 3 An Approximate Problem in the Case (K, L ) ∈ (0 , +∞] × (0 , +∞)
+
+3.1 Approximation of the initial data 
+
+For any σ ∈ 0, 1/2, we first introduce an auxiliary singular potential 
+
+fσ(r) = f0
+
+ r
+
+1 − σ
+
+
+
+for all r ∈ (−1 + σ, 1 − σ). (3.1) 16 Due to (A2) , we have fσ ∈ C1(−1 + σ, 1 − σ), fσ(0) = 0 and 
+
+f ′
+
+> σ
+
+(r) ≥ κ
+
+1 − σ > 0 for all r ∈ (−1 + σ, 1 − σ), (3.2) 
+
+lim  
+
+> r→± (1 −σ)
+
+fσ(r) = ±∞ , lim  
+
+> r→± (1 −σ)
+
+f ′
+
+> σ
+
+(r) = + ∞, (3.3) 
+
+fσ(r) f0(r) ≥ 0, fσ(r)g0(r) ≥ 0 for all r ∈ (−1 + σ, 1 − σ). (3.4) It is easy to see that fσ is the derivative of Fσ, where 
+
+Fσ(r) = (1 − σ)F0
+
+ r
+
+1 − σ
+
+
+
+for all r ∈ [−1 + σ, 1 − σ]. (3.5) Let φ0 = ( φ0, ψ 0) ∈ W 2 
+
+> K
+
+with ∥φ0∥L∞ ≤ 1 and |m(φ0)| < 1 be any prescribed initial data. In addition, we denote 
+
+eμ0 = −∆φ0 + f0(φ0) and eL0 = −∆τ ψ0 + ∂nφ0 + g0(ψ0).
+
+For k ∈ N+, let hk be a globally Lipschitz continuous truncation function 
+
+hk : R → R, hk(r) = 
+
+
+
+−k, if r < −k, r, if − k ≤ r ≤ k, k, if r > k. 
+
+(3.6) Then we define 
+
+eμ0,k = hk ◦ eμ0, eL0,k = hk ◦ eL0.
+
+The assumption (A4) implies that (eμ0, eL0) ∈ H 1, and thus eμ0,k ∈ V ∩ L∞(Ω) , eL0,k ∈ VΓ ∩ L∞(Γ) satisfying 
+
+∥eμ0,k ∥V ≤ ∥ eμ0∥V and ∥ eL0,k ∥VΓ ≤ ∥ eL0∥VΓ . (3.7) Now, for σ ∈ [0 , 1/2) and k ∈ N+, we approximate the initial data φ0 using the following bulk-surface elliptic problem 
+
+(Sσ,k )
+
+
+
+− ∆φ0,σ,k + f0(φ0,σ,k ) + k−1fσ(φ0,σ,k ) = eμ0,k in Ω,
+
+(
+
+K∂ nφ0,σ,k = ψ0,σ,k − φ0,σ,k , K ∈ (0 , +∞)
+
+∂nφ0,σ,k = 0 , K = + ∞ on Γ,
+
+− ∆τ ψ0,σ,k + ∂nφ0,σ,k + g0(ψ0,σ,k ) + k−1fσ(ψ0,σ,k ) = eL0,k on Γ.
+
+(3.8a) (3.8b) (3.8c) Below we show that the problem (Sσ,k ) admits a unique strong solution that satisfies the strict separation property. 
+
+Proposition 3.1. For any σ ∈ [0 , 1/2) and k ∈ N+, the bulk-surface elliptic problem (Sσ,k ) admits a unique strong solution φ0,σ,k = ( φ0,σ,k , ψ 0,σ,k ) ∈ W 2 
+
+> K
+
+that satisfies 
+
+∥φ0,σ,k ∥H2 + ∥f0(φ0,σ,k )∥H + ∥g0(ψ0,σ,k )∥HΓ ≤ C(1 + ∥eμ0∥V + ∥ eL0∥VΓ ), (3.9) 
+
+k−1∥fσ(φ0,σ,k )∥H + k−1∥fσ(ψ0,σ,k )∥HΓ ≤ C(1 + ∥eμ0∥V + ∥ eL0∥VΓ ), (3.10) 
+
+∥ − ∆φ0,σ,k + f0(φ0,σ,k ) + k−1fσ(φ0,σ,k )∥V ≤ ∥ eμ0∥V , (3.11) 
+
+∥ − ∆τ ψ0,σ,k + ∂nφ0,σ,k + g0(ψ0,σ,k ) + k−1fσ(ψ0,σ,k )) ∥VΓ ≤ ∥ eL0∥VΓ , (3.12) 
+
+for a constant C > 0 independent of σ and k, and there exists δ(k) ∈ (0 , 1) such that 
+
+∥φ0,σ,k ∥L∞(Ω) ≤ (1 − σ) 1 − δ(k), ∥ψ0,σ,k ∥L∞(Γ) ≤ (1 − σ) 1 − δ(k). (3.13) 17 Furthermore, we have 
+
+φ0,σ,k → φ0,k in H1 as σ → 0 and φ0,k → φ0 in H1 as k → +∞, (3.14) 
+
+where φ0,k := φ0,0,k denotes the unique strong solution to problem (S0,k ).
+
+Proof. Since eμ0,k ∈ V ∩ L∞(Ω) and eL0,k ∈ VΓ ∩ L∞(Γ) , the existence and uniqueness of a strong solution 
+
+φ0,σ,k = ( φ0,σ,k , ψ 0,σ,k ) ∈ H 2 to problem (Sσ,k ) as well as the estimates (3.9) and (3.10) are a direct con-sequence of [32, Propositions 5.1 and 5.2]. Moreover, combining (3.7) and (3.8), we easily obtain (3.11) and (3.12). In what follows, we prove the strict separation property and the convergence results. 
+
+Separation property. The strict separation property (3.13) can be established in a manner similar to that in [32, Proposition 5.3]. For completeness, we provide a brief sketch of the proof. To begin with, for any l ∈ N with 
+
+l ≥ 2, we introduce the globally Lipschitz continuous truncation 
+
+jl : R → R, jl(r) = 
+
+
+
+−1 + σ + 1 
+
+> l
+
+, if r < −1 + σ + 1 
+
+> l
+
+,r, if r ∈  − 1 + σ + 1 
+
+> l
+
+, 1 − σ − 1
+
+> l
+
+,
+
+1 − σ − 1 
+
+> l
+
+, if r > 1 − σ − 1 
+
+> l
+
+,
+
+and define φl 
+
+> 0,σ,k
+
+= jl ◦ φ0,σ,k and ψl 
+
+> 0,σ,k
+
+= jl ◦ ψ0,σ,k . It easily follows that (φl
+
+> 0,σ,k
+
+, ψ l
+
+> 0,σ,k
+
+) ∈ H 1 with 
+
+∇φl 
+
+> 0,σ,k
+
+= χ[−1+ σ+ 1   
+
+> l,1−σ−1
+> l]
+
+∇φ0,σ,k and ∇τ ψl 
+
+> 0,σ,k
+
+= χ[−1+ σ+ 1   
+
+> l,1−σ−1
+> l]
+
+∇τ ψ0,σ,k .
+
+For any p ≥ 2, testing (3.8a) by |fσ(φl
+
+> 0,σ,k
+
+)|p−2fσ(φl
+
+> 0,σ,k
+
+) and (3.8c) by |fσ(ψl
+
+> 0,σ,k
+
+)|p−2fσ(ψl
+
+> 0,σ,k
+
+), we find 
+
+k−1
+
+Z
+
+> Ω
+
+|fσ(φl
+
+> 0,σ,k
+
+)|p−2fσ(φl
+
+> 0,σ,k
+
+)fσ(φ0,σ,k ) d x + k−1
+
+Z
+
+> Γ
+
+|fσ(ψl
+
+> 0,σ,k
+
+)|p−2fσ(ψl
+
+> 0,σ,k
+
+)fσ(ψ0,σ,k ) d S
+
++ ( p − 1) 
+
+Z
+
+> Ω
+
+|fσ(φl
+
+> 0,σ,k
+
+)|p−2f ′
+
+> σ
+
+(φl
+
+> 0,σ,k
+
+)|∇ φl
+
+> 0,σ,k
+
+|2 dx
+
++ ( p − 1) 
+
+Z
+
+> Γ
+
+|fσ(ψl
+
+> 0,σ,k
+
+)|p−2f ′
+
+> σ
+
+(ψl
+
+> 0,σ,k
+
+)|∇ τ ψl
+
+> 0,σ,k
+
+|2 dS
+
++
+
+Z
+
+> Ω
+
+|fσ(φl
+
+> 0,σ,k
+
+)|p−2fσ(φl
+
+> 0,σ,k
+
+)f0(φ0,σ,k ) d x +
+
+Z
+
+> Γ
+
+|fσ(ψl
+
+> 0,σ,k
+
+)|p−2fσ(ψl
+
+> 0,σ,k
+
+)g0(ψ0,σ,k ) d S
+
+=
+
+Z
+
+> Ω
+
+eμ0,k |fσ(φl
+
+> 0,σ,k
+
+)|p−2fσ(φl
+
+> 0,σ,k
+
+) d x +
+
+Z
+
+> Γ
+
+eL0,k |fσ(ψl
+
+> 0,σ,k
+
+)|p−2fσ(ψl
+
+> 0,σ,k
+
+) d S
+
++
+
+Z
+
+> Γ
+
+∂nφ0,σ,k (|fσ(φl
+
+> 0,σ,k
+
+)|p−2fσ(φl
+
+> 0,σ,k
+
+) − | fσ(ψl
+
+> 0,σ,k
+
+)|p−2fσ(ψl
+
+> 0,σ,k
+
+)) d S
+
+≤ k−1
+
+2
+
+Z
+
+> Ω
+
+|fσ(φl
+
+> 0,σ,k
+
+)|p dx + k−1
+
+2
+
+Z
+
+> Γ
+
+|fσ(ψl
+
+> 0,σ,k
+
+)|p dS + Ck
+
+ Z
+
+> Ω
+
+|eμ0,k |p dx +
+
+Z
+
+> Γ
+
+| eL0,k |p dS
+
+
+
+. (3.15) Here, we have used the estimate 
+
+Z
+
+> Γ
+
+∂nφ0,σ,k (|fσ(φl
+
+> 0,σ,k
+
+)|p−2fσ(φl
+
+> 0,σ,k
+
+) − | fσ(ψl
+
+> 0,σ,k
+
+)|p−2fσ(ψl
+
+> 0,σ,k
+
+)) d S
+
+= −χ(K)
+
+Z
+
+> Γ
+
+(φ0,σ,k − ψ0,σ,k )( |fσ(φl
+
+> 0,σ,k
+
+)|p−2fσ(φl
+
+> 0,σ,k
+
+) − | fσ(ψl
+
+> 0,σ,k
+
+)|p−2fσ(ψl
+
+> 0,σ,k
+
+)) d S ≤ 0,
+
+which was shown, based on (3.8b), in [51, Proof of Lemma 3.4]. Thanks to (A2) , we know that the expressions f0(r), g0(r), fσ(r), and fσ(jl(r)) have the same sign for all 
+
+r ∈ (−1 + σ, 1 − σ). Consequently, due to the monotonicity of fσ, we have 
+
+fσ(φl
+
+> 0,σ,k
+
+)fσ(φ0,σ,k ) ≥ | fσ(φl
+
+> 0,σ,k
+
+)|2 a.e. in Ω,
+
+18 fσ(ψl
+
+> 0,σ,k
+
+)fσ(ψ0,σ,k ) ≥ | fσ(ψl
+
+> 0,σ,k
+
+)|2 a.e. on Γ,fσ(φl
+
+> 0,σ,k
+
+)f0(φ0,σ,k ) ≥ 0 a.e. in Ω,fσ(ψl
+
+> 0,σ,k
+
+)g0(ψ0,σ,k ) ≥ 0 a.e. on Γ.
+
+Thus, we infer from (3.15) that 
+
+∥fσ(φl
+
+> 0,σ,k
+
+)∥Lp(Ω) + ∥fσ(ψl
+
+> 0,σ,k
+
+)∥Lp(Γ) ≤ Ck(∥eμ0,k ∥Lp(Ω) + ∥ eL0,k ∥Lp(Γ) ) ≤ C(k) (3.16) for all p ≥ 2. Since the constant C(k) in (3.16) is independent of p, we get 
+
+∥fσ(φl
+
+> 0,σ,k
+
+)∥L∞(Ω) + ∥fσ(ψl
+
+> 0,σ,k
+
+)∥L∞(Γ) ≤ C(k). (3.17) According to Fatou’s lemma, we can pass to the limit as l → +∞ in (3.17) and conclude that 
+
+∥fσ(φ0,σ,k )∥L∞(Ω) + ∥fσ(ψ0,σ,k )∥L∞(Γ) ≤ C(k).
+
+Choosing δ(k) = 1 − max {f −10 (C(k)) , −f −10 (−C(k)) } ∈ (0 , 1) , this allows us to obtain 
+
+∥φ0,σ,k ∥L∞(Ω) ≤ (1 − σ)(1 − δ(k)) , ∥ψ0,σ,k ∥L∞(Γ) ≤ (1 − σ)(1 − δ(k)) .
+
+Convergence results. To investigate the convergence φ0,σ,k → φ0,k in H1, we introduce the notation 
+
+φ♯ 
+
+> 0,σ,k
+
+= ( φ♯
+
+> 0,σ,k
+
+, ψ ♯
+
+> 0,σ,k
+
+) := φ0,σ,k − φ0,k ∈ H 2.
+
+In view of (3.8), we have 
+
+− ∆φ♯ 
+
+> 0,σ,k
+
++ f0(φ0,σ,k ) − f0(φ0,k ) + k−1fσ(φ0,σ,k ) − k−1f0(φ0,k ) = 0 a.e. in Ω, (3.18a) 
+
+( K∂ nφ♯ 
+
+> 0,σ,k
+
+= ψ♯ 
+
+> 0,σ,k
+
+− φ♯
+
+> 0,σ,k
+
+, K ∈ (0 , +∞)
+
+∂nφ♯ 
+
+> 0,σ,k
+
+= 0 , K = + ∞ a.e. on Γ, (3.18b) 
+
+− ∆τ ψ♯ 
+
+> 0,σ,k
+
++ ∂nφ♯ 
+
+> 0,σ,k
+
++ g0(ψ0,σ,k ) − g0(ψ0,k ) + k−1fσ(ψ0,σ,k ) − k−1f0(ψ0,k ) = 0 a.e. on Γ. (3.18c) Testing (3.18a) by φ0,σ,k  
+
+> 1−σ
+
+− φ0,k , (3.18c) by ψ0,σ,k  
+
+> 1−σ
+
+− ψ0,k , respectively, using (3.18b), we obtain 
+
+0 = 
+
+Z
+
+> Ω
+
+∇φ♯ 
+
+> 0,σ,k
+
+· ∇ 
+
+ φ0,σ,k 
+
+1 − σ − φ0,k 
+
+
+
+dx +
+
+Z
+
+> Γ
+
+∇τ ψ♯ 
+
+> 0,σ,k
+
+· ∇ τ
+
+ ψ0,σ,k 
+
+1 − σ − ψ0,k 
+
+
+
+dS
+
++
+
+Z
+
+> Ω
+
+
+
+f0(φ0,σ,k ) − f0(φ0,k )
+
+ φ0,σ,k 
+
+1 − σ − φ0,k 
+
+
+
+dx +
+
+Z
+
+> Γ
+
+
+
+g0(ψ0,σ,k ) − g0(ψ0,k )
+
+ ψ0,σ,k 
+
+1 − σ − ψ0,k 
+
+
+
+dS
+
++ k−1
+
+Z
+
+> Ω
+
+
+
+f0
+
+ φ0,σ,k 
+
+1 − σ
+
+
+
+− f0(φ0,k )
+
+ φ0,σ,k 
+
+1 − σ − φ0,k 
+
+
+
+dx
+
++ k−1
+
+Z
+
+> Γ
+
+
+
+f0
+
+ ψ0,σ,k 
+
+1 − σ
+
+
+
+− f0(ψ0,k )
+
+ ψ0,σ,k 
+
+1 − σ − ψ0,k 
+
+
+
+dS
+
+−
+
+Z
+
+> Γ
+
+∂nφ♯
+
+> 0,σ,k
+
+ φ0,σ,k − ψ0,σ,k 
+
+1 − σ − φ0,k + ψ0,k 
+
+
+
+dS
+
+≥
+
+Z
+
+> Ω
+
+|∇ φ♯
+
+> 0,σ,k
+
+|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ ψ♯
+
+> 0,σ,k
+
+|2 dS+χ(K)
+
+Z
+
+> Γ
+
+|ψ♯ 
+
+> 0,σ,k
+
+− φ♯
+
+> 0,σ,k
+
+|2 dS
+
++ κ∥φ♯
+
+> 0,σ,k
+
+∥2 
+
+> L2
+
++ k−1κ φ0,σ,k 
+
+1 − σ − φ0,k  
+
+> 2
+> L2
+
++χ(K) σ
+
+1 − σ
+
+Z
+
+> Γ
+
+(φ♯ 
+
+> 0,σ,k
+
+− ψ♯
+
+> 0,σ,k
+
+)( φ0,σ,k − ψ0,σ,k ) d S
+
++ σ
+
+1 − σ
+
+Z
+
+> Ω
+
+∇φ0,σ,k · ∇ (φ0,σ,k − φ0,k ) d x + σ
+
+1 − σ
+
+Z
+
+> Γ
+
+∇τ ψ0,σ,k · ∇ τ (ψ0,σ,k − ψ0,k ) d S
+
+19 + σ
+
+1 − σ
+
+Z
+
+> Ω
+
+(f0(φ0,σ,k ) − f0(φ0,k )) φ0,σ,k dx + σ
+
+1 − σ
+
+Z
+
+> Γ
+
+(g0(ψ0,σ,k ) − g0(ψ0,k )) ψ0,σ,k dS. (3.19) Here, κ > 0 is the constant from (A2) . Using the estimates (3.9) and (3.10), we infer from (3.19) that 
+
+κ∥φ♯
+
+> 0,σ,k
+
+∥2 
+
+> L2
+
++ ∥∇ φ♯
+
+> 0,σ,k
+
+∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ψ♯
+
+> 0,σ,k
+
+∥2 
+
+> L2(Γ)
+
++ χ(K)∥φ♯ 
+
+> 0,σ,k
+
+− ψ♯
+
+> 0,σ,k
+
+∥2
+
+> HΓ
+
+≤ Cσ  ∥φ0,σ,k ∥2 
+
+> H1
+
++ ∥φ0,k ∥2 
+
+> H1
+
++ ∥f0(φ0,σ,k )∥2
+
+> H
+
++ ∥f0(φ0,k )∥2 
+
+> H
+
++ ∥g0(ψ0,σ,k )∥2 
+
+> HΓ
+
++ ∥g0(ψ0,k )∥2
+
+> HΓ
+
+
+
+≤ C∗σ(1 + ∥eμ0∥2 
+
+> V
+
++ ∥ eL0∥2 
+
+> VΓ
+
+) (3.20) for some constant C∗ > 0 independent of σ and k. Hence, passing to the limit σ → 0 in (3.20), we conclude the first convergence in (3.14). To establish the convergence φ0,k → φ0 in H1, we use the notation φ♯ 
+
+> 0,k
+
+= ( φ♯
+
+> 0,k
+
+, ψ ♯
+
+> 0,k
+
+) := φ0,k −φ0 ∈ H 2.Recalling the definition of eμ0,k and eL0,k , we use (3.8) to deduce that 
+
+− ∆φ♯ 
+
+> 0,k
+
++ (1 + k−1)( f0(φ0,k ) − f0(φ0)) = hk ◦ eμ0 − eμ0 − k−1f0(φ0) a.e. in Ω, (3.21a) 
+
+( K∂ nφ♯ 
+
+> 0,k
+
+= ψ♯ 
+
+> 0,k
+
+− φ♯
+
+> 0,k
+
+, K ∈ (0 , +∞)
+
+∂nφ♯ 
+
+> 0,k
+
+= 0 , K = + ∞ a.e. on Γ, (3.21b) 
+
+− ∆τ ψ♯ 
+
+> 0,k
+
++ ∂nφ♯ 
+
+> 0,k
+
++ g0(ψ0,k ) − g0(ψ0) + k−1(f0(ψ0,k ) − f0(ψ0)) (3.21c) 
+
+= hk ◦ eL0 − eL0 − k−1f0(ψ0) a.e. on Γ. (3.21d) Testing (3.21a) by φ♯ 
+
+> 0,k
+
+and (3.21d) by ψ♯
+
+> 0,k
+
+, using (3.21b), we have 
+
+Z
+
+> Ω
+
+|∇ φ♯
+
+> 0,k
+
+|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ ψ♯
+
+> 0,k
+
+|2 dS+χ(K)
+
+Z
+
+> Γ
+
+|φ♯ 
+
+> 0,k
+
+− ψ♯
+
+> 0,k
+
+|2 dS
+
++ (1 + k−1)κ
+
+ Z
+
+> Ω
+
+|φ♯
+
+> 0,k
+
+|2 dx +
+
+Z
+
+> Γ
+
+|ψ♯
+
+> 0,k
+
+|2 dS
+
+
+
+≤
+
+Z
+
+> Ω
+
+(hk ◦ eμ0 − eμ0)φ♯ 
+
+> 0,k
+
+dx +
+
+Z
+
+> Γ
+
+(hk ◦ eL0 − eL0)ψ♯ 
+
+> 0,k
+
+dS
+
+− k−1
+
+Z
+
+> Ω
+
+f0(φ0)φ♯ 
+
+> 0,k
+
+dx − k−1
+
+Z
+
+> Γ
+
+f0(ψ0)ψ♯ 
+
+> 0,k
+
+dS
+
+≤ κ
+
+2
+
+ Z
+
+> Ω
+
+|φ♯
+
+> 0,k
+
+|2 dx +
+
+Z
+
+> Γ
+
+|ψ♯
+
+> 0,k
+
+|2 dS
+
+
+
++ 1
+
+κ
+
+Z
+
+> Ω
+
+|hk ◦ eμ0 − eμ0|2 dx + 1
+
+κ
+
+Z
+
+> Γ
+
+|hk ◦ eL0 − eL0|2 dS
+
++ k−2
+
+κ
+
+Z
+
+> Ω
+
+|f0(φ0)|2 dx + k−2
+
+κ
+
+Z
+
+> Γ
+
+|f0(ψ0)|2 dS. (3.22) By (A3) , (A4) and the Lebesgue dominated convergence theorem, we obtain 
+
+12κ
+
+Z
+
+> Ω
+
+|hk ◦ eμ0 − eμ0|2 dx + 12κ
+
+Z
+
+> Γ
+
+|hk ◦ eL0 − eL0|2 dS
+
++ k−2
+
+κ
+
+Z
+
+> Ω
+
+|f0(φ0)|2 dx + k−2
+
+κ
+
+Z
+
+> Γ
+
+|f0(ψ0)|2 dS → 0 as k → +∞.
+
+The above convergence result together with (3.22) allows us to pass to the limit k → +∞ in the right-hand side of (3.22). Consequently, we can conclude that φ0,k → φ0 in H1 as k → +∞. This verifies the second convergence in (3.14) and thus the proof of Proposition 3.1 is complete. 20 3.2 The approximate problem 
+
+Let us consider the following bulk-surface Stokes operator, which was first introduced and analyzed in [46, Section 5]: 
+
+A : D(A) ⊂ L2div → L2div ,
+
+(v, w) 7 →  PΩdiv (−∆v), PΓdiv (−∆τ w + 2[ Dv n ]τ + w),
+
+where D(A) = H20,div . The operator A is a positive self-adjoint operator on L2div . We note that A is bounded from above as 
+
+(v, w) 7 → ∥ (v, w)∥2
+
+> H10,div
+
+:= 
+
+Z
+
+> Ω
+
+|Dv|2 dx +
+
+Z
+
+> Γ
+
+|Dτ w|2 dS +
+
+Z
+
+> Γ
+
+|w|2 dS
+
+defines a norm on D(A) that is equivalent to the H1-norm (see [46, Lemma 5.1]). In [46, Theorem 5.9], it was shown that there exists a sequence of countable many positive eigenvalues {λk}k∈N and the corresponding eigenfunctions {(evk, ewk)}k∈N ⊂ H20,div , which satisfy 
+
+Z
+
+> Ω
+
+Devk : Dbv dx +
+
+Z
+
+> Γ
+
+Dτ ewk : Dτ bw dS +
+
+Z
+
+> Γ
+
+ewk · bw dS
+
+= λk
+
+Z
+
+> Ω
+
+evk · bv dx + λk
+
+Z
+
+> Γ
+
+ewk · bw dS for all (bv, bw) ∈ H10,div ,can be chosen in such a way that they form an orthonormal basis of L2div . We also note that (evk, ewk) ∈ W2,r 
+
+> 0,div
+
+for all r ∈ (1 , +∞) (see [46, Theorem 5.7]) and the functions {(evk, ewk)}k∈N form a complete orthogonal system of H20,div (see [46, Corollary 5.11]). By definition, it holds evk = evk, τ = ewk almost everywhere on Γ.For any m ∈ N+, we define the finite-dimensional subspace 
+
+Vm = span (evk, ewk) mk=1 ⊂ H10,div 
+
+and the L2div -orthogonal projection onto Vm is denoted by Pm = ( PΩ
+
+> m
+
+, PΓ
+
+> m
+
+), which is uniformly bounded on 
+
+L2div and H10,div in the following way: 
+
+( ∥Pm(v, w)∥L2 ≤ ∥ (v, w)∥L2 for all (v, w) ∈ L2div ,
+
+∥Pm(v, w)∥H10,div ≤ ∥ (v, w)∥H10,div for all (v, w) ∈ H10,div . (3.23) Moreover, as a direct consequence of the regularity estimate in [46, Theorem 5.7], the following inverse Sobolev embedding inequalities hold for all (v, w) ∈ V m:
+
+∥(v, w)∥H1 ≤ Cm∥(v, w)∥L2 , ∥(v, w)∥H2 ≤ Cm∥(v, w)∥L2 . (3.24) Now, let us fix T > 0. For any m, k ∈ N+, γ > 0 and σ ∈ (0 , 1/2) , we intend to construct an approximate solution (vm, vm, τ , φm, μm) to the system (1.8)–(1.10) with the regularities 
+
+
+
+(vm, vm, τ ) ∈ C1([0 , T ]; Vm),
+
+φm = ( φm, ψ m) ∈ L∞(0 , T ; H3),∂tφm ∈ L∞(0 , T ; H1) ∩ L2(0 , T ; H2) ∩ H1(0 , T ; L2),φm ∈ L∞(QT ) with |φm(x, t )| ≤ (1 − σ)(1 − δ) a.e. in QT ,ψm ∈ L∞(Σ T ) with |ψm(x, t )| ≤ (1 − σ)(1 − δ) a.e. on ΣT ,
+
+μm = ( μm, Lm) ∈ L∞(0 , T ; H2) ∩ H1(0 , T ; H1),
+
+(3.25) 21 for some δ = δ(σ, k, γ ) ∈ (0 , 1) , which satisfies the following weak formulation 
+
+Z
+
+> Ω
+
+ρ(φm)∂tvm · w dx +
+
+Z
+
+> Ω
+
+2αD∂tvm : Dw dx
+
++
+
+Z
+
+> Ω
+
+2ν(φm)Dvm : Dw dx +
+
+Z
+
+> Γ
+
+β(ψm)vm, τ · wτ dS
+
+=
+
+Z
+
+> Ω
+
+μm∇φm · w dx −
+
+Z
+
+> Γ
+
+ψm∇τ Lm · wτ dS −
+
+Z
+
+> Ω
+
+ρ(φm)( vm · ∇ )vm · w dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μm · ∇ )vm · w dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μm · n)vm, τ · wτ dS, (3.26) almost everywhere in [0 , T ] for all (w, wτ ) ∈ V m, the equations 
+
+∂tφm + vm · ∇ φm = ∆ μm a.e. in QT , (3.27a) 
+
+μm = γ∂ tφm − ∆φm + f (φm) + k−1fσ(φm) a.e. in QT , (3.27b) 
+
+(
+
+K∂ nφm = ψm − φm, K ∈ (0 , +∞)
+
+∂nφm = 0 , K = + ∞ a.e. on ΣT , (3.27c) 
+
+L∂ nμm = Lm − μm, L ∈ (0 , +∞) a.e. on ΣT , (3.27d) 
+
+∂tψm + vm, τ · ∇ τ ψm = ∆ τ Lm − ∂nμm a.e. on ΣT , (3.27e) 
+
+Lm = γ∂ tψm − ∆τ ψm + ∂nφm + g(ψm) + k−1fσ(ψm) a.e. on ΣT , (3.27f) and the initial conditions 
+
+vm|t=0 = PΩ
+
+> m
+
+(v0, v0,τ ) a.e. in Ω, (φm, ψ m)|t=0 = ( φ0,σ,k , ψ 0,σ,k ) a.e. in Ω × Γ. (3.28) 
+
+3.3 Existence of approximate solutions 
+
+We establish the existence of approximate solutions to problem (3.26)–(3.28) on [0 , T ] by a fixed-point argument (cf. [30]). To this aim, we fix (v, vτ ) ∈ H1(0 , T ; Vm) and consider the following convective viscous Cahn–Hilliard equation with dynamic boundary conditions 
+
+∂tφm + v · ∇ φm = ∆ μm a.e. in QT , (3.29a) 
+
+μm = γ∂ tφm − ∆φm + f (φm) + k−1fσ(φm) a.e. in QT , (3.29b) 
+
+(
+
+K∂ nφm = ψm − φm, K ∈ (0 , +∞)
+
+∂nφm = 0 , K = + ∞ a.e. on ΣT , (3.29c) 
+
+L∂ nμm = Lm − μm, L ∈ (0 , +∞) a.e. on ΣT , (3.29d) 
+
+∂tψm + vτ · ∇ τ ψm = ∆ τ Lm − ∂nμm a.e. on ΣT , (3.29e) 
+
+Lm = γ∂ tψm − ∆τ ψm + ∂nφm + g(ψm) + k−1fσ(ψm) a.e. on ΣT , (3.29f) subject to the initial conditions 
+
+(φm, ψ m)|t=0 = ( φ0,σ,k , ψ 0,σ,k ) in Ω × Γ. (3.30) 22 According to Theorem A.1, there exists a unique solution (φm, μm) to (3.29)–(3.30) satisfying 
+
+
+
+φm = ( φm, ψ m) ∈ L∞(0 , T ; H3) ∩  C(QT ) × C(Σ T ),∂tφm ∈ L∞(0 , T ; H1) ∩ L2(0 , T ; H2) ∩ H1(0 , T ; L2),φm ∈ L∞(QT ) with |φm(x, t )| ≤ (1 − σ)(1 − eδ) a.e. in QT ,ψm ∈ L∞(Σ T ) with |ψm(x, t )| ≤ (1 − σ)(1 − eδ) a.e. on ΣT ,
+
+μm = ( μm, Lm) ∈ L∞(0 , T ; H2) ∩ H1(0 , T ; H1),
+
+(3.31) for some constant eδ = eδ(σ, k, γ ) ∈ (0 , 1) . It is straightforward to check that this weak solution also satisfies the energy estimate 
+
+sup 
+
+> s∈[0 ,t ]
+
+Eσ,k 
+
+> free
+
+(φm(s)) + 12
+
+Z t
+
+> 0
+
+Z
+
+> Ω
+
+|∇ μm(s)|2 dx ds + 12
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|∇ τ Lm(s)|2 dS ds
+
++ 1
+
+L
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+(Lm(s) − μm(s)) 2 dS ds + γ
+
+Z t
+
+> 0
+
+Z
+
+> Ω
+
+|∂tφm(s)|2 dx ds + γ
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|∂tψm(s)|2 dS ds
+
+≤ Eσ,k 
+
+> free
+
+(φ0,σ,k ) + 12
+
+Z T
+
+> 0
+
+∥v(s)∥2 
+
+> L2(Ω)
+
+ds + 12
+
+Z T
+
+> 0
+
+∥vτ (s)∥2 
+
+> L2(Γ)
+
+ds, (3.32) for all t ∈ [0 , T ]. Here, the free energy functional Eσ,k  
+
+> free
+
+associated with system (3.29)–(3.30) is given by 
+
+Eσ,k 
+
+> free
+
+(φm) = Efree (φm) + k−1
+
+Z
+
+> Ω
+
+Fσ(φm) d x + k−1
+
+Z
+
+> Γ
+
+Fσ(ψm) d S. 
+
+The assumption (A2) implies that there exists a positive constant Cb such that Eσ,k 
+
+> free
+
+(φm) ≥ − Cb.Next, we look for a spatially discrete solution 
+
+vm(x, t ) = 
+
+> m
+
+X
+
+> i=1
+
+ami (t)evi(x), with vm, τ (x, t ) = 
+
+> m
+
+X
+
+> i=1
+
+ami (t) ewi(x) = 
+
+> m
+
+X
+
+> i=1
+
+ami (t)evi, τ (x)
+
+to the following weak formulation 
+
+Z
+
+> Ω
+
+ρ(φm)∂tvm · evj dx +
+
+Z
+
+> Ω
+
+2αD∂tvm : Devj dx
+
++
+
+Z
+
+> Ω
+
+2ν(φm)Dvm : Devj dx +
+
+Z
+
+> Γ
+
+β(ψm)vm, τ · evj, τ dS
+
+=
+
+Z
+
+> Ω
+
+μm∇φm · evj dx −
+
+Z
+
+> Γ
+
+ψm∇τ Lm · evj, τ dS −
+
+Z
+
+> Ω
+
+ρ(φm)( v · ∇ )vm · evj dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μm · ∇ )vm · evj dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μm · n)vm, τ · evj, τ dS (3.33) for j ∈ { 1, ..., m }. Moreover, vm satisfies the initial condition 
+
+vm|t=0 = PΩ
+
+> m
+
+(v0, v0,τ ) a.e. in Ω.
+
+Defining Am(t) = ( am 
+
+> 1
+
+(t), ..., a mm(t)) ⊤, we can rewrite (3.33) into the system of ordinary differential equations 
+
+Mm(t) ddt Am(t) = Lm(t)Am(t) + Gm(t), (3.34) 23 where the matrices Mm(t), Lm(t) and the vector Gm(t) are given by 
+
+(Mm(t)) i,j =
+
+Z
+
+> Ω
+
+ρ(φm)evi · evj dx + 2 α
+
+Z
+
+> Ω
+
+Devi : Devj dx, 
+
+(Lm(t)) i,j = −
+
+Z
+
+> Γ
+
+β(ψm)evi, τ · evj, τ dS − 2
+
+Z
+
+> Ω
+
+ν(φm)Devi : Devj dx
+
+−
+
+Z
+
+> Ω
+
+(ρ(φm)v · ∇ )evi · evj dx + ρ′
+
+Z
+
+> Ω
+
+(∇μm · ∇ )evi · evj dx
+
+− ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μm · n)evi, τ · evj, τ dS, 
+
+(Gm(t)) i =
+
+Z
+
+> Ω
+
+μm∇φm · evi dx −
+
+Z
+
+> Γ
+
+ψm∇τ Lm · evi, τ dS, 
+
+and the initial condition reduces to 
+
+Am(0) =  (Pm(v0, v0,τ ), (ev1, ew1)) L2div , ..., (( Pm(v0, v0,τ ), (evm, ewm)) L2div 
+
+⊤. (3.35) Thanks to (3.31), it follows that φm ∈ C([0 , T ]; W 1,4(Ω)) , ψm ∈ C([0 , T ]; W 1,4(Γ)) . This, in turn, implies that 
+
+ρ(φm), ν (φm) ∈ C(Ω × [0 , T ]) , β(ψm) ∈ C(Γ × [0 , T ]) .
+
+Using (3.31), we find μm ∈ C([0 , T ]; H1). Then from the definition of J (see (1.2)) and (3.29d), we infer that J · n ∈ C([0 , T ]; HΓ). We also recall the fact that (v, vτ ) ∈ C([0 , T ]; Vm). Consequently, it follows that 
+
+Mm and Lm belong to C([0 , T ]; Rm×m) and Gm ∈ C([0 , T ]; Rm). Furthermore, like in [34, Appendix A], we can show that the matrix Mm(·) is positive definite on [0 , T ]. Indeed, for any fixed t ∈ [0 , T ] and a vector 
+
+a ∈ Rm \ { 0}, from (2.11) we infer that 
+
+a⊤Mm(t)a =
+
+> m
+
+X
+
+> i=1
+> m
+
+X
+
+> j=1
+
+ Z
+
+> Ω
+
+ρ(φm)ai evi · aj evj dx + α
+
+Z
+
+> Ω
+
+aiDevi : aj Devj dx
+
+
+
+=
+
+Z
+
+> Ω
+
+ρ(φm(t)) |ξ|2 dx + α
+
+Z
+
+> Ω
+
+|Dξ|2 dx
+
+≥ ρ2∥ξ∥2 
+
+> L2(Ω)
+
++ α∥Dξ∥2
+
+> L2(Ω)
+
+≥ C(ρ2, α, Ω) ∥(ξ, ξτ )∥2
+
+> L2div
+
+= C(ρ2, α, Ω) |a|2 
+
+> Rm
+
+> 0,
+
+where ξ = Pmi=1 ai evi with ξτ = Pmi=1 ai evi, τ . As a consequence, Mm(t) is positive definite on [0 , T ]. By the continuity of ρ(φm), the inverse matrix further satisfies (Mm)−1 ∈ C([0 , T ]; Rm×m). Hence, by the classical existence and uniqueness theorem for systems of linear ODEs, there exists a unique vector Am ∈
+
+C1([0 , T ]; Rm) that solves the initial value problem (3.34)–(3.35) on [0 , T ]. This yields that problem (3.33) admits a unique solution (vm, vm, τ ) ∈ C1([0 , T ]; Vm).Multiplying (3.33) by amj and summing over j, we find 
+
+12ddt
+
+ Z
+
+> Ω
+
+ρ(φm)|vm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dvm|2 dx
+
+
+
++
+
+Z
+
+> Ω
+
+2ν(φm)|Dvm|2 dx +
+
+Z
+
+> Γ
+
+β(ψm)|vm, τ |2 dS
+
+= −
+
+Z
+
+> Ω
+
+φm∇μm · vm dx −
+
+Z
+
+> Γ
+
+ψm∇τ Lm · vm, τ dS −
+
+Z
+
+> Ω
+
+(ρ(φm)v · ∇ )vm · vm dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μm · ∇ )vm · vm dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μm · n)|vm, τ |2 dS + ρ′
+
+2
+
+Z
+
+> Ω
+
+∂tφm|vm|2 dx. 
+
+Similar to [46, Formula (6.18)], we further obtain the identity 
+
+12ddt
+
+ Z
+
+> Ω
+
+ρ(φm)|vm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dvm|2 dx
+
+
+
++
+
+Z
+
+> Ω
+
+2ν(φm)|Dvm|2 dx +
+
+Z
+
+> Γ
+
+β(ψm)|vm, τ |2 dS
+
+24 = −
+
+Z
+
+> Ω
+
+φm∇μm · vm dx −
+
+Z
+
+> Γ
+
+ψm∇τ Lm · vm, τ dS. (3.36) Due to (A1) , it holds 
+
+Z
+
+> Ω
+
+2ν(φm)|Dvm|2 dx +
+
+Z
+
+> Γ
+
+β(ψm)|vm, τ |2 dS ≥ 2ν∗∥Dvm∥2 
+
+> L2(Ω)
+
++ β∗∥vm, τ ∥2
+
+> L2(Γ)
+
+. (3.37) For terms on the right-hand side of (3.36), we use the Poincaré inequality (2.1), Korn’s inequality (2.10), and Young’s inequality to derive the following estimate 
+
+−
+
+Z
+
+> Ω
+
+φm∇μm · vm dx −
+
+Z
+
+> Γ
+
+ψm∇τ Lm · vm, τ dS
+
+≤ ∥ φm∥L∞(Ω) ∥∇ μm∥L2(Ω) ∥vm∥L2(Ω) + ∥ψm∥L∞(Γ) ∥∇ τ Lm∥L2(Γ) ∥vm, τ ∥L2(Γ) 
+
+≤ eCP∥∇ μm∥L2(Ω) (∥∇ vm∥L2(Ω) + ∥vm, τ ∥L2(Γ) ) + ∥∇ τ Lm∥L2(Γ) ∥vm, τ ∥L2(Γ) 
+
+≤ eCP eCK∥∇ μm∥L2(Ω) ∥Dvm∥L2(Ω) 
+
++
+
+ eCP eCK∥∇ μm∥L2(Ω) + eCP∥∇ μm∥L2(Ω) + ∥∇ τ Lm∥L2(Γ) 
+
+
+
+∥vm, τ ∥L2(Γ) 
+
+≤ min {2ν∗, β ∗}
+
+2
+
+ ∥Dvm∥L2(Ω) + ∥vm, τ ∥L2(Γ) 
+
+2 + C∗
+
+
+
+∥∇ μm∥2 
+
+> L2(Ω)
+
++ ∥∇ τ Lm∥2
+
+> L2(Γ)
+
+
+
+≤ ν∗∥Dvm∥2 
+
+> L2(Ω)
+
++ β∗
+
+2 ∥vm, τ ∥2 
+
+> L2(Γ)
+
++ C∗
+
+
+
+∥∇ μm∥2 
+
+> L2(Ω)
+
++ ∥∇ τ Lm∥2
+
+> L2(Γ)
+
+
+
+, (3.38) where the constant C∗ > 0 depends only on eCP, eCK, ν∗ and β∗, but is independent of m. Combining (3.36), (3.37) and (3.38), we obtain 
+
+12ddt
+
+ Z
+
+> Ω
+
+ρ(φm)|vm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dvm|2 dx
+
+
+
++ ν∗∥Dvm∥2 
+
+> L2(Ω)
+
++ β∗
+
+2 ∥vm, τ ∥2
+
+> L2(Γ)
+
+≤ C∗
+
+
+
+∥∇ μm∥2 
+
+> L2(Ω)
+
++ ∥∇ τ Lm∥2
+
+> L2(Γ)
+
+
+
+. (3.39) From (3.32) and (3.39), we infer that 
+
+sup 
+
+> s∈[0 ,t ]
+
+ Z
+
+> Ω
+
+ρ(φm(s)) |vm(s)|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dvm(s)|2 dx
+
+
+
++ 2 ν∗
+
+Z t
+
+> 0
+
+∥Dvm(s)∥2 
+
+> L2(Ω)
+
+ds + β∗
+
+Z t
+
+> 0
+
+∥vm, τ (s)∥2 
+
+> L2(Γ)
+
+ds
+
+≤
+
+Z
+
+> Ω
+
+ρ(φ0,σ,k )|PΩ
+
+> m
+
+(v0, v0,τ )|2 dx + 2 α
+
+Z
+
+> Ω
+
+|DP Ω
+
+> m
+
+(v0, v0,τ )|2 dx
+
++ 4 C∗
+
+
+
+Cb + Eσ,k 
+
+> free
+
+(φ0,σ,k ) + 
+
+Z t
+
+> 0
+
+∥(v(s), vτ (s)∥2 
+
+> L2
+
+ds
+
+
+
+, (3.40) which, together with (3.23), implies that 
+
+∥vm(t)∥2 
+
+> L2(Ω)
+
+≤ ρ1
+
+ρ2
+
+∥(v0, v0,τ )∥2 
+
+> L2
+
++ 2αρ2
+
+∥(v0, v0,τ )∥2
+
+> H10,div
+
++ 4C∗
+
+ρ2
+
+
+
+Cb + Eσ,k 
+
+> free
+
+(φ0,σ,k ) + ∥(v, vτ )∥2
+
+> L2(0 ,t ;L2div )
+
+
+
+, (3.41) 
+
+∥Dvm(t)∥2 
+
+> L2(Ω)
+
+≤ ρ1
+
+2α ∥(v0, v0,τ )∥2 
+
+> L2
+
++ ∥(v0, v0,τ )∥2
+
+> H10,div
+
++ 2C∗
+
+α
+
+
+
+Cb + Eσ,k 
+
+> free
+
+(φ0,σ,k ) + ∥(v, vτ )∥2
+
+> L2(0 ,t ;L2div )
+
+
+
+. (3.42) 25 Recalling (2.11), we infer from (3.41) and (3.42) that 
+
+∥vm, τ (t)∥2 
+
+> L2(Γ)
+
+≤ 2 eC20 (∥Dvm(t)∥2 
+
+> L2(Ω)
+
++ ∥vm(t)∥2
+
+> L2(Ω)
+
+)
+
+≤ eC1
+
+
+
+∥(v0, v0,τ )∥2 
+
+> L2
+
++ ∥(v0, v0,τ )∥2
+
+> H10,div
+
+
+
++ eC2
+
+
+
+Cb + Eσ,k 
+
+> free
+
+(φ0,σ,k ) + ∥(v, vτ )∥2
+
+> L2(0 ,t ;L2div )
+
+
+
+, (3.43) where 
+
+eC1 := 2( eC20 + 1) max 
+
+n ρ1
+
+ρ2
+
++ ρ1
+
+2α , 2αρ2
+
++ 1 
+
+o
+
+, eC2 := 4( eC20 + 1) C∗
+
+ 2
+
+ρ2
+
++ 1
+
+α
+
+
+
+.
+
+At this point, we set 
+
+C1 = 2 eC1
+
+ ∥(v0, v0,τ )∥2 
+
+> L2
+
++ ∥(v0, v0,τ )∥2
+
+> H10,div
+
+ + 2 eC2
+
+ Cb + Eσ,k 
+
+> free
+
+(φ0,σ,k ), C2 = 2 eC2,
+
+and assuming 
+
+∥(v, vτ )∥2 
+
+> L2(0 ,t ;L2div )
+
+≤ C3eC2t, for all t ∈ [0 , T ], (3.44) where C3 = C1T . We deduce from (3.41), (3.43) and (3.44) that 
+
+Z t
+
+> 0
+
+∥(vm(s), vm, τ (s)) ∥2
+
+> L2div
+
+ds ≤ C3 + C2
+
+Z t
+
+> 0
+
+Z s
+
+> 0
+
+∥(v, vτ )∥2
+
+> L2div
+
+dτ ds ≤ C3eC2t (3.45) for all t ∈ [0 , T ]. Furthermore, thanks to (3.41) and (3.42), we also infer that 
+
+sup  
+
+> t∈[0 ,T ]
+
+(∥vm(t)∥2 
+
+> L2(Ω)
+
++ ∥Dvm(t)∥2
+
+> L2(Ω)
+
+) ≤ 2C1 + C2C3eC2T =: K0. (3.46) Next, we estimate the time derivative of vm. To this end, multiplying (3.33) by ddt amj and summing over j, we obtain 
+
+Z
+
+> Ω
+
+ρ(φm)|∂tvm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|D∂tvm|2 dx
+
+= −2
+
+Z
+
+> Ω
+
+ν(φm)Dvm : D∂tvm dx −
+
+Z
+
+> Ω
+
+φm∇μm · ∂tvm dx −
+
+Z
+
+> Ω
+
+(ρ(φm)v · ∇ )vm · ∂tvm dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μm · ∇ )vm · ∂tvm dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μm · n)vm, τ · ∂tvm, τ dS
+
+−
+
+Z
+
+> Γ
+
+β(ψm)vm, τ · ∂tvm, τ dS −
+
+Z
+
+> Γ
+
+ψm∇τ Lm · ∂tvm, τ dS
+
+=: 
+
+> 7
+
+X
+
+> j=1
+
+Ij . (3.47) By Hölder’s inequality and (3.24), the terms Ij (1 ≤ j ≤ 5) can be estimated as follows: 
+
+I1 ≤ α
+
+4
+
+Z
+
+> Ω
+
+|D∂tvm|2 dx + 4( ν∗)2
+
+α
+
+Z
+
+> Ω
+
+|Dvm|2 dx, I2 ≤ ∥ φm∥L∞(Ω) ∥∇ μm∥L2(Ω) ∥∂tvm∥L2(Ω) 
+
+≤ ρ2
+
+8
+
+Z
+
+> Ω
+
+|∂tvm|2 dx + 2
+
+ρ2
+
+Z
+
+> Ω
+
+|∇ μm|2 dx, 
+
+26 I3 ≤ ∥ ρ(φm)∥L∞(Ω) ∥v∥L2(Ω) ∥∇ vm∥L6(Ω) ∥∂tvm∥L3(Ω) 
+
+≤ Cm∥v∥L2(Ω) ∥vm∥L2(Ω) ∥∂tvm∥L2(Ω) 
+
+≤ ρ2
+
+8
+
+Z
+
+> Ω
+
+|∂tvm|2 dx + 2C2
+
+> m
+
+ρ2
+
+∥v∥2
+
+> L2(Ω)
+
+∥vm∥2
+
+> L2(Ω)
+
+,I4 ≤ ρ′∥∇ μm∥L2(Ω) ∥∇ vm∥L6(Ω) ∥∂tvm∥L3(Ω) 
+
+≤ Cm∥∇ μm∥L2(Ω) ∥vm∥L2(Ω) ∥∂tvm∥L2(Ω) 
+
+≤ ρ2
+
+8
+
+Z
+
+> Ω
+
+|∂tvm|2 dx + 2C2
+
+> m
+
+ρ2
+
+∥∇ μm∥2
+
+> L2(Ω)
+
+∥vm∥2
+
+> L2(Ω)
+
+,I5 ≤ ρ′
+
+2L ∥μm − L m∥HΓ ∥vm, τ ∥L2(Γ) ∥∂tvm, τ ∥L2(Γ) 
+
+≤ Cm
+
+L ∥μm − L m∥HΓ ∥vm∥L2(Ω) ∥∂tvm∥L2(Ω) 
+
+≤ ρ2
+
+8
+
+Z
+
+> Ω
+
+|∂tvm|2 dx + 2C2
+
+> m
+
+ρ2L ∥μm − L m∥2 
+
+> HΓ
+
+∥vm∥2
+
+> L2(Ω)
+
+.
+
+Moreover, using (2.11), the terms I6 and I7 can be estimated as 
+
+I6 ≤ β∗∥vm, τ ∥L2(Γ) ∥∂tvm, τ ∥L2(Γ) 
+
+≤ β∗ eC0∥vm, τ ∥L2(Γ) (∥∂tvm∥L2(Ω) + ∥D∂tvm∥L2(Ω) )
+
+≤ ρ2
+
+8
+
+Z
+
+> Ω
+
+|∂tvm|2 dx + α
+
+4
+
+Z
+
+> Ω
+
+|D∂tvm|2 dx + (β∗)2 eC20 (2 α + ρ2)
+
+αρ 2
+
+Z
+
+> Γ
+
+|vm, τ |2 dS, I7 ≤ ∥ ψm∥L∞(Γ) ∥∇ τ Lm∥L2(Γ) ∥∂tvm, τ ∥L2(Γ) 
+
+≤ eC0∥ψm∥L∞(Γ) ∥∇ τ Lm∥L2(Γ) (∥∂tvm∥L2(Ω) + ∥D∂tvm∥L2(Ω) )
+
+≤ ρ2
+
+8
+
+Z
+
+> Ω
+
+|∂tvm|2 dx + α
+
+4
+
+Z
+
+> Ω
+
+|D∂tvm|2 dx + eC20 (2 α + ρ2)
+
+αρ 2
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS. 
+
+Therefore, combining (3.47) with the estimates for Ij (1 ≤ j ≤ 7) , we conclude that 
+
+ρ2
+
+4
+
+Z
+
+> Ω
+
+|∂tvm|2 dx + α
+
+Z
+
+> Ω
+
+|D∂tvm|2 dx
+
+≤ 4( ν∗)2
+
+α
+
+Z
+
+> Ω
+
+|Dvm|2 dx + 2
+
+ρ2
+
+Z
+
+> Ω
+
+|∇ μm|2 dx + 2C2
+
+> m
+
+ρ2
+
+∥v∥2
+
+> L2(Ω)
+
+∥vm∥2
+
+> L2(Ω)
+
++ 2C2
+
+> m
+
+ρ2
+
+∥∇ μm∥2
+
+> L2(Ω)
+
+∥vm∥2 
+
+> L2(Ω)
+
++ 2C2
+
+> m
+
+ρ2L ∥μm − L m∥2 
+
+> HΓ
+
+∥vm∥2
+
+> L2(Ω)
+
++ (β∗)2 eC20 (2 α + ρ2)
+
+αρ 2
+
+Z
+
+> Γ
+
+|vm, τ |2 dS + eC20 (2 α + ρ2)
+
+αρ 2
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS. (3.48) Next, we set γ0 = min {ρ2/4, α }. Then, by (2.11), (3.32), (3.40) and (3.46), we infer from (3.48) that 
+
+Z T
+
+> 0
+
+(∥∂tvm(t)∥2 
+
+> L2(Ω)
+
++ ∥∂tvm, τ (t)∥2
+
+> L2(Γ)
+
+) d t
+
+≤ 2(1 + eC20 )
+
+Z T
+
+> 0
+
+(∥∂tvm(t)∥2 
+
+> L2(Ω)
+
++ ∥D∂tvm(t)∥2
+
+> L2(Ω)
+
+) d t
+
+≤ 8( ν∗)2(1 + eC20 )
+
+αγ 0
+
+Z T
+
+> 0
+
+Z
+
+> Ω
+
+|Dvm(t)|2 dx dt + 2( β∗)2 eC20 (2 α + ρ2)(1 + eC20 )
+
+αρ 2γ0
+
+Z T
+
+> 0
+
+Z
+
+> Γ
+
+|vm, τ (t)|2 dS dt
+
+27 + 4(1 + eC20 )
+
+ρ2γ0
+
+Z T
+
+> 0
+
+Z
+
+> Ω
+
+|∇ μm(t)|2 dx dt + 4 eC20 (α + ρ2)(1 + eC20 )
+
+αρ 2γ0
+
+Z T
+
+> 0
+
+Z
+
+> Γ
+
+|∇ τ Lm(t)|2 dS dt
+
++ 4C2
+
+> m
+
+(1 + eC20 )
+
+ρ2γ0
+
+Z T
+
+> 0
+
+∥v(t)∥2
+
+> L2(Ω)
+
+∥vm(t)∥2 
+
+> L2(Ω)
+
+dt
+
++ 4C2
+
+> m
+
+(1 + eC20 )
+
+ρ2γ0
+
+Z T
+
+> 0
+
+∥∇ μm(t)∥2
+
+> L2(Ω)
+
+∥vm(t)∥2 
+
+> L2(Ω)
+
+dt
+
++ 4C2
+
+> m
+
+(1 + eC20 )χ(L)
+
+ρ2γ0
+
+Z T
+
+> 0
+
+∥μm(t) − L m(t)∥2 
+
+> HΓ
+
+∥vm(t)∥2 
+
+> L2(Ω)
+
+dt
+
+≤ 8( ν∗)2(1 + eC20 )T K 0
+
+αγ 0
+
++ 2( β∗)2 eC40 (2 α + ρ2)(1 + eC20 )T K 0
+
+αρ 2γ0
+
++
+
+ 8(1 + eC20 )
+
+ρ2γ0
+
++ 8 eC20 (2 α + ρ2)(1 + eC20 )
+
+αρ 2γ0
+
+ 
+
+Eσ,k 
+
+> free
+
+(φ0,σ,k ) + Cb + 12 C3eC2T 
+
++ 4C2
+
+> m
+
+(1 + eC20 )
+
+ρ2γ0
+
+K0C3eC2T + 8C2
+
+> m
+
+(1 + eC20 )K0
+
+ρ2γ0
+
+
+
+Eσ,k 
+
+> free
+
+(φ0,σ,k ) + Cb + 12 C3eC2T 
+
++ 4C2
+
+> m
+
+(1 + eC20 )K0
+
+ρ2γ0
+
+
+
+Eσ,k 
+
+> free
+
+(φ0,σ,k ) + Cb + 12 C3eC2T 
+
+=: K21 . (3.49) We are now in a position to manage the setting for the fixed-point argument. Define 
+
+S =
+
+(
+
+(v, vτ ) ∈ H1(0 , T ; Vm) ∥(v, vτ )∥2 
+
+> L2(0 ,t ;L2div )
+
+≤ C3eC2t for all t ∈ [0 , T ],
+
+∥(∂tv, ∂ tvτ )∥L2(0 ,T ;L2div ) ≤ K1
+
+)
+
+.
+
+Then S is a closed, convex subset of L2(0 , T ; Vm). In addition, since Vm is finite-dimensional, S is a compact subset of L2(0 , T ; Vm). Next, we define the operator 
+
+Λ : S → L2(0 , T ; Vm), Λ( v, vτ ) = ( vm, vm, τ ),
+
+where, for any (v, vτ ) ∈ S, (vm, vm, τ ) is the solution to the system (3.33) constructed above. In light of the estimates (3.45) and (3.49), we find that Λ( S) ⊆ S.In order to apply Schauder’s fixed point theorem, it remains to prove that Λ is continuous. To this end, we consider a sequence {(vn, vn 
+
+> τ
+
+)}n≥1 ⊂ S such that (vn, vn 
+
+> τ
+
+) → (ev, evτ ) in L2(0 , T ; Vm) as n → +∞. Arguing as above, we find a sequence {(φnm, μnm) = ( φnm, ψ nm, μ nm, Lnm)}n≥1 and a pair ( eφm, eμm) = ( eφm, eψm, eμm, eLm),which solve the convective Cahn–Hilliard system (3.29)–(3.30), where (v, vτ ) is replaced by (vn, vn 
+
+> τ
+
+) and 
+
+(ev, evτ ), respectively. By repeating the uniqueness argument developed in the proof of Theorem A.1, we have 
+
+12ddt
+
+
+
+∥φnm − eφm∥2
+
+> H−1
+> L, 0
+
++ γ∥φnm − eφm∥2
+
+> L2
+
+
+
++ ∥∇ (φnm − eφm)∥2 
+
+> L2(Ω)
+
++ ∥∇ τ (ψnm − eψm)∥2 
+
+> L2(Γ)
+
++ χ(K)
+
+Z
+
+> Γ
+
+|φnm − eφm − (ψnm − eψm)|2 dS
+
+≤ CLip ∥φnm − eφm∥2 
+
+> L2
+
++
+
+Z
+
+> Ω
+
+φnm(vn − ev) · ∇ SL
+
+> Ω
+
+(φnm − eφm) d x +
+
+Z
+
+> Ω
+
+(φnm − eφm)ev · ∇ SL
+
+> Ω
+
+(φnm − eφm) d x
+
++
+
+Z
+
+> Γ
+
+ψnm(vn 
+
+> τ
+
+− evτ ) · ∇ τ SL 
+
+> Γ
+
+(φnm − eφm) d S +
+
+Z
+
+> Γ
+
+(ψnm − eψm)evτ · ∇ τ SL 
+
+> Γ
+
+(φnm − eφm) d S. 
+
+Since (vn, vn 
+
+> τ
+
+), (ev, evτ ) ∈ S, we can deduce that 
+
+12ddt Q + 12 ∥∇ (φnm − eφm)∥2 
+
+> L2(Ω)
+
++ 12 ∥∇ τ (ψnm − eψm)∥2 
+
+> L2(Γ)
+
++ χ(K)2
+
+Z
+
+> Γ
+
+|φnm − eφm − (ψnm − eψm)|2 dS
+
+28 ≤ CQ(t) + ∥vn − ev∥2 
+
+> L2(Ω)
+
++ ∥vn 
+
+> τ
+
+− evτ ∥2 
+
+> L2(Γ)
+
+a.e. in (0 , T ),
+
+where Q(t) := ∥φnm(t) − eφm(t)∥2
+
+> H−1
+> L, 0
+
++ γ∥φnm(t) − eφm(t)∥2 
+
+> L2
+
+. Observing that φnm(0) = eφm(0) , applying Gronwall’s lemma, we obtain 
+
+∥φnm − eφm∥L∞(0 ,T ;L2)∩L2(0 ,T ;H1)
+
+≤ eCT 
+
+Z T
+
+> 0
+
+(∥vn(t) − ev(t)∥2 
+
+> L2(Ω)
+
++ ∥vn 
+
+> τ
+
+(t) − evτ (t)∥2
+
+> L2(Γ)
+
+) d t → 0 as n → +∞. (3.50) Furthermore, we can use the continuous embedding H1(0 , T ; Vm) ,→ C([0 , T ]; Vm), the properties of φ0,σ,k 
+
+presented in Proposition 3.1, and Theorem A.1 to deduce that 
+
+∥∂tφnm∥L∞(0 ,T ;H1) + ∥∂t eφm∥L∞(0 ,T ;H1) ≤ C, (3.51a) 
+
+∥∂tφnm∥L2(0 ,T ;H2) + ∥∂t eφm∥L2(0 ,T ;H2) ≤ C, (3.51b) 
+
+∥μnm∥L∞(0 ,T ;H2) + ∥ eμm∥L∞(0 ,T ;H2) ≤ C, (3.51c) 
+
+∥φnm∥L∞(0 ,T ;H3) + ∥ eφm∥L∞(0 ,T ;H3) ≤ C, (3.51d) 
+
+∥∂tμnm∥L2(0 ,T ;H1) + ∥∂t eμm∥L2(0 ,T ;H1) ≤ C, (3.51e) 
+
+∥φnm∥L∞ ≤ (1 − σ)(1 − δ∗), (3.51f) 
+
+∥ eφm∥L∞ ≤ (1 − σ)(1 − δ∗), (3.51g) for some generic constant C > 0 and δ∗ ∈ (0 , 1) . Taking a closer look at the proofs of Proposition 3.1 and Theorem A.1, we find that C and δ∗ can be chosen independent of n. By interpolation, we deduce from (3.50) and (3.51d) that 
+
+∥φnm − eφm∥L∞(0 ,T ;H2) → 0 as n → +∞. (3.52) Next, by (3.51c), (3.51e) and the Aubin–Lions–Simon lemma, there exists a subsequence {μnj 
+
+> m
+
+}j≥1 such that 
+
+μnj 
+
+> m
+
+− eμm → μ∗ 
+
+> m
+
+in L∞(0 , T ; H1). Consider the equations 
+
+
+
+μnm − eμm = γ∂ t(φnm − eφm) − ∆( φnm − eφm)+ f (φnm) − f ( eφm) + k−1fσ(φnm) − k−1fσ( eφm) a.e. in QT ,
+
+Lnm − eLm = γ∂ t(ψnm − eψm) − ∆τ (ψnm − eψm) + ∂n(φnm − eφm)+ g(ψnm) − g( eψm) + k−1fσ(ψnm) − k−1fσ( eψm) a.e. on ΣT .
+
+(3.53) By (3.51f), (3.51g) and (3.52), we obtain 
+
+∥f (φnm) − f ( eφm)∥L∞(0 ,T ;H) + ∥g(ψnm) − g( eψm)∥L∞(0 ,T ;HΓ) → 0 as n → +∞,k−1∥fσ(φnm) − fσ( eφm)∥L∞(0 ,T ;H) + k−1∥fσ(ψnm) − fσ( eψm)∥L∞(0 ,T ;HΓ) → 0 as n → +∞.
+
+Moreover, it follows from (3.50), (3.51a) and (3.51b) that (up to a subsequence) ∂t(φnj 
+
+> m
+
+− eφm) → 0 weakly in L2(0 , T ; H2). Combining these convergence results, we can pass to the limit as n → +∞ on the right-hand side of (3.53) to deduce that μ∗ 
+
+> m
+
+= (0 , 0) . Finally, due to the uniqueness of the (weak) limit, we arrive at 
+
+∥μnm − eμm∥L∞(0 ,T ;H1) → 0 as n → +∞. (3.54) Define (vnm, vnm, τ ) := Λ( vn, vn 
+
+> τ
+
+) ∈ S for any n ∈ N and (evm, evm, τ ) := Λ( ev, evτ ) ∈ S. Consider the differences 
+
+bv := vn − ev, bvm := vnm − evm, bφm = ( bφm, bψm) := φnm − eφm, bμm = ( bμm, bLm) := μnm − eμm.
+
+29 We find that 
+
+Z
+
+> Ω
+
+ρ(φnm)∂t bvm · w dx +
+
+Z
+
+> Ω
+
+2αD∂t bvm : Dw dx +
+
+Z
+
+> Ω
+
+2ν(φnm)Dbvm : Dw dx +
+
+Z
+
+> Γ
+
+β(ψnm)bvm, τ · wτ dS
+
+= −
+
+Z
+
+> Ω
+
+2( ν(φnm) − ν( eφm)) Devm : Dw dx −
+
+Z
+
+> Γ
+
+(β(ψnm) − β( eψm)) evm, τ · wτ dS
+
+−
+
+Z
+
+> Ω
+
+(ρ(φnm) − ρ( eφm)) ∂t evm · w dx −
+
+Z
+
+> Ω
+
+bφm∇μnm · w dx −
+
+Z
+
+> Ω
+
+eφm∇bμm · w dx
+
+−
+
+Z
+
+> Γ
+
+bψm∇τ Lnm · wτ dS −
+
+Z
+
+> Γ
+
+eψm∇τ bLm · wτ dS
+
+−
+
+Z
+
+> Ω
+
+ρ(φnm)( vn · ∇ )vnm · w dx +
+
+Z
+
+> Ω
+
+ρ( eφm)( ev · ∇ )evm · w dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇bμm · ∇ )vnm · w dx + ρ′
+
+Z
+
+> Ω
+
+(∇eμm · ∇ )bvm · w dx
+
+− ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇bμm · n)vnm, τ · wτ dS − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇eμm · n)bvm, τ · wτ dS, (3.55) for all (w, wτ ) ∈ V m and for all t ∈ [0 , T ]. Taking (w, wτ ) = ( bvm, bvm, τ ) in (3.55), we obtain 
+
+12ddt
+
+ Z
+
+> Ω
+
+ρ(φnm)|bvm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dbvm|2 dx
+
+
+
++ 2 
+
+Z
+
+> Ω
+
+ν(φnm)|Dbvm|2 dx +
+
+Z
+
+> Γ
+
+β(ψnm)|bvm, τ |2 dS
+
+= −2
+
+Z
+
+> Ω
+
+(ν(φnm) − ν( eφm)) Devm : Dbvm dx −
+
+Z
+
+> Γ
+
+(β(ψnm) − β( eψm)) evm, τ · bvm, τ dS
+
+−
+
+Z
+
+> Ω
+
+bφm∇μnm · bvm dx −
+
+Z
+
+> Ω
+
+eφm∇bμm · bvm dx −
+
+Z
+
+> Γ
+
+bψm∇τ Lnm · bvm, τ dS −
+
+Z
+
+> Γ
+
+eψm∇τ bLm · bvm, τ dS
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇bμm · ∇ )vnm · bvm dx + ρ′
+
+Z
+
+> Ω
+
+(∇eμm · ∇ )bvm · bvm dx
+
+− ρ′
+
+2
+
+Z
+
+> Γ
+
+∂n bμm vnm, τ · bvm, τ dS − ρ′
+
+2
+
+Z
+
+> Γ
+
+∂n eμm |bvm, τ |2 dS
+
+− ρ′
+
+Z
+
+> Ω
+
+bφm∂t evm · bvm dx + ρ′
+
+2
+
+Z
+
+> Ω
+
+∂tφnm|bvm|2 dx
+
+−
+
+Z
+
+> Ω
+
+(ρ(φnm)vn · ∇ )vnm · bvm dx +
+
+Z
+
+> Ω
+
+(ρ( eφm)ev · ∇ )evm · bvm dx
+
+=: 
+
+> 14
+
+X
+
+> k=1
+
+Jk. (3.56) Now, we estimate the terms on the right-hand side of (3.56). Recalling that ρ(s) ≥ ρ2 for all s ∈ [−1, 1] and 
+
+α > 0, we use Hölder’s inequality, (2.11) and (2.12), to deduce that 
+
+J1 ≤ ν∗
+
+2 ∥Dbvm∥2 
+
+> L2(Ω)
+
++ C∥ bφm∥2
+
+> L∞(Ω)
+
+∥Devm∥2
+
+> L2(Ω)
+
+,J2 ≤ β∗
+
+8 ∥bvm, τ ∥2 
+
+> L2(Γ)
+
++ C∥ bψm∥2
+
+> L∞(Γ)
+
+∥evm, τ ∥2
+
+> L2(Γ)
+
+,J3 ≤ ∥ pρ(φnm) bvm∥2 
+
+> L2(Ω)
+
++ 14ρ2
+
+∥ bφm∥2
+
+> L∞(Ω)
+
+∥∇ μnm∥2
+
+> L2(Ω)
+
+,J4 =
+
+Z
+
+> Ω
+
+bμm∇ eφm · bvm dx ≤ ∥ pρ(φnm) bvm∥2 
+
+> L2(Ω)
+
++ 14ρ2
+
+∥bμm∥2 
+
+> H
+
+∥ eφm∥2
+
+> H3(Ω)
+
+,J5 ≤ β∗
+
+8 ∥bvm, τ ∥2 
+
+> L2(Γ)
+
++ 2
+
+β∗
+
+∥ bψm∥2
+
+> L∞(Γ)
+
+∥∇ τ Lnm∥2
+
+> L2(Γ)
+
+,
+
+30 J6 =
+
+Z
+
+> Γ
+
+bLm∇τ eψm · bvm, τ dS ≤ β∗
+
+8 ∥bvm, τ ∥2 
+
+> L2(Γ)
+
++ 2
+
+β∗
+
+∥ bLm∥2 
+
+> HΓ
+
+∥ eψm∥2
+
+> H3(Γ)
+
+,J7 ≤ C∥∇ bμm∥L2(Ω) ∥∇ vnm∥L6(Ω) ∥bvm∥L3(Ω) 
+
+≤ Cm∥bμm∥V ∥bvm∥H1(Ω) 
+
+≤ Cm(∥pρ(φnm)bvm∥2 
+
+> L2(Ω)
+
++ 2 α∥Dbvm∥2
+
+> L2(Ω)
+
+) + Cm∥bμm∥2 
+
+> V
+
+,J8 ≤ C∥∇ eμm∥L6(Ω) ∥∇ bvm∥L2(Ω) ∥bvm∥L3(Ω) ≤ C∥bvm∥2
+
+> H1(Ω)
+
+≤ C(∥pρ(φnm)bvm∥2 
+
+> L2(Ω)
+
++ 2 α∥Dbvm∥2
+
+> L2(Ω)
+
+),J9 ≤ β∗
+
+8 ∥bvm, τ ∥2 
+
+> L2(Γ)
+
++ Cm
+
+L ∥bμm − bLm∥2 
+
+> HΓ
+
+,J10 = − ρ′
+
+2L
+
+Z
+
+> Γ
+
+( eLm − eμm)|bvm, τ |2 dS
+
+≤ C(∥ eLm∥HΓ + ∥eμm∥HΓ))∥bvm, τ ∥2
+
+> L4(Γ)
+
+≤ C(∥pρ(φnm)bvm∥2 
+
+> L2(Ω)
+
++ 2 α∥Dbvm∥2
+
+> L2(Ω)
+
+),J11 ≤ C∥pρ(φnm)bvm∥2 
+
+> L2(Ω)
+
++ C∥∂t evm∥2
+
+> L2(Ω)
+
+∥ bφm∥2
+
+> H2(Ω)
+
+,J12 ≤ C∥∂tφnm∥L6(Ω) ∥bvm∥L2(Ω) ∥bvm∥L3(Ω) ≤ C∥bvm∥2
+
+> H1(Ω)
+
+≤ C(∥pρ(φnm)bvm∥2 
+
+> L2(Ω)
+
++ 2 α∥Dbvm∥2
+
+> L2(Ω)
+
+).
+
+Noticing that vn, ev, vnm, evm ∈ S, we find that 
+
+J13 + J14 = − ρ1 − ρ2
+
+2
+
+Z
+
+> Ω
+
+bφm(( vn · ∇ )vnm) · bvm dx −
+
+Z
+
+> Ω
+
+ρ( eφm)(( bv · ∇ )vnm) · bvm dx
+
+−
+
+Z
+
+> Ω
+
+ρ( eφm)(( ev · ∇ )bvm) · bvm dx
+
+≤ C∥ bφm∥L∞(Ω) ∥vn∥L∞(Ω) ∥∇ vn∥L2(Ω) ∥bvm∥L2(Ω) 
+
++ C∥bv∥L2(Ω) ∥∇ vnm∥L3(Ω) ∥bvm∥L6(Ω) 
+
++ C∥ev∥L∞(Ω) ∥∇ bvm∥L2(Ω) ∥bvm∥L2(Ω) 
+
+≤ Cm∥bvm∥2 
+
+> H1(Ω)
+
++ Cm(∥ bφm∥2 
+
+> H2(Ω)
+
++ ∥bv∥2
+
+> L2(Ω)
+
+)
+
+≤ Cm(∥pρ(φnm)bvm∥2 
+
+> L2(Ω)
+
++ 2 α∥Dbvm∥2
+
+> L2(Ω)
+
+) + Cm(∥ bφm∥2 
+
+> H2(Ω)
+
++ ∥bv∥2
+
+> L2(Ω)
+
+).
+
+Collecting the above estimates, we obtain 
+
+ddt
+
+ Z
+
+> Ω
+
+ρ(φnm)|bvm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dbvm|2 dx
+
+
+
+≤ Cm
+
+ Z
+
+> Ω
+
+ρ(φnm)|bvm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dbvm|2 dx
+
+
+
++ h(t), (3.57) where 
+
+h(t) := Cm
+
+
+
+∥ bφm(t)∥2 
+
+> H2
+
++ ∥∂t evm(t)∥2
+
+> L2(Ω)
+
+∥ bφm(t)∥2 
+
+> H2
+
++ ∥ bμm(t)∥2 
+
+> H1
+
++ ∥bv(t)∥2
+
+> L2(Ω)
+
+
+
+.
+
+Applying Gronwall’s lemma to (3.57) and using (3.52) and (3.54), we infer that 
+
+sup  
+
+> t∈[0 ,T ]
+
+∥bvm(t)∥2 
+
+> H1(Ω)
+
+≤ eCmT
+
+Z T
+
+> 0
+
+h(t) d t → 0, as n → +∞.
+
+31 This shows that the map Λ is continuous on S.Hence, applying Schauder’s fixed point theorem, we conclude that the map Λ admits a fixed point in S.This implies the existence of an approximate solution (vm, φm, μm) on [0 , T ] for any m ∈ N+, which has the regularities (3.25) and satisfies (3.26)–(3.28). This completes the proof. 
+
+# 4 Existence of Quasi-strong Solutions in the Case (K, L ) ∈ (0 , +∞] × (0 , +∞)
+
+In this section, we establish our main result Theorem 2.1 in the case (K, L ) ∈ (0 , +∞] × (0 , +∞). To this end, we assume that the premises of Theorem 2.1 hold and we take 
+
+m, k ∈ N+, 0 < σ ≤ c1
+
+2(1 + c1) < 12 , 0 < γ < 1 (4.1) for a constant c1 > 0 (independent of m, k, σ and γ), which will be specified later in (4.11). We first derive uniform a priori estimates for the approximate solutions (vm, φm, μm) obtained in Sec-tion 3. Then, by means of compactness arguments, we pass to the limits as m → +∞, σ → 0, γ = k−1 → 0
+
+to conclude the existence of a global quasi-strong solution [0 , T ].
+
+4.1 Uniform estimates for the approximate solutions 
+
+First of all, we have the following mass conservation law. 
+
+Lemma 4.1. Let L ∈ (0 , +∞). Then for all t ∈ [0 , T ], it holds that 
+
+Z
+
+> Ω
+
+φm(t) d x +
+
+Z
+
+> Γ
+
+ψm(t) d S =
+
+Z
+
+> Ω
+
+φ0,σ,k dx +
+
+Z
+
+> Γ
+
+ψ0,σ,k dS. (4.2) 
+
+Proof. Integrating (3.27a) over Ω and (3.27e) over Γ, adding the resultants together, and using integration by parts, we obtain 
+
+ddt
+
+ Z
+
+> Ω
+
+φm(t) d x +
+
+Z
+
+> Γ
+
+ψm(t) d S
+
+
+
+= −
+
+Z
+
+> Ω
+
+vm · ∇ φm dx +
+
+Z
+
+> Ω
+
+∆μm dx
+
+−
+
+Z
+
+> Γ
+
+vm, τ · ∇ τ ψm dS +
+
+Z
+
+> Γ
+
+∆τ Lm dS −
+
+Z
+
+> Γ
+
+∂nμm dS
+
+= −
+
+Z
+
+> Ω
+
+div( φmvm) d x +
+
+Z
+
+> Ω
+
+φm div vm dx +
+
+Z
+
+> Γ
+
+∂nμm dS
+
+−
+
+Z
+
+> Γ
+
+div Γ(ψmvm, τ ) d S +
+
+Z
+
+> Γ
+
+ψm div Γvm, τ dS −
+
+Z
+
+> Γ
+
+∂nμm dS
+
+= 0 , (4.3) where we have used the identities div vm = 0 in Ω, and div Γvm, τ = 0 , vm · n = 0 on Γ. Then, integrating (4.3) from 0 to t, we obtain (4.2). Hence, we complete the proof of Lemma 4.1. The following lemma provides uniform a priori bounds on the approximate solutions. 
+
+Lemma 4.2. There exists a positive constant C, independent of m, γ, σ, k and L, such that 
+
+∥vm∥L∞(0 ,T ;H1div (Ω)) + ∥φm∥L∞(0 ,T ;H1) ≤ C, (4.4) 
+
+∥∇ μm∥L2(0 ,T ;L2(Ω)) + ∥∇ τ Lm∥L2(0 ,T ;L2(Γ)) + 1
+
+√L ∥L m − μm∥L2(0 ,T ;HΓ) ≤ C, (4.5) 
+
+√γ∥∂tφm∥L2(0 ,T ;L2) ≤ C. (4.6) 32 Proof. Multiplying (3.27a) by μm and integrating by parts, taking (3.27b) into account, we obtain 
+
+ddt
+
+ Z
+
+> Ω
+
+12 |∇ φm|2 dx +
+
+Z
+
+> Ω
+
+F (φm) d x + k−1
+
+Z
+
+> Ω
+
+Fσ(φm) d x
+
+
+
++
+
+Z
+
+> Ω
+
+|∇ μm|2 dx + γ
+
+Z
+
+> Ω
+
+|∂tφm|2 dx
+
+= −
+
+Z
+
+> Ω
+
+μm∇φm · vm dx +
+
+Z
+
+> Γ
+
+∂tφm∂nφm dS +
+
+Z
+
+> Γ
+
+∂nμm μm dS. (4.7) Similarly, testing (3.27e) by Lm and using the boundary condition (3.27d), we obtain 
+
+ddt
+
+ Z
+
+> Γ
+
+12 |∇ τ ψm|2 dS +
+
+Z
+
+> Γ
+
+G(ψm) d S + k−1
+
+Z
+
+> Γ
+
+Fσ(ψm) d S
+
+
+
++
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS + γ
+
+Z
+
+> Γ
+
+|∂tψm|2 dS
+
+=
+
+Z
+
+> Γ
+
+ψm∇τ Lm · vm, τ dS −
+
+Z
+
+> Γ
+
+∂tψm∂nφm dS −
+
+Z
+
+> Γ
+
+∂nμm Lm dS. (4.8) Combining (3.36), (4.7) and (4.8), and using the boundary condition (3.27d), we deduce that 
+
+ddt Eσ,k  
+
+> tot
+
+(vm, φm) + 
+
+Z
+
+> Ω
+
+2ν(φm)|Dvm|2 dx +
+
+Z
+
+> Γ
+
+β(ψm)|vm, τ |2 dS
+
++ γ
+
+Z
+
+> Ω
+
+|∂tφm|2 dx + γ
+
+Z
+
+> Γ
+
+|∂tψm|2 dS
+
++
+
+Z
+
+> Ω
+
+|∇ μm|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS + 1
+
+L
+
+Z
+
+> Γ
+
+|L m − μm|2 dS = 0 , (4.9) where the approximate total energy functional Eσ,k  
+
+> tot
+
+is given by 
+
+Eσ,k  
+
+> tot
+
+(vm, φm) := Ekin (vm, φm) + Eσ,k 
+
+> free
+
+(φm).
+
+Integrating (4.9) from 0 to t and using (3.23), we find that 
+
+Eσ,k  
+
+> tot
+
+(vm(t), φm(t)) + 2 ν∗
+
+Z t
+
+> 0
+
+Z
+
+> Ω
+
+|Dvm(s)|2 dx ds + β∗
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|vm, τ (s)|2 dS ds
+
++ γ
+
+Z t
+
+> 0
+
+Z
+
+> Ω
+
+|∂tφm(s)|2 dx ds + γ
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|∂tψm(s)|2 dS ds
+
++
+
+Z t
+
+> 0
+
+Z
+
+> Ω
+
+|∇ μm(s)|2 dx ds +
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|∇ τ Lm(s)|2 dS ds + 1
+
+L
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+|L m(s) − μm(s)|2 dS ds
+
+≤ Eσ,k 
+
+> free
+
+ φ0,σ,k 
+
+ + 12
+
+Z
+
+> Ω
+
+ρ(φ0,σ,k )|PΩ
+
+> m
+
+(v0, v0,τ )|2 dx + α
+
+Z
+
+> Ω
+
+|DP Ω
+
+> m
+
+(v0, v0,τ )|2 dx
+
+≤ Eσ,k 
+
+> free
+
+ φ0,σ,k 
+
+ + ρ1
+
+2 ∥(v0, v0,τ )∥2 
+
+> L2
+
++ α∥(v0, v0,τ )∥2
+
+> H10,div
+
+. (4.10) This implies that (4.4), (4.5) and (4.6) hold with a positive constant C that is independent of m, γ, σ, and k.Next, we derive a uniform bound on μm.
+
+Lemma 4.3. There exists a positive constant C, independent of m, γ, σ and k, such that 
+
+∥μm∥L2(0 ,T ;H1) ≤ C. 
+
+33 Proof. We first recall the well-known Miranville–Zelik inequality (cf. [54]), which yields: 
+
+c1|f0(r)| ≤ f0(r)( r − m0,σ,k ) + c2, for all r ∈ (−1, 1) , (4.11) 
+
+c1|g0(r)| ≤ g0(r)( r − m0,σ,k ) + c2, for all r ∈ (−1, 1) , (4.12) where m0,σ,k := m(φ0,σ,k ) and the positive constants c1, c2 depend only on m0,σ,k . According to (3.14), we have 
+
+lim  
+
+> k→+∞
+
+m(φ0,k ) = m(φ0) ∈ (−1, 1) ,
+
+which, together with the fact m(φ0,k ) ∈ (−1, 1) for all k ∈ N+, implies that there exists a subinterval [a, b ] ⊂
+
+(−1, 1) such that m(φ0,k ) ∈ [a, b ] for all k ∈ N+. Moreover, we infer from (3.20) that 
+
+|m(φ0,σ,k )| ≤ | m(φ0,σ,k ) − m(φ0,k )| + |m(φ0,k )|≤ C∥φ0,σ,k − φ0,k ∥H1 + |m(φ0,k )|≤ Cσ 12 + |m(φ0,k )|,
+
+where the constant C is independent of σ and k, which, together with the fact m0,σ,k ∈ (−1, 1) for all σ ∈
+
+(0 , 1/2) , k ∈ N+, implies that there exists a subinterval [a′, b ′] ⊂ (−1, 1) such that m0,σ,k ∈ [a′, b ′]. Therefore, we can select c1 and c2 that are independent of σ and k.Testing (3.27b) by φm − m0,σ,k and (3.27f) by ψm − m0,σ,k , we have 
+
+Z
+
+> Ω
+
+f0(φm)( φm − m0,σ,k ) d x + k−1
+
+Z
+
+> Ω
+
+fσ(φm)( φm − m0,σ,k ) d x
+
++
+
+Z
+
+> Γ
+
+g0(ψm)( ψm − m0,σ,k ) d S + k−1
+
+Z
+
+> Γ
+
+fσ(ψm)( ψm − m0,σ,k ) d S
+
+=
+
+Z
+
+> Ω
+
+(μm − γ∂ tφm − f1(φm))( φm − m0,σ,k ) d x
+
++
+
+Z
+
+> Γ
+
+(Lm − γ∂ tψm − g1(ψm))( ψm − m0,σ,k ) d S
+
+−
+
+Z
+
+> Ω
+
+|∇ φm|2 dx −
+
+Z
+
+> Γ
+
+|∇ τ ψm|2 dS − χ(K)
+
+Z
+
+> Γ
+
+|φm − ψm|2 dS. (4.13) For the terms on the left-hand side of (4.13), using (4.11) and (4.12), we obtain 
+
+Z
+
+> Ω
+
+f0(φm)( φm − m0,σ,k ) d x +
+
+Z
+
+> Γ
+
+g0(ψm)( ψm − m0,σ,k ) d S
+
+≥ c1
+
+Z
+
+> Ω
+
+|f0(φm)| dx + c1
+
+Z
+
+> Γ
+
+|g0(ψm)| dS − c2(|Ω| + |Γ|). (4.14) Moreover, due to (4.1), it holds 
+
+k−1
+
+Z
+
+> Ω
+
+fσ(φm)( φm − m0,σ,k ) d x + k−1
+
+Z
+
+> Γ
+
+fσ(ψm)( ψm − m0,σ,k ) d S
+
+= k−1(1 − σ)
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+ φm
+
+1 − σ − m0,σ,k 
+
+
+
+dx
+
++ k−1(1 − σ)
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+ ψm
+
+1 − σ − m0,σ,k 
+
+
+
+dS
+
+− k−1σ m 0,σ,k 
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx − k−1σm 0,σ,k 
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+≥ k−1(1 − σ)c1
+
+ Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx +
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+
+
+− k−1(1 − σ)c2(|Ω| + |Γ|)
+
+34 − k−1σ
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx − k−1σ
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+= k−1(c1(1 − σ) − σ)
+
+ Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx +
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+
+
+− k−1(1 − σ)c2(|Ω| + |Γ|)
+
+≥ c1
+
+2
+
+
+
+k−1
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx + k−1
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+
+
+− k−1(1 − σ)c2(|Ω| + |Γ|)= c1
+
+2
+
+ Z
+
+> Ω
+
+k−1|fσ(φm)| dx +
+
+Z
+
+> Γ
+
+k−1|fσ(ψm)| dS
+
+
+
+− k−1(1 − σ)c2(|Ω| + |Γ|). (4.15) For the terms on the right-hand side of (4.13), we apply Hölder’s inequality to get 
+
+Z
+
+> Ω
+
+(μm − γ∂ tφm − f1(φm))( φm − m0,σ,k ) d x
+
++
+
+Z
+
+> Γ
+
+(Lm − γ∂ tψm − g1(ψm))( ψm − m0,σ,k ) d S
+
+−
+
+Z
+
+> Ω
+
+|∇ φm|2 dx −
+
+Z
+
+> Γ
+
+|∇ τ ψm|2 dS−χ(K)
+
+Z
+
+> Γ
+
+|φm − ψm|2 dS
+
+≤
+
+Z
+
+> Ω
+
+(μm − m(μm)) φm dx +
+
+Z
+
+> Γ
+
+(Lm − m(μm)) ψm dS
+
+−
+
+Z
+
+> Ω
+
+γ∂ tφm(φm − m0,σ,k ) d x −
+
+Z
+
+> Γ
+
+γ∂ tψm(ψm − m0,σ,k ) d S
+
+−
+
+Z
+
+> Ω
+
+f1(φm)( φm − m0,σ,k ) d x −
+
+Z
+
+> Γ
+
+g1(ψm)( ψm − m0,σ,k ) d S
+
+≤ C
+
+
+
+1 + ∥μm − m(μm)1∥L2 + γ∥∂tφm∥L2
+
+
+
+≤ C
+
+
+
+1 + ∥∇ μm∥L2(Ω) + ∥∇ τ Lm∥L2(Γ) + 1
+
+√L ∥L m − μm∥HΓ + γ∥∂tφm∥L2
+
+
+
+.
+
+Collecting (4.13), (4.14) and (4.15), we obtain 
+
+∥f0(φm)∥L1(Ω) + ∥g0(ψm)∥L1(Γ) + k−1∥fσ(φm)∥L1(Ω) + k−1∥fσ(ψm)∥L1(Γ) 
+
+≤ C(1 + ∥Pμm∥H1 
+
+> L, 0
+
++ γ∥∂tφm∥L2 ), (4.16) which together with (4.5) and (4.6) implies that 
+
+∥f0(φm)∥L2(0 ,T ;L1(Ω)) + ∥g0(ψm)∥L2(0 ,T ;L1(Γ)) ≤ C, (4.17) 
+
+k−1∥fσ(φm)∥L2(0 ,T ;L1(Ω)) + k−1∥fσ(ψm)∥L2(0 ,T ;L1(Γ)) ≤ C. (4.18) Integrating (3.27b) over Ω and (3.27f) over Γ, adding the resultants together, we have 
+
+Z
+
+> Ω
+
+μm dx +
+
+Z
+
+> Γ
+
+Lm dS
+
+≤
+
+Z
+
+> Ω
+
+f0(φm) d x + k−1
+
+Z
+
+> Ω
+
+fσ(φm) d x +
+
+Z
+
+> Ω
+
+f1(φm) d x
+
++
+
+Z
+
+> Γ
+
+g0(ψm) d S + k−1
+
+Z
+
+> Γ
+
+fσ(ψm) d S +
+
+Z
+
+> Γ
+
+g1(ψm) d S
+
+≤ C
+
+
+
+1 + ∥f0(φm)∥L1(Ω) + ∥g0(ψm)∥L1(Γ) + k−1∥fσ(φm)∥L1(Ω) + k−1∥fσ(ψm)∥L1(Γ) 
+
+
+
+. (4.19) This combined with (4.17) and (4.18) implies that 
+
+∥m(μm)∥L2(0 ,T ) ≤ C. (4.20) 35 Hence, using Lemma 4.2 and the generalized Poincaré inequality, we can conclude 
+
+∥μm∥L2(0 ,T ;H1) ≤ C, (4.21) for some positive constant C independent of m, γ, σ and k.The following lemma provides uniform bounds on the singular nonlinearities. 
+
+Lemma 4.4. There exists a positive constant C, independent of m, γ, σ and k, such that 
+
+∥f0(φm)∥L2(0 ,T ;H) + ∥f0(ψm)∥L2(0 ,T ;HΓ) ≤ C, (4.22) 
+
+k−1∥fσ(φm)∥L2(0 ,T ;H) + k−1∥fσ(ψm)∥L2(0 ,T ;HΓ) ≤ C. (4.23) 
+
+Proof. Multiplying (3.27b) by f0(φm) and integrating over Ω, multiplying (3.27f) by f0(ψm) and integrating over Γ, adding the resultants together, we find that 
+
+Z
+
+> Ω
+
+|f0(φm)|2 dx +
+
+Z
+
+> Γ
+
+g0(ψm)f0(ψm) d S + k−1
+
+Z
+
+> Ω
+
+fσ(φm)f0(φm) d x + k−1
+
+Z
+
+> Γ
+
+fσ(ψm)f0(ψm) d S
+
+=
+
+Z
+
+> Ω
+
+(μm − γ∂ tφm − f1(φm)) f0(φm) d x +
+
+Z
+
+> Γ
+
+(Lm − γ∂ tψm − g1(ψm)) f0(ψm) d S
+
+−
+
+Z
+
+> Ω
+
+f ′
+
+> 0
+
+(φm)|∇ φm|2 dx −
+
+Z
+
+> Γ
+
+g′
+
+> 0
+
+(ψm)|∇ τ ψm|2 dS+
+
+Z
+
+> Γ
+
+∂nφm(f0(φm) − f0(ψm)) d S
+
+≤
+
+Z
+
+> Ω
+
+(μm − γ∂ tφm − f1(φm)) f0(φm) d x +
+
+Z
+
+> Γ
+
+(Lm − γ∂ tψm − g1(ψm)) f0(ψm) d S. (4.24) Due to (3.4), it holds 
+
+k−1
+
+Z
+
+> Ω
+
+fσ(φm)f0(φm) d x + k−1
+
+Z
+
+> Γ
+
+fσ(ψm)f0(ψm) d S ≥ 0. (4.25) Using the compatibility condition (A3) and noticing that f0(r), g0(r) have the same sign for r ∈ (−1, 1) , we get 
+
+Z
+
+> Γ
+
+f0(ψm)g0(ψm) d S ≥ 12ϱ
+
+Z
+
+> Γ
+
+|f0(ψm)|2 dS − C. (4.26) The right-hand side of (4.24) can be estimated as follows: 
+
+Z
+
+> Ω
+
+(μm − γ∂ tφm − f1(φm)) f0(φm) d x +
+
+Z
+
+> Γ
+
+(Lm − γ∂ tψm − g1(ψm)) f0(ψm) d S
+
+≤ 12
+
+Z
+
+> Ω
+
+|f0(φm)|2 dx + 14ϱ
+
+Z
+
+> Γ
+
+|f0(ψm)|2 dS
+
++ 32
+
+ Z
+
+> Ω
+
+|μm|2 dx + γ2
+
+Z
+
+> Ω
+
+|∂tφm|2 dx +
+
+Z
+
+> Ω
+
+|f1(φm)|2 dx
+
+
+
++ 3 ϱ
+
+ Z
+
+> Γ
+
+|L m|2 dS + γ2
+
+Z
+
+> Γ
+
+|∂tψm|2 dS +
+
+Z
+
+> Γ
+
+|g1(ψm)|2 dS
+
+
+
+. (4.27) Combining (4.6), (4.21) and (4.24)–(4.27), we obtain (4.22). Next, multiplying (3.27b) by k−1fσ(φm) and integrating over Ω, multiplying (3.27f) by k−1fσ(ψm) and integrating over Γ, a similar line of argument leads to (4.23). In the following three lemmas, we derive some uniform higher-order estimates. 36 Lemma 4.5. There exists a positive constant C, independent of m, γ, σ and k, such that 
+
+∥g0(ψm)∥L2(0 ,T ;HΓ) + ∥φm∥L2(0 ,T ;H2) ≤ C. (4.28) 
+
+Proof. Multiplying (3.27f) by g0(ψm) and integrating over Γ, we get 
+
+Z
+
+> Ω
+
+|g0(ψm)|2 dS + k−1
+
+Z
+
+> Γ
+
+fσ(ψm)g0(ψm) d S
+
+=
+
+Z
+
+> Ω
+
+ Lm − γ∂ tψm − g1(ψm) − ∂nφm
+
+g0(ψm) d S −
+
+Z
+
+> Γ
+
+g′
+
+> 0
+
+(ψm)|∇ τ ψm|2 dS
+
+≤ 12
+
+Z
+
+> Ω
+
+|g0(ψm)|2 dS + 2 
+
+ Z
+
+> Γ
+
+|L m|2 dS + γ2
+
+Z
+
+> Γ
+
+|∂tψm|2 dS +
+
+Z
+
+> Γ
+
+|g1(ψm)|2 dS +
+
+Z
+
+> Γ
+
+|∂nφm|2 dS
+
+
+
+.
+
+This together with (3.27c), (3.4), (4.6) and (4.21) implies that 
+
+∥g0(ψm)∥L2(0 ,T ;HΓ) ≤ C. (4.29) Let us rewrite the equations for μm and Lm as a bulk-surface elliptic system of (φm, ψ m):
+
+− ∆φm = μm − γ∂ tφm − f (φm) − k−1fσ(φm) a.e. in QT ,
+
+(
+
+K∂ nφm = ψm − φm, K ∈ (0 , +∞)
+
+∂nφm = 0 , K = + ∞ a.e. on ΣT ,
+
+− ∆τ ψm + ∂nφm = Lm − γ∂ tψm − g(ψm) − k−1fσ(ψm) a.e. on ΣT .
+
+Applying the elliptic regularity theory for bulk-surface elliptic systems (see, e.g., [45, Proposition A.1]) together with (4.6), (4.21), (4.22), (4.23) and (4.29), we deduce that 
+
+∥φm∥H2 ≤ C
+
+
+
+1 + ∥μm∥L2 + γ∥∂tφm∥L2 + ∥f0(φm)∥H + ∥g0(ψm)∥HΓ
+
++ k−1∥fσ(φm)∥H + k−1∥fσ(ψm)∥HΓ
+
+
+
+. (4.30) This completes the proof of Lemma 4.5. 
+
+Lemma 4.6. There exists a positive constant C, independent of m, γ, σ, and k, such that 
+
+√γ∥∂tφm∥L∞(0 ,T ;L2) + ∥μm∥L∞(0 ,T ;H1) + ∥∂tφm∥L2(0 ,T ;H1) + ∥∂tvm∥L2(0 ,T ;H1(Ω)) ≤ C. (4.31) 
+
+Proof. Testing (3.27a) by ∂tμm and (3.27e) by ∂tLm, we see that 
+
+12ddt
+
+ Z
+
+> Ω
+
+|∇ μm|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS
+
+
+
++
+
+Z
+
+> Ω
+
+∂tμm∂tφm dx +
+
+Z
+
+> Γ
+
+∂tLm∂tψm dS
+
+=
+
+Z
+
+> Γ
+
+∂nμm(∂tμm − ∂tLm) d S −
+
+Z
+
+> Ω
+
+vm · ∇ φm∂tμm dx−
+
+Z
+
+> Γ
+
+vm, τ · ∇ τ ψm ∂tLm dS. (4.32) The last two terms on the right-hand side of (4.32) can be reformulated as 
+
+−
+
+Z
+
+> Ω
+
+vm · ∇ φm∂tμm dx
+
+= − ddt
+
+Z
+
+> Ω
+
+μm∇φm · vm dx +
+
+Z
+
+> Ω
+
+μm∇∂tφm · vm dx +
+
+Z
+
+> Ω
+
+μm∇φm · ∂tvm dx, (4.33) 
+
+−
+
+Z
+
+> Γ
+
+vm, τ · ∇ τ ψm ∂tLm dS
+
+37 = − ddt
+
+Z
+
+> Γ
+
+Lm∇τ ψm · vm, τ dS +
+
+Z
+
+> Γ
+
+Lm∇τ ∂tψm · vm, τ dS +
+
+Z
+
+> Γ
+
+Lm∇τ ψm · ∂tvm, τ dS. (4.34) Recalling the definition of μm and Lm, we find that 
+
+Z
+
+> Ω
+
+∂tμm∂tφm dx = γ
+
+2ddt ∥∂tφm∥2 
+
+> H
+
++
+
+Z
+
+> Ω
+
+|∇ ∂tφm|2 dx +
+
+Z
+
+> Ω
+
+f ′
+
+> 0
+
+(φm)|∂tφm|2 dx
+
++ k−1
+
+Z
+
+> Ω
+
+f ′
+
+> σ
+
+(φm)|∂tφm|2 dx +
+
+Z
+
+> Ω
+
+f ′
+
+> 1
+
+(φm)|∂tφm|2 dx −
+
+Z
+
+> Γ
+
+∂n∂tφm ∂tφm dS, 
+
+Z
+
+> Γ
+
+∂tLm∂tψm dS = γ
+
+2ddt ∥∂tψm∥2 
+
+> HΓ
+
++
+
+Z
+
+> Γ
+
+|∇ τ ∂tψm|2 dS +
+
+Z
+
+> Γ
+
+g′
+
+> 0
+
+(ψm)|∂tψm|2 dS
+
++ k−1
+
+Z
+
+> Γ
+
+f ′
+
+> σ
+
+(ψm)|∂tψm|2 dS +
+
+Z
+
+> Γ
+
+g′
+
+> 1
+
+(ψm)|∂tψm|2 dS +
+
+Z
+
+> Γ
+
+∂n∂tφm ∂tψm dS, 
+
+and Z
+
+> Γ
+
+∂nμm(∂tμm − ∂tLm) d S = − 12L
+
+ddt
+
+Z
+
+> Γ
+
+|μm − L m|2 dS. 
+
+Thus, combining (4.32), (4.33), (4.34), and the three identities above, we obtain 
+
+ddt Gm +
+
+Z
+
+> Ω
+
+|∇ ∂tφm|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ ∂tψm|2 dS + χ(K)
+
+Z
+
+> Γ
+
+|∂tψm − ∂tφm|2 dS
+
+≤ − 
+
+Z
+
+> Ω
+
+f ′
+
+> 1
+
+(φm)|∂tφm|2 dx −
+
+Z
+
+> Γ
+
+g′
+
+> 1
+
+(ψm)|∂tψm|2 dS
+
++
+
+Z
+
+> Ω
+
+μm∇∂tφm · vm dx +
+
+Z
+
+> Ω
+
+μm∇φm · ∂tvm dx
+
++
+
+Z
+
+> Γ
+
+Lm∇τ ∂tψm · vm, τ dS +
+
+Z
+
+> Γ
+
+Lm∇τ ψm · ∂tvm, τ dS, (4.35) where 
+
+Gm := γ
+
+2
+
+Z
+
+> Ω
+
+|∂tφm|2 dx + γ
+
+2
+
+Z
+
+> Γ
+
+|∂tψm|2 dS + 12
+
+Z
+
+> Ω
+
+|∇ μm|2 dx + 12
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS
+
++ 12L
+
+Z
+
+> Γ
+
+|μm − L m|2 dS +
+
+Z
+
+> Ω
+
+μm∇φm · vm dx +
+
+Z
+
+> Γ
+
+Lm∇τ ψm · vm, τ dS. 
+
+Combining (3.47) (replacing v therein by vm) and (4.35), we deduce that 
+
+ddt Gm +
+
+Z
+
+> Ω
+
+|∇ ∂tφm|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ ∂tψm|2 dS + χ(K)
+
+Z
+
+> Γ
+
+|∂tψm − ∂tφm|2 dS
+
++
+
+Z
+
+> Ω
+
+ρ(φm)|∂tvm|2 dx + 2 α
+
+Z
+
+> Ω
+
+|D∂tvm|2 dx
+
+≤ − 2
+
+Z
+
+> Ω
+
+φm∇μm · ∂tvm dx − 2
+
+Z
+
+> Γ
+
+ψm∇τ Lm · ∂tvm, τ dS −
+
+Z
+
+> Ω
+
+2ν(φm)Dvm : D∂tvm dx
+
+−
+
+Z
+
+> Γ
+
+β(ψm)vm, τ · ∂tvm, τ dS −
+
+Z
+
+> Ω
+
+(ρ(φm)vm · ∇ )vm · ∂tvm dx
+
++
+
+Z
+
+> Ω
+
+μm∇∂tφm · vm dx +
+
+Z
+
+> Γ
+
+Lm∇τ ∂tψm · vm, τ dS
+
+−
+
+Z
+
+> Ω
+
+f ′
+
+> 1
+
+(φm)|∂tφm|2 dx −
+
+Z
+
+> Γ
+
+g′
+
+> 1
+
+(ψm)|∂tψm|2 dS
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μm · ∇ )vm · ∂tvm dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μm · n)vm, τ · ∂tvm, τ dS
+
+38 =: 
+
+> 11
+
+X
+
+> j=1
+
+Kj . (4.36) Furthermore, by (4.4), we obtain 
+
+Z
+
+> Ω
+
+μm∇φm · vm dx +
+
+Z
+
+> Γ
+
+Lm∇τ ψm · vm, τ dS
+
+= −
+
+Z
+
+> Ω
+
+φmvm · ∇ μm dx −
+
+Z
+
+> Γ
+
+ψmvm, τ · ∇ τ Lm dS
+
+≤ ∥∇ μm∥L2(Ω) ∥φm∥L∞(Ω) ∥vm∥L2(Ω) + ∥∇ τ Lm∥L2(Γ) ∥ψm∥L∞(Γ) ∥vm, τ ∥L2(Γ) 
+
+≤ C(∥∇ μm∥L2(Ω) + ∥∇ τ Lm∥L2(Γ) )∥φm∥L∞ ∥vm∥H1(Ω) 
+
+≤ 14
+
+ Z
+
+> Ω
+
+|∇ μm|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS + 1
+
+L
+
+Z
+
+> Γ
+
+|μm − L m|2 dS
+
+
+
++ C. 
+
+Hence, it follows that 
+
+Gm ≥ γ
+
+2
+
+Z
+
+> Ω
+
+|∂tφm|2 dx + γ
+
+2
+
+Z
+
+> Γ
+
+|∂tψm|2 dS
+
++ 14
+
+ Z
+
+> Ω
+
+|∇ μm|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ Lm|2 dS + 1
+
+L
+
+Z
+
+> Γ
+
+|μm − L m|2 dS
+
+
+
+− C. (4.37) Now we proceed to estimate Kj for all 1 ≤ j ≤ 11 . First, arguing similarly to the estimates for I1, I2, I6 and 
+
+I7 in Section 3.3, we have 
+
+> 4
+
+X
+
+> j=1
+
+Kj ≤ ρ2
+
+4 ∥∂tvm∥2 
+
+> L2(Ω)
+
++ 3α
+
+4 ∥D∂tvm∥2
+
+> L2(Ω)
+
++ C
+
+
+
+∥∇ μm∥2 
+
+> L2(Ω)
+
++ ∥∇ τ Lm∥2 
+
+> L2(Γ)
+
++ ∥vm, τ ∥2 
+
+> L2(Γ)
+
++ ∥Dvm∥2
+
+> L2(Ω)
+
+
+
+.
+
+For Kj with 5 ≤ j ≤ 11 , applying (2.12), we can deduce that 
+
+K5 ≤ C∥vm∥L4(Ω) ∥∇ vm∥L2(Ω) ∥∂tvm∥L4(Ω) 
+
+≤ C∥vm∥2
+
+> H1(Ω)
+
+∥∂tvm∥H1(Ω) 
+
+≤ C∥vm∥2
+
+> H1(Ω)
+
+(∥∂tvm∥L2(Ω) + ∥D∂tvm∥L2(Ω) )
+
+≤ ρ2
+
+12 ∥∂tvm∥2 
+
+> L2(Ω)
+
++ α
+
+4 ∥D∂tvm∥2 
+
+> L2(Ω)
+
++ C∥vm∥4
+
+> H1(Ω)
+
+,K6 = −
+
+Z
+
+> Ω
+
+∂tφm∇μm · vm dx
+
+≤ ∥ ∂tφm∥L4(Ω) ∥∇ μm∥L2(Ω) ∥vm∥L4(Ω) 
+
+≤ C∥∂tφm∥V ∥∇ μm∥L2(Ω) ∥vm∥H1(Ω) 
+
+≤ 14 (∥∇ ∂tφm∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂tψm∥2 
+
+> L2(Γ)
+
++ χ(K)∥∂tφm − ∂tψm∥2 
+
+> HΓ
+
+)+ C∥∇ μm∥2
+
+> L2(Ω)
+
+∥vm∥2
+
+> H1(Ω)
+
+,K7 = −
+
+Z
+
+> Γ
+
+∂tψm∇τ Lm · vm, τ dS
+
+≤ ∥ ∂tψm∥L4(Γ) ∥∇ τ Lm∥L2(Γ) ∥vm∥L4(Γ) 
+
+≤ 14 (∥∇ ∂tφm∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂tψm∥2 
+
+> L2(Γ)
+
++ χ(K)∥∂tψm − ∂tφm∥2 
+
+> HΓ
+
+)
+
+39 + C∥∇ τ Lm∥2
+
+L2(Γ) ∥vm∥2
+
+H1(Ω) ,K8 + K9 ≤ C
+
+ Z
+
+Ω
+
+|∂tφm|2 dx +
+
+Z
+
+Γ
+
+|∂tψm|2 dS
+
+
+
+= C⟨∂tφm, ∂ tφm⟩(H1
+
+> L, 0
+
+)′,H1
+
+> L, 0
+
+≤ C∥∂tφm∥H−1
+
+> L, 0
+
+∥∂tφm∥H1
+
+> L, 0
+
+= C(∥μm − m(μm)1∥H1 
+
+> L, 0
+
++ ∥(vm, vm, τ )∥L2 )∥∂tφm∥H1
+
+> L, 0
+
+≤ 14 (∥∇ ∂tφm∥2
+
+L2(Ω) + ∥∇ τ ∂tψm∥2
+
+L2(Γ) +χ(K)∥∂tψm − ∂tφm∥2
+
+HΓ )+ C
+
+
+
+1 + ∥∇ μm∥2
+
+L2(Ω) + ∥∇ τ Lm∥2
+
+L2(Γ) + 1
+
+L ∥μm − L m∥2
+
+HΓ
+
+
+
+,K10 ≤ C∥∇ μm∥L3(Ω) ∥∇ vm∥L2(Ω) ∥∂tvm∥L6(Ω) 
+
+≤ C∥∇ μm∥ 12
+
+L2(Ω) ∥∇ μm∥ 12
+
+L6(Ω) ∥∂tvm∥H1(Ω) 
+
+≤ C∥∇ μm∥ 12
+
+L2(Ω) ∥Pμm∥ 12
+
+H2 ∥∂tvm∥H1(Ω) 
+
+≤ C∥∇ μm∥ 12
+
+L2(Ω) 
+
+
+
+∥∂tφm∥L2 + ∥vm · ∇ φm∥H + ∥vm, τ · ∇ τ ψm∥HΓ
+
+ 12
+
+∥∂tvm∥H1(Ω) 
+
+≤ ρ2
+
+12 ∥∂tvm∥2
+
+L2(Ω) + α
+
+4 ∥D∂tvm∥2
+
+L2(Ω) 
+
++ 18
+
+
+
+∥∇ ∂tφm∥2
+
+L2(Ω) + ∥∇ τ ∂tψm∥2
+
+L2(Γ) +χ(K)∥∂tψm − ∂tφm∥2
+
+HΓ
+
+
+
++ C∥∇ μm∥2
+
+L2(Ω) + C(∥vm∥2
+
+H1(Ω) + ∥φm∥2
+
+H2 ),K11 ≤ C∥∇ μm · n∥HΓ ∥vm, τ ∥L4(Γ) ∥∂tvm, τ ∥L4(Γ) 
+
+≤ C∥∇ μm∥L2(Γ) ∥vm∥H1(Ω) ∥∂tvm∥H1(Ω) 
+
+≤ C∥∇ μm∥ 12
+
+L2(Ω) ∥∇ μm∥ 12
+
+H1(Ω) ∥vm∥H1(Ω) ∥∂tvm∥H1(Ω) 
+
+≤ C∥∇ μm∥ 12
+
+L2(Ω) ∥Pμm∥ 12
+
+H2 ∥∂tvm∥H1(Ω) 
+
+≤ C∥∇ μm∥ 12
+
+L2(Ω) 
+
+
+
+∥∂tφm∥L2 + ∥vm · ∇ φm∥H + ∥vm, τ · ∇ τ ψm∥HΓ
+
+ 12
+
+∥∂tvm∥H1(Ω) 
+
+≤ ρ2
+
+12 ∥∂tvm∥2
+
+L2(Ω) + α
+
+4 ∥D∂tvm∥2
+
+L2(Ω) 
+
++ 18
+
+
+
+∥∇ ∂tφm∥2
+
+L2(Ω) + ∥∇ τ ∂tψm∥2
+
+L2(Γ) +χ(K)∥∂tψm − ∂tφm∥2
+
+HΓ
+
+
+
++ C∥∇ μm∥2
+
+L2(Ω) + C(∥vm∥2
+
+H1(Ω) + ∥φm∥2
+
+H2 ).
+
+We note that in the estimate for K8+K9, we have used the fact that the norms ∥·∥ H−1
+
+> L, 0
+
+and ∥·∥ (H1
+
+> L, 0
+
+)′ = ∥·∥ (H1
+
+> L
+
+)′
+
+on H−1
+
+L, 0 are equivalent. From (4.36) and the estimates for Kj for all 1 ≤ j ≤ 11 , we infer that 
+
+ddt Gm + 12
+
+Z
+
+Ω
+
+|∇ ∂tφm|2 dx + 12
+
+Z
+
+Γ
+
+|∇ τ ∂tψm|2 dS + χ(K)2
+
+Z
+
+Γ
+
+|∂tψm − ∂tφm|2 dS
+
++ ρ2
+
+2
+
+Z
+
+Ω
+
+|∂tvm|2 dx + α
+
+Z
+
+Ω
+
+|D∂tvm|2 dx
+
+≤ CGm + C(1 + Fm),
+
+40 where Fm := ∥vm∥4 
+
+> H1(Ω)
+
++ ∥φm∥2 
+
+> H2
+
+. Together with (4.4) and (4.28), Gronwall’s lemma implies that 
+
+sup  
+
+> t∈[0 ,T ]
+
+Gm(t) + C
+
+Z T
+
+> 0
+
+
+
+∥∂tφm(t)∥2 
+
+> H1
+
++ ∥∂tvm(t)∥2
+
+> H1(Ω)
+
+
+
+dt
+
+≤ Ce CT Gm(0) + Ce CT 
+
+Z T
+
+> 0
+
+Fm(t) d t ≤ Ce CT (1 + Gm(0)) . (4.38) We point out that the lower bound (4.37) is crucial in the derivation of (4.38). It remains to control Gm(0) . Multiplying (3.27b) by ∂tφm and integrating over Ω, multiplying (3.27e) by 
+
+∂tψm and integrating over Γ, adding the resulting equations together, we get 
+
+γ∥∂tφm∥2 
+
+> H
+
++ γ∥∂tψm∥2 
+
+> HΓ
+
++
+
+Z
+
+> Ω
+
+(−∆φm + f (φm) + k−1fσ(φm)) ∂tφm dx
+
++
+
+Z
+
+> Γ
+
+(−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm)∂tψm dS
+
+=
+
+Z
+
+> Ω
+
+μm∂tφm dx +
+
+Z
+
+> Γ
+
+Lm∂tψm dS. (4.39) Recalling (3.27a) and (3.27e) , we can deduce that 
+
+Z
+
+> Ω
+
+μm∂tφm dx +
+
+Z
+
+> Γ
+
+Lm∂tψm dS
+
+=
+
+Z
+
+> Ω
+
+μm(∆ μm − div( φmvm)) d x +
+
+Z
+
+> Γ
+
+Lm(∆ τ Lm − div Γ(ψmvm, τ ) − ∂nμm) d S
+
+= −∥∇ μm∥2 
+
+> L2(Ω)
+
+− ∥∇ τ Lm∥2 
+
+> L2(Γ)
+
+− 1
+
+L ∥μm − L m∥2
+
+> HΓ
+
++
+
+Z
+
+> Ω
+
+φmvm · ∇ μm dx +
+
+Z
+
+> Γ
+
+ψmvm, τ · ∇ τ Lm dS (4.40) and 
+
+Z
+
+> Ω
+
+(−∆φm + f (φm) + k−1fσ(φm)) ∂tφm dx
+
++
+
+Z
+
+> Γ
+
+(−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm)∂tψm dS
+
+=
+
+Z
+
+> Ω
+
+(−∆φm + f (φm) + k−1fσ(φm)) div( ∇μm − φmvm) d x
+
++
+
+Z
+
+> Γ
+
+(−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm) div Γ(∇τ Lm − ψmvm, τ ) d S
+
+− 1
+
+L
+
+Z
+
+> Γ
+
+(−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm)( Lm − μm) d S
+
+= −
+
+Z
+
+> Ω
+
+∇(−∆φm + f (φm) + k−1fσ(φm)) · (∇μm − φmvm) d x
+
+−
+
+Z
+
+> Γ
+
+∇τ (−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm) · (∇τ Lm − ψmvm, τ ) d S
+
+− 1
+
+L
+
+Z
+
+> Γ
+
+(−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm)( Lm − μm) d S
+
++ 1
+
+L
+
+Z
+
+> Γ
+
+(−∆φm + f (φm) + k−1fσ(φm))( Lm − μm) d S. (4.41) 41 Combining (4.39), (4.40) and (4.41), we obtain 
+
+γ∥∂tφm∥2 
+
+> H
+
++ γ∥∂tψm∥2 
+
+> HΓ
+
++ ∥∇ μm∥2 
+
+> L2(Ω)
+
++ ∥∇ τ Lm∥2 
+
+> L2(Γ)
+
++ 1
+
+L ∥μm − L m∥2
+
+> HΓ
+
+=
+
+Z
+
+> Ω
+
+φmvm · ∇ μm dx +
+
+Z
+
+> Γ
+
+ψmvm, τ · ∇ τ Lm dS
+
++
+
+Z
+
+> Ω
+
+∇(−∆φm + f (φm) + k−1fσ(φm)) · (∇μm − φmvm) d x
+
++
+
+Z
+
+> Γ
+
+∇τ (−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm) · (∇τ Lm − ψmvm, τ ) d S
+
++ 1
+
+L
+
+Z
+
+> Γ
+
+(−∆τ ψm + g(ψm) + k−1fσ(ψm) + ∂nφm)( Lm − μm) d S
+
+− 1
+
+L
+
+Z
+
+> Γ
+
+(−∆φm + f (φm) + k−1fσ(φm))( Lm − μm) d S. (4.42) In view of (3.25), we find 
+
+∂tφm ∈ C([0 , T ]; H1), μm ∈ C([0 , T ]; H1).
+
+Then by comparison in (3.27b) and (3.27f), it follows that 
+
+−∆φm + f (φm) + k−1fσ(φm) ∈ C([0 , T ]; V ),
+
+−∆τ ψm + ∂nφm + g(ψm) + k−1fσ(ψm) ∈ C([0 , T ]; VΓ).
+
+Due to these continuity properties, we can pass to the limit as t → 0 in (4.42) to conclude that 
+
+γ∥∂tφm(0) ∥2 
+
+> H
+
++ γ∥∂tψm(0) ∥2 
+
+> HΓ
+
++ ∥∇ μm(0) ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ Lm(0) ∥2 
+
+> L2(Γ)
+
++ 1
+
+L ∥μm(0) − L m(0) ∥2
+
+> HΓ
+
+=
+
+Z
+
+> Ω
+
+φ0,σ,k vm(0) · ∇ μm(0) d x +
+
+Z
+
+> Γ
+
+ψ0,σ,k vm, τ (0) · ∇ τ Lm(0) d S
+
++
+
+Z
+
+> Ω
+
+∇(−∆φ0,σ,k + f (φ0,σ,k ) + k−1fσ(φ0,σ,k )) · (∇μm(0) − φ0,σ,k vm(0)) d x
+
++
+
+Z
+
+> Γ
+
+∇τ (−∆τ ψ0,σ,k + g(ψ0,σ,k ) + k−1fσ(ψ0,σ,k ) + ∂nφ0,σ,k ) · (∇τ Lm(0) − ψ0,σ,k vm, τ (0)) d S
+
++ 1
+
+L
+
+Z
+
+> Γ
+
+(−∆τ ψ0,σ,k + g(ψ0,σ,k ) + k−1fσ(ψ0,σ,k ) + ∂nφ0,σ,k )( Lm(0) − μm(0)) d S
+
+− 1
+
+L
+
+Z
+
+> Γ
+
+(−∆φ0,σ,k + f (φ0,σ,k ) + k−1fσ(φ0,σ,k ))( Lm(0) − μm(0)) d S
+
+≤ 12
+
+
+
+∥∇ μm(0) ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ Lm(0) ∥2 
+
+> L2(Γ)
+
++ 1
+
+L ∥μm(0) − L m(0) ∥2
+
+> HΓ
+
+
+
++ C∥ − ∆φ0,σ,k + f (φ0,σ,k ) + k−1fσ(φ0,σ,k )∥2
+
+> V
+
++ C∥ − ∆τ ψ0,σ,k + g(ψ0,σ,k ) + ∂nφ0,σ,k + k−1fσ(ψ0,σ,k )∥2
+
+> VΓ
+
++ C∥vm(0) ∥2 
+
+> L2(Ω)
+
++ C∥vm, τ (0) ∥2
+
+> L2(Γ)
+
+. (4.43) Thus, applying (3.11), (3.12) to the right-hand side of (4.43), we infer that 
+
+Gm(0) ≤ C
+
+
+
+1 + ∥eμ0∥2 
+
+> V
+
++ ∥ eL0∥2 
+
+> VΓ
+
++ ∥φ0,σ,k ∥2 
+
+> H1
+
++ ∥vm(0) ∥2
+
+> H1(Ω)
+
+
+
+≤ C, (4.44) for some positive constant C independent of m, γ, σ, and k.Combining (4.37), (4.38), (4.44), and recalling the definition of Gm, we see that (4.31) holds. 42 Lemma 4.7. There exists a positive constant C, independent of m, γ, σ, and k, such that 
+
+∥f0(φm)∥L∞(0 ,T ;H) + ∥g0(ψm)∥L∞(0 ,T ;HΓ) ≤ C, (4.45) 
+
+k−1∥fσ(φm)∥L∞(0 ,T ;H) + k−1∥fσ(ψm)∥L∞(0 ,T ;HΓ) ≤ C, (4.46) 
+
+∥φm∥L∞(0 ,T ;H2) ≤ C, (4.47) 
+
+∥μm∥L2(0 ,T ;H2) ≤ C. (4.48) 
+
+Furthermore, the following strict separation property holds 
+
+φm ∈ L∞(QT ) such that |φm(x, t )| ≤ (1 − σ)(1 − eδ) a.e. in QT , (4.49) 
+
+ψm ∈ L∞(Σ T ) such that |ψm(x, t )| ≤ (1 − σ)(1 − eδ) a.e. on ΣT , (4.50) 
+
+for some eδ = eδ(σ, k, γ ) ∈ (0 , 1) .
+
+Proof. Based on Lemma 4.6, the uniform bounds (4.45)–(4.47) can be shown in a similar way as in the proof of Lemmas 4.4 and 4.5. Furthermore, applying the regularity theory for bulk-surface elliptic problems (see, e.g., [41, Theorem 3.3]) to the subsystem (3.29a), (3.29d), (3.29a), and using Lemmas 4.2, 4.3 and 4.6, we can derive (4.48). Finally, combining Lemma 4.6 with Theorem A.1, we find that the strict separation property in (3.31) depends on σ, γ and k, but is independent of m. This yields (4.49) and (4.50). The proof is complete. 
+
+4.2 Passage to the limit and existence of quasi-strong solutions 
+
+In this subsection, we prove the existence of quasi-strong solutions in the case (K, L ) ∈ (0 , +∞]×(0 , +∞).
+
+Proof of Theorem 2.1: (K, L ) ∈ (0 , +∞] × (0 , +∞). We will prove the assertions by choosing γ := k−1
+
+and passing to the limits as m → +∞, σ → 0 and k → +∞ in sequence. 
+
+Passage to the limit as m → +∞. Based on the uniform estimates established in Lemmas 4.2, 4.6 and 4.7, we apply the Banach–Alaoglu theorem and the Aubin–Lions–Simon lemma to conclude, up to subsequence extraction, the following convergences as m → +∞:
+
+vm → vσ weakly star in L∞(0 , T ; H1div (Ω)) , (4.51a) 
+
+∂tvm → ∂tvσ weakly in L2(0 , T ; H1div (Ω)) , (4.51b) 
+
+(vm, vm, τ ) → (vσ, vσ, τ ) strongly in C([0 , T ]; L2div ), (4.51c) 
+
+φm → φσ weakly star in L∞(0 , T ; H2) and strongly in C([0 , T ]; W1,p ), (4.51d) 
+
+∂tφm → ∂tφσ weakly in L2(0 , T ; H1), (4.51e) 
+
+μm → μσ weakly star in L∞(0 , T ; H1) and weakly in L2(0 , T ; H2), (4.51f) for all p ∈ [2 , 6) . Like before, here we use the notation φσ = ( φσ, ψ σ) and μσ = ( μσ, Lσ). As a consequence of the above convergences, we infer that 
+
+ρ(φm) → ρ(φσ) strongly in C([0 , T ]; W 1,p (Ω)) ,ν(φm) → ν(φσ) strongly in C([0 , T ]; W 1,p (Ω)) ,β(ψm) → β(ψσ) strongly in C([0 , T ]; W 1,p (Γ)) ,
+
+for all p ∈ [2 , 6) . Moreover, due to Lemma 4.7, we have 
+
+φσ ∈ L∞(QT ) such that |φσ(x, t )| ≤ (1 − σ)(1 − eδ) a.e. in QT , (4.52a) 43 ψσ ∈ L∞(Σ T ) such that |ψσ(x, t )| ≤ (1 − σ)(1 − eδ) a.e. on ΣT , (4.52b) with eδ = eδ(σ, k, γ ) ∈ (0 , 1) .The above properties guarantee the convergence of the nonlinear terms in (3.26), and of the singular non-linearities k−1fσ(φm) in (3.27b) and k−1fσ(ψm) in (3.27f). This allows us to pass to the limit as m → +∞ in (3.26)–(3.27), which entails that the limit functions (vσ, vσ, τ , φσ, μσ) satisfy the weak formulation 
+
+Z
+
+> Ω
+
+ρ(φσ)∂tvσ · evj dx +
+
+Z
+
+> Ω
+
+2αD∂tvσ : Devj dx +
+
+Z
+
+> Ω
+
+2ν(φσ)Dvσ : Devj dx +
+
+Z
+
+> Γ
+
+β(ψσ)vσ, τ · ewj dS
+
+=
+
+Z
+
+> Ω
+
+μσ∇φσ · evj dx −
+
+Z
+
+> Γ
+
+ψσ∇τ Lσ · ewj dS −
+
+Z
+
+> Ω
+
+ρ(φσ)( vσ · ∇ )vσ · evj dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μσ · ∇ )vσ · evj dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μσ · n)vσ, τ · ewj dS for all j ∈ N, (4.53) almost everywhere in [0 , T ], and the equations 
+
+
+
+∂tφσ + vσ · ∇ φσ = ∆ μσ a.e. in QT ,μσ = γ∂ tφσ − ∆φσ + f (φσ) + k−1fσ(φσ) a.e. in QT ,
+
+(
+
+K∂ nφσ = ψσ − φσ, K ∈ (0 , +∞)
+
+∂nφσ = 0 , K = + ∞ a.e. on ΣT ,L∂ nμσ = Lσ − μσ, L ∈ (0 , +∞) a.e. on ΣT ,∂tψσ + vσ, τ · ∇ τ ψσ = ∆ τ Lσ − ∂nμσ a.e. on ΣT ,
+
+Lσ = γ∂ tψσ − ∆τ ψσ + ∂nφσ + g(ψσ) + k−1fσ(ψσ) a.e. on ΣT .
+
+(4.54) Moreover, we have 
+
+vσ|t=0 = v0 a.e. in Ω, (φσ, ψ σ)|t=0 = ( φ0,σ,k , ψ 0,σ,k ) in Ω × Γ.
+
+Since span {(evj , ewj ) : j ∈ N} is dense in H20,div , we infer from (4.53) that (vσ, vσ, τ , φσ, μσ) satisfy 
+
+Z
+
+> Ω
+
+ρ(φσ)∂tvσ · w dx +
+
+Z
+
+> Ω
+
+2αD∂tvσ : Dw dx +
+
+Z
+
+> Ω
+
+2ν(φσ)Dvσ : Dw dx +
+
+Z
+
+> Γ
+
+β(ψσ)vσ, τ · wτ dS
+
+=
+
+Z
+
+> Ω
+
+μσ∇φσ · w dx −
+
+Z
+
+> Γ
+
+ψσ∇τ Lσ · wτ dS −
+
+Z
+
+> Ω
+
+ρ(φσ)( vσ · ∇ )vσ · w dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μσ · ∇ )vσ · w dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μσ · n)vσ, τ · wτ dS, (4.55) almost everywhere in [0 , T ] for all (w, wτ ) ∈ H20,div .
+
+Passage to the limit as σ → 0. As norms on Banach spaces are weakly (star) lower semicontinuous, we infer from the convergences (4.51) and the uniform bounds established in Lemmas 4.2, 4.6 and 4.7 that 
+
+∥vσ∥L∞(0 ,T ;H1div (Ω)) + ∥μσ∥L∞(0 ,T ;H1) + ∥φσ∥L∞(0 ,T ;H2) + √γ∥∂tφσ∥L∞(0 ,T ;L2) ≤ C, (4.56a) 
+
+∥f0(φσ)∥L∞(0 ,T ;H) + ∥g0(ψσ)∥L∞(0 ,T ;HΓ) ≤ C, (4.56b) 
+
+k−1∥fσ(φσ)∥L∞(0 ,T ;H) + k−1∥fσ(ψσ)∥L∞(0 ,T ;HΓ) ≤ C, (4.56c) 
+
+∥∂tφσ∥L2(0 ,T ;H1) + ∥∂tvσ∥L2(0 ,T ;H1div (Ω)) + ∥μσ∥L2(0 ,T ;H2) ≤ C, (4.56d) 44 for some positive constant C independent of γ, σ and k. Therefore, arguing as above, we use the Banach– Alaoglu theorem and the Aubin–Lions–Simon lemma to deduce that the convergences 
+
+vσ → vk weakly star in L∞(0 , T ; H1div (Ω)) , (4.57a) 
+
+∂tvσ → ∂tvk weakly in L2(0 , T ; H1div (Ω)) , (4.57b) 
+
+(vσ, vσ, τ ) → (vk, vk, τ ) strongly in C([0 , T ]; L2div ), (4.57c) 
+
+φσ → φk weakly star in L∞(0 , T ; H2) and strongly in C([0 , T ]; W1,p ), (4.57d) 
+
+∂tφσ → ∂tφk weakly in L2(0 , T ; H1), (4.57e) 
+
+μσ → μk weakly star in L∞(0 , T ; H1) and weakly in L2(0 , T ; H2), (4.57f) 
+
+ρ(φσ) → ρ(φk) strongly in C([0 , T ]; W 1,p (Ω)) , (4.57g) 
+
+ν(φσ) → ν(φk) strongly in C([0 , T ]; W 1,p (Ω)) , (4.57h) 
+
+β(ψσ) → β(ψk) strongly in C([0 , T ]; W 1,p (Γ)) , (4.57i) as σ → 0, hold for all p ∈ [2 , 6) up to subsequence extraction. Here, we use the notation φk = ( φk, ψ k) and 
+
+μk = ( μk, Lk). Thus, passing to the limit as σ → 0 in (4.55), we deduce that the functions (vk, vk, τ , φk, μk)
+
+satisfy 
+
+Z
+
+> Ω
+
+ρ(φk)∂tvk · w dx +
+
+Z
+
+> Ω
+
+2αD∂tvk : Dw dx +
+
+Z
+
+> Ω
+
+2ν(φk)Dvk : Dw dx +
+
+Z
+
+> Γ
+
+β(ψk)vk, τ · wτ dS
+
+=
+
+Z
+
+> Ω
+
+μk∇φk · w dx −
+
+Z
+
+> Γ
+
+ψk∇τ Lk · wτ dS −
+
+Z
+
+> Ω
+
+ρ(φk)( vk · ∇ )vk · w dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μk · ∇ )vk · w dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μk · n)vk, τ · wτ dS (4.58) almost everywhere in [0 , T ] for all (w, wτ ) ∈ H20,div .Since the quantity eδ = eδ(σ, k, γ ) in the separation properties (4.52a) and (4.52b) is not uniform with respect to the parameter σ, we cannot directly pass to the limit as σ → 0 in nonlinear terms f0(φσ), g0(ψσ), fσ(φσ)
+
+and fσ(ψσ). Instead, recalling the maximal monotonicity of f0 and g0, we can apply [12, Proposition 2.1] to conclude that 
+
+f0(φσ) → f0(φk) weakly star in L∞(0 , T ; H), (4.59a) 
+
+g0(ψσ) → g0(ψk) weakly star in L∞(0 , T ; HΓ), (4.59b) 
+
+fσ(φσ) = f0
+
+ φσ
+
+1 − σ
+
+
+
+→ f0(φk) weakly star in L∞(0 , T ; H), (4.59c) 
+
+fσ(ψσ) = f0
+
+ ψσ
+
+1 − σ
+
+
+
+→ f0(ψk) weakly star in L∞(0 , T ; HΓ). (4.59d) Combining (4.54), (4.57) and (4.59), we obtain 
+
+Z
+
+> Ω
+
+(∂tφk + vk · ∇ φk)z dx +
+
+Z
+
+> Γ
+
+(∂tψk + vk, τ · ∇ τ ψk)zΓ dS
+
+= −
+
+Z
+
+> Ω
+
+∇μk · ∇ z dx −
+
+Z
+
+> Γ
+
+∇τ Lk · ∇ τ zΓ dS − 1
+
+L
+
+Z
+
+> Γ
+
+(μk − L k)( z − zΓ) d S, (4.60) and 
+
+Z
+
+> Ω
+
+(μk − γ∂ tφk + ∆ φk − f1(φk)) z dx +
+
+Z
+
+> Γ
+
+(Lk − γ∂ tψk + ∆ τ ψk − ∂nφk − g1(ψk)) zΓ dS
+
+45 =
+
+Z
+
+> Ω
+
+(f0(φk) + k−1f0(φk)) z dx +
+
+Z
+
+> Γ
+
+(g0(ψk) + k−1f0(ψk)) zΓ dS, (4.61) for all (z, z Γ) ∈ H 1. Since the test functions (z, z Γ) ∈ H 1 in (4.60) and (4.61) are arbitrary, this implies that the functions (vk, vk, τ , φk, μk) also satisfy 
+
+
+
+∂tφk + vk · ∇ φk = ∆ μk a.e. in QT ,μk = γ∂ tφk − ∆φk + f (φk) + k−1f0(φk) a.e. in QT ,
+
+(
+
+K∂ nφk = ψk − φk, K ∈ (0 , +∞)
+
+∂nφk = 0 , K = + ∞ a.e. on ΣT ,L∂ nμk = Lk − μk, L ∈ (0 , +∞) a.e. on ΣT ,∂tψk + vk, τ · ∇ τ ψk = ∆ τ Lk − ∂nμk a.e. on ΣT ,
+
+Lk = γ∂ tψk − ∆τ ψk + ∂nφk + g(ψk) + k−1f0(ψk) a.e. on ΣT .
+
+(4.62) Moreover, using (3.14), we further get 
+
+vk|t=0 = v0 a.e. in Ω, (φk, ψ k)|t=0 = ( φ0,k , ψ 0,k ) in Ω × Γ. (4.63) 
+
+Passage to the limit as k → +∞. As mentioned above, in order to pass to the limits γ → 0 and k → +∞
+
+simultaneously, we choose γ := k−1 and send k → +∞. As norms on Banach spaces are weakly (star) lower semicontinuous, we infer from the convergences (4.51) and the uniform bounds (4.56) that 
+
+∥vk∥L∞(0 ,T ;H1div (Ω)) + ∥μk∥L∞(0 ,T ;H1) + ∥φk∥L∞(0 ,T ;H2) + k− 12 ∥∂tφk∥L∞(0 ,T ;L2) ≤ C, (4.64a) 
+
+∥f0(φk)∥L∞(0 ,T ;H) + ∥g0(ψk)∥L∞(0 ,T ;HΓ) ≤ C, (4.64b) 
+
+∥∂tφk∥L2(0 ,T ;H1) + ∥∂tvk∥L2(0 ,T ;H1div (Ω)) + ∥μk∥L2(0 ,T ;H2) ≤ C, (4.64c) for some positive constant C independent of k. Therefore, using the Banach–Alaoglu theorem and the Aubin– Lions–Simon lemma, we infer from (4.64a) and (4.64c) that 
+
+vk → v weakly star in L∞(0 , T ; H1div (Ω)) , (4.65a) 
+
+∂tvk → ∂tv weakly in L2(0 , T ; H1div (Ω)) , (4.65b) 
+
+(vk, vk, τ ) → (v, vτ ) strongly in C([0 , T ]; L2div ), (4.65c) 
+
+φk → φ weakly star in L∞(0 , T ; H2) and strongly in C([0 , T ]; W1,p ), (4.65d) 
+
+∂tφk → ∂tφ weakly in L2(0 , T ; H1), (4.65e) 
+
+μk → μ weakly star in L∞(0 , T ; H1) and weakly in L2(0 , T ; H2), (4.65f) 
+
+ρ(φk) → ρ(φ) strongly in C([0 , T ]; W 1,p (Ω)) , (4.65g) 
+
+ν(φk) → ν(φ) strongly in C([0 , T ]; W 1,p (Ω)) , (4.65h) 
+
+β(ψk) → β(ψ) strongly in C([0 , T ]; W 1,p (Γ)) , (4.65i) for all p ∈ [2 , 6) up to subsequence extraction. Here, we use the notation φ = ( φ, ψ ) and μ = ( μ, L). Thus, passing to the limit as k → +∞ in (4.58), we deduce that the functions (v, vτ , φ, μ) satisfy (2.13). To pass to the limit as k → +∞ in nonlinear terms f0(φk) and g0(ψk), arguing as (4.59), we obtain 
+
+f0(φk) → f0(φ) weakly star in L∞(0 , T ; H), (4.66a) 
+
+g0(ψk) → g0(ψ) weakly star in L∞(0 , T ; HΓ). (4.66b) 46 Furthermore, we infer from (4.64b) that 
+
+k−1f0(φk) → 0 strongly in L∞(0 , T ; H), (4.67a) 
+
+k−1f0(ψk) → 0 strongly in L∞(0 , T ; HΓ). (4.67b) Combining (4.62)–(4.67), and arguing as (4.60) and (4.61), we can conclude that (v, vτ , φ, μ) satisfy (2.14). Moreover, using (3.14), we find that 
+
+v|t=0 = v0 a.e. in Ω, (φ, ψ )|t=0 = ( φ0, ψ 0) in Ω × Γ. (4.68) 
+
+Energy equality. It remains to verify the energy identity (2.17). Since the weak formulation (2.13) holds for all test functions (w, wτ ) ∈ H20,div , we first take (w, wτ ) = ( vm, vm, τ ) in (2.13), where {(vm, vm, τ )}m∈N
+
+is the sequence of approximate solutions obtained in Section 3.3. This gives 
+
+Z
+
+> Ω
+
+ρ(φ)∂tv · vm dx +
+
+Z
+
+> Ω
+
+2α D∂tv : Dvm dx +
+
+Z
+
+> Ω
+
+2ν(φ)Dv : Dvm dx +
+
+Z
+
+> Γ
+
+β(ψ)vτ · vm, τ dS
+
+=
+
+Z
+
+> Ω
+
+μ∇φ · vm dx −
+
+Z
+
+> Γ
+
+ψ∇τ L · vm, τ dS −
+
+Z
+
+> Ω
+
+ρ(φ)( v · ∇ )v · vm dx
+
++ ρ′
+
+Z
+
+> Ω
+
+(∇μ · ∇ )v · vm dx − ρ′
+
+2
+
+Z
+
+> Γ
+
+(∇μ · n)vτ · vm, τ dS for a.a. t ∈ (0 , T ). (4.69) According to the convergence results (up to a subsequence) of vm (resp. vσ and vk) in (4.51) (resp. (4.57) and (4.65)), we can pass to the limits as m → +∞, σ → 0 and k → +∞ subsequently. Proceeding similarly to the derivation of (3.36), we obtain 
+
+12ddt
+
+ Z
+
+> Ω
+
+ρ(φ)|v|2 dx + 2 α
+
+Z
+
+> Ω
+
+|Dv|2 dx
+
+
+
++
+
+Z
+
+> Ω
+
+2ν(φ)|Dv|2 dx +
+
+Z
+
+> Γ
+
+β(ψ)|vτ |2 dS
+
+= −
+
+Z
+
+> Ω
+
+φ∇μ · v dx −
+
+Z
+
+> Γ
+
+ψ∇τ L · vτ dS. (4.70) Next, multiplying (2.14a) by μ and integrating over Ω, by integration by parts, and using (2.14b) and the chain rule for subdifferentials (see, e.g., [59, Chapter IV, Lemma 4.3]), we obtain 
+
+ddt
+
+ 12
+
+Z
+
+> Ω
+
+|∇ φ|2 dx +
+
+Z
+
+> Ω
+
+F (φ)d x
+
+
+
++
+
+Z
+
+> Ω
+
+|∇ μ|2 dx −
+
+Z
+
+> Γ
+
+μ∂ nμ dS
+
+=
+
+Z
+
+> Ω
+
+φv · ∇ μ dx +
+
+Z
+
+> Γ
+
+∂tφ∂ nφ dS. (4.71) Similarly, by (2.14e) and (2.14f), we have 
+
+ddt
+
+ 12
+
+Z
+
+> Γ
+
+|∇ τ ψ|2 dS +
+
+Z
+
+> Γ
+
+G(ψ)d S
+
+
+
++
+
+Z
+
+> Γ
+
+|∇ τ L| 2 dS +
+
+Z
+
+> Γ
+
+L∂nμ dS
+
+=
+
+Z
+
+> Γ
+
+ψvτ · ∇ τ L dS −
+
+Z
+
+> Γ
+
+∂tψ∂ nφ dS. (4.72) Combining (4.70), (4.71) and (4.72), and using the boundary condition (2.14d), we conclude that the energy identity (1.12) holds. Integrating (1.12) with respect to time from zero to any t ≥ 0, we arrive at the energy equality (2.17). This completes the proof of Theorem 2.1 in the case (K, L ) ∈ (0 , +∞] × (0 , +∞).
+
+# 5 Existence of Quasi-strong Solutions to the Limit Models 
+
+To establish Theorem 2.1 in the limiting cases (K, L ) ∈ (0 , ∞] × { 0, +∞} , we investigate the asymptotic limits as L → 0 and L → +∞, respectively, when K ∈ (0 , +∞].47 5.1 The case (K, L ) ∈ (0 , +∞] × { 0}
+
+In this subsection, we restrict ourselves to the matched-density case, i.e., ρ1 = ρ2 > 0. By examining the proof of Theorem 2.1 in the case (K, L ) ∈ (0 , +∞] × (0 , +∞) more closely, we observe that the estimates (4.16), (4.43) may depend on L ∈ (0 , 1] . The following two lemmas provide refined versions of the uniform estimates derived in Section 4, where the estimates are now independent of L ∈ (0 , 1] .
+
+Lemma 5.1. There exists a positive constant C, independent of m, γ, σ, k and L ∈ (0 , 1] , such that 
+
+∥μm∥L2(0 ,T ;H1) + ∥φm∥L2(0 ,T ;H2) ≤ C. 
+
+Proof. Proceeding as in the derivation of (4.17), we obtain 
+
+c1
+
+Z
+
+> Ω
+
+|f0(φm)| dx + c1
+
+Z
+
+> Γ
+
+|g0(ψm)| dS + c1
+
+2k
+
+Z
+
+> Ω
+
+|fσ(φm)| dx + c1
+
+2k
+
+Z
+
+> Γ
+
+|fσ(ψm)| dS
+
+≤
+
+Z
+
+> Ω
+
+(μm − m(μm))( φm − m0,σ,k ) d x +
+
+Z
+
+> Γ
+
+(Lm − m(μm))( ψm − m0,σ,k ) d S
+
+−
+
+Z
+
+> Ω
+
+(γ∂ tφm + f1(φm))( φm − m0,σ,k ) d x −
+
+Z
+
+> Γ
+
+(γ∂ tψm + g1(ψm))( ψm − m0,σ,k ) d S
+
++ 2 k−1(1 − σ)c2(|Ω| + |Γ|) + 2 c2(|Ω| + |Γ|)
+
+≤ ⟨ φm − m0,σ,k 1, μm − m(μm)1⟩(H1 
+
+> L, 0)′,H1
+> L, 0
+
++ C(1 + γ∥∂tφm∥L2 )
+
+≤ ∥ φm − m0,σ,k 1∥H−1
+
+> L, 0
+
+∥μm − m(μm)1∥H1 
+
+> L, 0
+
++ C(1 + γ∥∂tφm∥L2 ). (5.1) Here, we have used the fact that the norms ∥ · ∥ H−1
+
+> L, 0
+
+and ∥ · ∥ (H1 
+
+> L, 0)′
+
+= ∥ · ∥ (H1 
+
+> L)′
+
+on H−1 
+
+> L, 0
+
+are equivalent. Recalling [50, Lemma 5.1], it holds 
+
+∥φm − m0,σ,k 1∥H−1
+
+> L, 0
+
+≤ bC∥φm − m0,σ,k 1∥L2 for all L ∈ (0 , 1] , (5.2) where the positive constant bC is independent of m, γ, σ, k and L ∈ (0 , 1] . Using (5.1) and (5.2), we obtain 
+
+c1
+
+Z
+
+> Ω
+
+|f0(φm)| dx + c1
+
+Z
+
+> Γ
+
+|g0(ψm)| dS + c1
+
+2k
+
+Z
+
+> Ω
+
+|fσ(φm)| dx + c1
+
+2k
+
+Z
+
+> Γ
+
+|fσ(ψm)| dS
+
+≤ bC∥φm − m0,σ,k 1∥L2 ∥μm − m(μm)1∥H1 
+
+> L, 0
+
++ C(1 + γ∥∂tφm∥L2 ),
+
+which, together with Lemma 4.2, implies that the constant in (4.17) is independent of L as long as L ∈ (0 , 1] .Based on this result, we can repeat the process of [50, Lemma 5.9] to complete the proof of Lemma 5.1. 
+
+Lemma 5.2. There exists a positive constant C, independent of m, γ, σ, k and L ∈ (0 , 1] , such that 
+
+√γ∥∂tφm∥L∞(0 ,T ;L2) + ∥μm∥L∞(0 ,T ;H1)
+
++∥∂tφm∥L2(0 ,T ;H1) + ∥∂tvm∥L2(0 ,T ;H1(Ω)) ≤ C
+
+
+
+1 + 1
+
+√L Uσ,k 
+
+
+
+, (5.3) 
+
+∥f0(φm)∥L∞(0 ,T ;H) + ∥g0(ψm)∥L∞(0 ,T ;HΓ) + ∥φm∥L∞(0 ,T ;H2) ≤ C
+
+
+
+1 + 1
+
+√L Uσ,k 
+
+
+
+, (5.4) 
+
+k−1∥fσ(φm)∥L∞(0 ,T ;H) + k−1∥fσ(ψm)∥L∞(0 ,T ;HΓ) ≤ C
+
+
+
+1 + 1
+
+√L Uσ,k 
+
+
+
+, (5.5) 
+
+where Uσ,k := ∥φ0,σ,k − φ0∥H1 + ∥ eL0,k + g1(ψ0) − eμ0,k − f1(φ0)∥HΓ .
+
+48 Proof. Based on Lemma 5.1, we can repeat the proof of Lemmas 4.6 and 4.7 to verify (5.3), (5.4) and (5.5). The only notable difference is that we need to refine the estimate (4.43), that is, 
+
+1
+
+L
+
+Z
+
+> Γ
+
+  − ∆τ ψ0,σ,k + g(ψ0,σ,k ) + k−1fσ(ψ0,σ,k ) + ∂nφ0,σ,k 
+
+(Lm(0) − μm(0)) d S
+
+− 1
+
+L
+
+Z
+
+> Γ
+
+  − ∆φ0,σ,k + f (φ0,σ,k ) + k−1fσ(φ0,σ,k )(Lm(0) − μm(0)) d S
+
+= 1
+
+L
+
+Z
+
+> Γ
+
+  eL0,k + g1(ψ0) − eμ0,k − f1(φ0)(Lm(0) − μm(0)) d S
+
++ 1
+
+L
+
+Z
+
+> Γ
+
+  − f1(φ0,σ,k ) + f1(φ0) + g1(ψ0,σ,k ) − g1(ψ0)(Lm(0) − μm(0)) d S
+
+≤ 14L
+
+Z
+
+> Γ
+
+|L m(0) − μm(0) |2 dS + CL
+
+ ∥φ0,σ,k − φ0∥2 
+
+> H1
+
++ ∥ eL0,k + g1(ψ0) − eμ0,k − f1(φ0)∥2
+
+> HΓ
+
+.
+
+This completes the proof of Lemma 5.2. 
+
+Remark 5.1. For the chemical potentials μm, the available estimates fail to provide a bound on ∥μm∥L2(0 ,T ;H2)
+
+that is uniform with respect to L ∈ (0 , 1] . Indeed, to establish the H2-regularity of μm, we shall consider the following bulk-surface elliptic problem: 
+
+
+
+−∆μm = −∂tφm − vm · ∇ φm in Ω,L∂ nμm = Lm − μm on Γ,
+
+−∆τ Lm + ∂nμm = −∂tψm − vm, τ · ∇ τ ψm on Γ.
+
+By [41, Theorem 3.3], we have 
+
+∥L m∥H2(Γ) ≤ C
+
+
+
+∥∂tψm∥HΓ + ∥vm, τ · ∇ τ ψm∥HΓ + 1
+
+L ∥L m − μm∥HΓ
+
+
+
+,
+
+∥μm∥H2(Ω) ≤ C
+
+
+
+∥∂tφm∥H + ∥vm · ∇ φm∥H + ∥μm∥V + 1
+
+L ∥L m − μm∥H 12 (Γ) 
+
+
+
+≤ C
+
+
+
+∥∂tφm∥H + ∥vm · ∇ φm∥H + 1
+
+L (∥L m∥VΓ + ∥μm∥V )
+
+
+
+.
+
+Here, the constant C > 0 is independent of m and L. The factor 1/L in these estimates prevents us from deriving a uniform bound for ∥μm∥L2(0 ,T ;H2) with respect to L ∈ (0 , 1] . Nevertheless, in the matched-density case, i.e., ρ1 = ρ2 > 0, the estimate of μm provided in (5.3) is sufficient to rigorously justify the limiting process as L → 0.
+
+Proof of Theorem 2.1: (K, L ) ∈ (0 , +∞] × { 0}. Based on Lemmas 5.1 and 5.2, we can repeat the line of argument used in the proof of Theorem 2.1 in the case (K, L ) ∈ (0 , +∞] × (0 , +∞). In this way, we conclude that there exist functions (vL, vL 
+
+> τ
+
+, φL, μL) that satisfy the following weak formulation 
+
+Z
+
+> Ω
+
+ρ(φL)∂tvL · w dx +
+
+Z
+
+> Ω
+
+2αD∂tvL : Dw dx +
+
+Z
+
+> Ω
+
+2ν(φL)DvL : Dw dx +
+
+Z
+
+> Γ
+
+β(ψL)vL 
+
+> τ
+
+· wτ dS
+
+=
+
+Z
+
+> Ω
+
+μL∇φL · w dx −
+
+Z
+
+> Γ
+
+ψL∇τ LL · wτ dS −
+
+Z
+
+> Ω
+
+ρ(φL)( vL · ∇ )vL · w dx (5.6) 49 almost everywhere in [0 , T ] for all (w, wτ ) ∈ H20,div , and the equations 
+
+
+
+∂tφL + vL · ∇ φL = ∆ μL a.e. in QT ,μL = −∆φL + f (φL) a.e. in QT ,
+
+(
+
+K∂ nφL = ψL − φL, if K ∈ (0 , +∞)
+
+∂nφL = 0 , if K = + ∞ a.e. on ΣT ,L∂ nμL = LL − μL, L ∈ (0 , +∞) a.e. on ΣT ,∂tψL + vL 
+
+> τ
+
+· ∇ τ ψL = ∆ τ LL − ∂nμL a.e. on ΣT ,
+
+LL = −∆τ ψL + ∂nφL + g(ψL) a.e. on ΣT .
+
+(5.7) Furthermore, using (3.14), Lebesgue’s dominated convergence theorem and the compatibility condition (C) ,we find 
+
+lim  
+
+> k→∞
+
+lim  
+
+> σ→0
+
+Uσ,k = lim  
+
+> k→∞
+
+lim  
+
+> σ→0
+
+∥φ0,σ,k − φ0∥H1 + lim  
+
+> k→∞
+
+lim  
+
+> σ→0
+
+∥ eL0,k + g1(ψ0) − eμ0,k − f1(φ0)∥HΓ
+
+= lim  
+
+> k→∞
+
+∥ eL0,k + g1(ψ0) − eμ0,k − f1(φ0)∥HΓ
+
+= ∥ eL0 + g1(ψ0) − eμ0 − f1(φ0)∥HΓ
+
+= 0 . (5.8) Therefore, applying Lemma 4.2, (5.3), (5.4), (5.8) and the weak (star) lower semicontinuity of norms, we conclude that there exists a positive constant C, independent of L ∈ (0 , 1] , such that 
+
+∥vL∥L∞(0 ,T ;H1div (Ω)) + ∥φL∥L∞(0 ,T ;H2) + ∥μL∥L∞(0 ,T ;H1) + 1
+
+√L ∥μL − L L∥L2(0 ,T ;HΓ)
+
++ ∥f0(φL)∥L∞(0 ,T ;H) + ∥g0(ψL)∥L∞(0 ,T ;HΓ) + ∥∂tvL∥L2(0 ,T ;H1(Ω)) + ∥∂tφL∥L2(0 ,T ;H1) ≤ C. (5.9) Based on (5.9), we employ the Banach–Alaoglu theorem and the Aubin–Lions–Simon lemma to infer that there exist limit functions (v0, v0 
+
+> τ
+
+, φ0, μ0), such that 
+
+vL → v0 weakly star in L∞(0 , T ; H1div (Ω)) ,∂tvL → ∂tv0 weakly in L2(0 , T ; H1div (Ω)) ,
+
+(vL, vL 
+
+> τ
+
+) → (v0, v0 
+
+> τ
+
+) strongly in C([0 , T ]; L2div ),
+
+φL → φ0 weakly star in L∞(0 , T ; H2) and strongly in C([0 , T ]; W1,p ),∂tφL → ∂tφ0 weakly in L2(0 , T ; H1),
+
+μL → μ0 weakly star in L∞(0 , T ; H1),μL − L L → 0 strongly in L2(0 , T ; HΓ),
+
+for all p ∈ [2 , 6) up to subsequence extraction. Here, we use the notation φ0 = ( φ0, ψ 0) and μ0 = ( μ0, L0).As weak limits are unique, it follows that 
+
+μ0 = L0 a.e. on ΣT . (5.10) In the case of matched densities, based on the above convergence results, we can pass to the limit as L → 0 in (5.6) to conclude that the functions (v0, v0 
+
+> τ
+
+, φ0, μ0) satisfy the weak formulation (2.13). Proceeding similarly to the limiting process as k → +∞ in Section 4, we show that 
+
+f0(φL) → f0(φ0) weakly star in L∞(0 , T ; H), g0(ψL) → g0(ψ0) weakly star in L∞(0 , T ; HΓ).
+
+50 This entails that 
+
+φ0 ∈ L∞(QT ) such that |φ0(x, t )| < 1 a.e. in QT ,ψ0 ∈ L∞(Σ T ) such that |ψ0(x, t )| < 1 a.e. on ΣT .
+
+Using the above convergence results to pass to the limit in (5.7), we deduce that 
+
+μ0 = −∆φ0 + f (φ0) a.e. in QT ,
+
+(
+
+K∂ nφ0 = ψ0 − φ0, if K ∈ (0 , +∞)
+
+∂nφ0 = 0 , if K = + ∞ a.e. on ΣT ,
+
+L0 = −∆τ ψ0 + ∂nφ0 + g(ψ0) a.e. on ΣT ,
+
+and the weak formulation 
+
+Z
+
+> Ω
+
+∇μ0 · ∇ z dx +
+
+Z
+
+> Γ
+
+∇τ L0 · ∇ τ zΓ dS
+
+= −
+
+Z
+
+> Ω
+
+(∂tφ0 + v0 · ∇ φ0)z dx −
+
+Z
+
+> Γ
+
+(∂tψ0 + v0 
+
+> τ
+
+· ∇ τ ψ0)zΓ dS
+
+holds almost everywhere in (0 , T ) for all (z, z Γ) ∈ V 1. Together with (5.10), the latter equation implies that for almost all t ∈ (0 , T ), the pair (μ0(t), L0(t)) is a weak solution to the system 
+
+
+
+−∆μ0 = −∂tφ0 − v0 · ∇ φ0 in Ω,μ0 = L0 on Γ,
+
+−∆τ L0 + ∂nμ0 = −∂tψ0 − v0 
+
+> τ
+
+· ∇ τ ψ0 on Γ.
+
+(5.11) Applying the regularity theory for bulk-surface elliptic problems (see, e.g., [41, Theorem 3.3]), we conclude that (μ0(t), L0(t)) ∈ V 2 for almost all t ∈ [0 , T ] and the equations (5.11) are satisfied almost everywhere in 
+
+QT . In addition, we obtain the estimate 
+
+∥μ0∥L2(0 ,T ;V2) ≤ C ∥μ0∥L2(0 ,T ;L2) + ∥∂tφ0 + v0 · ∇ φ0∥L2(0 ,T ;H)
+
++ ∥∂tψ0 + v0 
+
+> τ
+
+· ∇ τ ψ0∥L2(0 ,T ;HΓ)
+
+
+
+≤ C. 
+
+In this way, the existence of a quasi-strong solution in the case (K, L ) ∈ (0 , +∞] × { 0} is established. More-over, the energy equality (2.17) can be verified in a similar way as in Section 4. Thus, the proof for the case 
+
+(K, L ) ∈ (0 , +∞] × { 0} is complete. 
+
+5.2 The case (K, L ) ∈ (0 , +∞] × { +∞} 
+
+In the following lemmas, we return to the approximate solutions constructed in Section 4 and derive uniform estimates for sufficiently large L ≥ 1.
+
+Lemma 5.3. There exists L0 ≥ 1 and a positive constant C, independent of m, γ, σ, k and L ≥ L0, such that 
+
+∥f0(φm)∥L2(0 ,T ;L1(Ω)) + ∥g0(ψm)∥L2(0 ,T ;L1(Γ)) ≤ C, (5.12) 
+
+k−1∥fσ(φm)∥L2(0 ,T ;L1(Ω)) + k−1∥fσ(ψm)∥L2(0 ,T ;L1(Γ)) ≤ C. (5.13) 51 Proof. Multiplying (3.27a) by NΩ(φm −⟨ φm⟩Ω) and integrating over Ω, and multiplying (3.27e) by NΓ(ψm −⟨ψm⟩Γ) and integrating over Γ, adding the resultants together, we obtain 
+
+0 = ⟨∂tφm, NΩ(φm − ⟨ φm⟩Ω)⟩V ′,V + ⟨∂tψm, NΓ(ψm − ⟨ ψm⟩Γ)⟩V ′
+
+> Γ,V Γ
+
++
+
+Z
+
+> Ω
+
+vm · ∇ φm NΩ(φm − ⟨ φm⟩Ω) d x +
+
+Z
+
+> Γ
+
+vm, τ · ∇ τ ψm NΓ(ψm − ⟨ ψm⟩Γ) d S
+
++
+
+Z
+
+> Ω
+
+μm(φm − ⟨ φm⟩Ω) d x +
+
+Z
+
+> Γ
+
+Lm(ψm − ⟨ ψm⟩Γ) d S
+
++ 1
+
+L
+
+Z
+
+> Γ
+
+(μm − L m)NΩ(φm − ⟨ φm⟩Ω) − N Γ(ψm − ⟨ ψm⟩Γ) dS
+
+=: 
+
+> 7
+
+X
+
+> j=1
+
+Rj . (5.14) By the same calculation as in [50, Lemma 5.8], we obtain 
+
+|R1| + |R2| ≤ C
+
+
+
+∥∂tφm∥V ′ ∥∇ φm∥L2(Ω) + ∥∂tψm∥V ′ 
+
+> Γ
+
+∥∇ τ ψm∥L2(Γ) 
+
+
+
+,
+
+|R7| ≤ C
+
+√L
+
+ 1
+
+√L ∥μm − L m∥HΓ
+
+
+
+(∥φm∥H + ∥ψm∥HΓ ).
+
+For the terms R3 and R4, we have 
+
+|R3| =
+
+Z
+
+> Ω
+
+φmvm · ∇N Ω(φm − ⟨ φm⟩Ω) d x
+
+≤ ∥ φm∥L∞(Ω) ∥vm∥L2(Ω) ∥∇N Ω(φm − ⟨ φm⟩Ω)∥L2(Ω) 
+
+≤ C∥vm∥L2(Ω) ∥φm − ⟨ φm⟩Ω∥H ,
+
+and similarly, 
+
+|R4| ≤ C∥vm, τ ∥L2(Γ) ∥ψm − ⟨ ψm⟩Γ∥HΓ .
+
+The estimates for R5 and R6 are more involved. By (3.27b) and (3.27f), we see that 
+
+R5 + R6 =
+
+Z
+
+> Ω
+
+|∇ φm|2 dx +
+
+Z
+
+> Γ
+
+|∇ τ ψm|2 dS+χ(K)
+
+Z
+
+> Γ
+
+|φm − ψm|2 dS
+
++
+
+Z
+
+> Ω
+
+f0(φm)( φm − ⟨ φm⟩Ω) d x +
+
+Z
+
+> Γ
+
+g0(ψm)( ψm − ⟨ ψm⟩Γ) d S
+
++ k−1
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+(φm − ⟨ φm⟩Ω) d x + k−1
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+(ψm − ⟨ ψm⟩Γ) d S
+
++
+
+Z
+
+> Ω
+
+(γ∂ tφm + f1(φm))( φm − ⟨ φm⟩Ω) d x
+
++
+
+Z
+
+> Γ
+
+(γ∂ tψm + g1(ψm))( ψm − ⟨ ψm⟩Γ) d S + ( ⟨φm⟩Ω − ⟨ ψm⟩Γ)
+
+Z
+
+> Γ
+
+∂nφm dS. (5.15) In view of (2.16), we can apply the method in [54] and an argument similar to the derivation of (4.14) and (4.15) to get 
+
+Z
+
+> Ω
+
+f0(φm)( φm − ⟨ φm⟩Ω) d x +
+
+Z
+
+> Γ
+
+g0(ψm)( ψm − ⟨ ψm⟩Γ) d S
+
+=
+
+Z
+
+> Ω
+
+f0(φm)( φm − ⟨ φ0,σ,k ⟩Ω) d x +
+
+Z
+
+> Γ
+
+g0(ψm)( ψm − ⟨ ψ0,σ,k ⟩Γ) d S
+
+52 + ( ⟨φ0,σ,k ⟩Ω − ⟨ φm⟩Ω)
+
+Z
+
+> Ω
+
+f0(φm) d x + ( ⟨ψ0,σ,k ⟩Γ − ⟨ ψm⟩Γ)
+
+Z
+
+> Γ
+
+g0(ψm) d S
+
+≥ ec1
+
+Z
+
+> Ω
+
+|f0(φm)| dx + ec1
+
+Z
+
+> Γ
+
+|g0(ψm)| dS − ec2(|Ω| + |Γ|)
+
+− |⟨ φ0,σ,k ⟩Ω − ⟨ φm⟩Ω|
+
+Z
+
+> Ω
+
+|f0(φm)| dx − |⟨ ψ0,σ,k ⟩Γ − ⟨ ψm⟩Γ|
+
+Z
+
+> Γ
+
+|g0(ψm)| dS
+
+and 
+
+k−1
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+(φm − ⟨ φm⟩Ω) d x + k−1
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+(ψm − ⟨ ψm⟩Γ) d S
+
+= k−1(1 − σ)
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+ φm
+
+1 − σ − ⟨ φm⟩Ω
+
+
+
+dx
+
++ k−1(1 − σ)
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+ ψm
+
+1 − σ − ⟨ ψm⟩Γ
+
+
+
+dS
+
+− k−1σ⟨φm⟩Ω
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx − k−1σ⟨ψm⟩Γ
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+= k−1(1 − σ)
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+ φm
+
+1 − σ − ⟨φ0,σ,k ⟩Ω
+
+1 − σ
+
+
+
+dx
+
++ k−1(1 − σ)
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+ ψm
+
+1 − σ − ⟨ψ0,σ,k ⟩Γ
+
+1 − σ
+
+
+
+dS
+
+− k−1(⟨φm⟩Ω − ⟨ φ0,σ,k ⟩Ω)
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx
+
+− k−1(⟨ψm⟩Γ − ⟨ ψ0,σ,k ⟩Γ)
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+≥ k−1(1 − σ)ec1
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx + k−1(1 − σ)ec1
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+− k−1(1 − σ)ec2(|Ω| + |Γ|) − k−1|⟨ φm⟩Ω − ⟨ φ0,σ,k ⟩Ω|
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx
+
+− k−1|⟨ ψm⟩Γ − ⟨ ψ0,σ,k ⟩Γ|
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS, 
+
+where the positive constants ec1 and ec2 are independent of k and σ. Using Lemma 4.2, we can derive the following estimate 
+
+|⟨ φ0,σ,k ⟩Ω − ⟨ φm(t)⟩Ω| = 1
+
+|Ω|
+
+Z t
+
+> 0
+
+⟨∂tφm(s), 1⟩V ′,V ds
+
+= 1
+
+|Ω|
+
+Z t
+
+> 0
+
+
+
+−
+
+Z
+
+> Ω
+
+vm(s) · ∇ φm(s) d x +
+
+Z
+
+> Ω
+
+∆μm(s) d x
+
+
+
+ds
+
+= 1
+
+|Ω|
+
+Z t
+
+> 0
+
+Z
+
+> Γ
+
+∂nμm(s) d S ds ≤ 1
+
+|Ω|
+
+1
+
+L
+
+Z t
+
+> 0
+
+∥μm(s) − L m(s)∥L1(Γ) ds
+
+≤ |Γ| 12 |T | 12
+
+|Ω|√L
+
+ 1
+
+√L ∥μm(s) − L m(s)∥L2(0 ,T ;HΓ)
+
+
+
+≤ C′|Γ| 12 |T | 12
+
+|Ω|√L
+
+for almost all t ∈ [0 , T ], and in a similar manner, we obtain 
+
+|⟨ ψ0,σ,k ⟩Γ − ⟨ ψm(t)⟩Γ| ≤ C′′ |T | 12
+
+|Γ| 12
+
+√L
+
+53 for almost all t ∈ [0 , T ]. Let us fix L0 ≥ 1 sufficiently large such that 
+
+C′|Γ| 12 |T | 12
+
+|Ω|√L ≤ ec1
+
+4 and C′′ |T | 12
+
+|Γ| 12
+
+√L ≤ ec1
+
+4 for all L ≥ L0.Now for the last three lines on the right-hand side of (5.15), by (4.4) and Hölder’s inequality, we get 
+
+Z
+
+> Ω
+
+(γ∂ tφm + f1(φm))( φm − ⟨ φm⟩Ω) d x +
+
+Z
+
+> Γ
+
+(γ∂ tψm + g1(ψm))( ψm − ⟨ ψm⟩Γ) d S
+
++ ( ⟨φm⟩Ω − ⟨ ψm⟩Γ)
+
+Z
+
+> Γ
+
+∂nφm dS
+
+≤ C
+
+
+
+1 + γ∥∂tφm∥L2 + ∥∂nφm∥HΓ
+
+
+
+.
+
+Collecting the above estimates, we can conclude that 
+
+R5 + R6 ≥ ec1
+
+2
+
+Z
+
+> Ω
+
+|f0(φm)| dx + ec1
+
+2
+
+Z
+
+> Γ
+
+|g0(ψm)| dS − ec2(|Ω| + |Γ|)+ k−1ec1
+
+4
+
+Z
+
+> Ω
+
+f0
+
+ φm
+
+1 − σ
+
+
+
+dx + k−1ec1
+
+4
+
+Z
+
+> Γ
+
+f0
+
+ ψm
+
+1 − σ
+
+
+
+dS
+
+− k−1(1 − σ)ec2(|Ω| + |Γ|) − C
+
+
+
+1 + γ∥∂tφm∥L2 + ∥∂nφm∥HΓ
+
+
+
+.
+
+As K∂ nφm = ψm − φm a.e. on ΣT , the conclusions (5.12) and (5.13) follow from (5.14) and the estimates above for Rj with 1 ≤ j ≤ 7. This completes the proof of Lemma 5.3. 
+
+Lemma 5.4. There exists a positive constant C, independent of m, γ, σ, k and L ≥ L0, such that 
+
+∥μm∥L2(0 ,T ;H1) ≤ C. (5.16) 
+
+Proof. By Lemma 4.2 and (5.12), we obtain (5.16) by repeating the process of [50, Lemma 5.9]. 
+
+Lemma 5.5. There exists a positive constant C, independent of m, γ, σ, k and L ≥ L0, such that 
+
+√γ∥∂tφm∥L∞(0 ,T ;L2) + ∥μm∥L∞(0 ,T ;H1) + ∥∂tφm∥L2(0 ,T ;H1) + ∥∂tvm∥L2(0 ,T ;H1(Ω)) ≤ C, (5.17) 
+
+∥f0(φm)∥L∞(0 ,T ;H) + ∥g0(ψm)∥L∞(0 ,T ;HΓ) + ∥φm∥L∞(0 ,T ;H2) + ∥μm∥L2(0 ,T ;H2) ≤ C, (5.18) 
+
+k−1∥fσ(φm)∥L∞(0 ,T ;H) + k−1∥fσ(ψm)∥L∞(0 ,T ;HΓ) ≤ C. (5.19) 
+
+Proof. Based on Lemmas 5.3 and 5.4, we can repeat the proof of Lemmas 4.6 and 4.7 to verify the claimed estimates. In particular, the constant in the estimate (4.43) can now be chosen independently of L ∈ [L0, +∞).The proof is complete. In view of Lemmas 5.3, 5.4 and 5.5, we are now ready to handle the case (K, L ) ∈ (0 , +∞] × { +∞} .
+
+Proof of Theorem 2.1: (K, L ) ∈ (0 , +∞] × { +∞} . Based on the refined estimates in Lemmas 5.3, 5.4 and 5.5, we can repeat the argument in Section 4.2 to conclude that there exist functions (vL, vL 
+
+> τ
+
+, φL, μL) satisfying the weak formulation (5.6) and the equations in (5.7). As norms on Banach spaces are weakly (star) lower semicontinuous, and the constants C in Lemmas 5.3, 5.4 and 5.5 are independent of the parameters m, σ,
+
+γ = k−1, and L ∈ [L0, +∞), we can repeat the argument in Section 4.2 by passing to the limit as m → +∞,
+
+σ → 0, γ = k−1 → 0 subsequently, and conclude that the uniform estimate (5.9) holds for all L ∈ [L0, +∞).Then, similar to the process for the case L = 0 , we can prove Theorem 2.1 in the current case (K, L ) ∈
+
+(0 , +∞]×{ +∞} by passing to the limit as L → +∞ in (5.6) and (5.7). The details are omitted for brevity. 54 A Analysis of a Bulk-Surface Convective Viscous Cahn–Hilliard System 
+
+Let γ > 0, σ ∈ (0 , 1/2) , k ∈ N+. We consider the following bulk-surface convective viscous Cahn– Hilliard system 
+
+∂tφ + v · ∇ φ = ∆ μ in QT , (A.1a) 
+
+μ = γ∂ tφ − ∆φ + f (φ) + k−1fσ(φ) in QT , (A.1b) 
+
+(
+
+K∂ nφ = ψ − φ, if K ∈ (0 , +∞)
+
+∂nφ = 0 , if K = + ∞ on ΣT , (A.1c) 
+
+L∂ nμ = L − μ, L ∈ (0 , +∞) on ΣT , (A.1d) 
+
+∂tψ + vτ · ∇ τ ψ = ∆ τ L − ∂nμ on ΣT , (A.1e) 
+
+L = γ∂ tψ − ∆τ ψ + ∂nφ + g(ψ) + k−1fσ(ψ) on ΣT , (A.1f) subject to the initial conditions 
+
+φ(0) = φ0 in Ω, ψ(0) = ψ0 on Γ. (A.2) Here, v is a prescribed velocity field and fσ is the nonlinear function introduced in (3.1). In the following, we establish the well-posedness and regularity results for problem (A.1)–(A.2). The anal-ysis extends the previous work [30] to the viscous approximation of a bulk-surface convective Cahn–Hilliard system. 
+
+Theorem A.1. Let Ω ⊂ Rd with d ∈ { 2, 3} be a bounded domain with smooth boundary Γ. Assume that 
+
+(A2) and (A3) hold, γ > 0, σ ∈ (0 , 1/2) , k ∈ N+. Moreover, we assume that v is a velocity field satisfying 
+
+(v, vτ ) ∈ L∞(0 , T ; L2div ∩ L3), and the initial data φ0 = ( φ0, ψ 0) ∈ H 1 ∩ L ∞ satisfies ∥φ0∥L∞ ≤ 1 − σ
+
+and |m(φ0)| < 1 − σ. Then, problem (A.1) –(A.2) admits a unique weak solution (φ, μ) on [0 , T ] such that 
+
+
+
+φ = ( φ, ψ ) ∈ L∞(0 , T ; H1) ∩ L2(0 , T ; H2), (∂tφ, ∂ tψ) ∈ L2(0 , T ; L2),
+
+|φ(x, t )| < 1 − σ a.e. in QT , |ψ(x, t )| < 1 − σ a.e. on ΣT ,
+
+μ = ( μ, L) ∈ L2(0 , T ; H2),  f0(φ), g 0(ψ) ∈ L2(0 , T ; L2),
+
+(A.3) 
+
+which satisfies the equations in (A.1) almost everywhere in QT (resp. ΣT ) and the initial conditions (A.2) 
+
+almost everywhere in Ω (resp. Γ). In addition, the weak solution has the following regularity properties: 
+
+(R1) Suppose that (∂tv, ∂ tvτ ) ∈ L 43 (0 , T ; L1) and (μ∗
+
+> 0
+
+, L∗
+
+> 0
+
+) ∈ L 2, where 
+
+μ∗ 
+
+> 0
+
+:= −∆φ0 + f0(φ0) + k−1fσ(φ0), L∗ 
+
+> 0
+
+:= −∆τ ψ0 + ∂nφ0 + g0(ψ0) + k−1fσ(ψ0).
+
+Furthermore, the following compatibility condition holds 
+
+(
+
+K∂ nφ0 = ψ0 − φ0, if K ∈ (0 , +∞)
+
+∂nφ0 = 0 , if K = + ∞ a.e. on ΣT . (A.4) 
+
+Then, we have 
+
+(φ, ψ ) ∈ L∞(0 , T ; H2), (μ, L) ∈ L∞(0 , T ; H2),
+
+(∂tφ, ∂ tψ) ∈ L∞(0 , T ; L2) ∩ L2(0 , T ; H1).
+
+55 (R2) Suppose that the assumptions of (R1) hold. Moreover, assume that 
+
+∥φ0∥L∞(Ω) ≤ (1 − σ)(1 − δ0), ∥ψ0∥L∞(Γ) ≤ (1 − σ)(1 − δ0) (A.5) 
+
+for some δ0 ∈ (0 , 1) . Then, there exists δ ∈ (0 , 1) such that 
+
+max   
+
+> (x,t )∈Ω×[0 ,T ]
+
+|φ(x, t )| ≤ (1 − σ)(1 − δ), max   
+
+> (x,t )∈Γ×[0 ,T ]
+
+|ψ(x, t )| ≤ (1 − σ)(1 − δ), (A.6) 
+
+and (φ, ψ ) ∈ L2(0 , T ; H3).
+
+(R3) Suppose that the assumptions of (R2) hold. Moreover, assume that (∂tv, ∂ tvτ ) ∈ L2(0 , T ; L2) and 
+
+(μ∗
+
+> 0
+
+, L∗
+
+> 0
+
+) ∈ H 1. Then, we have 
+
+(φ, ψ ) ∈ L∞(0 , T ; H3), (∂tφ, ∂ tψ) ∈ L∞(0 , T ; H1) ∩ L2(0 , T ; H2),
+
+(∂2 
+
+> t
+
+φ, ∂ 2 
+
+> t
+
+ψ) ∈ L2(0 , T ; L2), (∂tμ, ∂ tL) ∈ L2(0 , T ; H1).
+
+Proof. The proof is divided into several steps. When K = + ∞, the boundary condition of φ reduces to the homogeneous Neumann boundary condition ∂nφ = 0 on ΣT . This case can be treated by a limiting procedure as K → +∞, so we focus on the case K ∈ (0 , +∞) below. 
+
+Existence. The existence of a global weak solution on [0 , T ] with the regularity (A.3) can be shown in a stan-dard way: first for regular potentials through a Faedo–Galerkin method (cf. [44]), and afterwards for singular potentials by means of a Yosida approximation (cf. [45]). 
+
+Uniqueness. For i = 1 , 2, let φ0,i = ( φ0,i , ψ 0,i ) be two initial data, which are admissible in the sense of Theorem A.1 and satisfy m(φ0,1) = m(φ0,2). Furthermore, let (φi, μi) with φi = ( φi, ψ i) and μi = ( μi, Li)
+
+be the corresponding weak solutions of problem (A.1)–(A.2). For brevity, we use the notation 
+
+eφ = ( eφ, eψ) := φ1 − φ2, eμ = ( eμ, eL) := μ1 − μ2, eφ0 = ( eφ0, eψ0) := φ0,1 − φ0,2.
+
+Then the pairs eφ and eμ solve 
+
+
+
+∂t eφ + v · ∇ eφ = ∆ eμ a.e. in QT ,L∂ n eμ = eL − eμ a.e. on ΣT ,∂t eψ + vτ · ∇ τ eψ = ∆ τ eL − ∂n eμ a.e. on ΣT ,
+
+(A.7) and 
+
+eμ = γ∂ t eφ − ∆ eφ + f (φ1) − f (φ2) + k−1fσ(φ1) − k−1fσ(φ2) a.e. in QT ,K∂ n eφ = eψ − eφ, K ∈ (0 , +∞) a.e. on ΣT ,
+
+eL = γ∂ t eψ − ∆τ eψ + ∂n eφ + g(ψ1) − g(ψ2) + k−1fσ(ψ1) − k−1fσ(ψ2) a.e. on ΣT .
+
+Since L ∈ (0 , +∞), we use the definition of SL to rewrite (A.7) as 
+
+P eμ, eL = −SL ∂t eφ, ∂ t eψ − SL(v · ∇ eφ, vτ · ∇ τ eψ) in H1
+
+> L, 0
+
+, (A.8) where P is the projection introduced in (2.6). It follows directly from (A.7) that m( eφ(t)) = 0 for all t ∈ [0 , T ].Hence, multiplying (A.8) by SL( eφ, eψ) in H1
+
+> L, 0
+
+, and recalling (A2) , (3.2), we find that 
+
+12ddt ∥ eφ∥2
+
+> H−1
+> L, 0
+
+= −
+
+Z
+
+> Ω
+
+v · ∇ eφ SL
+
+> Ω
+
+( eφ) d x −
+
+Z
+
+> Γ
+
+vτ · ∇ τ eψ SL 
+
+> Γ
+
+( eφ) d S −
+
+Z
+
+> Ω
+
+eμ eφ dx −
+
+Z
+
+> Γ
+
+eL eψ dS
+
+56 = −
+
+Z
+
+> Ω
+
+v · ∇ eφ SL
+
+> Ω
+
+( eφ) d x −
+
+Z
+
+> Γ
+
+vτ · ∇ τ eψ SL 
+
+> Γ
+
+( eφ) d S
+
+− γ
+
+2ddt ∥ eφ∥2 
+
+> L2
+
+− ∥∇ eφ∥2 
+
+> L2(Ω)
+
+− ∥∇ τ eψ∥2
+
+> L2(Γ)
+
+− 1
+
+K
+
+Z
+
+> Γ
+
+| eψ − eφ|2 dS
+
+− k−1
+
+Z
+
+> Ω
+
+(fσ(φ1) − fσ(φ2)) eφ dx −
+
+Z
+
+> Ω
+
+(f0(φ1) − f0(φ2)) eφ dx
+
+− k−1
+
+Z
+
+> Γ
+
+(fσ(ψ1) − fσ(ψ2)) eψ dS −
+
+Z
+
+> Γ
+
+(g0(ψ1) − g0(ψ2)) eψ dS
+
+−
+
+Z
+
+> Ω
+
+(f1(φ1) − f1(φ2)) eφ dx −
+
+Z
+
+> Γ
+
+(g1(ψ1) − g1(ψ2)) eψ dS
+
+≤ − 
+
+Z
+
+> Ω
+
+v · ∇ eφ SL
+
+> Ω
+
+( eφ) d x −
+
+Z
+
+> Γ
+
+vτ · ∇ τ eψ SL 
+
+> Γ
+
+( eφ) d S
+
+− γ
+
+2ddt ∥ eφ∥2 
+
+> L2
+
+− ∥∇ eφ∥2 
+
+> L2(Ω)
+
+− ∥∇ τ eψ∥2
+
+> L2(Γ)
+
+− 1
+
+K
+
+Z
+
+> Γ
+
+| eψ − eφ|2 dS + CLip ∥ eφ∥2 
+
+> L2
+
+.
+
+Using the Sobolev embedding theorem and the regularity estimate (2.9) with k = 0 to bound SL( eφ), we get 
+
+12ddt
+
+
+
+∥ eφ∥2
+
+> H−1
+> L, 0
+
++ γ∥ eφ∥2
+
+> L2
+
+
+
++ ∥∇ eφ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ eψ∥2
+
+> L2(Γ)
+
++ 1
+
+K
+
+Z
+
+> Γ
+
+| eψ − eφ|2 dS
+
+≤ − 
+
+Z
+
+> Ω
+
+v · ∇ eφ SL
+
+> Ω
+
+( eφ) d x −
+
+Z
+
+> Γ
+
+vτ · ∇ τ eψ SL 
+
+> Γ
+
+( eφ) d S + CLip ∥ eφ∥2
+
+> L2
+
+=
+
+Z
+
+> Ω
+
+eφv · ∇ SL
+
+> Ω
+
+( eφ) d x +
+
+Z
+
+> Γ
+
+eψvτ · ∇ τ SL 
+
+> Γ
+
+( eφ) d S + CLip ∥ eφ∥2
+
+> L2
+
+≤ ∥ v∥L3(Ω) ∥ eφ∥H ∥∇ SL
+
+> Ω
+
+( eφ)∥L6(Ω) + ∥vτ ∥L3(Γ) ∥ eψ∥HΓ ∥∇ τ SL 
+
+> Γ
+
+( eφ)∥L6(Γ) + CLip ∥ eφ∥2
+
+> L2
+
+≤ C(1 + ∥v∥L3(Ω) + ∥vτ ∥L3(Γ) )∥ eφ∥2 
+
+> L2
+
+.
+
+Finally, an application of Gronwall’s lemma yields 
+
+∥ eφ(t)∥2
+
+> H−1
+> L, 0
+
++ γ∥ eφ(t)∥2
+
+> L2
+
+≤  ∥ eφ0∥2
+
+> H−1
+> L, 0
+
++ γ∥ eφ0∥2
+
+> L2
+
+ exp 
+
+
+
+C
+
+Z t
+
+> 0
+
+(1 + ∥v(s)∥L3(Ω) + ∥vτ (s)∥L3(Γ) ) d s
+
+
+
+for all t ∈ [0 , T ]. This continuous dependence estimate easily implies the uniqueness of weak solutions. 
+
+Regularity (R1) . We proceed to derive further regularity properties of the weak solution. The subsequent estimates may depend on the parameters γ, σ, k .Let h ∈  0, T / 2. For any Banach space X, any t ∈ (0 , T − h) and any function f : (0 , T − h) → X, we denote by ∂ht f (t) = 1
+
+> h
+
+f (t + h) − f (t) ∈ X the forward difference quotient of f . In the following, the generic constants denoted by C will always be independent of h. Applying the difference quotient on the equations of (A.1), we obtain 
+
+∂t∂ht φ + ∂ht (v · ∇ φ) = ∆ ∂ht μ a.e. in QT −h, (A.9a) 
+
+∂ht μ = γ∂ t∂ht φ − ∆∂ht φ + ∂ht f (φ) + k−1∂ht fσ(φ) a.e. in QT −h, (A.9b) 
+
+K∂ n∂ht φ = ∂ht ψ − ∂ht φ, K ∈ (0 , +∞) a.e. on ΣT −h, (A.9c) 
+
+L∂ n∂ht μ = ∂ht L − ∂ht μ, L ∈ (0 , +∞) a.e. on ΣT −h, (A.9d) 
+
+∂t∂ht ψ + ∂ht (vτ · ∇ τ ψ) = ∆ τ ∂ht L − ∂n∂ht μ a.e. on ΣT −h, (A.9e) 
+
+∂ht L = γ∂ t∂ht ψ − ∆τ ∂ht ψ + ∂n∂ht φ + ∂ht g(ψ) + k−1∂ht fσ(ψ) a.e. on ΣT −h. (A.9f) 57 It follows from (A.9a) and (A.9e) that m(∂ht φ) = 0 . Thus, we obtain 
+
+P(∂ht μ, ∂ ht L) = −SL(∂t∂ht φ + ∂ht (v · ∇ φ), ∂ t∂ht ψ + ∂ht (vτ · ∇ τ ψ)) in H1
+
+> L, 0
+
+,
+
+where P is the projection introduced in (2.6). Arguing as in the proof of uniqueness, we have 
+
+12ddt
+
+
+
+∥∂ht φ∥2
+
+> H−1
+> L, 0
+
++ γ∥∂ht φ∥2
+
+> L2
+
+
+
++ ∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ∥2
+
+> L2(Γ)
+
++ 1
+
+K
+
+Z
+
+> Γ
+
+|∂ht ψ − ∂ht φ|2 dS
+
+= −
+
+Z
+
+> Ω
+
+∂ht (v · ∇ φ)SL
+
+> Ω
+
+(∂ht φ) d x −
+
+Z
+
+> Γ
+
+∂ht (vτ · ∇ τ ψ)SL 
+
+> Γ
+
+(∂ht φ) d S
+
+− k−1
+
+Z
+
+> Ω
+
+∂ht fσ(φ)∂ht φ dx − k−1
+
+Z
+
+> Γ
+
+∂ht fσ(ψ)∂ht ψ dS
+
+−
+
+Z
+
+> Ω
+
+∂ht f0(φ)∂ht φ dx −
+
+Z
+
+> Γ
+
+∂ht g0(ψ)∂ht ψ dS
+
+−
+
+Z
+
+> Ω
+
+∂ht f1(φ)∂ht φ dx −
+
+Z
+
+> Γ
+
+∂ht g1(ψ)∂ht ψ dS
+
+≤ − 
+
+Z
+
+> Ω
+
+∂ht (v · ∇ φ)SL
+
+> Ω
+
+(∂ht φ) d x −
+
+Z
+
+> Γ
+
+∂ht (vτ · ∇ τ ψ)SL 
+
+> Γ
+
+(∂ht φ) d S
+
+−
+
+Z
+
+> Ω
+
+∂ht f1(φ)∂ht φ dx −
+
+Z
+
+> Γ
+
+∂ht g1(ψ)∂ht ψ dS. (A.10) Using the Sobolev embedding theorem, Agmon’s inequality, the regularity estimate (2.9) for k = 0 , 1, and Young’s inequality, we estimate the first two integrals on the right-hand side of (A.10) as follows: 
+
+Z
+
+> Ω
+
+∂ht (v · ∇ φ)SL
+
+> Ω
+
+(∂ht φ) d x +
+
+Z
+
+> Γ
+
+∂ht (vτ · ∇ τ ψ)SL 
+
+> Γ
+
+(∂ht φ) d S
+
+=
+
+Z
+
+> Ω
+
+div( ∂ht (φv)) SL
+
+> Ω
+
+(∂ht φ) d x +
+
+Z
+
+> Γ
+
+div Γ(∂ht (ψvτ )) SL 
+
+> Γ
+
+(∂ht φ) d S
+
+= −
+
+Z
+
+> Ω
+
+∂ht (φv) · ∇ SL
+
+> Ω
+
+(∂ht φ) d x −
+
+Z
+
+> Γ
+
+∂ht (ψvτ ) · ∇ τ SL 
+
+> Γ
+
+(∂ht φ) d S
+
+= −
+
+Z
+
+> Ω
+
+φ(· + h)∂ht v · ∇ SL
+
+> Ω
+
+(∂ht φ) d x −
+
+Z
+
+> Ω
+
+∂ht φ v · ∇ SL
+
+> Ω
+
+(∂ht φ) d x
+
+−
+
+Z
+
+> Γ
+
+ψ(· + h)∂ht vτ · ∇ τ SL 
+
+> Γ
+
+(∂ht φ) d S −
+
+Z
+
+> Γ
+
+∂ht ψ vτ · ∇ τ SL 
+
+> Γ
+
+(∂ht φ) d S
+
+≤ ∥ φ(· + h)∥L∞(Ω) ∥∂ht v∥L1(Ω) ∥∇ SL
+
+> Ω
+
+(∂ht φ)∥L∞(Ω) 
+
++ ∥ψ(· + h)∥L∞(Γ) ∥∂ht vτ ∥L1(Γ) ∥∇ τ SL 
+
+> Γ
+
+(∂ht φ)∥L∞(Γ) 
+
++ ∥∂ht φ∥H ∥v∥L3(Ω) ∥∇ SL
+
+> Ω
+
+(∂ht φ)∥L6(Ω) + ∥∂ht ψ∥HΓ ∥vτ ∥L3(Γ) ∥∇ τ SL 
+
+> Γ
+
+(∂ht φ)∥L6(Γ) 
+
+≤ ∥ ∂ht v∥L1(Ω) ∥∇ SL
+
+> Ω
+
+(∂ht φ)∥ 12
+
+> H1(Ω)
+
+∥∇ SL
+
+> Ω
+
+(∂ht φ)∥ 12
+
+> H2(Ω)
+
++ ∥∂ht vτ ∥L1(Γ) ∥∇ τ SL 
+
+> Γ
+
+(∂ht φ)∥ 12
+
+> H1(Γ)
+
+∥∇ τ SL 
+
+> Γ
+
+(∂ht φ)∥ 12
+
+> H2(Γ)
+
++ ∥∂ht φ∥H ∥v∥L3(Ω) ∥∇ SL
+
+> Ω
+
+(∂ht φ)∥L6(Ω) + ∥∂ht ψ∥HΓ ∥vτ ∥L3(Γ) ∥∇ τ SL 
+
+> Γ
+
+(∂ht φ)∥L6(Γ) 
+
+≤ C∥(∂ht v, ∂ ht vτ )∥L1 ∥∂ht φ∥ 12 
+
+> L2
+
+∥∂ht φ∥ 12 
+
+> H1
+
++ C∥(v, vτ )∥L3 ∥∂ht φ∥2
+
+> L2
+
+≤ 12
+
+
+
+∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ∥2 
+
+> L2(Γ)
+
++ 1
+
+K ∥∂ht ψ − ∂ht φ∥2
+
+> HΓ
+
+
+
++ C∥(∂ht v, ∂ ht vτ )∥ 43
+
+> L1
+
+
+
+1 + ∥∂ht φ∥2
+
+> L2
+
+
+
++ C∥(v, vτ )∥L3 ∥∂ht φ∥2 
+
+> L2
+
+.
+
+58 Besides, the last two integrals on the right-hand side of (A.10) can simply be estimated by 
+
+−
+
+Z
+
+> Ω
+
+∂ht f1(φ)∂ht φ dx −
+
+Z
+
+> Γ
+
+∂ht g1(ψ)∂ht ψ dS ≤ CLip ∥∂ht φ∥2 
+
+> L2
+
+.
+
+With the aid of the above estimates, we apply Gronwall’s lemma to (A.10) and obtain 
+
+∥∂ht φ(t)∥2
+
+> H−1
+> L, 0
+
++ γ∥∂ht φ(t)∥2
+
+> L2
+
++
+
+Z t
+
+> 0
+
+
+
+∥∇ ∂ht φ(s)∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ(s)∥2
+
+> L2(Γ)
+
++ 1
+
+K
+
+Z
+
+> Γ
+
+|∂ht ψ(s) − ∂ht φ(s)|2 dS
+
+
+
+ds
+
+≤
+
+
+
+∥∂ht φ(0) ∥2
+
+> H−1
+> L, 0
+
++ γ∥∂ht φ(0) ∥2 
+
+> L2
+
++ C
+
+Z t
+
+> 0
+
+∥(∂ht v(s), ∂ ht vτ (s)) ∥ 43 
+
+> L1
+
+ds
+
+
+
+× exp 
+
+
+
+Cγ
+
+Z t
+
+> 0
+
+
+
+∥(∂ht v(s), ∂ ht vτ (s)) ∥ 43 
+
+> L1
+
++ ∥(v(s), vτ (s)) ∥L3
+
+
+
+ds
+
+
+
+(A.11) for all t ∈ [0 , T ] and some constant Cγ > 0. It remains to control φ-dependent terms on the right-hand side of (A.11). To this end, we use the compatibility condition (A.4), the properties of SL, and the regularity estimate (2.9) for k = 0 to get 
+
+12ddt
+
+
+
+∥φ − φ0∥2
+
+> H−1
+> L, 0
+
++ γ∥φ − φ0∥2
+
+> L2
+
+
+
+= ( ∂tφ, φ − φ0)H−1
+
+> L, 0
+
++ γ(∂tφ, φ − φ0)L2
+
+=
+
+Z
+
+> Ω
+
+(γ∂ tφ − μ)( φ − φ0) d x +
+
+Z
+
+> Γ
+
+(γ∂ tψ − L )( ψ − ψ0) d S
+
+−
+
+Z
+
+> Ω
+
+(∇φ · v)SL
+
+> Ω
+
+(φ − φ0) d x −
+
+Z
+
+> Γ
+
+(∇τ ψ · vτ )SL 
+
+> Γ
+
+(φ − φ0) d S
+
+=
+
+Z
+
+> Ω
+
+ ∆φ − f0(φ) − k−1fσ(φ)(φ − φ0) d x
+
++
+
+Z
+
+> Γ
+
+ ∆τ ψ − ∂nφ − g0(ψ) − k−1fσ(ψ)(ψ − ψ0) d S
+
+−
+
+Z
+
+> Ω
+
+f1(φ)( φ − φ0) d x −
+
+Z
+
+> Γ
+
+g1(ψ)( ψ − ψ0) d S
+
+−
+
+Z
+
+> Ω
+
+div( φv)SL
+
+> Ω
+
+(φ − φ0) d x −
+
+Z
+
+> Γ
+
+div Γ(ψvτ )SL 
+
+> Γ
+
+(φ − φ0) d S
+
+=
+
+Z
+
+> Ω
+
+ ∆( φ − φ0) − (f0(φ) − f0(φ0)(φ − φ0) d x
+
++
+
+Z
+
+> Γ
+
+ ∆τ (ψ − ψ0) − ∂n(φ − φ0) − (g0(ψ) − g0(ψ0)) (ψ − ψ0) d S
+
+− k−1
+
+Z
+
+> Ω
+
+(fσ(φ) − fσ(φ0))( φ − φ0) d x − k−1
+
+Z
+
+> Γ
+
+(fσ(ψ) − fσ(ψ0))( ψ − ψ0) d S
+
++
+
+Z
+
+> Ω
+
+ ∆φ0 − f0(φ0) − k−1fσ(φ0)(φ − φ0) d x
+
++
+
+Z
+
+> Γ
+
+ ∆τ ψ0 − ∂nφ0 − g0(ψ0) − k−1fσ(ψ0)(ψ − ψ0) d S
+
+−
+
+Z
+
+> Ω
+
+f1(φ)( φ − φ0) d x −
+
+Z
+
+> Γ
+
+g1(ψ)( ψ − ψ0) d S
+
++
+
+Z
+
+> Ω
+
+φv · ∇ SL
+
+> Ω
+
+(φ − φ0) d x +
+
+Z
+
+> Γ
+
+ψvτ · ∇ τ SL 
+
+> Γ
+
+(φ − φ0) d S
+
+59 ≤ −∥∇ (φ − φ0)∥2 
+
+> L2(Ω)
+
+− ∥∇ τ (ψ − ψ0)∥2 
+
+> L2(Γ)
+
+− 1
+
+K ∥(φ − φ0) − (ψ − ψ0)∥2
+
+> HΓ
+
+−
+
+Z
+
+> Ω
+
+μ∗ 
+
+> 0
+
+(φ − φ0) d x −
+
+Z
+
+> Γ
+
+L∗ 
+
+> 0
+
+(ψ − ψ0) d S
+
++ C∥φ − φ0∥L2 + ∥(v, vτ )∥L2 ∥SL(φ − φ0)∥H1
+
+≤ C
+
+
+
+1 + ∥μ∗
+
+> 0
+
+∥H + ∥L ∗
+
+> 0
+
+∥HΓ + ∥(v, vτ )∥L2
+
+
+
+∥φ − φ0∥L2 .
+
+Applying Lemma 2.3, we find that 
+
+∥φ(t) − φ0∥2
+
+> H−1
+> L, 0
+
++ γ∥φ(t) − φ0∥2
+
+> L2
+
+≤ Cγ (1 + ∥μ∗
+
+> 0
+
+∥H + ∥L ∗
+
+> 0
+
+∥HΓ ) t + Cγ
+
+Z t
+
+> 0
+
+∥(v(s), vτ (s)) ∥L2 ds
+
+for all t ∈ [0 , T ]. Choosing t = h, we obtain 
+
+∥∂ht φ(0) ∥2
+
+> H−1
+> L, 0
+
++ γ∥∂ht φ(0) ∥2 
+
+> L2
+
+≤ Cγ
+
+
+
+1 + ∥μ∗
+
+> 0
+
+∥H + ∥L ∗
+
+> 0
+
+∥HΓ + ∥(v, vτ )∥2 
+
+> L∞(0 ,T ;L2)
+
+
+
+. (A.12) Combining (A.11) and (A.12), we can deduce that 
+
+γ∥∂ht φ(t)∥2 
+
+> L2
+
++
+
+Z t
+
+> 0
+
+
+
+∥∇ ∂ht φ(s)∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ(s)∥2 
+
+> L2(Γ)
+
++ 1
+
+K ∥∂ht ψ(s) − ∂ht φ(s)∥2
+
+> HΓ
+
+
+
+ds
+
+≤
+
+
+
+Cγ
+
+ 1 + ∥μ∗
+
+> 0
+
+∥H + ∥L ∗
+
+> 0
+
+∥HΓ + ∥(v, vτ )∥2 
+
+> L∞(0 ,T ;L2)
+
+ + C
+
+Z t
+
+> 0
+
+∥(∂ht v(s), ∂ ht vτ (s)) ∥ 43 
+
+> L1
+
+ds
+
+
+
+× exp 
+
+
+
+Cγ
+
+Z t
+
+> 0
+
+
+
+∥(∂tv(s), ∂ tvτ (s)) ∥ 43 
+
+> L1
+
++ ∥(v(s), vτ (s)) ∥L3
+
+
+
+ds
+
+
+
+. (A.13) Passing to the limit h → 0, we conclude that 
+
+∥∂tφ∥L∞(0 ,T ;L2) + ∥∂tφ∥L2(0 ,T ;H1) ≤ C(γ, T, ∥μ∗
+
+> 0
+
+∥H , ∥L ∗
+
+> 0
+
+∥HΓ , ∥(v, vτ )∥XT ), (A.14) where XT := L∞(0 , T ; L3) ∩ W 1, 43 (0 , T ; L1).Next, we derive regularity properties on φ and μ. By (A.1), the incompressibility properties of v and vτ ,and Lemma 2.1, we obtain 
+
+∥Pμ∥2
+
+> H1
+> L, 0
+
+= ∥∇ μ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ L∥ 2 
+
+> L2(Γ)
+
++ χ(L)∥L − μ∥2
+
+> HΓ
+
+= −
+
+Z
+
+> Ω
+
+∂tφμ dx −
+
+Z
+
+> Ω
+
+(v · ∇ φ)μ dx −
+
+Z
+
+> Γ
+
+∂tψL dS −
+
+Z
+
+> Γ
+
+(vτ · ∇ τ ψ)L dS
+
+= −(∂tφ, μ − m(μ)1)L2 +
+
+Z
+
+> Ω
+
+(v · ∇ μ)φ dx +
+
+Z
+
+> Γ
+
+(vτ · ∇ τ L)ψ dS
+
+≤ ∥ ∂tφ∥L2 ∥μ − m(μ)1∥L2 + ∥v∥L2(Ω) ∥∇ μ∥L2(Ω) ∥φ∥L∞(Ω) + ∥vτ ∥L2(Γ) ∥∇ τ L∥ L2(Γ) ∥ψ∥L∞(Γ) 
+
+≤ C∥∂tφ∥L2 ∥Pμ∥H1 
+
+> L, 0
+
++ ∥v∥L2(Ω) ∥∇ μ∥L2(Ω) + ∥vτ ∥L2(Γ) ∥∇ τ L∥ L2(Γ) 
+
+≤ 12 ∥Pμ∥2
+
+> H1
+> L, 0
+
++ C ∥∂tφ∥2 
+
+> L2
+
++ ∥(v, vτ )∥2
+
+> L2
+
+,
+
+which implies that 
+
+∥P(μ, L)∥H1 
+
+> L, 0
+
+≤ C(∥∂tφ∥L2 + ∥(v, vτ )∥L2 ). (A.15) 60 Similar to (4.16) and (4.19), it holds 
+
+|m(μ, L)| ≤ C(1 + ∥P(μ, L)∥H1 
+
+> L, 0
+
++ ∥∂tφ∥L2 ). (A.16) Then, recalling the definition of the projection P (see (2.6)), we infer from (A.14), (A.15) and (A.16) that 
+
+∥μ∥L∞(0 ,T ;H1) ≤ C(γ, T, ∥μ∗
+
+> 0
+
+∥H , ∥L ∗
+
+> 0
+
+∥HΓ , ∥(v, vτ )∥XT ). (A.17) For K ∈ (0 , +∞), we reformulate the subsystem (A.1b), (A.1c), (A.1f) as 
+
+−∆φ + k−1fσ(φ) = μ − γ∂ tφ − f (φ) in QT , (A.18a) 
+
+−∆τ ψ + ∂nφ + k−1fσ(ψ) = L − γ∂ tψ − g(ψ) on ΣT , (A.18b) 
+
+K∂ nφ = ψ − φ on ΣT . (A.18c) This allows us to apply a regularity result for bulk-surface elliptic systems with singular nonlinearities (see [32, Propositions 5.1 and 5.2]) to infer that φ ∈ L∞(0 , T ; H2) with 
+
+∥φ∥L∞(0 ,T ;H2) ≤ C 1 + ∥μ∥L∞(0 ,T ;L2) + γ ∥∂tφ∥L∞(0 ,T ;L2) + ∥(f (φ), g (ψ)) ∥L∞(0 ,T ;L2)
+
+. (A.19) Recalling that |φ| < 1 − σ a.e. in QT and |ψ| < 1 − σ a.e. on ΣT , we have 
+
+ f (φ), g (ψ) ≤ max 
+
+> r∈[−1+ σ, 1−σ]
+
+ f (r), g (r) a.e. on Ω × Γ. (A.20) In combination with (A.14), (A.17) and (A.19), we conclude that 
+
+∥φ∥L∞(0 ,T ;H2) ≤ C(σ, γ, T, ∥μ∗
+
+> 0
+
+∥H , ∥L ∗
+
+> 0
+
+∥HΓ , ∥(v, vτ )∥XT ).
+
+Next, we reformulate the subsystem (A.1a), (A.1d), (A.1e) as 
+
+−∆μ = −∂tφ − v · ∇ φ in QT , (A.21a) 
+
+−∆τ L + ∂nμ = −∂tψ − vτ · ∇ τ ψ on ΣT , (A.21b) 
+
+L∂ nμ = L − μ on ΣT . (A.21c) Applying the elliptic regularity theory for bulk-surface elliptic systems (see, e.g., [41, Theorem 3.3]), we deduce that μ ∈ L∞(0 , T ; H2) with 
+
+∥μ∥L∞(0 ,T ;H2) ≤ C 1 + ∥∂tφ∥L∞(0 ,T ;L2) + ∥(v, vτ )∥L∞(0 ,T ;L3)∥φ∥L∞(0 ,T ;L6)
+
+. (A.22) Using (A.14), we can conclude that 
+
+∥μ∥L∞(0 ,T ;H2) ≤ C(σ, γ, T, ∥μ∗
+
+> 0
+
+∥H , ∥L ∗
+
+> 0
+
+∥HΓ , ∥(v, vτ )∥XT ). (A.23) 
+
+Regularity (R2) . We employ a strategy that has been applied to the viscous (bulk) Cahn–Hilliard equation with classical Neumann boundary conditions in [54, Proposition A.3] and [30, Theorem A.1]. To this end, we rewrite the subsystem (A.1b), (A.1c), (A.1f) as 
+
+γ∂ tφ − ∆φ + k−1fσ(φ) = h a.e. in QT , (A.24a) 
+
+K∂ nφ = ψ − φ a.e. on ΣT , (A.24b) 
+
+γ∂ tψ − ∆τ ψ + ∂nφ + k−1fσ(ψ) = hΓ a.e. on ΣT , (A.24c) 61 where 
+
+h := μ − f (φ), hΓ := L − g(ψ).
+
+Due to (A.20), (A.23) and the continuous embedding H2 ,→ L ∞, we know that (h, h Γ) ∈ L∞(0 , T ; L∞).Next, consider the ODE problems 
+
+(
+
+γ∂ tU + k−1fσ(U ) = H, U (0) = (1 − σ)(1 − δ0),
+
+(
+
+γ∂ tV + k−1fσ(V ) = −H, V (0) = (1 − σ)( −1 + δ0), (A.25) where 
+
+H := max {∥ h∥L∞(Ω) , ∥hΓ∥L∞(Γ) }.
+
+We note that due to (A.20) and (A.23), H may depend on γ and σ. It is straightforward to check that there exist two unique solutions U, V ∈ C([0 , T ]) with ∂tU , ∂tV ∈ L∞(0 , T ) to the two ODE systems in (A.25), respectively. Define 
+
+δ := 1 − max 1 − δ0, f −10 (k∥H∥L∞(0 ,T )), −f −10 (−k∥H∥L∞(0 ,T )) ,M := (1 − σ)(1 − δ).
+
+Since δ0 > 0 and f −10 (R) = ( −1, 1) , it follows that δ > 0. It is easy to check that −M is a subsolution for the ODE involving V , and M is a supersolution for the ODE involving U . Moreover, since 0 < δ ≤ δ0, we further have −M ≤ V (0) ≤ U (0) ≤ M . Hence, a simple comparison argument entails that 
+
+−M ≤ V (t) ≤ U (t) ≤ M for all t ∈ [0 , T ].
+
+Next, we show that 
+
+V (t) ≤ φ(x, t ) ≤ U (t) for all (x, t ) ∈ QT , V (t) ≤ ψ(x, t ) ≤ U (t) for all (x, t ) ∈ ΣT .
+
+Let us define the pair (w, w Γ) := ( φ − U, ψ − U ) that satisfies 
+
+γ∂ tw − ∆φ + k−1fσ(φ) − k−1fσ(U ) = h − H a.e. in QT , (A.26a) 
+
+K∂ nw = wΓ − w, K ∈ (0 , +∞) a.e. on ΣT , (A.26b) 
+
+γ∂ twΓ − ∆τ ψ + ∂nφ + k−1fσ(ψ) − k−1fσ(U ) = hΓ − H a.e. on ΣT , (A.26c) 
+
+w(0) = φ0 − (1 − σ)(1 − δ0) a.e. in Ω, (A.26d) 
+
+wΓ(0) = ψ0 − (1 − σ)(1 − δ0) a.e. on Γ. (A.26e) Multiplying (A.26a) by w+ = max {φ − U, 0} and integrating over Ω, multiplying (A.26c) by w+Γ = max {ψ −
+
+U, 0} and integrating over Γ, using the following facts 
+
+∇φ = ∇w+ a.e. in {x ∈ Ω : φ ≥ U } × (0 , T ),
+
+∇τ ψ = ∇τ w+Γ a.e. on {x ∈ Γ : ψ ≥ U } × (0 , T ),∂nφ= 1 
+
+> K
+
+(ψ − φ) = 1 
+
+> K
+
+(wΓ − w) a.e. on ΣT ,
+
+we find that 
+
+γ
+
+2ddt
+
+
+
+∥w+∥2 
+
+> H
+
++ ∥w+Γ ∥2
+
+> HΓ
+
+
+
++ ∥∇ w+∥2 
+
+> L2(Ω)
+
++ ∥∇ τ w+Γ ∥2 
+
+> L2(Γ)
+
++
+
+Z
+
+> Γ
+
+∂nφ(w+Γ − w+) d S
+
+| {z }
+
+> ≥0
+
+62 + k−1
+
+Z
+
+> Ω
+
+(fσ(φ) − fσ(U )) w+ dx + k−1
+
+Z
+
+> Γ
+
+(fσ(ψ) − fσ(U )) w+Γ dS
+
+≤
+
+Z
+
+> Ω
+
+(h − H)w+ dx +
+
+Z
+
+> Γ
+
+(hΓ − H)w+Γ dS. (A.27) By the definition of H, we have h − H ≤ 0 a.e. in QT and hΓ − H ≤ 0 a.e. on ΣT . Thus, due to the monotonicity of fσ, we get 
+
+ddt
+
+
+
+∥w+∥2 
+
+> H
+
++ ∥w+Γ ∥2
+
+> HΓ
+
+
+
+≤ 0.
+
+This implies that 
+
+∥w+(t)∥2 
+
+> H
+
++ ∥w+Γ (t)∥2 
+
+> HΓ
+
+≤ ∥ w+(0) ∥2 
+
+> H
+
++ ∥w+Γ (0) ∥2 
+
+> HΓ
+
+= 0 for all t ∈ [0 , T ].
+
+Hence, we obtain 
+
+φ(x, t ) ≤ U (t) ≤ M in QT , ψ(x, t ) ≤ U (t) ≤ M on ΣT .
+
+Similarly, we can conclude 
+
+φ(x, t ) ≥ V (t) ≥ − M in QT , ψ(x, t ) ≥ V (t) ≥ − M on ΣT .
+
+This verifies the strict separation property (A.6). As a consequence, we have 
+
+(k−1fσ(φ), k −1fσ(ψ)) ∈ L∞(0 , T ; H1).
+
+Applying the elliptic regularity theory for bulk-surface elliptic systems (see, e.g., [41, Theorem 3.3]) to system (A.21) (or (A.24), respectively), we finally arrive at (φ, ψ ) ∈ L2(0 , T ; H3).
+
+Regularity (R3) .
+
+We use the time difference method again. Testing (A.9a) by ∂ht μ and (A.9e) by ∂ht L, we get 
+
+∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 1
+
+L ∥∂ht μ − ∂ht L∥ 2
+
+> HΓ
+
+= −
+
+Z
+
+> Ω
+
+∂t∂ht φ ∂ ht μ dx −
+
+Z
+
+> Γ
+
+∂t∂ht ψ ∂ ht L dS −
+
+Z
+
+> Ω
+
+∂ht (v · ∇ φ) ∂ht μ dx −
+
+Z
+
+> Γ
+
+∂ht (vτ · ∇ τ ψ) ∂ht L dS
+
+= −γ∥∂t∂ht φ∥2 
+
+> H
+
+− γ∥∂t∂ht ψ∥2 
+
+> HΓ
+
+− 12ddt
+
+
+
+∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ∥2 
+
+> L2(Γ)
+
++ 1
+
+K
+
+Z
+
+> Γ
+
+|∂ht ψ − ∂ht φ|2 dS
+
+
+
+− k−1
+
+Z
+
+> Ω
+
+∂ht fσ(φ)∂t∂ht φ dx − k−1
+
+Z
+
+> Γ
+
+∂ht fσ(ψ)∂t∂ht ψ dS
+
+−
+
+Z
+
+> Ω
+
+∂ht f (φ)∂t∂ht φ dx −
+
+Z
+
+> Γ
+
+∂ht g(ψ)∂t∂ht ψ dS
+
+−
+
+Z
+
+> Ω
+
+∂ht (v · ∇ φ) ∂ht μ dx −
+
+Z
+
+> Γ
+
+∂ht (vτ · ∇ τ ψ) ∂ht L dS. 
+
+This implies that 
+
+12ddt
+
+
+
+∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ∥2
+
+> L2(Γ)
+
++ 1
+
+K
+
+Z
+
+> Γ
+
+|∂ht ψ − ∂ht φ|2 dS
+
+
+
++ γ∥∂t∂ht φ∥2 
+
+> H
+
++ γ∥∂t∂ht ψ∥2 
+
+> HΓ
+
++ ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 1
+
+L ∥∂ht μ − ∂ht L∥ 2
+
+> HΓ
+
+= −k−1
+
+Z
+
+> Ω
+
+∂ht fσ(φ)∂t∂ht φ dx − k−1
+
+Z
+
+> Γ
+
+∂ht fσ(ψ)∂t∂ht ψ dS
+
+63 −
+
+Z
+
+> Ω
+
+∂ht f (φ)∂t∂ht φ dx −
+
+Z
+
+> Γ
+
+∂ht g(ψ)∂t∂ht ψ dS
+
+−
+
+Z
+
+> Ω
+
+∂ht (v · ∇ φ) ∂ht μ dx −
+
+Z
+
+> Γ
+
+∂ht (vτ · ∇ τ ψ) ∂ht L dS
+
+=: 
+
+> 6
+
+X
+
+> j=1
+
+Qj . (A.28) Testing (A.9b) by ∆∂ht φ and (A.9f) by ∆τ ∂ht ψ, we obtain 
+
+γ
+
+2ddt
+
+
+
+∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ∥2 
+
+> L2(Γ)
+
++ 1
+
+K ∥∂ht ψ − ∂ht φ∥2
+
+> HΓ
+
+
+
++ ∥∆∂ht φ∥2 
+
+> H
+
++ ∥∆τ ∂ht ψ∥2
+
+> HΓ
+
+=
+
+Z
+
+> Ω
+
+∇∂ht μ · ∇ ∂ht φ dx +
+
+Z
+
+> Γ
+
+∇τ ∂ht L · ∇ τ ∂ht ψ dS + k−1
+
+Z
+
+> Ω
+
+∂ht fσ(φ)∆ ∂ht φ dx
+
++ k−1
+
+Z
+
+> Γ
+
+∂ht fσ(ψ)∆ τ ∂ht ψ dS +
+
+Z
+
+> Ω
+
+∂ht f (φ)∆ ∂ht φ dx +
+
+Z
+
+> Γ
+
+∂ht g(ψ)∆ τ ∂ht ψ dS
+
+−
+
+Z
+
+> Γ
+
+∂n∂ht φ ∂ ht μ dS +
+
+Z
+
+> Γ
+
+∂n∂ht φ∆τ ∂ht ψ dS + γ
+
+Z
+
+> Γ
+
+∂n∂ht φ∂ t∂ht ψ dS
+
+=: 
+
+> 15
+
+X
+
+> j=7
+
+Qj . (A.29) Combining (A.28) and (A.29), we deduce that 
+
+1 + γ
+
+2ddt
+
+
+
+∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ∥2
+
+> L2(Γ)
+
++ 1
+
+K
+
+Z
+
+> Γ
+
+|∂ht ψ − ∂ht φ|2 dS
+
+
+
++ γ∥∂t∂ht φ∥2 
+
+> H
+
++ γ∥∂t∂ht ψ∥2 
+
+> HΓ
+
++ ∥∆∂ht φ∥2 
+
+> H
+
++ ∥∆τ ∂ht ψ∥2
+
+> HΓ
+
++ ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 1
+
+L ∥∂ht μ − ∂ht L∥ 2 
+
+> HΓ
+
+=
+
+> 15
+
+X
+
+> j=1
+
+Qj . (A.30) It remains to bound the terms Qj for 1 ≤ j ≤ 15 . For the first twelve terms we can use Hölder’s inequality to derive the following estimates 
+
+> 4
+
+X
+
+> j=1
+
+Qj ≤ γ
+
+4 ∥∂t∂ht φ∥2 
+
+> L2
+
++ 4
+
+γ
+
+
+
+∥∂ht f (φ)∥2 
+
+> H
+
++ ∥∂ht g(ψ)∥2 
+
+> HΓ
+
++ k−2∥∂ht fσ(φ)∥2 
+
+> H
+
++ k−2∥∂ht fσ(ψ)∥2
+
+> HΓ
+
+
+
+,
+
+> 8
+
+X
+
+> j=7
+
+Qj ≤ 18 ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ 18 ∥∇ τ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 2 ∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ 2 ∥∇ τ ∂ht ψ∥2
+
+> L2(Γ)
+
+,
+
+> 12
+
+X
+
+> j=9
+
+Qj ≤ 14 ∥∆∂ht φ∥2 
+
+> H
+
++ 14 ∥∆τ ∂tψ∥2
+
+> HΓ
+
++ 2 
+
+
+
+∥∂ht f (φ)∥2 
+
+> H
+
++ ∥∂ht g(ψ)∥2 
+
+> HΓ
+
++ k−2∥∂ht fσ(φ)∥2 
+
+> H
+
++ k−2∥∂ht fσ(ψ)∥2
+
+> HΓ
+
+
+
+.
+
+For the remaining terms, we apply Hölder’s inequality and the Sobolev’s embedding theorem to obtain 
+
+Q5 =
+
+Z
+
+> Ω
+
+∂ht (vφ) · ∇ ∂ht μ dx
+
+≤ 18 ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ 2 ∥∂ht (vφ)∥2
+
+> L2(Ω)
+
+64 ≤ 18 ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ 4 ∥v(· + h)∂ht φ∥2 
+
+> L2(Ω)
+
++ 4 ∥∂ht v φ∥2
+
+> L2(Ω)
+
+≤ 18 ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ 4 ∥v(· + h)∥2
+
+> L3(Ω)
+
+∥∂ht φ∥2 
+
+> L6(Ω)
+
++ 4 ∥∂ht v∥2
+
+> L2(Ω)
+
+∥φ∥2
+
+> L∞(Ω)
+
+,Q6 =
+
+Z
+
+> Γ
+
+∂ht (vτ ψ) · ∇ τ ∂ht L dS
+
+≤ 18 ∥∇ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 2 ∥∂ht (vτ ψ)∥2
+
+> L2(Γ)
+
+≤ 18 ∥∇ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 4 ∥vτ (· + h)∂ht ψ∥2 
+
+> L2(Γ)
+
++ 4 ∥∂ht vτ ψ∥2
+
+> L2(Γ)
+
+≤ 18 ∥∇ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 4 ∥vτ (· + h)∥2
+
+> L3(Γ)
+
+∥∂ht ψ∥2 
+
+> L6(Γ)
+
++ 4 ∥∂ht vτ ∥2
+
+> L2(Γ)
+
+∥ψ∥2
+
+> L∞(Γ)
+
+,Q13 ≤ ∥ ∂n∂ht φ∥HΓ ∥∂ht μ∥HΓ ≤ C∥∂ht φ∥H 74 (Ω) ∥∂ht μ∥V
+
+≤ 18
+
+
+
+|m(∂ht μ)|2 + ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 1
+
+L ∥∂ht μ − ∂ht L∥ 2
+
+> HΓ
+
+
+
++ C∥∂ht φ∥2  
+
+> H74(Ω)
+
+≤ 18
+
+
+
+|m(∂ht μ)|2 + ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 1
+
+L ∥∂ht μ − ∂ht L∥ 2
+
+> HΓ
+
+
+
++ 116 (∥∆∂ht φ∥2 
+
+> H
+
++ ∥∆τ ∂ht ψ∥2 
+
+> HΓ
+
+) + C(∥∂ht φ∥2 
+
+> H
+
++ ∥∂ht ψ∥2 
+
+> HΓ
+
+),Q14 ≤ 116 ∥∆τ ∂ht ψ∥2 
+
+> HΓ
+
++ ∥∂n∂ht φ∥2
+
+> HΓ
+
+≤ 18 (∥∆∂ht φ∥2 
+
+> H
+
++ ∥∆τ ∂ht ψ∥2 
+
+> HΓ
+
+) + C(∥∂ht φ∥2 
+
+> H
+
++ ∥∂ht ψ∥2 
+
+> HΓ
+
+),Q15 = γ
+
+Z
+
+> Γ
+
+∂n∂ht φ∂ t∂ht ψ dS ≤ γ
+
+8 ∥∂t∂ht ψ∥2 
+
+> HΓ
+
++ C∥∂ht φ∥2  
+
+> H74(Ω)
+
+≤ γ
+
+8 ∥∂t∂ht ψ∥2 
+
+> HΓ
+
++ 116 (∥∆∂ht φ∥2 
+
+> H
+
++ ∥∆τ ∂ht ψ∥2 
+
+> HΓ
+
+) + C(∥∂ht φ∥2 
+
+> H
+
++ ∥∂ht ψ∥2 
+
+> HΓ
+
+).
+
+Combining the above estimates, from (A.30), we infer that 
+
+ddt
+
+
+
+(1 + γ)∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ (1 + γ)∥∇ τ ∂ht ψ∥2
+
+> L2(Γ)
+
++ 1 + γK
+
+Z
+
+> Γ
+
+|∂ht ψ − ∂ht φ|2 dS
+
+
+
++ γ∥∂t∂ht φ∥2 
+
+> H
+
++ γ∥∂t∂ht ψ∥2 
+
+> HΓ
+
++ ∥∆∂ht φ∥2 
+
+> H
+
++ ∥∆τ ∂ht ψ∥2
+
+> HΓ
+
++ ∥∇ ∂ht μ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht L∥ 2 
+
+> L2(Γ)
+
++ 1
+
+L ∥∂ht μ − ∂ht L∥ 2
+
+> HΓ
+
+≤ C
+
+
+
+1 + ∥(v(· + h), vτ (· + h)) ∥2
+
+> L3
+
+ 
+
+∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ ∥∇ τ ∂ht ψ∥2 
+
+> L2(Γ)
+
++ K−1∥∂ht ψ − ∂ht φ∥2
+
+> HΓ
+
+
+
++ C
+
+
+
+1 + ∥∂ht f (φ)∥2 
+
+> H
+
++ ∥∂ht g(ψ)∥2 
+
+> HΓ
+
++ k−2∥∂ht fσ(φ)∥2 
+
+> H
+
++ k−2∥∂ht fσ(ψ)∥2
+
+> HΓ
+
+
+
++ C
+
+
+
+∥∂ht φ∥2 
+
+> H
+
++ ∥∂ht ψ∥2 
+
+> HΓ
+
++ ∥∂ht v∥2 
+
+> L2(Ω)
+
++ ∥∂ht vτ ∥2
+
+> L2(Γ)
+
+
+
+. (A.31) Define 
+
+F := (1 + γ)∥∇ ∂ht φ∥2 
+
+> L2(Ω)
+
++ (1 + γ)∥∇ τ ∂ht ψ∥2
+
+> L2(Γ)
+
++ 1 + γK
+
+Z
+
+> Γ
+
+|∂ht ψ − ∂ht φ|2 dS, 
+
+G := 1 + ∥(v(· + h), vτ (· + h)) ∥2 
+
+> L3
+
+,
+
+K := 1 + ∥∂ht f (φ)∥2 
+
+> H
+
++ ∥∂ht g(ψ)∥2 
+
+> HΓ
+
++ k−2∥∂ht fσ(φ)∥2 
+
+> H
+
++ k−2∥∂ht fσ(ψ)∥2
+
+> HΓ
+
++ ∥∂ht φ∥2 
+
+> H
+
++ ∥∂ht ψ∥2 
+
+> HΓ
+
++ ∥∂ht v∥2 
+
+> L2(Ω)
+
++ ∥∂ht vτ ∥2
+
+> L2(Γ)
+
+.
+
+65 It follows from (A.31) that 
+
+ddt F(t) ≤ CG(t)F(t) + CK(t), (A.32) where the positive constant C is independent of h. Due to the assumed regularity of (v, vτ ) (in particular, 
+
+(∂tv, ∂ tvτ ) ∈ L2(0 , T ; L2)) and the regularity properties obtained in (R1) and (R2) , we can check that 
+
+0 ≤
+
+Z t−h
+
+> 0
+
+G(s) d s ≤ C and 0 ≤
+
+Z t−h
+
+> 0
+
+K(s) d s ≤ C for all t ∈ (0 , T − h). (A.33) An application of Gronwall’s lemma to (A.32) yields that 
+
+F(t) ≤ eC R t 
+
+> 0G(s) d s
+
+F(0) + C
+
+Z t
+
+> 0
+
+eC R ts G(τ ) d τ K(s) d s ≤ C(1 + F(0)) (A.34) for all t ∈ (0 , T − h). Therefore, it remains to control the initial value F(0) . Since (μ∗
+
+> 0
+
+, L∗
+
+> 0
+
+) ∈ H 1 and the initial data are strictly separated from pure states ±1 (see (A.5)), it is easy to check that φ0 ∈ H 3. Using (A.1b) and (A.1f), we can derive the following estimate 
+
+12ddt
+
+
+
+γ∥∇ (φ − φ0)∥2 
+
+> L2(Ω)
+
++ γ∥∇ τ (ψ − ψ0)∥2
+
+> L2(Γ)
+
++ γK ∥(ψ − ψ0) − (φ − φ0)∥2
+
+> HΓ
+
+
+
+= γ
+
+Z
+
+> Ω
+
+∇∂tφ · ∇ (φ − φ0) d x + γ
+
+Z
+
+> Γ
+
+∇τ ∂tψ · ∇ τ (ψ − ψ0) d S
+
++ γK
+
+Z
+
+> Γ
+
+(∂tψ − ∂tφ)( ψ − ψ0 − φ + φ0) d S
+
+= −γ
+
+Z
+
+> Ω
+
+∂tφ∆( φ − φ0) d x + γ
+
+Z
+
+> Γ
+
+∂tφ∂ n(φ − φ0) d S − γ
+
+Z
+
+> Γ
+
+∂tψ∆τ (ψ − ψ0) d S
+
++γ
+
+Z
+
+> Γ
+
+(∂tψ − ∂tφ)∂n(φ − φ0) d S
+
+= −γ
+
+Z
+
+> Ω
+
+∂tφ∆( φ − φ0) d x − γ
+
+Z
+
+> Γ
+
+∂tψ(∆ τ (ψ − ψ0) − ∂n(φ − φ0)) d S
+
+=
+
+Z
+
+> Ω
+
+∆( φ − φ0)( −∆φ + f (φ) + k−1fσ(φ) − μ) d x
+
++
+
+Z
+
+> Γ
+
+(∆ τ (ψ − ψ0) − ∂n(φ − φ0))( −∆τ ψ + ∂nφ + g(ψ) + k−1fσ(ψ) − L ) d S
+
+= −
+
+Z
+
+> Ω
+
+|∆( φ − φ0)|2 dx −
+
+Z
+
+> Ω
+
+∆( φ − φ0)∆ φ0 dx −
+
+Z
+
+> Ω
+
+∇(φ − φ0) · ∇ (f (φ) + k−1fσ(φ) − μ) d x
+
++
+
+Z
+
+> Γ
+
+∂n(φ − φ0) f (φ) + k−1fσ(φ) − μ + ∆ τ ψ − ∂nφ − g(ψ) − k−1fσ(ψ) + L dS
+
+−
+
+Z
+
+> Γ
+
+|∆τ (ψ − ψ0)|2 dS −
+
+Z
+
+> Γ
+
+∆τ (ψ − ψ0)∆ τ ψ0 dS
+
+−
+
+Z
+
+> Γ
+
+∇τ (ψ − ψ0) · ∇ τ (∂nφ + g(ψ) + k−1fσ(ψ) − L ) d S
+
+≤
+
+Z
+
+> Ω
+
+∇(φ − φ0) · ∇ ∆φ0 dx −
+
+Z
+
+> Γ
+
+∂n(φ − φ0)∆ φ0 dS +
+
+Z
+
+> Γ
+
+∇τ (ψ − ψ0) · ∇ τ ∆τ ψ0 dS
+
++ ∥∇ (φ − φ0)∥L2(Ω) ∥∇ (f (φ) + k−1fσ(φ) − μ)∥L2(Ω) 
+
++ ∥∇ τ (ψ − ψ0)∥L2(Γ) ∥∇ τ (∂nφ + g(ψ) + k−1fσ(ψ) − L )∥L2(Γ) 
+
++ ∥∂n(φ − φ0)∥HΓ ∥f (φ) + k−1fσ(φ) − μ + ∆ τ ψ − ∂nφ − g(ψ) − k−1fσ(ψ) + L∥ HΓ
+
+66 ≤ C
+
+
+
+γ∥∇ (φ − φ0)∥2 
+
+> L2(Ω)
+
++ γ∥∇ τ (ψ − ψ0)∥2 
+
+> L2(Γ)
+
++ γK ∥(ψ − ψ0) − (φ − φ0)∥2
+
+> HΓ
+
+ 12
+
+. (A.35) Now, applying Lemma 2.3 and choosing t = h in the resulting estimate, we infer that 
+
+γ∥∇ ∂ht φ(0) ∥2 
+
+> L2(Ω)
+
++ γ∥∇ τ ∂ht ψ(0) ∥2
+
+> L2(Γ)
+
++ γK ∥∂ht ψ(0) − ∂ht φ(0) ∥2 
+
+> HΓ
+
+≤ Cγ .
+
+This entails that F(0) is uniformly bounded with respect to h ∈  0, T / 2. In particular, in view of (A.33), we can deduce from (A.34) that 
+
+F(t) ≤ C for all t ∈ (0 , T − h). (A.36) Integrating (A.31) with respect to time over (0 , T − h) and using the estimates (A.33) and (A.36) to bound the right-hand side of the resulting estimate, after passing to the limit as h → 0, we obtain 
+
+(∂tφ, ∂ tψ) ∈ L∞(0 , T ; H1) ∩ L2(0 , T ; H2),
+
+(∂2 
+
+> t
+
+φ, ∂ 2 
+
+> t
+
+ψ) ∈ L2(0 , T ; L2), (∂tμ, ∂ tL) ∈ L2(0 , T ; H1).
+
+Finally, applying the elliptic regularity theory for bulk-surface elliptic systems (see, e.g., [41, Theorem 3.3]) to the system (A.21) (resp. (A.24)), we find (φ, ψ ) ∈ L∞(0 , T ; H3). Thus, the proof of Theorem A.1 is complete. 
+
+# Declarations 
+
+Acknowledgments. HW is a member of the Key Laboratory of Mathematics for Nonlinear Sciences (Fudan University), Ministry of Education of China. 
+
+Funding. PK was supported by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation): on the one hand by the DFG-project 524694286, and on the other hand by the RTG 2339 “Interfaces, Complex Structures, and Singular Limits”. HW was partially supported by the Natural Science Foundation of Shanghai 25ZR1401023. The support is gratefully acknowledged. 
+
+Competing interests. The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+Data Availability Statement. Data sharing not applicable to this article as no datasets were generated or analyzed during the current study. 
+
+# References             
+
+> [1] H. Abels, On a diffuse interface model for two-phase flows of viscous, incompressible fluids with matched densities, Arch. Ration. Mech. Anal., 194 (2) (2009), 463–506. [2] H. Abels, Strong well-posedness of a diffuse interface model for a viscous, quasi-incompressible two-phase flow, SIAM J. Math. Anal., 44 (1) (2012), 316–340. [3] H. Abels, D. Depner, H. Garcke, Existence of weak solutions for a diffuse interface model for two-phase flows of incompressible fluids with different densities, J. Math. Fluid Mech., 15 (3) (2013), 453–480. [4] H. Abels, D. Depner, H. Garcke, On an incompressible Navier–Stokes/Cahn–Hilliard system with degenerate mobility, Ann. Inst. H. Poincaré C Anal. Non Linéaire, 30 (6) (2013), 1175–1190. [5] H. Abels, H. Garcke, A. Giorgini, Global regularity and asymptotic stabilization for the incompressible Navier–Stokes–Cahn– Hilliard model with unmatched densities, Math. Ann., 389 (2) (2024), 1267–1321. [6] H. Abels, H. Garcke, G. Grün, Thermodynamically consistent, frame indifferent diffuse interface models for incompressible two-phase flows with different densities, Math. Models Methods Appl. Sci., 22 (3) (2012), Paper No. 1150013, 40 pp.
+
+67 [7] H. Abels, H. Garcke, A. Poiatti, Mathematical analysis of a diffuse interface model for multi-phase flows of incompressible viscous fluids with different densities, J. Math. Fluid Mech., 26 (2) (2024), Paper No. 29, 51 pp. [8] H. Abels, H. Garcke, A. Poiatti, Diffuse interface model for two-phase flows on evolving surfaces with different densities: global well-posedness, Calc. Var. Partial Differential Equations, 64 (5) (2025), Paper No. 141, 41 pp. [9] H. Abels, Y. Terasawa, Weak solutions for a diffuse interface model for two-phase flows of incompressible fluids with different densities and nonlocal free energies, Math. Methods Appl. Sci., 43 (6) (2020), 3200–3219. [10] H. Abels, J. Weber, Local well-posedness of a quasi-incompressible two-phase flow, J. Evol. Equ., 21 (3) (2021), 3477–3502. [11] G. L. Aki, W. Dreyer, J. Giesselmann, C. Kraus, A quasi-incompressible diffuse interface model with phase transition, Math. Models Methods Appl. Sci., 24 (5) (2014), 827–861. [12] V. Barbu, Nonlinear Differential Equations of Monotone Types in Banach Spaces , Springer Monogr. Math., Springer, New York, 2010. [13] L. C. Berselli, S. Spirito, Suitable weak solutions to the 3D Navier–Stokes equations are constructed with the Voigt approxima-tion, J. Differential Equations, 262 (5) (2017), 3285–3316. [14] P. Colli, T. Fukao, Equation and dynamic boundary condition of Cahn–Hilliard type with singular potentials, Nonlinear Anal., 
+
+127 (2015), 413–433. [15] P. Colli, T. Fukao, H. Wu, On a transmission problem for equation and dynamic boundary condition of Cahn–Hilliard type with nonsmooth potentials, Math. Nachr., 293 (11) (2020), 2051–2081. [16] G. Dziuk, C. M. Elliott, Finite element methods for surface PDEs, Acta Numer., 22 (2013), 289–396. [17] S. Frigeri, Global existence of weak solutions for a nonlocal model for two-phase flows of incompressible fluids with unmatched densities, Math. Models Methods Appl. Sci., 26 (10) (2016), 1955–1993. [18] S. Frigeri, On a nonlocal Cahn–Hilliard/Navier–Stokes system with degenerate mobility and singular potential for incompressible fluids with different densities, Ann. Inst. H. Poincaré C Anal. Non Linéaire, 38 (3) (2021), 647–687. [19] T. Fukao, H. Wu, Separation property and convergence to equilibrium for the equation and dynamic boundary condition of Cahn–Hilliard type with singular potential, Asymptot. Anal., 124 (3–4) (2021), 303–341. [20] C. G. Gal, A. Giorgini, M. Grasselli, A. Poiatti, Global well-posedness and convergence to equilibrium for the Abels–Garcke– Grün model with nonlocal free energy, J. Math. Pures Appl., 178 (2023), 46–109. [21] C. G. Gal, M. Grasselli, A. Miranville, Cahn–Hilliard–Navier–Stokes systems with moving contact lines, Calc. Var. Partial Differential Equations, 55 (2016), Paper No. 50, 47 pp. [22] C. G. Gal, M. Grasselli, A. Poiatti, Allen–Cahn–Navier–Stokes–Voigt systems with moving contact lines, J. Math. Fluid Mech., 
+
+25 (2023), Paper No. 89, 57 pp. [23] C. G. Gal, M. Grasselli, H. Wu, Global weak solutions to a diffuse interface model for incompressible two-phase flows with moving contact line and different densities, Arch. Rational Mech. Anal., 234 (1) (2019), 1–56. [24] C. G. Gal, M.-Y. Lv, H. Wu, On a thermodynamically consistent diffuse interface model for two phase incompressible flows with non-matched densities: Dynamics of moving contact lines, surface diffusion, and mass transfer, J. Differential Equations, 465 
+
+(2026), Paper No. 114203, 70 pp. [25] G. P. Galdi, An Introduction to the Mathematical Theory of the Navier–Stokes Equations , Springer Monogr. Math., Springer, New York, 2011. [26] H. Garcke, P. Knopf, Weak solutions of the Cahn–Hilliard equation with dynamic boundary conditions: A gradient flow ap-proach, SIAM J. Math. Anal., 52 (1) (2020), 340–369. [27] H. Garcke, P. Knopf, S. Yayla, Long-time dynamics of the Cahn–Hilliard equation with kinetic rate dependent dynamic boundary conditions, Nonlinear Anal., 215 (2022), Paper No. 112619, 44 pp. [28] H. Garcke, M.-Y. Lv, H. Wu, On a thermodynamically consistent diffuse interface model for incompressible two-phase flows with unmatched densities: Energy equality and Lyapunov stability, (2026), preprint. arXiv: 2603.26020. [29] A. Giorgini, Well-posedness of the two-dimensional Abels–Garcke–Grün model for two-phase flows with unmatched densities, Calc. Var. Partial Differential Equations, 60 (3) (2021), Paper No. 100, 40 pp. [30] A. Giorgini, Existence and stability of strong solutions to the Abels–Garcke–Grün model in three dimensions, Interfaces Free Bound., 24 (4) (2022), 565–608. [31] A. Giorgini, P. Knopf, Two-phase flows with bulk-surface interaction: thermodynamically consistent Navier–Stokes–Cahn– Hilliard models with dynamic boundary conditions, J. Math. Fluid Mech., 25 (3) (2023), Paper No. 65, 44 pp. [32] A. Giorgini, P. Knopf, J. Stange, Regularity of a bulk-surface Cahn–Hilliard model driven by Leray velocity fields, Nonlinearity, 
+
+39 (2026), Paper No. 085013, 40 pp. [33] A. Giorgini, A. Miranville, R. Temam, Uniqueness and regularity for the Navier–Stokes–Cahn–Hilliard system, SIAM J. Math. Anal., 51 (3) (2019) 2535–2574. [34] A. Giorgini, R. Temam, Weak and strong solutions to the nonhomogeneous incompressible Navier–Stokes–Cahn–Hilliard sys-tem, J. Math. Pures Appl., 144 (2020), 194–249. [35] G. R. Goldstein, A. Miranville, G. Schimperna, A Cahn–Hilliard model in a domain with non permeable walls, Phys. D, 240 (8) (2011), 754–766. [36] M. E. Gurtin, D. Polignone, J. Viñals, Two-phase binary fluids and immiscible fluids described by an order parameter, Math. Models Methods Appl. Sci., 6(6) (1996), 815–831. 
+
+68 [37] D.-Z. Han, X.-M. Wang, H. Wu, Existence and uniqueness of global weak solutions to a Cahn–Hilliard–Stokes–Darcy system for two phase incompressible flows in karstic geometry, J. Differential Equations, 257 (10) (2014), 3887–3933. [38] P. C. Hohenberg, B. I. Halperin, Theory of dynamic critical phenomena, Rev. Mod. Phys., 49 (3) (1977), 435–479. [39] C. Hurm, P. Knopf, A. Poiatti, Nonlocal-to-local convergence rates for strong solutions to a Navier–Stokes–Cahn–Hilliard system with singular potential, Comm. Partial Differential Equations, 49 (9) (2024), 832–871. [40] P. Knopf, K.-F. Lam, C. Liu, S. Metzger, Phase-field dynamics with transfer of materials: The Cahn–Hilliard equation with reaction rate dependent dynamic boundary conditions, ESAIM Math. Model. Numer. Anal., 55 (1) (2021), 229–282. [41] P. Knopf, C. Liu, On second-order and fourth-order elliptic systems consisting of bulk and surface pdes: Well-posedness, regu-larity theory and eigenvalue problems, Interfaces Free Bound., 23 (4) (2021), 507–533. [42] P. Knopf, Y. Liu, A thermodynamically consistent free boundary model for two-phase flows in an evolving domain with moving contact lines, variable contact angles and bulk-surface interaction, (2025), preprint. arXiv:2507.01618. To appear in: Interfaces Free Bound. [43] P. Knopf, A. Poiatti, J. Stange, S. Yayla, Long-time dynamics of a bulk-surface convective Cahn–Hilliard system: Pullback attractors and convergence to equilibrium, (2026), preprint. arXiv:2603.10923. [44] P. Knopf, J. Stange, Well-posedness of a bulk-surface convective Cahn–Hilliard system with dynamic boundary conditions, NoDEA Nonlinear Differential Equations Appl., 31 (5) (2024), Paper No. 82, 48 pp. [45] P. Knopf, J. Stange, Strong well-posedness and separation properties for a bulk-surface convective Cahn–Hilliard system with singular potentials, J. Differential Equations, 439 (2025), Paper No. 113408, 60 pp. [46] P. Knopf, J. Stange, A thermodynamically consistent model for bulk-surface viscous fluid mixtures: Model derivation and mathematical analysis, (2025) preprint. arXiv:2509.11925. To appear in: Adv. Nonlinear Anal. [47] W. J. Layton, L. G. Rebholz, On relaxation times in the Navier–Stokes–Voigt model, Int. J. Comput. Fluid Dyn., 27 (3) (2013), 184–187. [48] C. Liu, H. Wu, An energetic variational approach for the Cahn–Hilliard equation with dynamic boundary condition: model derivation and mathematical analysis, Arch. Rational Mech. Anal., 233 (1) (2019), 167–247. [49] J. Lowengrub, L. Truskinovsky, Quasi-incompressible Cahn–Hilliard fluids and topological transitions, R. Soc. Lond. Proc. Ser. A Math. Phys. Eng. Sci., 454 (1978) (1998), 2617–2654. [50] M.-Y. Lv, H. Wu, On the Cahn–Hilliard equation with kinetic rate dependent dynamic boundary condition and non-smooth potential: Well-posedness and asymptotic limits, Interfaces Free Bound., 27 (2) (2025), 177–234. [51] M.-Y. Lv, H. Wu, Separation property and asymptotic behavior for a transmission problem of the bulk-surface coupled Cahn– Hilliard system with singular potentials and its Robin approximation, Anal. Appl., 23 (6) (2025), 887–928. [52] M.-Y. Lv, H. Wu, On the Cahn–Hilliard equation with kinetic rate dependent dynamic boundary condition and non-smooth potential: separation property and long-time behavior, J. Evol. Equ., 25 (2025), Paper No. 104, 38 pp. [53] A. Miranville, The Cahn–Hilliard Equation: Recent Advances and Applications , vol. 95 , CBMS–NSF Regional Conference Series in Applied Mathematics. Society for Industrial and Applied Mathematics (SIAM), Philadelphia, PA, 2019. [54] A. Miranville, S. Zelik, Robust exponential attractors for Cahn–Hilliard type equations with singular potentials, Math. Methods Appl. Sci., 27 (5) (2004), 545–582. [55] M. T. Mohan, On the three dimensional Kelvin–Voigt fluids: global solvability, exponential stability and exact controllability of Galerkin approximations, Evol. Equ. Control Theory, 9(2) (2020), 301–339. [56] T.-Z. Qian, X.-P. Wang, P. Sheng, A variational approach to moving contact line hydrodynamics, J. Fluid Mech., 564 (2006), 333–360. [57] J. Shen, X. Yang, Q. Wang, Mass and volume conservation in phase field models for binary fluids, Commun. Comput. Phys., 
+
+13 (4) (2013), 1045–1065. [58] M. Shokrpour Roudbari, G. Simsek, E. H. van Brummelen, K. G. van der Zee, Diffuse-interface two-phase flow models with different densities: A new quasi-incompressible form and a linear energy-stable method, Math. Models Methods in Appl. Sci., 
+
+28 (4) (2018), 733–770. [59] R. E. Showalter, Monotone Operators in Banach Spaces and Nonlinear Partial Differential Equations , American Mathematical Society, Providence, RI, 1997. [60] J. Stange, Well-posedness and long-time behavior of a bulk-surface Cahn–Hilliard model with non-degenerate mobility, Nonlin-ear Anal., 268 (2026), Paper No. 114060, 34 pp. [61] J. Stange, Global well-posedness of strong solutions to a bulk-surface Navier–Stokes–Cahn–Hilliard model with non-degenerate mobilities in two dimensions, (2025), preprint. arXiv:2511.06847. [62] J. Stange, On a bulk-surface Navier–Stokes–Cahn–Hilliard model: Existence of weak solutions and asymptotic limits, (2026), preprint. arxiv:2608.24647. [63] M. F. P. ten Eikelder, K. G. van der Zee, I. Akkerman, D. Schillinger, A unified framework for Navier–Stokes Cahn–Hilliard models with non-matching densities, Math. Models Methods Appl. Sci., 33 (1) (2023), 175–221. [64] M. F. P. ten Eikelder, K. G. van der Zee, D. Schillinger, Thermodynamically consistent diffuse-interface mixture models of incompressible multicomponent fluids, J. Fluid Mech., 990 (2024), Paper No. A8, 40 pp. [65] R. Temam, Infinite Dimensional Dynamical Systems in Mechanics and Physics , Applied Mathematical Sciences, 68, Springer-Verlag, New York, 1997. [66] H. Wu, A review on the Cahn–Hilliard equation: classical results and recent advances in dynamic boundary conditions, Electron. Res. Arch., 30 (8) (2022), 2788–2832. 
+
+69

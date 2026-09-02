@@ -1,0 +1,570 @@
+Title: Spectral element lattice Boltzmann method for non-ideal gases with partial wetting boundary condition
+
+URL Source: https://arxiv.org/pdf/2609.00535v1
+
+Published Time: Wed, 02 Sep 2026 00:30:31 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Highlights 
+
+Spectral element lattice Boltzmann method for non-ideal gases with partial wetting boundary condition 
+
+Chunheng Zhao, Saumil Patel, Taehun Lee 
+
+• Two-phase spectral Element LBM 
+
+• Wetting in unstructured meshes 
+
+• Force splitting scheme to eliminate parasitic currents arXiv:2609.00535v1 [physics.flu-dyn] 1 Sep 2026 Spectral element lattice Boltzmann method for non-ideal gases with partial wetting boundary condition 
+
+Chunheng Zhao a, Saumil Patel b, Taehun Lee a
+
+> aDepartment of Mechanical Engineering, City College of New York
+> bComputational Science Division, Argonne National Laboratory
+
+Abstract 
+
+We present a spectral element lattice Boltzmann method (LBM) for partial wetting on curved geometries. A non-ideal gas phase-field model is incorpo-rated into the LBM framework to enable phase separation with a constant interface thickness and the potential form of surface tension force is used. We adopt the force-splitting approach, yielding significantly improved sta-bility and accuracy. Complex boundaries are naturally handled using a flux bounce-back scheme, which resolves inconsistencies in normal vectors across adjacent elements. Additionally, a general wetting boundary condition is im-plemented to capture static contact line in a thermodynamically consistent manner. The method is validated through simulations of droplets on flat surfaces, 2/3-dimensional curved surfaces, and equilibrium droplets without boundaries. Results demonstrate that parasitic currents are significantly re-duced on unstructured meshes with complex geometries, reaching residual kinetic energy levels on the order of 10 −24 for wetting configurations and 10 −30 for isolated droplets. 
+
+Keywords: Two-phase spectral element LBM, General wetting boundary condition, Force splitting 
+
+PACS: 0000, 111 1 
+
+2000 MSC: 0000, 1111 
+
+1. Introduction 
+
+The lattice Boltzmann method (LBM) is a powerful and efficient ap-proach for simulating two-phase flows, particularly those involving wetting phenomena [1, 2, 3, 4, 5]. Among the various formulations, the non-ideal gas  
+
+> Preprint submitted to Journal of computational physics September 2, 2026
+
+model combined with the Cahn–Hilliard free energy has proven effective for modeling two-phase systems where surface tension arises from the Korteweg stress [6, 7, 8, 9, 10]. When expressed in potential form and combined with isotropic finite difference discretizations, this model can eliminate parasitic currents on structured meshes [2, 6]. Coupling with wetting boundary con-ditions [2, 11] further enables accurate capture of contact line dynamics. A major limitation of the standard LBM is its reliance on integer lattice grids, making it challenging to simulate flows in complex or unstructured geometries [12, 13]. While extensions such as the finite volume LBM [14, 15], finite difference LBM [16, 17, 18], and finite element LBM [19, 20, 21, 22] provide greater mesh flexibility, applying these to two-phase wetting prob-lems introduces two fundamental challenges: (i) the isotropic character of the surface tension discretization cannot be maintained on unstructured meshes, leading to persistent parasitic currents, and (ii) boundaries on unstructured meshes are generally curved or irregular, requiring consistent treatment of normal vectors and thermodynamically consistent enforcement of contact an-gles across element interfaces. Building upon our previous work on the spectral element lattice Boltz-mann method (LBM) for single-phase flow [23], we address these challenges by extending the framework to two-phase flow with partial wetting. The key contributions are: (1) a force-splitting strategy that decomposes the surface tension force into leading- and higher-order components for balanced dis-cretization on unstructured meshes [21], (2) a flux bounce-back scheme that resolves normal vector inconsistencies across contiguous element interfaces while conserving mass and enforcing no-slip conditions [20], and (3) a ther-modynamically consistent wetting boundary condition that couples the wall free energy with the spectral element weak formulation through the density gradient at the contact line [6]. In the following sections, we present the methodology with emphasis on the coupling between the wetting boundary condition and the spectral ele-ment framework (Section 2), followed by validation tests ordered by the pri-mary contribution: wetting on flat surfaces (Section 3.1), wetting on curved surfaces (Section 3.2), and a baseline force-splitting verification using an iso-lated droplet (Section 3.3). 22. Methodology 
+
+2.1. Single distribution function two-phase lattice Boltzmann method 
+
+The single distribution function fα, associated with the fluid density ρ, is constructed to model two-phase flow dynamics. The density field is initialized using a hyperbolic tangent profile (Eq. A.1 in Appendix A). The evolution of fα is governed by the discrete velocity Boltzmann equation: 
+
+ ∂∂t + eα · ∇ 
+
+
+
+fα = − 1
+
+λ(fα − f eq α ) + Fα, (1) where eα denotes the discrete velocity, λ is the relaxation time, and f eq α
+
+represents the equilibrium distribution function (see Appendix A for the full expression). For the current validation cases, we adopt the standard D2Q9 model [24]. Two-phase flow is modeled using a single-distribution function by replac-ing the ideal gas pressure with a pressure derived from the Cahn–Hilliard free energy. The standard formulation for the bulk free energy, surface energy, and their associated parameters β, κ, γ, follows [6, 8, 10] and is summarized in Appendix A (Eqs. A.2–A.7). The key quantity for the force formulation is the chemical potential: 
+
+μ = β(ρ − ρl)( ρ − ρv)(2 ρ − ρl − ρv) − κ∇2ρ. (2) The surface tension force is obtained from the potential form ρ∇μ [9, 24], yielding the forcing term: 
+
+Fα = tα
+
+c2
+
+> s
+
+
+
+(eα − u) + (eα · u)eα
+
+c2
+
+> s
+
+
+
+· F , (3) where F = ∇ρc 2 
+
+> s
+
+− ρ∇μ and cs = 1 /√3 represents the speed of sound in two dimensional simulation. The weight function for α direction, wα, follows the regular Lattice Boltzmann method can be found in [24]. This forcing term is decomposed into a leading-order term F ∗ 
+
+> α
+
+= tα
+
+> c2
+> s
+
+eα · F and a higher-order term F ∗∗  
+
+> α
+
+= tα
+
+> c2
+> s
+
+h(eα·u)eα
+
+> c2
+> s
+
+− u
+
+i
+
+·F involving velocity-dependent corrections [21]. This decomposition is central to achieving balanced discretization, as detailed below. The collision step incorporates the higher-order forcing term: 
+
+f ∗ 
+
+> α
+
+= ¯fα − 1
+
+τ + 0 .5( ¯fα − ¯f eq α ) + ∆ tF ∗∗  
+
+> α
+
+, (4) 3where the modified distribution functions absorb the higher-order correction (see Appendix A). The streaming step is formulated as a weak problem over each spectral element Ω e:
+
+∂ ¯fα
+
+∂t + eα · ∇ ¯fα − F ∗ 
+
+> α
+
+, ϕ 
+
+
+
+> Ωe
+
+= ( Jα, ϕ )∂Ω , (5) where the right-hand side contains the boundary flux Jα from the flux bounce-back scheme and ϕ is the test function [23]. The ∂Ω denotes the boundary. In matrix form: 
+
+M ∂ ¯fα
+
+∂t + Cα ¯fα = M F ∗ 
+
+> α
+
++ RJ α, (6) where M and Cα are the mass and convection matrices respectively, and 
+
+R is the surface integration. The derivations of all the matrices mentioned above can be found in our previous paper [23]. Time integration is performed using the third-order strong stability preserving Runge–Kutta scheme [23]. 
+
+2.2. Thermodynamically Consistent Wetting Boundary Conditions 
+
+To incorporate the wetting effect and enforce the correct contact-angle boundary condition, a wall free-energy density ew is introduced following the thermodynamically consistent formulations in [6, 25]: 
+
+ew = cos θeq 
+
+Z ρρvs 
+
+p2κρe 0dρ, (7) where ρvs represents the density of the solid gas surface, aligning with the equilibrium vapor density, ρvs = ρv.The enforcement of the contact angle enters the spectral element formu-lation through two coupled mechanisms: (1) Density gradient at the wall. In equilibrium, the wall free energy yields the relation ∂nρ = cos θeq p2e0/κ ,where ∂nρ is the density gradient normal to the wall. This condition specifies the interface orientation at the contact line, ensuring that the prescribed con-tact angle is maintained with a consistent interface thickness. (2) Coupling through the Laplacian in weak form. The chemical potential (Eq. 2) contains the term κ∇2ρ, which in the spectral element framework is evaluated via the weak form: 
+
+∇2ρ = M −1
+
+Z 
+
+> ∂Ω
+
+(ϕn · ∇ ρ)d ¯Ω −
+
+Z
+
+> Ω
+
+(∇ρ · ∇ ϕ)dΩ
+
+
+
+. (8) 4Element interface 
+
+Boundary Normal  n
+
+Node point on boundary 
+
+Incoming discrete velocity  eα
+
+Outgoing discrete velocity  eβ
+
+Node point in element          
+
+> Element interface
+> Boundary Normal n
+> Node point on boundary
+> Incoming discrete velocity eα
+> Outgoing discrete velocity eβ
+> n⋅eβ> 0
+> n⋅eα< 0 n
+> Node point in element
+
+D2Q9
+
+e1
+
+e2
+
+e3
+
+e4
+
+e5e6
+
+e7 e8
+
+e0Figure 1: Schematic of the flux bounce-back scheme for a boundary node point on the curved boundary with polynomial order N = 8. The incoming direction α and the cor-responding bounce-back (outgoing) direction β are defined with respect to the boundary normal n. The associated velocity vectors are represented by the red dashed (incoming) and red solid (outgoing) arrows. We indicate the D2Q9 model used in our current scheme. 
+
+The boundary integral in Eq. 8 directly incorporates the wetting condi-tion: n · ∇ ρ = cos θeq p2e0/κ . Through this mechanism, the contact angle information propagates into the chemical potential μ, which in turn modifies the leading-order forcing term F ∗ 
+
+> α
+
+in the streaming equation (Eq. 5). Thus, the wall free energy modifies the force balance in streaming—not the dis-tribution function fluxes Jα directly. The flux bounce-back (Eq. 9 below) enforces only the no-slip condition and mass conservation, while the con-tact angle is enforced through the modified chemical potential gradient. The boundary flux is defined as Jα = n · jα. with: 
+
+jα =
+
+(eα[ ¯f α]bc , n · eα < 0,
+
+0 n · eα ≥ 0.
+
+[ ¯f α]bc = ¯f α − ¯f β − 2tα
+
+c2
+
+> s
+
+ρ(eα · ub), (9) where α and β denote the bounce-back pair directions of the distribution functions (shown in Figure 1), and ub is the boundary velocity vector. Fur-ther implementation details can be found in [20]. 5°1.0 °0.5 0.0 0.5 1.0cos μeq 
+
+> 0.00.51.01.52.02.53.0
+> μAnalytical Solutions Simulation Results
+
+150 ∘
+
+30 ∘
+
+(a) (b)
+
+> Initialization
+
+Figure 2: (a) Initialization of the simulation and simulation results for droplet wetting on a flat surface with equilibrium contact angle θeq = π 
+
+> 6
+
+and θeq = 5π 
+
+> 6
+
+. (b) Comparison between the simulation results with the analytical solutions. 
+
+Following the streaming step, the macroscopic variables are updated: 
+
+ρ = X
+
+> α
+
+¯fα, (10) 
+
+ρu = X
+
+> α
+
+¯fαeα. (11) Additional details on the spectral element method and the derivation of the mass, convection, and surface operators can be found in [26]. 
+
+3. Numerical Validation 
+
+3.1. Droplet Wetting on a Flat Surface 
+
+We first evaluate the proposed scheme by simulating droplets on a flat surface at equilibrium contact angles. A droplet of diameter D = 0 .5, inter-face thickness δ = 0 .03, is placed in a rectangular domain L1 × L2 = 1 × 2, positioned such that it just touches a flat substrate (Figure 2 (a)). In addi-tion, the mesh is configured with element number for each direction, Ne = 16, along the x−axis and Ne = 8 along the y −axis . The polynomial order is set to N = 16. By varying the wall free energy, the system reaches equilibrium 60 100 200 300 400 500               
+
+> T /t¥
+> 10 °25 10 °22 10 °19 10 °16 10 °13 10 °10 10 °7
+> KEmax N= 8 , Ne = 16
+> N= 16 , Ne = 8
+> 0100 200 300 400 500
+> T /t¥
+> 10 °25 10 °22 10 °19 10 °16 10 °13 10 °10 10 °7
+> KEmax μeq = 30 ±
+> μeq = 60 ±
+> μeq = 90 ±
+> μeq = 120 ±
+> μeq = 150 ±
+
+(a) (b)Figure 3: (a) Maximum kinetic energy KE max evolution for a droplet contact with bound-ary with equilibrium contact angle θeq = [ π 
+
+> 6
+
+, 5π 
+
+> 6
+
+], La = 122, during T /t η = [0 , 500]. (b) Comparison of maximum kinetic energy, KE max , for θeq = π 
+
+> 3
+
+with N = 8, Ne = 16 and 
+
+N = 16 , N e = 8. 
+
+contact angles in the range θeq = [ π 
+
+> 6
+
+, 5π 
+
+> 6
+
+], with the Laplace number fixed at 
+
+La = 122. To eliminate the influence of spurious wave reflections, no-slip boundary conditions are applied on the remaining three domain boundaries. The initial density and velocity fields are prescribed as in Eqs. A.8–A.9 (Ap-pendix A). After initialization, the droplet contacts the substrate, and the contact angle evolves toward the equilibrium value implicitly determined by the wall free energy. Once the simulation has run sufficiently long to reach equi-librium, the contact angle is calculated geometrically following the method described in [6]. Figure 2 (b) presents a comparison between the simula-tion results and theoretical predictions, showing excellent agreement with the predefined contact angles. We further evaluate the parasitic currents, which constitute the central test of the force-splitting scheme in the presence of boundaries. To ensure a consistent analysis across different contact angles, each droplet is initialized with its corresponding equilibrium shape, eliminating additional contact line motion and isolating the parasitic currents. In this test, we maintain Laplace number, La = 122. The maximum kinetic energy eventually decreases to KE max ∼ 10 −27 for equilibrium contact 7angles θeq = [ π 
+
+> 3
+
+, 5π 
+
+> 6
+
+], and to KE max ∼ 10 −24 for θeq = π 
+
+> 6
+
+(shown in Figure 3 (a)). It is noted that a small equilibrium contact angle introduces a relatively large wall free energy source from the boundary to be dissipated by the viscous force. A comparison of KE max for N = 8 , N e = 16 and N = 16 , N e =8 at the same La and equilibrium contact angle θeq = π/ 3 is shown in Figure 3 (b). For both polynomial orders, similar parasitic current intensities are observed, with KE max ∼ 10 −27 .Upon examination, the residual parasitic currents are found to be asym-metric and of very small magnitude. Unlike regular LBM on structured grids, the spectral element method cannot preserve full isotropy, particularly near wetting boundaries. As a result, the residual kinetic energy in wetting cases (∼ 10 −24 to 10 −27 ) is higher than in the boundary-free single droplet test (∼ 10 −30 , see Section 3.3). This difference of three to six orders of magni-tude reflects the inherent anisotropy introduced by boundary discretization in the spectral element framework. For small contact angles, the liquid vapor interface is positioned very close to the solid surface, hindering the attain-ment of the elevated equilibrium density near the wall and thus leading to a relatively larger KE max [25]. Additionally, at small contact angles, the effective Laplace number La , computed from the curvature of the droplet, is approximately 4 to 5 times larger than that of a circular droplet. As a result, achieving parasitic currents of the same order as those observed in other contact angle tests becomes challenging [6]. 
+
+3.2. Droplet wetting on a curved surface 
+
+We further simulate droplets on a curved surface at equilibrium contact angles. The mesh is generated using GMSH, as shown in Figure 4 (a), featur-ing a curved circular boundary with diameter D = 0 .2 located at the center of the 2D square domain. A droplet of the same diameter is initialized just touching this curved boundary, and the wall free energy is varied to simulate contact angles ranging from θeq = [ π 
+
+> 12
+
+, 11 π 
+
+> 12
+
+]. In this test, we set La = 341, and the polynomial order is set to N = 11. The simulation results are obtained after long-time evolution to ensure equilibrium is reached. In Figure 4 (b), we compare the simulation results (indicated by square markers) with the analytical solution, showing excellent agreement. Additional comparisons for each equilibrium contact angle are presented in Figure 5. To evaluate parasitic currents for simulations with different contact angles 
+
+θeq = [ π 
+
+> 6
+
+, 5π 
+
+> 6
+
+], we initialize the droplet on the surface directly with the equilib-8°1.0 °0.5 0.0 0.5 1.0cos μeq 
+
+0.00.51.01.52.02.53.0
+
+> μAnalytical Solutions Simulation Results
+
+(a) (b)Figure 4: (a) Mesh structure with a circle boundary in the center. (b) Comparison between the simulation results with the analytical solutions. 165 ∘
+
+150 ∘
+
+135 ∘
+
+120 ∘
+
+105 ∘
+
+15 ∘ 30 ∘ 45 ∘ 60 ∘ 75 ∘
+
+Figure 5: Density profile for droplet wetting on a curved boundary with equilibrium contact angle θeq = [ π 
+
+> 12
+
+, 11 π 
+
+> 12
+
+]. 
+
+90 250 500 750 1000 1250 
+
+T /t η
+
+10 −22 
+
+10 −19 
+
+10 −16 
+
+10 −13 
+
+10 −10 
+
+10 −7     
+
+> KE max
+> θeq = 30 ◦
+> θeq = 60 ◦
+> θeq = 90 ◦
+> θeq = 120 ◦
+> θeq = 150 ◦
+
+Figure 6: Maximum kinetic energy KE max evolution for the single droplet wetting on the circle boundary with equilibrium contact angle θeq = [ π
+
+6 , 5π
+
+6 ], La = 442 during T /t η =[0 , 1200]. (a) (b)      
+
+> (c)(d)
+> °1.0°0.50.00.51.0cos μeq
+> 0.00.51.01.52.02.53.0
+> μAnalytical Solutions Simulation Results
+> (e)
+
+Figure 7: Density contour for ρ = 0 .55 for droplet wetting on a 3D curved surface with equilibrium contact angle (a) θeq = π
+
+6 , (b) θeq = π
+
+3 , (c) θeq = 2π
+
+3 , (d) θeq = 5π
+
+6 . (e) Comparison between the simulation results with the analytical solutions for 3D droplet wetting on a curved surface. 
+
+10 rium contact angle. All simulations exhibit a consistent decreasing trend in kinetic energy, with KE max ∼ 10 −24 . Our previous work [21] indicates that the parasitic currents are related to the mesh structure. A perturbed mesh will induce a relative strong parasitic currents. Although the kinetic energy continues to decline over time, the process is extremely slow, consistent with the results in [21]. A 3D study was performed to investigate droplet wetting on a curved surface, with equilibrium contact angles ranging from π/ 6 to 5 π/ 6. The computational domain is a rectangular cuboid ( L = 0 .5, W = 0 .5, H = 0 .25) featuring a curved bottom boundary with a diameter of D = 1 .4. A droplet with a diameter of d = 0 .25 was initialized at (0 .25 , 0.25 , 0.04) in contact with the spherical surface. The D3Q13 lattice model [27] was employed to ensure spatial isotropy while maintaining computational efficiency. The simulation parameters ( Cn = δ/d = 0 .08, La = 60, CF L = 0 .75) differ from the 2D cases due to the computational cost of 3D simulations: the lower Laplace number and larger Cahn number reduce the required spa-tial and temporal resolution while still providing a meaningful validation of contact angle accuracy. After T /t η ≈ 60, parasitic currents decreased to 
+
+∼ 10 −11 . Although these currents were still gradually decaying, the results demonstrate excellent agreement with the prescribed equilibrium contact an-gles, as illustrated in Figure 7. 
+
+3.3. Baseline Force-Splitting Verification: Static Droplet 
+
+In regular LBM, using the potential form of the surface tension force and isotropic finite difference, we can eliminate parasitic currents, as demon-strated in [9]. For the spectral element LBM, the streaming is solved by the Runge–Kutta method, and we cannot maintain the isotropic character when incorporating the surface tension force in collision step. Nevertheless, para-sitic currents can be further reduced by incorporating the leading-order forc-ing term into the streaming step. Following the force-splitting approach [21], the leading-order contribution of the forcing term is consistently applied dur-ing streaming: 
+
+∂ ¯fα
+
+∂t + eα · ∇   ¯fα − tαρ − tα
+
+c2
+
+> s
+
+ρeα · ∇ μ = 0 . (12) As the system approaches equilibrium, the second term vanishes, and the chemical potential generates an isotropic force along the interface, leading to a balanced system. 11 0 50 100 150             
+
+> T /t¥
+> 10 °26 10 °23 10 °20 10 °17 10 °14 10 °11 10 °8
+> KEmax Cn = 0 .047
+> Cn = 0 .063
+> Cn = 0 .078
+> 050 100 150 200
+> T /t¥
+> 10 °28 10 °25 10 °22 10 °19 10 °16 10 °13 10 °10 10 °7
+> KEmax La = 3 .07
+> La = 6 .15
+> La = 12 .3
+> La = 30 .7
+> La = 61 .5
+
+(a) (b)Figure 8: Maximum kinetic energy KE max evolution for the single droplet with (a) La =[3 .07 , 61 .5] during T /t η = [0 , 200]; (b) Cn = [0 .047 , 0.078] during T /t η = [0 , 150]. 
+
+A droplet of diameter D = 0 .5 is initially placed at the center of a square computational domain of size L = 1. Simulations are performed for La =[3 .07 , 61 .5], where La = γD/η 2 with the relaxation time fixed at τ = 0 .5 for both phases, over T /t η = [0 , 200], where tη = ηD/γ represents the viscous time scale. As shown in Figure 8 (a), KE max = 0 .5ρ|u|2 
+
+> max
+
+is monitored over the di-mensionless time interval T /t η = [0 , 200] till the system reaches equilibrium. To ensure consistency, the Cahn number is fixed at Cn = δ/D = 0 .063 for all simulations. In this test, the element count in each spatial direction is set to Ne = 4, and the polynomial order is N = 16. The results show that 
+
+KE max decays exponentially during the initial stage, up to approximately 
+
+T /t η ∼ 100. Droplets with larger La exhibit a steeper decline, indicating faster relaxation toward equilibrium compared to those with smaller La . At longer times, all cases converge to a residual kinetic energy of approximately 
+
+KE max ∼ 10 −30 , demonstrating that the system reaches a well-established equilibrium state. For comparison, Figure 8 (b) presents the evolution of 
+
+KE max for Ne = 16, and N = 4 (corresponding to the same total number of grid points) with Cn = [0 .047 , 0.078] over T /t η ∼ 150. In all cases, the bulk energy coefficient is kept constant at β = 0 .001. As the polynomial order decreases, the lower polynomial order leads to a higher residual kinetic 12 energy, converging to KE max ∼ 10 −28 .This baseline establishes the best achievable residual kinetic energy for the spectral element framework in the absence of boundaries. The subsequent introduction of wetting boundaries (Sections 3.1–3.2) raises the residual to 
+
+∼ 10 −24 due to boundary-induced anisotropy, providing a clear quantification of the boundary effect on parasitic currents. 
+
+4. Concluding remarks 
+
+A well-balanced spectral element lattice Boltzmann method (LBM) is de-veloped for simulating static partial wetting on unstructured meshes. The method integrates the non-ideal gas LBM model with a spectral element framework [20, 21, 6] and is employed to examine parasitic currents in three representative configurations: a single droplet, a droplet wetting a flat sur-face, and a droplet wetting a curved surface. A force-splitting strategy is adopted to add the forcing term consistently at each Runge–Kutta stage [23]. When coupled with the potential form of the surface-tension force, this method significantly reduces parasitic currents. For the boundary-free single droplet test, the force-splitting scheme achieves residual kinetic energy at KE max ∼ 10 −30 , demonstrating effective elimi-nation of parasitic currents. In wetting configurations, boundary-induced anisotropy inherent to the spectral element discretization raises residuals to 
+
+∼ 10 −24 to ∼ 10 −27 , depending on the contact angle and geometry. While these residuals are significantly lower than those typically observed in stan-dard unstructured LBM approaches, they reflect a fundamental trade-off: the spectral element method cannot fully preserve isotropy near boundaries, particularly in wetting problems where the liquid–vapor interface lies close to the solid surface. This trade-off is most pronounced at small contact angles, where the effective Laplace number increases substantially. In this study, no filtering is applied, unlike the standard practice in spec-tral element methods for turbulent flows [26]. The application of filters can interfere with the force balance, either by altering the macroscopic quantities (density/velocity) or by affecting the distribution functions. However, our current formulation is restricted to Van der Waals fluids. While the model allows for large density ratios, the evolution remains slow due to low Mach number constraints. Under these conditions, filtering is not necessary for maintaining stability. Future work will focus on extending the method to 13 incompressible flows with larger characteristic velocities, where filter effects must be carefully evaluated across different scenarios. 
+
+5. acknowledgment 
+
+This material is based upon work supported by the U.S. Department of Energy (DOE), Office of Nuclear Energy, under Award No. DE-NE0009420, and the National Science Foundation under Grant No. 2344147. This re-search used resources of the Argonne Leadership Computing Facility, which is a U.S. Department of Energy Office of Science User Facility operated under contract DE-AC02-06CH11357. 
+
+Appendix A. Standard Free Energy Formulations 
+
+The density field is initialized with a two-phase profile: 
+
+ρ = ρl + ρv
+
+2 − ρl − ρv
+
+2 tanh 
+
+2x
+
+δ
+
+
+
+, (A.1) where x represents the signed distance to the interface, and δ is the constant interface thickness. In most of our simulations, ρl = 1 and ρv = 0 .1 are used. Higher density ratios may also be considered, as demonstrated in previous studies [9]. The equilibrium distribution function is given by: 
+
+f eq α = ρt α
+
+
+
+1 + eα · u
+
+c2
+
+> s
+
++ (eα · u)2
+
+2c4
+
+> s
+
+− |u|2
+
+2c2
+
+> s
+
+
+
+. (A.2) The total free energy of the system is: 
+
+E =
+
+Z
+
+> Ω
+
+(e0 + es) dΩ + 
+
+Z
+
+> ∂Ω
+
+ewd∂ Ω, (A.3) where the bulk free energy density is e0 = β(ρ − ρl)2(ρ − ρv)2, the surface energy density is es = 0 .5κ|∇ ρ|2, and β, κ denote the bulk energy coefficient and surface tension coefficient respectively. The parameter relations are: 
+
+κ = βδ 2(ρl − ρv)2
+
+8 , (A.4) 
+
+γ = (ρl − ρv)3
+
+6
+
+p2κβ, (A.5) 14 The modified distribution functions used in the collision step are: ¯f eq α = f eq α − 0.5∆ tF ∗∗  
+
+> α
+
+, (A.6) ¯fα = fα − 0.5∆ tF ∗∗  
+
+> α
+
+. (A.7) The initial conditions for the wetting simulations: 
+
+ρ(x, 0) = ρl + ρv
+
+2 − ρl − ρv
+
+2 tanh 
+
+2 ( |x − x0| − R)
+
+δ
+
+
+
+. (A.8) 
+
+u(x, 0) = 0. (A.9) 
+
+References 
+
+[1] Y. Yan, Y. Zu, A lattice boltzmann method for incompressible two-phase flows on partial wetting surface with large density ratio, Journal of Computational Physics 227 (1) (2007) 763–775. [2] T. Lee, L. Liu, Wall boundary conditions in the lattice boltzmann equa-tion method for nonideal gases, Physical Review E—Statistical, Nonlin-ear, and Soft Matter Physics 78 (1) (2008) 017702. [3] L. Baroudi, T. Lee, Effect of interfacial mass transport on inertial spreading of liquid droplets, Physics of Fluids 32 (3) (2020). [4] A. Briant, A. Wagner, J. Yeomans, Lattice boltzmann simulations of contact line motion. i. liquid-gas systems, Physical Review E 69 (3) (2004) 031602. [5] C. Zhao, V. R. Kern, A. Carlson, T. Lee, Engulfment of a drop on solids coated by thin and thick fluid films, Journal of Fluid Mechanics 958 (2023) A41. [6] C. Zhao, A. Limare, S. Zaleski, General wetting energy boundary condi-tion in a fully explicit nonideal fluids solver, Physical Review E 108 (5) (2023) 055307. [7] J. D. Van der Waals, The thermodynamic theory of capillarity under the hypothesis of a continuous variation of density, Journal of Statistical Physics 20 (2) (1979) 200–244. 15 [8] D. Jacqmin, An energy approach to the continuum surface tension method, in: 34th Aerospace sciences meeting and exhibit, 1996, p. 858. [9] T. Lee, P. F. Fischer, Eliminating parasitic currents in the lat-tice boltzmann equation method for nonideal gases, Physical Review E—Statistical, Nonlinear, and Soft Matter Physics 74 (4) (2006) 046709. [10] B. NADIGA, S. ZALESKI, Investigations of a two-phase fluid model, European journal of mechanics. B, Fluids 15 (6) (1996) 885–896. [11] D. Jacqmin, Contact-line dynamics of a diffuse fluid interface, Journal of fluid mechanics 402 (2000) 57–88. [12] C. Zhao, S. Patel, R. Balakrishnan, T. Lee, Imexlbm: A portable lattice-boltzmann solver for heterogeneous platforms, in: Fluids Engineering Division Summer Meeting, Vol. 88995, American Society of Mechanical Engineers, 2025, p. V001T03A016. [13] C. Zhao, S. Patel, T. Lee, A difference-free conservative phase-field lat-tice boltzmann method, Computers & Fluids (2025) 106674. [14] H. Xi, G. Peng, S.-H. Chou, Finite-volume lattice boltzmann method, Physical Review E 59 (5) (1999) 6202. [15] S. C. Mishra, H. K. Roy, Solving transient conduction and radiation heat transfer problems using the lattice boltzmann method and the finite volume method, Journal of Computational Physics 223 (1) (2007) 89– 107. [16] R. Mei, W. Shyy, On the finite difference-based lattice boltzmann method in curvilinear coordinates, Journal of Computational Physics 143 (2) (1998) 426–448. [17] Z. Guo, T.-S. Zhao, Explicit finite-difference lattice boltzmann method for curvilinear coordinates, Physical review E 67 (6) (2003) 066709. [18] M. Junk, A finite difference interpretation of the lattice boltzmann method, Numerical Methods for Partial Differential Equations: An In-ternational Journal 17 (4) (2001) 383–402. 16 [19] T. Lee, C.-L. Lin, A characteristic galerkin method for discrete boltz-mann equation, Journal of Computational Physics 171 (1) (2001) 336– 356. [20] M. Min, T. Lee, A spectral-element discontinuous galerkin lattice boltz-mann method for nearly incompressible flows, Journal of Computational Physics 230 (1) (2011) 245–259. [21] S. Patel, T. Lee, A new splitting scheme to the discrete boltzmann equation for non-ideal gases on non-uniform meshes, Journal of Compu-tational Physics 327 (2016) 799–809. [22] R. Matin, M. Krzysztof Misztal, A. Hern´ andez-Garc´ ıa, J. Mathiesen, Finite-element lattice boltzmann simulations of contact line dynamics, Physical Review E 97 (1) (2018) 013307. [23] C. Zhao, S. S. Patel, H. L. Lin, M. Min, T. Lee, A flux bounce-back scheme for the filtered spectral element lattice boltzmann method, Com-puters & Fluids (2026) 106987. [24] C. Zhao, T. Lee, Interaction between a rising bubble and a stationary droplet immersed in a liquid pool using a ternary conservative phase-field lattice boltzmann method, Physical Review E 107 (2) (2023) 025308. [25] L. Liu, T. Lee, Wall free energy based polynomial boundary conditions for non-ideal gas lattice boltzmann equation, International Journal of Modern Physics C 20 (11) (2009) 1749–1768. [26] M. O. Deville, P. F. Fischer, E. H. Mund, High-order methods for in-compressible fluid flow, Vol. 9, Cambridge university press, 2002. [27] X. Shan, X.-F. Yuan, H. Chen, Kinetic theory representation of hydro-dynamics: a way beyond the navier–stokes equation, Journal of Fluid Mechanics 550 (2006) 413–441. 17
