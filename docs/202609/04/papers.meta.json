@@ -1,0 +1,54 @@
+{
+  "label": "2026-09-04",
+  "date": "2026-09-04",
+  "generated_at": "2026-09-04T22:03:01",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202609/04/2609.02279v1-ventilated-cavitation-around-a-sphere-through-surface-air-injection-at-re--10000",
+      "section": "deep",
+      "title_en": "Ventilated Cavitation around a sphere through surface air injection at Re = 10,000",
+      "authors": "Soundararajan R, Anikesh Pal",
+      "date": "2026-09-02",
+      "pdf": "https://arxiv.org/pdf/2609.02279v1",
+      "score": "8.0",
+      "evidence": "采用VOF和表面张力的通气空化直接数值模拟",
+      "tldr": "针对球体通气空化减阻机理不明的问题，本文采用DNS结合VOF方法并显式考虑表面张力，模拟Re=10000下前、中、后三种注入位置和两种通气量。结果表明，前部注入产生非稳态气泡空腔且阻力增加56%，中部注入减阻25%-35%，后部注入最大减阻46%。研究证明注入位置是控制空腔稳定性和减阻效果的关键参数，为通气减阻优化提供了新见解。",
+      "tags": "query:falling-film",
+      "abstract_en": "We perform DNS of ventilated cavitation over a sphere at subcritical (Re=10,000). The flow is modeled as a homogeneous mixture of water and air, with the interface tracked using the volume-of-fluid method. Unlike previous numerical investigations, surface tension is explicitly included. Air is injected through a circular strip on the sphere at three locations selected based on the bulk flow dynamics: front (FR025, (18^\\circ\\leqθ\\leq63^\\circ)), mid (MD025, MD050, (75^\\circ\\leqθ\\leq104^\\circ)), and back (BK025, (120^\\circ\\leqθ\\leq180^\\circ)), with (C_q=0.2) and (0.4). The injection location strongly governs cavity inception and stability and alters flow separation in the front- and mid-injection cases. Front injection produces an unsteady bubbly cavity due to vigorous puffing, which fragments the injected air and increases drag by (\\sim56%) relative to the single-phase case. In contrast, mid- and back-injection produce stable cavities with distinct leading-edge dynamics. In the mid-injection cases, puffing dominates and, despite delayed flow separation, the cavity detaches from the leading edge of the injection patch. For back injection, the cavity detaches upstream of the injection patch owing to the adverse pressure gradient induced by cavity formation. Kelvin--Helmholtz instabilities and divot formation characterize the back-injection cavity. Stable cavities exhibit strong air entrainment and close through a re-entrant jet. The mid-injection cases achieve (35%) and (25%) drag reduction at (C_q=0.2) and (0.4), respectively, while back injection yields a maximum drag reduction of (46%) relative to the single-phase case.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/04/2609.02489v1-a-meshfree-solver-for-coupled-bulk-surface-problems-with-self-organizing-surface-geometry",
+      "section": "quick",
+      "title_en": "A meshfree solver for coupled bulk-surface problems with self-organizing surface geometry",
+      "authors": "Lennart J. Schulze, Alejandra Foggia, Ivo F. Sbalzarini",
+      "date": "2026-09-02",
+      "pdf": "https://arxiv.org/pdf/2609.02489v1",
+      "score": "7.0",
+      "evidence": "用于可变形界面耦合体-面问题的无网格求解器",
+      "tldr": "在许多系统中，可变形表面或界面与周围体流体的相互作用，耦合了表面自身的时空动力学，例如肿瘤生长、组织形态发生等。本文提出完全无网格的数值求解器，隐式追踪表面，基于应力平衡耦合周围流体求解动态表面几何。在增长球体上验证了质量守恒收敛，并求解了不可压缩Navier-Stokes流体与表面非线性反应-扩散耦合问题。最后展示了生物形态发生模型，同时求解动态表面形状和曲面场，实现双向耦合。",
+      "tags": "query:falling-film",
+      "abstract_en": "In many systems, the interaction between a deformable surface or interface and the surrounding bulk fluid is coupled with intrinsic spatiotemporal dynamics within the moving surface. Examples include tumor growth, biological tissue morphogenesis, cardiac mechanics, multi-phase surfactant chemistry, additive manufacturing, clothing wear-and-tear, and reactive combustion flows. Solving such problems requires both geometric computing algorithms to track and resolve the surface and numerical methods to solve the coupled governing equations in the surface and the surrounding bulk phase. Here, we present a fully meshfree numerical solver for such coupled bulk-surface problems with deformable interfaces. The presented solver tracks the surface implicitly, solving for the dynamic surface geometry based on stress balance coupled to surrounding fluid phases. We show convergence for a mass-conserving case on a growing sphere and solve bulk-surface problems with incompressible Navier-Stokes fluids coupled to in-surface nonlinear reaction-diffusion dynamics. Finally, we show a model of biological morphogenesis, solving simultaneously for the dynamic surface shape and the fields on the curved surface with two-way coupling.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/04/2609.03396v1-interface-resolved-simulations-of-boiling-heat-transfer",
+      "section": "quick",
+      "title_en": "Interface-resolved simulations of boiling heat transfer",
+      "authors": "Alessio Roccon, Luca Brandt",
+      "date": "2026-09-03",
+      "pdf": "https://arxiv.org/pdf/2609.03396v1",
+      "score": "7.0",
+      "evidence": "沸腾传热的界面解析模拟，即带传热的多相流CFD方法",
+      "tldr": "沸腾传热在诸多高热通量应用中至关重要，但多尺度耦合输运使精确数值预测极具挑战。界面解析模拟通过显式或隐式描述液-汽界面，整合热力学与可压缩性建模，实现高保真沸腾流模拟。然而近期高保真研究揭示，此类模拟在流体动力学上解析，但成核、微层蒸发和接触线动力学仍需亚网格闭合模型，预测精度高度依赖这些微观模型。该综述系统评估现有方法、局限与开放挑战，对沸腾传热准确描述具有重要参考价值。",
+      "tags": "query:falling-film",
+      "abstract_en": "Boiling heat transfer underpins many applications where large heat fluxes must be dissipated. Boiling is characterized by a wide range of coupled multiscale transport phenomena, making its accurate numerical prediction a long-standing challenge. In this context, interface-resolved simulation approaches - where the liquid-vapor interface is either explicitly or implicitly described - have undergone significant advancements, driven by improved numerical formulations, more complete thermodynamic and compressibility modeling, and the growing availability of computational resources. Here, we provide a comprehensive overview of the state of the art in interface-resolved simulations of boiling flows. We examine the different formulations governing the flow and temperature field, strategies for coupling heat and mass transfer at the interface, and current modeling approaches for small-scale physics such as nucleation, microlayer evaporation, and contact-line dynamics. By analyzing insights from recent high-fidelity simulations, a central observation is that interface-resolved simulations of boiling are hydrodynamically resolved but microscopically modeled: their predictive accuracy depends on the sub-grid closures for nucleation, microlayer, and contact-line physics no less than on the fidelity of the hydrodynamic solver. We discuss the strengths and limitations of available methods on this basis, together with the open challenges in the accurate description of boiling heat transfer.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

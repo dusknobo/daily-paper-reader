@@ -1,0 +1,129 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-04T21:55:47.161245+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 1,
+    "deep_cap": 6,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2609.02279v1",
+      "source": "arxiv",
+      "title": "Ventilated Cavitation around a sphere through surface air injection at Re = 10,000",
+      "abstract": "We perform DNS of ventilated cavitation over a sphere at subcritical (Re=10,000). The flow is modeled as a homogeneous mixture of water and air, with the interface tracked using the volume-of-fluid method. Unlike previous numerical investigations, surface tension is explicitly included. Air is injected through a circular strip on the sphere at three locations selected based on the bulk flow dynamics: front (FR025, (18^\\circ\\leqθ\\leq63^\\circ)), mid (MD025, MD050, (75^\\circ\\leqθ\\leq104^\\circ)), and back (BK025, (120^\\circ\\leqθ\\leq180^\\circ)), with (C_q=0.2) and (0.4). The injection location strongly governs cavity inception and stability and alters flow separation in the front- and mid-injection cases. Front injection produces an unsteady bubbly cavity due to vigorous puffing, which fragments the injected air and increases drag by (\\sim56%) relative to the single-phase case. In contrast, mid- and back-injection produce stable cavities with distinct leading-edge dynamics. In the mid-injection cases, puffing dominates and, despite delayed flow separation, the cavity detaches from the leading edge of the injection patch. For back injection, the cavity detaches upstream of the injection patch owing to the adverse pressure gradient induced by cavity formation. Kelvin--Helmholtz instabilities and divot formation characterize the back-injection cavity. Stable cavities exhibit strong air entrainment and close through a re-entrant jet. The mid-injection cases achieve (35%) and (25%) drag reduction at (C_q=0.2) and (0.4), respectively, while back injection yields a maximum drag reduction of (46%) relative to the single-phase case.",
+      "authors": [
+        "Soundararajan R",
+        "Anikesh Pal"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "published": "2026-09-02T08:26:15+00:00",
+      "link": "https://arxiv.org/pdf/2609.02279v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "DNS of ventilated cavitation with VOF and surface tension",
+      "llm_evidence_cn": "采用VOF和表面张力的通气空化直接数值模拟",
+      "llm_evidence": "采用VOF和表面张力的通气空化直接数值模拟",
+      "canonical_evidence": "采用VOF和表面张力的通气空化直接数值模拟",
+      "llm_tldr_en": "Performs DNS of ventilated cavitation over a sphere using volume-of-fluid with explicit surface tension, studying air injection effects on cavity stability.",
+      "llm_tldr_cn": "该文对球体绕流中的通气空化进行直接数值模拟，采用均相混合物模型和体积分数法追踪水-气界面，并显式包含表面张力。通过在球体不同位置注入空气，研究注入位置和流量系数对空腔形成、稳定性及流动分离的影响。结果表明注入位置强烈控制空腔起始与稳定性，前部注入产生非定常气泡。该工作为多相流CFD中界面动力学和空化模拟提供了高保真参考。",
+      "llm_tldr": "该文对球体绕流中的通气空化进行直接数值模拟，采用均相混合物模型和体积分数法追踪水-气界面，并显式包含表面张力。通过在球体不同位置注入空气，研究注入位置和流量系数对空腔形成、稳定性及流动分离的影响。结果表明注入位置强烈控制空腔起始与稳定性，前部注入产生非定常气泡。该工作为多相流CFD中界面动力学和空化模拟提供了高保真参考。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2609.02489v1",
+      "source": "arxiv",
+      "title": "A meshfree solver for coupled bulk-surface problems with self-organizing surface geometry",
+      "abstract": "In many systems, the interaction between a deformable surface or interface and the surrounding bulk fluid is coupled with intrinsic spatiotemporal dynamics within the moving surface. Examples include tumor growth, biological tissue morphogenesis, cardiac mechanics, multi-phase surfactant chemistry, additive manufacturing, clothing wear-and-tear, and reactive combustion flows. Solving such problems requires both geometric computing algorithms to track and resolve the surface and numerical methods to solve the coupled governing equations in the surface and the surrounding bulk phase. Here, we present a fully meshfree numerical solver for such coupled bulk-surface problems with deformable interfaces. The presented solver tracks the surface implicitly, solving for the dynamic surface geometry based on stress balance coupled to surrounding fluid phases. We show convergence for a mass-conserving case on a growing sphere and solve bulk-surface problems with incompressible Navier-Stokes fluids coupled to in-surface nonlinear reaction-diffusion dynamics. Finally, we show a model of biological morphogenesis, solving simultaneously for the dynamic surface shape and the fields on the curved surface with two-way coupling.",
+      "authors": [
+        "Lennart J. Schulze",
+        "Alejandra Foggia",
+        "Ivo F. Sbalzarini"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE",
+        "math.NA",
+        "physics.comp-ph"
+      ],
+      "published": "2026-09-02T11:57:50+00:00",
+      "link": "https://arxiv.org/pdf/2609.02489v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "meshfree solver for coupled bulk-surface problems with deformable interfaces",
+      "llm_evidence_cn": "用于可变形界面耦合体-面问题的无网格求解器",
+      "llm_evidence": "用于可变形界面耦合体-面问题的无网格求解器",
+      "canonical_evidence": "用于可变形界面耦合体-面问题的无网格求解器",
+      "llm_tldr_en": "Presents a meshfree numerical solver for coupled bulk-surface problems with deformable interfaces, tracking surfaces and solving coupled bulk and surface equations.",
+      "llm_tldr_cn": "该文针对可变形表面或界面与周围体相流体相互作用且界面内部存在时空动力学的问题，提出了一种全无网格数值求解器，能同时跟踪表面并求解表面与体相的耦合控制方程。该方法避免了网格重构难题，可处理肿瘤生长、多相表面活性剂化学等复杂界面演化。其数值结果表明该求解器能有效模拟具有自组织表面几何的耦合体-面问题，为多相流CFD中的移动界面计算提供了新途径。",
+      "llm_tldr": "该文针对可变形表面或界面与周围体相流体相互作用且界面内部存在时空动力学的问题，提出了一种全无网格数值求解器，能同时跟踪表面并求解表面与体相的耦合控制方程。该方法避免了网格重构难题，可处理肿瘤生长、多相表面活性剂化学等复杂界面演化。其数值结果表明该求解器能有效模拟具有自组织表面几何的耦合体-面问题，为多相流CFD中的移动界面计算提供了新途径。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2609.03396v1",
+      "source": "arxiv",
+      "title": "Interface-resolved simulations of boiling heat transfer",
+      "abstract": "Boiling heat transfer underpins many applications where large heat fluxes must be dissipated. Boiling is characterized by a wide range of coupled multiscale transport phenomena, making its accurate numerical prediction a long-standing challenge. In this context, interface-resolved simulation approaches - where the liquid-vapor interface is either explicitly or implicitly described - have undergone significant advancements, driven by improved numerical formulations, more complete thermodynamic and compressibility modeling, and the growing availability of computational resources. Here, we provide a comprehensive overview of the state of the art in interface-resolved simulations of boiling flows. We examine the different formulations governing the flow and temperature field, strategies for coupling heat and mass transfer at the interface, and current modeling approaches for small-scale physics such as nucleation, microlayer evaporation, and contact-line dynamics. By analyzing insights from recent high-fidelity simulations, a central observation is that interface-resolved simulations of boiling are hydrodynamically resolved but microscopically modeled: their predictive accuracy depends on the sub-grid closures for nucleation, microlayer, and contact-line physics no less than on the fidelity of the hydrodynamic solver. We discuss the strengths and limitations of available methods on this basis, together with the open challenges in the accurate description of boiling heat transfer.",
+      "authors": [
+        "Alessio Roccon",
+        "Luca Brandt"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "categories": [
+        "physics.flu-dyn",
+        "physics.comp-ph"
+      ],
+      "published": "2026-09-03T05:53:50+00:00",
+      "link": "https://arxiv.org/pdf/2609.03396v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Interface-resolved simulation of boiling heat transfer, a multiphase CFD method with heat transfer",
+      "llm_evidence_cn": "沸腾传热的界面解析模拟，即带传热的多相流CFD方法",
+      "llm_evidence": "沸腾传热的界面解析模拟，即带传热的多相流CFD方法",
+      "canonical_evidence": "沸腾传热的界面解析模拟，即带传热的多相流CFD方法",
+      "llm_tldr_en": "Reviews interface-resolved simulation methods for boiling flows covering governing equations, thermodynamics, and interface descriptions; provides a resource for high-fidelity multiphase CFD with heat transfer.",
+      "llm_tldr_cn": "沸腾传热广泛应用于高热流密度场景，但其多尺度耦合传输现象使得精确数值预测长期面临挑战。本文综述了界面解析模拟方法（显式或隐式描述液汽界面）的最新进展，涵盖控制方程、热力学与可压缩性建模等。通过这些方法，能够更准确地捕捉沸腾过程中的界面动力学与传热特性。该综述为沸腾及类似相变换热过程（如降膜蒸发）的高保真CFD模拟提供了方法参考。",
+      "llm_tldr": "沸腾传热广泛应用于高热流密度场景，但其多尺度耦合传输现象使得精确数值预测长期面临挑战。本文综述了界面解析模拟方法（显式或隐式描述液汽界面）的最新进展，涵盖控制方程、热力学与可压缩性建模等。通过这些方法，能够更准确地捕捉沸腾过程中的界面动力学与传热特性。该综述为沸腾及类似相变换热过程（如降膜蒸发）的高保真CFD模拟提供了方法参考。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "multiphase flow CFD",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
