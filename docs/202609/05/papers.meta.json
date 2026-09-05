@@ -1,0 +1,24 @@
+{
+  "label": "2026-09-05",
+  "date": "2026-09-05",
+  "generated_at": "2026-09-05T22:03:51",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202609/05/2609.03509v1-a-conservative-coupling-method-of-sharp-interface-and-multi-species-model-for-compressible-reacting-gas-liquid-flows-with-phase-change",
+      "section": "quick",
+      "title_en": "A conservative coupling method of sharp-interface and multi-species model for compressible reacting gas-liquid flows with phase change",
+      "authors": "Jiaxi Song, Yunzhang Tian, Shucheng Pan",
+      "date": "2026-09-03",
+      "pdf": "https://arxiv.org/pdf/2609.03509v1",
+      "score": "6.0",
+      "evidence": "可压缩气液两相流相变的数值方法",
+      "tldr": "可压缩气液多组分流动中相变与化学反应共存时，传统单相或多相模型难以同时保证守恒和精度。本文提出锐界面与扩散界面耦合方法，锐界面追踪液气界面，扩散界面模拟气相多组分输运和反应。通过扩展多组分相变黎曼问题并采用组分选择性能量耦合，构造近似四波求解器，数值测试（如脉冲蒸发、激波-液滴作用）验证了其准确性。该方法实现了保守耦合，有效处理相变与化学反应的相互作用，为复杂多相反应流提供新工具。",
+      "tags": "query:falling-film",
+      "abstract_en": "In this paper, a conservative sharp-interface and diffuse-interface coupling method is developed for compressible two-phase multi-species flows with phase change and chemical reactions. The liquid--gas interface is represented by a sharp-interface model, whereas a diffuse-interface model treats the transport and chemical reactions of gas-phase species. Conservation is enforced by coupling the two phases through interfacial fluxes obtained from a multi-species phase-change Riemann problem. The original single-species four-wave Riemann solver is extended to multi-species gas mixtures by modifying the interfacial energy jump condition. Interfacial mass transfer is restricted to the condensable vapor species. Accordingly, both the interfacial energy jump condition and the gas-mixture energy-exchange flux are constructed using the internal energy of the phase-changing vapor species rather than the mixture internal energy. With this species-selective energy coupling, an approximate multi-species Riemann solver is constructed that retains the four-wave structure while avoiding the multidimensional nonlinear root-finding required by the exact solution. A series of numerical tests, including impulsive evaporation and condensation, reacting aluminum vaporization, shock-droplet interaction, and detonation-droplet interaction, are performed to assess the accuracy and robustness of the method. The numerical results agree well with reference solutions and benchmark data, demonstrating that the present method resolves the effects of phase change and chemical reactions in compressible multi-species multiphase flows while preserving conservative interfacial coupling.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
