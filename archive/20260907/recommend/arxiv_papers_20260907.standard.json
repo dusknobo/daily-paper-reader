@@ -1,0 +1,53 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-07T22:57:05.148648+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 11,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.30062v1",
+      "source": "arxiv",
+      "title": "An Immersed Interface Method for Parabolic Interface Problems with Nonlinear Jump Conditions",
+      "abstract": "We develop an immersed interface finite difference method for a one-dimensional nonlinear parabolic interface problem with jump condition \\[ [u]_α=λu^+u^-. \\] The method combines a Crank--Nicolson immersed interface discretization with an \\(s\\)-parameter reduction of the nonlinear interface condition, thereby reducing the nonlinear coupling to a scalar quadratic equation. We also discuss two different viewpoints for combining Newton iteration with immersed interface discretization, namely the IIM--Newton and Newton--IIM formulations. Numerical experiments are presented to illustrate the behavior and accuracy of the method.",
+      "authors": [
+        "So-Hsiang Chou",
+        "Patrick Nyadjo Fonga"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-08-30T22:08:10+00:00",
+      "link": "https://arxiv.org/pdf/2608.30062v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Immersed interface method for parabolic interface problems with nonlinear jump conditions, providing a numerical technique for two-phase flow interface simulation.",
+      "llm_evidence_cn": "针对抛物型界面问题的浸没界面方法，可作为两相流界面模拟的数值技术。",
+      "llm_evidence": "针对抛物型界面问题的浸没界面方法，可作为两相流界面模拟的数值技术。",
+      "canonical_evidence": "针对抛物型界面问题的浸没界面方法，可作为两相流界面模拟的数值技术。",
+      "llm_tldr_en": "Develops an immersed interface finite difference method for one-dimensional nonlinear parabolic interface problems with jump conditions. The method combines Crank-Nicolson discretization with a parameter reduction of the nonlinear condition, enabling efficient solution. Numerical experiments demonstrate the method's accuracy, offering a transferable approach for interface problems in multiphase flow simulations.",
+      "llm_tldr_cn": "针对一维非线性抛物型界面问题，提出一种浸没界面有限差分方法。该方法结合Crank-Nicolson离散与非线性界面条件的参数缩减，将非线性耦合转化为标量二次方程，简化了求解过程。文中还讨论了IIM-Newton与Newton-IIM两种结合方式，展示了方法的灵活性。数值实验验证了方法的准确性，为多相流界面问题的数值模拟提供了可借鉴的技术途径。",
+      "llm_tldr": "针对一维非线性抛物型界面问题，提出一种浸没界面有限差分方法。该方法结合Crank-Nicolson离散与非线性界面条件的参数缩减，将非线性耦合转化为标量二次方程，简化了求解过程。文中还讨论了IIM-Newton与Newton-IIM两种结合方式，展示了方法的灵活性。数值实验验证了方法的准确性，为多相流界面问题的数值模拟提供了可借鉴的技术途径。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "two-phase flow simulation",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

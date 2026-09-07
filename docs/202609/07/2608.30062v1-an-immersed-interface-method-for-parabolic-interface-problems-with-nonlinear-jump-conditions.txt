@@ -1,0 +1,798 @@
+Title: An Immersed Interface Method for Parabolic Interface Problems with Nonlinear Jump Conditions
+
+URL Source: https://arxiv.org/pdf/2608.30062v1
+
+Published Time: Tue, 01 Sep 2026 01:44:58 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+AN IMMERSED INTERFACE METHOD FOR PARABOLIC INTERFACE PROBLEMS WITH NONLINEAR JUMP CONDITIONS 
+
+SO-HSIANG CHOU AND PATRICK NYADJO FONGA 
+
+Abstract. We develop an immersed interface finite difference method for a one-dimensional nonlinear parabolic interface problem with jump condition [u]α = λu +u−.
+
+The method combines a Crank–Nicolson immersed interface discretization with an s-parameter reduction of the nonlinear interface condition, thereby reducing the nonlinear coupling to a scalar quadratic equation. We also discuss two different viewpoints for combin-ing Newton iteration with immersed interface discretization, namely the IIM–Newton and Newton–IIM formulations. Numerical experiments are presented to illustrate the behavior and accuracy of the method. 
+
+1. Introduction 
+
+Immersed interface methods (IIM) provide an effective framework for solving interface problems on unfitted grids while maintaining high-order accuracy near interfaces. In classical IIM formulations, the jump conditions are assumed to be prescribed explicitly, so that correction terms at irregular grid points can be constructed directly from the known interface data. For nonlinear interface conditions, however, the jump quantities are not known a priori since they depend on the unknown traces of the solution itself. As a result, the implementation of immersed interface corrections becomes substantially more delicate than in the standard linear setting. In this paper, we study immersed interface finite difference approximations for the one-dimensional nonlinear parabolic interface problem ( NPIP ): 
+
+Lu := ut − (βu x)x + qu = f, x ∈ Ω− ∪ Ω+, t ∈ (0 , T ],(1) 
+
+u(a, t ) = ξ(t), u(b, t ) = η(t),(2) [u]α = λu +u−,(3) [βu x]α = 0 ,(4) 
+
+u(x, 0) = g(x), x ∈ Ω− ∪ Ω+.(5) Here α is a fixed interface point, Ω − = ( a, α ), Ω + = ( α, b ), and the diffusion coefficient 
+
+β = β(x) > 0 is piecewise constant: 
+
+β =
+
+
+
+β−, x ∈ Ω−,β+, x ∈ Ω+.
+
+We use the standard notation [u]α = u+ − u−, [βu x]α = β+u+ 
+
+> x
+
+− β−u− 
+
+> x
+
+,
+
+> 1arXiv:2608.30062v1 [math.NA] 30 Aug 2026
+
+where 
+
+u+ := lim  
+
+> x→α+
+
+u(x, t ), u− := lim  
+
+> x→α−
+
+u(x, t ).
+
+The nonlinear interface condition [ u]α = λu +u− couples the one-sided traces of the solution across the interface and constitutes the principal nonlinearity of the problem. Problems of this type arise in diffusion and transport models involving interfaces, mem-branes, and heterogeneous media. Numerical methods for interface problems with discon-tinuous coefficients include fitted finite difference methods, immersed interface methods, immersed finite element methods, and related unfitted discretizations. Among these, the immersed interface method introduced by LeVeque and Li [4] provides a systematic way to retain high-order finite difference accuracy on Cartesian grids by incorporating correction terms at irregular grid points near the interface. Subsequent developments of immersed interface methods for elliptic and parabolic interface problems may be found in [1, 5, 6], while related immersed finite element approaches are discussed in [7]. Most immersed interface formulations are developed for interface problems with prescribed jumps. For nonlinear interface conditions, however, the interface jump depends implicitly on the unknown solution traces, which introduces additional difficulties in constructing immersed interface correction terms. A reduction of nonlinear interface conditions to a scalar equation through an s-parameter formulation was proposed in [3]. Related fitted finite difference approaches for nonlinear jump conditions were studied in [2]. The present work focuses instead on the immersed interface setting and investigates how nonlinear jump conditions may be incorporated into a classical immersed interface discretization. To handle the nonlinear jump relation, we employ the s-parameter reduction introduced in [3]. The solution is represented as (6) u = u0 + su 1.
+
+Here u0 satisfies homogeneous interface jumps and u1 corresponds to a unit solution jump. The nonlinear interface condition then reduces to a scalar quadratic equation for the parameter s.This decomposition separates the nonlinear interface coupling from the linear bulk equations and allows the immersed interface discretization to be applied to two auxiliary linear problems. The purpose of the present paper is not to develop a new immersed interface stencil for general nonlinear interface problems, but rather to investigate how nonlinear jump conditions can be incorporated into a classical immersed interface framework. In particular, we examine two different viewpoints for combining Newton iteration with immersed interface discretization. The first viewpoint, referred to here as the IIM–Newton approach, applies the immersed interface discretization first and then performs Newton iteration on the resulting nonlinear algebraic system. In this case, the nonlinearity is localized near the irregular interface grid points, and the Jacobian corrections remain sparse. The second viewpoint, referred to as the Newton–IIM approach, linearizes the nonlinear interface problem first at the continuous level and then attempts to discretize the resulting correction equation by the immersed interface method. We also discuss several practi-cal difficulties associated with this latter strategy within the standard immersed interface framework. For the numerical verification tests presented in this paper, the one-sided interface traces entering the scalar equation for s are evaluated from the manufactured exact solution. This allows the experiments to isolate the immersed interface discretization and the nonlinear 
+
+> 2
+
+scalar reduction from additional trace-reconstruction errors. The separate issue of recovering interface traces from unfitted numerical data is discussed briefly below. A systematic study of trace-recovery procedures, including reconstructions that incorporate the interface jump relations, is the subject of separate work. To expose the nonlinear algebraic structure without the additional notation associated with time discretization, we first develop the IIM–Newton formulation for the corresponding stationary elliptic interface problem. This problem also serves as a model for the nonlinear algebraic problem arising at each time level after an implicit discretization of the parabolic equation. The parabolic problem is then treated by combining the Crank–Nicolson immersed interface discretization with the s-parameter reduction. The remainder of the paper is organized as follows. Section 2 derives the immersed interface finite difference approximation for a related linear interface problem and records the correction terms at irregular grid points. Section 3 presents the IIM–Newton formulation for the stationary nonlinear elliptic model problem. Section 4 contains numerical experiments illustrating the behavior of the method. Finally, Section 5 discusses the Newton–IIM formulation and explains its practical difficulties within the immersed interface framework. 2. Immersed Interface Discretization for a Linear Problem 
+
+The purpose of this section is to derive the immersed interface finite difference approximation for a linear parabolic interface problem with prescribed jumps. This linear problem serves as the building block for the nonlinear problem NPIP .Since the correction terms at irregular grid points depend sensitively on the convention used for the discrete operator, we briefly record the derivation employed in the present implementation. We consider the linear parabolic interface problem 
+
+ut = ( βu x)x − qu + f, x ∈ Ω− ∪ Ω+, t ∈ (0 , T ],(7) 
+
+u(a, t ) = ξ(t), u(b, t ) = η(t),(8) [u]α = (1 − A(t)) u+ + ( B(t) − 1) u− + w(t),(9) [βu x]α = β+u+ 
+
+> x
+
+− β−u− 
+
+> x
+
+= v(t),(10) 
+
+u(x, 0) = g(x), x ∈ Ω− ∪ Ω+.(11) Equivalently, the jump condition may be written as 
+
+A(t)u+ − B(t)u− = w(t).
+
+When A(t) = B(t) = 1, this reduces to the standard prescribed jump condition [u]α = w(t).
+
+We assume that A, B, w ∈ C1([0 , T ]), that v is continuous on [0 , T ], that 
+
+A(t)B(t)̸ = 0 , 0 ≤ t ≤ T, 
+
+and that the one-sided limits 
+
+f ±(t) = lim  
+
+> x→α±
+
+f (x, t )exist. The initial data are assumed to be compatible with the boundary and interface conditions at t = 0. 
+
+> 3
+
+Let 
+
+a = x0 < x 1 < · · · < x N = b
+
+be a uniform mesh with mesh size h, and assume that the interface point satisfies 
+
+xj ≤ α < x j+1 .
+
+The grid points xj and xj+1 are the irregular points. For the time discretization, we use the θ-method: 
+
+U n+1  
+
+> i
+
+− U ni
+
+∆t = θ (
+
+γi, 1U n+1  
+
+> i−1
+
++ γi, 2U n+1  
+
+> i
+
++ γi, 3U n+1  
+
+> i+1
+
++ Cn+1  
+
+> i
+
+− (qU )n+1 
+
+> i
+> )
+
++ (1 − θ) (
+
+γi, 1U ni−1 + γi, 2U ni + γi, 3U ni+1 + Cni − (qU )ni
+
+> )
+
++ f (xi, t n+θ).(12) Here the coefficients γi,k and the correction term Cni depend on whether xi is a regular or an irregular grid point. Away from the interface, the standard centered approximation is used. Thus, for i / ∈{j, j + 1 },
+
+γi, 1 = βi− 12
+
+h2 , γi, 2 = −βi− 12
+
++ βi+ 12
+
+h2 , γi, 3 = βi+ 12
+
+h2 , Cni = 0 .
+
+Here θ = 1 corresponds to backward Euler, while θ = 1 /2 gives the Crank–Nicolson method. In the fully discrete scheme, the correction terms Cni and Cn+1  
+
+> i
+
+are evaluated from the interface data at tn and tn+1 , respectively. Thus, for the Crank–Nicolson scheme ( θ = 1 /2), the two correction terms enter through their trapezoidal average. The quantities At, Bt, and 
+
+wt appearing in the correction formulas below are evaluated at the corresponding time levels. When these functions are prescribed analytically, as in the verification problems considered here, their derivatives are evaluated directly. It remains to determine the immersed interface correction terms at the irregular grid points. We derive them by Taylor expansion about the interface. 
+
+Correction term at xj . At the point xj , we expand uj−1, uj , and uj+1 about α−:
+
+uj−1 = u− + u− 
+
+> x
+
+(xj−1 − α) + 12u−
+
+> xx
+
+(xj−1 − α)2 + O(h3),(13) 
+
+uj = u− + u− 
+
+> x
+
+(xj − α) + 12u−
+
+> xx
+
+(xj − α)2 + O(h3),(14) 
+
+uj+1 = u+ + u+ 
+
+> x
+
+(xj+1 − α) + 12u+
+
+> xx
+
+(xj+1 − α)2 + O(h3).(15) The interface conditions imply 
+
+u+ = Bu − + wA , u+ 
+
+> x
+
+= v + β−u−
+
+> x
+
+β+ .
+
+Using the equation on both sides of the interface together with the time derivative of 
+
+Au + − Bu − = w, 
+
+we obtain 
+
+u+ 
+
+> xx
+
+= Bβ −
+
+Aβ + u− 
+
+> xx
+
++ 
+
+> (
+
+B(q+ − q−)
+
+Aβ + + 1
+
+β+ 
+
+> (
+
+BA
+
+> )
+> t
+> )
+
+u− + q+w − (Af + − Bf −) + wt
+
+Aβ + − Atwβ+A2 .
+
+> 4
+
+Matching the coefficients of u−, u− 
+
+> x
+
+, and u− 
+
+> xx
+
+gives the correction term (16) 
+
+Cj = −γj, 3 
+
+> [
+
+wA + vβ+ (xj+1 − α) + (xj+1 − α)2
+
+2 
+
+> (
+
+q+w − (Af + − Bf −) + wt
+
+Aβ + − Atwβ+A2
+
+> )]
+
+.
+
+Correction term at xj+1 . We next derive the correction term at xj+1 . Expanding about 
+
+α+ gives 
+
+uj = u− + u− 
+
+> x
+
+(xj − α) + 12u−
+
+> xx
+
+(xj − α)2 + O(h3),(17) 
+
+uj+1 = u+ + u+ 
+
+> x
+
+(xj+1 − α) + 12u+
+
+> xx
+
+(xj+1 − α)2 + O(h3),(18) 
+
+uj+2 = u+ + u+ 
+
+> x
+
+(xj+2 − α) + 12u+
+
+> xx
+
+(xj+2 − α)2 + O(h3).(19) The interface conditions now imply 
+
+u− = Au + − wB , u− 
+
+> x
+
+= β+u+ 
+
+> x
+
+− vβ− .
+
+Proceeding as above yields 
+
+u− 
+
+> xx
+
+= Aβ +
+
+Bβ − u+ 
+
+> xx
+
++
+
+> (
+
+−A(q+ − q−)
+
+Bβ − + 1
+
+β− 
+
+> (
+
+AB
+
+> )
+> t
+> )
+
+u+ + Af + − Bf − − q−w − wt + Bt 
+
+> B
+
+wBβ − .
+
+Matching the coefficients of u+, u+ 
+
+> x
+
+, and u+ 
+
+> xx
+
+gives the correction term (20) Cj+1 = γj+1 ,1 
+
+> [
+
+wB + vβ− (xj − α) + (xj − α)2
+
+2 
+
+> (
+
+q−w − (Af + − Bf −) + wt − Bt 
+
+> B
+
+wBβ −
+
+> )]
+
+.
+
+When A = B = 1, the jump condition reduces to [u]α = w(t),
+
+and the correction terms simplify to 
+
+Cj = −γj, 3
+
+> [
+
+w + vβ+ (xj+1 − α) + (xj+1 − α)2
+
+2
+
+q+w − [f ] + wt
+
+β+
+
+> ]
+
+,
+
+and 
+
+Cj+1 = γj+1 ,1
+
+> [
+
+w + vβ− (xj − α) + (xj − α)2
+
+2
+
+q−w − [f ] + wt
+
+β−
+
+> ]
+
+.
+
+2.1. Spatial consistency and accuracy. We briefly record the spatial consistency of the preceding immersed interface discretization and explain why the lower local order at the two irregular grid points is compatible with second-order global accuracy. For simplicity, the discussion is given for the homogeneous forcing case f = 0; the same local argument applies when the prescribed forcing is retained. 
+
+Lemma 1. Fix t ∈ [0 , T ], and suppose that the one-sided solution satisfies 
+
+u±(·, t ) ∈ C4(Ω ±).
+
+Assume also that the interface data are sufficiently smooth for the preceding Taylor expansions. Let τi denote the spatial truncation error obtained by inserting the exact nodal values into the immersed interface difference operator, including the correction terms (16) and (20) . Then 
+
+τi = O(h2), i / ∈ { j, j + 1 },
+
+> 5
+
+while at the two irregular grid points, 
+
+τj = O(h), τj+1 = O(h).
+
+Proof. At a regular grid point the stencil is the standard centered second-order approximation, and hence 
+
+τi = O(h2).
+
+At an irregular grid point, the Taylor expansions about the interface are matched through the quadratic terms by the correction formulas (16) and (20). The first unmatched terms in the expansions are therefore of order O(h3). Since the coefficients of the second-difference operator are of order O(h−2), the remaining local residual is of order 
+
+O(h−2) O(h3) = O(h).
+
+The same argument applies at both irregular grid points. □
+
+Remark 1. The first-order truncation errors at the two irregular grid points do not by themselves imply a loss of global second-order accuracy. This is a familiar feature of one-dimensional immersed interface discretizations. The irregular defects are supported at only two neighboring grid points, whereas the discrete inverse associated with the second-order elliptic difference operator has entries of order h in the corresponding discrete Green-function representation. Hence an O(h) defect supported at a fixed number of grid points produces an 
+
+O(h2) contribution to the solution error. The O(h2) truncation errors at the regular grid points likewise give an O(h2) global contribution. Thus the spatial discretization is consistent with second-order global accuracy despite the lower local order at the two irregular points. The numerical results in Section 4 confirm this behavior. 
+
+3. IIM–Newton Formulation: A Stationary Model Problem 
+
+To make the nonlinear algebraic structure transparent, we first consider the stationary analogue of the parabolic interface problem. The same structure arises at each time level after an implicit discretization of the parabolic equation. The essential issue is that, unlike the prescribed-jump problem of Section 2, the solution jump now depends on the unknown interface traces. We show that this nonlinearity can be incorporated directly into the immersed interface correction terms, so that the nonlinear contribution remains confined to the irregular grid points. We consider the elliptic interface problem 
+
+−(βu ′)′ + qu = f, x ∈ Ω− ∪ Ω+,(21) 
+
+u(a) = ξ, u(b) = η, (22) [u]α = λu +u−,(23) [βu ′]α = v. (24) The nonlinear jump condition may be rewritten as (25) [u]α = w = λ(u−)2
+
+1 − λu − .
+
+Thus the nonlinear interface condition has the same algebraic form as a prescribed solution jump, except that the jump value is now an unknown function of the one-sided trace u−(α). This observation allows the linear immersed interface construction of Section 2 to be retained: 
+
+> 6
+
+the prescribed quantity w in the irregular-point correction terms is replaced by a nonlinear function of the discrete solution. Let 
+
+a = x0 < x 1 < · · · < x N < x N +1 = b
+
+be a uniform grid with mesh size h, and assume that 
+
+xI ≤ α < x I+1 .
+
+The grid points xI and xI+1 are the irregular points. For a linear interface problem with prescribed jumps, the immersed interface discretization has the form (26) AhU = Fh + Ch,
+
+where U = ( U1, . . . , U N )T , Ah contains the standard finite difference coefficients together with the modified irregular-point coefficients, and Ch contains the immersed interface correction terms. The vector Ch is zero except possibly in the two entries corresponding to the irregular grid points. For the nonlinear problem, the correction terms depend on the nonlinear jump w. Conse-quently, the discrete system becomes (27) AhU = Fh + Φ( U ),
+
+where Φ( U ) = 
+
+> 
+
+0...ΦI (U )ΦI+1 (U )...0
+
+> 
+
+.
+
+Thus the nonlinearity appears only in the correction terms at the irregular points. To express the nonlinear jump in terms of the discrete unknowns, an approximation of the one-sided trace u−(α) is required. In the computations below, we use the three neighboring grid values on the minus side and define the quadratic Lagrange extrapolation 
+
+> ˜
+
+U − = UI−2ℓI−2(α) + UI−1ℓI−1(α) + UI ℓI (α),
+
+where 
+
+ℓI−2(x) = (x − xI−1)( x − xI )(xI−2 − xI−1)( xI−2 − xI ),ℓI−1(x) = (x − xI−2)( x − xI )(xI−1 − xI−2)( xI−1 − xI ),
+
+and 
+
+ℓI (x) = (x − xI−2)( x − xI−1)(xI − xI−2)( xI − xI−1).
+
+For a smooth one-sided solution, this is the usual quadratic same-side extrapolation to the interface. Replacing u− in (25) by ˜U −, we define the discrete nonlinear jump (28) μ(U ) = λ( ˜U −)2
+
+1 − λ ˜U − .
+
+> 7
+
+The immersed interface correction terms are then obtained by replacing the prescribed jump w in the corresponding linear correction formulas by μ(U ). Thus ΦI (U ) = CI (μ(U )) , ΦI+1 (U ) = CI+1 (μ(U )) .
+
+This replacement is the essential step in the IIM–Newton formulation. The finite-difference operator Ah is unchanged from the corresponding linear immersed interface problem; all dependence on the nonlinear jump law is collected in the correction vector Φ( U ). Moreover, Φi(U ) = 0 , i / ∈ { I, I + 1 },
+
+so that the nonlinear correction has fixed local support, independent of the total number of grid points. For the stationary interface problem considered in this section, the correction terms depend linearly on the prescribed solution jump w when the remaining interface data are fixed. We may therefore write 
+
+CI (w) = κI w + rI , CI+1 (w) = κI+1 w + rI+1 ,
+
+where κI , κI+1 and the terms rI , r I+1 are determined by the corresponding linear immersed interface discretization. Replacing w by μ(U ) gives 
+
+CI (μ(U )) = κI μ(U ) + rI , CI+1 (μ(U )) = κI+1 μ(U ) + rI+1 .
+
+Thus the nonlinear dependence enters through the scalar quantity μ(U ). If the solution jump is prescribed independently of U , then μ(U ) is replaced by that prescribed value and Φ ′(U ) = 0; the formulation therefore reduces immediately to the linear immersed interface scheme of Section 2. Define the nonlinear residual (29) G(U ) = AhU − Fh − Φ( U ).
+
+The nonlinear algebraic problem (27) is therefore equivalent to 
+
+G(U ) = 0 .
+
+Newton’s method is given by the iteration (30) G′(U (k))δU (k) = −G(U (k)),
+
+followed by the update (31) U (k+1) = U (k) + δU (k).
+
+Since 
+
+G′(U ) = Ah − Φ′(U ),
+
+the Jacobian differs from the linear immersed interface matrix only through the localized derivative Φ ′(U ). Since ˜U − depends only on UI−2, UI−1, and UI , the Jacobian correction contains only a few nonzero entries. Thus the sparse bulk structure of the linear immersed interface discretization is preserved, while the nonlinear modification remains localized near the interface. The derivative of μ(U ) with respect to ˜U − is 
+
+dμ d ˜U − = 2λ ˜U − − λ2( ˜U −)2
+
+(1 − λ ˜U −)2 .
+
+> 8
+
+Consequently, 
+
+∂μ ∂U I−2
+
+= 2λ ˜U − − λ2( ˜U −)2
+
+(1 − λ ˜U −)2 ℓI−2(α),(32) 
+
+∂μ ∂U I−1
+
+= 2λ ˜U − − λ2( ˜U −)2
+
+(1 − λ ˜U −)2 ℓI−1(α),(33) 
+
+∂μ ∂U I
+
+= 2λ ˜U − − λ2( ˜U −)2
+
+(1 − λ ˜U −)2 ℓI (α).(34) 
+
+Remark 2. The quantity 
+
+1 − λ ˜U −
+
+must remain nonzero during the Newton iteration. If the denominator becomes too small, the Newton step should be damped or restarted from a different initial guess. This illustrates one practical difficulty of directly incorporating nonlinear jumps into an immersed interface Newton iteration. 
+
+The quadratic extrapolation above provides a simple way to close the IIM–Newton algebraic system using computed grid values and is the trace approximation used in the elliptic experiment of Section 4.1. More generally, one-sided interface traces may be recovered by higher-order same-side reconstruction or by an IIM-consistent reconstruction incorporating the jump relations. A systematic analysis of such trace-recovery procedures is beyond the scope of the present paper. In the manufactured-solution verification of the s-parameter method in Section 4.2, the required auxiliary interface traces are instead evaluated from the exact auxiliary solutions. This choice is made deliberately to isolate the accuracy of the immersed interface discretization and the nonlinear scalar reduction from additional trace-reconstruction errors. 4. Numerical Experiments 
+
+In this section, we present numerical experiments illustrating the behavior of the immersed interface methods discussed in the previous sections. The first example concerns a nonlinear elliptic interface problem and is used to illustrate the behavior of the IIM–Newton iteration for a problem possessing multiple solutions. In particular, we demonstrate the sensitivity of the iteration to the choice of the initial iterate. The second example concerns a nonlinear parabolic interface problem and illustrates the Crank–Nicolson immersed interface scheme combined with the s-parameter reduction. In this verification example, the one-sided interface traces entering the quadratic equation for the parameter s are evaluated from the exact auxiliary solutions. This allows us to isolate the immersed interface discretization and the scalar reduction from additional trace-reconstruction errors. Throughout the experiments, the error is measured in the discrete maximum norm 
+
+∥Eh∥∞ = max  
+
+> i
+
+|Ui − u(xi)|,
+
+where Ui denotes the numerical approximation and u(xi) denotes the exact solution at the grid point xi.
+
+> 9
+
+4.1. A nonlinear elliptic interface problem. We first consider the nonlinear elliptic interface problem on ( −1, 1) with interface point α = 0: 
+
+−(βu ′)′ = sin( πx ), −1 < x < 0 or 0 < x < 1,(35) [u] = λu +u−,(36) [βu ′] = 0 ,(37) 
+
+u(−1) = u(1) = 0 .(38) The parameters are 
+
+λ = 1 .5, β− = 2 , β+ = 1 .
+
+The exact solution has the form (39) u(x) = 
+
+> 
+
+1
+
+π2β− sin( πx ) + A(x + 1) , −1 ≤ x < 0,
+
+1
+
+π2β+ sin( πx ) + B(x − 1) , 0 < x ≤ 1.
+
+Let 
+
+r = β−
+
+β+ .
+
+The flux continuity condition gives B = rA , and substitution into the nonlinear jump condition yields 
+
+λrA 2 = ( r + 1) A. 
+
+Consequently, the problem possesses two exact solutions, 
+
+A = 0 , A = r + 1 
+
+λr .
+
+The first is a continuous solution, denoted by uc, while the second is a discontinuous solution, denoted by ud.Because the discrete nonlinear system also possesses multiple solutions, the convergence of Newton’s method depends on the initial iterate. In our computations, the basin of attraction of the continuous solution uc appears to be larger. For example, initial iterates of the form 
+
+t u d(xi), 0 ≤ t ≤ 0.67 ,
+
+converge to the continuous solution uc, while larger values of t may lead to convergence toward the discontinuous solution ud.Figures 1 and 2 show the two exact solutions together with their immersed interface approximations. 
+
+> 10
+
+Figure 1. Discontinuous solution ud and its immersed interface approximation. 
+
+Figure 2. Continuous solution uc and its immersed interface approximation. 
+
+Since the mesh size is halved successively, the observed order is computed by 
+
+ph = log( Eh/E h/ 2)log 2 .
+
+Table 1 reports the L∞-errors for the discontinuous solution. The results show second-order convergence. 
+
+Table 1. L∞-errors and observed orders for the nonlinear elliptic example. 
+
+h L∞-error Observed order 0.05 2.0859 × 10 −4 –0.025 5.2099 × 10 −5 2.001 0.0125 1.3022 × 10 −5 2.001 0.00625 3.2553 × 10 −6 2.000 0.003125 8.1381 × 10 −7 2.000 To examine the behavior for a substantially larger diffusion contrast, we repeated the computation, keeping λ = 1 .5, with 
+
+β− = 1 , β+ = 250 ,
+
+> 11
+
+so that β+/β − = 250. The errors and observed orders are reported in Table 2. The method again exhibits second-order convergence in the maximum norm.   
+
+> Table 2. L∞-errors and observed orders for the nonlinear elliptic problem with
+> β+/β −= 250.
+
+h L∞-error Observed order 0.05 2.0859 × 10 −4 –0.025 5.2099 × 10 −5 2.001 0.0125 1.3022 × 10 −5 2.000 0.00625 3.2556 × 10 −6 2.000 4.2. A nonlinear parabolic interface problem. We next consider the nonlinear parabolic interface problem 
+
+ut − (βu x)x = f (x, t ), −1 < x < 0 or 0 < x < 1, t ∈ (0 , T ],(40) 
+
+u(−1, t ) = 0 , u(1 , t ) = 11 − λ,(41) [u] = λu +u−,(42) [βu x] = 0 .(43) The parameters in the first set of computations are 
+
+λ = −2.5, β− = 1 , β+ = 0 .1.
+
+The source term is chosen so that the exact solution is (44) u(x, t ) = 
+
+> 
+
+e−t sin( πx ) + x + 1 , −1 ≤ x < 0,
+
+11 − λ + β−
+
+β+ (πe −t + 1)( x − x2), 0 < x ≤ 1.
+
+The solution is represented by the s-parameter decomposition 
+
+u(x, t ) = u0(x, t ) + s(t)u1(x, t ),
+
+where u0 satisfies the linear auxiliary problem with zero solution jump, while u1 satisfies the corresponding homogeneous problem with unit solution jump and zero flux jump. The scalar parameter s(t) is determined from the nonlinear jump condition. At each time level, s(t) satisfies 
+
+s(t) = λ(
+
+u+0 (t) + s(t)u+1 (t))( 
+
+u− 
+
+> 0
+
+(t) + s(t)u− 
+
+> 1
+
+(t))
+
+.
+
+Equivalently, 
+
+a2s2 + a1s + a0 = 0 ,
+
+where 
+
+a2 = λu +1 u− 
+
+> 1
+
+, a1 = λ(u− 
+
+> 0
+
+u+1 + u+0 u− 
+
+> 1
+
+) − 1, a0 = λu +0 u− 
+
+> 0
+
+.
+
+The scalar quadratic equation may admit two distinct real roots, a repeated root, or no real root. As discussed in our earlier work [2], the nonlinear interface condition can therefore give rise to multiple solution branches. In a time-dependent computation, a natural way to follow a prescribed branch is by continuation. The initial root is selected consistently with the initial data, and at each subsequent time level the admissible real root closest to the 
+
+> 12
+
+value of s at the preceding time level is selected. This criterion avoids unintended switching between solution branches. In the manufactured-solution experiment reported here, the desired solution branch is known explicitly, and the root corresponding to that branch is selected. If the discriminant vanishes, the two roots coincide. If the discriminant becomes negative beyond roundoff tolerance, the discrete scalar equation has no real root and the continuation procedure must be reconsidered. In the present manufactured-solution experiment, the one-sided auxiliary traces entering the scalar equation for s are evaluated from the exact auxiliary solutions. This choice is deliberate: it allows us to isolate the accuracy of the immersed interface discretization and the nonlinear scalar reduction from additional trace-reconstruction errors. In a general computation, the required one-sided traces can instead be recovered from nearby numerical values, for example by one-sided extrapolation or by an IIM-consistent reconstruction incorporating the interface jump relations. A detailed study of numerical trace recovery is beyond the scope of the present paper. For the computations reported below, the Crank–Nicolson method ( θ = 1 /2) is used. For each spatial mesh, the number of time steps is chosen as 
+
+M = round( T /h ), ∆t = TM .
+
+Thus ∆ t is comparable to h, while the final time is reached exactly, tM = T . The reported error is the discrete maximum-norm error at t = T . For two successive meshes with sizes h1
+
+and h2, the observed order is computed by 
+
+p = log( Eh1 /E h2 )log( h1/h 2) .
+
+For T = 7, Figures 3 and 4 compare the numerical approximations of u0 and u1 with their exact solutions.           
+
+> Figure 3. Comparison between the numerical and exact solutions for u0at T= 7.
+> 13 Figure 4. Comparison between the numerical and exact solutions for u1at T= 7.
+
+After computing u0, u1, and s(t), the nonlinear solution is reconstructed as 
+
+u(x, t ) = u0(x, t ) + s(t)u1(x, t ).
+
+Figure 5 compares the reconstructed solution with the exact nonlinear solution.    
+
+> Figure 5. Comparison between the reconstructed numerical solution and the exact nonlinear solution at T= 7.
+
+Table 3 reports the errors at T = 7. The observed orders approach two very closely. In this manufactured experiment, the scalar parameter s is recovered to essentially machine precision from the exact auxiliary traces. Thus the reported error primarily reflects the Crank–Nicolson immersed interface discretization of the auxiliary problems. 
+
+> 14
+
+Table 3. L∞-errors and observed orders for the nonlinear parabolic problem at 
+
+T = 7, with β− = 1 and β+ = 0 .1. 
+
+Mesh size h L∞-error Observed order 0.048780 1.1890 × 10 −4 –0.024691 3.0603 × 10 −5 1.993 0.012422 7.7658 × 10 −6 1.996 0.0062305 1.9564 × 10 −6 1.998 Since the transient component of the solution has largely decayed by T = 7, we also repeated the computation at the shorter final time T = 0 .1. In addition, to examine the effect of a large diffusion contrast, we considered 
+
+β− = 1 , β+ = 250 ,
+
+for which β+/β − = 250. Table 4 reports the results at T = 0 .1 for both coefficient choices. In each case the observed convergence rate approaches two. 
+
+Table 4. L∞-errors and observed orders at T = 0 .1 for two diffusion contrasts. 
+
+β− = 1 , β + = 0 .1 β− = 1 , β + = 250 
+
+h Error Order Error Order 0.048780 1.7583 × 10 −3 – 1.0991 × 10 −3 –0.024691 4.6349 × 10 −4 1.958 2.8515 × 10 −4 1.982 0.012422 1.1919 × 10 −4 1.977 7.2885 × 10 −5 1.986 0.0062305 3.0220 × 10 −5 1.989 1.8437 × 10 −5 1.992 Figure 6 compares the reconstructed numerical solution with the exact solution at the shorter final time T = 0 .1. At this time the transient component remains significant, and close agreement is observed on both sides of the interface. 
+
+Figure 6. Comparison between the reconstructed numerical solution and the exact nonlinear solution at T = 0 .1, with β− = 1 and β+ = 0 .1. 
+
+> 15
+
+The numerical experiments illustrate two distinct features of the proposed formulations. The elliptic example demonstrates the behavior of the IIM–Newton method in the presence of multiple solutions, while the parabolic example verifies the second-order behavior of the Crank–Nicolson IIM combined with the s-parameter reduction. The additional computations show that the observed second-order convergence persists at short times and for diffusion contrasts as large as β+/β − = 250. 5. Remarks on the Newton–IIM Formulation 
+
+The nonlinear difficulty in NPIP is localized at the interface condition [u]α = λu +u−.
+
+Since the differential equation is linear away from the interface, it is natural to ask whether one may first linearize the nonlinear interface problem by Newton’s method at the continuous level and then discretize the resulting correction equation by the immersed interface method. We refer to this viewpoint as the Newton–IIM approach. Let 
+
+Pu := ut − (βu x)x + qu. 
+
+Formally, Newton’s method seeks a correction v satisfying 
+
+F ′(u)v = −F (u),
+
+where the nonlinear operator F (u) contains both the differential equation and the nonlinear interface condition. The corresponding linearized interface condition takes the form [v]α − λ(u+v− + u−v+) = −[u]α + λu +u−.
+
+Thus the Newton correction problem becomes a linear parabolic interface problem whose coefficients and interface data depend on the current iterate u.At first sight, this appears compatible with the immersed interface framework. However, the right-hand side of the correction equation contains the residual 
+
+−(Pu − f ),
+
+which involves derivatives of the current iterate u. In practice, the iterate is available only through discrete grid values, and near the interface these derivatives are influenced by the jump conditions. Consequently, evaluating the residual consistently would require additional differentiation or extrapolation of the numerical iterate near the interface. For this reason, the continuous Newton–IIM formulation is less natural within the standard immersed interface framework than the IIM–Newton approach considered in the previous section, where the immersed interface discretization is constructed first and Newton’s method is applied directly to the resulting nonlinear algebraic system. 
+
+References         
+
+> [1] L. Adams and Z. Li ,The immersed interface/multigrid methods for interface problems , SIAM Journal on Scientific Computing, 24 (2002), pp. 463–479. [2] S.-H. Chou, C. Khaemba, and A. Wachira ,A finite difference method for an interface problem with a nonlinear jump condition , Int. J. Numer. Anal. Model., 22 (2025), pp. 801–823. [3] G. Hetzer and A. Meir ,On an interface problem with a nonlinear jump condition, numerical approximation of solutions , Int. J. Numer. Anal. Model, 4 (2007), pp. 519–530. [4] R. J. LeVeque and Z. Li ,The immersed interface method for elliptic equations with discontinuous coefficients and singular sources , SIAM Journal on Numerical Analysis, 31 (1994), pp. 1019–1044.
+> 16
+
+[5] Z. Li , The immersed interface method using a finite element formulation , Applied Numerical Mathematics, 27 (1998), pp. 253–267. [6] Z. Li and K. Ito , The Immersed Interface Method: Numerical Solutions of PDEs Involving Interfaces and Irregular Domains , SIAM, 2006. [7] T. Lin, Y. Lin, and X. Zhang , Immersed finite element method of lines for moving interface prob-lems with nonhomogeneous flux jump , in Recent Progress on Immersed Boundary Methods and Their Applications, vol. 586 of Contemporary Mathematics, American Mathematical Society, 2013, pp. 257–265. 
+
+Department of Mathematics and Statistics, Bowling Green State University, Bowling Green, OH 43403, USA 
+
+Email address : chou@bgsu.edu 
+
+Department of Mathematics and Statistics, Bowling Green State University, Bowling Green, OH 43403, USA 
+
+Email address : nyadjop@bgsu.edu
