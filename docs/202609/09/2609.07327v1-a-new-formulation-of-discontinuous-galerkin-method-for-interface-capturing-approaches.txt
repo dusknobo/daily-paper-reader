@@ -1,0 +1,709 @@
+Title: A new formulation of Discontinuous Galerkin method for interface capturing approaches
+
+URL Source: https://arxiv.org/pdf/2609.07327v1
+
+Published Time: Wed, 09 Sep 2026 02:47:55 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# A new formulation of Discontinuous Galerkin method for interface capturing approaches 
+
+W. Herri a, K. Benmoussa a, R. Bouydou a, D. Yakoubi b, ∗
+
+> aDepartment of Mathematics, Faculty of Sciences, Ibn Zohr University, Agadir, Morocco
+> bLéonard de Vinci Pôle Universitaire, Research Center, 92916 Paris La Défense, France
+
+Abstract 
+
+In computational fluid dynamics, the numerical simulation of free-surface flows using interface capturing approaches (level set, pseudo-concentration) requires accurate resolution of a transport equation. In the present work, this equation is solved using a new formulation of the Lesaint–Raviart discontinuous Galerkin method, which is particularly suitable for problems without inflow boundaries. The motion is described by the incompressible Navier–Stokes equations with surface tension, discretized using the standard P 2 − P 1
+
+Taylor–Hood finite element method in space. Surface tension effects are represented using the so-called Continuum Surface Force model. Finally, the proposed approach is implemented and tested on several benchmarks, including the single rising bubble and the Rayleigh–Taylor instability. 
+
+Keywords: Free-surface flows, interface capturing methods, Pseudo-concentration, Level set, Discontinuous Galerkin, Navier–Stokes equations, Surface tension. 
+
+2000 MSC: 35G35, 65M60, 76D05, 76T99 
+
+1. Introduction 
+
+The study of two-fluid flows, where two immiscible fluids are separated by a moving and deforming inter-face, is a challenging and active area of research in computational fluid mechanics, with applications ranging from geophysical flows and biomedical engineering to industrial processes [1, 2, 3]. The main difficulty lies in accurately tracking the interface while preserving the sharp transitions in fluid properties such as density and viscosity across it. The numerical treatment of the interface between two immiscible fluids varies significantly depending on the nature of the problem. These methods are generally classified into two major categories: interface tracking and interface capturing methods. In interface tracking techniques, the interface is explicitly described in a Lagrangian manner, where marker particles track the interface, which is transported by the flow field. The main advantage of this approach is that it tracks and determines the evolving interface with high precision. However, it becomes less effective when the domain undergoes complex topological changes such as merging or breakup. The Marker-and-Cell (MAC) method of Harlow and Welch [4] and the Front-Tracking method of Unverdi and Tryggvason [5] are among the most prominent techniques in this category. In contrast to interface tracking techniques, interface capturing approaches are based on the implicit repre-sentation of the interface. Both fluids and the interface are represented on a fixed spatial domain using a scalar field. The commonly used interface capturing techniques are: Volume-of-fluid (VOF) [6], phase-field [7], pseudo-concentration [8], and level set [9] methods. Here, we focus our numerical study on the last two methods.        
+
+> ∗Corresponding author
+> Email addresses: w.herri95@gmail.com (W. Herri), k.benmoussa@uiz.ac.ma (K. Benmoussa),
+> rachidbiddou1994@gmail.com (R. Bouydou), driss.yakoubi@devinci.fr (D. Yakoubi) arXiv:2609.07327v1 [math.NA] 7 Sep 2026
+
+The pseudo-concentration approach can be seen as an extension of the VOF method to finite element ap-proximation, with multiple applications in the context of mold filling problems (see, e.g., [3, 10, 11]). To indicate the phases and the interface, this approach uses a continuous pseudo-concentration function that reduces the numerical diffusion caused by the advection of the discontinuous volume fraction of the VOF method. The level-set method, owing to its capacity to naturally handle complex topological changes, cov-ers various domains, including, though not exclusively, multiphase compressible/incompressible flows, image processing, and computer vision; see for instance [12, 13] and references therein. The scalar field used by this technique is the so-called level set function, which is generally taken as a signed distance function. The interface is represented by the zero level set of this function and is transported by the flow velocity field. The main advantage of this technique is the direct access to geometric properties, such as interface normals and curvature, which allows a precise calculation of surface tension forces. After several time steps, the level set function may lose its signed distance property. This is mainly due to the numerical resolution of the transport equation. To circumvent this issue and ensure stability, a reinitialization step must be integrated. The numerical solution of the transport equation generated by interface capturing techniques is crucial for accurately capturing the interface. This was initially achieved using the ENO and WENO methods, which belong to the finite difference framework. Although these methods perform well on regular Cartesian meshes, they are difficult to generalize to complex geometries and suffer from mass loss over time due to numerical dissipation. To overcome these limitations, finite element methods have been widely adopted, as they naturally handle complex geometries and irregular computational domains. The standard Galerkin method often provides a centered approximation for derivative calculations, which could result in spurious oscillations and numerical instabilities. To address this issue, Brooks and Hughes [14] proposed the Stream-line Upwind Petrov-Galerkin (SUPG) scheme, by adding an artificial diffusion term to control the variations of the derivatives in the direction of the solution gradients, though this stabilization term may over-diffuse the solution near the interface, leading to a loss of accuracy and mass conservation issues over time. The discontinuous Galerkin (DG) method, proposed by Reed and Hill [15] and Lesaint and Raviart [16], was initially applied to the neutron transport equation, based on a discontinuous piecewise polynomial approx-imation for spatial discretization. This method overcomes these limitations and offers several advantages, including low memory consumption due to its element-by-element resolution, high accuracy, and the ability to handle irregular computational domains. This explains why it has attracted considerable attention for the numerical solution of both level set [17, 18, 19] and pseudo-concentration [20, 21] equations. Despite these advantages, the method also faces several challenges. The element-by-element resolution requires a specific ordering of the elements in the flow direction and the existence of an inflow boundary from which the computation can be initiated. Consequently, the method may become ill-defined in the absence of an inflow boundary condition, such as in closed domain geometries. When the flow velocity field is time-dependent or involves recirculating regions, a consistent element ordering cannot be established, or must be recomputed at each time step, increasing the computational cost. In the present work, we discretize the hyperbolic transport equation of the interface in space, using a re-formulation of the Lesaint–Raviart discontinuous Galerkin (RDG) method of Fortin et al. [22], applied by the authors to an industrial problem in nonlinear solid mechanics. This reformulation allows standard finite element assembly by avoiding the super-element procedure used in the original formulation, and can be di-rectly implemented in existing finite element codes. This RDG method also eliminates the need for explicit upwind element ordering and inflow boundary identification, making it well-suited for complex, unsteady, and recirculating flows. The fluid motion is modeled using the incompressible Navier–Stokes equations, where the surface tension is added as a body force following the Continuum Surface Force (CSF) model of Brackbill et al. [23]. These equations are discretized using a semi-implicit scheme for the convection term, combined with a standard Taylor–Hood finite element method for the remaining terms. For the level set reinitialization equation, a linearized semi-Lagrangian method of characteristics is employed in pseudo-time. The subsequent sections are structured as follows. Section 2 presents the mathematical model, including the level set and pseudo-concentration methods for interface representation, the incompressible Navier–Stokes equations for two immiscible Newtonian fluids, along with the corresponding initial and boundary condi-tions. Section 3 is divided into three subsections. The first provides the variational formulation for both the interface transport equation and the governing flow equations. The second details the spatial and temporal 2discretization of the Navier-Stokes equations, while the third, which constitutes the core of this article, in-troduces the discretization of the transport equation using the reformulated discontinuous Galerkin (RDG) method. Section 4 presents two benchmark problems, namely the rising bubble and the Rayleigh–Taylor instability, to verify and validate the proposed approach. The paper closes with concluding remarks. 
+
+2. Modeling of the problem 
+
+Before presenting the corresponding mathematical model, we first introduce the study field, which de-scribes the flow of two incompressible and immiscible fluids separated by a smooth interface, see Figure 1. For any fixed positive real T > 0, we introduce the time interval [0 , T ] and an arbitrary time t ∈ [0 , T ]. We denote the whole bounded domain by Ω = Rd (d = 2 or 3) , which is a partition of sub-domains Ω1 and Ω2
+
+occupied by Fluid-1 with its corresponding density ρ1 and viscosity μ1, and by Fluid-2 with its respective density ρ2 and viscosity μ2, respectively. The interface separating the two fluids is denoted by Γ( t), such that: 
+
+Ω = Ω 1 ∪ Ω2 and Γ( t) = ∂Ω1 ∩ ∂Ω2
+
+where ∂Ωi is the boundary of Ωi , i=1,2. 
+
+> Figure 1: Example of a computational domain consisting of two different fluids, 1 and 2.
+
+2.1. Approximation of the interface 2.1.1. Level set method and its reinitialization equation 
+
+The main idea of the level set method was introduced by Osher and Sethian [9]. The basic concept of this method is to localize the interface by using a signed distance function φ defined as follows: 
+
+φ(x)
+
+
+
+< 0 if x ∈ Fluid-1 ,
+
+= 0 if x ∈ Γ( t),> 0 if x ∈ Fluid-2 .
+
+(2.1) The values of the distance function are always advected by a transport equation, given by: 
+
+∂φ ∂t + u.∇φ = 0 , (2.2) where u denotes the velocity field. Then, the current position of the interface is represented by the solution of equation 2.2 as: 
+
+Γ( t) = {x ∈ Ω, φ(x, t ) = 0 }.
+
+3Additionally, the strength of the level set technique is the direct access to the interface’s local geometrical characteristics, specifically the normal n and curvature κ, expressed as: 
+
+n = ∇φ
+
+|∇ φ| and κ = ∇.
+
+ ∇φ
+
+|∇ φ|
+
+
+
+= ∇.n. (2.3) Over time, the level set function φ progressively loses its signed-distance behavior (i.e, |∇ φ|̸ = 1 ), due to the expansion or contraction of the level set contours. The method then becomes too inaccurate to be applied in this way. To rectify the situation, a process of reinitialization must be applied. The justification for this technique lies in demonstrating that the interface does not depend on the specific choice of initial data, as long as they share the same zero level set; see, for instance, [24]. Sussman et al. [25] introduced an effective algorithm that does not require interface localization, unlike the direct approach described in [26]. The algorithm hinges on the resolution of a Hamilton–Jacobi type equation at every time step until it achieves the steady state. The system to be solved in pseudo time τ is given by: 
+
+( ∂ ˜φ∂τ + sign (φ)( |∇ ˜φ| − 1) = 0 ,
+
+˜φ(x, 0) = ˜ φ0(x) = φ(x, t ), (2.4) here, ˜φ is the new level set function, which is initialized with the same zero contour as φ. The sign 
+
+function is approximated and smoothed, as pointed out in [27] by: 
+
+sign (φ) = φ
+
+pφ2 + ϵ2 , (2.5) with ϵ = |∇ φ|2∇x2, ∇x is the grid spacing. Equation (2.4) can be rewritten as a transport equation with velocity v = sign (φ)n:
+
+∂ ˜φ∂τ + v · ∇ ˜φ = sign (φ). (2.6) This formulation shows that ˜φ propagates in the normal direction at unit speed, and at steady state recovers the eikonal condition |∇ ˜φ| = 1 . Among the various methods proposed in the literature, the present work adopts a semi-Lagrangian characteristics method to advance the reinitialization equation in pseudo-time. More precisely, the advective part is treated using the characteristic operator, while the source term is evaluated explicitly. 
+
+2.1.2. Pseudo-concentration method 
+
+The pseudo-concentration method is also included in the class of Eulerian methods. It was introduced by Eric Thompson in 1986 for industrial and geological applications [8]. The idea is to introduce a material marker C, which represents pseudo-concentration. It is a continuous function between 0 and 1 around the interface. C is used to distinguish the two fluids; it is given the values C = 0 for Fluid-1, C = 1 for Fluid-2, and the isoline for C = 0 .5 defines the interface Γ( t). This variable is transported by the velocity field, which requires solving the following transport equation: 
+
+∂C ∂t + u.∇C = 0 . (2.7) From this point onward, the term F will be used to refer to the scalar field, which could be the level set function φ or the pseudo-concentration C. Then the interface problem reads: 
+
+
+
+∂F ∂t + u.∇F = 0 in Ω×(0 , T),F (x, 0) = F 0(x) in Ω.
+
+(2.8) 4Since the nature of the first equation is hyperbolic, a Dirichlet condition must be imposed only on the portion of the boundary where the flow enters the domain: 
+
+F = FD on ∂Ω−,
+
+where 
+
+∂Ω− = {x ∈ ∂Ω | u.n(x) < 0}, (2.9) 
+
+n is the exterior unit normal vector to the boundary. 
+
+2.2. Equations of motion 
+
+Here, the two fluids are considered Newtonian, homogeneous, isothermal, incompressible, and immiscible. Hence, the fluid motion is given by the incompressible Navier–Stokes equations with surface tension: 
+
+
+
+ρ
+
+ ∂u
+
+∂t + u.∇u
+
+
+
+= −∇ p + ∇.(2 μ ˙γ(u)) + ρg + fst ,
+
+∇.u = 0 ,
+
+(2.10) where ˙γ(u) = 12 (∇u + ( ∇u)T ) is the strain-rate tensor, and g is the gravitational force. ρ is the density and μ is the viscosity are piecewise constant functions in each fluid domain, with discontinuities across the moving interface Γ( t). The velocity field u and the pressure p are the unknowns of the system. The surface tension force fst is incorporated as a volumetric force in the momentum equation according to the Continuum Surface Force (CSF) model introduced by Brackbill et al.[23]. This model approximates the singular interfacial force by a smooth volumetric force, which is particularly suitable when the interface is implicitly captured by the interface function F . Following the extension proposed by Lafaurie et al.[28], the interfacial force is reformulated as the divergence of the capillary pressure tensor T, defined by: 
+
+T = σδ Γ( t)(I − n ⊗ n), (2.11) so that 
+
+fst = σnκδ Γ( t) = −∇ .T,
+
+where n = ∇F  
+
+> |∇ F|
+
+is the unit normal vector to the interface, κ = ∇.n is the mean curvature, σ > 0 is the constant surface tension coefficient, and δΓ( t) is the Dirac delta function concentrated on the interface Γ( t).The expression of δΓ( t) depends on the method used to capture the interface. In the pseudo-concentration method, it is naturally approximated by δΓ( t) ≈ |∇ C|, whereas in the level set framework, it is approximated by δΓ( t) ≈ ∂H ε(φ) 
+
+> ∂φ
+
+, where Hε, defined in Eq.(2.13), is the regularized Heaviside function providing a smooth transition of width 2ε across the interface Γ( t). Then, the surface tension force fst could be written in the following tensorial form: 
+
+fst = −∇ .
+
+
+
+σ δ Γ( t)
+
+
+
+I − ∇F ⊗ ∇ F
+
+|∇ F |2
+
+ 
+
+. (2.12) This tensorial formulation avoids the direct computation of the curvature and provides a unified treatment of capillary effects for both interface representations. 
+
+Hε(φ) = 
+
+
+
+0 if φ < −ε,  
+
+> 12
+
+[1 + φε + 1 
+
+> π
+
+sin( πφ ε )] if |φ| ⩽ ε, 
+
+1 if φ > ε. 
+
+(2.13) Besides, in order to model the transition of the material properties across the interface, different definitions are adopted depending on the interface representation. In the pseudo-concentration method, the density and viscosity are directly interpolated using the concentration function, whereas in the level set framework a regularization through the Heaviside function Hε is introduced. For the level set formulation, the density and viscosity are defined by: ( ρφ = ρ1 + ( ρ2 − ρ1)Hε(φ),μφ = μ1 + ( μ2 − μ1)Hε(φ). (2.14) 5For the pseudo-concentration formulation, they are given by: 
+
+ ρC = ρ1 + ( ρ2 − ρ1)C, μC = μ1 + ( μ2 − μ1)C. (2.15) For the sake of simplicity, these quantities will be generically denoted by ρF and μF throughout the remainder of this work. Combining the above, the full coupled problem reads: find (u, p, F ) such that 
+
+
+
+ρF
+
+∂u
+
+∂t + u.∇u
+
+
+
+= −∇ p+ ∇.(2 μF ˙γ(u)) + ρF g + fst in Ω×(0 , T )
+
+∇.u = 0 in Ω×(0 , T )
+
+∂F ∂t + u.∇F = 0 in Ω×(0 , T )
+
+u(x, 0) = u0, F (x, 0) = F 0(x) for a.e. x ∈ Ω
+
+u = 0 on ∂Ω×(0 , T )
+
+(2.16) (2.17) (2.18) (2.19) (2.20) where ρF , μF , and fst denote, respectively, the density, viscosity, and surface tension associated with the considered interface function, as defined above. In order to ensure the well-posedness of the problem, the initial and boundary conditions must satisfy the following compatibility conditions: 
+
+∇.u0 = 0 in Ω, and u0.n = 0 on ∂Ω.
+
+Since u = 0 on ∂Ω, we have ∂Ω−(t) = ∅, therefore, no boundary condition on F is required. 
+
+3. Numerical method 
+
+Before presenting the numerical method used to solve the system (2.16)-(2.20), we first introduce the functional spaces that are used in this section. We begin by recalling the Hilbert space 
+
+L2(Ω) = 
+
+
+
+u : Ω → R :
+
+Z
+
+> Ω
+
+|u|2 dx < ∞
+
+
+
+,
+
+equipped with the inner product (u, v ) = R 
+
+> Ω
+
+u v dx , and the associated norm ∥u∥L2(Ω) =  R  
+
+> Ω
+
+|u|2 dx 1/2. We then consider the Sobolev space W m,q (Ω) , defined by W m,q (Ω) = {u ∈ Lq (Ω) : ∂αu ∈ Lq (Ω) , ∀| α| ≤ m}.When q = 2 , this space coincides with the Hilbert space Hm(Ω) . In particular, H1(Ω) contains functions with square-integrable first-order derivatives, while its subspace H10 (Ω) consists of functions vanishing on the boundary. For simplicity, we set: 
+
+V = H10 (Ω) d, Q = L20(Ω) = 
+
+
+
+q ∈ L2(Ω) : 
+
+Z
+
+> Ω
+
+q dx = 0 
+
+
+
+,
+
+and 
+
+H = u ∈ L2(Ω) d : ∇ · u = 0 , u · n|∂Ω = 0 .
+
+The space V is endowed with the norm ∥v∥V = ∥∇ v∥L2(Ω) d×d . To account for time dependence, we consider the Bochner spaces: 
+
+V = L2(0 , T ; V ) ∩ C0(0 , T ; L2(Ω) d), Q = L2(0 , T ; Q).
+
+These spaces provide the functional framework for the variational formulation. For further details on these spaces and their properties, we refer to [29]. 63.1. Well-posedness of the coupled variational problem 
+
+To establish the well-posedness of the coupled problem (2.16)-(2.20), we first recall some existence and regularity results related to the transport problem (2.8). According to Proposition 3.1 in [30], assuming that the velocity field u belongs to C0(0 , T ; V )∩C0(0 , T ; W 1,∞(Ω) d) with ∇.u = 0 , then for any initial datum F 0
+
+in L2(Ω) , the transport problem admits a unique solution F ∈ C0(0 , T ; L2(Ω)) , which satisfies an L2-stability estimate. Furthermore, Corollary 3.2 in [30] states that if the initial datum satisfies F 0 ∈ H1(Ω) , then the corresponding solution verifies F ∈ C0(0 , T ; H1(Ω)) . Under this regularity, the variational formulation of problem (2.8) is as follows: find F ∈ C0(0 , T ; H1(Ω)) satisfying F (., 0) = F 0 such that, for all t ∈ (0 , T )
+
+Z
+
+> Ω
+
+∂tF ψ dx −
+
+Z
+
+> Ω
+
+F u · ∇ ψ dx = 0 , ∀ψ ∈ H1(Ω) .
+
+Under the previous assumptions, the transport problem is well posed. Regarding the Navier–Stokes equations, we initially introduce the following forms: 
+
+mρF (u, v) = 
+
+Z
+
+> Ω
+
+ρF u · v dx, bρF (w, u, v) = 
+
+Z
+
+> Ω
+
+ρF (w · ∇ u) · v dx, c(v, q ) = 
+
+Z
+
+> Ω
+
+q ∇ · v dx, aμF (u, v) = 2 
+
+Z
+
+> Ω
+
+μF ˙γ(u) : ˙ γ(v) dx, 
+
+and 
+
+s(F, v) = 
+
+Z
+
+> Ω
+
+T : ∇v dx, 
+
+where T denotes the surface tension tensor defined in Eq. (2.11). The variational formulation reads as follows: find (u, p ) ∈ V × Q with u(·, 0) = u0 ∈ H, such that for all 
+
+(v, q ) ∈ V × Q and for a.e. t ∈ (0 , T ),
+
+(mρF (∂tu, v) + bρF (u, u, v) + aμF (u, v) − c(v, p ) − s(F, v) = ⟨f , v⟩,c(u, q ) = 0, (3.1) where ⟨· , ·⟩ denotes the duality pairing between V and its dual V ′, and f is the external force corresponding to the gravitational force. 
+
+Remark 3.1. Under the above assumptions, problem (3.1) admits at least one solution (u, p ), which is unique in two space dimensions. This result follows from arguments similar to those in [30, Proposition 3.3], since F ∈ L4(0 , T ; W 1,4(Ω)) and f ∈ L2(0 , T ; H−1(Ω) d).
+
+Finally, concerning the well-posedness of the full coupled problem, we refer to Proposition 3.4 of Maarouf et al. [30], based on the work of Milcent [31], which provides the existence of a local strong solution on 
+
+Ω×[0 , T ∗], for some T ∗ > 0, under sufficiently regular assumptions on the initial data. More precisely, the result is obtained for F 0 ∈ W 2,q (Ω) , q > 3 with |∇ F 0| > 0 in a neighborhood of the initial interface Γ(0) ,and for u0 ∈ W 2,q (Ω) d ∩ W 1,q  
+
+> 0
+
+(Ω) d with ∇.u0 = 0 . Under these conditions, the corresponding solution satisfies: 
+
+u ∈ L∞(0 , T ∗; W 1,q  
+
+> 0
+
+(Ω) d) ∩ Lq (0 , T ∗; W 2,q (Ω) d),
+
+∇p ∈ Lq (0 , T ∗; Lq (Ω) d),F ∈ L∞(0 , T ∗; W 2,q (Ω)) .
+
+As pointed out in [30], these assumptions remain rather restrictive from a practical point of view. However, this result supports the mathematical consistency of the coupled model considered in the present work. 73.2. Discretization of the Navier–Stokes equations 
+
+The variational formulation (3.1) is discretized in space using the standard Galerkin finite element method with the Taylor–Hood P2 − P1 mixed finite element pair. Let Th be a regular family of triangulations of the domain Ω into simplices K (triangles if d=2, tetrahedra if d=3). We denote by hK the diameter of element 
+
+K and set h = max K∈T h hK , and the space Pk(K) designates the set of all polynomials of total degree at most k on an element K. The approximation spaces are constructed as follows: 
+
+Vh = {vh ∈ V | vh|K ∈ P2(K) , ∀K ∈ T h},
+
+and 
+
+Qh = {qh ∈ Q | qh|K ∈ P1(K) , ∀K ∈ T h}.
+
+Finally, we denote by Ih the Lagrange interpolation operator onto Qh.The compatibility between the velocity and pressure approximation spaces relies on satisfying the discrete inf-sup condition. Several finite element pairs satisfy this condition, including the Taylor–Hood elements, based on velocity approximation spaces ( P2) of higher polynomial degree than those of pressure ( P1). There exists β > 0, independent of h, such that 
+
+sup 
+
+> vh∈Vh
+
+R
+
+> Ω
+
+(∇ · vh) qh dx 
+
+∥vh∥V
+
+≥ β∥qh∥Q, ∀ qh ∈ Qh.
+
+This condition, as used in Maarouf et al. [30] (Eq. 4.12) for the same finite element pair, ensures the well-posedness of the discrete pressure. In contrast, equal-order P1 − P1 elements do not satisfy this condition, requiring an additional stabilization technique [32]. The P2 − P1 pair proves particularly advantageous for free-surface flow problems, as pressure boundary conditions can be specified directly and stress components are naturally incorporated into the formulation [33]. For the temporal discretization, a first-order implicit Euler scheme is applied. Explicit schemes are constrained by a CFL stability condition, which requires extremely small time steps when fine meshes are used to resolve the fluid interface. Conversely, the implicit Euler scheme is unconditionally stable, allowing the use of larger time steps without loss of stability. A semi-implicit treatment of the convective term is adopted in order to avoid solving a nonlinear problem at each time step. We choose a time step ∆t > 0 and define tn = n∆t for any 1 ⩽ n ⩽ T 
+
+> ∆t
+
+= N . The fully discrete variational problem reads: Find un+1  
+
+> h
+
+∈ Vh with u0 
+
+> h
+
+= Ihu0, and pn+1  
+
+> h
+
+∈ Qh such that 
+
+Z
+
+> Ω
+
+ρnF
+
+ un+1  
+
+> h
+
+− unh
+
+∆t
+
+
+
+·vh dx+
+
+Z
+
+> Ω
+
+ρnF (unh ·∇ )un+1  
+
+> h
+
+·vh dx =
+
+Z
+
+> Ω
+
+pn+1  
+
+> h
+
+∇· vh dx
+
+−2
+
+Z
+
+> Ω
+
+μnF ˙γ(un+1  
+
+> h
+
+) : ˙ γ(vh) d x +
+
+Z
+
+> Ω
+
+T(F n) : ∇vh dx
+
++
+
+Z
+
+> Ω
+
+ρnF g · vh dx, ∀ vh ∈ Vh,
+
+Z
+
+> Ω
+
+∇.un+1  
+
+> h
+
+qh dx = 0 , ∀ qh ∈ Qh,
+
+(3.2) where F n denotes the interface function at time tn, g refers to the gravitational acceleration, so that the body force reads ρnF g.
+
+3.3. Discretization of the interface equation 
+
+The discontinuous Galerkin method was introduced by Lesaint and Raviart [16] for the numerical solution of first-order hyperbolic transport equations. The method is based on a discontinuous piecewise polynomial approximation of the unknown F , defined on the discrete space: 
+
+Mh = {v | v ∈ L2(Ω) , v|K ∈ Pk(K), ∀K ∈ T h},
+
+8where Pk(K) denotes the space of polynomials of degree at most k defined on the element K of the mesh 
+
+Th. The discretization of equation (2.8) on each element K reads: find Fh ∈ Mh such that ∀ψF ∈ Mh:
+
+Z
+
+> K
+
+∂tFhψF dx +
+
+Z
+
+> K
+
+(u.∇Fh)ψF dx +
+
+Z
+
+> ∂K −
+
+(u.nK )[ Fh]ψF ds = 0 , (3.3) where nK denotes the outward unit normal to ∂K , and [Fh] = F − 
+
+> h
+
+− Fh is the upwind jump at the element interface with F − 
+
+> h
+
+denotes the value of Fh taken from the neighboring element sharing the face, see Fig. 2. The inflow boundary of element K is defined as: 
+
+∂K − = {x ∈ ∂K | u.nK < 0}.
+
+By ordering the elements according to the flow direction, the global system matrix becomes block lower triangular, with diagonal blocks of size di × di (where di = dimP k(Ki)) associated with each element Ki
+
+[16]. The approximate solution can then be computed by solving a sequence of small independent local systems, on per element, without assembling or inverting the full global matrix. This sequential resolution significantly reduces both memory requirements and computational cost, but it requires that Fh be known on ∂K − before it can be computed on K, implying a specific ordering of the elements in the flow direction, starting from the inflow boundary ∂Ω−. The method becomes ill-defined in a closed domain or in the presence of recirculating flows, where no inflow boundary exists and a consistent element ordering cannot be established. In the latter case, an iterative relaxation procedure may be employed, which consists in iterating over the elements until the solution stabilizes. It may not converge especially for nonlinear problems, as the nonlinearity may amplify errors between successive iterations rather than reducing them. 
+
+> Figure 2: Schematic of the Lesaint–Raviart method
+
+To address these limitations, Fortin et al. [22] introduced a face-based auxiliary unknown λ, representing the inter-element upwind flux. More precisely, λ is defined on the space of piecewise polynomial functions on the mesh faces:  λ = Fh on ∂K + ,λ = F − 
+
+> h
+
+on ∂K −. (3.4) Instead of relying on the super-element connectivity of the original Lesaint–Raviart formulation, this ap-proach reformulates the problem as a coupled system in (Fh, λ ), transforming the element-by-element pro-cedure into a globally assembled system. The local and discontinuous character of Fh allows its elimination at the element level through static condensation, leading to a reduced face-based system with degrees of freedom located on the mesh faces only, with no need for element ordering or inflow boundary identification. The resulting condensed system fits naturally into existing finite element solvers. The coupled formulation takes the following form: 
+
+(R  
+
+> K
+
+∂tFhψF dx + R 
+
+> K
+
+(u.∇Fh)ψF dx + R 
+
+> ∂K
+
+(λ − Fh)( u.nK )ψF ds = 0 ,
+
+R 
+
+> ∂K +
+
+(λ − Fh)( u.nK )ψλ ds = 0 . (3.5) Following [22], it is straightforward to verify that formulation (3.5) is equivalent to the Lesaint–Raviart formulation (3.3). Indeed, the second equation in (3.5) enforces the condition λ = Fh on ∂K +. Substituting 9this condition into the first equation shows that the boundary integral over ∂K + vanishes, and the remaining boundary term over ∂K − reduces to (λ − Fh) = ( F − 
+
+> h
+
+− Fh) = [ Fh], which is precisely the upwind jump term of formulation (3.3). Hence, the two formulations are equivalent. To provide a complete discretization of the transport problem, a first-order implicit Euler scheme is used for the time discretization. The discretized elementary formulation is given by: 
+
+R
+
+> K
+
+F n+1  
+
+> h
+
+− F nh
+
+∆t ψF dx + R 
+
+> K
+
+(un+1 .∇F n+1  
+
+> h
+
+)ψF dx 
+
++ R 
+
+> ∂K
+
+(λ − F n+1  
+
+> h
+
+)( un+1 .nK )ψF ds = 0,
+
+R 
+
+> ∂K +
+
+(λ − F n+1  
+
+> h
+
+)( un+1 .nK )ψλ ds = 0,
+
+(3.6) with the initial condition F 0 
+
+> h
+
+= IhF 0.
+
+3.4. Summary of the algorithm 
+
+The complete algorithm is summarized for each time step in Fig. 3. Beginning with the initial conditions, the mesh is adapted isotropically using a Hessian-based metric derived from the interface capturing function, and the solution fields u, p and F are projected onto the new mesh using a conservative interpolation method. The fluid properties are then updated based on the current interface function through the corresponding regularized definitions, and the incompressible Navier–Stokes system is solved using the discrete variational formulation given in Eq. (3.2) to obtain the updated velocity and pressure fields ( un+1 , pn+1 ). The interface variable is then advanced to tn+1 using the discrete variational formulation of the advection equation given in Eq. (3.6). In the case of the level set method, an additional reinitialization step is performed to preserve the signed-distance property of the level set function, whereas no such step is required for the pseudo-concentration approach. This procedure is repeated until the final simulation time T is reached. 10 Figure 3: Flowchart 
+
+11 4. Numerical experiments 
+
+Numerous references exist for numerical simulations of incompressible two-phase flows with fluids under-going complex topological changes. In the absence of analytical solutions, the validation of a mathematical model can be performed using numerical benchmark configurations. 
+
+4.1. Rising bubble in 2D 
+
+In pursuit of benchmark configurations, the study by Hysing et al. [34] piqued our interest. The authors propose the following: an ascending bubble under the effects of buoyancy in a two-dimensional liquid column for different reference configurations. They test not only the topological aspects of the interface, but also the evolution of the center of mass, the bubble rise velocity, and the circularity, which are used as comparison criteria. For the test, we centered a circular bubble of radius r = 0 .25 at the point (0 .5, 0.5) within a 
+
+> Figure 4: Initial state of the bubble and computational domain.
+
+rectangular domain defined by [0 , 1] ×[0 , 2] , filled with a fluid of viscosity and density higher than those of the bubble. Two boundary conditions are considered. We impose a no-slip condition (u1 = u2 = 0) on the horizontal walls of the domain ((1) and (2)) , while a free-slip boundary condition, reduced to u1 = 0 ,is imposed on the left/right walls ((3) and (4)) . Figure 4 shows this initial setup. The governing physical parameters for the two different test cases are listed in Table 1, as stated in [34]. Indices 1 and 2 refer to the lighter fluid of the bubble and the surrounding fluid, respectively. For the two different dimensionless numbers mentioned in the last two cells, the Reynolds number Re = ρ2(2 r)3/2√gμ2 , which is the ratio between inertial and viscous terms, and the Eötvös number, which represents the ratio of the gravity force to the surface tension given by E0 = 4r2ρ2gσ , both impact the bubble shape. As mentioned above, we quantify our simulation results using the following quantities that characterize the bubble’s shape: 
+
+• The centroid or center of mass: 
+
+Xc = 1
+
+|Ω1|
+
+Z
+
+> Ω1
+
+x dx. 
+
+where |Ω1| = R 
+
+> Ω1
+
+1 dx the area of the bubble. 12 • The rise velocity: the second component of the mean velocity of the bubble, 
+
+Uc = 1
+
+|Ω1|
+
+Z
+
+> Ω1
+
+u dx. 
+
+• The circularity: the ratio between the perimeter of an area-equivalent circle and the perimeter of the bubble, which represents the deviation of the bubble’s shape from a circle. 
+
+ρ1 ρ2 μ1 μ2 σ Re E0
+
+Test case 1 100 1000 1 10 24 .5 35 10 
+
+Test case 2 1 1000 0.1 10 1.96 35 125 
+
+> Table 1: Numerical parameters
+
+All tests are carried out using the FreeFEM++ software [35]. We run the simulation for t = 0 s to t = 3 s .We use a time step ∆t of 2.5 × 10 −3 for test case 1 and 1.5 × 10 −3 for test case 2. For the reinitialization of the level set function, the pseudo time step ∆τ is taken equal to ∆t for both test cases. Mesh adaptation is carried out using the adaptmesh procedure of FreeFEM++ [36], which relies on a metric-based isotropic strategy derived from the Hessian of the interface function. This method automatically refines the mesh near the bubble’s interface, where the gradients are strongest, while maintaining a coarser mesh in regions far from the interface. 
+
+4.1.1. Test case 1 
+
+In Fig. 5, we present the final interface of the bubble (at t = 3 seconds) computed using the reformu-lated discontinuous Galerkin method for two distinct approaches: the level set method (RDG-LS) and the pseudo-concentration method (RDG-PC), together with the result of the FreeLIFE group, presented in the benchmark [34]. Duo to buoyancy and surface tension forces, the bubble exhibits a nearly spherical shape with slight deformations at the base.       
+
+> (a) (b)
+> Figure 5: Test case 1: Bubble shapes at t= 3 .(a) RDG-LS (red) and (b) RDG-PC (blue) compared with the benchmark solution (black).
+
+To further support the bubble shape results, Fig. 6 provides a comparison of three benchmark quantities. The top-left panel shows the vertical position of the bubble’s center of mass, reaching 1.0807 at t=3 s for the RDG-LS method and 1.0778 for the RDG-PC method, both in very good agreement with the benchmark value of 1.0798 . A close-up view is included to better illustrate the agreement. Panel (c) of Fig.6 illustrates the expected behavior of the bubble’s vertical velocity. For the FreeLIFE group, the maximum velocity is approximately 0.2420 at t = 0 .93 s. The RDG-LS approach accurately reproduces this value (0 .2421) , whereas the RDG-PC approach slightly underestimates it, giving a maximum of 0.2409 .13 The last figure at the bottom-right compares the circularity evolution to assess the deformation of the bubble. Again, we see a good agreement for both approaches, with only minor difference (approximately 0.2% ) for the RDG-PC method. Although this difference remains small, it suggests a slightly different deformation of the bubble. The minor discrepancy between the RDG-LS and RDG-PC approaches stems from the nature of interface representation. For the pseudo-concentration method which belongs to the class of diffuse interface methods, the interface is represented over a finite thickness, which affects the evaluation of curvature and surface tension forces. However, the RDG discretization remains robust and produces consistent results with both formulations.      
+
+> (a) (b)
+> (c) (d)
+> Figure 6: Test case 1: Comparison of RDG-LS and RDG-PC results with the benchmark solution. (a) center of mass, (b) close-up of the center of mass, (c) rise velocity and (d) circularity.
+
+4.1.2. Test case 2 
+
+Test case 2 is characterized by a large contrast in density and viscosity, together with a significantly lower surface tension (reduced by approximately 92% compared to the Test case 1), leading to noticeable bubble shape distortion. Fig. 7 shows the bubble’s shape at the final time ( t = 3 s ) for both approaches RDG-LS and RDG-PC together with the results of two groups (FreeLIFE & MooNMD) in the benchmark [34]. The three benchmark quantities (center of mass, rise velocity, and circularity) are presented and compared in Fig. 8. The results of both techniques are in good agreement with the benchmark’s results; they remain stable up to t = 1 .7, after which they diverge, which is attributed to the sensitivity of this test case to the numerical approaches and mesh discretization. These results reinforce the validity of the employed RDG method and demonstrate its ability to address problems with significant topological changes. 14 Figure 7: Test case 2: Bubble shapes at t=3 (RDG-LS (solid blue), RDG-PC (solid red), MooNMD (solid black), and FreeLIFE (dotted gray)).   
+
+> (a) (b)
+> (c) (d)
+
+Figure 8: Test case 2: Comparison of RDG-LS and RDG-PC results with the benchmark solution. (a) center of mass, (b) close-up of the center of mass, (c) rise velocity and (d) circularity. 
+
+15 4.2. Rayleigh–Taylor instability 
+
+In the framework of developing and evaluating computational methods, the true measure of performance lies in its ability to handle systems exhibiting rich physical phenomena, strong dynamical instabilities, and complex topological changes. With this in mind, we deliberately assess our proposed approach using the Rayleigh–Taylor instability in this subsection, which demands both numerical robustness and physical accuracy. A heavy fluid resting above a lighter one, separated by a perturbed interface under the influence of gravity, gives rise to the so-called two-dimensional Rayleigh–Taylor instability which has been studied using a variety of different methods (see e.g. references [37, 38, 39, 40]). We conducted our simulations using the same physical parameters utilized by Gao et al. [19], which in turn builds upon the parameters of Popinet et al. [41] and Puckett et al. [42]. The setup consists of a 
+
+1 m wide rectangular domain with a length four times its width. A sinusoidal perturbed interface given by y = 2 + 0 .05 cos(2 πx ) separates a heavy fluid of density ρh = 1 .225 kg m −3 (Air) above a lighter one of density ρl = 0 .1694 kg m −3 (Helium) below (see Fig. 9(a)). Both fluids are initially at rest under the action of gravity and share the same viscosity μ = 0 .003 kg m −1 s−1. The Reynolds number is taken to equal 400 
+
+and the Froude number is 0.9. We use a time step of 5 × 10 −3 for both techniques and a pseudo time step of 1 × 10 −2 for the reinitialization of the level set method. For the boundary conditions, we applied no-slip and free-slip boundary conditions on the horizontal and vertical walls, respectively, whereas a zero pressure is imposed on the upper wall.  
+
+> (a) (b)
+> Figure 9: The schematic graph and the adaptive Mesh of The Rayleigh–Taylor instability problem.
+
+We present in Fig. 9(b) the computational mesh used in this simulation, adapted through the functions 
+
+φ and c of the level set and pseudo-concentration techniques, respectively. We conducted the first numerical experiment without considering surface tension ( σ = 0 ). Since the instability causes significant interface deformation, we illustrate its evolution at different time steps using snapshots in Fig. 10. Results obtained using the level set method are shown in the first row, whereas those obtained with the pseudo-concentration method appear in the second row. At late times, the development of Kelvin-Helmholtz instability leads to a mushroom-shaped deformation of the interface. This evolution is driven by the velocity shear at the fluid interface, which generates short-wavelength perturbations and progressively rolls up the interface along the sides of the spike. The interface evolution for both techniques compares well with the solution reported by Gao et al. [19], shown in the last row, as well as with previously published results [41, 42]. We next check the mass conservation of the heavier fluid, which is evaluated through the relative mass variation (see Fig. 11). The maximal relative mass error is approximately 0.3% for the RDG-LS method without applying the volume correction technique, which is consistent with the results reported in the 16 (a) t=2.2 (b) t=2.8 (c) t=3.4 (d) t=4.0 
+
+Figure 10: Time evolution of the interface in the Rayleigh–Taylor instability without surface tension at dimensionless times. 
+
+17 literature, especially those of Gao et al. [19]. For the RDG-PC method, the maximal relative mass error is on the order of 10 −5, confirming the conservative nature of the pseudo-concentration technique.  
+
+> (a) (b)
+> Figure 11: Mass variation of the heavier fluid for both methods: (a) RDG-LS and (b) RDG-PC.
+
+It is well known that the density ratio influences the development of the instability, but it is not the only contributing factor. Surface tension also plays a significant role. Fig. 12 shows the effect of surface tension in delaying the roll-up of the spike sides. This behavior is expected, as surface tension stabilizes the interface by suppressing short-wavelength perturbations, and is in good agreement with results in [37, 43]. Finally, Fig. 13 shows the mass change of the heavier fluid for both techniques. For the RDG-LS method, the maximal relative mass error is 0.15% , while the RDG-PC method yields 5.6 × 10 −5.
+
+5. Conclusions 
+
+In this paper, we propose a reformulated DG approach to solve the advection equation of two different interface capturing approaches (level set and pseudo-concentration), along with the standard P 2−P 1 Taylor– Hood finite element method to solve the incompressible Navier–Stokes equations. The surface tension effects are integrated into the Navier–Stokes equations as an external force, according to the CSF approach. The results presented in this work for both benchmarks, namely the rising bubble and the Rayleigh–Taylor instability, demonstrate that regardless of how the interface is represented, the RDG method remains stable and accurate, enabling its application to other interface capturing techniques. In addition, it has proven its ability to deal with different surface tension effects and instability phenomena. Extended investigations will emphasize the study of three dimensional simulations utilizing high performance computing. 
+
+References 
+
+[1] T. Duretz, D. A. May, P. Yamato, A free surface capturing discretization for the staggered grid finite difference scheme, Geophysical Journal International 204 (3) (2016) 1518–1530. [2] V. Doyeux, Y. Guyot, V. Chabannes, C. Prud’Homme, M. Ismail, Simulation of two-fluid flows using a finite element/level set method. application to bubbles and vesicle dynamics, Journal of Computational and Applied Mathematics 246 (2013) 251–259. [3] G. Haagh, F. Van De Vosse, Simulation of three-dimensional polymer mould filling processes using a pseudo-concentration method, International Journal for Numerical Methods in Fluids 28 (9) (1998) 1355–1369. [4] F. H. Harlow, J. E. Welch, et al., Numerical calculation of time-dependent viscous incompressible flow of fluid with free surface, Physics of fluids 8 (12) (1965) 2182. 18 (a) t=2.2 (b) t=2.8 (c) t=3.4 (d) t=4.0 
+
+Figure 12: Time evolution of the interface in the Rayleigh–Taylor instability with surface tension at dimensionless times.  
+
+> (a) (b)
+
+Figure 13: Mass variation of the heavier fluid for both methods: (a) RDG-LS and (b) RDG-PC. 
+
+19 [5] S. O. Unverdi, G. Tryggvason, A front-tracking method for viscous, incompressible, multi-fluid flows, Journal of computational physics 100 (1) (1992) 25–37. [6] C. W. Hirt, B. D. Nichols, Volume of fluid (vof) method for the dynamics of free boundaries, Journal of computational physics 39 (1) (1981) 201–225. [7] J. Lowengrub, L. Truskinovsky, Quasi–incompressible cahn–hilliard fluids and topological transitions, Proceedings of the Royal Society of London. Series A: Mathematical, Physical and Engineering Sciences 454 (1978) (1998) 2617–2654. [8] E. Thompson, Use of pseudo-concentrations to follow creeping viscous flows during transient analysis, International Journal for Numerical Methods in Fluids 6 (10) (1986) 749–761. [9] S. Osher, J. A. Sethian, Fronts propagating with curvature-dependent speed: Algorithms based on hamilton-jacobi formulations, Journal of computational physics 79 (1) (1988) 12–49. [10] R. Codina, U. Schäfer, E. Onate, Mould filling simulation using finite elements, International Journal of Numerical Methods for Heat & Fluid Flow 4 (4) (1994) 291–310. [11] J.-F. Hétu, D. Gao, A. Garcia-Rejon, G. Salloum, 3d finite element method for the simulation of the filling stage in injection molding, Polymer Engineering & Science 38 (2) (1998) 223–236. [12] S. Osher, R. Fedkiw, K. Piechor, Level set methods and dynamic implicit surfaces, Appl. Mech. Rev. 57 (3) (2004) B15–B15. [13] J. A. Sethian, Level set methods: Evolving interfaces in geometry, fluid mechanics, computer vision, and materials science, Cambridge monographs on applied and computational mathematics 3 (1996). [14] A. N. Brooks, T. J. Hughes, Streamline upwind/petrov-galerkin formulations for convection dominated flows with particular emphasis on the incompressible navier-stokes equations, Computer methods in applied mechanics and engineering 32 (1-3) (1982) 199–259. [15] W. H. Reed, T. R. Hill, Triangular mesh methods for the neutron transport equation, Tech. rep., Los Alamos Scientific Lab., N. Mex.(USA) (1973). [16] P. LASAINT, P. RAVIART, On a finite element method for solving the neutron transport equation, in: C. de Boor (Ed.), Mathematical Aspects of Finite Elements in Partial Differential Equations, Academic Press, 1974, pp. 89–123. doi:https://doi.org/10.1016/B978-0-12-208350-1.50008-X .URL https://www.sciencedirect.com/science/article/pii/B978012208350150008X 
+
+[17] S. Osher, J. Yan, Discontinuous galerkin level set method for interface capturing, UCLA report (2005). [18] E. Marchandise, J.-F. Remacle, N. Chevaugeon, A quadrature-free discontinuous galerkin method for the level set equation, Journal of Computational Physics 212 (1) (2006) 338–357. [19] P. Gao, J. Ouyang, W. Zhou, Development of a finite element/discontinuous galerkin/level set approach for the simulation of incompressible two phase flow, Advances in Engineering Software 118 (2018) 45–59. [20] A. Fortin, P. Carrier, Y. Demay, Numerical simulation of coextrusion and film casting, International journal for numerical methods in fluids 20 (1) (1995) 31–57. [21] A. Béliveau, A. Fortin, Y. Demay, A two-dimensional numerical method for the deformation of drops with surface tension, International Journal of Computational Fluid Dynamics 10 (3) (1998) 225–240. [22] M. Fortin, A. Fortin, K. Benmoussa, C. Tibirna, A reformulation of the lesaint–raviart discontinuous galerkin method for advection equations, International Journal for Numerical Methods in Biomedical Engineering 26 (10) (2010) 1343–1350. 20 [23] J. U. Brackbill, D. B. Kothe, C. Zemach, A continuum method for modeling surface tension, Journal of computational physics 100 (2) (1992) 335–354. [24] Y.-G. Chen, Y. Giga, S. Goto, Uniqueness and existence of viscosity solutions of generalized mean curvature flow equations, in: Fundamental Contributions to the Continuum Theory of Evolving Phase Interfaces in Solids: A Collection of Reprints of 14 Seminal Papers, Springer, 1999, pp. 375–412. [25] M. Sussman, P. Smereka, S. Osher, A level set approach for computing solutions to incompressible two-phase flow, Journal of Computational physics 114 (1) (1994) 146–159. [26] B. Merriman, J. K. Bence, S. J. Osher, Motion of multiple junctions: A level set approach, Journal of computational physics 112 (2) (1994) 334–363. [27] D. Peng, B. Merriman, S. Osher, H. Zhao, M. Kang, A pde-based fast local level set method, Journal of computational physics 155 (2) (1999) 410–438. [28] B. Lafaurie, C. Nardone, R. Scardovelli, S. Zaleski, G. Zanetti, Modelling merging and fragmentation in multiphase flows with surfer, Journal of computational physics 113 (1) (1994) 134–147. [29] R. Temam, Navier–Stokes equations: theory and numerical analysis, Vol. 343, American Mathematical Society, 2024. [30] S. Maarouf, C. Bernardi, D. Yakoubi, Characteristics/finite element analysis for two incompressible fluid flows with surface tension using level set method, Computer Methods in Applied Mechanics and Engineering 394 (2022) 114843. [31] T. Milcent, Une approche eulérienne du couplage fluide-structure, analyse mathématique et applications en biomécanique, Ph.D. thesis, Université Joseph-Fourier-Grenoble I (2009). [32] T. J. Hughes, L. P. Franca, M. Balestra, A new finite element formulation for computational fluid dynamics: V. circumventing the babuška-brezzi condition: A stable petrov-galerkin formulation of the stokes problem accommodating equal-order interpolations, Computer methods in applied mechanics and engineering 59 (1) (1986) 85–99. [33] C. Taylor, P. Hood, A numerical solution of the navier-stokes equations using the finite element tech-nique, Computers & Fluids 1 (1) (1973) 73–100. [34] S.-R. Hysing, S. Turek, D. Kuzmin, N. Parolini, E. Burman, S. Ganesan, L. Tobiska, Quantitative benchmark computations of two-dimensional bubble dynamics, International Journal for Numerical Methods in Fluids 60 (11) (2009) 1259–1288. [35] F. Hecht, O. Pironneau, A. Le Hyaric, K. Ohtsuka, Freefem++ manual, Laboratoire Jacques Louis Lions (2005). [36] F. Hecht, New development in freefem++, Journal of Numerical Mathematics 20 (3-4) (2012) 1–14. 
+
+doi:10.1515/jnum-2012-0013 .URL https://hal.sorbonne-universite.fr/hal-01476313 
+
+[37] N. Lock, M. Jaeger, M. Medale, R. Occelli, Local mesh adaptation technique for front tracking problems, International journal for numerical methods in fluids 28 (4) (1998) 719–736. [38] A. CELANI, A. MAZZINO, P. MURATORE-GINANNESCHI, L. VOZELLA, Phase-field model for the rayleigh–taylor instability of immiscible fluids, Journal of Fluid Mechanics 622 (2009) 115–134. 
+
+doi:10.1017/S0022112008005120 .[39] M. Shadloo, A. Zainali, M. Yildiz, Simulation of single mode rayleigh–taylor instability by sph method, Computational Mechanics 51 (5) (2013) 699–715. 21 [40] E. Marchandise, J.-F. Remacle, A stabilized finite element method using a discontinuous level set approach for solving two phase incompressible flows, Journal of computational physics 219 (2) (2006) 780–800. [41] S. Popinet, S. Zaleski, A front-tracking algorithm for accurate representation of surface tension, Inter-national Journal for Numerical Methods in Fluids 30 (6) (1999) 775–793. [42] E. G. Puckett, A. S. Almgren, J. B. Bell, D. L. Marcus, W. J. Rider, A high-order projection method for tracking fluid interfaces in variable density incompressible flows, Journal of computational physics 130 (2) (1997) 269–282. [43] A. Smolianski, Finite-element/level-set/operator-splitting (felsos) approach for computing two-fluid un-steady flows with free moving interfaces, International journal for numerical methods in fluids 48 (3) (2005) 231–269. 22

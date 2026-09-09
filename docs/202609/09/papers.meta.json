@@ -1,0 +1,39 @@
+{
+  "label": "2026-09-09",
+  "date": "2026-09-09",
+  "generated_at": "2026-09-09T21:39:02",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202609/09/2609.07327v1-a-new-formulation-of-discontinuous-galerkin-method-for-interface-capturing-approaches",
+      "section": "quick",
+      "title_en": "A new formulation of Discontinuous Galerkin method for interface capturing approaches",
+      "authors": "W. Herri, K. Benmoussa, R. Bouydou, D. Yakoubi",
+      "date": "2026-09-07",
+      "pdf": "https://arxiv.org/pdf/2609.07327v1",
+      "score": "7.0",
+      "evidence": "提出用于自由表面流的间断伽辽金界面捕捉方法，可应用于降膜等多相流CFD模拟",
+      "tldr": "自由表面流数值模拟中，界面捕捉方法的输运方程求解精度是关键挑战。针对无入流边界条件问题，本文提出一种 Lesaint-Raviart 间断伽辽金方法的新公式。该方法结合不可压缩 Navier-Stokes 方程、P2-P1 Taylor-Hood 有限元空间离散以及连续表面力模型来模拟表面张力效应。在单上升气泡和 Rayleigh-Taylor 不稳定性等基准算例中验证表明，新方法能精确稳定地捕捉自由界面。该工作为界面追踪类数值模拟提供了一种高效且实用的新方案，具有重要应用价值。",
+      "tags": "query:falling-film",
+      "abstract_en": "In computational fluid dynamics, the numerical simulation of free-surface flows using interface capturing approaches (level set, pseudo-concentration) requires accurate resolution of a transport equation. In the present work, this equation is solved using a new formulation of the Lesaint--Raviart discontinuous Galerkin method, which is particularly suitable for problems without inflow boundaries. The motion is described by the incompressible Navier--Stokes equations with surface tension, discretized using the standard $P2-P1$ Taylor--Hood finite element method in space. Surface tension effects are represented using the so-called Continuum Surface Force model. Finally, the proposed approach is implemented and tested on several benchmarks, including the single rising bubble and the Rayleigh--Taylor instability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/09/2609.07232v1-micro-convection-mass-transfer-following-bubble-coalescence-on-a-solid-wall",
+      "section": "quick",
+      "title_en": "Micro-convection mass transfer following bubble coalescence on a solid wall",
+      "authors": "Zahra Saadat, Michele Cattani, Amin Soltani, Pourya Forooghi",
+      "date": "2026-09-07",
+      "pdf": "https://arxiv.org/pdf/2609.07232v1",
+      "score": "6.0",
+      "evidence": "采用Volume-of-Fluid方法模拟气泡聚并和质量传递",
+      "tldr": "气泡合并后从固体壁面跳离引发的微对流对壁面质量传递的影响尚缺乏定量研究。本研究采用Basilisk的Volume-of-Fluid方法模拟氢-水体系，覆盖不同气泡半径与Schmidt数。结果表明，合并后约0.5-1个惯性-毛细时间单位内，界面快速运动向下卷吸低浓度液体，在Sc=210时导致壁面核心区域Sherwood数出现显著局部增强，增强幅度与初始质量边界层厚度密切相关。该工作揭示了微对流的瞬态强化机制，为相关传质过程建模提供了依据。",
+      "tags": "query:falling-film",
+      "abstract_en": "The Volume-of-Fluid implementation in the \\href{basilisk.fr}{Basilisk} flow solver is employed to study mass transfer after coalescence-induced jump-off of bubbles on solid substrates at four combinations of bubble radius ($R_m=150$ and 25 $μ$m, hydrogen-water properties) and Schmidt number ($\\text{Sc}=210$ and 1). The results show a relatively strong downward entrainment of low-concentration liquid, induced by a rapid movement of the bubble interface at approximately 0.5 to 1 inertio-capillary time units after the moment of coalescence. At $\\text{Sc}=210$, this leads to a highly local increase of the Sherwood number at a core region (roughly an area of radius $R_m/2$) below the south pole of the merged bubble, which persists long after the bubble departure due to the slow diffusion at large $\\text{Sc}$. The enhancement factor of the Sherwood number is highly dependent on the state of the mass-transfer boundary layer at the moment of coalescence, increasing with smaller boundary layer thicknesses. Shortly after the jump-off, the velocity of the bubble is considerably damped and rapidly approaches its free-rise terminal velocity. The effect of micro-convection on the wall mass transfer coefficient at this stage is insignificant when isolated, similar to what is reported in the literature for purely buoyancy-driven bubble rise -- but slightly stronger.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
