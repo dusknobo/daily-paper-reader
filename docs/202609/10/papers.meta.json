@@ -1,0 +1,39 @@
+{
+  "label": "2026-09-10",
+  "date": "2026-09-10",
+  "generated_at": "2026-09-10T22:00:45",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202609/10/2609.05939v1-a-structure-preserving-implicit-explicit-method-for-a-hyperbolic-approximation-of-fourth-order-pdes",
+      "section": "quick",
+      "title_en": "A structure-preserving implicit-explicit method for a hyperbolic approximation of fourth-order PDEs",
+      "authors": "Rahul Barthwal, Rahuldev Ghorai",
+      "date": "2026-09-05",
+      "pdf": "https://arxiv.org/pdf/2609.05939v1",
+      "score": "7.0",
+      "evidence": "针对薄膜方程的结构保持方法，可用于降膜模拟",
+      "tldr": "四阶偏微分方程（如薄层方程）数值求解面临刚性与高阶导数带来的稳定性与保结构难题。本文提出一种结构保持的隐式-显式（IMEX）方法，将系统分裂为刚性项与非刚性项，用于其双曲逼近系统。在CFL型条件下严格证明该格式能量一致且正性保持，并展现出渐近区域稳健稳定性，时间步限制与松弛参数完全无关。通过薄层方程系列数值算例验证了理论性质与计算效能，表明方法可有效处理此类高阶方程。",
+      "tags": "query:falling-film",
+      "abstract_en": "We introduce a novel structure-preserving numerical method for a first-order hyperbolic approximation system, which approximates the solutions of general fourth-order partial differential equations. By employing an implicit-explicit (IMEX) splitting between the stiff and non-stiff terms, we rigorously prove that the proposed scheme is energy-consistent and positivity-preserving under a CFL-type condition. Furthermore, we show that the method remains robustly stable in asymptotic regimes, with a time-step restriction that is entirely independent of the relaxation parameters. Finally, we present a series of numerical examples for thin film equations to validate the theoretical properties and efficacy of the scheme.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/10/2609.06314v1-a-review-of-weakly-enforced-dirichlet-boundary-conditions-in-computational-flow-analysis",
+      "section": "quick",
+      "title_en": "A review of weakly enforced Dirichlet boundary conditions in computational flow analysis",
+      "authors": "Ming-Chen Hsu, Monu Jaiswal, Yuri Bazilevs",
+      "date": "2026-09-06",
+      "pdf": "https://arxiv.org/pdf/2609.06314v1",
+      "score": "6.0",
+      "evidence": "弱施加Dirichlet边界条件综述，面向近壁速度与温度梯度，可用于降膜CFD",
+      "tldr": "强施加狄利克雷边界条件需精细近壁网格，导致高计算成本。弱强制边界条件作为变分一致的近壁模型，允许壁面受控滑移，在粗网格上恢复精确流动量。该技术还是浸入式几何分析的基础，可直接对复杂几何进行高保真流动分析而无需贴体网格。本综述梳理了从标量对流扩散方程到纳维-斯托克斯方程的统一数学框架及其在不可压/可压流中的通用性。",
+      "tags": "query:falling-film",
+      "abstract_en": "Strongly enforced Dirichlet boundary conditions require highly refined near-wall meshes to resolve steep velocity and thermal gradients. This introduces high computational costs, especially for practical flow simulations. Weakly enforced boundary conditions alleviate this burden by acting as a variationally consistent near-wall model. By allowing a controlled slip at the solid wall, weak enforcement recovers accurate flow quantities on coarse boundary-layer meshes across both incompressible and compressible regimes. Furthermore, weak boundary conditions serve as the fundamental enabling technology for immersogeometric analysis. Because the weak operator evaluates boundary integrals independently of the background mesh, high-fidelity flow analysis can be performed directly on complex geometries without fitting a mesh to the surface. This capability has facilitated direct geometry-to-analysis workflows for boundary-representation CAD models, raw point clouds, photogrammetric reconstructions, and segmented medical images. This review examines the unified mathematical development of the weak boundary condition framework from scalar advection-diffusion equations to the full Navier-Stokes equations, illustrating its versatility and robustness across incompressible and compressible flows, whether in traditional boundary-fitted, sliding-interface, or advanced immersogeometric applications.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

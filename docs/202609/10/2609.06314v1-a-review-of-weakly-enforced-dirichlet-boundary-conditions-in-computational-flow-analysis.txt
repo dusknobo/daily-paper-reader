@@ -1,0 +1,2771 @@
+A review of weakly enforced Dirichlet boundary conditions in
+computational flow analysis
+Ming-Chen Hsua,∗, Monu Jaiswala, Yuri Bazilevsb,c,d,∗
+aDepartment of Mechanical Engineering, Iowa State University, Ames, Iowa 50011, USA
+bDepartment of Civil and Environmental Engineering, Vanderbilt University, Nashville, Tennessee 37235, USA
+cDepartment of Mechanical Engineering, Vanderbilt University, Nashville, Tennessee 37240, USA
+dFaculty of Science and Engineering, Graduate School of Creative Science and Engineering, Waseda University,
+Shinjuku City, Tokyo 169-8050, Japan
+Abstract
+Strongly enforced Dirichlet boundary conditions require highly refined near-wall meshes to resolve
+steep velocity and thermal gradients. This introduces high computational costs, especially for
+practical flow simulations. Weakly enforced boundary conditions alleviate this burden by acting
+as a variationally consistent near-wall model.
+By allowing a controlled slip at the solid wall,
+weak enforcement recovers accurate flow quantities on coarse boundary-layer meshes across both
+incompressible and compressible regimes. Furthermore, weak boundary conditions serve as the
+fundamental enabling technology for immersogeometric analysis.
+Because the weak operator
+evaluates boundary integrals independently of the background mesh, high-fidelity flow analysis can
+be performed directly on complex geometries without fitting a mesh to the surface. This capability
+has facilitated direct geometry-to-analysis workflows for boundary-representation CAD models,
+raw point clouds, photogrammetric reconstructions, and segmented medical images. This review
+examines the unified mathematical development of the weak boundary condition framework from
+scalar advection–diffusion equations to the full Navier–Stokes equations, illustrating its versatility
+and robustness across incompressible and compressible flows, whether in traditional boundary-
+fitted, sliding-interface, or advanced immersogeometric applications.
+Keywords: Weakly enforced no-slip conditions, Nitsche’s method, Near-wall modeling,
+Immersogeometric analysis, Point cloud
+Contents
+1
+Introduction
+2
+1.1
+Weak enforcement of essential boundary conditions: core formulations and com-
+putations . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+3
+1.2
+Weak BCs in sliding/slip-interface and space–time methods . . . . . . . . . . . . .
+3
+1.3
+Weak BCs in immersed methods . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4
+∗Corresponding authors
+Email addresses: jmchsu@iastate.edu (Ming-Chen Hsu), yuri.bazilevs@vanderbilt.edu
+(Yuri Bazilevs)
+arXiv:2609.06314v1  [math.NA]  6 Sep 2026
+
+
+2
+Weak imposition of boundary conditions: scalar model problems
+5
+2.1
+Advection equation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5
+2.2
+Diffusion equation
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+7
+2.3
+Selection of 𝜏B using stability analysis . . . . . . . . . . . . . . . . . . . . . . . .
+7
+2.4
+Combining the advection and diffusion equations
+. . . . . . . . . . . . . . . . . .
+9
+2.5
+Numerical examples: the advection–diffusion equation
+. . . . . . . . . . . . . . .
+10
+3
+Weak BCs for incompressible flow
+11
+3.1
+The incompressible Navier–Stokes weak BC operator . . . . . . . . . . . . . . . .
+11
+3.2
+Wall-bounded turbulent flows . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+14
+3.3
+Aerodynamics of wind turbines . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+15
+3.4
+Immersogeometric analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+18
+3.4.1
+The tetrahedral finite cell method
+. . . . . . . . . . . . . . . . . . . . . .
+19
+3.4.2
+Direct flow analysis on CAD models . . . . . . . . . . . . . . . . . . . . .
+21
+3.4.3
+Free-surface, moving-object, and industrial-scale flows . . . . . . . . . . .
+22
+3.4.4
+Direct flow analysis on point clouds, photogrammetric reconstructions, and
+medical images . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+23
+4
+Weak BCs for compressible flow
+27
+4.1
+Nonlinear (general) flux . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+28
+4.2
+The compressible Navier–Stokes equations and weak BC operators . . . . . . . . .
+29
+4.2.1
+Strong form . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+29
+4.2.2
+Weak form
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+30
+4.2.3
+Design of weak wall BC operators . . . . . . . . . . . . . . . . . . . . . .
+31
+4.2.4
+Temperature wall BCs
+. . . . . . . . . . . . . . . . . . . . . . . . . . . .
+32
+4.2.5
+Heat-flux wall BCs . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+34
+4.3
+Aerodynamics on boundary-fitted meshes . . . . . . . . . . . . . . . . . . . . . .
+35
+4.4
+Immersogeometric compressible flow
+. . . . . . . . . . . . . . . . . . . . . . . .
+38
+5
+Conclusions
+39
+1. Introduction
+A major factor in the computational cost of flow simulation is the thin boundary layer that
+develops near a solid wall. Accurately resolving the sharp velocity gradients within this layer
+requires a mesh that is highly refined in the wall-normal direction, which produces a large number
+of degrees of freedom (DoFs) and high-aspect-ratio elements. In finite element formulations [1],
+Dirichlet boundary conditions such as the no-slip condition are typically imposed by prescribing the
+nodal values of the velocity, or the control variables in the case of Isogeometric Analysis (IGA) [2].
+This is referred to as strong enforcement of essential boundary conditions. When the near-wall
+mesh is too coarse to resolve the boundary layer, strong enforcement constrains the discrete velocity
+to vanish at the wall even though the adjacent element lacks the resolution needed to capture the
+steep velocity gradient. As a result, the discrete solution poorly approximates the near-wall flow
+and produces inaccurate mean-flow quantities throughout the domain [3–7]. For three-dimensional
+(3D) flows of industrial interest, where optimal mesh design is rarely feasible and resolving the
+boundary layers is expensive, this limitation is significant.
+2
+
+
+1.1. Weak enforcement of essential boundary conditions: core formulations and computations
+Weak imposition of Dirichlet boundary conditions (hereafter referred to as weak BCs) was
+originally introduced for incompressible flows by Bazilevs and Hughes [3] to address this challenge
+in the context of stabilized and variational multiscale (VMS) finite element methods [8]. Rather than
+setting the discrete solution to satisfy the boundary conditions exactly, the weak BC methodology
+augments the variational formulation with an operator, defined through integrals over the boundary
+surface, that enforces the Dirichlet data as Euler–Lagrange conditions of the formulation [3]. The
+construction draws on Nitsche’s method [9–11] and on the treatment of boundary and interface
+conditions in discontinuous Galerkin methods [12–14]. Weak enforcement allows the flow to slip
+at the wall by a controlled amount so that the discretization is not required to resolve the sharp
+gradients within the boundary layer. The amount of the slip is governed by the local mesh size,
+velocity, and viscosity [3, 4]. The weak BC formulation reduces to its strong counterpart in the
+limit of vanishing wall-normal mesh size [4, 15], allowing mesh refinement to recover the exact
+Dirichlet condition.
+Numerical studies have shown that weak BCs deliver accuracy comparable to or exceeding that
+of strongly enforced boundary conditions on substantially coarser boundary-layer meshes [3–7].
+This behavior was observed for turbulent channel flow, where the convergence of the mean velocity
+profile suggested that weak no-slip conditions behave similarly to a wall-function model, although
+the boundary operator was designed on numerical rather than physical or empirical grounds [3].
+The connection to near-wall modeling [16–18] was later made explicit by incorporating the law
+of the wall into the weak operator [4, 19] and studied further in the context of large-eddy simu-
+lation (LES) [15]. For incompressible flows, weak BCs combined with residual-based variational
+multiscale turbulence modeling [8] and its arbitrary Lagrangian–Eulerian (ALE) extension have
+enabled accurate, full-scale aerodynamic simulations of wind turbines [5, 20]. Extended to the
+compressible regime [7, 21], weak BCs have also been successfully applied to aircraft [7, 22] and
+gas-turbine [21, 23, 24] aerodynamics, as well as hypersonic flows [25]. In each case, weak en-
+forcement predicts quantities of engineering interest on boundary-layer meshes that are far coarser
+than those required by strong enforcement.
+1.2. Weak BCs in sliding/slip-interface and space–time methods
+Nitsche’s method and the weak BC methodology also underpin a family of techniques for
+coupling non-matching meshes, in which the conditions imposed weakly are those at an interface
+between two mesh zones [26, 27]. In the ALE setting, this is the sliding-interface method [28],
+introduced in connection with the ALE-based variational multiscale (ALE–VMS) formulation. Its
+counterpart in the space–time (ST) framework is the ST Slip Interface (ST-SI) method, introduced
+for incompressible flows [29], incompressible flows with thermal coupling [30], and compressible
+flows [31]. It allows the core ST computational flow analysis methods [32, 33] to be used as moving-
+mesh methods even in the presence of rotating solid surfaces, such as a car tire. Across a fluid–fluid
+SI, the mesh on one side rotates with the solid surface, retaining the high-resolution boundary-layer
+representation, while the mesh on the other side remains independent of the rotation. A fluid–solid
+SI [29–31] is the ST counterpart of the weak BC formulation for non-matching fluid–structure
+interaction (FSI) [34, 35], and a porosity SI [29, 31] is for a thin porous structure with fluid on its
+two sides.
+The ST-SI has since been combined with other ST methods to broaden its scope. Its synthesis
+with the ST Topology Change (ST-TC) method [36] is the ST-SI-TC [37], which enables moving-
+3
+
+
+mesh computation with actual contact between solid surfaces while retaining the high-resolution
+boundary-layer representation. The first 3D computation with the ST-SI-TC was for tire aerody-
+namics with transverse grooves, road contact, and tire deformation [37]. Adding the ST-IGA [38],
+which is IGA discretization in space, in time, or in both, gives the ST-SI-TC-IGA [39]. Problems of
+this class often involve narrow, curved gaps between solid surfaces and elements with high aspect
+ratios. The IGA discretization achieves good accuracy in such gaps at a reasonable element density,
+and therefore at a reasonable computational cost, while also being more robust in computations
+with high-aspect-ratio elements. With the feature introduced in Ref. [40], the ST-SI-TC-IGA has a
+built-in Reynolds-equation limit for fluid films between surfaces coming into contact. It has been
+used for aortic valve flow with leaflet contact [39], for tire aerodynamics with near-actual geometry
+and, more recently, with a complex asymmetric tread pattern [41, 42], and for aortic-valve-to-aorta
+flow [43]. Dirichlet-boundary stabilization methods, for both weak and strong enforcement, have
+also been derived in the context of 1D elastodynamics to improve the accuracy of the boundary
+fluxes computed with higher-order functions in the ST framework [44].
+1.3. Weak BCs in immersed methods
+Another role for weak BCs arises in immersed methods [45–49]. In the fluid setting, the Navier–
+Stokes equations are solved on a background mesh that does not conform to the geometry [50–55].
+Immersed methods relax the mesh-conforming constraint and simplify mesh generation around
+geometrically complex objects, but strong enforcement of wall boundary conditions becomes
+infeasible. Because the immersed boundary cuts arbitrarily through element interiors, the Dirichlet
+data cannot be imposed by directly prescribing nodal values, as is done on boundary-fitted meshes.
+The weak BC methodology resolves this issue directly, since its boundary operator is expressed
+in terms of the surface traces of the discrete fields and is independent of the mesh. However,
+standard numerical integration over these arbitrarily intersected elements remains a problem [56,
+57]. Immersogeometric analysis (IMGA) [52, 53] was proposed to address both challenges by
+combining weak BCs with geometry-aware integration over the cut elements, as resolving them
+with sufficient geometric fidelity was shown to be essential for accurate flow solutions. IMGA was
+later driven directly by boundary-representation (B-rep) CAD models [58, 59], removing the labor-
+intensive geometry cleanup and meshing steps from the design-through-analysis workflow [60, 61].
+The framework has since been extended to compressible flows and rotorcraft [62], free-surface and
+marine flows [63], moving-object problems [64, 65], and industrial-scale simulations [66].
+Because the weak BC operator requires only a geometric description, rather than a discrete
+surface mesh, to evaluate boundary traces, IMGA has recently been applied directly to sampled
+representations of physical objects. In this setting, a sufficiently dense point cloud of the surface is
+used to enforce the no-slip condition weakly, and the simulation proceeds without reconstructing an
+analysis-suitable CAD model or surface mesh [67]. This capability has enabled computational flow
+analysis directly on point clouds obtained from photogrammetry for in-use civil structures [68],
+from scans of real-world objects subject to noise, incompleteness, and irregular sampling [69],
+and from segmented medical images for patient-specific cardiovascular simulation [70]. In each of
+these developments, the weak imposition of the no-slip condition is the underlying mechanism that
+makes flow analysis possible on geometries that are never meshed and, in some cases, never fully
+reconstructed.
+This review unifies these developments and presents them as successive applications of a single
+core concept. We begin with a derivation of weak boundary conditions for the scalar advection and
+4
+
+
+diffusion problems, combine them into the advection–diffusion equation, and illustrate the practical
+behavior of this baseline formulation with numerical examples. We then extend this mathematical
+structure to the incompressible Navier–Stokes equations, reviewing its application in both boundary-
+fitted and immersogeometric contexts. Following this, we introduce a generalized nonlinear flux
+framework, which serves as the foundation for our weak boundary condition formulation for
+compressible flows. Alongside these mathematical developments, we review the relevant literature,
+organizing our discussion around the two primary roles established earlier: acting as a near-
+wall model and serving as an enabling technology for direct geometry-to-analysis workflows.
+We focus throughout on computational flow analysis and compare weakly and strongly enforced
+boundary conditions to demonstrate the practical advantages of these formulations. For a systematic
+construction of the underlying Nitsche’s method across general variational problems, we refer the
+reader to Ref. [71].
+The remainder of the paper is organized as follows. Section 2 develops the weak BC operator
+for scalar model problems and reviews its behavior on the advection–diffusion equation. Section 3
+presents the incompressible Navier–Stokes operator and reviews its application to wall-bounded
+turbulence, wind-turbine aerodynamics, and immersogeometric analysis. Section 4 details the
+nonlinear flux formulation, applies it to compressible flows, and reviews relevant boundary-fitted
+and immersogeometric results. Section 5 draws conclusions.
+2. Weak imposition of boundary conditions: scalar model problems
+In this section, we derive the weak BC operator for scalar model problems, beginning with the
+pure advection and pure diffusion equations and then combining them into the advection–diffusion
+problem. The two equations contribute different components. The advection equation contributes
+a flux term that is active on the inflow boundary, stabilizing the formulation where the flow enters
+the domain.
+The diffusion equation contributes the natural consistency flux together with the
+adjoint-consistency and penalty/stabilization terms of Nitsche’s method [71]. In the combined
+advection–diffusion equation, these terms act together, and the local mesh size and the relative
+strength of advection and diffusion control how closely the discrete solution satisfies 𝑢= 𝑔on the
+boundary.
+2.1. Advection equation
+Consider the pure advection equation
+∇· (a𝑢) −𝑓= 0
+in Ω ,
+(1)
+𝑢= 𝑔
+on Γ−,
+(2)
+where a denotes a prescribed advective velocity field (assumed solenoidal), 𝑓is a source term,
+and 𝑢is the unknown scalar quantity being transported on a domain Ω ⊂R2 or R3 with boundary
+𝜕Ω = Γ. The inflow boundary is defined as Γ−= { x ∈Γ | a · n < 0 }, where x denotes a spatial
+point and n is the outward unit normal to Γ. The outflow boundary is given by Γ+ = Γ \ Γ−.
+Accordingly, {·}−and {·}+ denote the negative and positive parts of their argument, respectively.
+To derive the weak formulation, we multiply Eq. (1) by a test function 𝑤and integrate over the
+5
+
+
+domain Ω:
+∫
+Ω
+𝑤∇· (a𝑢) dΩ −
+∫
+Ω
+𝑤𝑓dΩ = 0 .
+(3)
+The advection term in Eq. (3) can be integrated by parts, yielding
+∫
+Ω
+𝑤∇· (a𝑢) dΩ = −
+∫
+Ω
+∇𝑤· a𝑢dΩ +
+∫
+Γ
+𝑤(a · n) 𝑢dΓ .
+(4)
+Substituting this result back into Eq. (3) leads to the weak form
+−
+∫
+Ω
+∇𝑤· a𝑢dΩ +
+∫
+Γ
+𝑤(a · n) 𝑢dΓ −
+∫
+Ω
+𝑤𝑓dΩ = 0 .
+(5)
+On the boundary Γ, the second term in Eq. (5) naturally separates into contributions from the inflow
+and outflow regions:
+−
+∫
+Ω
+∇𝑤· a𝑢dΩ +
+∫
+Γ−
+𝑤{a · n}−𝑢dΓ +
+∫
+Γ+
+𝑤{a · n}+ 𝑢dΓ −
+∫
+Ω
+𝑤𝑓dΩ = 0 .
+(6)
+Substituting Eq. (2) into Eq. (6) on the inflow boundary Γ−yields
+−
+∫
+Ω
+∇𝑤· a𝑢dΩ +
+∫
+Γ−
+𝑤{a · n}−𝑔dΓ +
+∫
+Γ+
+𝑤{a · n}+ 𝑢dΓ −
+∫
+Ω
+𝑤𝑓dΩ = 0 .
+(7)
+To retain the advection term in its original divergence form, ∇· (a𝑢), we reverse the integration
+by parts in Eq. (7) using Eq. (4):
+∫
+Ω
+𝑤∇· (a𝑢) dΩ −
+∫
+Γ
+𝑤(a · n) 𝑢dΓ +
+∫
+Γ−
+𝑤{a · n}−𝑔dΓ +
+∫
+Γ+
+𝑤{a · n}+ 𝑢dΓ
+−
+∫
+Ω
+𝑤𝑓dΩ = 0 .
+(8)
+Splitting the boundary integral over Γ in the second term into its inflow and outflow contributions,
+the outflow terms cancel exactly, and only the inflow contribution remains:
+∫
+Ω
+𝑤∇· (a𝑢) dΩ −
+∫
+Γ−
+𝑤{a · n}−(𝑢−𝑔) dΓ −
+∫
+Ω
+𝑤𝑓dΩ = 0 .
+(9)
+Remark 1. The final weak formulation in Eq. (9) is consistent with the strong form, Eq. (1): the
+inflow term vanishes whenever the Dirichlet condition 𝑢= 𝑔is satisfied on the inflow boundary
+Γ−. The inflow term adds stability: setting 𝑤= 𝑢in the homogeneous case (𝑔= 0), its contribution
+to the bilinear form is −
+∫
+Γ−{a · n}−𝑢2 dΓ ≥0, since a · n < 0 on Γ−. The term therefore adds a
+non-negative, dissipative contribution to the energy estimate on the inflow boundary, supplying the
+control over the inflow data that the advection operator alone does not provide.
+6
+
+
+2.2. Diffusion equation
+Consider the steady-state diffusion problem
+−∇· (𝜅∇𝑢) −𝑓= 0
+in Ω ,
+(10)
+𝑢= 𝑔
+on Γ ,
+(11)
+where Ω ⊂R2 or R3 is a bounded domain with boundary 𝜕Ω = Γ, 𝜅is the diffusivity, and 𝑓is a
+source term. For elliptic problems with 𝜅> 0, it is standard practice to impose Dirichlet conditions
+on the entire boundary Γ. However, rather than enforcing the nodal values of 𝑢directly, we impose
+these conditions weakly. To derive the weak formulation, we multiply Eq. (10) by a test function
+𝑤, integrate over Ω, and apply integration by parts:
+∫
+Ω
+∇𝑤· 𝜅∇𝑢dΩ −
+∫
+Ω
+𝑤𝑓dΩ −
+∫
+Γ
+𝑤𝜅∇𝑢· n dΓ = 0 ,
+(12)
+where n is the outward unit normal to Γ. The boundary integral in Eq. (12) is the natural (Neumann)
+boundary contribution that arises from integration by parts. To impose the Dirichlet condition 𝑢= 𝑔
+weakly while preserving consistency, we add an adjoint-consistency term and a stabilization term,
+which yields
+∫
+Ω
+∇𝑤· 𝜅∇𝑢dΩ −
+∫
+Ω
+𝑤𝑓dΩ −
+∫
+Γ
+𝑤𝜅∇𝑢· n dΓ −
+∫
+Γ
+𝜅∇𝑤· n (𝑢−𝑔) dΓ
++
+∫
+Γ
+𝑤𝜏B (𝑢−𝑔) dΓ = 0 .
+(13)
+Here, the first three terms are the weak form of the partial differential equation (PDE), while the last
+two terms impose the Dirichlet condition weakly. The second-to-last term is the adjoint-consistency
+term, which renders the formulation symmetric. The last term is a penalty/stabilization term that
+penalizes violation of the Dirichlet condition and is essential for the coercivity of the bilinear form,
+with 𝜏B the stabilization parameter. The choice of 𝜏B is a compromise: the parameter must be
+large enough to guarantee stability, but not so large that the operator behaves like a pure penalty
+method, overshadowing the variational consistency that distinguishes Nitsche’s method from a
+penalty method and degrading the conditioning of the resulting linear equation systems [9, 72, 73].
+2.3. Selection of 𝜏B using stability analysis
+To determine an appropriate scaling of the stabilization parameter 𝜏B, we examine the stability
+of the formulation in Eq. (13). To this end, we reformulate the problem as: find 𝑢such that for all
+𝑤,
+𝐵(𝑤, 𝑢) −𝐹(𝑤) = 0 ,
+(14)
+where 𝐵is a bilinear form and 𝐹a linear functional, given by
+𝐵(𝑤, 𝑢) =
+∫
+Ω
+∇𝑤· 𝜅∇𝑢dΩ −
+∫
+Γ
+𝑤𝜅∇𝑢· n dΓ −
+∫
+Γ
+𝜅∇𝑤· n𝑢dΓ +
+∫
+Γ
+𝑤𝜏B𝑢dΓ ,
+(15)
+𝐹(𝑤) =
+∫
+Ω
+𝑤𝑓dΩ −
+∫
+Γ
+𝜅∇𝑤· n𝑔dΓ +
+∫
+Γ
+𝑤𝜏B𝑔dΓ .
+(16)
+7
+
+
+The well-posedness of the problem relies on the coercivity of 𝐵(𝑤, 𝑢). Specifically, we seek a
+norm ||| · ||| and a mesh-independent constant 𝐶> 0 such that
+𝐵(𝑢, 𝑢) ≥𝐶|||𝑢|||2 .
+(17)
+The choice of an energy-equivalent norm is guided by the structure of 𝐵(𝑤, 𝑢). Setting 𝑤= 𝑢in
+Eq. (15) yields
+𝐵(𝑢, 𝑢) =
+∫
+Ω
+𝜅|∇𝑢|2 dΩ
+|           {z           }
+(i)
+−2
+∫
+Γ
+𝑢𝜅∇𝑢· n dΓ
+|               {z               }
+(ii)
++
+∫
+Γ
+𝜏B 𝑢2 dΓ
+|        {z        }
+(iii)
+.
+(18)
+Provided 𝜅> 0 and 𝜏B > 0, terms (i) and (iii) are non-negative and contribute directly to coercivity.
+This motivates defining the discrete energy norm
+|||𝑢|||2 =
+∫
+Ω
+𝜅|∇𝑢|2 dΩ +
+∫
+Γ
+𝜏B 𝑢2 dΓ .
+(19)
+Note that Eq. (19) defines a valid norm as it satisfies all the defining properties of a norm.
+The remaining term (ii), however, lacks a definite sign. We can perform the following steps to
+demonstrate that term (ii) can be bounded by terms (i) and (iii).
+Step 1: Application of Young’s inequality. Applying Young’s inequality
+2|𝑎𝑏| ≤𝑎2/𝜀+ 𝜀𝑏2
+(20)
+for any 𝜀> 0 pointwise on Γ with 𝑎= 𝑢and 𝑏= ∇𝑢· n, we establish the lower bound
+−2
+∫
+Γ
+𝑢𝜅∇𝑢· n dΓ ≥−
+∫
+Γ
+𝜅
+𝜀𝑢2 dΓ
+|       {z       }
+(iv)
+−
+∫
+Γ
+𝜅𝜀(∇𝑢· n)2 dΓ
+|                  {z                  }
+(v)
+.
+(21)
+Term (iv) shares the same functional form as the penalty term (iii) and can be directly absorbed.
+However, term (v) involves the normal flux on the boundary, which is not bounded by the norm in
+Eq. (19).
+Step 2: Trace inverse estimate. To bound term (v), we employ a trace inverse inequality. For
+piecewise polynomial functions, there exists a mesh-independent constant 𝐶I > 0, dependent only
+on the polynomial degree and element type, such that
+∫
+Γ
+(∇𝑢· n)2 dΓ ≤𝐶I
+ℎ
+∫
+Ω
+|∇𝑢|2 dΩ ,
+(22)
+where ℎdenotes the characteristic element size, evaluated element-wise; Eq. (22) is stated in global
+form for notational simplicity.
+8
+
+
+Combining inequalities (21) and (22) yields
+−2
+∫
+Γ
+𝑢𝜅∇𝑢· n dΓ ≥−
+∫
+Γ
+𝜅
+𝜀𝑢2 dΓ −𝜀𝐶I
+ℎ
+∫
+Ω
+𝜅|∇𝑢|2 dΩ .
+(23)
+Substituting Eq. (23) into Eq. (18) and grouping like terms gives
+𝐵(𝑢, 𝑢) ≥
+∫
+Ω
+𝜅
+
+1 −𝜀𝐶I
+ℎ
+
+|∇𝑢|2 dΩ +
+∫
+Γ
+
+𝜏B −𝜅
+𝜀
+
+𝑢2 dΓ .
+(24)
+To ensure coercivity, we therefore need
+𝜀< ℎ
+𝐶I
+(25)
+and
+𝜏B > 𝜅
+𝜀,
+(26)
+which implies that
+𝜏B > 𝐶I 𝜅
+ℎ
+.
+(27)
+Therefore, setting 𝜏B = 𝐶P 𝜅
+ℎ
+with 𝐶P > 𝐶I guarantees stability.
+2.4. Combining the advection and diffusion equations
+The strong form of the steady-state advection–diffusion problem is given as
+∇· (a𝑢) −∇· (𝜅∇𝑢) −𝑓= 0
+in Ω ,
+(28)
+𝑢= 𝑔
+on Γ .
+(29)
+Combining Eqs. (9) and (13), the weak formulation for the advection–diffusion equation is obtained
+as follows: find 𝑢such that for all 𝑤,
+∫
+Ω
+𝑤(∇· (a𝑢) −𝑓) dΩ +
+∫
+Ω
+∇𝑤· 𝜅∇𝑢dΩ −
+∫
+Γ
+𝑤𝜅∇𝑢· n dΓ
+−
+∫
+Γ−
+(𝑤{a · n}−+ 𝜅∇𝑤· n) (𝑢−𝑔) dΓ −
+∫
+Γ+
+𝜅∇𝑤· n (𝑢−𝑔) dΓ
++
+∫
+Γ
+𝑤𝐶P 𝜅
+ℎ
+(𝑢−𝑔) dΓ = 0 .
+(30)
+Remark 2. The combined operator in Eq. (30) adjusts the strength with which the Dirichlet
+condition 𝑢= 𝑔is enforced according to the local mesh size ℎand the relative importance
+of advection and diffusion, so that the appropriate balance is selected automatically rather than
+prescribed manually. The constant 𝐶P must be taken large enough to retain stability and coercivity,
+with its lower bound computed from an element-level inverse estimate [72, 74–77]. On the inflow
+boundary Γ−, the advective contribution adds to the adjoint-consistency and penalty terms, so
+the boundary data is enforced more strongly where the flow enters the domain. In the advective
+limit 𝜅→0, the diffusive adjoint-consistency and penalty terms vanish, the formulation reduces
+9
+
+
+smoothly to the pure-advection operator of Eq. (9), and the condition 𝑢= 𝑔is no longer enforced
+on the outflow boundary Γ+.
+2.5. Numerical examples: the advection–diffusion equation
+We begin by examining the behavior of the weak BC operator on the scalar advection–diffusion
+equation (see Eq. (30)). The original study of Ref. [3] compared the weakly and strongly enforced
+formulations on a sequence of 1D, 2D, and 3D boundary-layer problems. The 1D and 2D examples
+consider the transport of a scalar whose exact solution has a thin boundary layer near the wall that the
+mesh is too coarse to resolve. With strong enforcement, requiring the discrete solution to attain the
+prescribed value on the wall over an under-resolved boundary layer produces spurious oscillations
+that propagate into the interior. With weak enforcement through the operator of Eq. (30), the
+discrete solution is allowed to depart from the boundary value by an amount controlled by the
+local mesh size and the relative strength of advection and diffusion. The spurious oscillations are
+reduced or removed, and the solution away from the boundary is more accurate as a result.
+A representative 2D case is advection skew to the mesh, where the diffusivity is small, making
+the problem advection-dominated. The presence of unresolved interior and boundary layers poses
+difficulties for most existing techniques, and oscillations are often observed in their vicinity. Com-
+paring computations in which all Dirichlet conditions are enforced strongly with those in which they
+are enforced weakly (Figure 1), we observe that strong enforcement produces a spurious overshoot
+at the outflow boundary, where the boundary layer is unresolved on the coarse mesh. The computed
+result exceeds the exact solution by more than 50%. Weak enforcement successfully removes this
+overshoot at the outflow boundary, while reproducing the inflow data fairly well, with only a slight
+oscillation in the region of the discontinuity.
+(a) Problem description and data
+(b) Strong BC 
+(c) Weak BC 
+Figure 1: Advection skew to the mesh: strongly enforced versus weakly enforced Dirichlet boundary conditions.
+Adapted from Ref. [3].
+10
+
+
+(a) Problem description and data
+(b) NURBS meshes 1–3
+(c) Solution on the whole domain
+(d) Detail of the outflow boundary layers
+(e) Axisymmetric solution contours 
+at various angular position on 
+finest mesh 
+(f) Convergence to exact solution
+u = 0
+u = 0
+log r
+log 2
+Flow
+∂u
+∂r =
+ePe(z)−ePe(L)
+(1−ePe(L))2 log 2
+a = (1, 0, 0)
+κ = 0.025
+L = 5, Ri = 1, Ro = 2
+Pe(z) = |a|z/κ
+102
+101
+100
+10-1
+10-2
+10-3
+10-4
+10-1
+100
+Figure 2: Advection–diffusion in an annular region: problem setup, NURBS meshes, and solutions. Adapted from
+Ref. [3].
+The 3D example is posed on an annular region (Figure 2), for which an exact geometric
+description of the hollow cylinder is obtained using a quadratic NURBS basis in the isogeometric
+framework [2]. The Dirichlet conditions are imposed weakly on a sequence of meshes that are
+locally refined in the thin outflow layer. The weak formulation yields a stable solution that recovers
+the pointwise axisymmetric response expected for the problem, and the error measured against the
+analytical solution in the 𝐿2-norm and 𝐻1-seminorm shows optimal convergence rates under mesh
+refinement.
+Two features of these results carry over to all subsequent formulations. First, the weak operator
+is variationally consistent: the exact solution satisfies the discrete formulation, so weak enforcement
+introduces no modeling error, and refinement recovers the strongly enforced result. Second, the
+advantage of weak enforcement is largest where strong enforcement performs worst—on meshes
+too coarse to resolve the boundary layer. Both properties hold for the wall-bounded turbulent
+flows introduced later, where the boundary layer is physical rather than a feature of a manufactured
+solution.
+3. Weak BCs for incompressible flow
+The scalar developments of the previous section carry over directly to the no-slip condition for
+the incompressible Navier–Stokes equations, the setting in which weak BCs have seen their widest
+use.
+3.1. The incompressible Navier–Stokes weak BC operator
+Let Ω ⊂R𝑑, 𝑑= 2 or 3, be the spatial domain with boundary Γ = 𝜕Ω. Let ΓD ⊂Γ denote
+the portion on which the velocity is prescribed and ΓN ⊂Γ be the Neumann boundary. The strong
+11
+
+
+form of the problem can be written as
+𝜌
+𝜕u
+𝜕𝑡+ u · ∇u −f
+
+−∇· 𝝈(u, 𝑝) = 0
+in Ω ,
+(31)
+∇· u = 0
+in Ω ,
+(32)
+u = g
+on ΓD ,
+(33)
+−𝑝n + 2𝜇𝜺(u) n = h
+on ΓN ,
+(34)
+where u is the velocity, 𝑝is the pressure, 𝜌is the (constant) density, f is the body force per unit
+mass, h is the prescribed traction on ΓN, and 𝝈(u, 𝑝) = −𝑝I + 2𝜇𝜺(u) is the stress tensor, with I
+the identity tensor, 𝜇the dynamic viscosity, and 𝜺(u) = 1
+2
+
+∇u + (∇u)T
+the strain-rate tensor. On
+a no-slip boundary, g is the prescribed velocity, which is zero for a stationary wall.
+The discrete problem is posed over finite element (or, in IGA, NURBS) spaces and is stabilized
+using the residual-based VMS formulation [8], which on moving domains is recast in its ALE–
+VMS form [20, 28]. The VMS framework decomposes the velocity and pressure into coarse- and
+fine-scale parts, u = uℎ+u′ and 𝑝= 𝑝ℎ+ 𝑝′, where the coarse scales are represented by the discrete
+spaces and the fine scales are modeled.
+Let 𝐵VMS  {wℎ, 𝑞ℎ}, {uℎ, 𝑝ℎ} and 𝐹VMS  {wℎ, 𝑞ℎ}
+denote, respectively, the semi-linear form and the linear functional of the semi-discrete VMS
+formulation, where {uℎ, 𝑝ℎ} are the coarse-scale velocity and pressure trial solutions and {wℎ, 𝑞ℎ}
+the corresponding test functions. The fluid domain Ω is divided into individual spatial finite element
+subdomains Ω𝑒, and the detailed expressions for 𝐵VMS and 𝐹VMS are
+𝐵VMS 
+{wℎ, 𝑞ℎ}, {uℎ, 𝑝ℎ}
+
+=
+∫
+Ω
+wℎ· 𝜌
+𝜕uℎ
+𝜕𝑡+ uℎ· ∇uℎ
+
+dΩ +
+∫
+Ω
+𝜺(wℎ) : 𝝈(uℎ, 𝑝ℎ) dΩ
++
+∫
+Ω
+𝑞ℎ∇· uℎdΩ −
+∑︁
+𝑒
+∫
+Ω𝑒
+
+uℎ· ∇wℎ+ ∇𝑞ℎ
+𝜌
+
+· u′ dΩ −
+∑︁
+𝑒
+∫
+Ω𝑒𝑝′∇· wℎdΩ
++
+∑︁
+𝑒
+∫
+Ω𝑒wℎ·
+
+u′ · ∇uℎ
+dΩ −
+∑︁
+𝑒
+∫
+Ω𝑒
+∇wℎ
+𝜌
+: (u′ ⊗u′) dΩ
++
+∑︁
+𝑒
+∫
+Ω𝑒
+
+u′ · ∇wℎ
+· ¯𝜏
+
+u′ · ∇uℎ
+dΩ ,
+(35)
+and
+𝐹VMS 
+{wℎ, 𝑞ℎ}
+
+=
+∫
+Ω
+wℎ· 𝜌f dΩ +
+∫
+ΓN wℎ· h dΓ ,
+(36)
+where u′ and 𝑝′ are the fine-scale terms associated with the VMS formulation, modeled in terms
+of the residuals of the coarse-scale solution as
+u′ = −𝜏M
+
+𝜌
+𝜕uℎ
+𝜕𝑡+ uℎ· ∇uℎ−f
+
+−∇· 𝝈
+
+uℎ, 𝑝ℎ
+,
+(37)
+𝑝′ = −𝜌𝜏C∇· uℎ.
+(38)
+12
+
+
+In the above, ¯𝜏, 𝜏M, and 𝜏C are the stabilization parameters, and their detailed expressions can be
+found in Ref. [53]. Other options for the stabilization parameters can be found in Refs. [78–81].
+In the standard, strongly enforced approach, the trial and test functions are constrained to satisfy
+uℎ= g and wℎ= 0 on ΓD, and the discrete problem is given by 𝐵VMS −𝐹VMS = 0. To enforce the
+condition weakly, the constraint is removed from the function spaces and the following weak BC
+operator is added to the formulation:
+−
+∫
+ΓD wℎ·
+
+−𝑝ℎn + 2𝜇𝜺
+
+uℎ
+n
+
+dΓ
+−
+∫
+ΓD
+
+2𝜇𝜺
+
+wℎ
+n + 𝑞ℎn
+
+·
+
+uℎ−g
+
+dΓ
+−
+∫
+ΓD−
+wℎ· 𝜌
+
+uℎ· n
+ 
+uℎ−g
+
+dΓ
++
+∫
+ΓD 𝜏TAN
+B
+
+wℎ−
+
+wℎ· n
+
+n
+
+·
+
+uℎ−g
+
+−
+
+uℎ−g
+
+· n
+
+n
+
+dΓ
++
+∫
+ΓD 𝜏NOR
+B
+
+wℎ· n
+ 
+uℎ−g
+
+· n
+
+dΓ ,
+(39)
+where ΓD
+−=
+
+x ∈ΓD | uℎ· n < 0
+	
+is the inflow part of ΓD, n is the outward unit normal, and
+𝜏TAN
+B
+and 𝜏NOR
+B
+are stabilization parameters acting on the tangential and normal components of the
+velocity, respectively.
+The five terms in Eq. (39) are the vector, momentum-equation counterparts of the contributions
+derived for the scalar case. The first term is the consistency term. It cancels the traction that
+arises from integration by parts of the stress in the interior formulation, so that no spurious traction
+is imposed on the no-slip boundary, and it ensures that the exact solution satisfies the discrete
+formulation. The second term is the adjoint-consistency term, the symmetric counterpart of the
+first; its presence renders the formulation adjoint consistent, which is associated with optimal
+convergence in lower-order norms. Note that the continuity test function 𝑞ℎalso appears in this
+term, so that the wall-normal component of the Dirichlet condition is weighted by the pressure test
+function as well. The third term is active only on the inflow portion ΓD
+−and further enforces the
+boundary condition where flow enters the domain; as shown for pure advection in Section 2.1, it
+adds a non-negative contribution to the energy estimate and improves stability without affecting
+consistency or adjoint consistency. The final two terms are the Nitsche-type stabilization terms,
+which penalize the deviation of the discrete velocity from g and provide the coercivity that the
+consistency and adjoint-consistency terms would otherwise compromise.
+The tangential and
+normal components are penalized separately, which allows the no-penetration condition in the
+normal direction to be enforced more strongly than the no-slip condition in the tangential direction.
+Following the analysis of the scalar diffusion equation, the penalty parameter is now given by
+𝜏(·)
+B = 𝐶P 𝜇
+ℎ𝑛
+,
+(40)
+where ℎ𝑛is a measure of the element size at the boundary, taken in the wall-normal direction, and
+𝐶P is a dimensionless constant whose lower bound follows from the inverse estimate in Eq. (22).
+13
+
+
+Remark 3. Under mesh refinement, the no-slip condition is recovered in the limit ℎ→0 [4]. On a
+sufficiently fine boundary-layer mesh, the weak operator yields results close to those obtained with
+strong enforcement. On a coarse mesh, however, the discrete solution is allowed to slip at the wall.
+This controlled slip acts as a model for the unresolved thin boundary layer, and accurate global flow
+quantities are obtained even when the wall-normal mesh size is large [3–5].
+Remark 4. For immersed methods, in which ΓD cuts arbitrarily through the interiors of the back-
+ground elements, the integrals in Eq. (39) are evaluated over the immersed surface independently
+of the background mesh. Because the operator references only traces of the discrete fields on ΓD,
+no boundary nodes are required. On a cut element, 𝜏(·)
+B may be prescribed directly [52, 53] or
+estimated from the local cut configuration [72, 82, 83]. These properties make weak enforcement
+applicable in the immersed setting, where the absence of boundary-fitted nodes renders strong
+enforcement of the boundary conditions infeasible.
+3.2. Wall-bounded turbulent flows
+Equilibrium turbulent channel flow, the canonical wall-bounded turbulence benchmark, was the
+first turbulent flow on which weakly enforced no-slip conditions were shown to outperform their
+strong counterparts [3]. At a friction Reynolds number of 𝑅𝑒𝜏= 180, on uniform meshes that
+could not resolve the near-wall region, strongly enforced no-slip conditions overpredicted the mean
+velocity, while weakly enforced conditions recovered mean profiles in close agreement with the
+direct numerical simulation (DNS) data [84] (Figure 3). Convergence of the mean profile under
+mesh refinement was substantially faster for the weak formulation. Even though no turbulence
+physics was built into the boundary term, its behavior resembled that of a wall-function model.
+Solid wall
+Flow driven by pressure gradient
+(a) Problem setup
+(b) Streamwise velocity contours
+(c) Convergence of the mean flow: Strong BC
+(d) Convergence of the mean flow: Weak BC
+–1
+–0.8
+–0.6
+–0.4
+–0.2
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+0.5
+1
+1.5
+y
+U
+8x16x8
+16x32x16
+32x64x32
+DNS
+–1
+–0.8
+–0.6
+–0.4
+–0.2
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+0.5
+1
+1.5
+y
+U
+8x16x8
+16x32x16
+32x64x32
+DNS
+(e) Convergence of the mean flow in the 
+boundary layer: Strong BC
+(f) Convergence of the mean flow in the 
+boundary layer: Weak BC
+Figure 3: Turbulent channel flow at 𝑅𝑒𝜏= 180: convergence of the mean velocity profile to the DNS benchmark for
+strongly and weakly enforced no-slip conditions on uniform meshes. Adapted from Ref. [3].
+14
+
+
+643 (Stretched) 
+ 0.5
+ 1
+ 1.5
+w+
+ 0
+ 0.5
+ 1
+v+
+ 0.5
+ 1
+ 1.5
+ 2
+ 2.5
+ 3
+ 3.5
+ 4
+ 4.5
+0
+100
+200
+300
+400
+500
+600
+700
+800
+900
+1000
+u+
+y+
+DNS
+DNS
+Strong
+Strong
+Orig. Weak
+Orig.Weak
+Weak (Wall)
+Weak (Wall)
+(a) Snapshot of stream-wise velocity contours
+(b) Mean stream-wise velocity
+(c) Velocity fluctuations
+Res = 950
+Figure 4: Turbulent channel flow at 𝑅𝑒𝜏= 395 and 𝑅𝑒𝜏= 950: mean velocity profiles for the strong, original weak,
+and law-of-the-wall weak formulations, compared with DNS. Adapted from Ref. [4].
+This observation motivated a reformulation that incorporated the law of the wall consistently
+into the weak operator, which further improved the prediction of mean-flow quantities at 𝑅𝑒𝜏= 395
+and 950 (Figure 4) [4]. The isogeometric variational multiscale formulation with weak BCs was
+subsequently assessed on unstretched meshes [19], and the connection of weak BCs to near-wall
+modeling was studied further in the context of large-eddy simulation (Figure 5) [15]. Because
+the weak BC formulation reduces to strong enforcement as the wall-normal mesh size vanishes,
+refinement toward the wall recovers the exact no-slip condition.
+The additional cost of weak
+enforcement is negligible, since the added integrals are evaluated only over the wall boundary [4].
+The same near-wall mechanism extends to thermal boundary layers. For natural convection in a
+differentially heated cavity at high Rayleigh number, where the thermal and velocity boundary layers
+on the hot and cold walls are both thin, weakly imposing the velocity and temperature Dirichlet
+conditions on coarse, boundary-fitted meshes improved the prediction of the wall Nusselt number
+relative to strong enforcement [6]. On a coarse, uniform mesh, weak enforcement also recovered
+temperature and velocity profiles that matched both the reference data and the strongly enforced
+results on fine meshes (Figure 6). This establishes that the coarse-mesh advantage observed for
+the no-slip condition carries over to thermal Dirichlet data, a property that becomes important in
+the compressible-flow setting of Section 4, where the wall-temperature condition is also imposed
+weakly.
+3.3. Aerodynamics of wind turbines
+Wind-turbine aerodynamics involves thin boundary layers developing over large-scale geome-
+tries. Fully resolving the boundary layer over the rotor is often computationally expensive and
+impractical. Obtaining accurate solutions on coarse meshes is therefore highly desirable, and this
+is the regime in which weak BCs are most effective. Combined with the ALE–VMS formulation
+on a rotating mesh, weak BCs reproduced the measured aerodynamic (low-speed-shaft) torque and
+the blade-surface pressure distribution of the full-scale NREL Phase VI rotor on meshes with only
+15
+
+
+(a)
+(b)
+(c)
+Figure 5: Large-eddy simulation of turbulent channel flow at 𝑅𝑒𝜏= 950 with near-wall modeling through weakly
+enforced no-slip conditions: (a) mean velocity in log wall units, (b) root-mean-square velocity profiles, both compared
+with DNS (and the law of the wall in (a)), and (c) instantaneous flow-speed contours. Adapted from Ref. [15].
+(a) Problem setup
+(b) Streamlines and velocity contour
+(c) Temperature contour
+(d) Temperature along the 
+horizontal median line
+(e) Vertical velocity along the 
+horizontal median line
+(f) Temperature along the 
+vertical median line    
+(g) Horizontal velocity along 
+the vertical median line
+Figure 6: Natural convection in a differentially heated cavity at 𝑅𝑎= 109: problem setup, flow visualization, and mean
+temperature and velocity profiles along the median lines for weakly enforced velocity and temperature conditions on a
+coarse 100 × 100 mesh and strongly enforced conditions on a fine 600 × 600 mesh, compared with reference LES data.
+Adapted from Ref. [6].
+16
+
+
+(a) NREL Phase VI
+(b) Computational domain
+(c) Mesh
+(d) Aerodynamic torque at 5 m/s
+(e) Aerodynamic torque at 25 m/s
+Time (s)
+Low Speed Shaft Torque (N m)
+0
+1
+2
+3
+-400
+-200
+0
+200
+400
+600
+800
+NREL
+Experiment
+ALE VMS
+(Weak BC)
+ALE VMS
+(Strong BC)
+Time (s)
+Low Speed Shaft Torque (N m)
+0.2
+0.4
+0.6
+0.8
+1
+1.2
+400
+800
+1200
+1600
+2000
+2400
+NREL
+Experiment
+ALE VMS
+(Weak BC)
+ALE VMS
+(Strong BC)
+Figure 7: NREL Phase VI rotor: aerodynamic (low-speed-shaft) torque for weakly and strongly enforced no-slip
+conditions, compared with experimental data, at 5 m/s and 25 m/s. The strong-BC computation stalls and underpredicts
+the torque on the coarse boundary-layer mesh. Adapted from Ref. [5].
+coarse boundary-layer refinement [5]. On the same meshes, strong enforcement produced spurious
+flow separation and underpredicted the torque (Figure 7).
+The cause of the torque error is visible in the near-wall flow. On the coarse mesh, the strongly
+enforced computation develops a thick, under-resolved boundary layer that separates prematurely,
+whereas the weakly enforced computation allows the flow to remain attached and recovers the
+correct surface pressure. The same comparison, with no change to the formulation, was repeated
+on the much larger NREL 5MW offshore wind-turbine rotor [5]. The behavior was similar at
+both scales: weak enforcement on a coarse boundary-layer mesh reproduced the reference torque,
+while strong enforcement produced a thick spurious boundary layer, unphysical separation, and an
+inaccurate torque. The cross-section contour and streamline plots (Figure 8) clearly illustrate this
+difference in flow separation for both rotors.
+A comprehensive validation of the weakly enforced ALE–VMS formulation against the NREL
+Phase VI experiment was subsequently carried out across the full measured wind-speed range, from
+5 to 25 m/s [20]. The rotor-only simulations reproduced the measured low-speed-shaft torque, root
+flap bending moment, sectional force coefficients, and blade-surface pressure distributions, again
+17
+
+
+(a) NREL Phase VI wind turbine: Coarser Mesh
+(b) NREL Phase VI wind turbine: Weak BC
+(c) NREL Phase VI wind turbine: Strong BC
+(d) NREL 5MW offshore baseline wind turbine: 
+Coarser Mesh
+(e) NREL 5MW offshore baseline wind turbine: 
+Weak BC
+(f) NREL 5MW offshore baseline wind turbine: 
+Strong BC
+Figure 8: Weakly versus strongly enforced no-slip conditions on coarse boundary-layer meshes, shown through air-
+speed contours with velocity streamlines at a blade cross-section: (a)–(c) NREL Phase VI rotor at 5 m/s (0.8𝑅) and
+(d)–(f) NREL 5MW offshore baseline rotor (0.75𝑅), each with weak and strong enforcement. Strong enforcement
+produces a thick, under-resolved boundary layer and premature separation at both scales. Adapted from Ref. [5].
+on boundary-layer meshes far coarser than strong enforcement would require. The same weak
+BC operator and the same parameter values were used throughout, even though the flow regime
+varied substantially with wind speed, ranging from fully attached at 5 m/s to massively separated
+at 25 m/s (Figure 9). This insensitivity to the flow regime contrasts with classical eddy-viscosity
+wall models, which typically require recalibration for each flow condition.
+To capture the influence of the tower, the study was extended to the full wind-turbine configura-
+tion of rotor, nacelle, and tower [20]. The rotating (rotor) and stationary (tower) subdomains were
+coupled across a non-matching sliding interface, with kinematic and traction continuity enforced
+weakly through Nitsche-type interface terms analogous to the weak wall BC operators [20, 28].
+The full-machine results reproduced the measured blade–tower interaction: as a blade passes in
+front of the tower, the single-blade aerodynamic torque at the 7 m/s condition drops by about 8%,
+an effect the rotor-only model cannot capture (Figure 10).
+3.4. Immersogeometric analysis
+The previous applications demonstrate how weak boundary conditions reduce computational
+cost in boundary-fitted frameworks.
+Here, we show that these operators are essential in non-
+boundary-fitted discretizations. As discussed in Section 1.3, immersed methods embed the geom-
+etry within a background mesh that does not conform to the physical boundaries. The interface
+arbitrarily intersects the fluid elements, making the strong imposition of wall conditions infeasible.
+Immersogeometric analysis instead couples a weak boundary condition operator with geometrically
+accurate quadrature over the intersected elements, ensuring both the weak imposition of Dirichlet
+boundary conditions and a faithful representation of the immersed surface without a boundary-fitted
+mesh.
+18
+
+
+Wind speed (m/s)
+Low-speed shaft torque (N m)
+0
+5
+10
+15
+20
+25
+30
+0
+400
+800
+1200
+1600
+2000
+NREL Exp.
+ALE VMS
+Wind speed (m/s)
+Root flap bending moment (N m)
+0
+5
+10
+15
+20
+25
+30
+0
+1000
+2000
+3000
+4000
+5000
+6000
+NREL Exp.
+ALE VMS
+X/Chord
+0
+0.2
+0.4
+0.6
+0.8
+1
+-Cp
+-2
+0
+2
+4
+ALE VMS
+NREL Exp.
+5m/s; r/R = 80%
+X/Chord
+0
+0.2
+0.4
+0.6
+0.8
+1
+-Cp
+-2
+0
+2
+4
+ALE VMS
+NREL Exp.
+7m/s; r/R = 80%
+X/Chord
+0
+0.2
+0.4
+0.6
+0.8
+1
+-Cp
+-2
+0
+2
+4
+6
+ALE VMS
+NREL Exp.
+10m/s; r/R = 80%
+X/Chord
+-Cp
+0
+0.2
+0.4
+0.6
+0.8
+1
+-2
+0
+2
+4
+ALE VMS
+NREL Exp.
+15m/s; r/R = 80%
+X/Chord
+-Cp
+0
+0.2
+0.4
+0.6
+0.8
+1
+-2
+0
+2
+4
+ALE VMS
+NREL Exp.
+20m/s; r/R = 80%
+X/Chord
+-Cp
+0
+0.2
+0.4
+0.6
+0.8
+1
+-2
+0
+2
+4
+ALE VMS
+NREL Exp.
+25m/s; r/R = 80%
+Figure 9: NREL Phase VI rotor-only validation with weakly enforced no-slip conditions, across wind speeds from 5 to
+25 m/s: air-speed contours and velocity streamlines, low-speed-shaft torque and root flap bending moment versus wind
+speed, and sectional pressure coefficient. The latter two are compared with the NREL experimental data. Adapted
+from Ref. [20].
+(a) Computational setup and mesh
+(b) Air speed contour and Q-criterion at 7 m/s
+(c) Aerodynamic torque at 7 m/s
+(d) Aerodynamic torque at 10 m/s
+Figure 10: NREL Phase VI full-wind-turbine simulation with the sliding-interface method at 7 m/s and 10 m/s: the
+full-tower model closely matches the experimental measurements of the torque drop as the blade passes in front of the
+tower (180◦), in contrast to the rotor-only result. Adapted from Ref. [20].
+3.4.1. The tetrahedral finite cell method
+The immersogeometric concept was established for incompressible flow around complex ge-
+ometries using a tetrahedral finite cell method, in which the immersed object is embedded in a
+19
+
+
+non-boundary-fitted tetrahedral mesh and the cut elements are integrated by sub-cell-based adaptive
+quadrature [53]. Tetrahedral background elements were chosen for their flexibility in providing
+local refinement around complex geometries, and the intersected elements were recursively sub-
+divided into quadrature sub-cells to faithfully capture the volume integral on the fluid side of the
+immersed surface without modifying the underlying mesh.
+The method was assessed on flow past a sphere at Reynolds numbers of 𝑅𝑒= 100, 300, and 3700.
+This range covers steady and unsteady laminar regimes, as well as the transitional and turbulent wake
+features present at 𝑅𝑒= 3700. The drag coefficient, Strouhal number, recirculation length, and
+surface pressure distribution were all in excellent agreement with boundary-fitted reference values
+on meshes of comparable resolution. At 𝑅𝑒= 3700, the computed time-averaged quantities and
+wake statistics also compared favorably to DNS data from the literature (Figure 11). A systematic
+study showed that the immersogeometric results converge to the boundary-fitted reference under
+subdivision of the adaptive quadrature, without requiring the background fluid mesh to be refined
+beyond the resolution of its boundary-fitted counterpart. The method was then applied to the
+aerodynamic analysis of a full-scale agricultural tractor at 𝑅𝑒≈3 × 106. The tractor contains fine
+geometric features that would typically require extensive defeaturing for boundary-fitted analysis.
+However, the immersogeometric workflow efficiently generated a background mesh that intersects
+with the tractor surface without requiring geometric simplification. The time-averaged pressure
+distribution and surface drag were captured with an accuracy comparable to that of a boundary-fitted
+reference on a mesh of similar size (Figure 11).
+(a) Sphere: Computational setup
+(b) Sphere: Background mesh
+(d) Sphere: Comparison of vorticity contour at Re = 3700
+Boundary-fitted
+Immersogeometric
+(c) Sphere: Convergence of  drag and 
+pressure coefficient under AQ level
+Re = 100
+Re = 3700
+(e) Tractor: Computational setup
+(f) Tractor: Background mesh
+Boundary-fitted
+Immersogeometric
+Boundary-fitted
+Immersogeometric
+(g) Tractor: Comparison of velocity and pressure
+Figure 11: Tetrahedral finite cell method: immersed sphere benchmark and industrial-scale tractor aerodynamics on
+non-boundary-fitted meshes. Adapted from Ref. [53].
+20
+
+
+3.4.2. Direct flow analysis on CAD models
+Because IMGA enforces boundary conditions directly on the immersed geometry through the
+weak BC operator rather than on a discrete surface mesh, it can natively utilize B-rep CAD models.
+Two geometric operations drive the analysis: a surface quadrature on the immersed B-rep for
+evaluating the weak BC integrals, and a point membership classification of background-mesh
+quadrature points to identify those inside or outside the immersed object [58]. Surface quadrature
+is generated directly on the trimmed B-rep surfaces, and the point membership classification is
+performed efficiently through a high-resolution voxelization obtained from GPU rendering of the
+immersed surfaces. The framework was initially developed for trimmed NURBS patches [58]
+and subsequently extended to analytic surfaces such as planes, cones, spheres, and tori that would
+otherwise require conversion to NURBS for analysis [59]. Validation on flow past a sphere using
+three boundary representations (triangulated, untrimmed NURBS, and trimmed NURBS) showed
+that the drag coefficient converges to values in close agreement with reference data under refinement
+of the surface quadrature density. The framework was then applied to the aerodynamic analysis
+of an agricultural tractor and a semi-trailer truck, both immersed directly as B-rep CAD models
+into a background mesh and bypassing the labor-intensive steps of defeaturing and surface meshing
+(Figure 12).
+(a) B-rep CAD and corresponding untrimmed NURBS patches
+(b) Locally refined tetrahedral mesh
+(c) Voxelization for point classification
+(d) Flow simulation of industrial tractor with IMGA
+(e) SolidWorks plugin for 
+generating surface quadrature 
+(f) Flow simulation of semi-trailer truck with IMGA
+Figure 12: Immersogeometric analysis driven directly by B-rep CAD models. Adapted from Refs. [58, 59].
+21
+
+
+3.4.3. Free-surface, moving-object, and industrial-scale flows
+The immersogeometric framework was extended to free-surface flows of interest in marine
+engineering [63]. The weak BC operator on the immersed structure was coupled with a level-set
+treatment of the air–water interface, and a residual-based VMS formulation was used to stabilize
+the coupled Navier–Stokes and level-set convection equations. The method was assessed on three
+benchmark problems of increasing complexity: a solitary wave impacting a stationary platform, a
+dam break with an obstacle, and the planing of a DTMB 5415 ship hull. The predicted pressure
+histories and free-surface elevations were in good agreement with experimental measurements and
+boundary-fitted reference simulations (Figure 13).
+IMGA was also extended to moving-object problems, in which a rigid body translates and
+rotates through a non-boundary-fitted background mesh under the action of integrated surface
+forces and external body forces [64]. Particular attention was given to the freshly cleared nodes,
+namely background nodes that were inside the object at one time step and in the fluid domain at the
+next. Because these nodes lacked a field history, their values were interpolated from neighboring
+fluid nodes and points on the object surface. The method was validated on free-falling 2D cylinders
+and 3D spheres in viscous fluids, with terminal velocities and trajectories matching analytical
+and experimental references. It was then applied to 2D inertial particle focusing in straight and
+pillar-obstructed microfluidic channels (Figure 14). At comparable accuracy, the moving IMGA
+simulations were approximately eight times faster than a boundary-fitted commercial code at the
+same mesh density. The framework was later extended to utilize adaptively refined, octree-based
+background meshes to enable scalable 3D simulations of inertial particle migration in straight and
+converging-diverging microchannels [65].
+To support industrial-scale large-eddy simulations, IMGA was implemented on adaptively
+(a) Solitary wave impacting a platform
+(b) Dam break with an obstacle
+(c) Ship planing
+Figure 13: Immersogeometric analysis of free-surface flows: solitary wave impacting a platform, dam break with an
+obstacle, and ship planing. Adapted from Ref. [63].
+22
+
+
+(a) Free-falling sphere
+(b) Inertial particle focusing
+Figure 14: Immersogeometric analysis of moving objects in incompressible flows: free-falling sphere in a viscous fluid
+and inertial particle focusing in a pillar-obstructed microfluidic channel, with the no-slip condition enforced weakly on
+the moving immersed surface. Adapted from Ref. [64].
+Re = 100
+Re = 160,000
+Re = 1,000,000
+(a) Flow past a sphere
+(c) Truck platooning
+(b) HPC weak scaling 
+Figure 15: Immersogeometric analysis of industrial-scale flows: sphere drag crisis and semi-truck platooning. Adapted
+from Ref. [66].
+refined octree background meshes with a parallel framework that demonstrated scalability up to
+32K processors [66].
+Efficiency at this scale was further enabled by rapid point membership
+classification and tensorized matrix assembly. The framework was applied to the flow over a sphere
+across Reynolds numbers from 1 to 106, reproducing the drag crisis observed in experiments. It
+was also used to characterize the drag reduction of the trailing vehicle in a two-truck semi-trailer
+platoon (Figure 15).
+3.4.4. Direct flow analysis on point clouds, photogrammetric reconstructions, and medical images
+Alongside direct point-cloud analysis in solid mechanics with the finite cell method [85, 86],
+IMGA has recently been applied directly to sampled representations of physical objects, bypassing
+23
+
+
+(c) Flow past an industrial commercial-vehicle
+CAD to point cloud
+(a) Flow past a sphere at Re = 3700
+(b) Validation of Nusselt number for buoyancy-driven flow
+Figure 16: Direct immersogeometric flow and heat transfer analysis on point clouds, with the no-slip condition enforced
+weakly on the points: fluid and thermal validations against boundary-fitted references and an industrial construction-
+vehicle application. Adapted from Ref. [67].
+the geometric model altogether. A sufficiently dense point cloud of the object boundary provides
+the geometric traces needed to evaluate the weak BC operator, enabling flow analysis without
+reconstructing a CAD model or a discrete surface mesh [67–70]. Three geometric operations
+drive the analysis directly from the point cloud: inside–outside classification of the background-
+mesh quadrature points, estimation of the surface normal at each point, and computation of the
+Jacobian determinant used for surface integration. The classification uses the winding number,
+which extends naturally to non-manifold and non-watertight inputs and therefore does not require
+a watertight surface representation. The framework was assessed on benchmark problems across
+a wide range of Reynolds numbers, including incompressible flow past a sphere, with surface
+pressure and flow quantities in excellent agreement with boundary-fitted references. It was further
+extended to heat transfer, with thermal Dirichlet conditions imposed weakly on the points alongside
+the no-slip condition. The method was then applied to a John Deere 544K Wheel Loader, sampled
+from the as-designed CAD assembly as a point cloud of over 12 million points (Figure 16). The
+wheel loader is composed largely of finite-thickness shells with gaps, intersections, and collocated
+faces that would require extensive cleanup and defeaturing for boundary-fitted analysis. Using
+the point-cloud representation circumvents this geometry-simplification step entirely. The small
+geometric details are fully preserved, and their impact on the flow is clearly visible (Figure 16).
+Photogrammetry-based CFD [68] extends this capability to in-use civil structures using geome-
+try acquired from photographic surveys. The reconstruction pipeline begins with a structure-from-
+motion (SfM) step to estimate camera poses from a set of overlapping 2D images. Next, a learned
+multi-view stereo step infers a dense depth map for each image and fuses these maps into a dense
+point cloud. An octree-based subsampling method then generates a more uniformly distributed
+24
+
+
+(a) Flow past a scanned soda can
+Re = 300
+Re = 5000
+Re = 5000
+Re = 300
+Point cloud
+Boundary-fitted
+(b) Flow past a scanned tower
+(c) Flow past a scanned bridge
+Figure 17: Photogrammetry-based CFD on point clouds of in-use civil structures, with the no-slip condition enforced
+weakly on the reconstructed points. Adapted from Ref. [68].
+point cloud suitable for immersogeometric analysis. The framework was validated on the flow past
+a standard 12 oz soda can reconstructed from cellphone imagery, at Reynolds numbers of 300 and
+5000, with the surface pressure coefficients and the wake velocity profiles matching the boundary-
+fitted references computed on an idealized CAD model of the same can [68]. The approach was then
+applied to two in-use civil structures captured by drone surveys: a bell tower and a pedestrian bridge
+(Figure 17). In both cases, the flow analysis was carried out directly on the reconstructed point
+clouds. These applications demonstrated the robustness of the photogrammetry-based high-fidelity
+CFD framework for evaluating the aerodynamics of complex, real-world infrastructure.
+Real-world point clouds are frequently characterized by noise, incompleteness, and irregular
+sampling due to sensor inaccuracies, surface reflections, and limited scanning coverage. To address
+these issues, Jaiswal et al. [69] introduced NIMBUS, an integrated framework combining immer-
+sogeometric CFD, photogrammetric reconstruction, and mesh-driven resampling. The resampling
+step uses the background fluid mesh to define the target point distribution. A local quadratic surface
+is fitted to the original points nearest to an intersected element. The medians of the element are
+then intersected with this surface to generate exactly one resampled point per intersected element.
+This guarantees that each intersected background element contains at least one point, which is the
+local requirement for effective weak enforcement of the no-slip condition. Additionally, a ghost
+penalty operator was applied to address both the stability and ill-conditioning issues caused by small
+cut elements inherent to immersed methods [87–93]. The approach was validated on a randomly
+sampled sphere to demonstrate hole-filling and noise robustness, and on the Stanford dragon to
+25
+
+
+Resampling Stanford Dragon on three background mesh, while preserving features
+(a) Flow past the Stanford dragon
+(b) Flow past a scanned statue
+Before 
+resampling:
+After 
+resampling:
+Figure 18: Mesh-driven resampling and regularization for robust point-cloud-based flow analysis on scanned objects.
+Adapted from Ref. [69].
+show the retention of fine geometric details while filling sparse regions. For the Stanford bunny,
+resampling the point cloud to match each background mesh enabled a direct mesh convergence
+study; without it, the simulation would have suffered from flow leakage through under-sampled
+cut elements. The methodology was benchmarked against boundary-fitted results for a scanned
+soda can: the resampled point cloud reduced the spurious pressure oscillations observed with a
+prior subsampled point cloud, bringing the results closer to the reference solutions. The complete
+pipeline was then applied to real-world scans containing severe geometric defects, including the
+Stanford dragon and an in-house photogrammetric scan of a statue with sparse, incomplete regions
+(Figure 18). Ultimately, the framework eliminates the need for labor-intensive CAD reconstruction
+and enables stable flow simulations directly on imperfect scanned geometries.
+Applied to point clouds obtained from auto-segmentation of medical images, the same frame-
+work yields patient-specific cardiovascular simulations directly from CT data [70].
+The auto-
+segmentation uses a dual-stream 3D deep learning model that combines a U-Net with a gradient-
+based shape stream to capture both the main aortic vessel and its smaller branches. It produces
+a sparse dataset, with one point sampled at the center of each segmented voxel. NIMBUS then
+resamples these sparse points into an analysis-suitable point cloud that preserves the lumen geom-
+etry observed in the scan. To efficiently resolve near-wall hemodynamics, the framework uses an
+anisotropic background mesh built from a point-cloud-derived metric tensor that clusters elements
+in the wall-normal direction and relaxes them tangentially [70]. This delivers boundary-layer-like
+refinement around the immersed point cloud without the excessive element counts that isotropic
+26
+
+
+Figure 19: Direct medical image to flow analysis using auto-segmentation and point-cloud-based CFD. Adapted from
+Ref. [70].
+refinement would produce. The framework was validated on benchmark hemodynamic problems
+with analytical or established reference solutions, including Hagen–Poiseuille pipe flow and steady
+flow through a bifurcation. It was then applied to a patient-specific aorta segmented from a CT
+scan, using a steady inflow corresponding to peak systole and resistance outlet conditions tuned
+to the peak-systolic pressures reported for each branch (Figure 19). The entire pipeline, from
+imaging data to CFD results, proceeds with minimal manual intervention: no CAD reconstruction,
+no boundary-fitted mesh generation, and no manual segmentation. This makes it well suited for
+digital-twin and large-cohort cardiovascular workflows.
+Across all of these developments, from CAD models to point clouds to medical images, the
+weak imposition of the no-slip condition is the underlying mechanism that makes flow analysis
+possible on geometries that are never meshed and, in several cases, never fully reconstructed.
+4. Weak BCs for compressible flow
+The majority of the weak BC literature focuses on incompressible flows. Extending these
+methods to the compressible regime introduces complexities due to the coupled mass, momentum,
+and energy fluxes at the wall. The first weak BC formulation for compressible flows adapted the
+incompressible weak BC velocity operator and incorporated the thermal condition as a standalone
+27
+
+
+term [21, 62]. While this decoupled treatment performed well in many cases, instabilities emerged
+in certain flow scenarios. To maintain stability, these cases often relied on hybrid approaches
+requiring the strong enforcement of specific variables, such as strong temperature enforcement
+in the hypersonic regime [25] or strong normal-velocity enforcement at adiabatic boundaries in
+transonic cases [22]. This limitation was later resolved by unifying the velocity, temperature,
+and heat-flux operators within the mathematical framework of advective–diffusive systems [7].
+The following sections review this unified formulation: the scalar model from Section 2 is first
+generalized to a nonlinear flux, which is then applied to the compressible Navier–Stokes equations
+to systematically derive the weak wall BC operators.
+4.1. Nonlinear (general) flux
+Let Ω ⊂R𝑑(𝑑= 2 or 3) define a fixed spatial domain with a boundary Γ = 𝜕Ω.
+Let
+F (𝑢) : Ω →R𝑑represent a nonlinear (general) flux and 𝑆a source term, and let Γ∗⊂Γ denote
+the portion of the boundary on which Dirichlet data 𝑔: Γ∗→R is prescribed. The boundary value
+problem consists of finding 𝑢: Ω →R such that
+∇· F (𝑢) −𝑆= 0
+in Ω ,
+(41)
+𝑢= 𝑔
+on Γ∗.
+(42)
+To derive the weak formulation, we multiply Eq. (41) by a test function 𝑤, integrate over the domain
+Ω, and apply integration by parts to obtain
+−
+∫
+Ω
+∇𝑤· F (𝑢) dΩ −
+∫
+Ω
+𝑤𝑆dΩ +
+∫
+Γ
+𝑤F (𝑢) · n dΓ = 0 .
+(43)
+Following the same procedure as in Section 2.1 to enforce 𝑢= 𝑔on Γ∗, we obtain the weak
+formulation: find 𝑢such that for all 𝑤,
+∫
+Ω
+𝑤(∇· F (𝑢) −𝑆) dΩ −
+∫
+Γ∗
+𝑤(F (𝑢) −F (𝑔)) · n dΓ = 0 .
+(44)
+For the boundary integral, we apply a Taylor expansion about the prescribed state 𝑔and retain the
+linear term:
+F (𝑢) −F (𝑔) ≈𝜕F
+𝜕𝑢
+
+𝑢=𝑔
+(𝑢−𝑔) .
+(45)
+Hence, the final weak form is given by
+∫
+Ω
+𝑤(∇· F (𝑢) −𝑆) dΩ −
+∫
+Γ∗
+𝑤
+ 
+𝜕F
+𝜕𝑢
+
+𝑢=𝑔
+· n
+!
+(𝑢−𝑔) dΓ = 0 .
+(46)
+Remark 5. In the special case F (𝑢) = a𝑢and Γ∗= Γ−, the formulation reduces to the weak form
+presented in Eq. (9) for the pure advection problem.
+Remark 6. The Jacobian 𝜕F/𝜕𝑢evaluated at𝑢= 𝑔plays the role of a solution-dependent convective
+velocity, generalizing the advection field a of Section 2.1 to the nonlinear setting.
+28
+
+
+4.2. The compressible Navier–Stokes equations and weak BC operators
+This section derives the formulation for weak enforcement of wall boundary conditions for
+the compressible Navier–Stokes equations using the design developed in the previous section. All
+equations are written in the Eulerian frame. Throughout the section, (·),𝑡denotes a partial time
+derivative taken with respect to a fixed spatial coordinate and (·),𝑖denotes a spatial gradient, where
+𝑖= 1, . . . , 𝑑and 𝑑= 2, 3 is the space dimension. The Einstein summation convention for repeated
+indices is also used.
+4.2.1. Strong form
+The reduced form of the Navier–Stokes equations of compressible flows from Refs. [21, 62] is
+taken as a starting point of the developments that follow. We introduce the vectors of conservation
+(U) and pressure-primitive (Y) variables as
+U =
+
+𝜌
+𝜌𝑢1
+𝜌𝑢2
+𝜌𝑢3
+𝜌𝑒
+
+(47)
+and
+Y =
+
+𝑝
+𝑢1
+𝑢2
+𝑢3
+𝑇
+
+,
+(48)
+where U is in a reduced form that utilizes internal rather than total energy [94]. In the above, 𝜌is
+the density, 𝑢𝑖is the 𝑖th velocity component, 𝑝is the pressure, and 𝑇is the temperature. In addition,
+𝑒= 𝑐v𝑇is the specific internal energy of the fluid, where 𝑐v = 𝑅/(𝛾−1) is the specific heat at
+constant volume, 𝑅is the ideal gas constant, and 𝛾is the heat capacity ratio. Finally, the pressure,
+density, and temperature unknowns are related through the ideal gas equation of state, 𝑝= 𝜌𝑅𝑇.
+Using conservation variables, the Navier–Stokes equations of compressible flows hold in a fixed
+spatial domain Ω ⊂R𝑑and may be written as
+U,𝑡+ Fadv\𝑝
+𝑖,𝑖
++ F𝑝
+𝑖,𝑖+ Fsp −Fdiff
+𝑖,𝑖−S = 0 ,
+(49)
+where the convective flux (without the pressure) is given by
+Fadv\𝑝
+𝑖
+=
+
+𝜌𝑢𝑖
+𝜌𝑢𝑖𝑢1
+𝜌𝑢𝑖𝑢2
+𝜌𝑢𝑖𝑢3
+𝜌𝑢𝑖𝑒
+
+,
+(50)
+29
+
+
+the pressure flux is given by
+F𝑝
+𝑖=
+
+0
+𝑝𝛿1𝑖
+𝑝𝛿2𝑖
+𝑝𝛿3𝑖
+0
+
+,
+(51)
+the diffusive flux is given by
+Fdiff
+𝑖
+=
+
+0
+𝜏1𝑖
+𝜏2𝑖
+𝜏3𝑖
+−𝜙𝑞
+𝑖
+
+,
+(52)
+the contribution of stress-power in the energy equation is given by
+Fsp =
+
+0
+0
+0
+0
+𝑝𝑢𝑖,𝑖−𝜏𝑖𝑗𝑢𝑗,𝑖
+
+,
+(53)
+and S is the source term. In Eqs. (51)–(53), 𝛿𝑖𝑗is the Kronecker delta, and 𝜏𝑖𝑗and 𝜙𝑞
+𝑖are the
+viscous stress and heat flux, respectively, given by 𝜏𝑖𝑗= 𝜆𝑢𝑘,𝑘𝛿𝑖𝑗+ 𝜇 𝑢𝑖,𝑗+ 𝑢𝑗,𝑖
+ and 𝜙𝑞
+𝑖= −𝜅𝑇,𝑖,
+where 𝜇is the dynamic viscosity, 𝜆= −2𝜇/3, and 𝜅is the thermal conductivity.
+4.2.2. Weak form
+A weak form of the compressible-flow equations may be stated using conservation variables as
+follows: find U such that for all vector-valued test functions W,
+∫
+Ω
+W · U,𝑡dΩ +
+∫
+Ω
+W · Fadv\𝑝
+𝑖,𝑖
+dΩ −
+∫
+Ω
+W,𝑖· F𝑝
+𝑖dΩ +
+∫
+Ω
+W,𝑖· Fdiff
+𝑖
+dΩ
++
+∫
+Ω
+W · Fsp dΩ −
+∫
+Ω
+W · S dΩ −
+∫
+Γ𝐻W · H dΓ = 0 ,
+(54)
+where Γ𝐻is the part of the boundary of Ω with prescribed traction and heat-flux boundary
+conditions, whose values are collected in the vector H. The vector H is given by
+H =
+
+0
+−𝑝𝑛1 + 𝜏1𝑖𝑛𝑖
+−𝑝𝑛2 + 𝜏2𝑖𝑛𝑖
+−𝑝𝑛3 + 𝜏3𝑖𝑛𝑖
+−𝜙𝑞
+𝑖𝑛𝑖
+
+,
+(55)
+30
+
+
+where 𝑛𝑖is the 𝑖th component of the outward unit surface normal n. Note that the pressure and
+diffusive fluxes are integrated by parts in the above formulation to enable natural imposition of
+traction and heat-flux BCs.
+While popular, conservation variables are perhaps not the most convenient option for compu-
+tation (see, e.g., the discussion in Ref. [95]). A more natural choice is presented by the pressure-
+primitive variables. To reformulate the weak form of the compressible-flow problem given by
+Eq. (54) using pressure-primitive variables, we first use the chain rule of differentiation to compute
+U,𝑡= U,YY,𝑡= A0Y,𝑡
+(56)
+and
+Fadv\𝑝
+𝑖,𝑖
+= Fadv\𝑝
+𝑖,Y
+Y,𝑖= Aadv\𝑝
+𝑖
+Y,𝑖.
+(57)
+In addition, a direct computation gives
+F𝑝
+𝑖= A𝑝
+𝑖Y ,
+(58)
+and
+Fdiff
+𝑖,𝑖= (K𝑖𝑗Y,𝑗),𝑖.
+(59)
+Introducing the above relations into the weak form given by Eq. (54), we arrive at the weak form for
+the pressure-primitive variables: find Y = [𝑝, u,𝑇]T such that for all vector-valued test functions
+W = [𝛿𝑝, 𝛿u, 𝛿𝑇]T,
+∫
+Ω
+W · A0Y,𝑡dΩ +
+∫
+Ω
+W · Aadv\𝑝
+𝑖
+Y,𝑖dΩ −
+∫
+Ω
+W,𝑖· A𝑝
+𝑖Y dΩ +
+∫
+Ω
+W,𝑖· K𝑖𝑗Y,𝑗dΩ
++
+∫
+Ω
+W · Fsp dΩ −
+∫
+Ω
+W · S dΩ −
+∫
+Γ𝐻W · H dΓ = 0 .
+(60)
+Detailed expressions for the matrices A0, Aadv\𝑝
+𝑖
+, A𝑝
+𝑖, and K𝑖𝑗appearing in Eq. (60) may be found
+in Ref. [21, Appendix A].
+4.2.3. Design of weak wall BC operators
+Let G be a vector of prescribed wall BC values and Γ𝐺be the part of the boundary of Ω
+where G is prescribed. To design a weak wall BC operator on Γ𝐺, we focus on the convective and
+pressure flux terms. Note that the convective-flux terms are not integrated by parts, whereas the
+pressure-flux terms are. The following terms are added to Eq. (60) or Eq. (54):
+−
+∫
+Γ𝐺W ·
+
+Fadv\𝑝
+𝑖
+(Y) −Fadv\𝑝
+𝑖
+(G)
+
+𝑛𝑖dΓ
++
+∫
+Γ𝐺W · F𝑝
+𝑖(G) 𝑛𝑖dΓ .
+(61)
+For pressure-primitive variables, G collects the wall values of [𝑝, u,𝑇]T (specific cases are consid-
+ered in the following sections). Expanding the difference in the first term of Eq. (61) in a Taylor
+31
+
+
+series and retaining only the linear terms yields
+Fadv\𝑝
+𝑖
+(Y) ≈Fadv\𝑝
+𝑖
+(G) + Fadv\𝑝
+𝑖,Y
+|G (Y −G)
+= Fadv\𝑝
+𝑖
+(G) + Aadv\𝑝
+𝑖
+|G (Y −G) .
+(62)
+Substituting the above result together with Eq. (58) into Eq. (61) gives the weak wall BC operator
+−
+∫
+Γ𝐺W · [Aadv\𝑝
+𝑖
+|G 𝑛𝑖] (Y −G) dΓ
++
+∫
+Γ𝐺W · [A𝑝
+𝑖𝑛𝑖] G dΓ .
+(63)
+We now examine two wall BC cases: a prescribed temperature and a prescribed heat flux. We refer
+to the constant-temperature condition as isothermal and the zero-heat-flux condition as adiabatic.
+In both cases, the flow velocity at the wall is zero, and the pressure and density are unknown and
+are computed from an equation of state (the ideal gas law is assumed in this work).
+4.2.4. Temperature wall BCs
+For the temperature wall BC, the vector G is given as follows:
+G =
+
+𝑝
+0
+0
+0
+𝑇𝑔
+
+,
+(64)
+where 𝑇𝑔is the prescribed temperature, which may vary in space and time, the zeros in the middle
+reflect zero flow velocity, and 𝑝is an unknown taken from the solution. With these values, the
+matrices Aadv\𝑝
+𝑖
+|G 𝑛𝑖and A𝑝
+𝑖𝑛𝑖become
+Aadv\𝑝
+𝑖
+|G 𝑛𝑖=
+
+0
+𝜌𝑛1
+𝜌𝑛2
+𝜌𝑛3
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+𝜌𝑐v𝑇𝑔𝑛1
+𝜌𝑐v𝑇𝑔𝑛2
+𝜌𝑐v𝑇𝑔𝑛3
+0
+
+(65)
+and
+A𝑝
+𝑖𝑛𝑖=
+
+0
+0
+0
+0
+0
+𝑛1
+0
+0
+0
+0
+𝑛2
+0
+0
+0
+0
+𝑛3
+0
+0
+0
+0
+0
+0
+0
+0
+0
+
+.
+(66)
+32
+
+
+The products [Aadv\𝑝
+𝑖
+|G 𝑛𝑖] (Y −G) and [A𝑝
+𝑖𝑛𝑖] G are obtained from a direct computation as
+[Aadv\𝑝
+𝑖
+|G 𝑛𝑖] (Y −G) =
+
+𝜌(𝑢𝑖𝑛𝑖−0)
+0
+0
+0
+𝜌𝑐v𝑇𝑔(𝑢𝑖𝑛𝑖−0)
+
+(67)
+and
+[A𝑝
+𝑖𝑛𝑖] G =
+
+0
+𝑝𝑛1
+𝑝𝑛2
+𝑝𝑛3
+0
+
+.
+(68)
+Introducing the above results into Eq. (63) gives an explicit expression for the weak wall BC
+operator
+−
+∫
+Γ𝐺𝛿𝑝𝜌(𝑢𝑖𝑛𝑖−0) dΓ +
+∫
+Γ𝐺𝛿𝑢𝑖𝑛𝑖𝑝dΓ −
+∫
+Γ𝐺𝛿𝑇𝜌𝑐v𝑇𝑔(𝑢𝑖𝑛𝑖−0) dΓ .
+(69)
+We note that the first two integrals in Eq. (69) represent the “adjoint” consistency and consistency
+terms for the pressure, respectively. While initially introduced in Ref. [21] in an ad hoc fashion, these
+terms are derived systematically in Ref. [7] using the machinery of weak BCs for advective–diffusive
+systems. This mathematical framework also naturally yields the last integral, a modification that
+further enhances the robustness of the formulation across a wider range of flow conditions, as
+evidenced by the numerical results shown in later sections.
+We now state the complete weak temperature wall BC operator, adding the convective stabi-
+lization contributions not covered by the Taylor expansion approach and the contributions from the
+viscous and heat-flux terms:
+−
+∫
+Γ𝐺𝛿𝑝𝜌(𝑢𝑖𝑛𝑖−0) dΓ +
+∫
+Γ𝐺𝛿𝑢𝑖𝑛𝑖𝑝dΓ −
+∫
+Γ𝐺𝛿𝑢𝑖𝜌{𝑢𝑗𝑛𝑗}−(𝑢𝑖−0𝑖) dΓ
+−
+∫
+Γ𝐺𝛿𝑢𝑖2𝜇𝑢(𝑖,𝑗)𝑛𝑗dΓ −
+∫
+Γ𝐺𝛿𝑢𝑖𝑛𝑖𝜆𝑢𝑗,𝑗dΓ
+−
+∫
+Γ𝐺2𝜇𝛿𝑢(𝑖,𝑗)𝑛𝑗(𝑢𝑖−0𝑖) dΓ −
+∫
+Γ𝐺𝜆𝛿𝑢𝑖,𝑖(𝑢𝑗𝑛𝑗−0) dΓ +
+∫
+Γ𝐺𝛿𝑢𝑖
+𝐶P 𝜇
+ℎ
+(𝑢𝑖−0𝑖) dΓ
+−
+∫
+Γ𝐺𝛿𝑇𝜌𝑐v𝑇𝑔(𝑢𝑖𝑛𝑖−0) dΓ −
+∫
+Γ𝐺𝛿𝑇𝜌𝑐v{𝑢𝑗𝑛𝑗}−(𝑇−𝑇𝑔) dΓ
+−
+∫
+Γ𝐺𝛿𝑇𝜅𝑇,𝑖𝑛𝑖dΓ −
+∫
+Γ𝐺𝜅𝛿𝑇,𝑖𝑛𝑖(𝑇−𝑇𝑔) dΓ +
+∫
+Γ𝐺𝛿𝑇𝐶P 𝜅
+ℎ
+(𝑇−𝑇𝑔) dΓ .
+(70)
+Here, 𝐶P is a positive constant taken just large enough to guarantee stability, ℎis the local mesh
+size, and (·)(𝑖,𝑗) indicates that the tensor (·) is symmetrized.
+33
+
+
+Remark 7. A direct inspection of the convective matrix in Eq. (65) reveals that it has all zero
+eigenvalues. However, given the non-symmetry of the matrix, its eigenvalues alone are not sufficient
+to guarantee stability. The convective contribution from Eq. (65) to the boundary energy estimate
+is instead governed by the quadratic form (Y −G) · [Aadv\𝑝
+𝑖
+|G 𝑛𝑖] (Y −G), which, using Eq. (67),
+evaluates to 𝜌𝑐v𝑇𝑔(𝑇−𝑇𝑔)(𝑢𝑖𝑛𝑖). This is proportional to the normal velocity 𝑢𝑖𝑛𝑖, which vanishes
+at a no-slip wall for the exact solution. Therefore, the convective contribution carries no energy
+across Γ𝐺and is stability-neutral.
+4.2.5. Heat-flux wall BCs
+For the heat-flux wall BC, because the temperature is unknown, the vector G is now given by
+G =
+
+𝑝
+0
+0
+0
+𝑇
+
+,
+(71)
+where the unknown temperature 𝑇is substituted for the prescribed temperature 𝑇𝑔. This results in
+a slight modification of the product
+[Aadv\𝑝
+𝑖
+|G 𝑛𝑖] (Y −G) =
+
+𝜌(𝑢𝑖𝑛𝑖−0)
+0
+0
+0
+𝜌𝑐v𝑇(𝑢𝑖𝑛𝑖−0)
+
+,
+(72)
+while the pressure-flux contributions remain the same.
+Explicit expressions for the weak BC
+operator contributions from the convective and pressure-flux terms become
+−
+∫
+Γ𝐺𝛿𝑝𝜌(𝑢𝑖𝑛𝑖−0) dΓ +
+∫
+Γ𝐺𝛿𝑢𝑖𝑛𝑖𝑝dΓ −
+∫
+Γ𝐺𝛿𝑇𝜌𝑐v𝑇(𝑢𝑖𝑛𝑖−0) dΓ .
+(73)
+The complete weak heat-flux wall BC operator, adding the convective stabilization contributions
+not covered by the Taylor expansion approach and the contributions from the viscous terms and the
+prescribed wall heat flux, becomes
+−
+∫
+Γ𝐺𝛿𝑝𝜌(𝑢𝑖𝑛𝑖−0) dΓ +
+∫
+Γ𝐺𝛿𝑢𝑖𝑛𝑖𝑝dΓ −
+∫
+Γ𝐺𝛿𝑢𝑖𝜌{𝑢𝑗𝑛𝑗}−(𝑢𝑖−0𝑖) dΓ
+−
+∫
+Γ𝐺𝛿𝑢𝑖2𝜇𝑢(𝑖,𝑗)𝑛𝑗dΓ −
+∫
+Γ𝐺𝛿𝑢𝑖𝑛𝑖𝜆𝑢𝑗,𝑗dΓ
+−
+∫
+Γ𝐺2𝜇𝛿𝑢(𝑖,𝑗)𝑛𝑗(𝑢𝑖−0𝑖) dΓ −
+∫
+Γ𝐺𝜆𝛿𝑢𝑖,𝑖(𝑢𝑗𝑛𝑗−0) dΓ +
+∫
+Γ𝐺𝛿𝑢𝑖
+𝐶P 𝜇
+ℎ
+(𝑢𝑖−0𝑖) dΓ
+−
+∫
+Γ𝐺𝛿𝑇𝜌𝑐v𝑇(𝑢𝑖𝑛𝑖−0) dΓ −
+∫
+Γ𝐺𝛿𝑇ℎ𝑇dΓ ,
+(74)
+where ℎ𝑇is a known prescribed heat flux at the wall.
+34
+
+
+4.3. Aerodynamics on boundary-fitted meshes
+The compressible weak BC formulation was first developed for moving-domain problems and
+applied, together with a sliding-interface formulation, to the aerodynamic analysis of a gas-turbine
+stage [21]. The preliminary validation studies in that work covered a wide range of Reynolds and
+Mach numbers, including subsonic (𝑀= 0.8) and supersonic (𝑀= 2.0) flows over a NASA delta
+wing. The computed surface pressure distributions agreed with the wind-tunnel data even on coarse
+boundary-layer meshes with a first-layer height of 𝑦+ ≈225 [21]. The sliding-interface formulation
+was validated on turbulent flow past a sphere at 𝑅𝑒= 10,000 and 𝑀= 0.1. Computations with
+and without the sliding interface produced drag, pressure, and skin-friction quantities that were in
+excellent agreement. The validated method was then applied to the flow inside a gas-turbine stage.
+The results showed that the weak BCs deliver accurate near-wall behavior on coarse boundary-
+layer meshes in the compressible regime and remain consistent across non-matching, rotating
+subdomains (Figure 20).
+The framework was later validated extensively for canonical aircraft aerodynamic configura-
+tions, including the NACA 0012 and RAE 2822 airfoils, the ONERA M6 wing, and the NASA
+Common Research Model (CRM) at various Mach and Reynolds numbers in Ref. [22].
+An
+entropy-based discontinuity-capturing operator [95–102] was combined with streamline upwind
+Petrov–Galerkin (SUPG) stabilization [103–113] and the weak BC operator to provide additional
+dissipation near shocks while preserving the consistency of the formulation. The computed pres-
+sure coefficients were all in good agreement with reference values (Figure 21). In all of these
+computations, the weak BCs behaved as a near-wall model, yielding accurate pressure and shock
+(a) Delta wing: setup and mesh
+(b) Subsonic flow around delta wing
+(c) Supersonic flow around delta wing
+(d) Turbulent flow around a sphere at Re = 10000
+(e) Flow inside a gas turbine stage
+Before pitching
+After pitching
+Figure 20: Weakly enforced wall conditions for compressible flow on boundary-fitted meshes: benchmark problems
+and gas-turbine aerodynamics. Adapted from Ref. [21].
+35
+
+
+1500 m
+1400 m
+700 m
+α
+Freestream BC
+M = 0.85
+Re = 5 × 106
+α=2.75°
+Symmetry side
+Freestream BC
+Freestream BC
+Freestream BC
+Figure 21: Weakly enforced wall conditions for compressible flow on boundary-fitted meshes: aircraft (NASA CRM)
+aerodynamics. Adapted from Ref. [22].
+predictions without highly refined boundary-layer meshes.
+The approach was later extended to the hypersonic regime by combining SUPG, an entropy-
+based discontinuity-capturing operator, and weak imposition of the no-slip condition for heat-flux
+prediction [25]. The formulation was validated on a compression corner at 𝑀= 14.1 with ramp
+angles of 15◦and 24◦, the flow over a 2D cylinder at 𝑀= 17, and the Mars Pathfinder re-entry
+vehicle at 𝑀= 10. The predicted surface heat-flux distributions were in good agreement with the
+experimental measurements and reference numerical results across the benchmark set, including
+the separation region of the compression corner and the stagnation-point heating of the re-entry
+capsule (Figure 22). The isothermal wall-temperature condition was imposed strongly in this work,
+which preserved stability across the high-Mach cases but motivated the unified treatment developed
+later [7], in which the velocity and temperature conditions were derived together within a single
+advective–diffusive framework.
+The weak wall BC operators derived in Sections 4.2.3–4.2.5 build on these earlier compressible
+formulations. By constructing the operator contributions from the advective and pressure fluxes
+within the framework of advective–diffusive systems, the derivation identifies the required weak
+36
+
+
+(a) Compression corner
+(b) Canonical Cylinder
+(c) Mars Pathfinder re-entry vehicle
+Figure 22: Weakly enforced wall conditions for hypersonic flow: surface heat-flux prediction for a compression
+corner, a canonical cylinder, and the Mars Pathfinder re-entry vehicle, using a stabilized formulation combining SUPG,
+discontinuity capturing, and weak BCs. Adapted from Ref. [25].
+ 
+Figure 23: Weakly enforced compressible wall BCs: ONERA M6 wing pressure distribution compared with experi-
+ment, and weakly versus strongly enforced surface pressure and shock structure. Adapted from Ref. [7].
+BC terms systematically. This approach removes the need for the hybrid strong–weak enforcement
+used in earlier work for specific high-speed cases, such as the strong enforcement of the isothermal
+wall-temperature condition in the hypersonic regime [25] and strong normal-velocity enforcement
+with adiabatic conditions in some transonic aircraft cases [22]. The stability and accuracy of the
+formulation were demonstrated on a set of 2D and 3D benchmark problems: subsonic flow over the
+NACA 0012 airfoil, transonic flow over the RAE 2822 airfoil, and transonic flow over the ONERA
+M6 wing [7]. The predicted pressure distributions were in excellent agreement with reference
+experimental and numerical data. Accurate near-wall predictions were obtained without highly
+refined boundary-layer meshes, and on the same coarse meshes, the weak treatment captured the
+shock location and strength more accurately than strong enforcement (Figure 23).
+37
+
+
+4.4. Immersogeometric compressible flow
+The compressible weak BC operator was combined with the immersogeometric framework
+to analyze compressible flow problems on non-boundary-fitted meshes [62]. The operator was
+reformulated using the non-symmetric Nitsche method [114, 115], which removes the formal
+lower bound on the penalty parameters required by the symmetric formulation and is especially
+convenient when these parameters are difficult to estimate in cut elements. The formulation can
+be used penalty-free [116–118], or with a small penalty retained to improve the 𝐿2 accuracy [119–
+121], which was the choice made here. The formulation was validated on benchmark problems
+covering a wide range of Reynolds and Mach numbers, including laminar subsonic (𝑀= 0.8) and
+supersonic (𝑀= 2.0) flows past a 3D torpedo-shaped body and the turbulent transonic flow past
+a 3D cylinder at 𝑅𝑒= 200,000 and 𝑀= 0.75 [62]. For the torpedo-shaped body, the IMGA
+framework accurately captured critical flow phenomena, such as the detached bow shock ahead of
+the leading edge in the supersonic regime. The predicted surface pressure distributions for both the
+subsonic and supersonic cases demonstrated excellent agreement with boundary-fitted reference
+computations using comparable mesh sizes (Figure 24).
+The cylinder case features turbulent
+boundary-layer separation together with shocks, localized supersonic zones, and shocklets in the
+wake. The surface pressure distributions on the cylinder predicted by the IMGA framework agreed
+with the experimental data and the LES results from the literature, and with a boundary-fitted
+reference computed using the symmetric Nitsche method (Figure 25).
+The framework was then applied to a full-scale UH-60A Black Hawk rotorcraft in forward
+flight [62]. Two flight speeds were considered, 30 m/s and 60 m/s, with the latter corresponding to
+a free-stream Mach number of 0.17 and a blade-tip relative Mach number of 0.63. A hybrid meshing
+strategy was adopted. The main rotor blade was lofted through airfoil cross-sections to obtain a
+clean NURBS surface that is straightforward to mesh. A boundary-fitted prismatic boundary-
+layer mesh was generated around it inside a sliding-interface subdomain rotating at 27 rad/s, with
+the no-slip condition on the blade imposed weakly using the symmetric Nitsche method. The
+Boundary-fitted Mesh
+Immersed Mesh
+Subsonic
+Supersonic
+Figure 24: Immersogeometric analysis of compressible flow: subsonic and supersonic flows past a torpedo-shaped
+body. Adapted from Ref. [62].
+38
+
+
+Figure 25: Immersogeometric analysis of compressible flow: transonic flow past a 3D cylinder. Adapted from Ref. [62].
+fuselage and landing gear, given as a complex non-watertight tessellated surface, were instead
+immersed in a non-boundary-fitted background mesh and treated with the non-symmetric Nitsche
+method. The two subdomains were coupled across the rotating interface using the sliding-interface
+formulation extended to compressible flow [62]. Following a mesh refinement study on fuselage-
+only computations at both flight speeds, the IMGA predictions for normalized fuselage drag versus
+angle of attack agreed with the NASA quarter-scale UH-60A wind-tunnel data [122]. Full-machine
+computations captured the tip-vortex propagation, the unsteady fuselage pressure distribution under
+the rotor downwash, and the wake asymmetry at the higher speed (Figure 26).
+Building on these capabilities, the compressible IMGA framework has also been extended to
+operate directly on point-cloud data [67]. By evaluating the weak BC operator on the individual
+point samples, aerodynamic simulations of a torpedo-shaped body represented by a point cloud
+were successfully carried out in both subsonic and supersonic regimes.
+The predicted Mach
+number contours and surface pressure distributions showed excellent agreement with boundary-
+fitted reference solutions. This demonstrates the potential of performing high-speed compressible
+flow analysis directly on point-cloud objects without the need to reconstruct a CAD model or
+surface mesh.
+5. Conclusions
+This review has traced the development of weakly enforced boundary conditions as successive
+applications of a single unified idea. Beginning with the scalar advection and diffusion equations, we
+showed that the weak BC operator is assembled from a stabilizing inflow term and the consistency,
+adjoint-consistency, and penalty terms of Nitsche’s method. These contributions extend to the
+incompressible Navier–Stokes equations, where the scalar operator is recast in vector form, with
+the normal and tangential wall conditions penalized separately. For compressible flow, the scalar
+operator is generalized to a nonlinear flux, which accommodates the coupling of mass, momentum,
+39
+
+
+Figure 26: Immersogeometric analysis of compressible flow: rotorcraft aerodynamics in which the rotor is resolved
+with a boundary-fitted mesh inside a rotating sliding-interface subdomain, while the fuselage and landing gear are
+immersed in a non-boundary-fitted background mesh. Wall conditions are enforced weakly on both. Adapted from
+Ref. [62].
+and energy at the wall and yields the velocity, temperature, and heat-flux conditions within a single
+framework. We also noted, in the context of both ALE and ST methods, the slip/sliding-interface
+techniques underpinned by weak BCs.
+From this development, two distinct roles for weak BCs emerged. In boundary-fitted compu-
+tations, weak enforcement acts as a near-wall model: it allows a controlled slip at the wall that
+imitates an unresolved thin boundary layer, recovering accurate mean-flow, wall heat-transfer, and
+engineering quantities on coarse meshes, as demonstrated across many examples and applications
+involving turbulent boundary layers. In immersed computations, the interface arbitrarily inter-
+sects the background elements. Strong imposition of no-slip and no-penetration wall conditions
+becomes intractable, making weak enforcement an essential alternative methodology. This obser-
+vation underlies immersogeometric analysis and the direct geometry-to-analysis frameworks that
+have followed, in which flow analysis is carried out directly using CAD models, point clouds,
+photogrammetric reconstructions, and segmented medical images.
+Acknowledgments
+M.-C. Hsu and M. Jaiswal would like to acknowledge funding from the National Institutes of
+Health under Award Number R01HL184128 and the National Science Foundation under Award
+Number DMS-2436623. Y. Bazilevs would like to acknowledge partial support from the Center for
+Information Geometric Mechanics and Optimization (CIGMO), a PSAAP-IV Focused Investigatory
+Center funded by the U.S. Department of Energy, National Nuclear Security Administration under
+Award Number DE-NA0004261. We also acknowledge the Texas Advanced Computing Center
+(TACC) at The University of Texas at Austin for providing computational resources that have
+contributed to the research results reported within this paper.
+40
+
+
+References
+[1] Hughes TJR.
+The Finite Element Method. Linear Static and Dynamic Finite Element Analysis.
+Prentice-Hall, 1987.
+[2] Hughes TJR, Cottrell JA, Bazilevs Y. Isogeometric analysis: CAD, finite elements, NURBS, ex-
+act geometry and mesh refinement. Computer Methods in Applied Mechanics and Engineering.
+2005;194:4135–4195.
+[3] Bazilevs Y, Hughes TJR. Weak imposition of Dirichlet boundary conditions in fluid mechanics.
+Computers & Fluids. 2007;36:12–26.
+[4] Bazilevs Y, Michler C, Calo VM, Hughes TJR. Weak Dirichlet boundary conditions for wall-bounded
+turbulent flows. Computer Methods in Applied Mechanics and Engineering. 2007;196:4853–4862.
+[5] Hsu MC, Akkerman I, Bazilevs Y. Wind turbine aerodynamics using ALE–VMS: Validation and the
+role of weakly enforced boundary conditions. Computational Mechanics. 2012;50:499–511.
+[6] Xu S, Gao B, Hsu MC, Ganapathysubramanian B. A residual-based variational multiscale method with
+weak imposition of boundary conditions for buoyancy-driven flows. Computer Methods in Applied
+Mechanics and Engineering. 2019;352:345–368.
+[7] Jaiswal M, Rajanna MR, Islam MR, Hsu MC, Bazilevs Y.
+Weak wall boundary conditions for
+compressible flows. Engineering with Computers. 2026;42:16.
+[8] Bazilevs Y, Calo VM, Cottrell JA, Hughes TJR, Reali A, Scovazzi G. Variational multiscale residual-
+based turbulence modeling for large eddy simulation of incompressible flows. Computer Methods in
+Applied Mechanics and Engineering. 2007;197:173–201.
+[9] Nitsche J.
+¨Uber ein Variationsprinzip zur L¨osung von Dirichlet-Problemen bei Verwendung von
+Teilr¨aumen, die keinen Randbedingungen unterworfen sind. Abhandlungen aus dem Mathematischen
+Seminar der Universit¨at Hamburg. 1971;36:9–15.
+[10] Stenberg R. On some techniques for approximating boundary conditions in the finite element method.
+Journal of Computational and Applied Mathematics. 1995;63:139–148.
+[11] Hansbo A, Hansbo P. An unfitted finite element method, based on Nitsche’s method, for elliptic
+interface problems. Computer Methods in Applied Mechanics and Engineering. 2002;191:5537–
+5552.
+[12] Baumann CE, Oden JT. A discontinuous hp finite element method for convection–diffusion problems.
+Computer Methods in Applied Mechanics and Engineering. 1999;175:311–341.
+[13] Rivi`ere B, Wheeler MF, Girault V. A priori error estimates for finite element methods based on
+discontinuous approximation spaces for elliptic problems. SIAM Journal on Numerical Analysis.
+2001;39:902–931.
+[14] Arnold DN, Brezzi F, Cockburn B, Marini LD. Unified analysis of discontinuous Galerkin methods
+for elliptic problems. SIAM Journal on Numerical Analysis. 2002;39:1749–1779.
+[15] Golshan R, Tejada-Mart´ınez AE, Juha M, Bazilevs Y. Large-eddy simulation with near-wall modeling
+using weakly enforced no-slip boundary conditions. Computers & Fluids. 2015;118:172–181.
+[16] Piomelli U, Balaras E.
+Wall-layer models for large-eddy simulations.
+Annual Review of Fluid
+Mechanics. 2002;34:349–374.
+[17] Wilcox DC. Turbulence Modeling for CFD. 3rd ed. DCW Industries, Inc., 2006.
+[18] Bose ST, Park GI. Wall-modeled large-eddy simulation for complex turbulent flows. Annual Review
+of Fluid Mechanics. 2018;50:535–561.
+[19] Bazilevs Y, Michler C, Calo VM, Hughes TJR. Isogeometric variational multiscale modeling of wall-
+bounded turbulent flows with weakly enforced boundary conditions on unstretched meshes. Computer
+41
+
+
+Methods in Applied Mechanics and Engineering. 2010;199:780–790.
+[20] Hsu MC, Akkerman I, Bazilevs Y. Finite element simulation of wind turbine aerodynamics: validation
+study using NREL Phase VI experiment. Wind Energy. 2014;17:461–481.
+[21] Xu F, Moutsanidis G, Kamensky D, Hsu MC, Murugan M, Ghoshal A, Bazilevs Y. Compressible
+flows on moving domains: Stabilized methods, weakly enforced essential boundary conditions, sliding
+interfaces, and application to gas-turbine modeling. Computers & Fluids. 2017;158:201–220.
+[22] Rajanna MR, Johnson EL, Codoni D, Korobenko A, Bazilevs Y, Liu N, Lua J, Phan N, Hsu MC. Finite
+element methodology for modeling aircraft aerodynamics: development, simulation, and validation.
+Computational Mechanics. 2022;70:549–563.
+[23] Kozak N, Xu F, Rajanna MR, Bravo L, Murugan M, Ghoshal A, Bazilevs Y, Hsu MC. High-fidelity
+finite element modeling and analysis of adaptive gas turbine stator–rotor flow interaction at off-design
+conditions. Journal of Mechanics. 2020;36:595–606.
+[24] Kozak N, Rajanna MR, Wu MCH, Murugan M, Bravo L, Ghoshal A, Hsu MC, Bazilevs Y. Optimizing
+gas turbine performance using the surrogate management framework and high-fidelity flow modeling.
+Energies. 2020;13:4283.
+[25] Codoni D, Bayram A, Rajanna MR, Johansen C, Hsu MC, Bazilevs Y, Korobenko A. Heat flux predic-
+tion for hypersonic flows using a stabilized formulation. Computational Mechanics. 2024;73:419–426.
+[26] Becker R, Hansbo P, Stenberg R. A finite element method for domain decomposition with non-
+matching grids. ESAIM: Mathematical Modelling and Numerical Analysis. 2003;37:209–225.
+[27] Hansbo P. Nitsche’s method for interface problems in computational mechanics. GAMM-Mitteilungen.
+2005;28:183–206.
+[28] Bazilevs Y, Hughes TJR. NURBS-based isogeometric analysis for the computation of flows about
+rotating components. Computational Mechanics. 2008;43:143–150.
+[29] Takizawa K, Tezduyar TE, Mochizuki H, Hattori H, Mei S, Pan L, Montel K. Space–time VMS
+method for flow computations with slip interfaces (ST-SI). Mathematical Models and Methods in
+Applied Sciences. 2015;25:2377–2406.
+[30] Takizawa K, Tezduyar TE, Kuraishi T, Tabata S, Takagi H. Computational thermo-fluid analysis of a
+disk brake. Computational Mechanics. 2016;57:965–977.
+[31] Takizawa K, Tezduyar TE, Kanai T. Porosity models and computational methods for compressible-
+flow aerodynamics of parachutes with geometric porosity. Mathematical Models and Methods in
+Applied Sciences. 2017;27:771–806.
+[32] Tezduyar TE, Takizawa K. A chronological catalog of methods and solutions in the Space–Time
+Computational Flow Analysis: I. Finite element analysis. Computational Mechanics. 2025;75:793–
+831.
+[33] Tezduyar TE, Takizawa K. A chronological catalog of methods and solutions in the Space–Time
+Computational Flow Analysis: II. Isogeometric analysis. Computational Mechanics. 2025;75:833–
+874.
+[34] Hansbo P, Hermansson J. Nitsche’s method for coupling non-matching meshes in fluid–structure
+vibration problems. Computational Mechanics. 2003;32:134–139.
+[35] Bazilevs Y, Hsu MC, Scott MA. Isogeometric fluid–structure interaction analysis with emphasis on
+non-matching discretizations, and with application to wind turbines. Computer Methods in Applied
+Mechanics and Engineering. 2012;249–252:28–41.
+[36] Takizawa K, Tezduyar TE, Buscher A, Asada S. Space–time interface-tracking with topology change
+(ST-TC). Computational Mechanics. 2014;54:955–971.
+[37] Takizawa K, Tezduyar TE, Asada S, Kuraishi T. Space–time method for flow computations with slip
+42
+
+
+interfaces and topology changes (ST-SI-TC). Computers & Fluids. 2016;141:124–134.
+[38] Takizawa K, Tezduyar TE. Multiscale space–time fluid–structure interaction techniques. Computa-
+tional Mechanics. 2011;48:247–267.
+[39] Takizawa K, Tezduyar TE, Terahara T, Sasaki T. Heart valve flow computation with the integrated
+Space–Time VMS, Slip Interface, Topology Change and Isogeometric Discretization methods. Com-
+puters & Fluids. 2017;158:176–188.
+[40] Kuraishi T, Takizawa K, Tezduyar TE. Space–time isogeometric flow analysis with built-in Reynolds-
+equation limit. Mathematical Models and Methods in Applied Sciences. 2019;29:871–904.
+[41] Kuraishi T, Takizawa K, Tezduyar TE. Tire aerodynamics with actual tire geometry, road contact and
+tire deformation. Computational Mechanics. 2019;63:1165–1185.
+[42] Kuraishi T, Xu Z, Takizawa K, Tezduyar TE, Kakegami T. Space–time isogeometric analysis of
+tire aerodynamics with complex tread pattern, road contact, and tire deformation. Computational
+Mechanics. 2025;75:575–591.
+[43] Terahara T, Miura H, Takizawa K, Tezduyar TE. Space–time isogeometric analysis of the aortic-
+valve to aorta flow with high-resolution boundary-layer representation. Computational Mechanics.
+2026;78:999–1013.
+[44] Taniguchi Y, Takizawa K, Kashiwabara T, Tezduyar TE. Dirichlet-boundary stabilization in space–
+time computational analysis: Derivation in 1D elastodynamics. Mathematical Models and Methods
+in Applied Sciences. 2026. (2026) https://doi.org/10.1142/S0218202526500491.
+[45] Peskin CS. The immersed boundary method. Acta Numerica. 2002;11:479–517.
+[46] Mittal R, Iaccarino G.
+Immersed boundary methods.
+Annual Review of Fluid Mechanics.
+2005;37:239–261.
+[47] Burman E, Claus S, Hansbo P, Larson MG, Massing A. CutFEM: Discretizing geometry and partial
+differential equations. International Journal for Numerical Methods in Engineering. 2015;104:472–
+501.
+[48] Schillinger D, Ruess M. The finite cell method: A review in the context of higher-order structural anal-
+ysis of CAD and image-based geometric models. Archives of Computational Methods in Engineering.
+2015;22:391–455.
+[49] Griffith BE, Patankar NA. Immersed methods for fluid–structure interaction. Annual Review of Fluid
+Mechanics. 2020;52:421–448.
+[50] R¨uberg T, Cirak F. Subdivision-stabilised immersed b-spline finite elements for moving boundary
+flows. Computer Methods in Applied Mechanics and Engineering. 2012;209–212:266–283.
+[51] Schott B, Wall WA. A new face-oriented stabilized XFEM approach for 2D and 3D incompressible
+Navier–Stokes equations. Computer Methods in Applied Mechanics and Engineering. 2014;276:233–
+265.
+[52] Kamensky D, Hsu MC, Schillinger D, Evans JA, Aggarwal A, Bazilevs Y, Sacks MS, Hughes TJR. An
+immersogeometric variational framework for fluid–structure interaction: Application to bioprosthetic
+heart valves. Computer Methods in Applied Mechanics and Engineering. 2015;284:1005–1053.
+[53] Xu F, Schillinger D, Kamensky D, Varduhn V, Wang C, Hsu MC. The tetrahedral finite cell method
+for fluids: Immersogeometric analysis of turbulent flow around complex geometries. Computers &
+Fluids. 2016;141:135–154.
+[54] Main A, Scovazzi G. The shifted boundary method for embedded domain computations. Part II:
+Linear advection–diffusion and incompressible Navier–Stokes equations. Journal of Computational
+Physics. 2018;372:996–1026.
+[55] Karki S, Shadkhah M, Yang CH, Balu A, Scovazzi G, Krishnamurthy A, Ganapathysubramanian B.
+43
+
+
+Direct flow simulations with implicit neural representation of complex geometry. Computer Methods
+in Applied Mechanics and Engineering. 2025;446:118248.
+[56] Parvizian J, D¨uster A, Rank E. Finite cell method. Computational Mechanics. 2007;41:121–133.
+[57] D¨uster A, Parvizian J, Yang Z, Rank E. The finite cell method for three-dimensional problems of
+solid mechanics. Computer Methods in Applied Mechanics and Engineering. 2008;197:3768–3782.
+[58] Hsu MC, Wang C, Xu F, Herrema AJ, Krishnamurthy A. Direct immersogeometric fluid flow analysis
+using B-rep CAD models. Computer Aided Geometric Design. 2016;43:143–158.
+[59] Wang C, Xu F, Hsu MC, Krishnamurthy A. Rapid B-rep model preprocessing for immersogeometric
+analysis using analytic surfaces. Computer Aided Geometric Design. 2017;52–53:190–204.
+[60] Schillinger D, Ded`e L, Scott MA, Evans JA, Borden MJ, Rank E, Hughes TJR. An isogeometric
+design-through-analysis methodology based on adaptive hierarchical refinement of NURBS, immersed
+boundary methods, and T-spline CAD surfaces.
+Computer Methods in Applied Mechanics and
+Engineering. 2012;249–252:116–150.
+[61] Wassermann B, Kollmannsberger S, Yin S, Kudela L, Rank E. Integrating CAD and numerical
+analysis: “dirty geometry” handling using the finite cell method. Computer Methods in Applied
+Mechanics and Engineering. 2019;351:808–835.
+[62] Xu F, Bazilevs Y, Hsu MC.
+Immersogeometric analysis of compressible flows with application
+to aerodynamic simulation of rotorcraft. Mathematical Models and Methods in Applied Sciences.
+2019;29:905–938.
+[63] Zhu Q, Xu F, Xu S, Hsu MC, Yan J.
+An immersogeometric formulation for free-surface flows
+with application to marine engineering problems. Computer Methods in Applied Mechanics and
+Engineering. 2020;361:112748.
+[64] Xu S, Xu F, Kommajosula A, Hsu MC, Ganapathysubramanian B. Immersogeometric analysis of
+moving objects in incompressible flows. Computers & Fluids. 2019;189:24–33.
+[65] Xu S, Gao B, Lofquist A, Fernando M, Hsu MC, Sundar H, Ganapathysubramanian B. An octree-based
+immersogeometric approach for modeling inertial migration of particles in channels. Computers &
+Fluids. 2021;214:104764.
+[66] Saurabh K, Gao B, Fernando M, Xu S, Khanwale MA, Khara B, Hsu MC, Krishnamurthy A, Sundar
+H, Ganapathysubramanian B. Industrial scale Large Eddy Simulations with adaptive octree meshes
+using immersogeometric analysis. Computers & Mathematics with Applications. 2021;97:28–44.
+[67] Balu A, Rajanna MR, Khristy J, Xu F, Krishnamurthy A, Hsu MC. Direct immersogeometric fluid
+flow and heat transfer analysis of objects represented by point clouds. Computer Methods in Applied
+Mechanics and Engineering. 2023;404:115742.
+[68] Wang X, Jaiswal M, Corpuz AM, Paudel S, Balu A, Krishnamurthy A, Yan J, Hsu MC.
+Photogrammetry-based computational fluid dynamics. Computer Methods in Applied Mechanics
+and Engineering. 2023;417:116311.
+[69] Jaiswal M, Corpuz AM, Hsu MC.
+Mesh-driven resampling and regularization for robust point
+cloud-based flow analysis directly on scanned objects. Computer Methods in Applied Mechanics and
+Engineering. 2024;432:117426.
+[70] Corpuz AM, Jaiswal M, Du P, Ramachandra AB, Wang JX, Hsu MC. Direct medical image to
+simulation using auto-segmentation and point cloud-based CFD. Advances in Computational Science
+and Engineering. 2025;3:95–124.
+[71] Benzaken J, Evans JA, Tamstorf R. Constructing Nitsche’s method for variational problems. Archives
+of Computational Methods in Engineering. 2024;31:1867–1896.
+[72] Embar A, Dolbow J, Harari I.
+Imposing Dirichlet boundary conditions with Nitsche’s method
+44
+
+
+and spline-based finite elements.
+International Journal for Numerical Methods in Engineering.
+2010;83:877–898.
+[73] de Prenter F, Lehrenfeld C, Massing A. A note on the stability parameter in Nitsche’s method for
+unfitted boundary value problems. Computers & Mathematics with Applications. 2018;75:4322–4336.
+[74] Ciarlet PG. The Finite Element Method for Elliptic Problems. North-Holland, 1978.
+[75] Harari I, Hughes TJR. What are 𝐶and ℎ?: Inequalities for the analysis and design of finite element
+methods. Computer Methods in Applied Mechanics and Engineering. 1992;97:157–192.
+[76] Warburton T, Hesthaven JS. On the constants in hp-finite element trace inverse inequalities. Computer
+Methods in Applied Mechanics and Engineering. 2003;192:2765–2773.
+[77] Evans JA, Hughes TJR. Explicit trace inequalities for isogeometric analysis and parametric hexahedral
+finite elements. Numerische Mathematik. 2013;123:259–290.
+[78] Tezduyar TE, Osawa Y. Finite element stabilization parameters computed from element matrices and
+vectors. Computer Methods in Applied Mechanics and Engineering. 2000;190:411–430.
+[79] Hsu MC, Bazilevs Y, Calo VM, Tezduyar TE, Hughes TJR. Improving stability of stabilized and
+multiscale formulations in flow simulations at small time steps.
+Computer Methods in Applied
+Mechanics and Engineering. 2010;199:828–840.
+[80] Takizawa K, Tezduyar TE, Otoguro Y.
+Stabilization and discontinuity-capturing parameters for
+space–time flow computations with finite element and isogeometric discretizations. Computational
+Mechanics. 2018;62:1169–1186.
+[81] Takizawa K, Otoguro Y, Tezduyar TE.
+Variational multiscale method stabilization parameter
+calculated from the strain-rate tensor.
+Mathematical Models and Methods in Applied Sciences.
+2023;33:1661–1691.
+[82] Annavarapu C, Hautefeuille M, Dolbow JE. A robust Nitsche’s formulation for interface problems.
+Computer Methods in Applied Mechanics and Engineering. 2012;225–228:44–54.
+[83] Ruess M, Schillinger D, Bazilevs Y, Varduhn V, Rank E.
+Weakly enforced essential boundary
+conditions for NURBS-embedded and trimmed NURBS geometries on the basis of the finite cell
+method. International Journal for Numerical Methods in Engineering. 2013;95:811–846.
+[84] Kim J, Moin P, Moser R. Turbulence statistics in fully developed channel flow at low Reynolds
+number. Journal of Fluid Mechanics. 1987;177:133–166.
+[85] Kudela L, Kollmannsberger S, Almac U, Rank E. Direct structural analysis of domains defined by
+point clouds. Computer Methods in Applied Mechanics and Engineering. 2020;358:112581.
+[86] Hartmann F, Kollmannsberger S. Enforcing essential boundary conditions on domains defined by
+point clouds. Computers & Mathematics with Applications. 2022;113:13–23.
+[87] Burman E. Ghost penalty. Comptes Rendus Mathematique. 2010;348:1217–1220.
+[88] Burman E, Hansbo P. Fictitious domain finite element methods using cut elements: II. A stabilized
+Nitsche method. Applied Numerical Mathematics. 2012;62:328–341.
+[89] Burman E, Hansbo P. Fictitious domain methods using cut elements: III. A stabilized Nitsche method
+for Stokes’ problem. ESAIM: Mathematical Modelling and Numerical Analysis. 2014;48:859–874.
+[90] de Prenter F, Verhoosel CV, van Zwieten GJ, van Brummelen EH. Condition number analysis and
+preconditioning of the finite cell method. Computer Methods in Applied Mechanics and Engineering.
+2017;316:297–327.
+[91] Badia S, Verdugo F, Mart´ın AF. The aggregated unfitted finite element method for elliptic problems.
+Computer Methods in Applied Mechanics and Engineering. 2018;336:533–553.
+[92] Larsson K, Kollmannsberger S, Rank E, Larson MG. The finite cell method with least squares
+stabilized Nitsche boundary conditions. Computer Methods in Applied Mechanics and Engineering.
+45
+
+
+2022;393:114792.
+[93] de Prenter F, Verhoosel CV, van Brummelen EH, Larson MG, Badia S. Stability and conditioning
+of immersed finite element methods: analysis and remedies. Archives of Computational Methods in
+Engineering. 2023;30:3617–3656.
+[94] Codoni D, Moutsanidis G, Hsu MC, Bazilevs Y, Johansen C, Korobenko A. Stabilized methods
+for high-speed compressible flows: toward hypersonic simulations.
+Computational Mechanics.
+2021;67:785–809.
+[95] Hauke G, Hughes TJR. A comparative study of different sets of variables for solving compressible and
+incompressible flows. Computer Methods in Applied Mechanics and Engineering. 1998;153:1–44.
+[96] Tezduyar TE, Park YJ.
+Discontinuity capturing finite element formulations for nonlinear
+convection–diffusion–reaction equations. Computer Methods in Applied Mechanics and Engineering.
+1986;59:307–325.
+[97] Hughes TJR, Mallet M, Mizukami A. A new finite element formulation for computational fluid dynam-
+ics: II. Beyond SUPG. Computer Methods in Applied Mechanics and Engineering. 1986;54:341–355.
+[98] Hughes TJR, Mallet M. A new finite element formulation for computational fluid dynamics: IV. A
+discontinuity-capturing operator for multidimensional advective–diffusive systems. Computer Meth-
+ods in Applied Mechanics and Engineering. 1986;58:329–336.
+[99] Le Beau GJ, Tezduyar TE. Finite element computation of compressible flows with the SUPG formu-
+lation. In: Advances in Finite Element Analysis in Fluid Dynamics. FED-Vol. 123. ASME, 1991, pp.
+21–27.
+[100] Almeida RC, Gale˜ao AC. An adaptive Petrov–Galerkin formulation for the compressible Euler and
+Navier–Stokes equations. Computer Methods in Applied Mechanics and Engineering. 1996;129:157–
+176.
+[101] Tezduyar TE, Senga M.
+Stabilization and shock-capturing parameters in SUPG formulation of
+compressible flows. Computer Methods in Applied Mechanics and Engineering. 2006;195:1621–
+1632.
+[102] Hughes TJR, Scovazzi G, Tezduyar TE. Stabilized methods for compressible flows. Journal of
+Scientific Computing. 2010;43:343–368.
+[103] Brooks AN, Hughes TJR. Streamline upwind/Petrov–Galerkin formulations for convection dominated
+flows with particular emphasis on the incompressible Navier–Stokes equations. Computer Methods
+in Applied Mechanics and Engineering. 1982;32:199–259.
+[104] Hughes TJR, Tezduyar TE. Finite element methods for first-order hyperbolic systems with partic-
+ular emphasis on the compressible Euler equations. Computer Methods in Applied Mechanics and
+Engineering. 1984;45:217–284.
+[105] Hughes TJR, Franca LP, Mallet M. A new finite element formulation for computational fluid dynamics:
+I. Symmetric forms of the compressible Euler and Navier–Stokes equations and the second law of
+thermodynamics. Computer Methods in Applied Mechanics and Engineering. 1986;54:223–234.
+[106] Hughes TJR, Mallet M. A new finite element formulation for computational fluid dynamics: III. The
+generalized streamline operator for multidimensional advective–diffusive systems. Computer Methods
+in Applied Mechanics and Engineering. 1986;58:305–328.
+[107] Hughes TJR, Franca LP, Mallet M. A new finite element formulation for computational fluid dynamics:
+VI. Convergence analysis of the generalized SUPG formulation for linear time-dependent multidi-
+mensional advective–diffusive systems. Computer Methods in Applied Mechanics and Engineering.
+1987;63:97–112.
+[108] Shakib F, Hughes TJR, Johan Z. A new finite element formulation for computational fluid dynamics:
+46
+
+
+X. The compressible Euler and Navier–Stokes equations. Computer Methods in Applied Mechanics
+and Engineering. 1991;89:141–219.
+[109] Le Beau GJ, Ray SE, Aliabadi SK, Tezduyar TE. SUPG finite element computation of compressible
+flows with the entropy and conservation variables formulations.
+Computer Methods in Applied
+Mechanics and Engineering. 1993;104:397–422.
+[110] Aliabadi SK, Tezduyar TE. Space–time finite element computation of compressible flows involving
+moving boundaries and interfaces.
+Computer Methods in Applied Mechanics and Engineering.
+1993;107:209–223.
+[111] Tezduyar TE, Aliabadi SK, Behr M, Mittal S. Massively parallel finite element simulation of com-
+pressible and incompressible flows. Computer Methods in Applied Mechanics and Engineering.
+1994;119:157–177.
+[112] Mittal S, Tezduyar TE. A unified finite element formulation for compressible and incompressible flows
+using augmented conservation variables. Computer Methods in Applied Mechanics and Engineering.
+1998;161:229–243.
+[113] Hauke G. Simple stabilizing matrices for the computation of compressible flows in primitive variables.
+Computer Methods in Applied Mechanics and Engineering. 2001;190:6881–6893.
+[114] Hartmann R. Adjoint consistency analysis of discontinuous Galerkin discretizations. SIAM Journal
+on Numerical Analysis. 2007;45:2671–2696.
+[115] Schillinger D, Harari I, Hsu MC, Kamensky D, Stoter SKF, Yu Y, Zhao Y. The non-symmetric Nitsche
+method for the parameter-free imposition of weak boundary and coupling conditions in immersed
+finite elements. Computer Methods in Applied Mechanics and Engineering. 2016;309:625–652.
+[116] Burman E. A penalty-free nonsymmetric Nitsche-type method for the weak imposition of boundary
+conditions. SIAM Journal on Numerical Analysis. 2012;50:1959–1981.
+[117] Boiveau T, Burman E. A penalty-free Nitsche method for the weak imposition of boundary conditions
+in compressible and incompressible elasticity. IMA Journal of Numerical Analysis. 2016;36:770–795.
+[118] Dettmer WG, Kadapa C, Peri´c D. A stabilised immersed boundary method on hierarchical b-spline
+grids. Computer Methods in Applied Mechanics and Engineering. 2016;311:415–437.
+[119] Kirby RM, Karniadakis GE. Selecting the numerical flux in discontinuous Galerkin methods for
+diffusion problems. Journal of Scientific Computing. 2005;22:385–411.
+[120] Heimann F, Engwer C, Ippisch O, Bastian P. An unfitted interior penalty discontinuous Galerkin
+method for incompressible Navier–Stokes two-phase flow.
+International Journal for Numerical
+Methods in Fluids. 2013;71:269–293.
+[121] Guo Y, Ruess M, Schillinger D. A parameter-free variational coupling approach for trimmed isogeo-
+metric thin shells. Computational Mechanics. 2017;59:693–715.
+[122] Howlett JJ. UH-60A Black Hawk engineering simulation program. Volume 1: Mathematical model.
+NASA, 1981. NASA-CR-16630.
+47

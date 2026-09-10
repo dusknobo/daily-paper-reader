@@ -1,0 +1,92 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-09-10T21:59:23.561494+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 0,
+    "deep_cap": 6,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 11,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2609.05939v1",
+      "source": "arxiv",
+      "title": "A structure-preserving implicit-explicit method for a hyperbolic approximation of fourth-order PDEs",
+      "abstract": "We introduce a novel structure-preserving numerical method for a first-order hyperbolic approximation system, which approximates the solutions of general fourth-order partial differential equations. By employing an implicit-explicit (IMEX) splitting between the stiff and non-stiff terms, we rigorously prove that the proposed scheme is energy-consistent and positivity-preserving under a CFL-type condition. Furthermore, we show that the method remains robustly stable in asymptotic regimes, with a time-step restriction that is entirely independent of the relaxation parameters. Finally, we present a series of numerical examples for thin film equations to validate the theoretical properties and efficacy of the scheme.",
+      "authors": [
+        "Rahul Barthwal",
+        "Rahuldev Ghorai"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA"
+      ],
+      "published": "2026-09-05T07:09:20+00:00",
+      "link": "https://arxiv.org/pdf/2609.05939v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "structure-preserving method for thin film equations, applicable to falling film simulation",
+      "llm_evidence_cn": "针对薄膜方程的结构保持方法，可用于降膜模拟",
+      "llm_evidence": "针对薄膜方程的结构保持方法，可用于降膜模拟",
+      "canonical_evidence": "针对薄膜方程的结构保持方法，可用于降膜模拟",
+      "llm_tldr_en": "A structure-preserving IMEX scheme for hyperbolic approximation of fourth-order PDEs is developed, proven energy-consistent and validated on thin film equations applicable to falling films.",
+      "llm_tldr_cn": "针对四阶偏微分方程（如薄膜方程）在降膜等自由表面流动模拟中的刚性和数值稳定性问题，提出一种保结构的隐式-显式（IMEX）方法。该方法基于一阶双曲近似系统，并严格证明了能量一致性和正性保持。数值实验以薄膜方程为例，验证了方法在渐近区域的稳定性和与松弛参数无关的时间步限制。这项工作为降膜流动的长期可靠模拟提供了新的数值工具。",
+      "llm_tldr": "针对四阶偏微分方程（如薄膜方程）在降膜等自由表面流动模拟中的刚性和数值稳定性问题，提出一种保结构的隐式-显式（IMEX）方法。该方法基于一阶双曲近似系统，并严格证明了能量一致性和正性保持。数值实验以薄膜方程为例，验证了方法在渐近区域的稳定性和与松弛参数无关的时间步限制。这项工作为降膜流动的长期可靠模拟提供了新的数值工具。",
+      "llm_tags": [
+        "query:falling-film:composite"
+      ],
+      "matched_query_tag": "query:falling-film:composite",
+      "matched_query_text": "Papers central to 请帮我查找与传热管垂直降膜换热、CFD模拟相关的论文, especially work that connects or combines: heat transfer in falling film; falling film on vertical tube; two-phase flow simulation; liquid film thickness measurement; multiphase flow CFD; heat and mass transfer in falling film; CFD modeling of falling film heat transfer in vertical tubes; Numerical simulation of heat transfer in vertical falling film heat exchangers; Heat transfer characteristics of falling film over vertical tubes using computational fluid dynamics; Falling film evaporation and heat transfer in vertical tubes CFD.",
+      "matched_requirement_id": "req-composite-falling-film",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2609.06314v1",
+      "source": "arxiv",
+      "title": "A review of weakly enforced Dirichlet boundary conditions in computational flow analysis",
+      "abstract": "Strongly enforced Dirichlet boundary conditions require highly refined near-wall meshes to resolve steep velocity and thermal gradients. This introduces high computational costs, especially for practical flow simulations. Weakly enforced boundary conditions alleviate this burden by acting as a variationally consistent near-wall model. By allowing a controlled slip at the solid wall, weak enforcement recovers accurate flow quantities on coarse boundary-layer meshes across both incompressible and compressible regimes. Furthermore, weak boundary conditions serve as the fundamental enabling technology for immersogeometric analysis. Because the weak operator evaluates boundary integrals independently of the background mesh, high-fidelity flow analysis can be performed directly on complex geometries without fitting a mesh to the surface. This capability has facilitated direct geometry-to-analysis workflows for boundary-representation CAD models, raw point clouds, photogrammetric reconstructions, and segmented medical images. This review examines the unified mathematical development of the weak boundary condition framework from scalar advection-diffusion equations to the full Navier-Stokes equations, illustrating its versatility and robustness across incompressible and compressible flows, whether in traditional boundary-fitted, sliding-interface, or advanced immersogeometric applications.",
+      "authors": [
+        "Ming-Chen Hsu",
+        "Monu Jaiswal",
+        "Yuri Bazilevs"
+      ],
+      "primary_category": "math.NA",
+      "categories": [
+        "math.NA",
+        "cs.CE",
+        "physics.flu-dyn"
+      ],
+      "published": "2026-09-06T00:26:36+00:00",
+      "link": "https://arxiv.org/pdf/2609.06314v1",
+      "tags": [
+        "keyword:falling-film",
+        "query:falling-film"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Weakly enforced Dirichlet boundary conditions for near-wall velocity and thermal gradients in computational flow analysis, applicable to falling film CFD",
+      "llm_evidence_cn": "弱施加Dirichlet边界条件综述，面向近壁速度与温度梯度，可用于降膜CFD",
+      "llm_evidence": "弱施加Dirichlet边界条件综述，面向近壁速度与温度梯度，可用于降膜CFD",
+      "canonical_evidence": "弱施加Dirichlet边界条件综述，面向近壁速度与温度梯度，可用于降膜CFD",
+      "llm_tldr_en": "Reviews weakly enforced boundary conditions that reduce near-wall mesh requirements while preserving accuracy in flow and thermal simulations; this technique can improve falling film heat transfer CFD models.",
+      "llm_tldr_cn": "该综述讨论弱施加Dirichlet边界条件，通过允许壁面受控滑移，在粗糙边界层网格上恢复速度与温度场精度。论文指出强施加边界条件需极细网格以解析陡峭梯度，弱施加作为变分一致的近壁模型可降低计算成本。这种方法适用于不可压缩与可压缩流动及热边界层，并支撑浸入式几何分析，对垂直降膜换热CFD具有方法论借鉴价值。",
+      "llm_tldr": "该综述讨论弱施加Dirichlet边界条件，通过允许壁面受控滑移，在粗糙边界层网格上恢复速度与温度场精度。论文指出强施加边界条件需极细网格以解析陡峭梯度，弱施加作为变分一致的近壁模型可降低计算成本。这种方法适用于不可压缩与可压缩流动及热边界层，并支撑浸入式几何分析，对垂直降膜换热CFD具有方法论借鉴价值。",
+      "llm_tags": [
+        "query:falling-film"
+      ],
+      "matched_query_tag": "query:falling-film",
+      "matched_query_text": "CFD modeling of falling film heat transfer in vertical tubes",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
