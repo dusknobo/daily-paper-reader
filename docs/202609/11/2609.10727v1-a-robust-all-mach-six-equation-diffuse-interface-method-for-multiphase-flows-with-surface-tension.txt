@@ -1,0 +1,2427 @@
+A Robust All-Mach Six-Equation Diffuse-Interface Method for
+Multiphase Flows with Surface Tension
+Ghanshyam Bharatea, J.C. Mandala
+aDepartment of Aerospace Engineering, Indian Institute of Technology Bombay, Mumbai, 400076, India
+Abstract
+A robust finite-volume framework is presented for the simulation of compressible multiphase
+flows with surface tension across a wide range of Mach numbers. The method is based on a
+two-pressure, six-equation diffuse interface model incorporating viscous, gravitational, and
+capillary effects through the continuum surface force formulation. To consistently account
+for capillary-induced pressure jumps, an HLLC Riemann solver is developed using gener-
+alized Riemann invariant analysis, and the instantaneous pressure relaxation procedure is
+modified to preserve the Laplace pressure jump during phase equilibration. To overcome the
+excessive numerical diffusion of conventional approximate Riemann solvers in the low-Mach
+regime, a robust low-Mach correction is proposed by extending our previous formulation with
+a modified scaling strategy that remains stable in regions of strong pressure variation. The
+resulting method retains accuracy from nearly incompressible flows to compressible regimes
+while preserving the robustness of the six-equation formulation. The numerical framework
+is validated using a series of benchmark problems involving surface tension, viscosity, grav-
+ity, and compressibility. The results demonstrate accurate prediction of interface dynamics,
+capillary pressure, and low-Mach flow features, while significantly reducing numerical dissi-
+pation without compromising stability. The proposed methodology provides an efficient and
+reliable approach for the simulation of complex multiphase flows spanning a broad range of
+flow regimes.
+Keywords:
+Diffused interface method (DIM); Six-equation model; Multiphase flows; Surface tension;
+low-Mach correction
+1. Introduction
+Numerical simulation of compressible multiphase flows is of fundamental importance
+in numerous engineering and scientific applications, including cavitation, droplet dynam-
+ics, bubble collapse, atomization, shock–bubble interactions, additive manufacturing, and
+microfluidics. These problems often involve large density and pressure gradients, moving
+interfaces, surface tension, viscous effects, and, in many practical situations, flow speeds
+ranging from nearly incompressible to highly compressible regimes. Developing numerical
+methods that remain accurate and robust over such a broad range of physical conditions
+continues to be a significant challenge.
+Preprint submitted to Elsevier
+September 11, 2026
+arXiv:2609.10727v1  [physics.flu-dyn]  9 Sep 2026
+
+
+Among the available approaches for interface-resolved multiphase computations, dif-
+fuse interface methods (DIMs) have emerged as an attractive alternative to sharp-interface
+techniques because they naturally accommodate large interface deformations, topological
+changes, and compressibility within a conservative finite-volume framework. Since the pi-
+oneering work of Saurel and Abgrall [1], diffuse interface methods have been successfully
+applied to a variety of compressible multiphase flow problems. Their principal advantage
+lies in replacing the sharp material interface with a narrow transition region, thereby avoid-
+ing explicit interface reconstruction. However, the inherent numerical diffusion associated
+with this formulation causes interface smearing, which may degrade the accuracy of in-
+terfacial dynamics. Considerable effort has therefore been devoted to reducing numerical
+diffusion through interface-compression techniques [2–4], THINC (Tangent of Hyperbola
+for INterface Capturing) reconstruction scheme [5–7], and compressive limiting strategies
+within the MUSCL framework Chiapolino et al. [8]. These developments have substantially
+improved the ability of diffuse interface methods to capture complex interface evolution
+while preserving numerical robustness.
+Several mathematical models have been proposed within the diffuse interface framework.
+The five-equation model [9, 10], has become one of the most widely used formulations for
+compressible multiphase flows because of its simplicity and computational efficiency. An
+alternative formulation, commonly referred to as the five-equation reduced model [11, 12], is
+obtained from the non-equilibrium seven-equation model under the assumption of instanta-
+neous pressure and velocity relaxation. Compared with the original five-equation model, the
+reduced formulation includes an additional compressibility correction term in the volume-
+fraction equation, enabling accurate prediction of important phenomena such as Rayleigh
+bubble collapse [4, 13], while satisfying the second law of thermodynamics [12].
+Despite these attractive properties, the five-equation reduced model suffers from several
+numerical deficiencies, including difficulties in maintaining volume-fraction positivity under
+strong expansion or compression [14] and the occurrence of a non-monotonic mixture sound
+speed, which may introduce spurious sonic points inside diffuse interfaces [15, 16]. To over-
+come these issues, pressure non-equilibrium is retained by employing the two-pressure six-
+equation model [15]. Combined with an instantaneous pressure-relaxation procedure, this
+formulation recovers the equilibrium solution while avoiding many of the numerical difficul-
+ties encountered in the reduced five-equation model. Consequently, the six-equation model
+has become a preferred framework for compressible diffuse interface simulations [15, 17–21]
+and is adopted in the present work.
+Although diffuse interface methods have achieved considerable success for compressible
+flows, they generally exhibit excessive numerical dissipation at low Mach numbers. This be-
+haviour originates from approximate Riemann solvers whose artificial dissipation scales with
+the acoustic wave speed rather than the fluid velocity. Various preconditioning techniques
+[22–28] have been proposed to alleviate this deficiency and have been successfully extended to
+multiphase flows. However, preconditioning methods suffer from well-known drawbacks, in-
+cluding the global Mach-number cut-off problem and severe time-step restrictions in explicit
+time integration [29, 30]. In our previous work [31], we proposed an alternative low-Mach
+correction based on modifying the velocity jumps within the Riemann solver. The approach
+2
+
+
+is straightforward to implement, avoids additional time-step constraints, and substantially
+improves accuracy for low-Mach multiphase flows. Nevertheless, its performance has not
+been investigated for flows involving surface tension and viscosity, and the original scaling
+strategy may become unstable in regions with strong pressure gradients.
+Accurate representation of surface tension constitutes another essential requirement for
+many multiphase applications. Several numerical formulations have been developed to incor-
+porate capillary effects into diffuse interface methods [3, 19, 32, 33]. Exact [32] and HLLC-
+type approximate [3] Riemann solvers have been proposed for five-equation models by ac-
+counting for the Laplace pressure jump across material interfaces. Nguyen and Dumbser [33]
+developed a path-conservative Osher-type method for the seven-equation model including
+capillary effects, whereas Schmidmayer et al. [19] introduced a three-step operator-splitting
+procedure for the six-equation model based on a curl-free formulation of the surface-tension
+force.
+Although these methods have demonstrated promising performance, existing six-
+equation formulations do not explicitly modify either the Riemann solver or the pressure-
+relaxation procedure to consistently preserve the capillary pressure jump. Consequently,
+a formulation that directly incorporates capillary effects within the wave propagation and
+relaxation processes remains unavailable.
+The objective of the present work is to develop a robust numerical framework for the
+simulation of multiphase flows with surface tension over a broad range of Mach numbers.
+The proposed method is based on the two-pressure six-equation diffuse interface model with
+viscous, gravitational, and capillary effects represented through the continuum surface force
+formulation. An HLLC Riemann solver incorporating capillary pressure jumps is derived
+using generalized Riemann invariant analysis, and the instantaneous pressure-relaxation
+procedure is modified to preserve the Laplace pressure jump during phase equilibration.
+Furthermore, a more robust low-Mach correction is proposed by extending our previous
+formulation with a modified scaling strategy that remains stable in regions of large pres-
+sure variation while retaining accuracy in the incompressible limit. The resulting numerical
+framework is assessed using a series of benchmark problems involving surface tension, viscos-
+ity, gravity, and compressibility, demonstrating its accuracy, robustness, and applicability
+over a wide range of multiphase flow regimes.
+Finally, the remainder of the paper is organized as follows. Section 2, presents the gov-
+erning six-equation multiphase model. Section 3 describes the finite-volume discretization,
+including the HLLC Riemann solver, surface-tension treatment, curvature evaluation, vis-
+cous discretization, and pressure-relaxation procedure. Section 4 introduces the modified
+low-Mach correction. Numerical validations are presented in Section 5, followed by conclud-
+ing remarks in Section 6.
+3
+
+
+2. Multiphase model
+Six-equation multiphase model [11, 15, 34] including viscous and surface tension effects
+can be written as
+∂α1
+∂t + u · ∇α1 = Kp(p1 −p2),
+∂α1ρ1
+∂t
++ ∇· (α1ρ1u) = 0,
+∂α2ρ2
+∂t
++ ∇· (α2ρ2u) = 0,
+∂ρu
+∂t + ∇· (ρu ⊗u) + ∇p = ∇· τ + fσ + ρg,
+∂α1ρ1e1
+∂t
++ ∇· (α1ρ1e1u) + α1p1∇· u = α1τ1 : ∇u −KppI(p1 −p2),
+∂α2ρ2e2
+∂t
++ ∇· (α2ρ2e2u) + α2p2∇· u = αjτ2 : ∇u + KppI(p1 −p2).
+(1)
+Here αj, ρj, pj, ej are the volume fraction, density, pressure, and specific internal energy of the
+phase j respectively. The velocity is represented by u and g is gravitational acceleration. The
+mixture density and mixture pressure is denoted by ρ and p respectively. The expressions
+for these mixture quantities are given by
+ρ =
+X
+j
+αjρj,
+p =
+X
+j
+αjpj.
+(2)
+On the right side of the volume fraction and specific energy equation we have pressure
+relaxation terms, Kp(p1 −p2) and pIKp(p1 −p2). Here Kp and pI are relaxation rate and
+interface pressure. Interface pressure (pI) appearing in the relaxation terms is defined as
+[15, 17]
+pI = (ρ1a1)p2 + (ρ2a2)p1
+ρ1a1 + ρ2a2
+.
+(3)
+The system of equations (1) is closed by equation of state. Here stiffened gas equation
+of state (SG EOS) is used for each phase. The expressions of the specific internal energy
+(ej) and speed of sound (aj) for SG EOS can be written as
+ej = pj + γjπj
+ρj (γj −1),
+aj =
+s
+γj (pj + πj)
+ρj
+.
+(4)
+There are two viscous tensor terms appearing in the system (1), one is the mixture stress
+τ and another is phasic stress τj. The both stress terms are assumed to be equal (τj = τ)
+[34, 35]. The stress tensor is defined as
+τ =
+ τxx
+τxy
+τyx
+τyy
+
+= µ
+" 4
+3
+∂u
+∂x −2
+3
+∂v
+∂y
+∂u
+∂y + ∂v
+∂x
+∂u
+∂y + ∂v
+∂x
+4
+3
+∂v
+∂y −2
+3
+∂u
+∂x
+#
+.
+(5)
+4
+
+
+The mixture viscosity (µ) can be defined as simple average of the phasic viscosity [32, 34].
+µ =
+X
+j
+αjµj.
+(6)
+The surface tension effects are accounted using continuum surface force (CSF) approach [36],
+where the capillary forces are modeled as volumetric source term in the multiphase system.
+This method is followed by many authors [3, 23, 37–39] in case of compressible multiphase
+models. Surface tension force fσ in the multiphase system (1) is defined as
+fσ = σκ∇α1.
+(7)
+Where, σ is the surface tension coefficient and κ is the curvature of interface.
+The multiphase model (1) includes phasic internal energy equations. There is no gu-
+rantee that numerical discretization of the these internal energy equations will conserve the
+mixture total energy, which is essential in the presence of shock waves. To address this issue,
+Saurel et al. [15] introduced an extra mixture total energy equation to ensure total energy
+conservation. The mixture total energy equation can be written as
+∂ρE
+∂t + ∇· (ρEu + pu) = ∇· (τ · u) + u · fσ + ρg · u.
+(8)
+The mixture total energy ρE is defined as
+ρE = ρe + 1
+2ρ |u|2 .
+(9)
+Here, ρe is the mixture internal energy it is expressed as
+ρe =
+X
+j
+αjρjej.
+(10)
+3. Numerical Method
+Following the methods described in the literature [8, 15, 20] and our previous work [31],
+the six-equation model is solved using two step procedure. The first step, referred to as the
+evolution step, solves the multiphase system (1) in the absence of relaxation terms. In the
+second step, only the pressure relaxation terms are retained, forming a system of ordinary
+differential equations (ODEs). These steps are elaborated in Sections 3.1 and 3.2.
+5
+
+
+Figure 1: (a) Quadrilateral cell stencil for curvature estimation. (b) Estimation of velocity gradients for
+viscous fluxes at face pq via the Green-Gauss method on a diamond-shaped control volume.
+3.1. Evolution step
+This section details the solution of system (11) in the absence of relaxation effects. By
+omitting the pressure relaxation term, the multiphase system from Eq. (1) can be expressed
+6
+
+
+in a compact form as:
+∂U
+∂t + ∇· Fc + h ∇· u −∇· Fv −Nv −S = 0
+Fc = (Fc, Gc),
+Fv = (Fv, Gv)
+U =
+
+
+α1
+α1ρ1
+α2ρ2
+ρu
+ρv
+ρE
+α1ρ1e1
+α2ρ2e2
+
+
+,
+Fc =
+
+
+α1u
+α1ρ1u
+α2ρ2u
+ρu2 + p
+ρuv
+(ρE + p)u
+α1ρ1e1u
+α2ρ2e2u
+
+
+,
+Gc =
+
+
+α1v
+α1ρ1v
+α2ρ2v
+ρuv
+ρv2 + p
+(ρE + p)v
+α1ρ1e1v
+α2ρ2e2v
+
+
+,
+h =
+
+
+−α1
+0
+0
+0
+0
+0
+α1p1
+α2p2
+
+
+Fv =
+
+
+0
+0
+0
+τxx
+τyx
+τxxu + τxyv
+α1 (τxxu + τxyv)
+α2 (τxxu + τxyv)
+
+
+,
+Gv =
+
+
+0
+0
+0
+τxy
+τyy
+τyxu + τyyv
+α1 (τyxu + τyyv)
+α2 (τyxu + τyyv)
+
+
+Nv =
+
+
+0
+0
+0
+0
+0
+0
+−u · (∇· (α1τ))
+−u · (∇· (α2τ))
+
+
+,
+S =
+
+
+0
+0
+0
+σκ∂α1
+∂x + ρgx
+σκ∂α1
+∂y + ρgy
+σκu · ∇α1 + ρg · u
+0
+0
+
+
+(11)
+The Finite volume discretization of system without any relaxation terms can be written
+as
+∂Ui
+∂t + 1
+Ωi
+"
+4
+X
+l=1
+Fc
+il · nil ∆sil + hi
+4
+X
+l=1
+(un)il ∆sil −
+4
+X
+l=1
+Fv
+il · nil ∆sil
+#
+−Nv
+i −Si = 0
+(12)
+Here, Ωi denotes area of cell i and ∆sil represents the length and nil represents the normal
+face vector of the interface between cell i and neighbouring cell l. In the subsequent sections
+the discretization of convective, viscous and surface tension terms are discussed in a detailed
+manner.
+7
+
+
+3.1.1. Discretization of convective terms
+First we look into computation of conservative fluxes Fc. With the rotation invariance
+property the normal conservative flux can be written as
+Fc
+il · nil = T−1
+il Fc 
+ˆUL, ˆUR
+
+.
+(13)
+where T−1
+il
+is the inverse rotational matrix and Fc 
+ˆUL, ˆUR
+
+is the normal conservative
+flux vector in locally rotated coordinate.
+ˆUL and ˆUR are the set of normal conservative
+variables at the left and right side of the cell interface. The normal flux Fc 
+ˆUL, ˆUR
+
+at the
+cell interface is computed using Riemann solver. The expression for normal variables can be
+written as
+ˆUL/R = TilUL/R =
+
+
+α1
+α1ρ1
+α2ρ2
+ρun
+ρut
+ρE
+α1ρ1e1
+α2ρ2e2
+
+
+L/R
+,
+Til =
+
+
+1
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+nx
+ny
+0
+0
+0
+0
+0
+0
+−ny
+nx
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+0
+0
+0
+1
+
+
+.
+(14)
+Here, un and ut are normal and tangential velocities at cell interface, and (nx, ny) are
+components of unit normal face vector nil.
+Besides the conservative fluxes, the non-conservative terms also contribute to the con-
+vective portion of the system, represented by h∇·u in Eq. (11). Its discretized counterpart,
+shown in Eq. (12), requires the evaluation of hi using cell-averaged variables, while the
+normal velocity at the cell faces (un)il is obtained using a Riemann solver.
+3.1.2. HLLC Riemann solver with capillary terms
+The normal flux vector, Fc 
+ˆUL, ˆUR
+
+, is determined using an HLLC solver. Although
+Riemann solvers incorporating capillary terms have already been developed in the literature
+[3, 32, 37], they are primarily formulated for single-pressure models. For the two-pressure six-
+equation model, both an analysis of Generalised Riemann Invariants (GRI) and a Riemann
+solver that accounts for capillary effects are currently missing from the literature.
+The
+present study addresses this limitation. The eigenvalues and eigenvectors of the multiphase
+system with capillary terms, along with the Generalised Riemann Invariants analysis, are
+presented in Appendix A.
+For the six-equation compressible multiphase flow model, the HLLC solver acts as an
+approximate Riemann solver characterized by two intermediate states separated by middle
+wave fields moving at a single speed S∗, bounded by outer waves with speeds SL and SR.
+The normal flux vector, F
+
+ˆUL, ˆUR
+
+, depends on the wave speeds relative to the interface
+8
+
+
+and is determined according to the following conditions:
+F
+
+ˆUL, ˆUR
+
+= F
+ Uint
+,
+where
+Uint =
+
+
+
+
+
+
+
+
+
+UL,
+if 0 ≤SL
+U∗
+L,
+if SL ≤0 ≤S∗
+U∗
+R,
+if S∗≤0 ≤SR
+UR,
+if SR ≤0
+(15)
+Using the Rankine-Hugoniot jump conditions, F(U∗
+K)−F(UK) = SK (U∗
+K −UK), across
+the left (K = L) and right (K = R) waves, the intermediate state variables, U∗
+K, are
+determined. Applying these relations to the mass, momentum, and total energy equations,
+and invoking the condition u∗
+nR = u∗
+nL = S∗from Eq. (A.13), we obtain:
+α∗
+jKρ∗
+jK = αjKρjK
+SK −unK
+SK −S∗
+
+p∗
+K = pK + ρK(unK −SK)(unK −S∗)
+E∗
+K =
+
+EK + (S∗−unK)
+
+S∗+
+pK
+ρK (SK −unK)
+
+(16)
+.
+Based on the Generalised Riemann Invariants (GRI) analysis performed in Appendix A,
+the Laplace relation for the mixture pressure (Eq. (A.13)) across the contact wave is given
+by p∗
+R −p∗
+L = σκ (α∗
+1R −α∗
+1L). Furthermore, from Eqs. (A.9) and (A.10), we establish that
+u∗
+tK = utK and α∗
+K = αK. Applying these relations for the mixture pressure and volume
+fraction yields the contact wave speed:
+S∗= (pR −pL) + ρRunR(unR −SR) −ρLunL(unL −SL) −σκ(α1R −α1L)
+ρR(unR −SR) −ρL(unL −SL)
+.
+(17)
+Evaluating this expression requires the curvature, κ, at the cell faces. This value can be
+approximated by a simple arithmetic average of the curvatures from the adjacent cell centers,
+i.e., κ = 1
+2(κi + κl). Finally, the bounding wave speeds SL and SR are estimated using the
+following expressions [40]:
+SL = min(unL −aL, unR −aR),
+SR = max(unL + aL, unR + aR).
+(18)
+For the phasic energy equations, the intermediate specific internal energy e∗
+jK is needed,
+which can be computed using the equation of state (4). This requires the phasic pressure
+p∗
+jK and density ρ∗
+jK, which can be evaluated as [15]:
+p∗
+jK = (pjK + πj)(γj −1)ρjK −(γj + 1)ρ∗
+jK
+(γj −1)ρ∗
+jK −(γj + 1)ρjK
+−πj.
+(19)
+Here, ρ∗
+jK is taken from Eq. (16). We can also consider the expression for p∗
+jK given by the
+isentropic relation, which can be written as:
+p∗
+jK = (pjK + πj)
+ρ∗
+jK
+ρjK
+γ
+−πj.
+(20)
+9
+
+
+For moderate density ratios, both formulations yield the same results; differences are only
+observed in the presence of high density ratios.
+Specifically, the expression in Eq. (19)
+can produce large negative values.
+Thus, we can use the relation in Eq. (20) to avoid
+any computational breakdown in cases involving high-strength shock waves. For a detailed
+discussion, please refer to Appendix B.
+3.1.3. Surface tension terms
+The surface tension terms appearing in the momentum equation require the computation
+of the volume fraction gradient, ∇α1.
+Using the Green–Gauss method, these terms are
+evaluated as
+σκ∂α1
+∂x = σκi
+1
+Ωi
+4
+X
+l=1
+(α1)il (nx)il ∆sil,
+σκ∂α1
+∂y = σκi
+1
+Ωi
+4
+X
+l=1
+(α1)il (ny)il ∆sil
+(21)
+Surface tension term appearing in the total energy can be re-expressed as [3, 37]
+σκu · ∇α1 = σκ (∇· (α1u) −α1∇· (u))
+(22)
+Since the above expression is in divergence form it can be discretized as
+σκ (∇· (α1u) −α1∇· (u)) = 1
+Ωi
+σκi
+ 
+4
+X
+l=1
+(α1)il(un)il ∆sil −(α1)i
+4
+X
+l=1
+(un)il ∆sil
+!
+(23)
+To maintain consistency with the convective fluxes [3, 7, 37], the interface quantities (α1)il
+and (un)il in Eqs. (21) and (23) are obtained from the solution of the Riemann problem
+described in Section 3.1.2.
+3.1.4. Curvature computation
+The surface tension formulation requires the computation of the interface curvature κ at
+the cell center, given by
+κ = −∇· nI,
+nI = −∇ψ
+|∇ψ|.
+(24)
+Here, nI is interface normal vector, which is computed using the smoothed field, ψ. The
+smoothed field is obtained from the volume fraction field through the convolution process
+defined as
+ψi =
+X
+m
+(α1)m K(|rl −ri|, δ) Ωm.
+(25)
+10
+
+
+Following [41, 42], smoothing kernel given by cubic spline function [43] is used, which is
+defined as
+K(r, δ) =
+
+
+
+
+
+
+
+
+
+
+
+
+
+40
+7π
+
+1 −6
+r
+δ
+2
++ 6
+r
+δ
+3
+,
+if r
+δ < 1
+2,
+80
+7π
+
+1 −r
+δ
+3
+,
+if 1
+2 ≤r
+δ < 1,
+0,
+otherwise.
+(26)
+The parameter δ in above expression defines width of the region used for smoothing and it is
+generally selected as δ = 3H [41, 42], where H is a measure of grid size. The computation of
+curvature from the smoothed volume fraction field requires the estimation of gradients. Due
+to its robustness and applicability to arbitrary meshes, the weighted least squares method
+is employed to evaluate the gradients required for curvature calculation.
+The truncated Taylor series expansion at the neighboring cell center l about cell center
+i can be written as
+fl = fi + ∂f
+∂x
+
+i
+(xl −xi) + ∂f
+∂y
+
+i
+(yl −yi) + O(∆x2, ∆y2)
+(27)
+Using above Eq. (27) for a set of neighbors, we get following linear system.
+
+
+w1 (x1 −xi)
+w1 (y1 −yi)
+...
+...
+wl (xl −xi)
+wl (yl −yi)
+...
+...
+wN (xN −xi)
+wN (yN −yi)
+
+
+|
+{z
+}
+S
+
+
+∂f
+∂x
+
+i
+∂f
+∂y
+
+i
+
+
+|
+{z
+}
+df
+=
+
+
+w1 (f1 −fi)
+...
+wl (fl −fi)
+...
+wN (fN −fi)
+
+
+|
+{z
+}
+∆f
+(28)
+Here, wl are distance based weights defined as wl =
+1
+(xl−xi)2+(yl−yi)2.
+The linear system
+in Eq. (28) is constructed for all neighboring cells surrounding cell i, including indirect
+neighbors, as illustrated in Figure 1 (a). The resulting system is overdetermined and is
+solved using the least-squares method. In the present work, the classical normal equation
+approach is used, which can be written as
+df =
+ STS
+−1ST∆f.
+(29)
+To calculate the curvature, the derivatives of the smoothed function, (∂ψ
+∂x, ∂ψ
+∂y ), are first
+evaluated using the weighted least-squares method detailed above. The interface normal
+vector is then obtained through normalization as nI =
+∇ψ
+|∇ψ|.
+Using this computed nor-
+mal, the derivatives (∂nI
+x
+∂x ,
+∂nI
+y
+∂y ) are subsequently evaluated by solving the same least squares
+system with f = nI
+x and f = nI
+y, respectively.
+Finally, the curvature is determined as
+κ = −
+
+∂nI
+x
+∂x +
+∂nI
+y
+∂y
+
+.
+11
+
+
+The computed curvature varies along the interface normal, with numerical errors increas-
+ing significantly near the pure-phase regions. To reduce the error in curvature estimation, an
+iterative correction procedure [3, 7, 44] is used. The corrected curvature after the (n + 1)-th
+iteration is given by
+κn+1
+i
+= wiκn
+i + P
+l wlκn
+l
+wi + P
+l wl
+.
+(30)
+The stencil of neighboring cells used in Eq. (30) is identical to that employed for curvature
+estimation (shown in Figure 1 (a)). Here, the weights are defined as w = (ψ(1 −ψ)), which
+attains its maximum value at ψ = 0.5. Consequently, the iterative procedure redistributes
+the curvature evaluated near ψ = 0.5 across the neighboring cells, thereby improving the
+overall curvature field. The number of iterations used in the method is problem specific and
+it is reported in the test cases.
+3.1.5. Viscous terms
+The viscous fluxes appearing in the momentum and mixture total energy equations of
+the multiphase model (1) are similar to those in the Navier–Stokes equations. The only
+additional contribution arises in the phasic energy equations, where the viscous dissipation
+term αjτ : ∇u appears. This term is re-expressed as [34] ∇(αjτ · u) −u · (∇· (αjτ)), and
+incorporated into the formulation given in Eq. (11).
+For convenience, the viscous terms are grouped into the tensor Fv and the vector Nv.
+The divergence term ∇· Fv in the system (11) can be directly discretized as
+4
+X
+l=1
+Fv
+il · nil ∆sil =
+4
+X
+l=1
+ Fv
+il(nx)il + Gv
+il(ny)il
+
+∆sil.
+(31)
+The only expressions appearing in the vector Nv are the terms −u · (∇· (αjτ)) can be
+discretized as
+u · (∇· (αjτ)) = 1
+Ωi
+"
+ui
+4
+X
+l=1
+(αj)il
+ (τxx)il(nx)il + (τxy)il(ny)il
+
+∆sil
+#
++ 1
+Ωi
+"
+vi
+4
+X
+l=1
+(αj)il
+ (τyx)il(nx)il + (τyy)il(ny)il
+
+∆sil
+#
+.
+(32)
+The evaluation of the viscous stress tensor τ at the cell faces requires velocity gradients
+∇u, ∇v. These gradients are computed at the cell faces using the Green–Gauss method
+applied to a diamond-shaped control volume (shown in Figure 1 (b)), commonly referred to
+as the Coirier diamond [45]. The gradient of a scalar variable ϕ at the cell face shared by
+cell i and l can be written as
+∇ϕ =
+1
+2Ωiplq
+[(ϕi + ϕp) nip ∆sip + (ϕp + ϕl) npl ∆spl + (ϕl + ϕq) nlq ∆slq + (ϕq + ϕi) nqi ∆sqi] .
+(33)
+12
+
+
+In the above expression, the values at vertices p and q are also required. These are obtained
+as area-weighted averages of the cell-centered values of the cells sharing the respective vertex.
+For example scalar value at vertex p can be defined
+ϕp =
+PN
+r=1 Ωrϕr
+PN
+r=1 Ωr
+.
+(34)
+Where N is the total number of cells sharing a common vertex p.
+In addition to the gradients, the evaluation of the diffusive fluxes requires the viscosity
+µ, volume fraction αj, and velocity u at the cell faces. These quantities are computed by
+averaging the values from the neighboring cells sharing the face.
+3.2. Relaxation step
+The solution obtained from the evolution step is in a non-equilibrium state. It is subse-
+quently projected onto mechanical equilibrium during the relaxation step by using instan-
+taneous pressure relaxation (in the limit Kp →∞) [15, 17, 24, 46]. Retaining only the
+relaxation terms in model (1) leads to following system
+d
+dt
+
+
+α1
+α1ρ1
+α2ρ2
+ρu
+ρv
+ρE
+α1ρ1e1
+α2ρ2e2
+
+
+=
+
+
+Kp (p1 −p2)
+0
+0
+0
+0
+0
+−KppI (p1 −p2)
+KppI (p1 −p2)
+
+
+.
+(35)
+Based on the system of ODEs (Eq. (35)), the product of the volume fraction and the density
+(αjρj) and the velocity components (u and v) remain constant during the relaxation step.
+By substituting the volume fraction equation into the phasic energy equations, the system
+in Eq. (35) reduces to
+d(αjρjej)
+dt
+= −pI
+dαj
+dt ,
+j = 1, 2.
+(36)
+Above ODEs can be discretized as
+(αjρjej)∗−(αjρjej)o = −¯pI
+ α∗
+j −αo
+j
+
+,
+j = 1, 2.
+(37)
+The superscripts o and ∗denote the variables before and after the relaxation step, respec-
+tively. Here, ¯pI represents the numerical approximation of
+1
+(α∗
+j −αo
+j)
+R
+pIdαj, and it can be
+taken as po
+I, p∗
+I, or
+p∗
+I+po
+I
+2
+[15, 17, 47]. It is observed that in the absence of a strong shock, any
+of these choices yields similar results. Assuming ¯pI = po
+I, and with the help of the SGEOS
+(Eq. (4)), Eq. (37) becomes:
+α∗
+j
+ p∗
+j + γjπj
+
+−αo
+j
+ po
+j + γjπj
+
+= −po
+I
+ α∗
+j −αo
+j
+
+(γj −1) .
+(38)
+13
+
+
+Since, the pressure relaxation is done by considering instantaneous relaxation, the pres-
+sures p∗
+1, p∗
+2 after relaxation follows mechanical equilibrium condition. In the case of surface
+tension it would be p∗
+1 −p∗
+2 = σκ [1, 35, 39]. Substituting the conditions in Eq.(38) with
+volume fraction constraint P
+j αj = 1 we get single quadratic equation as
+A1(p∗)2 + A2(p∗) + A3 = 0,
+Where,
+A1 = 1,
+A2 = (αo
+1C2 + αo
+2C1) −αo
+1 (po
+1 −σκ) −αo
+2 (po
+2 −σκ) ,
+A3 = −(αo
+1(po
+1 −σκ)C2 + αo
+2po
+2(C1 + σκ)) ,
+Cj = γjπj + po
+I(γj −1).
+(39)
+Keeping the positive root as a solution for p∗:
+p∗= −A2 +
+p
+A2
+2 −4A1A3
+2A1
+,
+(40)
+values of the phasic pressure are set as p∗
+1 = p∗+ σκ and p∗
+2 = p∗. Volume fraction α∗
+j after
+relaxation are computed from Eq. (38) and phasic densities are computed as ρ∗
+j = (αjρj)o
+α∗
+j
+.
+In order to enforce the conservation of mixture total energy, the pressure pj and energy ej
+values obtained from pressure relaxation are corrected using mixture total energy equation
+[8, 15, 46]. The corrected pressure is obtained using mixture equation of state. Using the
+surface tension constraint p∗∗
+1 −p∗∗
+2 = σκ and SGEOS (4) relation final pressures are obtained
+as
+p∗∗
+1 = p∗∗
+2 + σκ,
+p∗∗
+2 =
+(ρe)o −
+P
+j
+α∗
+j γjπj
+γj−1 + α∗
+1σκ
+γ1−1
+
+P
+j
+α∗
+j
+γj−1
+(41)
+3.3. Second order formulation
+To obtain a second-order spatial discretization, the set of primitive variables at the cell
+faces, WL/R = [α1, ρ1, ρ2, u, v, p1, p2]L/R is reconstructed from the neighboring cell-averaged
+quantities (Wi, Wl). The reconstruction procedure is based on a Taylor series expansion
+truncated after the first-order terms, and can be written as
+WL = Wi +
+ ∂W
+∂x
+
+i
+(xil −xi) + ∂W
+∂y
+
+i
+(yil −yi)
+
+,
+WR = Wl +
+ ∂W
+∂x
+
+l
+(xil −xl) + ∂W
+∂y
+
+l
+(yil −yl)
+
+.
+(42)
+In this work, the gradients ∂W
+∂x , ∂W
+∂y for all primitive variables, except the volume fraction, are
+computed using the SWDLS method [48–50]. The method uses the weighted least-squares
+14
+
+
+formulation described in Eqs. (28) and (29). The only modification is the use of solution-
+dependent weights defined as wl =
+1
+|Wl−Wi|+ϵ, where ϵ is a small positive number added to
+avoid division by zero.
+Only for the volume fraction α1, the interface-sharpening reconstruction proposed by
+Chiapolino et al. [8] is used. In this approach, the compressive Overbee limiter, is used
+together with the gradients computed by weighted least square method with the distance
+based weights. The use of this dedicated reconstruction procedure for the volume fraction
+effectively reduces numerical smearing of the interface [8, 44, 51].
+For second-order temporal accuracy, the strong stability-preserving Runge-Kutta (SSPRK)
+method is employed. Representing the evolution step (Section 3.1) and the relaxation step
+(Section 3.2) with the operators L∆t
+E and L∆t
+R , respectively, the implementation of the second-
+order SSPRK scheme is written as
+U(1) = L∆t
+R L∆t
+E (Un) ,
+U(2) = L∆t
+R L∆t
+E
+ U(1)
+,
+U(3) = 1
+2
+ Un + U(2)
+,
+Un+1 = L∆t
+R
+ U(3)
+.
+(43)
+Figure 2: Schematic illustrating the local pressure functions, fp,r, required to evaluate the pressure function,
+fp, at the face shared by cells i and l.
+4. Low Mach correction with modified scaling factor
+Standard Riemann solvers are known to produce inaccurate results in the low-Mach
+regime. To mitigate this issue, a low-Mach correction approach originally developed for
+15
+
+
+single-phase flows [52–56] was extended to multiphase flows in our recent work [31]. The
+effectiveness of this method has been established through various numerical experiments and
+asymptotic analyses [31]. In this approach, the velocity differences in the convective flux
+expressions are scaled by the local Mach number. To implement this correction, the following
+reconstructed left and right velocities [52] are used in place of the standard left and right
+velocities, (unL, unR, utL, utR), in the HLLC flux expressions presented in the Section 3.1.2.
+ur
+nL = unR + unL
+2
+−flm
+unR −unL
+2
+,
+ur
+tL = utR + utL
+2
+−flm
+utR −utL
+2
+ur
+nR = unR + unL
+2
++ flm
+unR −unL
+2
+,
+ur
+tR = utR + utL
+2
++ flm
+utR −utL
+2
+(44)
+In our previous work [31], the scaling factor, flm, was defined directly as the local Mach
+number. At the cell face, this is computed as:
+flm = fM,
+fM = min
+ 
+1, max
+ p
+u2
+nL + u2
+tL
+aL
+,
+p
+u2
+nR + u2
+tR
+aR
+!!
+.
+(45)
+While the low-Mach correction effectively reduces excessive diffusion in the low-Mach
+limit (M →0), it is prone to producing instabilities in the vicinity of pressure jumps. To
+circumvent this problem, the present study introduces a modified scaling factor, flm, which
+is evaluated as follows:
+flm = fM(1 −fp) + fp.
+(46)
+Here, fp is a multidimensional pressure function that detects the presence of pressure jumps
+and reduces the effect of the low-Mach correction based on the strength of the pressure
+jump. The value of fp at the cell face shared by cells i and l is computed by evaluating the
+local pressure function, fp,r, across all faces of the adjacent cells i and l, as illustrated in
+Figure 2. The pressure functions fp and fp,r are defined as follows [56]:
+fp = min
+r (fp,r),
+fp,r =
+s
+|pR −pL|
+max(pL, pR).
+(47)
+The pressure function based approach has also been employed in the single-phase flow
+studies [55–58] to mitigate shock instabilities in the low-Mach regime. However, in multi-
+phase flows, pressure jumps can be induced by other factors such as surface tension at the
+phase interface or by hydrostatic pressure gradients within high-density fluids. Our numer-
+ical experiments demonstrate that our modified scaling factor, flm, enhances stability for
+low-Mach multiphase flows (M →0).
+5. Results
+To assess the capability of the proposed numerical method, various numerical experi-
+ments were conducted for a wide range of problems. These include the dam-break, static
+droplet, oscillating droplet, and rising bubble test cases. These problems are low-Mach test
+16
+
+
+cases which include surface tension and viscous effects. Additionally, to test the robustness
+of the numerical method for high-speed flows, we simulate a shock-induced bubble collapse.
+Numerical results for all the test cases were obtained using a second-order scheme on a
+structured grid. A CFL number of 0.8 is used for the test cases unless otherwise specified.
+5.1. Dam-break
+The classic dam-break test case involves the collapse of a water column under gravity.
+Since the water starts moving from rest and the Mach number remains below 10−2 through-
+out the simulation, the low-Mach correction is essential for maintaining numerical accuracy.
+The effectiveness of this correction has already been demonstrated in recent work [31]. It
+is well known that viscous and capillary effects do not significantly alter the results of the
+dam-break problem. Therefore, the primary objective of this test case is to examine the
+effect of the modified scaling factor, fM(1 −fp) + fp. The geometric configuration and mesh
+resolution are identical to those used in the previous study [31]. The material properties of
+water and air employed in the present simulations are given by
+ρ1 = 1000 kg/m3,
+µ1 = 10−3 Pa s,
+γ1 = 4.4,
+and π1 = 6 × 108 Pa.
+ρ2 = 1 kg/m3,
+µ2 = 1.8 × 10−5 Pa s,
+γ2 = 1.4,
+and π2 = 0 Pa,
+σ = 0.072N/m,
+g = (0, −9.8)m/s2.
+(48)
+The pressure contours along with the interface profiles at various time instants for the
+numerical results obtained with the different scaling factors, fM and fM (1 −fp) + fp, are
+shown in Figure 3. In the left-hand plots, the black contour lines reveal spurious pressure
+oscillations, particularly near the interface (white line). Since the pressure variation due to
+the hydrostatic effect in the water side is higher, the low-Mach correction with the simple
+scaling factor fM results in instability. However, the modified scaling factor fM (1 −fp)+fp
+rectifies the problem by reducing the effect of the low-Mach correction in regions of high
+pressure variation. The effectiveness of the modified factor can be observed in the right-side
+plots of Figure 3.
+For a quantitative comparison, time histories of the water column height and front po-
+sition for the different numerical results, along with the experimental data [59], are shown
+in Figure 4. The comparison shows that the inclusion of viscous and capillary effects has
+a negligible influence on the results. The presence of spurious pressure oscillations also af-
+fects the interface movement and the overall accuracy of the numerical results, which can
+be observed in Figure 4. With the modified scaling factor, the numerical results agree more
+closely with the experimental data. For example, at the non-dimensional time (t
+p
+2g/a) =
+4.43, the percentage error in the front position decreases from 8.22% to 2.85% after applying
+the modified scaling factor.
+17
+
+
+Figure 3: Pressure contours and interface movement for the dam break problem. The black lines denote
+pressure contours, and the white line represents the interface (α = 0.5). The left-hand plots show the results
+obtained using the scaling factor fM, while the right-hand plots show the results obtained using the modified
+scaling factor fM(1 −fp) + fp.
+18
+
+
+Figure 4: Comparison of the numerical results, obtained using two different scaling factors, against the
+experimental data of Martin and Moyce [59]: (a) non-dimensional water column height versus time, and (b)
+non-dimensional front position versus time.
+5.2. Static droplet
+To validate the numerical scheme’s efficacy in capturing the surface tension-induced
+pressure jump across the phase interface, the standard static droplet benchmark is simulated.
+In this problem, a circular liquid droplet of radius R = 0.2 m, centered at (0.5, 0.5) inside a
+unit square domain, is considered. All boundaries of the computational domain are treated as
+walls. Since a uniform curvature is desired in this test, the curvature correction procedure
+(Eq. (30)) is applied using 10 iterations. The properties of the liquid (phase 1) and the
+surrounding air (phase 2) are defined as follows [33].
+ρ1 = 1000 kg/m3,
+γ1 = 2.4,
+and π1 = 107 Pa,
+ρ2 = 1 kg/m3,
+γ2 = 1.4
+and π2 = 0 Pa,
+σ = 200N/m.
+(49)
+Initially, a uniform pressure of p0 = 104 Pa is prescribed throughout the domain. Due
+to surface tension, the pressure inside the droplet increases to p0 + ∆p. According to the
+Young–Laplace law, the exact pressure jump should be ∆pexact = σ/R. However, due to
+numerical errors from the curvature calculation and spatial discretization, a deviation from
+the exact pressure jump is expected. To evaluate the accuracy of the proposed numerical
+method, simulations are performed on three different meshes: Grid A (32 × 32), Grid B
+(64 × 64), and Grid C (128 × 128). The pressure profiles along the horizontal centerline at
+t = 2 s for all test cases are compared in Figure 5(a), with the corresponding relative error
+19
+
+
+norms are plotted in Figure 5(b). The L2 error norm is calculated for cells located strictly
+within the liquid droplet (α1 ≥0.99) using the following expression:
+ϵ∆p =
+1
+∆pexact
+sX
+i
+ ∆pnumerical
+i
+−∆pexact2 Ωi.
+(50)
+From the comparison plot (Figure 5(a)), it can be seen that a uniform pressure inside
+the droplet is created, and the pressure jump is converging to the exact solution with al-
+most second-order accuracy (Figure 5(b)). The numerical error also gives rise to spurious
+velocities, also known as parasitic currents. For all the test results, these currents remain
+bounded and maximum value is less than 10−2 m/s.
+Figure 5: Numerical results for different gird sizes: (a) pressure distribution along the horizontal center line,
+(b) log–log plot of relative error norms versus the number of cells.
+Parasitic currents are typically quantified and analyzed in the presence of physical vis-
+cosity using appropriate non-dimensional numbers [7, 60, 61]. Assuming equal viscosities,
+µ1 = µ2 = µ, the same static droplet case is simulated on a 64 × 64 mesh. The simulations
+are performed for four different Laplace numbers
+
+La = ρσD
+µ2
+
+: 104, 106, 109, and 1011. A
+higher Laplace number corresponds to less physical dissipation and, consequently, greater
+computational difficulty.
+To demonstrate the effectiveness of the modified scaling factor, numerical results obtained
+using the simple scaling factor, fM are compared with those using the modified scaling
+factor fM(1 −fp) + fp in Figure 6. The time history of the maximum value of the parasitic
+currents (Figure 6 (a)) reveals that, regardless of the Laplace number, the parasitic current is
+consistently lower when the modified scaling factor is applied. This reduction occurs because
+the pressure sensor near the interface diminishes the effect of the low-Mach correction, which
+subsequently increases numerical dissipation and helps suppress parasitic currents. However,
+the difference between the parasitic currents observed in the test cases with two different
+20
+
+
+scaling factors decreases at lower Laplace numbers. In case of highest Laplace number, 1011,
+the parasitic currents become unbounded if a simple scaling factor is used. These strong
+currents cause distortion and displacement of the interface, as observed in the comparison of
+interface profiles at t = 9.3 s in Figure 6(b). Since the low-Mach correction is unavoidable in
+low-Mach flow regimes, the modified scaling factor offers a balanced approach for achieving
+stable and accurate solutions.
+Figure 6: (a) Time history of parasitic currents in a static droplet case, simulated using the simple scaling
+factor, fM, and the modified scaling factor, fM(1 −fp) + fp, for different Laplace numbers. (b) Comparison
+of the interface profiles for a Laplace number of 1011 at t = 9.3 s, obtained using different scaling factors,
+against the initial profile.
+5.3. Oscillating droplet
+To evaluate the scheme’s ability to resolve dynamic, surface tension driven flows, we
+simulate the standard oscillating droplet benchmark [32, 33, 39].
+In this test case, an
+ellipsoidal liquid droplet is placed inside a 2D square domain of size L = 1 m, surrounded
+by air. The initial setup and material properties are adopted from the literature [32, 33].
+For the liquid (phase 1) and air (phase 2) the properties are defined as
+ρ1 = 100 kg/m3,
+γ1 = 2.4,
+and π1 = 107 Pa,
+ρ2 = 1 kg/m3,
+γ2 = 1.4
+and π2 = 0 Pa.
+(51)
+Additionally, the surface tension coefficient is set to σ = 342 N/m. The initial geometric
+profile of the liquid droplet is given by the following equation.
+(x −0.5)2
+a2
++ (y −0.5)2
+b2
+= 1.
+(52)
+The lengths of the semi-major (a) and semi-minor (b) axes are taken as a = 0.2 m and
+b = 0.12 m. For this test problem, the curvature correction formulae (Eq. (30)) is used
+21
+
+
+with two iterations. Due to the non-uniform curvature of the initial liquid-gas interface, the
+droplet does not remain in its initial shape and undergoes repeated cycles of deformation.
+The evolution of the droplet is plotted in Figure 8 at different stages of a complete cycle. The
+oscillation frequency of the droplet is given by the following analytical expression [62, 63]
+ω2 =
+6σ
+(ρ1 + ρ2)R3.
+(53)
+Here, R represents the equivalent circular radius of the droplet, which is evaluated as R =
+√
+ab. For an equivalent radius of 0.1549 m, the oscillation period
+ T = 2π
+ω
+
+evaluates to
+0.085 s [39].
+Since the pressure jump induced by surface tension is very large, the low Mach correction
+with pressure function, (flm = fM(1 −fp) + fp), is employed for all test cases to suppress
+spurious interface oscillations. To demonstrate the effect of the pressure function based low
+Mach correction, the combined pressure contour, velocity vectors, and interface location at
+t = 0.235 ms are presented in Figure 7. The left plot, obtained using the simple low Mach
+correction, flm = fM, exhibits spurious interface oscillations near the upper and lower ends
+of the interface, where the pressure gradient is very high. In contrast, when the pressure
+function based low Mach correction, flm = fM(1 −fp) + fp, is employed, these spurious
+interface oscillations disappear, resulting in a smooth interface profile.
+Figure 7: Pressure field (Pa), velocity glyphs, and interface location (α = 0.5, black line) at t = 0.235 ms
+for mesh size 128 × 128. (a) Result obtained with scaling factor flm = fM. (b) Result obtained with a low
+Mach correction factor which includes pressure function (flm = fM(1 −fp) + fp).
+During the deformation cycles, kinetic and potential energy are continuously trans-
+formed into one another. The temporal variation of the global kinetic energy, defined as
+1
+2
+P
+i ρi |ui|2 Ωi, is plotted for different cases in Figure 9. The kinetic energy reaches its peak
+value twice during a single physical oscillation cycle, corresponding to the instants when the
+droplet becomes circular. However, driven by this kinetic energy, the deformation contin-
+ues until the droplet transforms into a vertical or horizontal elliptical shape, a state that
+corresponds to minimum kinetic energy.
+22
+
+
+Ideally, in the absence of physical viscosity, the cycles of droplet deformation would con-
+tinue indefinitely. However, inherent numerical dissipation artificially damps the oscillations,
+an effect that is clearly evident in the kinetic energy plots. As shown in Figure 9 (a), which
+compares results obtained across different mesh resolutions using the low Mach correction ,
+numerical dissipation noticeably decreases as grid resolution increases. Additionally, com-
+paring the results with and without the low Mach correction on the finest grid, illustrated
+in Figure 9 (b), demonstrates that applying the low Mach correction significantly reduces
+numerical dissipation. The percentage errors in the computed oscillation frequency (ω) and
+energy decay ratio (G) for the different test cases are summarized in Table 1. The energy
+decay ratio (G) is defined as the ratio of the third peak to the first peak of the global kinetic
+energy curve and quantifies the fraction of kinetic energy remaining after one complete oscil-
+lation cycle. Compared to work done by Panchal et al. [39], which reported a 66% error for
+200×200 mesh, the present work achieves a significant lower error of 4.38% on a comparable
+192 × 192 mesh. The results confirm the scheme’s robust capability to accurately simulate
+dynamic, surface tension dominated multiphase flows.
+Figure 8: Evolution of an oscillating droplet on Grid C (192×192) at various normalized times: (a) t/T = 0,
+(b) t/T = 0.25, (c) t/T = 0.5, (d) t/T = 0.75, and (e) t/T = 1, where t is the oscillation period.
+23
+
+
+Figure 9: Time history of global kinetic energy: (a) comparison of results obtained with the low Mach
+correction for different mesh sizes, and (b) comparison of results with and without the low-Mach correction
+on Grid C (192 × 192).
+Table 1: Percentage error in the droplet oscillation frequency (ω) and energy decay ratio (G) for different
+test cases.
+Case
+Error
+G
+Grid A (64 × 64), Without correction
+8.151 %
+0.35
+Grid A (64 × 64), With correction
+7.211 %
+0.722
+Grid B (128 × 128), Without correction
+5.223 %
+0.717
+Grid B (128 × 128), With correction
+4.927 %
+0.89
+Grid C (192 × 192), Without correction
+4.707 %
+0.835
+Grid C (192 × 192), With correction
+4.37 %
+0.918
+Figure 10: Initial setup for bubble rise test case
+24
+
+
+5.4. Rising bubble
+To test the capability of numerical scheme to accurately resolve low Mach multiphase
+flows involving gravitation and viscous effect, we consider rising bubble test case [64]. The
+computational setup of the test problem is shown in Figure 10. The top and bottom wall
+considered as no slip wall while free slip boundary condition is imposed on the side walls.
+The material properties for the bubble (phase 1) and surrounding liquid (phase 2) are taken
+as
+ρ1 = 100 kg/m3,
+µ1 = 1 Pa s,
+γ1 = 2.4,
+and π1 = 107 Pa,
+ρ2 = 1000 kg/m3,
+µ2 = 10 Pa s,
+γ2 = 4.4,
+and π2 = 6 × 108 Pa.
+(54)
+The simulations are performed using a surface tension coefficient of σ = 24.5 N/m and
+a gravitational acceleration of g = (0, −0.98) m/s2.
+The stiffened gas parameters were
+specifically selected according to the phase densities. The number of iterations used with
+the curvature correction formula (Eq. (30)) is the same as in the previous oscillating droplet
+problem.
+The optimal mesh resolution is determined by comparing the time history of
+bubble’s center of mass, its rise velocity and circularity for three different mesh sizes: Grid
+A (64 × 128), Grid B (96 × 192), and Grid C (128 × 256), as shown in Figure 11. The center
+of mass, yb, rise velocity, vb, and circularity of the bubble, χb are computed as
+yb =
+P
+i (α1)i yi
+P
+i (α1)i
+,
+vb =
+P
+i (α1)i vi
+P
+i (α1)i
+,
+χb = Pa
+Pb
+.
+(55)
+Here, Pa is the perimeter of a circle with area equivalent to bubble and Pb is the actual
+perimeter of the bubble. Since, the results does not change significantly from Grid B to
+Grid C, Grid B is selected for further investigation.
+Because of the buoyant force, the bubble starts moving upward (see Figure 12(a)), and
+its velocity increases during the initial phase. As viscous drag increases, the forces balance,
+and the bubble ultimately attains a constant terminal velocity (see Figure 11 (b)). During
+its upward motion, the bubble deforms from its initial circular geometry into an ellipsoidal
+shape, as seen in Figure 12 (a). To confirm this behavior, the bubble’s shape at 3.0 s is com-
+pared against the reference data [64] in Figure 12 (b), demonstrating close agreement. To
+illustrate the efficacy of the low Mach correction, numerical results obtained with and with-
+out correction are compared against the reference solution [64] in Figure 13. The comparison
+clearly indicates that the correction improves the results, which are in close agreement with
+the incompressible solution. In this case, the low-Mach correction is employed with the
+modified scaling factor. However, the modified scaling factor is not strictly necessary for
+this specific test problem, as the physical viscosity alone provides sufficient stability. As
+demonstrated by the parasitic current study in Section 5.2, the modified scaling factor has
+a minimal impact at lower Laplace numbers. Because the Laplace number
+
+La = ρσD
+µ2
+
+of
+the bubble in this setup is relatively low at 1225, the factor’s influence remains minimal.
+25
+
+
+Figure 11: Comparison of numerical results using the low Mach correction on different meshes: (a) trajectory
+of the bubble’s center of mass (yb), (b) bubble rising velocity (vb), and (c) bubble circularity (χb).
+26
+
+
+Figure 12: (a) Temporal evolution of the bubble interface at different time intervals, illustrating movement
+and deformation. (b) comparison of bubble interface at t = 3 s with the reference incompressible solution
+[64]
+27
+
+
+Figure 13: Comparison of numerical results obtained with and without the low Mach correction against the
+reference incompressible solution of Hysing et al. [64]: (a) center of mass trajectory (yb), (b) rise velocity
+(vb), and (c) circularity (χb).
+5.5. Shock-induced bubble collapse
+In order to test the robustness of the proposed numerical method, we simulate a standard
+benchmark problem in which a shock wave traveling in water at Mach 1.72 causes the collapse
+of an air bubble. This specific configuration has been investigated in numerous studies [65–
+69] to assess the capability of various numerical methods. Initially, an air bubble of diameter
+D = 6 mm is placed at the origin (0, 0), with a normal shock wave positioned at x = −5.4
+mm inside a rectangular domain of size [−12, 18] × [−7.5, 7.5] mm2. The computational
+28
+
+
+domain is discretized using a uniform mesh of size D/250, and a CFL number of 0.4 is used.
+The initial conditions for the water and air are defined as follows:
+Post-shock water: ρ = 1324.81 kg/m3, p = 1.92 × 109 Pa, u = 685.2 m/s, γ = 4.4, π = 6 × 108 Pa,
+Pre-shock water: ρ = 1000 kg/m3, p = 105 Pa, u = 0 m/s, γ = 4.4, π = 6 × 108 Pa,
+Air cavity: ρ = 1 kg/m3, p = 105 Pa, u = 0 m/s, γ = 1.4, π = 0 Pa.
+(56)
+Since the Weber number (We = ρu2D
+σ ) based on the post-shock conditions is extremely
+high (We = 51.83 × 106), surface tension effects can be safely neglected in this problem.
+The evolution of the bubble after the collision is presented in Figure 14, which includes
+a series of normalized pressure contours (p/105) and the interface (α = 0.5) at various
+time instants. From Figure 14(a), it can be observed that as the shock wave in the water
+collides with the bubble interface, a reflected rarefaction in the water and a transmitted
+shock within the bubble are formed. Following the collision, the bubble begins to deform;
+specifically, the upstream interface deforms inward while the transmitted shock continues
+to travel through the cavity. This internal shock reaches the downstream interface before
+the upstream interface converges upon it. As evident in Figure 14(d), a transmitted shock
+has already formed in the surrounding water before the bubble breaks apart. When the
+two sides of the interface meet, the bubble splits in two, and a strong blast wave forms
+behind the transmitted wave (see Figure 14(e)). For a more detailed explanation of the
+flow physics, refer the work of Hawker and Ventikos [70].
+The numerical results are in
+qualitative agreement with previous studies [66, 69, 70]. For quantitative validation, we
+plotted the nondimensional height and width of the bubble in Figure 15 prior to its collapse
+and compared against the results of [68]. The results presented in Figure 14 and Figure 15
+demonstrate that the present numerical scheme successfully resolves high-speed flows with
+shock waves, even when the involved fluids exhibit vastly different compressibilities.
+In this work, the stiffened gas equation of state (EOS) is used for water, which is known
+to produce non-physical negative pressures, as widely reported in the literature [1, 7, 47, 71].
+The present method robustly circumvents this issue by incorporating an implicit approxima-
+tion, ¯pI = p∗
+I, within the pressure relaxation step. Furthermore, to prevent computational
+breakdown caused by large negative pressures during the evolution step, the flux computa-
+tion procedure for this test case relies on the isentropic relation in Eq. (20) rather than Eq.
+(19). For a detailed explanation, please refer to Section Appendix B.
+29
+
+
+Figure 14: Normalized pressure contours (p/105) and interface (α = 0.5) at different time instances for
+shock induced bubble collapse test case.
+Figure 15: Non-dimensional height (h/D) and width (w/D) of the collapsing bubble and comparison with
+the reference result from [68]
+30
+
+
+6. Conclusion
+In this work, we presented an effective finite volume method capable of resolving mul-
+tiphase flows involving surface tension, viscous, and gravitational effects across all Mach
+numbers. We incorporated capillary effects into the two-pressure six-equation model using
+the continuum surface force (CSF) approach [36] as a source term. The curvature values at
+the cell centers are computed using a weighted least squares method on a smoothed field
+obtained via a convolution process. Furthermore, both the HLLC Riemann solver and the
+pressure relaxation step were modified to consistently account for capillary-induced pressure
+jumps, preserving the Laplace pressure discontinuity during phase equilibration. The pres-
+sure jump across the contact wave was derived based on a generalised Riemann invariant
+analysis performed for the six-equation model with capillary terms.
+To accurately compute multiphase flow problems in the low Mach regime while overcom-
+ing excessive numerical diffusion, we extended the low Mach correction approach presented
+in our recent work [31]. Although this method significantly improves accuracy without im-
+posing strict time-step constraints, it is prone to instabilities in regions of strong pressure
+variation. To mitigate this issue, we introduced a modified scaling factor using a multidi-
+mensional pressure-based sensor, providing a stable and robust approach across low Mach
+regimes. Demonstrated across the test cases, this pressure sensor-based formulation suc-
+cessfully eliminates spurious oscillations that occur under simple low Mach corrections near
+regions of high-pressure gradients, yielding smooth interface profiles.
+The efficacy of the proposed numerical framework was validated against several bench-
+mark problems involving various physical phenomena. For the oscillating droplet case, key
+quantitative metrics including the percentage errors in computed oscillation frequency (ω)
+and energy decay ratio (G) - representing the remaining kinetic energy fraction after one
+complete cycle - demonstrated strong accuracy, while the rising bubble results confirmed the
+scheme’s capability to capture interface dynamics and low Mach flow features. Furthermore,
+the parasitic current study involving a static droplet highlights the role of the modified scal-
+ing factor in dampening unwanted numerical currents and maintaining solution stability,
+particularly for flows with lower physical viscosity. The effectiveness of this scaling factor is
+further supported by the dam break problem, which demonstrated improved agreement with
+experimental data. Finally, the robustness of the overall scheme in handling highly com-
+pressible regimes and preventing negative pressures was confirmed through the simulation
+of a shock-induced bubble collapse.
+Appendix A. Generalised Riemann Invariants Analysis
+The approximate Riemann solver relies on relations across the waves, which are deter-
+mined using Generalised Riemann Invariants (GRI) analysis [72]. To incorporate capillary
+effects into the solver, a constant curvature is assumed [3, 32]. Considering only surface
+tension effects, the multiphase system in Eq. (1), can be expressed in an augmented one-
+31
+
+
+dimensional form as:
+∂ˆU
+∂t + ∂Fc( ˆU)
+∂ˆx
++ B( ˆU)∂ˆU
+∂ˆx = 0
+ˆU =
+
+
+α1
+α1ρ1
+α2ρ2
+ρun
+ρut
+α1ρ1e1
+α2ρ2e2
+
+
+,
+Fc( ˆU) =
+
+
+α1un
+α1ρ1un
+α2ρ2un
+ρu2
+n + p
+ρunut
+α1ρ1e1un
+α2ρ2e2un
+
+
+,
+B( ˆU) =
+
+
+0
+α1un
+ρ
+α1un
+ρ
+−α1
+ρ
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+σκ
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+−α1p1un
+ρ
+−α1p1un
+ρ
+α1p1
+ρ
+0
+0
+0
+0
+−α2p2un
+ρ
+−α2p2un
+ρ
+α2p2
+ρ
+0
+0
+0
+
+
+(A.1)
+Above system can be written in quasi-linear form as
+∂ˆ
+W
+∂t + A( ˆ
+W)∂ˆ
+W
+∂ˆx = 0.
+(A.2)
+Here, ˆ
+W is the vector with primitive variables and coefficient matrix A( ˆ
+W) is obtained using
+the relation
+A( ˆ
+W) = ∂ˆ
+W
+∂ˆU
+ 
+∂Fc( ˆU)
+∂ˆU
++ B( ˆU)
+!
+∂ˆU
+∂ˆ
+W
+(A.3)
+where ˆ
+W and A( ˆ
+W) are given below
+ˆ
+W =
+
+
+α1
+ρ1
+ρ2
+un
+ut
+p1
+p2
+
+
+,
+A( ˆ
+W) =
+
+
+un
+0
+0
+0
+0
+0
+0
+0
+un
+0
+ρ1
+0
+0
+0
+0
+0
+un
+ρ2
+0
+0
+0
+p1 −p2 −σκ
+ρ
+0
+0
+un
+0
+α1
+ρ
+α2
+ρ
+0
+0
+0
+0
+un
+0
+0
+0
+0
+0
+ρ1a2
+1
+0
+un
+0
+0
+0
+0
+ρ2a2
+2
+0
+0
+un
+
+
+.
+(A.4)
+Matrix A( ˆ
+W) has seven eigenvalues as
+λ1 = un −a,
+λ2,..,6 = un,
+λ7 = un + a.
+(A.5)
+32
+
+
+and the corresponding right eigenvectors are
+R1 =
+
+
+0
+ρ1
+ρ2a22
+1
+a2
+2
+−
+a
+ρ2a22
+0
+ρ1a12
+ρ2a22
+1
+
+
+,
+R2 =
+
+
+0
+1
+0
+0
+0
+0
+0
+
+
+,
+R3 =
+
+
+−α2
+p1 −p2 −σ κ
+0
+0
+0
+0
+0
+1
+
+
+R4 =
+
+
+−α1
+p1 −p2 −σ κ
+0
+0
+0
+0
+1
+0
+
+
+,
+R5 =
+
+
+0
+0
+0
+0
+1
+0
+0
+
+
+,
+R6 =
+
+
+0
+0
+1
+0
+0
+0
+0
+
+
+,
+R7 =
+
+
+0
+ρ1
+ρ2a22
+1
+a2
+2
+a
+ρ2a22
+0
+ρ1a12
+ρ2a22
+1
+
+
+.
+(A.6)
+From the above expressions, it is evident that the eigenvalues of the multiphase system do
+not change even after the inclusion of the capillary term. In these expressions, a denotes
+the mixture sound speed, which can be computed as
+a =
+s
+1
+ρ
+X
+j
+αjρja2
+j.
+(A.7)
+With right eigenvector Ri = [Ri
+1, Ri
+2, .., Ri
+7]
+T, the GRIs across wave λi in the Riemann
+solution can be found using following relation [72]
+dα1
+Ri
+1
+= dρ1
+Ri
+2
+= dρ2
+Ri
+3
+= dun
+Ri
+4
+= dut
+Ri
+5
+= dp1
+Ri
+6
+= dp2
+Ri
+7
+(A.8)
+While applying above expression for eigenvectors (A.6) we may encounter zeros in some of
+the denominator terms. This implies that the change in corresponding variable (appearing in
+33
+
+
+the numerator) is zero. Using GRIs analysis on R1, we obtain following important relations
+across λ1 wave
+dα1 = 0,
+dut = 0.
+(A.9)
+Similarly for λ7 wave we have
+dα1 = 0,
+dut = 0.
+(A.10)
+In the 6-equation compressible multiphase framework, the intermediate eigenvalues λ2, . . . , λ6
+are represented by a single contact speed S∗, effectively merging their corresponding char-
+acteristic fields into a single middle wave within the HLLC Riemann solver structure. The
+invariants across this discontinuity can be found by performing GRI analysis on all the right
+eigenvectors associated with eigenvalues λ2,..,6 = u. Using R3 we get the following relations,
+dα1(p1 −p2 −σκ) = dp2(−α2),
+dρ1 = 0,
+dρ2 = 0,
+dun = 0,
+dut = 0,
+dp1 = 0
+(A.11)
+From the relation dα1(p1 −p2 −σκ) = −dp2α2 and dp1 = 0, we obtain another expression,
+dp = σκdα1. Similarly, using R4 we obtain
+dα1(p1 −p2 −σκ) = dp1(−α1),
+dρ1 = 0,
+dρ2 = 0,
+dun = 0,
+dut = 0,
+dp2 = 0
+(A.12)
+From the relation dα1(p1 −p2 −σκ) = −dp1α1 and dp2 = 0, we again obtain, dp = σκdα1.
+This implies that mixture pressure follows Laplace law across the intermediate wave.
+From the GRI analysis using R3 and R4, we also find that the phasic densities (ρ1, ρ2),
+normal velocity (un), and tangential velocity (ut) remain constant. However, examining
+other eigenvectors, R1, R5 and R6, we conclude that except for normal velocity (un) all
+other variable may change across the wave. Finally, the following relations holds across the
+intermediate wave,
+dp = σκdα1,
+dun = 0
+(A.13)
+Appendix B. Preventing Computational Breakdown in Strong Shock Waves via
+Isentropic Pressure Relations
+Phasic pressures computed from the phasic energy equations act as intermediate values
+for determining the final relaxed pressure. Although they are subsequently corrected using
+the mixture total energy equation, the phasic pressures from the evolution step can still
+influence the volume fraction and final relaxed pressure.
+Thus, to avoid computational
+breakdown due to negative volume fractions or negative pressures after relaxation, we can
+use measures to minimize the influence of the phasic pressures from the evolution step in the
+presence of strong shock waves. Primarily, we must avoid large negative pressures from the
+evolution step. To achieve this, rather than relying on the expression suggested by Saurel
+et al. [15] (Eq. (19)), we instead utilize the isentropic relation from Eq. (20).
+If we plot the pressure ratio
+ p∗
+jK+πj
+pjK+πj
+
+using both expressions given in Eqs. (19) and (20)
+for a typical water value of γ = 4.4 (Figure B.16), we observe that for moderate density
+ratios (near
+ρ∗
+jK
+ρjK = 1), both expressions converge to the same value. Additionally, Figure B.16
+34
+
+
+shows that Eq. (19) yields a negative pressure ratio for
+ ρ∗
+jK
+ρjK
+
+<
+
+γj−1
+γj+1
+
+and
+ ρ∗
+jK
+ρjK
+
+>
+
+γj+1
+γj−1
+
+.
+In contrast, Eq. (20) consistently yields a positive pressure ratio. Therefore, utilizing the
+isentropic relation from Eq. (20) effectively prevents large negative pressures during the
+evolution step.
+Another observation regarding problems that involve high-strength shock waves is the
+influence of the approximate interface pressure, ¯pI, during the relaxation procedure. If we
+use an implicit approximation, such that ¯pI = p∗
+I, we can further minimize the influence of
+large negative pressures arising from the evolution step.
+Figure B.16: Pressure ratio
+ p∗
+jK+πj
+pjK+πj
+
+versus density ratio
+ ρ∗
+jK
+ρjK
+
+across the left or right wave, computed
+via (19) and (20) for γ = 4.4. (a) Broader view, and (b) magnified view.
+References
+[1] R. Saurel, R. Abgrall, A multiphase godunov method for compressible multifluid and multiphase flows,
+Journal of Computational Physics 150 (1999) 425–467.
+[2] R. K. Shukla, C. Pantano, J. B. Freund, An interface capturing method for the simulation of multi-phase
+compressible flows, Journal of Computational Physics 229 (2010) 7411–7439.
+[3] D. P. Garrick, M. Owkes, J. D. Regele, A finite-volume hllc-based scheme for compressible interfacial
+flows with surface tension, Journal of Computational Physics 339 (2017) 46–67.
+[4] A. Tiwari, J. B. Freund, C. Pantano, A diffuse interface model with immiscibility preservation, Journal
+of computational physics 252 (2013) 290–309.
+[5] T. Nonomura, K. Kitamura, K. Fujii,
+A simple interface sharpening technique with a hyperbolic
+tangent function applied to compressible two-fluid modeling, Journal of Computational Physics 258
+(2014) 95–117.
+[6] K.-M. Shyue, F. Xiao, An eulerian interface sharpening algorithm for compressible two-phase flow:
+The algebraic thinc approach, Journal of Computational Physics 268 (2014) 326–354.
+35
+
+
+[7] D. P. Garrick, W. A. Hagen, J. D. Regele, An interface capturing scheme for modeling atomization in
+compressible flows, Journal of Computational Physics 344 (2017) 260–280.
+[8] A. Chiapolino, R. Saurel, B. Nkonga, Sharpening diffuse interfaces with compressible fluids on unstruc-
+tured meshes, Journal of Computational Physics 340 (2017) 389–417.
+[9] G. Allaire, S. Clerc, S. Kokh, A five-equation model for the simulation of interfaces between compressible
+fluids, Journal of Computational Physics 181 (2002) 577–616.
+[10] J. Massoni, R. Saurel, B. Nkonga, R. Abgrall, Proposition de m´ethodes et mod`eles eul´eriens pour les
+probl`emes `a interfaces entre fluides compressibles en pr´esence de transfert de chaleur: Some models and
+eulerian methods for interface problems between compressible fluids with heat transfer, International
+journal of heat and mass transfer 45 (2002) 1287–1307.
+[11] A. Kapila, R. Menikoff, J. Bdzil, S. Son, D. S. Stewart,
+Two-phase modeling of deflagration-to-
+detonation transition in granular materials: Reduced equations, Physics of fluids 13 (2001) 3002–3024.
+[12] A. Murrone, H. Guillard, A five equation reduced model for compressible two phase flow problems,
+Journal of Computational Physics 202 (2005) 664–698.
+[13] U. Rasthofer, F. Wermelinger, P. Hadijdoukas, P. Koumoutsakos,
+Large scale simulation of cloud
+cavitation collapse, Procedia Computer Science 108 (2017) 1763–1772.
+[14] S. Beig, B. Aboulhasanzadeh, E. Johnsen, Temperatures produced by inertially collapsing bubbles near
+rigid surfaces, Journal of Fluid Mechanics 852 (2018) 105–125.
+[15] R. Saurel, F. Petitpas, R. A. Berry, Simple and efficient relaxation methods for interfaces separating
+compressible fluids, cavitating flows and shocks in multiphase mixtures, J. Comput. Phys. 228 (2009)
+1678–1712.
+[16] F. Petitpas, E. Franquet, R. Saurel, O. Le Metayer, A relaxation-projection method for compressible
+flows. part ii: Artificial heat exchanges for multiphase shocks, Journal of Computational Physics 225
+(2007) 2214–2248.
+[17] M. Pelanti, K.-M. Shyue,
+A mixture-energy-consistent six-equation two-phase numerical model for
+fluids with interfaces, cavitation and evaporation waves, Journal of Computational Physics 259 (2014)
+331–357.
+[18] W. Yu, S. Song, J.-I. Choi,
+Numerical simulations of underwater explosions using a compressible
+multi-fluid model, Physics of Fluids 35 (2023).
+[19] K. Schmidmayer, F. Petitpas, E. Daniel, N. Favrie, S. Gavrilyuk, A model and numerical method for
+compressible flows with capillary effects, Journal of Computational Physics 334 (2017) 468–496.
+[20] K. Schmidmayer, S. H. Bryngelson, T. Colonius, An assessment of multicomponent flow models and
+interface capturing schemes for spherical bubble dynamics,
+Journal of Computational Physics 402
+(2020) 109080.
+[21] Y. Hong, B. Wang, H. Liu, Numerical simulation of compressible multiphase hydrodynamic problems
+using reduced five-equation model on body-fitted grids, Computers & Fluids 233 (2022) 105243.
+[22] A. Murrone, H. Guillard, Behavior of upwind scheme in the low mach number limit: Iii. preconditioned
+dissipation for a five equation two phase model, Computers & fluids 37 (2008) 1209–1224.
+[23] B. Braconnier, B. Nkonga, An all-speed relaxation scheme for interface flows with surface tension,
+Journal of Computational Physics 228 (2009) 5722–5739.
+[24] S. LeMartelot, B. Nkonga, R. Saurel, Liquid and liquid–gas flows at all speeds, Journal of Computa-
+tional Physics 255 (2013) 53–82.
+[25] M. Pelanti, Low mach number preconditioning techniques for roe-type and hllc-type methods for a
+two-phase compressible flow model, Applied Mathematics and Computation 310 (2017) 112–133.
+[26] H. Guillard, C. Viozat, On the behaviour of upwind schemes in the low mach number limit, Computers
+& fluids 28 (1999) 63–86.
+[27] H. Guillard, A. Murrone, On the behavior of upwind schemes in the low mach number limit: Ii. godunov
+type schemes, Computers & fluids 33 (2004) 655–675.
+[28] M. Pelanti, Wave structure similarity of the hllc and roe riemann solvers: Application to low mach
+number preconditioning, SIAM Journal on Scientific Computing 40 (2018) A1836–A1859.
+[29] X.-s. Li, C.-w. Gu, An all-speed roe-type scheme and its asymptotic analysis of low mach number
+36
+
+
+behaviour, Journal of Computational Physics 227 (2008) 5144–5159.
+[30] P. Birken, A. Meister, Stability of preconditioned finite volume schemes at low mach numbers, BIT
+Numerical Mathematics 45 (2005) 463–480.
+[31] G. Bharate, J. Mandal, Enhanced diffuse interface method for multiphase flow simulations across all
+mach numbers, Journal of Computational Physics (2025) 114397.
+[32] G. Perigaud, R. Saurel, A compressible flow model with capillary effects, Journal of Computational
+Physics 209 (2005) 139–178.
+[33] N. T. Nguyen, M. Dumbser, A path-conservative finite volume scheme for compressible multi-phase
+flows with surface tension, Applied Mathematics and Computation 271 (2015) 959–978.
+[34] C. Zhang, I. Menshov, L. Wang, Z. Shen, Diffuse interface relaxation model for two-phase compressible
+flows with diffusion processes, Journal of Computational Physics 466 (2022) 111356.
+[35] M. B. Kuhn, O. Desjardins, An all-mach, low-dissipation strategy for simulating multiphase flows,
+Journal of Computational Physics 445 (2021) 110602.
+[36] J. U. Brackbill, D. B. Kothe, C. Zemach, A continuum method for modeling surface tension, Journal
+of computational physics 100 (1992) 335–354.
+[37] M. Y. Oomar, A. G. Malan, R. A. Horwitz, B. W. Jones, G. S. Langdon, An all-mach number hllc-based
+scheme for multi-phase flow with surface tension, Applied Sciences 11 (2021) 3413.
+[38] S. Le Martelot, R. Saurel, B. Nkonga, Towards the direct numerical simulation of nucleate boiling
+flows, International Journal of Multiphase Flow 66 (2014) 62–78.
+[39] A. Panchal, S. H. Bryngelson, S. Menon,
+A seven-equation diffused interface method for resolved
+multiphase flows, Journal of Computational Physics 475 (2023) 111870.
+[40] S. Davis, Simplified second-order godunov-type methods, SIAM Journal on Scientific and Statistical
+Computing 9 (1988) 445–473.
+[41] S. Bhat, J. Mandal, Contact preserving riemann solver for incompressible two-phase flows, Journal of
+Computational Physics 379 (2019) 173–191.
+[42] D. Sun, W. Tao, A coupled volume-of-fluid and level set (voset) method for computing incompressible
+two-phase flows, International Journal of Heat and Mass Transfer 53 (2010) 645–655.
+[43] J. J. Monaghan, Smoothed particle hydrodynamics, In: Annual review of astronomy and astrophysics.
+Vol. 30 (A93-25826 09-90), p. 543-574. 30 (1992) 543–574.
+[44] D. Furfaro, R. Saurel, L. David, F. Beauchamp, Towards sodium combustion modeling with liquid
+water, Journal of Computational Physics 403 (2020) 109060.
+[45] W. J. Coirier, An adaptively-refined, Cartesian, cell-based scheme for the Euler and Navier-Stokes
+equations, University of Michigan, 1994.
+[46] A. Zein, M. Hantke, G. Warnecke, Modeling phase transition for compressible two-phase flows applied
+to metastable liquids, Journal of Computational Physics 229 (2010) 2964–2998.
+[47] R. SAUREL, O. LEMETAYER, A multiphase model for compressible flows with interfaces, shocks,
+detonation waves and cavitation,
+Journal of Fluid Mechanics 431 (2001) 239–271. doi:10.1017/
+S0022112000003098.
+[48] J. Mandal, J. Subramanian, On the link between weighted least-squares and limiters used in higher-
+order reconstructions for finite volume computations of hyperbolic equations,
+Applied Numerical
+Mathematics 58 (2008) 705–725. URL: https://www.sciencedirect.com/science/article/pii/
+S0168927407000554. doi:https://doi.org/10.1016/j.apnum.2007.02.003.
+[49] J. Mandal, N. Arvind,
+High resolution schemes for genuinely two-dimensional hlle riemann solver,
+Progress in Computational Fluid Dynamics, an International Journal 14 (2014) 205–220.
+[50] J. Mandal, V. Sharma, A genuinely multidimensional convective pressure flux split riemann solver
+for euler equations,
+Journal of Computational Physics 297 (2015) 669–688. URL: https://www.
+sciencedirect.com/science/article/pii/S0021999115003733. doi:https://doi.org/10.1016/j.
+jcp.2015.05.039.
+[51] V.-T. Nguyen, T.-H. Phan, T.-N. Duy, D.-H. Kim, W.-G. Park, Fully compressible multiphase model
+for computation of compressible fluid flows with large density ratio and the presence of shock waves,
+Computers & Fluids 237 (2022) 105325.
+37
+
+
+[52] B. Thornber, A. Mosedale, D. Drikakis, D. Youngs, R. J. Williams, An improved reconstruction method
+for compressible flows with low mach number features, Journal of computational Physics 227 (2008)
+4873–4894.
+[53] F. Rieper, A low-mach number fix for roe’s approximate riemann solver, Journal of Computational
+Physics 230 (2011) 5263–5287.
+[54] K. Oßwald, A. Siegmund, P. Birken, V. Hannemann, A. Meister, L2roe: a low dissipation version of
+roe’s approximate riemann solver for low mach numbers, International Journal for Numerical Methods
+in Fluids 81 (2016) 71–86.
+[55] A. Gogoi, J. C. Mandal,
+Enhanced approximate riemann solvers for all-mach number flows using
+anti-diffusion coefficients, Physics of Fluids 37 (2025) 026140. doi:10.1063/5.0248756.
+[56] A. Gogoi, J. Mandal, A low diffusion flux-split scheme for all mach number flows, Physics of Fluids 35
+(2023).
+[57] F. Zhang, J. Liu, B. Chen, W. Zhong, A robust low-dissipation ausm-family scheme for numerical
+shock stability on unstructured grids, International Journal for Numerical Methods in Fluids 84 (2017)
+135–151.
+[58] W.
+Xie,
+R.
+Zhang,
+J.
+Lai,
+H.
+Li,
+An
+accurate
+and
+robust
+hllc-type
+riemann
+solver
+for
+the
+compressible
+euler
+system
+at
+various
+mach
+numbers,
+International
+Journal
+for
+Numerical
+Methods
+in
+Fluids
+89
+(2019)
+430–463.
+doi:https://doi.org/10.1002/fld.4704.
+arXiv:https://onlinelibrary.wiley.com/doi/pdf/10.1002/fld.4704.
+[59] J. Martin, W. Moyce, An experimental study of the collapse of fluid columns on a rigid horizontal
+plane, in a medium of lower, but comparable, density. 5.,
+Philosophical Transactions of the Royal
+Society of London Series A-Mathematical and Physical Sciences 244 (1952) 325–334.
+[60] C.-H. Chang, X. Deng, T. G. Theofanous,
+Direct numerical simulation of interfacial instabilities:
+a consistent, conservative, all-speed, sharp-interface method, Journal of Computational Physics 242
+(2013) 946–990.
+[61] T. Abadie, J. Aubin, D. Legendre, On the combined effects of surface tension force calculation and
+interface advection on spurious currents within volume of fluid and level set frameworks, Journal of
+Computational Physics 297 (2015) 611–636.
+[62] L. Rayleigh, On the capillary phenomena of jets, Proceedings of the royal society of London (1879)
+71–97.
+[63] D. E. Fyfe, E. S. Oran, M. Fritts, Surface tension and viscosity with lagrangian hydrodynamics on a
+triangular mesh, Journal of Computational Physics 76 (1988) 349–384.
+[64] S. Hysing, S. Turek, D. Kuzmin, N. Parolini, E. Burman, S. Ganesan, L. Tobiska,
+Quantitative
+benchmark computations of two-dimensional bubble dynamics, International Journal for Numerical
+Methods in Fluids 60 (2009) 1259–1288.
+[65] R. R. Nourgaliev, T.-N. Dinh, T. G. Theofanous, Adaptive characteristics-based matching for com-
+pressible multifluid dynamics, Journal of Computational Physics 213 (2006) 500–529.
+[66] R. R. Nourgaliev, T. G. Theofanous, High-fidelity interface tracking in compressible flows: unlimited
+anchored adaptive level set, Journal of Computational Physics 224 (2007) 836–866.
+[67] H. Terashima, G. Tryggvason, A front-tracking/ghost-fluid method for fluid interfaces in compressible
+flows, Journal of Computational Physics 228 (2009) 4012–4037.
+[68] H. Terashima, G. Tryggvason, A front-tracking method with projected interface conditions for com-
+pressible multi-fluid flows, Computers & Fluids 39 (2010) 1804–1814.
+[69] R. K. Shukla, Nonlinear preconditioning for efficient and accurate interface capturing in simulation of
+multicomponent compressible flows, Journal of Computational Physics 276 (2014) 508–540.
+[70] N. Hawker, Y. Ventikos, Interaction of a strong shockwave with a gas bubble in a liquid medium: a
+numerical study, Journal of Fluid Mechanics 701 (2012) 59–97.
+[71] C.-H. Chang, M.-S. Liou, A robust and accurate approach to computing compressible multiphase flow:
+Stratified flow model and ausm+-up scheme, Journal of Computational Physics 225 (2007) 840–873.
+[72] E. F. Toro, Riemann solvers and numerical methods for fluid dynamics, Riemann Solvers and Numerical
+Methods for Fluid Dynamics (1997).
+38

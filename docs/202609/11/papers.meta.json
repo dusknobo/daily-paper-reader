@@ -1,0 +1,39 @@
+{
+  "label": "2026-09-11",
+  "date": "2026-09-11",
+  "generated_at": "2026-09-11T21:14:37",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202609/11/2609.10727v1-a-robust-all-mach-six-equation-diffuse-interface-method-for-multiphase-flows-with-surface-tension",
+      "section": "quick",
+      "title_en": "A Robust All-Mach Six-Equation Diffuse-Interface Method for Multiphase Flows with Surface Tension",
+      "authors": "Ghanshyam Bharate, J. C. Mandal",
+      "date": "2026-09-09",
+      "pdf": "https://arxiv.org/pdf/2609.10727v1",
+      "score": "7.0",
+      "evidence": "可压缩多相流表面张力的鲁棒有限体积法",
+      "tldr": "模拟带表面张力的可压缩多相流时，传统数值方法在低马赫数下存在过度耗散且难以保持毛细压力跳跃。为此，本文提出一种基于六方程扩散界面模型的鲁棒有限体积框架，通过广义黎曼不变量分析开发HLLC求解器并修改压力松弛过程。基准验证表明，该方法能准确预测界面动力学和毛细压力，显著降低数值耗散且保持稳定。该工作为跨宽马赫数范围的多相流模拟提供了高效可靠的手段。",
+      "tags": "query:falling-film",
+      "abstract_en": "A robust finite-volume framework is presented for the simulation of compressible multiphase flows with surface tension across a wide range of Mach numbers. The method is based on a two-pressure, six-equation diffuse interface model incorporating viscous, gravitational, and capillary effects through the continuum surface force formulation. To consistently account for capillary-induced pressure jumps, an HLLC Riemann solver is developed using generalized Riemann invariant analysis, and the instantaneous pressure relaxation procedure is modified to preserve the Laplace pressure jump during phase equilibration. To overcome the excessive numerical diffusion of conventional approximate Riemann solvers in the low-Mach regime, a robust low-Mach correction is proposed by extending our previous formulation with a modified scaling strategy that remains stable in regions of strong pressure variation. The resulting method retains accuracy from nearly incompressible flows to compressible regimes while preserving the robustness of the six-equation formulation. The numerical framework is validated using a series of benchmark problems involving surface tension, viscosity, gravity, and compressibility. The results demonstrate accurate prediction of interface dynamics, capillary pressure, and low-Mach flow features, while significantly reducing numerical dissipation without compromising stability. The proposed methodology provides an efficient and reliable approach for the simulation of complex multiphase flows spanning a broad range of flow regimes.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202609/11/2609.05939v1-a-structure-preserving-implicit-explicit-method-for-a-hyperbolic-approximation-of-fourth-order-pdes",
+      "section": "quick",
+      "title_en": "A structure-preserving implicit-explicit method for a hyperbolic approximation of fourth-order PDEs",
+      "authors": "Rahul Barthwal, Rahuldev Ghorai",
+      "date": "2026-09-05",
+      "pdf": "https://arxiv.org/pdf/2609.05939v1",
+      "score": "6.0",
+      "evidence": "针对薄膜方程的结构保持IMEX格式，可用于降膜模拟",
+      "tldr": "四阶偏微分方程的直接数值离散面临刚性与结构保持难题。本文提出一种基于一阶双曲近似系统的结构保持隐式-显式(IMEX)方法，通过分裂刚性项与非刚性项实现高效求解。严格证明该格式在CFL条件下能量一致且保正，且时间步长限制完全独立于松弛参数。薄膜方程数值实验验证了理论性质，表明方法兼具稳健性与精度。",
+      "tags": "query:falling-film",
+      "abstract_en": "We introduce a novel structure-preserving numerical method for a first-order hyperbolic approximation system, which approximates the solutions of general fourth-order partial differential equations. By employing an implicit-explicit (IMEX) splitting between the stiff and non-stiff terms, we rigorously prove that the proposed scheme is energy-consistent and positivity-preserving under a CFL-type condition. Furthermore, we show that the method remains robustly stable in asymptotic regimes, with a time-step restriction that is entirely independent of the relaxation parameters. Finally, we present a series of numerical examples for thin film equations to validate the theoretical properties and efficacy of the scheme.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
